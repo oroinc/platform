@@ -8,15 +8,17 @@ use Doctrine\ORM\EntityManager;
 
 use Gaufrette\Filesystem;
 
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
@@ -32,6 +34,11 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
      * @var EmailAttachmentManager
      */
     protected $emailAttachmentManager;
+
+    /**
+     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fileManager;
 
     /**
      * @var EmailCacheManager|\PHPUnit_Framework_MockObject_MockObject
@@ -53,23 +60,8 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $configFileValidator;
 
-    /**
-     * @var KernelInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $kernel;
-
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
-
-    /**
-     * @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacadeLink;
-
-    /**
-     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
 
     /**
      * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
@@ -98,23 +90,13 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailCacheManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Cache\EmailCacheManager')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $filesystemMap = $this->getMockBuilder('Knp\Bundle\GaufretteBundle\FilesystemMap')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->filesystem = $this->getMockBuilder('Gaufrette\Filesystem')
-            ->setMethods(['delete', 'write', 'has'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMap->expects($this->once())
-            ->method('get')
-            ->with('attachments')
-            ->will($this->returnValue($this->filesystem));
 
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
@@ -123,11 +105,6 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->configFileValidator = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
-        $this->kernel->expects($this->once())
-            ->method('getRootDir')
-            ->willReturn('');
 
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()
@@ -140,21 +117,6 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->registry->expects($this->any())
             ->method('getManager')
             ->will($this->returnValue($this->om));
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->setMethods(['getLoggedUser'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacadeLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->setMethods(['getService'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacadeLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($this->securityFacade));
 
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -170,48 +132,44 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->emailAttachmentManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager')
-            ->setMethods(['getAttachmentFullPath', 'buildAttachmentInstance'])
-            ->setConstructorArgs(
-                [
-                    $filesystemMap,
-                    $this->em,
-                    $this->kernel,
-                    $this->securityFacadeLink,
-                    $this->router,
-                    $this->configFileValidator,
-                    $this->attachmentAssociationHelper
-                ]
-            )
-            ->getMock();
-
-        $this->emailAttachmentManager->expects($this->any())
-            ->method('getAttachmentFullPath')
-            ->willReturn(__DIR__ . '/../Fixtures/attachment/test.txt');
+        $this->emailAttachmentManager = new EmailAttachmentManager(
+            $this->fileManager,
+            $this->em,
+            $this->router,
+            $this->configFileValidator,
+            $this->attachmentAssociationHelper
+        );
     }
 
     public function testLinkEmailAttachmentToTargetEntity()
     {
-        $emailAttachment = $this->getEmailAttachment();
+        $emailAttachment = new EmailAttachment();
+        ReflectionUtil::setId($emailAttachment, 1);
+        $emailAttachment->setContent($this->getContentMock());
 
-        $this->emailAttachmentManager
-            ->method('buildAttachmentInstance')
-            ->withAnyParameters()
-            ->will($this->returnValue($this->attachment));
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/attachment/test.txt');
 
-        $emailAttachment->expects($this->once())
-            ->method('setFile')
-            ->withAnyParameters();
-
-        $this->attachment->expects($this->never())
-            ->method('setFile')
-            ->withAnyParameters();
-
-        $this->configFileValidator->expects($this->any())
+        $this->fileManager->expects($this->once())
+            ->method('writeToTemporaryFile')
+            ->with(
+                ContentDecoder::decode(
+                    $emailAttachment->getContent()->getContent(),
+                    $emailAttachment->getContent()->getContentTransferEncoding()
+                )
+            )
+            ->willReturn($file);
+        $this->configFileValidator->expects($this->once())
             ->method('validate')
             ->willReturn($this->getMock('Countable'));
 
         $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
+
+        $expectedFile = new UploadedFile(
+            $file->getPathname(),
+            $emailAttachment->getFileName(),
+            $emailAttachment->getContentType()
+        );
+        $this->assertEquals($expectedFile, $emailAttachment->getFile()->getFile());
     }
 
     public function testLinkEmailAttachmentToTargetEntityNotValid()
@@ -229,11 +187,6 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($countable));
 
         $emailAttachment = $this->getEmailAttachment();
-
-        $this->emailAttachmentManager
-            ->method('buildAttachmentInstance')
-            ->withAnyParameters()
-            ->will($this->returnValue($this->attachment));
 
         $emailAttachment->expects($this->any())
             ->method('getFile')
@@ -261,8 +214,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function getContentMock()
     {
-        $content = $this->getMockBuilder('\stdClass')
-            ->setMethods(['getContent', 'getContentTransferEncoding'])
+        $content = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent')
             ->getMock();
         $content->expects($this->any())
             ->method('getContent')

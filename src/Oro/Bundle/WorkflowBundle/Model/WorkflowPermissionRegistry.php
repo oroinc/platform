@@ -72,7 +72,7 @@ class WorkflowPermissionRegistry
             if ($activeWorkflows) {
                 $config = $this->configProvider->getConfig($relatedClass);
 
-                $support = $support && $config->get('active_workflow', false, false);
+                $support = $support && $config->get('active_workflows', false, false);
             }
 
             if ($support) {

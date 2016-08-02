@@ -33,6 +33,7 @@ oro:
         create:         Create
         create_entity:  Create %entityName%
         update_entity:  Update %entityName%
+        convert_entity: Convert %name% to %entityName%
         created_at:     Created At
         delete:         Delete
         delete_confirm: Are you sure you want to delete this %entity_label%?

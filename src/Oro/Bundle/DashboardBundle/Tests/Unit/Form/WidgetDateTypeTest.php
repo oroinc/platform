@@ -19,7 +19,7 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_type_widget_date', $this->formType->getName());
     }
 
-    public function testBuildForm()
+    public function testBuildFormWithDate()
     {
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
@@ -33,6 +33,18 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(1))
             ->method('add')
             ->with('date', 'oro_date');
-        $this->formType->buildForm($builder, []);
+        $this->formType->buildForm($builder, ['enable_date' => true]);
+    }
+
+    public function testBuildFormWithoutDate()
+    {
+        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $builder->expects($this->once())
+            ->method('add')
+            ->with('useDate', 'checkbox')
+            ->will($this->returnSelf());
+        $this->formType->buildForm($builder, ['enable_date' => false]);
     }
 }

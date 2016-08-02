@@ -12,6 +12,10 @@ namespace Oro\Component\ChainProcessor;
  */
 class MatchApplicableChecker implements ApplicableCheckerInterface
 {
+    const OPERATOR_AND = '&';
+    const OPERATOR_OR  = '|';
+    const OPERATOR_NOT = '!';
+
     /** @var string[] */
     protected $ignoredAttributes;
 
@@ -87,15 +91,50 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
             return $this->isMatchScalarInArray($value, $contextValue, $name);
         }
 
-        $result = true;
-        foreach ($value as $val) {
-            if (!$this->isMatchScalarInArray($val, $contextValue, $name)) {
+        switch (key($value)) {
+            case self::OPERATOR_NOT:
+                return !$this->isMatchScalarInArray(current($value), $contextValue, $name);
+            case self::OPERATOR_AND:
+                $result = true;
+                foreach (current($value) as $val) {
+                    if (!$this->isMatchScalarWithArray($val, $contextValue, $name)) {
+                        $result = false;
+                        break;
+                    }
+                }
+
+                return $result;
+            case self::OPERATOR_OR:
                 $result = false;
-                break;
-            }
+                foreach (current($value) as $val) {
+                    if ($this->isMatchScalarWithArray($val, $contextValue, $name)) {
+                        $result = true;
+                        break;
+                    }
+                }
+
+                return $result;
         }
 
-        return $result;
+        return false;
+    }
+
+    /**
+     * @param mixed  $value        Scalar or ['!' => Scalar]
+     * @param mixed  $contextValue Array
+     * @param string $name         The name of an attribute
+     *
+     * @return bool
+     */
+    protected function isMatchScalarWithArray($value, $contextValue, $name)
+    {
+        if (!is_array($value)) {
+            return $this->isMatchScalarInArray($value, $contextValue, $name);
+        }
+
+        return self::OPERATOR_NOT === key($value)
+            ? !$this->isMatchScalarInArray(current($value), $contextValue, $name)
+            : false;
     }
 
     /**
@@ -107,9 +146,7 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
      */
     protected function isMatchScalarInArray($value, $contextValue, $name)
     {
-        return is_string($value) && 0 === strpos($value, '!')
-            ? !in_array(substr($value, 1), $contextValue, true)
-            : in_array($value, $contextValue, true);
+        return in_array($value, $contextValue, true);
     }
 
     /**
@@ -125,15 +162,50 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
             return $this->isMatchScalars($value, $contextValue, $name);
         }
 
-        $result = true;
-        foreach ($value as $val) {
-            if (!$this->isMatchScalars($val, $contextValue, $name)) {
+        switch (key($value)) {
+            case self::OPERATOR_NOT:
+                return !$this->isMatchScalars(current($value), $contextValue, $name);
+            case self::OPERATOR_AND:
+                $result = true;
+                foreach (current($value) as $val) {
+                    if (!$this->isMatchScalarWithScalar($val, $contextValue, $name)) {
+                        $result = false;
+                        break;
+                    }
+                }
+
+                return $result;
+            case self::OPERATOR_OR:
                 $result = false;
-                break;
-            }
+                foreach (current($value) as $val) {
+                    if ($this->isMatchScalarWithScalar($val, $contextValue, $name)) {
+                        $result = true;
+                        break;
+                    }
+                }
+
+                return $result;
         }
 
-        return $result;
+        return false;
+    }
+
+    /**
+     * @param mixed  $value        Scalar or ['!' => Scalar]
+     * @param mixed  $contextValue Scalar
+     * @param string $name         The name of an attribute
+     *
+     * @return bool
+     */
+    protected function isMatchScalarWithScalar($value, $contextValue, $name)
+    {
+        if (!is_array($value)) {
+            return $this->isMatchScalars($value, $contextValue, $name);
+        }
+
+        return self::OPERATOR_NOT === key($value)
+            ? !$this->isMatchScalars(current($value), $contextValue, $name)
+            : false;
     }
 
     /**
@@ -145,8 +217,6 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
      */
     protected function isMatchScalars($value, $contextValue, $name)
     {
-        return is_string($value) && 0 === strpos($value, '!')
-            ? $contextValue !== substr($value, 1)
-            : $contextValue === $value;
+        return $contextValue === $value;
     }
 }

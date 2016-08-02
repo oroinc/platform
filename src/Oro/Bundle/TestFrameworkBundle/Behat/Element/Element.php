@@ -6,9 +6,12 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 
 class Element extends NodeElement
 {
+    use AssertTrait;
+
     /**
      * @var OroElementFactory
      */
@@ -54,6 +57,40 @@ class Element extends NodeElement
         $message = sprintf('"%s" method is not available on the %s', $name, $this->getName());
 
         throw new \BadMethodCallException($message);
+    }
+
+    /**
+     * Finds label with specified locator.
+     *
+     * @param string $locator label text
+     *
+     * @return NodeElement|null
+     */
+    public function findLabel($locator)
+    {
+        $labelSelector = sprintf("label:contains('%s')", $locator);
+
+        return $this->find('css', $labelSelector);
+    }
+
+    /**
+     * Find first visible element
+     *
+     * @param string       $selector selector engine name
+     * @param string|array $locator  selector locator
+     *
+     * @return NodeElement|null
+     */
+    public function findVisible($selector, $locator)
+    {
+        $visibleElements = array_filter(
+            $this->getPage()->findAll($selector, $locator),
+            function (NodeElement $element) {
+                return $element->isVisible();
+            }
+        );
+
+        return array_shift($visibleElements);
     }
 
     /**

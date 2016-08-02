@@ -98,6 +98,7 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                             ],
                             'enabled'          => true,
                             'isNew'            => false,
+                            'configuration_dialog_options' => ['resizable' => false],
                             'configuration'    => [],
                             'data_items'       => [],
                         ],
@@ -110,6 +111,7 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                             ],
                             'isNew'            => true,
                             'enabled'          => true,
+                            'configuration_dialog_options' => ['resizable' => false],
                             'configuration'    => [],
                             'data_items'       => [],
                         ]

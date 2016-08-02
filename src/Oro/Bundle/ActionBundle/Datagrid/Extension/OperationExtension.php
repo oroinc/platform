@@ -16,6 +16,9 @@ use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 
 class OperationExtension extends AbstractExtension
 {
+    const OPERATION_ROOT_PARAM = '_operation';
+    const DISABLED_PARAM  = '_disabled';
+
     /** @var OperationManager */
     protected $operationManager;
 
@@ -62,6 +65,16 @@ class OperationExtension extends AbstractExtension
     }
 
     /**
+     * @return bool
+     */
+    protected function isDisabled()
+    {
+        $operationParameters = $this->getParameters()->get(self::OPERATION_ROOT_PARAM);
+
+        return !empty($operationParameters[self::DISABLED_PARAM]);
+    }
+
+    /**
      * @param array $groups
      */
     public function setGroups(array $groups)
@@ -74,6 +87,9 @@ class OperationExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if ($this->isDisabled()) {
+            return false;
+        }
         $this->datagridContext = $this->getDatagridContext($config);
         $this->operations = $this->getOperations(
             $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),

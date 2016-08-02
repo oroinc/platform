@@ -122,8 +122,9 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 OperationDefinition::PRECONDITIONS,
                 [
                     '@and' => [
-                        ['@acl_granted' => 'test_acl'],
-                        ['config_pre_cond']
+                        ['config_pre_cond'],
+                        ['@acl_granted' => 'test_acl']
+
                     ]
                 ]
             )

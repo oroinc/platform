@@ -28,6 +28,14 @@ class CustomEntityType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'custom_entity_type';
     }
 }
