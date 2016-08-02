@@ -349,4 +349,50 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    /**
+     * @dataProvider getUsersAssignedToBusinessUnitsProvider
+     */
+    public function testGetUsersAssignedToBusinessUnits(array $businessUnitIds, array $expectedOwnerIds)
+    {
+        $tree = new OwnerTree();
+
+        $tree->addLocalEntityToBasic(1, 1, 1);
+        $tree->addLocalEntityToBasic(1, 2, 1);
+        $tree->addLocalEntityToBasic(2, 3, 1);
+        $tree->addLocalEntityToBasic(3, 3, 1);
+        $tree->addLocalEntityToBasic(4, 3, 1);
+
+        $this->assertEquals($expectedOwnerIds, $tree->getUsersAssignedToBusinessUnits($businessUnitIds));
+    }
+
+    public function getUsersAssignedToBusinessUnitsProvider()
+    {
+        return [
+            'non existing bu' => [
+                [4],
+                [],
+            ],
+            [
+                [1],
+                [1],
+            ],
+            [
+                [1, 2],
+                [1],
+            ],
+            [
+                [3],
+                [2, 3, 4],
+            ],
+            [
+                [1, 3],
+                [1, 2, 3, 4],
+            ],
+            'ids without duplicities' => [
+                [1, 2, 3],
+                [1, 2, 3, 4],
+            ],
+        ];
+    }
 }

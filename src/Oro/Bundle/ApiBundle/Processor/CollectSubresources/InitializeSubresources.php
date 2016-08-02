@@ -110,8 +110,8 @@ class InitializeSubresources implements ProcessorInterface
             $entityClass,
             $version,
             $requestType,
-            $metadataExtras,
-            $config->getDefinition()
+            $config->getDefinition(),
+            $metadataExtras
         );
 
         $resourceExcludedActions = $resource->getExcludedActions();

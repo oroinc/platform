@@ -49,24 +49,20 @@ class BusinessUnitType extends AbstractType
                 ]
             )
             ->add(
-                'businessUnit',
-                'oro_business_unit_tree_select',
+                'parentBusinessUnit',
+                'oro_type_business_unit_select_autocomplete',
                 [
-                    'label' => 'oro.organization.businessunit.parent.label',
-                    'empty_value' => 'oro.business_unit.form.none_business_user',
-                    'property_path' => 'owner',
                     'required' => false,
-                    'choices' => $this->getBusinessUnitChoices(
-                        $this->businessUnitManager->getBusinessUnitsTree(
-                            null,
-                            $this->getOrganizationId()
-                        )
-                    ),
-                    'business_unit_ids' => $this->businessUnitManager->getBusinessUnitIds(
-                        null,
-                        $this->getOrganizationId()
-                    ),
-                    'translatable_options' => false
+                    'label' => 'oro.organization.businessunit.parent.label',
+                    'autocomplete_alias' => 'business_units_owner_search_handler',
+                    'empty_value' => 'oro.business_unit.form.none_business_user',
+                    'configs' => [
+                        'multiple' => false,
+                        'component'   => 'tree-autocomplete',
+                        'width'       => '400px',
+                        'placeholder' => 'oro.dashboard.form.choose_business_unit',
+                        'allowClear'  => true
+                    ]
                 ]
             )
             ->add(
@@ -121,43 +117,6 @@ class BusinessUnitType extends AbstractType
                     'multiple' => true,
                 ]
             );
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'onPreSetData']);
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function onPreSetData(FormEvent $event)
-    {
-        $form = $event->getForm();
-        $data = $event->getData();
-        if ($data) {
-            if ($data->getId()) {
-                $form->remove('businessUnit');
-                $form->add(
-                    'businessUnit',
-                    'oro_business_unit_tree_select',
-                    [
-                        'label' => 'oro.organization.businessunit.parent.label',
-                        'empty_value' => 'oro.business_unit.form.none_business_user',
-                        'property_path' => 'owner',
-                        'required' => false,
-                        'choices' => $this->getBusinessUnitChoices(
-                            $this->businessUnitManager->getBusinessUnitsTree(
-                                null,
-                                $this->getOrganizationId()
-                            )
-                        ),
-                        'forbidden_business_unit_ids' => $this->businessUnitManager->getChildBusinessUnitIds(
-                            $data->getId(),
-                            $this->getOrganizationId()
-                        ),
-                        'translatable_options' => false
-                    ]
-                );
-            }
-        }
     }
 
     /**
@@ -179,27 +138,6 @@ class BusinessUnitType extends AbstractType
     public function getName()
     {
         return self::FORM_NAME;
-    }
-
-    /**
-     * Prepare choice options for a hierarchical select
-     *
-     * @param array $options
-     * @param int   $level
-     * @return array
-     */
-    protected function getBusinessUnitChoices($options, $level = 0)
-    {
-        $choices = [];
-        $blanks  = str_repeat('&nbsp;&nbsp;&nbsp;', $level);
-        foreach ($options as $option) {
-            $choices += [$option['id'] => $blanks . $option['name']];
-            if (isset($option['children'])) {
-                $choices += $this->getBusinessUnitChoices($option['children'], $level + 1);
-            }
-        }
-
-        return $choices;
     }
 
     /**

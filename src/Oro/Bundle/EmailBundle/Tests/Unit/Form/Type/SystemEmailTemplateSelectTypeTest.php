@@ -2,15 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,33 +31,17 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
     protected $queryBuilder;
 
     /**
-     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
-
-    /**
-     * @var Organization|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $organization;
-
-    /**
      * Setup test env
      */
     protected function setUp()
     {
-        $this->organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->setMethods(['getOrganization'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
                 ->disableOriginalConstructor()
                 ->getMock();
 
         $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
                 ->disableOriginalConstructor()
-                ->setMethods(['getEntityTemplatesQueryBuilder'])
+                ->setMethods(['getSystemTemplatesQueryBuilder'])
                 ->getMock();
 
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -69,32 +49,21 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getRepository'])
             ->getMock();
 
-        $this->type = new SystemEmailTemplateSelectType($this->em, $this->securityFacade);
+        $this->type = new SystemEmailTemplateSelectType($this->em);
     }
 
     protected function tearDown()
     {
         unset($this->type);
-        unset($this->securityFacade);
         unset($this->em);
         unset($this->queryBuilder);
         unset($this->entityRepository);
-        unset($this->organization);
     }
 
     public function testSetDefaultOptions()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('getOrganization')
-            ->will($this->returnValue($this->organization));
-
         $this->entityRepository->expects($this->any())
-            ->method('getEntityTemplatesQueryBuilder')
-            ->with(
-                '',
-                $this->organization,
-                true
-            )
+            ->method('getSystemTemplatesQueryBuilder')
             ->will($this->returnValue($this->queryBuilder));
 
         $this->em->expects($this->once())

@@ -85,6 +85,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -140,6 +141,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -195,6 +197,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -251,6 +254,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -306,6 +310,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -364,6 +369,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);

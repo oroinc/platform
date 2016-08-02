@@ -95,17 +95,9 @@ class TrackingWebsiteController extends Controller
     {
         return $this->get('oro_form.model.update_handler')->update(
             $trackingWebsite,
-            $this->createForm($this->getFormType(), $trackingWebsite),
+            $this->createForm(TrackingWebsiteType::NAME),
             $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
         );
-    }
-
-    /**
-     * @return TrackingWebsiteType
-     */
-    protected function getFormType()
-    {
-        return $this->get('oro_tracking.form.type.tracking_website');
     }
 
     /**
