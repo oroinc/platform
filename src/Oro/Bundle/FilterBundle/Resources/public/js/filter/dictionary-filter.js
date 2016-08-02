@@ -182,35 +182,8 @@ define(function(require) {
          * @inheritDoc
          */
         _renderCriteria: function() {
-            debugger;
-            var self = this;
-            self.renderTemplate();
-
+            this.renderTemplate();
             this.loadValuesById('renderCriteriaLoadValues');
-        },
-
-
-
-        /**
-         *
-         * @returns {{url: (*|string), data: {keys: (Array|*)}, error: error}}
-         * @private
-         */
-        _getAjaxSearchConfig: function() {
-            return {
-                url: routing.generate(
-                    'oro_dictionary_value',
-                    {
-                        dictionary: this.dictionaryClass
-                    }
-                ),
-                data: {
-                    'keys': this.value.value
-                },
-                error: function (jqXHR) {
-                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                }
-            };
         },
 
         /**
