@@ -12,6 +12,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Manage Entity Config Enum Options
+ */
 class EnumFieldConfigSubscriber implements EventSubscriberInterface
 {
     /** @var ConfigManager */
