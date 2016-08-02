@@ -28,7 +28,7 @@ class CountTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Array parameter is required.
+     * @expectedExceptionMessage Parameter `value` is required.
      */
     public function testInitializeArrayException()
     {
@@ -37,20 +37,20 @@ class CountTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute name parameter is required.
+     * @expectedExceptionMessage Parameter `attribute` is required.
      */
     public function testInitializeAttributeException()
     {
-        $this->assertEquals($this->action, $this->action->initialize(['array' => []]));
+        $this->assertEquals($this->action, $this->action->initialize(['value' => []]));
     }
 
     /**
      * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
+     * @expectedExceptionMessage Parameter `attribute` must be a valid property definition.
      */
     public function testInitializeAttributeWrongException()
     {
-        $this->assertEquals($this->action, $this->action->initialize(['array' => [], 'attribute' => 'test']));
+        $this->assertEquals($this->action, $this->action->initialize(['value' => [], 'attribute' => 'test']));
     }
 
     /**
@@ -63,7 +63,7 @@ class CountTest extends \PHPUnit_Framework_TestCase
     {
         $context = new StubStorage();
 
-        $this->action->initialize(['array' => $array, 'attribute' => new PropertyPath('test')]);
+        $this->action->initialize(['value' => $array, 'attribute' => new PropertyPath('test')]);
         $this->action->execute($context);
 
         $this->assertEquals(['test' => $count], $context->getValues());

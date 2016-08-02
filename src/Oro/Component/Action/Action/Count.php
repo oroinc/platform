@@ -2,8 +2,6 @@
 
 namespace Oro\Component\Action\Action;
 
-use Doctrine\Common\Collections\Collection;
-
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
@@ -11,22 +9,35 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 class Count extends AbstractAction
 {
     /** @var array */
-    protected $options;
+    protected $options = [];
 
     /**
      * {@inheritdoc}
      */
     public function initialize(array $options)
     {
-        if (!isset($options['array'])) {
-            throw new InvalidParameterException('Array parameter is required.');
+        if (array_key_exists(0, $options)) {
+            $this->options['value'] = $options[0];
+        } elseif (array_key_exists('value', $options)) {
+            $this->options['value'] = $options['value'];
         }
 
-        if (empty($options['attribute'])) {
-            throw new InvalidParameterException('Attribute name parameter is required.');
+        if (array_key_exists(1, $options)) {
+            $this->options['attribute'] = $options[1];
+        } elseif (array_key_exists('attribute', $options)) {
+            $this->options['attribute'] = $options['attribute'];
         }
-        if (!$options['attribute'] instanceof PropertyPathInterface) {
-            throw new InvalidParameterException('Attribute must be valid property definition.');
+
+        if (!array_key_exists('value', $this->options)) {
+            throw new InvalidParameterException('Parameter `value` is required.');
+        }
+
+        if (empty($this->options['attribute'])) {
+            throw new InvalidParameterException('Parameter `attribute` is required.');
+        }
+
+        if (!$this->options['attribute'] instanceof PropertyPathInterface) {
+            throw new InvalidParameterException('Parameter `attribute` must be a valid property definition.');
         }
 
         $this->options = $options;
@@ -39,11 +50,11 @@ class Count extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $array = $this->contextAccessor->getValue($context, $this->options['array']);
-        if (!is_array($array) && !$array instanceof \Countable) {
-            $array = [];
+        $value = $this->contextAccessor->getValue($context, $this->options['value']);
+        if (!is_array($value) && !$value instanceof \Countable) {
+            $value = [];
         }
 
-        $this->contextAccessor->setValue($context, $this->options['attribute'], count($array));
+        $this->contextAccessor->setValue($context, $this->options['attribute'], count($value));
     }
 }
