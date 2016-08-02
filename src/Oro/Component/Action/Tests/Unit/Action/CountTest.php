@@ -69,6 +69,16 @@ class CountTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['test' => $count], $context->getValues());
     }
 
+    public function testInlineOptions()
+    {
+        $context = new StubStorage();
+
+        $this->action->initialize([[1,2,3], new PropertyPath('test')]);
+        $this->action->execute($context);
+
+        $this->assertEquals(['test' => 3], $context->getValues());
+    }
+
     /**
      * @return array
      */

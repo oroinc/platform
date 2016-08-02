@@ -40,8 +40,6 @@ class Count extends AbstractAction
             throw new InvalidParameterException('Parameter `attribute` must be a valid property definition.');
         }
 
-        $this->options = $options;
-
         return $this;
     }
 
