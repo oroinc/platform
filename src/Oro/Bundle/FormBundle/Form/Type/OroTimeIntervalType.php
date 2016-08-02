@@ -7,6 +7,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @deprecated since 1.10. Use {@see Oro\Bundle\FormBundle\Form\Type\OroDurationType} instead
+ */
 class OroTimeIntervalType extends AbstractType
 {
     const NAME = 'oro_time_interval';
@@ -15,6 +18,14 @@ class OroTimeIntervalType extends AbstractType
      * {@inheritDoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

@@ -277,15 +277,12 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 .filter-item-simple .caret {
     display: none;
 }
-.active-filter .dropdown:after {
+.active-filter .dropdown:after,
+.active-filter .dropup:after {
     display: inline-block;
 }
 .active-filter .field-select {
     display: block;
-}
-
-.ui-multiselect-menu.multiselect-filter-widget {
-    margin-top: 7px;
 }
 .ui-multiselect.multiselect-filter-widget span,
 .filter-item .filter-criteria-hint {
@@ -358,6 +355,9 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
   margin-bottom: 0;
   max-width: 300px;
   min-width: 180px;
+  .select2-container {
+    margin-bottom: 8px;
+  }
   .choice-tree-filter-search{
     width: calc(~"100% - 14px");
   }

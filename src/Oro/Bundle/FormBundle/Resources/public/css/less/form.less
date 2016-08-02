@@ -58,3 +58,42 @@
 .expanded-text-field textarea, .expanded-text-field .mce-tinymce {
   width: 100%
 }
+
+.control-group.collapsible {
+  .collapse-expand-action-container {
+    display: inline-block;
+    .collapse-action {
+      color: #727272;
+      font-size: 13px;
+      font-family: Helvetica, Arial, sans-serif;
+      font-weight: bold;
+      &:before {
+        content: '−';
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        font-weight: normal;
+        border: 1px solid #c3c3c3;
+        margin-right: 8px;
+        background-color: #fcfcfc;
+        font-size: 12px;
+        line-height: 12px;
+        padding: 1px 0 0px 0;
+        text-align: center;
+        color: #727272;
+        #gradient > .horizontal(#fcfcfc, #e9e9e9);
+      }
+      &.collapsed:before {
+        content: '+';
+      }
+    }
+  }
+  > .controls {
+    overflow: hidden;
+  }
+  &.collapsed {
+    .collapse-expand-action-container .collapse-action:before {
+      content: '+';
+    }
+  }
+}

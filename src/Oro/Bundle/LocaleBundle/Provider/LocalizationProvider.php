@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -11,15 +13,22 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationProvider
 {
+    const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
+
     /**
      * @var ObjectRepository
      */
-    protected $registry;
+    protected $repository;
 
     /**
      * @var ConfigManager
      */
     protected $configManager;
+
+    /**
+     * @var CacheProvider
+     */
+    protected $cache;
 
     /**
      * @param ObjectRepository $repository
@@ -29,6 +38,9 @@ class LocalizationProvider
     {
         $this->repository = $repository;
         $this->configManager = $configManager;
+
+        /** used to minimize SQL Queries */
+        $this->cache = new ArrayCache();
     }
 
     /**
@@ -38,7 +50,9 @@ class LocalizationProvider
      */
     public function getLocalization($id)
     {
-        return $this->repository->find($id);
+        $cache = $this->getLocalizations();
+
+        return isset($cache[$id]) ? $cache[$id] : null;
     }
 
     /**
@@ -48,7 +62,28 @@ class LocalizationProvider
      */
     public function getLocalizations(array $ids = null)
     {
-        return $this->repository->findBy(!is_null($ids) ? ['id' => $ids] : [], ['name' => 'ASC']);
+        $cache = $this->cache ? $this->cache->fetch(self::CACHE_NAMESPACE) : false;
+
+        if ($cache === false) {
+            $cache = $this->repository->findBy([], ['name' => 'ASC']);
+            $cache = array_combine(
+                array_map(function (Localization $element) {
+                    return $element->getId();
+                }, $cache),
+                array_values($cache)
+            );
+            if ($this->cache) {
+                $this->cache->save(self::CACHE_NAMESPACE, $cache);
+            }
+        }
+
+        return is_null($ids) ? $cache : array_filter(
+            $cache,
+            function ($value, $key) use ($ids) {
+                return in_array($key, $ids, true);
+            },
+            true
+        );
     }
 
     /**
@@ -70,5 +105,26 @@ class LocalizationProvider
         }
 
         return null;
+    }
+
+    /**
+     * Warms up the cache
+     */
+    public function warmUpCache()
+    {
+        if ($this->cache) {
+            $this->clearCache();
+            $this->getLocalizations();
+        }
+    }
+
+    /**
+     * Clears the cache
+     */
+    public function clearCache()
+    {
+        if ($this->cache) {
+            $this->cache->delete(self::CACHE_NAMESPACE);
+        }
     }
 }

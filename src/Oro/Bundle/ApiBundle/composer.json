@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/ApiBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.5.9",
         "oro/config": "dev-master",
         "oro/chain-processor": "dev-master"
     },

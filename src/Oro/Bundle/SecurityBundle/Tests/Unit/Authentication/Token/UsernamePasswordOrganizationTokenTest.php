@@ -8,6 +8,9 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 
 class UsernamePasswordOrganizationTokenTest extends OrganizationTokenTestAbstract
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function getToken()
     {
         $user = new User(2);

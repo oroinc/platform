@@ -402,6 +402,7 @@ define(function(require) {
             var self = this;
             var isDefault = 1;
             var defaultModel = this._getCurrentDefaultViewModel();
+            var gridName = this.gridName;
             var currentViewModel = this._getCurrentViewModel();
             var id = currentViewModel.id;
             if (this._isCurrentViewSystem()) {
@@ -412,7 +413,8 @@ define(function(require) {
             return $.post(
                 routing.generate('oro_datagrid_api_rest_gridview_default', {
                     id: id,
-                    default: isDefault
+                    default: isDefault,
+                    gridName: gridName
                 }),
                 {},
                 function(response) {

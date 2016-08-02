@@ -34,6 +34,7 @@ services:
         calls:
             - [setResolver, ['@routing.resolver']]
             - [setEventDispatcher, ['@event_dispatcher']]
+            - [setCache, ['@oro_distribution.routing_loader.cache']]
         tags:
             - { name: routing.loader }
 
@@ -45,8 +46,13 @@ services:
         calls:
             - [setResolver, ['@routing.resolver']]
             - [setEventDispatcher, ['@event_dispatcher']]
+            - [setCache, ['@oro_distribution.routing_loader.cache']]
         tags:
             - { name: routing.loader, priority: 255 }
+
+    oro_distribution.routing_loader.cache:
+        class: Oro\Bundle\DistributionBundle\Routing\SharedData
+        public: false
 
     oro_distribution.routing_options_resolver:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver

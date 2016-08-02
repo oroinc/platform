@@ -22,7 +22,8 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
-use Doctrine\Common\Persistence\ObjectRepository;
-
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -13,9 +11,6 @@ use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 
 class LocalizationChoicesProvider
 {
-    /** @var ObjectRepository */
-    protected $repository;
-
     /** @var ConfigManager */
     protected $configManager;
 
@@ -25,22 +20,25 @@ class LocalizationChoicesProvider
     /** @var FormattingCodeFormatter */
     protected $formattingFormatter;
 
+    /** @var LocalizationProvider */
+    protected $localizationProvider;
+
     /**
-     * @param ObjectRepository $repository
      * @param ConfigManager $configManager
      * @param LanguageCodeFormatter $languageFormatter
      * @param FormattingCodeFormatter $formattingFormatter
+     * @param LocalizationProvider $localizationProvider
      */
     public function __construct(
-        ObjectRepository $repository,
         ConfigManager $configManager,
         LanguageCodeFormatter $languageFormatter,
-        FormattingCodeFormatter $formattingFormatter
+        FormattingCodeFormatter $formattingFormatter,
+        LocalizationProvider $localizationProvider
     ) {
-        $this->repository = $repository;
         $this->configManager = $configManager;
         $this->languageFormatter = $languageFormatter;
         $this->formattingFormatter = $formattingFormatter;
+        $this->localizationProvider = $localizationProvider;
     }
 
     /**
@@ -65,7 +63,7 @@ class LocalizationChoicesProvider
     public function getLocalizationChoices()
     {
         /** @var Localization[] $choices */
-        $choices = $this->repository->findBy([], ['name' => 'ASC']);
+        $choices = $this->localizationProvider->getLocalizations();
         $data = [];
 
         foreach ($choices as $choice) {

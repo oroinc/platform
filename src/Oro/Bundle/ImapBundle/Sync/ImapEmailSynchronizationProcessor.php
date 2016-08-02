@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -20,6 +19,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
+use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
@@ -40,6 +40,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
     /** Determines how often the clearing of outdated folders routine should be executed */
     const CLEANUP_EVERY_N_RUN = 100;
+
+    /** Time limit to sync origin in seconds */
+    const MAX_ORIGIN_SYNC_TIME = 30;
 
     /** @var ImapEmailManager */
     protected $manager;
@@ -71,7 +74,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->emailEntityBuilder->clear();
 
         $this->initEnv($origin);
-
+        $processStartTime = time();
         // iterate through all folders enabled for sync and do a synchronization of emails for each one
         $imapFolders = $this->getSyncEnabledImapFolders($origin);
         foreach ($imapFolders as $imapFolder) {
@@ -97,12 +100,25 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 // set seen flags from previously synchronized emails
                 $this->checkFlags($imapFolder, $checkStartDate);
 
-                $this->em->flush($folder);
             } catch (UnselectableFolderException $e) {
-                $this->logger->info(sprintf('The folder "%s" cannot be selected and was skipped.', $folderName));
+                $folder->setSyncEnabled(false);
+                $this->logger->info(
+                    sprintf('The folder "%s" cannot be selected and was skipped and disabled.', $folderName)
+                );
+            } catch (InvalidEmailFormatException $e) {
+                $folder->setSyncEnabled(false);
+                $this->logger->info(
+                    sprintf('The folder "%s" has unsupported email format and was skipped and disabled.', $folderName)
+                );
             }
+            $this->em->flush($folder);
 
             $this->cleanUp(true, $imapFolder->getFolder());
+
+            $processSpentTime = time() - $processStartTime;
+            if ($processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+                break;
+            }
         }
 
         $this->removeRemotelyRemovedEmails($origin);
@@ -148,12 +164,18 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     /* @var $staleImapEmails ImapEmail[] */
                     foreach ($staleImapEmails as $imapEmail) {
                         $email = $imapEmail->getEmail();
-                        $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use ($folder) {
-                            $emailUser->removeFolder($folder);
-                            if (!$emailUser->getFolders()->count()) {
-                                $this->em->remove($emailUser);
-                            }
-                        });
+                        $email->getEmailUsers()
+                            ->forAll(function ($key, EmailUser $emailUser) use ($folder, $imapEmail) {
+                                $existsEmails = $this->em->getRepository('OroImapBundle:ImapEmail')
+                                    ->findBy(['email' => $imapEmail->getEmail()]);
+
+                                $emailUser->removeFolder($folder);
+                                // if existing imapEmail is last for current email or is absent
+                                // we remove emailUser and after that will remove last imapEmail and email
+                                if (count($existsEmails) <= 1 && !$emailUser->getFolders()->count()) {
+                                    $this->em->remove($emailUser);
+                                }
+                            });
                         $this->em->remove($imapEmail);
                     }
                 });
@@ -563,7 +585,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
         if ($emailUser != null) {
-            $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+            $emailUser->removeFolder($imapEmail->getImapFolder()->getFolder());
+            if (!$emailUser->getFolders()->count()) {
+                $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+            }
         }
         $this->em->remove($imapEmail);
     }

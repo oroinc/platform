@@ -37,6 +37,7 @@ parameters:
     oro_security.acl.annotation_provider.class:                Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider
     oro_security.acl.annotation_loader.class:                  Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
     oro_security.acl.config_loader.class:                      Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
+    oro_security.acl.annotation_listener.class:                Oro\Bundle\SecurityBundle\Annotation\AclListener
 
     oro_security.acl.annotation_provider.cache.warmer.class:   Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheWarmer
     oro_security.acl.annotation_provider.cache.clearer.class:  Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheClearer
@@ -320,6 +321,14 @@ services:
         tags:
             - { name: oro_security.acl.config_loader }
 
+    oro_security.acl.annotation_listener:
+        class: %oro_security.acl.annotation_listener.class%
+        arguments:
+            - '@service_container'
+            - '@oro_security.acl.annotation_provider.cache.warmer'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     oro_security.acl.config_loader:
         public: false
         class: %oro_security.acl.config_loader.class%
@@ -497,8 +506,8 @@ services:
             - '@oro_security.link.ownership_tree_provider'
         calls:
             - ['setContainer', ['@service_container']]
-            - ['addSupportedClass', [%oro_user.entity.class%]]
-            - ['addSupportedClass', [%oro_organization.business_unit.entity.class%]]
+            - ['addSupportedClass', [%oro_user.entity.class%, [owner, organization], [businessUnits, organizations]]]
+            - ['addSupportedClass', [%oro_organization.business_unit.entity.class%, [owner, organization], [users]]]
             - ['addSupportedClass', [%oro_organization.organization.entity.class%]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
@@ -599,14 +608,6 @@ services:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
               - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: collectEntityMapEvent, priority: -100 }
 
-    oro_security.layout_expression.acl_granted:
-        class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
-        arguments:
-            - '@oro_security.security_facade'
-            - '@doctrine'
-        tags:
-            - { name: oro_layout.expression, alias: acl|acl_granted }
-
     oro_security.walker_hint_provider.current_user:
         public: false
         class: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider
@@ -641,3 +642,11 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
+
+    oro_security.layout.data_provider.acl:
+        class: Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider
+        arguments:
+            - '@oro_security.security_facade'
+            - '@doctrine'
+        tags:
+            - { name: layout.data_provider, alias: acl }

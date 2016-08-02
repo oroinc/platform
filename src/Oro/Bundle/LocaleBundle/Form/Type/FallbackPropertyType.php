@@ -33,6 +33,14 @@ class FallbackPropertyType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return self::NAME;
     }
 
@@ -89,6 +97,20 @@ class FallbackPropertyType extends AbstractType
                 }
 
                 return $choices;
+            }
+        );
+
+        $resolver->setNormalizer(
+            'choice_label',
+            function (Options $options) {
+                $choices = $options->offsetGet('choices');
+
+                if ($choices) {
+                    return function ($choice, $key) use ($choices) {
+                        return $key;
+                    };
+                }
+                return;
             }
         );
     }
