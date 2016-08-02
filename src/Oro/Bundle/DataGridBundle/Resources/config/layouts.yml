@@ -10,3 +10,37 @@ services:
         class: Oro\Bundle\DataGridBundle\Layout\Block\Extension\TaggableDatagridExtension
         tags:
             - { name: layout.block_type_extension, alias: datagrid }
+
+    oro_datagrid.block_type.datagrid_cell_value:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{column_name: {required: true}}]]
+            - [setName, ['column_name']]
+        tags:
+             - { name: layout.block_type, alias: datagrid_cell_value }
+
+    oro_datagrid.block_type.datagrid_cell:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{column_name: {required: true}}]]
+            - [setName, ['column_name']]
+        tags:
+             - { name: layout.block_type, alias: datagrid_cell }
+
+    oro_datagrid.block_type.datagrid_row:
+        parent: oro_layout.block_type.abstract_configurable
+        tags:
+             - { name: layout.block_type, alias: datagrid_row }
+
+    oro_datagrid.block_type.datagrid_header_cell:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{column_name: {required: true}}]]
+            - [setName, ['column_name']]
+        tags:
+             - { name: layout.block_type, alias: datagrid_header_cell }
+
+    oro_datagrid.block_type.datagrid_header:
+        parent: oro_layout.block_type.abstract_configurable
+        tags:
+             - { name: layout.block_type, alias: datagrid_header }
