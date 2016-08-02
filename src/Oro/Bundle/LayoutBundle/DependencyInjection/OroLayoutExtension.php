@@ -265,12 +265,14 @@ class OroLayoutExtension extends Extension
     protected function getAdditionalConfig(CumulativeResourceInfo $resource)
     {
         $themeName = basename(dirname(dirname($resource->path)));
+        $section = basename($resource->path, ".yml");
 
         return [
             'themes' => [
                 $themeName => [
-                    // prevents loading theme information in additional config
-                    'config' => $resource->data['config']
+                    'config' => [
+                        $section => $resource->data
+                    ]
                 ]
             ]
         ];

@@ -13,13 +13,11 @@ Assets configuration file should be placed in `layout/{theme_name}/config` folde
 
 ```yaml
 #DemoBundle/Resources/views/layouts/first_theme/config/assets.yml
-config:
-    assets:
-        styles:
-            inputs:
-                - 'bundles/demo/css/bootstrap.min.css'
-                - 'bundles/demo/css/font-awesome.min.css'
-            output: 'css/layout/first_theme/styles.css'
+styles:
+    inputs:
+        - 'bundles/demo/css/bootstrap.min.css'
+        - 'bundles/demo/css/font-awesome.min.css'
+    output: 'css/layout/first_theme/styles.css'
 ```
 
 ## Images
@@ -31,21 +29,19 @@ Images configuration file should be placed in `layout/{theme_name}/config` folde
 
 ```yaml
 #DemoBundle/Resources/views/layouts/first_theme/config/images.yml
-config:
-    images:
-        types:
-            main:
-                label: orob2b.product.productimage.type.main.label
-                dimensions: ~
-                max_number: 1
-            listing:
-                label: orob2b.product.productimage.type.listing.label
-                dimensions: ~
-                max_number: 1
-            additional:
-                label: orob2b.product.productimage.type.additional.label
-                dimensions: ~
-                max_number: ~
+types:
+    main:
+        label: orob2b.product.productimage.type.main.label
+        dimensions: ~
+        max_number: 1
+    listing:
+        label: orob2b.product.productimage.type.listing.label
+        dimensions: ~
+        max_number: 1
+    additional:
+        label: orob2b.product.productimage.type.additional.label
+        dimensions: ~
+        max_number: ~
 ```
 
 ## RequireJS definition

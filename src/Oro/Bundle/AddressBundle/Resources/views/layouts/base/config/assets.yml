@@ -1,5 +1,3 @@
-config:
-    assets:
-        styles:
-            inputs:
-                - 'bundles/oroaddress/css/less/address.less'
+styles:
+    inputs:
+        - 'bundles/oroaddress/css/less/address.less'
