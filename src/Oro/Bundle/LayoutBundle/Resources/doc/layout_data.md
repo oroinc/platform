@@ -74,7 +74,7 @@ class ProductDataProvider
 
 Also you can implement [AbstractFormDataProvider](../../../../Component/Layout/DataProvider/AbstractFormDataProvider.php) if you use forms.
 
-**IMPORTANT:**  DataProvider provider method should begin with `get`.
+**IMPORTANT:**  DataProvider provider method should begin with `get`, `has` or `is`.
 
 Registering a data provider
 ---------------------------

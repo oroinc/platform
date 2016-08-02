@@ -45,7 +45,7 @@ class DataAccessor implements DataAccessorInterface
         $dataProvider = $this->getDataProvider($name);
 
         if (is_object($dataProvider)) {
-            return new DataProviderDecorator($dataProvider, ['get']);
+            return new DataProviderDecorator($dataProvider, ['get', 'has', 'is']);
         } elseif ($dataProvider !== false) {
             return $this->context->data()->get($name);
         }
