@@ -8,6 +8,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('oro/filter/choice-filter');
     var messenger = require('oroui/js/messenger');
+    var tools = require('oroui/js/tools');
     require('jquery.select2');
 
     /**
@@ -61,6 +62,8 @@ define(function(require) {
 
         previousData: [],
 
+        selectedData: {},
+
         /**
          * @inheritDoc
          */
@@ -70,6 +73,9 @@ define(function(require) {
             } else {
                 this.dictionaryClass = this.class.replace(/\\/g, '_');
             }
+
+            this.listenTo(this, 'renderCriteriaLoadValues', this.renderCriteriaLoadValues);
+            this.listenTo(this, 'updateCriteriaLabels', this.updateCriteriaLabels);
 
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
@@ -98,69 +104,86 @@ define(function(require) {
             }
         },
 
+        loadValuesById: function(callbackEvent) {
+            var self = this;
+            $.ajax({
+                url: routing.generate(
+                    'oro_dictionary_value',
+                    {
+                        dictionary: this.dictionaryClass
+                    }
+                ),
+                data: {
+                    'keys': this.value.value
+                },
+                success: function(response) {
+                    self.trigger(callbackEvent, response);
+                },
+                error: function (jqXHR) {
+                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                }
+            })
+        },
+
+        renderCriteriaLoadValues: function(response) {
+            var ids = [];
+            _.each(response.results, function (item) {
+                ids.push(item.id);
+                this.selectedData[item.id] = item;
+            }, this);
+
+            this.value.value = ids;
+            this._writeDOMValue(this.value);
+            this.applySelect2();
+            this._updateCriteriaHint();
+            this.renderDeferred.resolve();
+        },
+
         /**
          * @inheritDoc
          */
         _renderCriteria: function() {
+            debugger;
             var self = this;
             self.renderTemplate();
 
-            $.ajax({
-                url: routing.generate(
-                    'oro_dictionary_value',
-                    {
-                        dictionary: this.dictionaryClass
-                    }
-                ),
-                data: {
-                    'keys': this.value.value
-                },
-                success: function(reposne) {
-                    self.value.value = reposne.results;
-                    self._writeDOMValue(self.value);
-                    self.applySelect2();
-                    self._updateCriteriaHint();
-                    self.renderDeferred.resolve();
-                },
-                error: function(jqXHR) {
-                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                }
-            });
+            this.loadValuesById('renderCriteriaLoadValues');
         },
 
-        _updateCriteriaLabels: function() {
-            var self = this;
-            $.ajax({
-                url: routing.generate(
-                    'oro_dictionary_value',
-                    {
-                        dictionary: this.dictionaryClass
-                    }
-                ),
-                data: {
-                    'keys': this.value.value
-                },
-                success: function(reposne) {
-                    self.value.value = reposne.results;
-                    self._updateCriteriaHint(true);
-                },
-                error: function(jqXHR) {
-                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                }
-            });
+        updateCriteriaLabels: function(response)
+        {
+            var ids = [];
+            _.each(response.results, function (item) {
+                ids.push(item.id);
+                this.selectedData[item.id] = item;
+            }, this);
+
+            this.value.value = ids;
+
+            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
+            this._updateCriteriaHint();
         },
 
         /**
-         * Updates criteria hint element with actual criteria hint value
          *
-         * @protected
-         * @return {*}
+         * @returns {{url: (*|string), data: {keys: (Array|*)}, error: error}}
+         * @private
          */
-        _updateCriteriaHint: function(renderedCriteria) {
-            this.subview('hint').update(this._getCriteriaHint(renderedCriteria));
-            this.$el.find('.filter-criteria-selector')
-                .toggleClass('filter-default-value', this.isEmptyValue());
-            return this;
+        _getAjaxSearchConfig: function() {
+            return {
+                url: routing.generate(
+                    'oro_dictionary_value',
+                    {
+                        dictionary: this.dictionaryClass
+                    }
+                ),
+                data: {
+                    'keys': this.value.value
+                },
+                error: function (jqXHR) {
+                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                }
+            };
         },
 
         /**
@@ -262,12 +285,16 @@ define(function(require) {
          */
         getDataForSelect2: function() {
             var values = [];
-            $.each(this.value.value, function(index, value) {
-                values.push({
-                    'id': value.id,
-                    'text': value.text
-                });
-            });
+            _.each(this.value.value, function(value) {
+                var item = this.selectedData[value];
+
+                if (item) {
+                    values.push({
+                        'id': item.id,
+                        'text': item.text
+                    });
+                }
+            }, this);
 
             return values;
         },
@@ -302,6 +329,27 @@ define(function(require) {
             }
 
             return parts;
+        },
+
+        /**
+         * Set raw value to filter
+         *
+         * @param value
+         * @return {*}
+         */
+        setValue: function(value) {
+            var oldValue = this.value;
+            this.value = tools.deepClone(value);
+            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
+            this._updateDOMValue();
+
+            if (this.valueIsLoaded(value.value)) {
+                this._onValueUpdated(this.value, oldValue);
+            } else {
+                this.loadValuesById('updateCriteriaLabels');
+            }
+
+            return this;
         },
 
         /**
@@ -360,7 +408,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function(criteriaRendered) {
+        _getCriteriaHint: function() {
             var value = this._getDisplayValue();
             var option = null;
 
@@ -382,26 +430,28 @@ define(function(require) {
                 data = this.previousData.length ? this.previousData : this.initialData;
             }
 
-            if (!criteriaRendered) {
-                this._updateCriteriaLabels();
+            if (this.valueIsLoaded(value.value)) {
+                var self = this;
+
+                var hintRawValue = _.isObject(_.first(value.value)) ?
+                    _.map(value.value, _.property('text')) :
+                    _.chain(value.value)
+                        .map(function(id) {
+                            var item =  _.find(self.selectedData, function(item) {
+                                return item.id === id;
+                            });
+
+                            return item ? item.text : item;
+                        })
+                        .filter(_.negate(_.isUndefined))
+                        .value();
+
+                var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
+
+                return (option ? option.label + ' ' : '') + hintValue;
+            } else {
+                return this.placeholder;
             }
-
-            var hintRawValue = _.isObject(_.first(value.value)) ?
-                _.map(value.value, _.property('text')) :
-                _.chain(value.value)
-                    .map(function(id) {
-                        var item =  _.find(data, function(item) {
-                            return item.id === id;
-                        });
-
-                        return item ? item.text : item;
-                    })
-                    .filter(_.negate(_.isUndefined))
-                    .value();
-
-            var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
-
-            return (option ? option.label + ' ' : '') + hintValue;
         },
 
         /**
@@ -410,6 +460,23 @@ define(function(require) {
         _hideCriteria: function() {
             this.$el.find(this.elementSelector).inputWidget('close');
             DictionaryFilter.__super__._hideCriteria.apply(this, arguments);
+        },
+
+        /**
+         *
+         * @param values
+         * @returns {boolean}
+         */
+        valueIsLoaded: function(values) {
+            var foundItems = 0;
+            var self = this;
+            _.each(values, function(item) {
+                if (self.selectedData && self.selectedData[item]) {
+                    foundItems++;
+                }
+            });
+
+            return foundItems === values.length
         }
     });
 
