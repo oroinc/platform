@@ -8,6 +8,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 
 class LocalizationHelper
 {
@@ -19,11 +20,36 @@ class LocalizationHelper
     protected $localizationProvider;
 
     /**
-     * @param LocalizationProvider $localizationProvider
+     * @var CurrentLocalizationProvider
      */
-    public function __construct(LocalizationProvider $localizationProvider)
-    {
+    protected $currentLocalizationProvider;
+
+    /**
+     * @param LocalizationProvider $localizationProvider
+     * @param CurrentLocalizationProvider $currentLocalizationProvider
+     */
+    public function __construct(
+        LocalizationProvider $localizationProvider,
+        CurrentLocalizationProvider $currentLocalizationProvider
+    ) {
         $this->localizationProvider = $localizationProvider;
+        $this->currentLocalizationProvider = $currentLocalizationProvider;
+    }
+
+    /**
+     * @return Localization
+     */
+    public function getCurrentLocalization()
+    {
+        return $this->currentLocalizationProvider->getCurrentLocalization();
+    }
+
+    /**
+     * @return Localization[]
+     */
+    public function getLocalizations()
+    {
+        return $this->localizationProvider->getLocalizations();
     }
 
     /**
@@ -33,6 +59,6 @@ class LocalizationHelper
      */
     public function getLocalizedValue(Collection $values, Localization $localization = null)
     {
-        return $this->getFallbackValue($values, $localization ?: $this->localizationProvider->getCurrentLocalization());
+        return $this->getFallbackValue($values, $localization ?: $this->getCurrentLocalization());
     }
 }

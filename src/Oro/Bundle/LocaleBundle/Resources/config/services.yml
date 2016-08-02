@@ -52,6 +52,7 @@ services:
         public: false
         arguments:
             - '@oro_locale.provider.localization'
+            - '@oro_locale.provider.current_localization'
 
     oro_locale.listener.orm.localization_listener:
         class: 'Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener'
@@ -67,7 +68,6 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension'
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_locale.provider.localization'
             - '@oro_locale.helper.localization'
         tags:
             - { name: oro_datagrid.extension }
@@ -311,6 +311,9 @@ services:
         arguments:
             - '@oro_locale.repository.localization'
             - '@oro_config.global'
+
+    oro_locale.provider.current_localization:
+        class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
 
     oro_locale.entity_generator.extension:
         class: %oro_locale.entity_generator.extension.class%

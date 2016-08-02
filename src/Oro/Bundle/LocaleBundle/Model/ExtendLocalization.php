@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Model;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
  * @method LocalizedFallbackValue getTitle(Localization $localization = null)

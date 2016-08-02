@@ -16,7 +16,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -28,9 +27,6 @@ class LocalizedValueExtension extends AbstractExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var LocalizationProvider */
-    protected $localizationProvider;
-
     /** @var LocalizationHelper */
     protected $localizationHelper;
 
@@ -39,16 +35,11 @@ class LocalizedValueExtension extends AbstractExtension
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param LocalizationProvider $localizationProvider
      * @param LocalizationHelper $localizationHelper
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper,
-        LocalizationProvider $localizationProvider,
-        LocalizationHelper $localizationHelper
-    ) {
+    public function __construct(DoctrineHelper $doctrineHelper, LocalizationHelper $localizationHelper)
+    {
         $this->doctrineHelper = $doctrineHelper;
-        $this->localizationProvider = $localizationProvider;
         $this->localizationHelper = $localizationHelper;
 
         $this->propertyAccessor = new PropertyAccessor();
@@ -77,7 +68,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        if (null === $this->localizationProvider->getCurrentLocalization()) {
+        if (null === $this->localizationHelper->getCurrentLocalization()) {
             return;
         }
 
@@ -94,7 +85,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        if (null !== $this->localizationProvider->getCurrentLocalization()) {
+        if (null !== $this->localizationHelper->getCurrentLocalization()) {
             return;
         }
 
@@ -132,7 +123,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        if (null === ($localization = $this->localizationProvider->getCurrentLocalization())) {
+        if (null === ($localization = $this->localizationHelper->getCurrentLocalization())) {
             return;
         }
 
