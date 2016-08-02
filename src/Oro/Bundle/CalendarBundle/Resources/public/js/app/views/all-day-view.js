@@ -34,7 +34,7 @@ define([
         },
 
         handleLayoutInit: function() {
-            this.handleAllDayEventFlag($('input[name$="[allDay]"]'), 0);
+            this.handleAllDayEventFlag(this.$('input[name$="[allDay]"]'), 0);
         },
 
         onAllDayChange: function(event) {
