@@ -1,14 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var RolePermissionsActionLauncher;
+    var RolePermissionsActionView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
 
-    RolePermissionsActionLauncher = BaseView.extend({
+    RolePermissionsActionView = BaseView.extend({
         className: 'dropdown',
         icon: '',
+        autoRender: true,
         template: function() {
             return '<a data-toggle="dropdown" ' +
                 'class="dropdown-toggle role-permissions-action-launcher" href="javascript:void(0);">...</a>';
@@ -25,12 +26,15 @@ define(function(require) {
         action: null,
 
         events: {
-            'shown.bs.dropdown': 'onDropdownOpen'
+            'shown.bs.dropdown': 'onDropdownOpen',
+            'click': '_showDropdown',
+            'mouseover .dropdown-toggle': '_showDropdown',
+            'mouseleave .dropdown-menu, .dropdown-menu__placeholder': '_hideDropdown'
         },
 
         initialize: function(options) {
             _.extend(this, _.pick(options, ['accessLevels', 'action']));
-            RolePermissionsActionLauncher.__super__.initialize.call(this, options);
+            RolePermissionsActionView.__super__.initialize.call(this, options);
         },
 
         dispose: function() {
@@ -39,7 +43,7 @@ define(function(require) {
             }
             delete this.accessLevels;
             delete this.action;
-            RolePermissionsActionLauncher.__super__.dispose.call(this);
+            RolePermissionsActionView.__super__.dispose.call(this);
         },
 
         render: function() {
@@ -47,7 +51,7 @@ define(function(require) {
             if (dropdown) {
                 dropdown.$el.detach();
             }
-            RolePermissionsActionLauncher.__super__.render.call(this);
+            RolePermissionsActionView.__super__.render.call(this);
             if (dropdown) {
                 this.$el.append(dropdown.$el);
             }
@@ -80,10 +84,26 @@ define(function(require) {
         },
 
         onAccessLevelSelect: function(patch) {
-            var options = {modelPatch: patch};
-            this.action.run(options);
+            this.trigger('row-access-level-change', patch);
+            if (this.$('.dropdown-toggle').parent().hasClass('open')) {
+                this.$('.dropdown-toggle').dropdown('toggle');
+            }
+        },
+
+        _showDropdown: function(e) {
+            if (!this.$('.dropdown-toggle').parent().hasClass('open')) {
+                this.$('.dropdown-toggle').dropdown('toggle');
+            }
+            e.stopPropagation();
+        },
+
+        _hideDropdown: function(e) {
+            if (this.$('.dropdown-toggle').parent().hasClass('open')) {
+                this.$('.dropdown-toggle').dropdown('toggle');
+            }
+            e.stopPropagation();
         }
     });
 
-    return RolePermissionsActionLauncher;
+    return RolePermissionsActionView;
 });

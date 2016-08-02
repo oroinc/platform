@@ -80,6 +80,14 @@ class ActionMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return [];
+    }
+
+    /**
      * @param string $category
      */
     public function setCategory($category)
