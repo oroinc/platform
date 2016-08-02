@@ -17,6 +17,7 @@ class ReminderCollectionType extends AbstractType
                 'type'                 => 'oro_reminder',
                 'required'             => false,
                 'show_form_when_empty' => false,
+                'error_bubbling'       => false,
                 'options'              => array(
                     'data_class' => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder'
                 )
@@ -36,6 +37,14 @@ class ReminderCollectionType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_reminder_collection';
     }

@@ -17,10 +17,19 @@ define([
         open: function() {
             if (!this.hasBeenOpened) {
                 this.hasBeenOpened = true;
-                this.refresh(true);
+                this.refresh();
             }
             this._superApply(arguments);
-            mask.show().onhide($.proxy(this.close, this));
+
+            this.menu.css('zIndex', '');
+            var zIndex = Math.max.apply(Math, this.element.parents().add(this.menu).map(function() {
+                var zIndex = Number($(this).css('zIndex'));
+                return isNaN(zIndex) ? 0 : zIndex;
+            }));
+
+            this.menu.css('zIndex', zIndex + 2);
+            mask.show(zIndex + 1)
+                .onhide($.proxy(this.close, this));
         },
 
         /**

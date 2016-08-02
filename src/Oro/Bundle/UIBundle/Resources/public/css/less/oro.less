@@ -3039,6 +3039,7 @@ span.validation-failed {
 }
 
 .popover {
+  position: fixed;
   max-width: 315px; /* little increase to fit usual content */
   .popover-content {
     padding: 13px 30px 13px 15px;
@@ -3230,5 +3231,16 @@ label .popover-content {
     [class^="icon-"], a [class*=" icon-"] {
       margin: 0;
     }
+  }
+}
+
+.chart-hint {
+  color: #666;
+  text-align: center;
+}
+
+.stackedbar-chart {
+  .flotr-overlay {
+    cursor: all-scroll;
   }
 }

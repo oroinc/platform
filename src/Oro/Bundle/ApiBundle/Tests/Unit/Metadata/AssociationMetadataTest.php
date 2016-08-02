@@ -54,6 +54,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $associationMetadata->setDataType('testDataType');
         $associationMetadata->setTargetClassName('targetClassName');
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1', 'targetClassName2']);
+        $associationMetadata->setAssociationType('manyToMany');
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setTargetMetadata($this->entityMetadata);
@@ -64,6 +65,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
                 'data_type'                 => 'testDataType',
                 'target_class'              => 'targetClassName',
                 'acceptable_target_classes' => ['targetClassName1', 'targetClassName2'],
+                'association_type'          => 'manyToMany',
                 'collection'                => true,
                 'nullable'                  => true,
                 'target_metadata'           => [
@@ -137,6 +139,15 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
             ['targetClassName2', 'targetClassName3'],
             $associationMetadata->getAcceptableTargetClassNames()
         );
+    }
+
+    public function testAssociationType()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertNull($associationMetadata->getAssociationType());
+        $associationMetadata->setAssociationType('manyToOne');
+        $this->assertEquals('manyToOne', $associationMetadata->getAssociationType());
     }
 
     public function testCollection()

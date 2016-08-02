@@ -39,11 +39,6 @@ class DataBlockExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetExtendedType()
-    {
-        $this->assertEquals('form', $this->formExtension->getExtendedType());
-    }
-
     public function testBuildView()
     {
         /** @var FormView $formView */

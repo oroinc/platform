@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Twig;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 class OroSecurityExtension extends \Twig_Extension
 {
@@ -35,11 +36,16 @@ class OroSecurityExtension extends \Twig_Extension
      * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id
      *                                    or something else, it depends on registered security voters
      * @param mixed $object A domain object, object identity or object identity descriptor (id:type)
+     * @param string $fieldName Field name in case if Field ACL check should be used
      *
      * @return bool
      */
-    public function checkResourceIsGranted($attributes, $object = null)
+    public function checkResourceIsGranted($attributes, $object = null, $fieldName = null)
     {
+        if ($fieldName) {
+            return $this->securityFacade->isGranted($attributes, new FieldVote($object, $fieldName));
+        }
+
         return $this->securityFacade->isGranted($attributes, $object);
     }
 
