@@ -280,6 +280,7 @@ define(function(require) {
 
         /**
          * Convert data to format for select2
+         *
          * @returns {Array}
          */
         getDataForSelect2: function() {
@@ -334,6 +335,7 @@ define(function(require) {
          * Set raw value to filter
          *
          * @param value
+         *
          * @return {*}
          */
         setValue: function(value) {
@@ -451,7 +453,9 @@ define(function(require) {
 
         /**
          * Checking  the existence of entities with selected ids in loaded data.
+         *
          * @param values
+         *
          * @returns {boolean}
          */
         valueIsLoaded: function(values) {
