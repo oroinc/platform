@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
@@ -350,7 +353,46 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testSetHints()
+    public function testFormType()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getFormType());
+
+        $config->setFormType('test');
+        $this->assertEquals('test', $config->getFormType());
+        $this->assertEquals(['form_type' => 'test'], $config->toArray());
+
+        $config->setFormType(null);
+        $this->assertNull($config->getFormType());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testFormOptions()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getFormOptions());
+
+        $config->setFormOptions(['key' => 'val']);
+        $this->assertEquals(['key' => 'val'], $config->getFormOptions());
+        $this->assertEquals(['form_options' => ['key' => 'val']], $config->toArray());
+
+        $config->setFormOptions(null);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testAddFormConstraint()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $config->addFormConstraint(new NotNull());
+        $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+
+        $config->addFormConstraint(new NotBlank());
+        $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+    }
+
+    public function testHints()
     {
         $config = new EntityDefinitionConfig();
         $this->assertEquals([], $config->getHints());

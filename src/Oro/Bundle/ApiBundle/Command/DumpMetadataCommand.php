@@ -93,8 +93,8 @@ class DumpMetadataCommand extends AbstractDebugCommand
             $entityClass,
             $version,
             $requestType,
-            [],
-            $config->getDefinition()
+            $config->getDefinition(),
+            []
         );
 
         return [

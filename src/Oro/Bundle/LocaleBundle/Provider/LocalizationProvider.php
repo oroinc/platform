@@ -67,9 +67,12 @@ class LocalizationProvider
         if ($cache === false) {
             $cache = $this->repository->findBy([], ['name' => 'ASC']);
             $cache = array_combine(
-                array_map(function (Localization $element) {
-                    return $element->getId();
-                }, $cache),
+                array_map(
+                    function (Localization $element) {
+                        return $element->getId();
+                    },
+                    $cache
+                ),
                 array_values($cache)
             );
             if ($this->cache) {
@@ -77,13 +80,18 @@ class LocalizationProvider
             }
         }
 
-        return is_null($ids) ? $cache : array_filter(
-            $cache,
-            function ($value, $key) use ($ids) {
-                return in_array($key, $ids, true);
-            },
-            true
-        );
+        if (null === $ids) {
+            return $cache;
+        } else {
+            $keys = array_filter(
+                array_keys($cache),
+                function ($key) use ($ids) {
+                    return in_array($key, $ids, true);
+                }
+            );
+
+            return array_intersect_key($cache, array_flip($keys));
+        }
     }
 
     /**

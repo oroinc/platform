@@ -110,7 +110,7 @@ class FileSubscriber implements EventSubscriberInterface
             }
         }
 
-        $violations = $this->validator->validate($dataClass, $entity, $fieldName);
+        $violations = $this->validator->validate($entity->getFile(), $dataClass, $fieldName);
 
         if (!empty($violations)) {
             $fileField = $form->get('file');

@@ -18,7 +18,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationProvider */
     protected $provider;
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
@@ -169,7 +169,8 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->warmUpCache();
     }
 
-    protected function assertRepositoryCalls(){
+    protected function assertRepositoryCalls()
+    {
         $this->repository->expects($this->never())->method('find');
         $this->repository->expects($this->once())->method('findBy')->willReturn($this->entities);
     }
