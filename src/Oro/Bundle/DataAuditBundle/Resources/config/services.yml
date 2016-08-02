@@ -74,11 +74,10 @@ services:
     oro_dataaudit.migration.extension.audit_field:
         class: 'Oro\Bundle\DataAuditBundle\Migration\Extension\AuditFieldExtension'
         tags:
-            - { name: oro_migration.extension, extension_name: audit_field }
+            - { name: 'oro_migration.extension', extension_name: 'audit_field' }
 
     oro_dataaudit.segment_widget.context_checker:
-        class: Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker
-            - { name: 'oro_migration.extension', extension_name: 'audit_field' }
+        class: 'Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker'
 
     oro_dataaudit.set_new_audit_version:
         class: 'Oro\Bundle\DataAuditBundle\Service\SetNewAuditVersionService'
