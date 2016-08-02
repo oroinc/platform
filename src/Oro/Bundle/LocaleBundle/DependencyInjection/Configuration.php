@@ -25,7 +25,8 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_LOCALIZATION = 'default_localization';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
