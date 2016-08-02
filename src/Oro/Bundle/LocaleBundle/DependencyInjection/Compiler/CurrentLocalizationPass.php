@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class CurrentLocalizationPass implements CompilerPassInterface
 {
     const PROVIDER_TAG = 'oro_locale.extension.current_localization';
-    const EXTENSION_SERVICE_ID = 'oro_locale.provider.current_localization';
+    const EXTENSION_SERVICE_ID = 'oro_locale.provider.localization';
 
     /**
      * {@inheritdoc}
