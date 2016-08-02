@@ -69,6 +69,8 @@ oro_menu_config:
             route: 'oro_user_profile_configuration'
             extras:
                 position: 12
+            attributes:
+                class: 'mobile-hide'
 
     tree:
         application_menu:

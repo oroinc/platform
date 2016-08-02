@@ -68,6 +68,14 @@ class OrganizationsSelectType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_organizations_select';
     }
 
@@ -80,6 +88,12 @@ class OrganizationsSelectType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
                 $data = is_string($event->getData()) ? json_decode($event->getData(), true) : $event->getData();
+                if (isset($data['organizations'])) {
+                    $organizations = json_decode(reset($data['organizations']));
+                    $data['organizations'] = is_object($organizations)
+                        ? $organizations->organizations
+                        : $data['organizations'];
+                }
                 $event->setData($data);
             }
         );
@@ -95,10 +109,18 @@ class OrganizationsSelectType extends AbstractType
         );
         $builder->add(
             'businessUnits',
-            'oro_business_unit_tree',
+            'oro_type_business_unit_select_autocomplete',
             [
-                'multiple' => true,
                 'required' => false,
+                'label' => 'oro.user.form.access_settings.label',
+                'autocomplete_alias' => 'business_units_tree_search_handler',
+                'configs'            => [
+                    'multiple'    => true,
+                    'width'       => '400px',
+                    'component'   => 'bu-tree-autocomplete',
+                    'placeholder' => 'oro.dashboard.form.choose_business_unit',
+                    'allowClear'  => true,
+                ]
             ]
         );
     }

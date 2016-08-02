@@ -1,9 +1,14 @@
-<% if (typeof steps !== 'undefined' && steps.length > 0) { %>
-    <ul class="workflow-step-list nav <%= steps.length > 1 ? 'more-than-one-step' : 0 %>">
-        <% for (var i = 0; i < steps.length; i++ ) { %>
-        <li class="<%= steps[i].name === currentStep.name ? 'current' : (steps[i].processed ? 'processed' : '') %>">
-            <%= steps[i].label %>
-        </li>
-        <% } %>
-    </ul>
+<% if (typeof stepsData !== 'undefined') { %>
+    <% _.each(stepsData, function(stepData) { %>
+        <div class="workflow-step-container">
+            <span class="workflow-step-name"><%= stepData.workflow %></span>
+            <ul class="workflow-step-list nav <%= stepData.steps.length > 1 ? 'more-than-one-step' : 0 %>">
+                <% _.each(stepData.steps, function(step) { %>
+                    <li class="<%= step.name === stepData.currentStep.name ? 'current' : (step.processed ? 'processed' : '') %>">
+                        <%= step.label %>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    <% }) %>
 <% } %>

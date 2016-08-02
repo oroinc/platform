@@ -41,10 +41,13 @@ class EntityMetadata implements ToArrayInterface
     public function __clone()
     {
         if (null !== $this->attributes) {
-            $attributes = ConfigUtil::cloneItems($this->attributes->toArray());
+            $attributes = $this->attributes->toArray();
             $this->attributes->clear();
-            foreach ($attributes as $key => $value) {
-                $this->attributes->set($key, $value);
+            foreach ($attributes as $key => $val) {
+                if (is_object($val)) {
+                    $val = clone $val;
+                }
+                $this->attributes->set($key, $val);
             }
         }
         $this->metaProperties = ConfigUtil::cloneObjects($this->metaProperties);

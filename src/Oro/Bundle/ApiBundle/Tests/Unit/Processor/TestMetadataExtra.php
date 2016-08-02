@@ -32,4 +32,12 @@ class TestMetadataExtra implements MetadataExtraInterface
     public function configureContext(MetadataContext $context)
     {
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheKeyPart()
+    {
+        return null;
+    }
 }

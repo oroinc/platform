@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ExpectationException;
+use Doctrine\Common\Inflector\Inflector;
 
 class Form extends Element
 {
@@ -71,29 +71,52 @@ class Form extends Element
     public function findField($locator)
     {
         if ($field = parent::findField($locator)) {
+            if ($field->hasAttribute('type') && 'file' === $field->getAttribute('type')) {
+                return $this->elementFactory->wrapElement('FileField', $field);
+            }
+
+            if ($field->hasAttribute('type') && 'datetime' === $field->getAttribute('type')) {
+                return $this->elementFactory->wrapElement('DateTimePicker', $field->getParent()->getParent());
+            }
+
             return $field;
         }
 
+        if ($field = $this->findFieldByLabel($locator)) {
+            return $field;
+        }
+
+        if ($fieldSetLabel = $this->findFieldSetLabel($locator)) {
+            return $this->elementFactory->wrapElement('FieldSet', $fieldSetLabel->getParent());
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $locator Label text
+     * @return NodeElement|null
+     */
+    protected function findFieldByLabel($locator)
+    {
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
             if ($sndParent->hasClass('control-group-collection')) {
-                return $this->elementFactory->wrapElement('CollectionField', $sndParent);
+                $elementName = Inflector::singularize(trim($label->getText())).'Collection';
+                $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
+
+                return $this->elementFactory->wrapElement($elementName, $sndParent);
             } elseif ($sndParent->hasClass('control-group-oro_file')) {
-                return $this->elementFactory->wrapElement('FileField', $sndParent);
+                $input = $sndParent->find('css', 'input[type="file"]');
+
+                return $this->elementFactory->wrapElement('FileField', $input);
             } elseif ($select = $sndParent->find('css', 'select')) {
                 return $select;
             } elseif ($sndParent->hasClass('control-group-checkbox')) {
                 return $sndParent->find('css', 'input[type=checkbox]');
             } else {
-                throw new ExpectationException(
-                    sprintf('Find label "%s", but can\'t detemine field type', $locator),
-                    $this->getDriver()
-                );
+                self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
-        }
-
-        if ($fieldSetLabel = $this->findFieldSetLabel($locator)) {
-            return $this->elementFactory->wrapElement('FieldSet', $fieldSetLabel->getParent());
         }
 
         return null;
@@ -109,6 +132,10 @@ class Form extends Element
 
         if (0 === strpos($value, '[')) {
             return explode(',', trim($value, '[]'));
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
+            return new \DateTime($value);
         }
 
         return $value;

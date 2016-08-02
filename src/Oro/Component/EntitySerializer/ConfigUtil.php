@@ -177,4 +177,38 @@ class ConfigUtil
     {
         return explode(self::PATH_DELIMITER, $propertyPath);
     }
+
+    /**
+     * Makes a deep copy of an array of objects.
+     *
+     * @param object[] $objects
+     *
+     * @return object[]
+     */
+    public static function cloneObjects(array $objects)
+    {
+        $result = [];
+        foreach ($objects as $key => $val) {
+            $result[$key] = clone $val;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Makes a deep copy of an array of configuration options.
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    public static function cloneItems(array $items)
+    {
+        $result = [];
+        foreach ($items as $key => $val) {
+            $result[$key] = is_object($val) ? clone $val : $val;
+        }
+
+        return $result;
+    }
 }

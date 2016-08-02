@@ -46,14 +46,13 @@ class DataNormalizer
             $targetConfig = $fieldConfig->getTargetEntity();
             if (!$fieldConfig->isExcluded()) {
                 $propertyPath = $fieldConfig->getPropertyPath();
-                if ($propertyPath
-                    && (!array_key_exists($field, $row) || null !== $row[$field])
-                ) {
-                    $renaming     =
-                        null !== $targetConfig
-                        && !$fieldConfig->isCollapsed()
-                        && $targetConfig->hasField($propertyPath);
-                    $this->applyPropertyPath($row, $field, $propertyPath, $renaming);
+                if ($propertyPath) {
+                    $path = ConfigUtil::explodePropertyPath($propertyPath);
+                    if (!array_key_exists($path[0], $row) || null !== $row[$path[0]]) {
+                        $this->applyPropertyPath($row, $field, $path);
+                    } else {
+                        $row[$field] = null;
+                    }
                 }
             }
             if (null !== $targetConfig && !empty($row[$field]) && is_array($row[$field])) {
@@ -67,47 +66,47 @@ class DataNormalizer
     }
 
     /**
-     * @param array  $row
-     * @param string $field
-     * @param string $propertyPath
-     * @param bool   $renaming
+     * @param array    $row
+     * @param string   $field
+     * @param string[] $propertyPath
      */
-    protected function applyPropertyPath(array &$row, $field, $propertyPath, $renaming)
+    protected function applyPropertyPath(array &$row, $field, array $propertyPath)
     {
         if (!array_key_exists($field, $row)) {
-            if (!$renaming) {
-                $row[$field] = $this->extractValueByPropertyPath($row, $propertyPath);
-            }
+            $row[$field] = $this->extractValueByPropertyPath($row, $propertyPath);
         } elseif (is_array($row[$field])) {
+            $childPropertyPath = array_slice($propertyPath, 1);
             if (array_key_exists(0, $row[$field])) {
                 foreach ($row[$field] as &$subRow) {
-                    $subRow = $this->extractValueByPropertyPath($subRow, $propertyPath);
+                    $subRow = $this->extractValueByPropertyPath($subRow, $childPropertyPath);
                 }
             } else {
-                $row[$field] = $this->extractValueByPropertyPath($row[$field], $propertyPath);
+                $row[$field] = $this->extractValueByPropertyPath($row[$field], $childPropertyPath);
             }
-        } elseif (!$renaming && array_key_exists($propertyPath, $row) && $field !== $propertyPath) {
-            $row[$field] = $row[$propertyPath];
-            unset($row[$propertyPath]);
+        } elseif (1 === count($propertyPath)) {
+            $srcName = $propertyPath[0];
+            if (array_key_exists($srcName, $row) && $field !== $srcName) {
+                $row[$field] = $row[$srcName];
+                unset($row[$srcName]);
+            }
         }
     }
 
     /**
-     * @param array  $row
-     * @param string $propertyPath
+     * @param array    $row
+     * @param string[] $propertyPath
      *
      * @return mixed
      */
-    protected function extractValueByPropertyPath(array &$row, $propertyPath)
+    protected function extractValueByPropertyPath(array &$row, array $propertyPath)
     {
         $result     = null;
-        $properties = ConfigUtil::explodePropertyPath($propertyPath);
-        $lastIndex  = count($properties) - 1;
+        $lastIndex  = count($propertyPath) - 1;
         $i          = 0;
         $path       = [];
         $currentRow = &$row;
         while ($i <= $lastIndex) {
-            $property = $properties[$i];
+            $property = $propertyPath[$i];
             if (null === $currentRow || !array_key_exists($property, $currentRow)) {
                 break;
             }

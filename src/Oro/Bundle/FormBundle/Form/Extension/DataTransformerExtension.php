@@ -7,8 +7,12 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+
 class DataTransformerExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+
     /** @var ContainerInterface */
     protected $container;
 
@@ -36,13 +40,5 @@ class DataTransformerExtension extends AbstractTypeExtension
         if (!empty($options['data_transformer'])) {
             $builder->addViewTransformer($this->container->get($options['data_transformer']));
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 }

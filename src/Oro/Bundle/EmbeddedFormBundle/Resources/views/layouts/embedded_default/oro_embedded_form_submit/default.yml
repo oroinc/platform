@@ -8,7 +8,5 @@ layout:
                 form_name: embedded_form
                 split_to_fields: true
 
-    conditions:
-        '@eq':
-            - ''
-            - $context.embedded_form_custom_layout
+    conditions: 'context["embedded_form_custom_layout"]==""'
+
