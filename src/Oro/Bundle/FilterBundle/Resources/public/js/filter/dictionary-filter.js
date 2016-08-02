@@ -62,6 +62,9 @@ define(function(require) {
 
         previousData: [],
 
+        /**
+         * Data of selected values
+         */
         selectedData: {},
 
         /**
@@ -104,7 +107,12 @@ define(function(require) {
             }
         },
 
-        loadValuesById: function(callbackEvent) {
+        /**
+         * Execute ajax request to get data of entities by ids.
+         *
+         * @param successEventName
+         */
+        loadValuesById: function(successEventName) {
             var self = this;
             $.ajax({
                 url: routing.generate(
@@ -117,7 +125,7 @@ define(function(require) {
                     'keys': this.value.value
                 },
                 success: function(response) {
-                    self.trigger(callbackEvent, response);
+                    self.trigger(successEventName, response);
                 },
                 error: function (jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
@@ -125,18 +133,49 @@ define(function(require) {
             })
         },
 
+        /**
+         * Handler for event 'renderCriteriaLoadValues'
+         *
+         * @param response
+         */
         renderCriteriaLoadValues: function(response) {
+            this.updateLocalValues(response.results);
+
+            this._writeDOMValue(this.value);
+            this.applySelect2();
+            this._updateCriteriaHint();
+            this.renderDeferred.resolve();
+        },
+
+        /**
+         * Handler for event 'updateCriteriaLabels'
+         *
+         * @param response
+         */
+        updateCriteriaLabels: function(response)
+        {
+            this.updateLocalValues(response.results);
+            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
+            this._updateCriteriaHint();
+        },
+
+        /**
+         * Update privet variables selectedData and value
+         *
+         * @param values
+         *
+         * @returns {oro.filter.DictionaryFilter}
+         */
+        updateLocalValues: function(values) {
             var ids = [];
-            _.each(response.results, function (item) {
+            _.each(values, function (item) {
                 ids.push(item.id);
                 this.selectedData[item.id] = item;
             }, this);
 
             this.value.value = ids;
-            this._writeDOMValue(this.value);
-            this.applySelect2();
-            this._updateCriteriaHint();
-            this.renderDeferred.resolve();
+
+            return this;
         },
 
         /**
@@ -150,19 +189,7 @@ define(function(require) {
             this.loadValuesById('renderCriteriaLoadValues');
         },
 
-        updateCriteriaLabels: function(response)
-        {
-            var ids = [];
-            _.each(response.results, function (item) {
-                ids.push(item.id);
-                this.selectedData[item.id] = item;
-            }, this);
 
-            this.value.value = ids;
-
-            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
-            this._updateCriteriaHint();
-        },
 
         /**
          *
@@ -212,7 +239,6 @@ define(function(require) {
             }));
 
             this._appendFilter($filter);
-            this._refreshWidth();
         },
 
         /**
@@ -394,18 +420,6 @@ define(function(require) {
         },
 
         /**
-         * Update width of filter
-         */
-        _refreshWidth: function() {
-            var valueFrame = this.$('.value-field-frame');
-            // update left and right margins of value field frame
-            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
-            var rightWidth = this.$('.filter-update').outerWidth();
-            valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('padding-right', rightWidth);
-        },
-
-        /**
          * @inheritDoc
          */
         _getCriteriaHint: function() {
@@ -463,20 +477,24 @@ define(function(require) {
         },
 
         /**
-         *
+         * Checking  the existence of entities with selected ids in loaded data.
          * @param values
          * @returns {boolean}
          */
         valueIsLoaded: function(values) {
-            var foundItems = 0;
-            var self = this;
-            _.each(values, function(item) {
-                if (self.selectedData && self.selectedData[item]) {
-                    foundItems++;
-                }
-            });
+            if (values) {
+                var foundItems = 0;
+                var self = this;
+                _.each(values, function (item) {
+                    if (self.selectedData && self.selectedData[item]) {
+                        foundItems++;
+                    }
+                });
 
-            return foundItems === values.length
+                return foundItems === values.length;
+            }
+
+            return true;
         }
     });
 
