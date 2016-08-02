@@ -17,12 +17,20 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension;
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
+
+    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationProvider;
 
     /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $localizationHelper;
@@ -48,6 +56,10 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->localizationProvider = $this->getMockBuilder(LocalizationProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -62,7 +74,11 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new LocalizedValueExtension($this->doctrineHelper, $this->localizationHelper);
+        $this->extension = new LocalizedValueExtension(
+            $this->doctrineHelper,
+            $this->localizationProvider,
+            $this->localizationHelper
+        );
     }
 
     public function testApplicable()
@@ -89,6 +105,18 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->extension->isApplicable($config));
     }
 
+    public function testProcessConfigsWithoutCurrentLocalization()
+    {
+        $config = DatagridConfiguration::create([]);
+        $clonedConfig = clone $config;
+
+        $this->localizationProvider->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+
+        $this->extension->processConfigs($clonedConfig);
+
+        $this->assertEquals($config, $clonedConfig);
+    }
+
     public function testProcessConfigs()
     {
         $config = DatagridConfiguration::create([
@@ -111,13 +139,37 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             'filters' => ['columns' => []],
         ]);
 
-        $this->localizationHelper->expects($this->once())
+        $this->localizationProvider->expects($this->once())
             ->method('getCurrentLocalization')
             ->willReturn(new Localization());
 
         $this->extension->processConfigs($config);
 
         $this->assertEquals($expectedConfig, $config);
+    }
+
+    public function testVisitDatasourceWithCurrentLocalization()
+    {
+        $config = DatagridConfiguration::create([]);
+
+        $this->localizationProvider->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(new Localization());
+
+        $this->datasource->expects($this->never())->method($this->anything());
+
+        $this->extension->visitDatasource($config, $this->datasource);
+    }
+
+    public function testVisitDatasourceWithoutRootAlias()
+    {
+        $config = DatagridConfiguration::create([]);
+
+        $this->localizationProvider->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+
+        $this->datasource->expects($this->never())->method($this->anything());
+
+        $this->extension->visitDatasource($config, $this->datasource);
     }
 
     public function testVisitDatasource()
@@ -141,7 +193,7 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $this->localizationHelper->expects($this->once())
+        $this->localizationProvider->expects($this->once())
             ->method('getCurrentLocalization')
             ->willReturn(null);
 
@@ -179,6 +231,30 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->visitDatasource($config, $this->datasource);
     }
 
+    public function testVisitResultWithoutCurrentLocalization()
+    {
+        $config = DatagridConfiguration::create([]);
+
+        $this->localizationProvider->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+
+        $result = ResultsObject::create([]);
+
+        $this->extension->visitResult($config, $result);
+    }
+
+    public function testVisitResultWithoutRootAlias()
+    {
+        $config = DatagridConfiguration::create([]);
+
+        $this->localizationProvider->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(new Localization());
+
+        $result = ResultsObject::create([]);
+
+        $this->extension->visitResult($config, $result);
+    }
+
     public function testVisitResult()
     {
         $config = DatagridConfiguration::create([
@@ -204,7 +280,7 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $this->localizationHelper->expects($this->once())
+        $this->localizationProvider->expects($this->once())
             ->method('getCurrentLocalization')
             ->willReturn(new Localization());
 
@@ -251,5 +327,10 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals([$record], $result->getData());
+    }
+
+    public function testGetPriority()
+    {
+        $this->assertEquals(200, $this->extension->getPriority());
     }
 }

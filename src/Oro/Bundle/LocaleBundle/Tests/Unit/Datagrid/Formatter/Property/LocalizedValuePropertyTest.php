@@ -9,7 +9,7 @@ use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 class LocalizedValuePropertyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var FallbackProperty
+     * @var LocalizedValueProperty
      */
     protected $property;
 
@@ -19,9 +19,7 @@ class LocalizedValuePropertyTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->property = new LocalizedValueProperty();
-        $this->property->init(
-            PropertyConfiguration::createNamed(LocalizedValueProperty::NAME, [])
-        );
+        $this->property->init(PropertyConfiguration::createNamed(LocalizedValueProperty::NAME, []));
     }
 
     public function testGetValue()

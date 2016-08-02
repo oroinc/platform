@@ -4,11 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Datagrid\Extension;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Inflector\Inflector;
-use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
@@ -16,6 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -27,6 +28,9 @@ class LocalizedValueExtension extends AbstractExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var LocalizationProvider */
+    protected $localizationProvider;
+
     /** @var LocalizationHelper */
     protected $localizationHelper;
 
@@ -35,11 +39,16 @@ class LocalizedValueExtension extends AbstractExtension
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param LocalizationProvider $localizationProvider
      * @param LocalizationHelper $localizationHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, LocalizationHelper $localizationHelper)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        LocalizationProvider $localizationProvider,
+        LocalizationHelper $localizationHelper
+    ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->localizationProvider = $localizationProvider;
         $this->localizationHelper = $localizationHelper;
 
         $this->propertyAccessor = new PropertyAccessor();
@@ -60,9 +69,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $properties = $this->getProperties($config);
-
-        return count($properties) > 0;
+        return count($this->getProperties($config)) > 0;
     }
 
     /**
@@ -70,7 +77,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        if (null === $this->localizationHelper->getCurrentLocalization()) {
+        if (null === $this->localizationProvider->getCurrentLocalization()) {
             return;
         }
 
@@ -87,7 +94,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        if (null !== $this->localizationHelper->getCurrentLocalization()) {
+        if (null !== $this->localizationProvider->getCurrentLocalization()) {
             return;
         }
 
@@ -98,7 +105,7 @@ class LocalizedValueExtension extends AbstractExtension
 
         $properties = $this->getProperties($config);
 
-        /* @var $queryBuilder QueryBuilder */
+        /** @var OrmDatasource $datasource */
         $queryBuilder = $datasource->getQueryBuilder();
 
         foreach ($properties as $name => $definition) {
@@ -125,7 +132,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        if (null === ($localization = $this->localizationHelper->getCurrentLocalization())) {
+        if (null === ($localization = $this->localizationProvider->getCurrentLocalization())) {
             return;
         }
 
@@ -171,16 +178,6 @@ class LocalizedValueExtension extends AbstractExtension
     }
 
     /**
-     * @param string $fieldName
-     * @param string $prefix
-     * @return string
-     */
-    protected function getMethodName($fieldName, $prefix)
-    {
-        return $prefix . ucfirst(Inflector::camelize(Inflector::singularize($fieldName)));
-    }
-
-    /**
      * @param DatagridConfiguration $config
      * @return array
      */
@@ -190,7 +187,7 @@ class LocalizedValueExtension extends AbstractExtension
             $config->offsetGetOr(Configuration::PROPERTIES_KEY, []),
             function ($property) {
                 return isset($property[LocalizedValueProperty::TYPE_KEY]) &&
-                    $property[LocalizedValueProperty::TYPE_KEY] == LocalizedValueProperty::NAME;
+                    $property[LocalizedValueProperty::TYPE_KEY] === LocalizedValueProperty::NAME;
             }
         );
 

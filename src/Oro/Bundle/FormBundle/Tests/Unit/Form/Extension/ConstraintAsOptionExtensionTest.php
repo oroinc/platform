@@ -49,9 +49,4 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf($constraintClasses[$key], $constraint);
         }
     }
-
-    public function testGetExtendedType()
-    {
-        $this->assertEquals('form', $this->extension->getExtendedType());
-    }
 }

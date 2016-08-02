@@ -16,12 +16,10 @@ trait FallbackTrait
 
     /**
      * @param object $object
-     * @param striing $method
+     * @param string $method
      */
     protected function assertFallbackValue($object, $method)
     {
-        $callable = [$object, $method];
-
         $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
         $localization2 = $this->getEntity(Localization::class, ['id' => 2, 'parentLocalization' => $localization1]);
         $localization3 = $this->getEntity(Localization::class, ['id' => 3, 'parentLocalization' => $localization2]);
@@ -50,19 +48,18 @@ trait FallbackTrait
             'localization' => $localization3,
         ]);
 
+        $values = new ArrayCollection([$value1, $value2, $value3, $value4]);
+
+        // test 'FallbackType::NONE'
+        $this->assertEquals($value2, $object->$method($values, $localization1));
+        // test 'FallbackType::PARENT_LOCALIZATION;
+        $this->assertEquals($value2, $object->$method($values, $localization2));
+        // test 'FallbackType::SYSTEM;
+        $this->assertEquals($value1, $object->$method($values, $localization3));
 
         // test logic exception
         $badValues = new ArrayCollection([$value1, $value1]);
         $this->setExpectedException('LogicException');
-        $callable($badValues, $localization1);
-
-        $values = new ArrayCollection([$value1, $value2, $value3, $value4]);
-
-        // test 'FallbackType::NONE'
-        $this->assertEquals($value2, $callable($values, $localization1));
-        // test 'FallbackType::PARENT_LOCALIZATION;
-        $this->assertEquals($value2, $callable($values, $localization2));
-        // test 'FallbackType::SYSTEM;
-        $this->assertEquals($value1, $callable($values, $localization3));
+        $object->$method($badValues, $localization1);
     }
 }

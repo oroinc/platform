@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Layout;
 
-use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
@@ -28,11 +28,15 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
     public function getFunctions()
     {
         return [
-            new ExpressionFunction('localized_value', function () {
-                return '$this->localizationHelper->getLocalizedValue($value)';
-            }, function (array $variables, $value) {
-                return $this->localizationHelper->getLocalizedValue($value);
-            })
+            new ExpressionFunction(
+                'localized_value',
+                function () {
+                    return '$this->localizationHelper->getLocalizedValue($value)';
+                },
+                function (array $variables, $value) {
+                    return $this->localizationHelper->getLocalizedValue($value);
+                }
+            )
         ];
     }
 }

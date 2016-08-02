@@ -10,25 +10,26 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface;
 
 class LocalizationProvider
 {
     const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
 
-    /**
-     * @var ObjectRepository
-     */
+    /** @var ObjectRepository */
     protected $repository;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     protected $cache;
+
+    /** @var CurrentLocalizationExtensionInterface[] */
+    protected $extensions = [];
+
+    /** @var Localization */
+    protected $currentLocalization = false;
 
     /**
      * @param ObjectRepository $repository
@@ -41,6 +42,15 @@ class LocalizationProvider
 
         /** used to minimize SQL Queries */
         $this->cache = new ArrayCache();
+    }
+
+    /**
+     * @param string $name
+     * @param CurrentLocalizationExtensionInterface $extension
+     */
+    public function addExtension($name, CurrentLocalizationExtensionInterface $extension)
+    {
+        $this->extensions[$name] = $extension;
     }
 
     /**
@@ -105,6 +115,30 @@ class LocalizationProvider
         }
 
         return null;
+    }
+
+    /**
+     * @return Localization|null
+     */
+    public function getCurrentLocalization()
+    {
+        if (false === $this->currentLocalization) {
+            $this->currentLocalization = null;
+
+            if (!$this->extensions) {
+                return null;
+            }
+
+            foreach ($this->extensions as $extension) {
+                /* @var $extension CurrentLocalizationExtensionInterface */
+                if (null !== ($localization = $extension->getCurrentLocalization())) {
+                    $this->currentLocalization = $localization;
+                    break;
+                }
+            }
+        }
+
+        return $this->currentLocalization;
     }
 
     /**

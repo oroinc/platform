@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 trait FallbackTrait
@@ -57,18 +58,7 @@ trait FallbackTrait
      */
     private function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
     {
-        $filteredValues = $values->filter(
-            function (LocalizedFallbackValue $title) use ($localization) {
-                return $localization === $title->getLocalization();
-            }
-        );
-
-        if ($filteredValues->count() > 1) {
-            $title = $localization ? $localization->getName() : 'default';
-            throw new \LogicException(sprintf('There must be only one %s title', $title));
-        }
-
-        $value = $filteredValues->count() ? $filteredValues->first() : null;
+        $value = $this->getValue($values, $localization);
         if ($value && $localization) {
             switch ($value->getFallback()) {
                 case FallbackType::PARENT_LOCALIZATION:
@@ -87,5 +77,26 @@ trait FallbackTrait
         }
 
         return $value;
+    }
+
+    /**
+     * @param Collection $values
+     * @param Localization|null $localization
+     * @return LocalizedFallbackValue|null
+     */
+    private function getValue(Collection $values, Localization $localization = null)
+    {
+        $filteredValues = $values->filter(
+            function (LocalizedFallbackValue $title) use ($localization) {
+                return $localization === $title->getLocalization();
+            }
+        );
+
+        if ($filteredValues->count() > 1) {
+            $title = $localization ? $localization->getName() : 'default';
+            throw new \LogicException(sprintf('There must be only one %s title', $title));
+        }
+
+        return $filteredValues->count() ? $filteredValues->first() : null;
     }
 }
