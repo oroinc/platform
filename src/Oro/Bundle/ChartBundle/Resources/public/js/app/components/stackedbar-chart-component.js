@@ -41,11 +41,11 @@ define(function(require) {
             var drawGraph = _.bind(this.drawGraph, this);
             var start;
 
-            Flotr.EventAdapter.observe(container, 'flotr:mousedown',  function (e) {
+            Flotr.EventAdapter.observe(container, 'flotr:mousedown',  function(e) {
                 start = graph.getEventPosition(e);
                 Flotr.EventAdapter.observe(container, 'flotr:mousemove', onMove);
                 Flotr.EventAdapter.observe(container, 'flotr:mouseup', onStop);
-            });  
+            });
 
             function onStop () {
                 Flotr.EventAdapter.stopObserving(container, 'flotr:mousemove', onMove);

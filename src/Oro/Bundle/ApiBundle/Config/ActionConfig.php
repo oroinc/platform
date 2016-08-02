@@ -101,7 +101,7 @@ class ActionConfig
      */
     public function __clone()
     {
-        $this->cloneItems();
+        $this->items = ConfigUtil::cloneItems($this->items);
         $this->fields = ConfigUtil::cloneObjects($this->fields);
     }
 

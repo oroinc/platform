@@ -53,6 +53,8 @@ UPGRADE FROM 1.9 to 1.10
 - Added migration `Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery` for updating ACL Entries to use custom Permissions.
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`.
 - Added third parameter `$byCurrentGroup` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions` for getting permissions only for current application group name. Updated same method in `Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension` and `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`.
+- Added second parameter `$permissionName` to `getAccessLevelNames` method of `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
+- Added `getFieldExtension` method of `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
 - For php version from 7.0.0 to 7.0.5 we replaced `Symfony\Component\Security\Acl\Domain\Entry` on `Oro\Bundle\SecurityBundle\Acl\Domain\Entry` to avoid [bug](https://bugs.php.net/bug.php?id=71940) with unserialization of an object reference
 - Method `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::getTreeData` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::createTreeObject` instead.
 - Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBU` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBusinessUnit` instead.
@@ -237,8 +239,8 @@ Now:
 
 
 ####EmailBundle
-- Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
-- Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
+- `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager::__construct()` signature changed from `public function __construct(FilesystemMap $filesystemMap, EntityManager $em, KernelInterface $kernel, ServiceLink $securityFacadeLink, RouterInterface $router, ConfigFileValidator $configFileValidator, AttachmentAssociationHelper $attachmentAssociationHelper)` to `public function __construct(FileManager $fileManager, EntityManager $em, RouterInterface $router, ConfigFileValidator $configFileValidator, AttachmentAssociationHelper $attachmentAssociationHelper)`.
+- `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer::__construct()` signature changed from `public function __construct(FilesystemMap $filesystemMap, Factory $factory)` to `public function __construct(Factory $factory, FileManager $fileManager, AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager)`.
 - The constructor of the `Oro\Bundle\EmailBundle\Mailer\Processor` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailOwnerProvider $emailOwnerProvider, EmailActivityManager $emailActivityManager, ServiceLink $serviceLink, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`. After: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailActivityManager $emailActivityManager, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`.
 - `Oro\Bundle\EmailBundle\Mailer\Processor::getEmailOrigin` marked as deprecated. Use method `Oro\Bundle\EmailBundle\Tools\EmailOriginHelper::getEmailOrigin` instead.
 - Additional you should use origin as second parameter for `Oro\Bundle\EmailBundle\Mailer\Processor::process` if you want use specific transport different from system.
@@ -253,6 +255,12 @@ Now:
 ####AttachmentBundle:
 - Fixed `Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser` to avoid PHP notices on file upload in some cases
 - Added translation strategies to dynamically handle translation fallbacks
+- Extracted a file system relates functionality from `Oro\Bundle\AttachmentBundle\Manager\AttachmentManager` to `Oro\Bundle\AttachmentBundle\Manager\FileManager`. As result the following methods of the AttachmentManager class was marked as deprecated: `prepareRemoteFile`, `preUpload`, `upload`, `copyLocalFileToStorage`, `getContent`, `checkOnDelete`, `copyAttachmentFile`.
+- `Oro\Bundle\AttachmentBundle\Manager\AttachmentManager::__construct()` signature changed from `public function __construct(FilesystemMap $filesystemMap, Router $router, ServiceLink $securityFacadeLink, array $fileIcons, AssociationManager $associationManager)` to `public function __construct(RouterInterface $router, array $fileIcons, AssociationManager $associationManager)`.
+- Removed `uploaded` property of `Oro\Bundle\AttachmentBundle\Entity\File`.
+- `Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter::__construct()` signature changed from `public function __construct(AttachmentManager $manager, FileLocatorInterface $fileLocator)` to `public function __construct(FileManager $fileManager, FileLocatorInterface $fileLocator)`.
+- `Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager::__construct()` signature changed from `public function __construct(string $class, ObjectManager $om, SecurityFacade $securityFacade, AttachmentManager $attachmentManager)` to `public function __construct(string $class, ObjectManager $om, SecurityFacade $securityFacade, FileManager $fileManager, AttachmentManager $attachmentManager)`.
+- `Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator::validate()` signature changed from `public function validate(string $dataClass, File $entity, string $fieldName = '')` to `public function validate(ComponentFile $file, string $dataClass, string $fieldName = '')`.
 
 ####CalendarBundle
 - The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
