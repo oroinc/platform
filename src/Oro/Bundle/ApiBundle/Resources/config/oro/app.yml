@@ -11,7 +11,6 @@ nelmio_api_doc:
         enabled: false
     cache:
         enabled: true
-        file: '%kernel.cache_dir%/oro_entities/Extend/ApiDoc/cache'
 
 security:
     firewalls:
