@@ -16,18 +16,15 @@ class Count extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (array_key_exists(0, $options)) {
-            $this->options['value'] = $options[0];
-        } elseif (array_key_exists('value', $options)) {
+        if (array_key_exists('value', $options)) {
             $this->options['value'] = $options['value'];
         }
 
-        if (array_key_exists(1, $options)) {
-            $this->options['attribute'] = $options[1];
-        } elseif (array_key_exists('attribute', $options)) {
+        if (array_key_exists('attribute', $options)) {
             $this->options['attribute'] = $options['attribute'];
         }
 
+        //validation
         if (!array_key_exists('value', $this->options)) {
             throw new InvalidParameterException('Parameter `value` is required.');
         }
