@@ -35,7 +35,7 @@ In additional Oro allows you to protect data on different levels:
  - **Business Unit**: Allows to gives a user a permissions to access to records in all business units are assigned to the user.
  - **User**: Allows to gives a user a permissions to access to own records and records that are shared with the user.
 
-Also the following permissions are supported:
+Also the following permissions are supported for entities:
 
  - **VIEW**: Controls whether a user is allowed to view a record.
  - **CREATE**: Controls whether a user is allowed to create a record.
@@ -46,10 +46,17 @@ Also the following permissions are supported:
 
  `*` **NOTE: SHARE functionality is implemented in Enterprise Edition**
 
+And these permissions are supported for fields:
+ 
+ - **VIEW**: Controls whether a user is allowed to view a field.
+ - **EDIT**: Controls whether a user is allowed to modify a field.
+
+
 - [Implementation](./Resources/doc/implementation.md)
 - [UI](./Resources/doc/ui.md)
 - [ACL manager](./Resources/doc/acl-manager.md)
 - [Access levels] (./Resources/doc/access-levels.md)
+- [Field ACL](./Resources/doc/field-acl.md)
 - [Custom listeners] (./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
 

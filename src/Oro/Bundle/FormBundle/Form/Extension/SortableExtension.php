@@ -6,8 +6,12 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+
 class SortableExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
@@ -36,13 +40,5 @@ class SortableExtension extends AbstractTypeExtension
             'sortable' => false,
             'sortable_property_path' => 'position',
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 }
