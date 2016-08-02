@@ -12,22 +12,17 @@ define([
          */
         options: {},
 
+        autoRender: true,
+
         events: {
             'change input[name$="[allDay]"]': 'onAllDayChange'
         },
 
         startAtTimeElement: null,
-        endAtTimeElement: null,
+        oldStartAtValue: null,
 
-        /**
-         * @constructor
-         *
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            this.options = options || {};
-            this.render();
-        },
+        endAtTimeElement: null,
+        oldEndAtValue: null,
 
         render: function() {
             var self = this;
@@ -56,8 +51,8 @@ define([
                 this.endAtTimeElement = endAtElements.find('.timepicker-input');
             }
             if (allDayEventElement.prop('checked')) {
-                this.startAtTimeElement.data('old-time-value', this.startAtTimeElement.timepicker('getTime'));
-                this.endAtTimeElement.data('old-time-value', this.endAtTimeElement.timepicker('getTime'));
+                this.oldStartAtValue = this.startAtTimeElement.timepicker('getTime');
+                this.oldEndAtValue = this.endAtTimeElement.timepicker('getTime');
 
                 var resetTimeDelegate = function() {
                     $(this).timepicker('setTime', 0).trigger('change');
@@ -65,13 +60,11 @@ define([
                 this.startAtTimeElement.hide(animationDuration, resetTimeDelegate);
                 this.endAtTimeElement.hide(animationDuration, resetTimeDelegate);
             } else {
-                var oldStartTimeValue = this.startAtTimeElement.data('old-time-value');
-                if (oldStartTimeValue) {
-                    this.startAtTimeElement.timepicker('setTime', oldStartTimeValue);
+                if (this.oldStartAtValue) {
+                    this.startAtTimeElement.timepicker('setTime', this.oldStartAtValue);
                 }
-                var oldEndTimeValue = this.endAtTimeElement.data('old-time-value');
-                if (oldEndTimeValue) {
-                    this.endAtTimeElement.timepicker('setTime', oldEndTimeValue);
+                if (this.oldEndAtValue) {
+                    this.endAtTimeElement.timepicker('setTime', this.oldEndAtValue);
                 }
 
                 this.startAtTimeElement.show(animationDuration);

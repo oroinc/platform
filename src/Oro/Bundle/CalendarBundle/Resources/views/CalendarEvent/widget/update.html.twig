@@ -68,9 +68,7 @@
                     widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }},
                         function(widget) {
                             widget.once('widgetReady', function(){
-                                var allDayView = new AllDayView({'el': '#{{ form.vars.id }}'});
-                                widget.subview('all_day', allDayView);
-                                allDayView.render();
+                                widget.subview('all_day', new AllDayView({'el': '#{{ form.vars.id }}'}));
                             });
                         }
                     );
