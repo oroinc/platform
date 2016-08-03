@@ -27,7 +27,7 @@ Locale settings uses system configuration as a source.
 
 See detailed [documentation](./Resources/doc/reference/locale-settings.md) for more details.
 
-Formatters
------------------
+Formatters and Helpers
+----------------------
 
 Please see [documentation](./Resources/doc/index.md) for more details.

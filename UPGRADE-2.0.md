@@ -1,4 +1,4 @@
-UPGRADE FROM 1.10 to 2.0 
+UPGRADE FROM 1.10 to 2.0
 ========================
 
 ####WorkflowBundle
@@ -30,3 +30,15 @@ UPGRADE FROM 1.10 to 2.0
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder trough specified workflowItem alias
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
+
+####LocaleBundle:
+- Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryHelper`
+- Added provider `Oro\Bundle\LocaleBundle\Provider\LocalizationProvider` for providing localizations
+- Added provider `Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider` for providing current localization
+- Added datagrid extension `Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension`
+- Added datagrid property `Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty`
+- Added extension interface `Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface` for providing current localization
+- Added twig filter `localized_value` to `Oro\Bundle\LocaleBundle\Twig\LocalizationExtension`
+- Added ExpressionFunction `localized_value` to `Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider`
+- Added Localization Settings page in System configuration
+- Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values

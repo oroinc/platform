@@ -7,3 +7,4 @@ OroLocaleBundle Documentation
 - [Address Formatting](./reference/address-formatting.md)
 - [Name Formatting](./reference/name-formatting.md)
 - [Entities](./reference/entities.md)
+- [Localized Values](./reference/localized-values.md)

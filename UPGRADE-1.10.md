@@ -331,8 +331,6 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 - Added Formatter `Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter` for displaying full title of the language by code.
 - Added Formatter `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` for displaying full title of the formatting by code.
 - Added `oro_format_datetime_organization` twig extension - allows get formatted date and calendar date range by organization localization settings. Deprecated since 1.11. Will be removed after 1.13.
-- Added provider `Oro\Bundle\LocaleBundle\Provider\LocalizationProvider`.
-- Added Localization Settings page in System configuration.
 
 ####Layout Component:
 - `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
