@@ -13,7 +13,7 @@ php app/console oro:api:cache:clear
 
 ### oro:api:doc:cache:clear
 
-This command command allows to clear or warm-up API documentation cache.
+This command allows to clear or warm-up API documentation cache.
 
 If this command is launched without parameters it warm-ups all API documentation caches:
 
