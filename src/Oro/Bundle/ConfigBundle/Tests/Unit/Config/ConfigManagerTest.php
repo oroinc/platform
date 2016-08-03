@@ -373,6 +373,51 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->manager->get($parameterName));
     }
 
+    public function testGetSettingsDefaultsMethodReturnNullForMissing()
+    {
+        $this->assertEquals(null, $this->manager->getSettingsDefaults('oro_test.null', true));
+    }
+
+    public function testGetSettingsDefaultsMethodReturnPlain()
+    {
+        $this->assertEquals('anyvalue', $this->manager->getSettingsDefaults('oro_test.anysetting'));
+    }
+
+    public function testGetSettingsDefaultsMethodReturnFull()
+    {
+        $this->assertEquals(
+            [
+                'value' => 'anyvalue',
+                'type' => 'scalar',
+            ],
+            $this->manager->getSettingsDefaults('oro_test.anysetting', true)
+        );
+    }
+
+    public function testGetMergedWithParentValue()
+    {
+        $parameterName = 'oro_test.anysetting';
+
+        $this->globalScopeManager->expects($this->once())
+            ->method('getSettingValue')
+            ->with($parameterName, false)
+            ->willReturn(['a' => 1, 'b' => 1, 'c' => 1]);
+
+        $this->userScopeManager->expects($this->once())
+            ->method('getSettingValue')
+            ->with($parameterName, false)
+            ->willReturn(['a' => null, 'b' => 2]);
+
+        $this->assertEquals(
+            [
+                'a' => null,
+                'b' => 2,
+                'c' => 1,
+            ],
+            $this->manager->getMergedWithParentValue([], $parameterName)
+        );
+    }
+
     public function testGetValues()
     {
         $parameterName = 'oro_test.someValue';
