@@ -37,7 +37,9 @@ define(function(require) {
 
         onSubmit: function(e) {
             var value = _.extend({}, this.emptyValue, this.getValue());
-            if (parseInt(value.type) === this.typeValues.between && !value.value.start && !value.value.end) {
+            if (_.values(this.typeValues).indexOf(parseInt(value.type)) !== -1 &&
+                !value.value.start && !value.value.end
+            ) {
                 this.$('select[name=""]').eq(0).val(this.typeDefinedValues.all_time).change();
                 this.applyValue();
             }
