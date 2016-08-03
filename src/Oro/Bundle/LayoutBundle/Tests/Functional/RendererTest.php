@@ -429,7 +429,7 @@ HTML;
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
-                value=""/>
+                value="" checked="checked"/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
@@ -495,7 +495,7 @@ HTML;
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
-                value=""/>
+                value=""  checked="checked"/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"

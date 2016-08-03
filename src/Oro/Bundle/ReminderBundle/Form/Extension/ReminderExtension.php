@@ -9,9 +9,12 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class ReminderExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * @var ReminderManager
      */
@@ -23,14 +26,6 @@ class ReminderExtension extends AbstractTypeExtension
     public function __construct(ReminderManager $manager)
     {
         $this->manager = $manager;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 
     /**

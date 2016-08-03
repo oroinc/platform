@@ -71,6 +71,7 @@ class EntityClassResolver
      * Check if given class is real entity class
      *
      * @param string $className
+     *
      * @return bool
      */
     public function isEntity($className)

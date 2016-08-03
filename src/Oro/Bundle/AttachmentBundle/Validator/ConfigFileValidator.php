@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
-
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
 
@@ -39,13 +37,13 @@ class ConfigFileValidator
     }
 
     /**
-     * @param string          $dataClass Parent entity class name
-     * @param File|Attachment $entity    File entity
-     * @param string          $fieldName Field name where new file/image field was added
+     * @param ComponentFile $file      A file object to be validated
+     * @param string        $dataClass Parent entity class name
+     * @param string        $fieldName Field name where new file/image field was added
      *
      * @return \Symfony\Component\Validator\ConstraintViolationListInterface
      */
-    public function validate($dataClass, $entity, $fieldName = '')
+    public function validate(ComponentFile $file, $dataClass, $fieldName = '')
     {
         /** @var Config $entityAttachmentConfig */
         if ($fieldName === '') {
@@ -76,7 +74,7 @@ class ConfigFileValidator
         }
 
         return $this->validator->validate(
-            $entity->getFile(),
+            $file,
             [
                 new FileConstraint(
                     [

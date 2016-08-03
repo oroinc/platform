@@ -13,9 +13,12 @@ use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class RestrictionsExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * @var WorkflowManager
      */
@@ -92,14 +95,6 @@ class RestrictionsExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
-    }
-
-    /**
      * @param array         $restriction
      * @param FormInterface $form
      */
@@ -130,8 +125,8 @@ class RestrictionsExtension extends AbstractTypeExtension
     protected function tryDisableFieldValues(FormInterface $form, $field, $disabledValues)
     {
         $fieldForm = $form->get($field);
-        if ($fieldForm->getConfig()->hasOption('disabled_values')) {
-            FormUtils::replaceField($form, $field, ['disabled_values' => $disabledValues]);
+        if ($fieldForm->getConfig()->hasOption('excluded_values')) {
+            FormUtils::replaceField($form, $field, ['excluded_values' => $disabledValues]);
         } else {
             FormUtils::replaceField($form, $field, ['read_only' => true]);
         }

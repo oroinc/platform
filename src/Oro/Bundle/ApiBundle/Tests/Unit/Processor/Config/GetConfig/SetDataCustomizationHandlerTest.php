@@ -238,11 +238,13 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
         $rootAssert    = $this->getRootHandlerAssertion($configObject);
         $field2Assert  = $this->getChildHandlerAssertion(
+            $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
             'field2'
         );
         $field22Assert = $this->getChildHandlerAssertion(
+            $configObject,
             $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
             'Test\Field22Target',
             'field2.field22'
@@ -358,11 +360,13 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
         $rootAssert    = $this->getRootHandlerAssertion($configObject);
         $field2Assert  = $this->getChildHandlerAssertion(
+            $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
             'field2'
         );
         $field22Assert = $this->getChildHandlerAssertion(
+            $configObject,
             $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
             'Test\Field22Target',
             'field2.field22'
@@ -476,11 +480,13 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
         $rootAssert    = $this->getRootHandlerAssertion($configObject);
         $field2Assert  = $this->getChildHandlerAssertion(
+            $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
             'field2'
         );
         $field22Assert = $this->getChildHandlerAssertion(
+            $configObject,
             $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
             'Test\Field22Target',
             'field2.field22'
@@ -502,10 +508,15 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         $this->customizationProcessor->expects($this->at($this->customizationProcessorCallIndex++))
             ->method('process')
             ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) use ($sourceDataItem, $processedDataItem) {
+                function (CustomizeLoadedDataContext $context) use (
+                    $sourceDataItem,
+                    $processedDataItem,
+                    $configObject
+                ) {
                     $this->assertEquals($this->context->getVersion(), $context->getVersion());
                     $this->assertEquals($this->context->getRequestType(), $context->getRequestType());
                     $this->assertEquals($this->context->getClassName(), $context->getClassName());
+                    $this->assertSame($configObject, $context->getConfig());
                     $this->assertEquals($sourceDataItem, $context->getResult());
 
                     $context->setResult($processedDataItem);
@@ -522,6 +533,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     }
 
     /**
+     * @param EntityDefinitionConfig $configObject
      * @param EntityDefinitionConfig $childConfigObject
      * @param string                 $childEntityClass
      * @param string                 $fieldPath
@@ -529,6 +541,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
      * @return callable
      */
     protected function getChildHandlerAssertion(
+        EntityDefinitionConfig $configObject,
         EntityDefinitionConfig $childConfigObject,
         $childEntityClass,
         $fieldPath
@@ -542,13 +555,17 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                     $sourceDataItem,
                     $processedDataItem,
                     $childEntityClass,
-                    $fieldPath
+                    $fieldPath,
+                    $configObject,
+                    $childConfigObject
                 ) {
                     $this->assertEquals($this->context->getVersion(), $context->getVersion());
                     $this->assertEquals($this->context->getRequestType(), $context->getRequestType());
                     $this->assertEquals($this->context->getClassName(), $context->getRootClassName());
                     $this->assertEquals($childEntityClass, $context->getClassName());
                     $this->assertEquals($fieldPath, $context->getPropertyPath());
+                    $this->assertSame($configObject, $context->getRootConfig());
+                    $this->assertSame($childConfigObject, $context->getConfig());
                     $this->assertEquals($sourceDataItem, $context->getResult());
 
                     $context->setResult($processedDataItem);

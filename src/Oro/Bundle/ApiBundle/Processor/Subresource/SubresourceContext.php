@@ -380,8 +380,8 @@ class SubresourceContext extends Context
                 $parentEntityClass,
                 $this->getVersion(),
                 $this->getRequestType(),
-                $this->getParentMetadataExtras(),
-                $this->getParentConfig()
+                $this->getParentConfig(),
+                $this->getParentMetadataExtras()
             );
             $this->set(self::PARENT_METADATA, $metadata);
         } catch (\Exception $e) {

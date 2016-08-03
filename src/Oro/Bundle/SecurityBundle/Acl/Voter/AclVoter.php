@@ -113,6 +113,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             return self::ACCESS_ABSTAIN;
         }
 
+        $this->checkFieldObject($object);
         // replace empty permissions with default ones
         $attributesCount = count($attributes);
         for ($i = 0; $i < $attributesCount; $i++) {
@@ -125,7 +126,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         $result = $this->checkAclGroup($attributes, $group);
 
         if ($result !== self::ACCESS_DENIED) {
-            $result = parent::vote($token, $this->object, $attributes);
+            $result = parent::vote($token, $this->getObjectToVote($object), $attributes);
         }
 
         $this->extension = null;
@@ -235,5 +236,25 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         return $result;
+    }
+
+    /**
+     * @param mixed $object
+     *
+     * @return mixed|FieldVote
+     */
+    protected function getObjectToVote($object)
+    {
+        return $object instanceof FieldVote ? $object : $this->object;
+    }
+
+    /**
+     * @param mixed $object
+     */
+    protected function checkFieldObject($object)
+    {
+        if ($object instanceof FieldVote) {
+            $this->extension = $this->extension->getFieldExtension();
+        }
     }
 }

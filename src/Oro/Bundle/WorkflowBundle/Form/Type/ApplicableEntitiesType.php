@@ -45,6 +45,14 @@ class ApplicableEntitiesType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return self::NAME;
     }
 
@@ -61,6 +69,8 @@ class ApplicableEntitiesType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $resolver->setDefaults(['apply_exclusions' => false]);
+
         $resolver->setNormalizers(
             array(
                 'choices' => function (Options $options, $choices) {

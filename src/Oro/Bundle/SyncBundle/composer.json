@@ -6,8 +6,8 @@
     "homepage": "https://github.com/laboro/SyncBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": "2.7.*",
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*",
         "jdare/clank-bundle": "dev-master",
         "oro/platform-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master"
