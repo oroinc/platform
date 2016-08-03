@@ -14,6 +14,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 class CronCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:cron';
+    const DEFAULT_MAX_COUNT_CONCURRENT_JOBS = 1;
 
     /**
      * {@inheritdoc}
@@ -80,7 +81,12 @@ class CronCommand extends ContainerAwareCommand
 
             $schedule = current($schedule);
             $this->checkDefinition($command, $schedule);
-            $job = $this->createJob($output, $schedule, $name);
+            $maxCountConcurrentJobs = self::DEFAULT_MAX_COUNT_CONCURRENT_JOBS;
+            if ($command instanceof CronCommandConcurrentJobsInterface) {
+                $maxCountConcurrentJobs = $command->getMaxJobsCount();
+            }
+
+            $job = $this->createJob($output, $schedule, $name, $maxCountConcurrentJobs);
 
             if ($job) {
                 $em->persist($job);
@@ -172,18 +178,25 @@ class CronCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      * @param Schedule $schedule
      * @param string $name
+     * @param integer $maxJobsCount
      *
      * @return bool|Job
      */
-    protected function createJob(OutputInterface $output, Schedule $schedule, $name)
-    {
+    protected function createJob(
+        OutputInterface $output,
+        Schedule $schedule,
+        $name,
+        $maxJobsCount = self::DEFAULT_MAX_COUNT_CONCURRENT_JOBS
+    ) {
         $cronHelper = $this->getContainer()->get('oro_cron.helper.cron');
         $cron = $cronHelper->createCron($schedule->getDefinition());
         /**
          * @todo Add "Oro timezone" setting as parameter to isDue method
          */
         if ($cron->isDue()) {
-            if (!$this->hasJobInQueue($name)) {
+            if (!$this->hasJobInQueue($schedule->getCommand())
+                || $this->getJobsInQueueCount($schedule->getCommand()) < $maxJobsCount
+            ) {
                 $job = new Job($name);
 
                 $output->writeln('<comment>added to job queue</comment>');
@@ -209,5 +222,15 @@ class CronCommand extends ContainerAwareCommand
         $jobManager = $this->getContainer()->get('oro_cron.job_manager');
 
         return $jobManager->hasJobInQueue($name, '[]');
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return integer
+     */
+    protected function getJobsInQueueCount($name)
+    {
+        return $this->getContainer()->get('oro_cron.job_manager')->getJobsInQueueCount($name, '[]');
     }
 }
