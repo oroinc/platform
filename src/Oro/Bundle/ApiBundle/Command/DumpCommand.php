@@ -132,11 +132,17 @@ class DumpCommand extends AbstractDebugCommand
         /** @var ResourcesProvider $resourcesProvider */
         $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
         $resources = $resourcesProvider->getResources($version, $requestType);
+        /** @var ApiResource[] $sortedResources */
+        $sortedResources = [];
+        foreach ($resources as $resource) {
+            $sortedResources[$resource->getEntityClass()] = $resource;
+        }
+        ksort($sortedResources);
 
         /** @var SubresourcesProvider $subresourcesProvider */
         $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
 
-        foreach ($resources as $resource) {
+        foreach ($sortedResources as $resource) {
             if ($entityClass && $resource->getEntityClass() !== $entityClass) {
                 continue;
             }
