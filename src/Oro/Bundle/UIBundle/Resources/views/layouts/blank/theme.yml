@@ -1,5 +1,5 @@
 label: Blank theme
-description: Blank theme based on BEM methodology
+description: Blank theme.
 groups: [ main ]
 data:
     assets:
