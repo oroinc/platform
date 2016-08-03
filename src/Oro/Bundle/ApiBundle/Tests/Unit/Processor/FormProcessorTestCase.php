@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Validator\Validation;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
@@ -38,5 +46,32 @@ class FormProcessorTestCase extends \PHPUnit_Framework_TestCase
                 new EntityDefinitionConfigExtra($this->context->getAction())
             ]
         );
+    }
+
+    /**
+     * @param FormExtensionInterface[] $extensions
+     *
+     * @return FormBuilder
+     */
+    protected function createFormBuilder(array $extensions = [])
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addExtensions(array_merge($this->getFormExtensions(), $extensions))
+            ->getFormFactory();
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        return new FormBuilder(null, null, $dispatcher, $formFactory);
+    }
+
+    /**
+     * @return FormExtensionInterface[]
+     */
+    protected function getFormExtensions()
+    {
+        $validator = Validation::createValidatorBuilder()
+            ->enableAnnotationMapping(new AnnotationReader())
+            ->getValidator();
+
+        return [new ValidatorExtension($validator)];
     }
 }

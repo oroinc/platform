@@ -17,10 +17,12 @@ config:
         'orocalendar/js/calendar/color-manager': 'bundles/orocalendar/js/calendar/color-manager.js'
         'orocalendar/js/app/views/change-status-view': 'bundles/orocalendar/js/app/views/change-status-view.js'
         'orocalendar/js/app/views/guest-notifier-view': 'bundles/orocalendar/js/app/views/guest-notifier-view.js'
+        'orocalendar/js/app/views/all-day-view': 'bundles/orocalendar/js/app/views/all-day-view.js'
         'orocalendar/js/app/views/calendar-event-form-view': 'bundles/orocalendar/js/app/views/calendar-event-form-view.js'
         'orocalendar/js/app/components/calendar-component': 'bundles/orocalendar/js/app/components/calendar-component.js'
         'orocalendar/js/app/components/dashboard-calendar-component': 'bundles/orocalendar/js/app/components/dashboard-calendar-component.js'
         'orocalendar/js/app/modules/calendar-module': 'bundles/orocalendar/js/app/modules/calendar-module.js'
         'orocalendar/js/validator/dateearlierthan': 'bundles/orocalendar/js/validator/dateearlierthan.js'
+        'oro/select2-attendees-component': 'bundles/orocalendar/js/app/components/select2-attendees-component.js'
     appmodules:
         - orocalendar/js/app/modules/calendar-module

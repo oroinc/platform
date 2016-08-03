@@ -3,6 +3,7 @@
 namespace Oro\Component\Routing\Resolver;
 
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class RouteCollectionAccessor
 {
@@ -81,11 +82,7 @@ class RouteCollectionAccessor
      */
     public function append($routeName, Route $route)
     {
-        $this->collection->insert($routeName, $route, null);
-        if (null !== $this->routeMap) {
-            $key                  = $this->getRouteKey($route->getPath(), $route->getMethods());
-            $this->routeMap[$key] = $routeName;
-        }
+        $this->insert($routeName, $route, null, false);
     }
 
     /**
@@ -96,27 +93,45 @@ class RouteCollectionAccessor
      */
     public function prepend($routeName, Route $route)
     {
-        $this->collection->insert($routeName, $route, null, true);
+        $this->insert($routeName, $route, null, true);
+    }
+
+    /**
+     * Adds a new route near to the specified target route.
+     * If the target route name is empty adds a new route to the beginning or end of the route collection.
+     *
+     * @param string      $routeName       The route name
+     * @param Route       $route           A Route instance
+     * @param string|null $targetRouteName The name of a route near to which the new route should be added
+     * @param bool        $prepend         Determines whether the new route should be added
+     *                                     before or after the target route
+     */
+    public function insert($routeName, Route $route, $targetRouteName = null, $prepend = false)
+    {
+        $this->collection->insert($routeName, $route, $targetRouteName, $prepend);
         if (null !== $this->routeMap) {
-            $key                  = $this->getRouteKey($route->getPath(), $route->getMethods());
+            $key = $this->getRouteKey($route->getPath(), $route->getMethods());
             $this->routeMap[$key] = $routeName;
         }
     }
 
     /**
-     * Adds a new route near to the specified target route.
+     * Adds a route collection near the specified target route.
+     * If the target route name is empty adds a given route collection to the beginning or end of the route collection.
      *
-     * @param string $routeName       The route name
-     * @param Route  $route           A Route instance
-     * @param string $targetRouteName The name of a route near to which the new route should be added
-     * @param bool   $prepend         Determines whether the new route should be added before or after the target route
+     * @param RouteCollection $collection      A RouteCollection instance
+     * @param string          $targetRouteName The name of a route near which the new route should be added
+     * @param bool            $prepend         Determines whether the new route should be added
+     *                                         before or after the target route
      */
-    public function insert($routeName, Route $route, $targetRouteName, $prepend = false)
+    public function insertCollection(RouteCollection $collection, $targetRouteName = null, $prepend = false)
     {
-        $this->collection->insert($routeName, $route, $targetRouteName, $prepend);
+        $this->collection->insertCollection($collection, $targetRouteName, $prepend);
         if (null !== $this->routeMap) {
-            $key                  = $this->getRouteKey($route->getPath(), $route->getMethods());
-            $this->routeMap[$key] = $routeName;
+            foreach ($collection->all() as $name => $route) {
+                $key = $this->getRouteKey($route->getPath(), $route->getMethods());
+                $this->routeMap[$key] = $name;
+            }
         }
     }
 

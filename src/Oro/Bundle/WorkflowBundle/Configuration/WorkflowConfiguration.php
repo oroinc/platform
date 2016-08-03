@@ -327,7 +327,6 @@ class WorkflowConfiguration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root(self::NODE_ENTITY_RESTRICTIONS);
         $rootNode
             ->useAttributeAsKey('name')
-            ->requiresAtLeastOneElement()
                 ->prototype('array')
                     ->children()
                         ->scalarNode('name')

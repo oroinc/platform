@@ -1,6 +1,8 @@
 parameters:
     # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
     oro_api.config.max_nesting_level: 3
+    # all supported ApiDoc views
+    oro_api.api_doc.views: ['default', 'rest_json_api', 'rest_plain']
 
 services:
     oro_api.action_processor_bag:
@@ -145,12 +147,14 @@ services:
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
 
-    oro_api.listener.console_command:
-        class: Oro\Bundle\ApiBundle\EventListener\ConsoleCommandListener
+    oro_api.listener.update_schema:
+        class: Oro\Bundle\ApiBundle\EventListener\UpdateSchemaListener
         arguments:
             - '@oro_api.resources_cache'
+            - '@nelmio_api_doc.extractor.api_doc_extractor'
+            - '%oro_api.api_doc.views%'
         tags:
-            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+            - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: onSchemaUpdate }
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
@@ -239,6 +243,9 @@ services:
             - '@oro_api.entity_serializer.field_accessor'
             - '@oro_api.entity_serializer.config_normalizer'
             - '@oro_api.entity_serializer.data_normalizer'
+        calls:
+            # replace to compiler pass injection ?
+            - ["setFieldsFilter", ['@oro_security.serializer.filter_chain']]
 
     oro_api.entity_serializer.doctrine_helper:
         class: Oro\Component\EntitySerializer\DoctrineHelper
@@ -263,7 +270,7 @@ services:
             - '@oro_api.entity_accessor'
 
     oro_api.entity_serializer.config_normalizer:
-        class: Oro\Component\EntitySerializer\ConfigNormalizer
+        class: Oro\Bundle\ApiBundle\Util\ConfigNormalizer
         public: false
 
     oro_api.entity_serializer.data_normalizer:

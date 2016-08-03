@@ -103,6 +103,14 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_entity_extend_multiple_association_choice';
     }
 

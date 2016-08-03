@@ -10,9 +10,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Component\Log\OutputLogger;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandConcurrentJobsInterface;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 
-class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface
+class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface, CronCommandConcurrentJobsInterface
 {
     /**
      * The maximum number of email origins which can be synchronized
@@ -33,6 +34,11 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
      * The maximum execution time (in minutes)
      */
     const MAX_EXEC_TIME_IN_MIN = 15;
+
+    /**
+     * The maximum number of jobs running in the same time
+     */
+    const MAX_JOBS_COUNT = 3;
 
     /**
      * {@internaldoc}
@@ -106,5 +112,13 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 (int)$input->getOption('max-tasks')
             );
         }
+    }
+
+    /**
+     * {@internaldoc}
+     */
+    public function getMaxJobsCount()
+    {
+        return self::MAX_JOBS_COUNT;
     }
 }

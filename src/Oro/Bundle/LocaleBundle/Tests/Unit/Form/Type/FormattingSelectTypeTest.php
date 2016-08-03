@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
@@ -50,14 +51,23 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        $data =  ['en' => 'English', 'es' => 'Spain'];
+        $data =  [
+            'en' => 'English',
+            'es' => 'Spain'
+        ];
 
         $this->provider->expects($this->once())->method('getFormattingChoices')->willReturn($data);
 
         $form = $this->factory->create($this->formType);
 
-        $choices = $form->getConfig()->getOption('choices');
+        $choices = $form->createView()->vars['choices'];
 
-        $this->assertEquals($data, $choices);
+        $this->assertEquals(
+            [
+                new ChoiceView('en', 'en', 'English'),
+                new ChoiceView('es', 'es', 'Spain')
+            ],
+            $choices
+        );
     }
 }

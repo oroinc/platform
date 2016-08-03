@@ -5,21 +5,26 @@ datagrid:
             type: orm
             query:
                 select:
+                    - partial event.{ id, start, recurrence }
                     - event.id
                     - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
                     - event.title
                     - event.start
                     - event.end
-                    - event.invitationStatus
+                    - status.id as invitationStatus
                     - parent.id as parentId
                     - owner.id as ownerId
                     - COUNT(children.id) as childrenCount
+                    - (CASE WHEN (recurrence.id IS NULL) THEN false ELSE true END) as is_recurrent
                 from:
                     - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
                 join:
                     left:
                         - { join: event.parent, alias: parent }
                         - { join:  %oro_calendar.calendar_event.entity.class%, alias: children, conditionType: WITH, condition: 'children.parent = event' }
+                        - { join: event.relatedAttendee, alias: ra }
+                        - { join: ra.status, alias: status }
+                        - { join: event.recurrence, alias: recurrence }
                     inner:
                         - { join: event.calendar, alias: calendar }
                         - { join: calendar.owner, alias: owner }
@@ -32,6 +37,7 @@ datagrid:
                 where:
                     and:
                         - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
+                        - event.cancelled = false
                 groupBy: event.id, calendar.name, owner.firstName, owner.lastName, parentId, ownerId
         columns:
             title:
@@ -44,6 +50,14 @@ datagrid:
             end:
                 label: oro.calendar.calendarevent.end.label
                 frontend_type: datetime
+            is_recurrent:
+                label: oro.calendar.calendarevent.recurrence.alias.recurrent
+                frontend_type: boolean
+            recurrence:
+                label: oro.calendar.calendarevent.recurrence.label
+                type: twig
+                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/recurrence.html.twig
+                frontend_type: html
             invitationStatus:
                 label: oro.calendar.calendarevent.invitation_status.label
                 type: twig
@@ -77,16 +91,13 @@ datagrid:
                 end:
                     type: datetime
                     data_name: event.end
+                is_recurrent:
+                    type: boolean
+                    data_name: is_recurrent
                 invitationStatus:
-                    type: choice
-                    data_name: event.invitationStatus
-                    options:
-                        field_options:
-                            choices:
-                                not_responded: oro.calendar.calendarevent.statuses.not_responded
-                                accepted: oro.calendar.calendarevent.statuses.accepted
-                                tentatively_accepted: oro.calendar.calendarevent.statuses.tentatively_accepted
-                                declined: oro.calendar.calendarevent.statuses.declined
+                    type: enum
+                    enum_code: ce_attendee_status
+                    data_name: status.id
         properties:
             id: ~
             view_link:
@@ -98,16 +109,17 @@ datagrid:
                 route:      oro_calendar_event_update
                 params:     [ id ]
             delete_link:
-                type:       url
-                route:      oro_api_delete_calendarevent
-                params:     [ id ]
+                type:     callback
+                callable: "@oro_calendar.datagrid.helper.calendar_event_grid->getDeleteLinkProperty"
+                route:    oro_calendar_event_delete
+                params:   [ id ]
             accept_link:
                 type:       url
                 route:      oro_calendar_event_accepted
                 params:     [ id ]
             tentatively_link:
                 type:       url
-                route:      oro_calendar_event_tentatively_accepted
+                route:      oro_calendar_event_tentative
                 params:     [ id ]
             decline_link:
                 type:       url
@@ -348,7 +360,7 @@ datagrid:
                 params:     [ id ]
             delete_link:
                 type:       url
-                route:      oro_api_delete_calendarevent
+                route:      oro_calendar_event_delete
                 params:     [ id ]
         actions:
             view:
