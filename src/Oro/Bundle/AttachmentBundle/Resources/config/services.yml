@@ -192,3 +192,13 @@ services:
           - '%kernel.root_dir%/../web'
         tags:
           - { name: liip_imagine.cache.resolver, resolver: %oro_attachment.imagine.cache.resolver.custom_web_path.name% }
+
+    oro_attachment.image_resizer:
+        class: 'AttachmentBundle\Resizer\ImageResizer'
+        arguments:
+            - '@oro_attachment.manager'
+            - '@liip_imagine.cache.manager'
+            - '@liip_imagine.filter.manager'
+            - '@liip_imagine.extension_guesser'
+            - '%oro_attachment.imagine.cache.resolver.custom_web_path.name%'
+
