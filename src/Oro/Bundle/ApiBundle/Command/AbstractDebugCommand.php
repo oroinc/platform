@@ -101,19 +101,22 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      * @param string      $version
      * @param RequestType $requestType
      *
-     * @return string
+     * @return string|null
      */
     protected function resolveEntityClass($entityName, $version, RequestType $requestType)
     {
-        if ($entityName && false !== strpos($entityName, '\\')) {
-            return $entityName;
+        if (!$entityName) {
+            return null;
         }
 
-        $entityClass = ValueNormalizerUtil::convertToEntityClass(
-            $this->getContainer()->get('oro_api.value_normalizer'),
-            $entityName,
-            $requestType
-        );
+        $entityClass = $entityName;
+        if (false === strpos($entityClass, '\\')) {
+            $entityClass = ValueNormalizerUtil::convertToEntityClass(
+                $this->getContainer()->get('oro_api.value_normalizer'),
+                $entityName,
+                $requestType
+            );
+        }
 
         /** @var ResourcesProvider $resourcesProvider */
         $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
