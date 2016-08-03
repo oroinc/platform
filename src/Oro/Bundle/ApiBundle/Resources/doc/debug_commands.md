@@ -45,6 +45,12 @@ or
 php app/console oro:api:dump users --sub-resources
 ```
 
+In additional you can use this command to get all entities that are not accessible through Data API. Use `--not-accessible` option for this:
+
+```bash
+php app/console oro:api:dump --not-accessible
+```
+
 ### oro:api:debug
 
 This command shows details about registered Data API actions and processors.
