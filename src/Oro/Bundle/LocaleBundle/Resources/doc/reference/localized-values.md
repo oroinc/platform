@@ -3,12 +3,12 @@ Localized Values
 
 Table of Contents
 -----------------
- - [Format localized values in twig](#format-localized-values-in-twig)
- - [Format localized values in layout configs](#format-localized-values-in-layout-configs)
- - [Format localized values in datagrids](#format-localized-values-in-datagrids)
+ - [Format values in twig](#format-values-in-twig)
+ - [Format values in layout configs](#format-values-in-layout-configs)
+ - [Format values in datagrids](#format-values-in-datagrids)
 
-Format localized values in twig
-===============================
+Format values in twig
+=====================
 
 Use `localized_value` twig filter
 
@@ -17,8 +17,8 @@ Use `localized_value` twig filter
 localization.titles|localized_value
 ```
 
-Format localized values in layout configs
-=========================================
+Format values in layout configs
+===============================
 
 Use `localized_value` ExpressionFunction
 
@@ -33,11 +33,11 @@ layout:
                 content: '=localized_value(data["localization"].getTitles())'
 ```
 
-Format localized values in datagrids
-====================================
+Format values in datagrids
+==========================
 
-Use datagrid property with type `localized_value` and attribute `data_name` to set needed property by path, for example `titles`, `relation.subrelation.titles`
-If current localization not detected, will be join direct SQL relation to default fallback value, otherwhise values will be recieved by LocalizationHelper, sorters and filters will be removed.
+Use datagrid property with type `localized_value` and attribute `data_name` to set needed property by path, for example `titles`, `relation.subrelation.titles`.
+If current localization not detected, will be joined SQL relation to default fallback values, otherwhise it will be recieved by LocalizationHelper, sorters and filters will be removed.
 
 ```yml
 # .../Resources/config/datagrid.yml
@@ -60,4 +60,16 @@ datagrid:
                 label: Name
             title:
                 label: Title
+        sorters:
+            columns:
+                name:
+                    label: Name
+                title:
+                    label: Title
+        filters:
+            columns:
+                name:
+                    label: Name
+                title:
+                    label: Title
 ```
