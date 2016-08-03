@@ -63,13 +63,15 @@ datagrid:
         sorters:
             columns:
                 name:
-                    label: Name
+                    data_name: name
                 title:
-                    label: Title
+                    data_name: title
         filters:
             columns:
                 name:
-                    label: Name
+                    type: string
+                    data_name: name
                 title:
-                    label: Title
+                    type: string
+                    data_name: title
 ```
