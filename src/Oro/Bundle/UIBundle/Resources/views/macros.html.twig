@@ -111,9 +111,11 @@
     Parameters:
         title - property title
         data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderProperty(title, data) %}
-    {{ _self.renderHtmlProperty(title, data|escape) }}
+{% macro renderProperty(title, data, entity = null, fieldName = null) %}
+    {{ _self.renderHtmlProperty(title, data|escape, entity, fieldName) }}
 {% endmacro %}
 
 {#
@@ -121,9 +123,14 @@
     Parameters:
         title - property title
         data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+{% macro renderHtmlProperty(title, data, entity = null, fieldName = null) %}
+    {% if entity is defined and fieldName is defined and not resource_granted('VIEW', entity, fieldName) %}
+    {% else %}
+        {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {% endif %}
 {% endmacro %}
 
 {#
@@ -1093,4 +1100,8 @@
         {% set links = links|merge([_self.entityViewLink(entity, attribute(entity, labelProperty), route, permission)]) %}
     {% endfor %}
     {{ _self.renderList(links) }}
+{%- endmacro -%}
+
+{%- macro renderDisabledLabel(labelText) -%}
+    <i>{{ labelText }}</i>
 {%- endmacro -%}
