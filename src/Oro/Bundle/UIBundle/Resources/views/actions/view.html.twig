@@ -103,8 +103,12 @@
                                 <ul class="inline">
                                     {% placeholder page_header_stats_before with {entity: entity} %}
                                     {% block stats %}
-                                        <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-                                        <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt is defined and breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                        {% if  resource_granted('VIEW', entity, 'createdAt') %}
+                                            <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+                                        {% endif %}
+                                        {% if  resource_granted('VIEW', entity, 'updatedAt') %}
+                                            <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt is defined and breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                        {% endif %}
                                     {% endblock stats %}
                                     {% placeholder page_header_stats_after with {entity: entity} %}
 
