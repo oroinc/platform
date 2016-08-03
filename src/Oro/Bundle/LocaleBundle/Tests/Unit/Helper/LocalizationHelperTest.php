@@ -4,16 +4,16 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\FallbackTrait;
 
 class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
 {
     use FallbackTrait;
 
-    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $localizationProvider;
+    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationManager;
 
     /** @var CurrentLocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $currentLocalizationProvider;
@@ -26,7 +26,7 @@ class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->localizationProvider = $this->getMockBuilder(LocalizationProvider::class)
+        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -34,7 +34,7 @@ class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new LocalizationHelper($this->localizationProvider, $this->currentLocalizationProvider);
+        $this->helper = new LocalizationHelper($this->localizationManager, $this->currentLocalizationProvider);
     }
 
     public function testGetCurrentLocalization()
@@ -52,7 +52,7 @@ class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $localizations = [new Localization()];
 
-        $this->localizationProvider->expects($this->once())
+        $this->localizationManager->expects($this->once())
             ->method('getLocalizations')
             ->willReturn($localizations);
 

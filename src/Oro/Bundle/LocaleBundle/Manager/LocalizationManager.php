@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Provider;
+namespace Oro\Bundle\LocaleBundle\Manager;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
@@ -11,7 +11,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
-class LocalizationProvider
+class LocalizationManager
 {
     const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
 

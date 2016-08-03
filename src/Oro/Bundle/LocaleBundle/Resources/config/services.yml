@@ -51,7 +51,7 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
         public: false
         arguments:
-            - '@oro_locale.provider.localization'
+            - '@oro_locale.manager.localization'
             - '@oro_locale.provider.current_localization'
 
     oro_locale.listener.orm.localization_listener:
@@ -279,7 +279,7 @@ services:
     oro_locale.validator.default_localization:
         class: 'Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator'
         arguments:
-            - '@oro_locale.provider.localization'
+            - '@oro_locale.manager.localization'
         tags:
             - { name: validator.constraint_validator, alias: oro_locale.default_localization_validator }
 
@@ -304,10 +304,10 @@ services:
             - '@oro_config.manager'
             - '@oro_locale.formatter.language_code'
             - '@oro_locale.formatter.formatting_code'
-            - '@oro_locale.provider.localization'
+            - '@oro_locale.manager.localization'
 
-    oro_locale.provider.localization:
-        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationProvider'
+    oro_locale.manager.localization:
+        class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
         arguments:
             - '@oro_locale.repository.localization'
             - '@oro_config.global'

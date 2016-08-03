@@ -10,9 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
 class LocalizationSelectionType extends AbstractType
 {
@@ -29,9 +29,14 @@ class LocalizationSelectionType extends AbstractType
     protected $localeSettings;
 
     /**
-     * @var LocalizationProvider
+     * @var LocalizationManager
      */
-    protected $localizationProvider;
+    protected $localizationManager;
+
+    /**
+     * @var LocalizationChoicesProvider
+     */
+    protected $localizationChoicesProvider;
 
     /**
      * @var string
@@ -49,18 +54,18 @@ class LocalizationSelectionType extends AbstractType
     /**
      * @param ConfigManager $configManager
      * @param LocaleSettings $localeSettings
-     * @param LocalizationProvider $localizationProvider
+     * @param LocalizationManager $localizationManager
      * @param LocalizationChoicesProvider $localizationChoicesProvider
      */
     public function __construct(
         ConfigManager $configManager,
         LocaleSettings $localeSettings,
-        LocalizationProvider $localizationProvider,
+        LocalizationManager $localizationManager,
         LocalizationChoicesProvider $localizationChoicesProvider
     ) {
         $this->configManager = $configManager;
         $this->localeSettings = $localeSettings;
-        $this->localizationProvider = $localizationProvider;
+        $this->localizationManager = $localizationManager;
         $this->localizationChoicesProvider = $localizationChoicesProvider;
     }
 
@@ -82,8 +87,7 @@ class LocalizationSelectionType extends AbstractType
                     $localizations = $this->getLocalizations();
                 }
 
-                $localizations += (array)$options['additional_localizations'];
-
+                $localizations = array_merge($localizations, (array)$options['additional_localizations']);
                 $localizations = $this->checkLocalizations($localizations);
 
                 return $this->getChoices($localizations, $options['compact']);
@@ -137,7 +141,7 @@ class LocalizationSelectionType extends AbstractType
     protected function checkLocalizations(array $localizations)
     {
         foreach ($localizations as $id => $label) {
-            $localization = $this->localizationProvider->getLocalization($id);
+            $localization = $this->localizationManager->getLocalization($id);
             if (!($localization instanceof Localization)) {
                 unset($localizations[$id]);
             }

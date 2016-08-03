@@ -7,19 +7,19 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
+class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
     /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /** @var LocalizationProvider */
-    protected $provider;
+    /** @var LocalizationManager */
+    protected $manager;
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -44,14 +44,14 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
             2 => $this->getEntity(Localization::class, ['id' => 2]),
         ];
 
-        $this->provider = new LocalizationProvider($this->repository, $this->configManager);
+        $this->manager = new LocalizationManager($this->repository, $this->configManager);
     }
 
     public function tearDown()
     {
         unset(
             $this->repository,
-            $this->provider,
+            $this->manager,
             $this->configManager,
             $this->entities
         );
@@ -64,7 +64,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertRepositoryCalls();
 
-        $result = $this->provider->getLocalization($entity->getId());
+        $result = $this->manager->getLocalization($entity->getId());
 
         $this->assertEquals($entity, $result);
 
@@ -74,7 +74,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertRepositoryCalls();
 
-        $result = $this->provider->getLocalizations();
+        $result = $this->manager->getLocalizations();
 
         $this->assertEquals($this->entities, $result);
     }
@@ -91,7 +91,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ids = [1, 3];
 
-        $result = $this->provider->getLocalizations((array)$ids);
+        $result = $this->manager->getLocalizations((array)$ids);
 
         $this->assertEquals($entities, $result);
     }
@@ -110,7 +110,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
             ->willReturn(1);
 
-        $this->assertSame($localization1, $this->provider->getDefaultLocalization());
+        $this->assertSame($localization1, $this->manager->getDefaultLocalization());
     }
 
     public function testGetDefaultLocalizationAndNoDefaultLocalization()
@@ -127,7 +127,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
         $this->repository->expects($this->once())->method('findBy')
             ->willReturn([1 => $localization1, 2 => $localization2]);
 
-        $this->assertSame($localization1, $this->provider->getDefaultLocalization());
+        $this->assertSame($localization1, $this->manager->getDefaultLocalization());
     }
 
     public function testGetDefaultLocalizationAndNoDefaultLocalizationAndNoLocalizations()
@@ -140,7 +140,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
             ->willReturn(false);
 
-        $this->assertNull($this->provider->getDefaultLocalization());
+        $this->assertNull($this->manager->getDefaultLocalization());
     }
 
     public function testGetDefaultLocalizationAndUnknownConfigDefaultLocalization()
@@ -157,7 +157,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
         $this->repository->expects($this->once())->method('findBy')
             ->willReturn([1 => $localization1, 2 => $localization2]);
 
-        $this->assertSame($localization1, $this->provider->getDefaultLocalization());
+        $this->assertSame($localization1, $this->manager->getDefaultLocalization());
     }
 
     public function testWarmUpCache()
@@ -166,7 +166,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->willReturn($this->entities);
 
-        $this->provider->warmUpCache();
+        $this->manager->warmUpCache();
     }
 
     protected function assertRepositoryCalls()

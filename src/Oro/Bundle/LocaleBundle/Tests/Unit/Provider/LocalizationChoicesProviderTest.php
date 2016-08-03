@@ -6,8 +6,8 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -15,8 +15,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
-    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $localizationProvider;
+    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationManager;
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -32,7 +32,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->localizationProvider = $this->getMockBuilder(LocalizationProvider::class)
+        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,7 +52,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
             $this->configManager,
             $this->languageFormatter,
             $this->formattingFormatter,
-            $this->localizationProvider
+            $this->localizationManager
         );
     }
 
@@ -60,7 +60,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->provider,
-            $this->localizationProvider,
+            $this->localizationManager,
             $this->configManager,
             $this->languageFormatter,
             $this->formattingFormatter
@@ -98,7 +98,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
         /** @var Localization $entity2 */
         $entity2 = $this->getEntity(Localization::class, ['id' => 42, 'name' => 'test2']);
 
-        $this->localizationProvider->expects($this->once())
+        $this->localizationManager->expects($this->once())
             ->method('getLocalizations')
             ->with(null)
             ->willReturn([$entity1, $entity2]);

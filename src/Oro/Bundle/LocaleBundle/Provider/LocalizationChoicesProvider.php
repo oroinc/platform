@@ -8,6 +8,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 class LocalizationChoicesProvider
 {
@@ -20,25 +21,25 @@ class LocalizationChoicesProvider
     /** @var FormattingCodeFormatter */
     protected $formattingFormatter;
 
-    /** @var LocalizationProvider */
-    protected $localizationProvider;
+    /** @var LocalizationManager */
+    protected $localizationManager;
 
     /**
      * @param ConfigManager $configManager
      * @param LanguageCodeFormatter $languageFormatter
      * @param FormattingCodeFormatter $formattingFormatter
-     * @param LocalizationProvider $localizationProvider
+     * @param LocalizationManager $localizationManager
      */
     public function __construct(
         ConfigManager $configManager,
         LanguageCodeFormatter $languageFormatter,
         FormattingCodeFormatter $formattingFormatter,
-        LocalizationProvider $localizationProvider
+        LocalizationManager $localizationManager
     ) {
         $this->configManager = $configManager;
         $this->languageFormatter = $languageFormatter;
         $this->formattingFormatter = $formattingFormatter;
-        $this->localizationProvider = $localizationProvider;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -63,7 +64,7 @@ class LocalizationChoicesProvider
     public function getLocalizationChoices()
     {
         /** @var Localization[] $choices */
-        $choices = $this->localizationProvider->getLocalizations();
+        $choices = $this->localizationManager->getLocalizations();
         $data = [];
 
         foreach ($choices as $choice) {

@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator;
 
@@ -23,13 +23,13 @@ class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
     /** @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $context;
 
-    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $localizationProvider;
+    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationManager;
 
     /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $form;
 
-    /** @var LocalizationValidator */
+    /** @var DefaultLocalizationValidator */
     protected $validator;
 
     /**
@@ -43,13 +43,13 @@ class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->localizationProvider = $this->getMockBuilder(LocalizationProvider::class)
+        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->form = $this->getMock(FormInterface::class);
 
-        $this->validator = new DefaultLocalizationValidator($this->localizationProvider);
+        $this->validator = new DefaultLocalizationValidator($this->localizationManager);
         $this->validator->initialize($this->context);
     }
 
@@ -123,7 +123,7 @@ class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
-        $this->localizationProvider->expects($this->once())
+        $this->localizationManager->expects($this->once())
             ->method('getLocalization')
             ->willReturn((new Localization)->setName('L1'));
 
@@ -151,7 +151,7 @@ class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
-        $this->localizationProvider->expects($this->once())
+        $this->localizationManager->expects($this->once())
             ->method('getLocalization')
             ->willReturn(null);
 

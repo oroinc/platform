@@ -11,9 +11,9 @@ use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
 class LocalizationSelectionTypeTest extends FormIntegrationTestCase
 {
@@ -25,8 +25,8 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
     /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject */
     protected $localeSettings;
 
-    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $localizationProvider;
+    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationManager;
 
     /** @var LocalizationChoicesProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $localizationChoicesProvider;
@@ -55,7 +55,7 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
             ->method('getLocale')
             ->willReturn(Locale::getDefault());
 
-        $this->localizationProvider = $this->getMockBuilder(LocalizationProvider::class)
+        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -66,7 +66,7 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         $this->formType = new LocalizationSelectionType(
             $this->configManager,
             $this->localeSettings,
-            $this->localizationProvider,
+            $this->localizationManager,
             $this->localizationChoicesProvider
         );
     }
@@ -107,14 +107,14 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
      */
     public function testSubmitValidForm($submittedValue, $isValid)
     {
-        $this->localizationProvider->method('getLocalization')
+        $this->localizationManager->method('getLocalization')
             ->will($this->returnValueMap([
                 [1, $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1'])],
                 [2, $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2'])],
                 [3, $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3'])],
             ]));
 
-        $this->localizationProvider->method('getLocalizations')->willReturn([
+        $this->localizationManager->method('getLocalizations')->willReturn([
             $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1']),
             $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2']),
             $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3']),

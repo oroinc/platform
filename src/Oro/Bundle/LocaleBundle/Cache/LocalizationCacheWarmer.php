@@ -4,21 +4,21 @@ namespace Oro\Bundle\LocaleBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 class LocalizationCacheWarmer implements CacheWarmerInterface
 {
     /**
-     * @var LocalizationProvider
+     * @var LocalizationManager
      */
-    private $provider;
+    private $localizationManager;
 
     /**
-     * @param LocalizationProvider $provider
+     * @param LocalizationManager $localizationManager
      */
-    public function __construct(LocalizationProvider $provider)
+    public function __construct(LocalizationManager $localizationManager)
     {
-        $this->provider = $provider;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -34,6 +34,6 @@ class LocalizationCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $this->provider->warmUpCache();
+        $this->localizationManager->warmUpCache();
     }
 }
