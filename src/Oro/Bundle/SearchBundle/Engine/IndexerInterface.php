@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine;
 
 interface IndexerInterface
@@ -22,7 +23,8 @@ interface IndexerInterface
     public function delete($entity);
 
     /**
-     * Returns required classes for reindex by class.
+     * Returns classes required to reindex for one or several classes
+     * Returns all indexed classes if $class is null
      *
      * @param string|string[] $class
      *
@@ -31,14 +33,16 @@ interface IndexerInterface
     public function getClassesForReindex($class = null);
 
     /**
-     * Resets one or several indexes. Resets all indexes if class is null.
+     * Resets data for one or several classes in index
+     * Resets data for all indexed classes if $class is null
      *
      * @param string|string[] $class
      */
     public function resetIndex($class = null);
 
     /**
-     * Reindex one or several indexes. Reindex all indexes if class is null.
+     * Reindex data for one or several classes in index
+     * Reindex data for all indexed classes if $class is null
      *
      * @param string|string[] $class
      */

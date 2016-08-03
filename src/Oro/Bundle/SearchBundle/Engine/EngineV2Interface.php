@@ -8,7 +8,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 interface EngineV2Interface
 {
     /**
-     * Search query with query builder
+     * Performs search in index according to passed query
      *
      * @param Query $query
      * @return Result
