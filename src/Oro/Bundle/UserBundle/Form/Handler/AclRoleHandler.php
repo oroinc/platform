@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -155,6 +156,7 @@ class AclRoleHandler
      * Create form for role manipulation
      *
      * @param AbstractRole $role
+     *
      * @return FormInterface
      */
     public function createForm(AbstractRole $role)
@@ -167,9 +169,9 @@ class AclRoleHandler
     }
 
     /**
-     * @param bool $ignoreShare
+     * Load privilege config permissions
      */
-    protected function loadPrivilegeConfigPermissions($ignoreShare = false)
+    protected function loadPrivilegeConfigPermissions()
     {
         foreach ($this->privilegeConfig as $configName => $config) {
             $this->privilegeConfig[$configName]['permissions']
@@ -194,18 +196,13 @@ class AclRoleHandler
      * Save role
      *
      * @param AbstractRole $role
+     *
      * @return bool
      */
     public function process(AbstractRole $role)
     {
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $data = $this->request->request->get($this->form->getName(), []);
-            if (isset($data['privileges'])) {
-                $privileges = json_decode($data['privileges'], true);
-                if (is_array($privileges)) {
-                    $data = array_merge($data, $privileges);
-                }
-            }
             $this->form->submit($data);
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();
@@ -265,11 +262,10 @@ class AclRoleHandler
          * @var ArrayCollection|AclPrivilege[] $sortedPrivileges
          */
         foreach ($this->getAllPrivileges($role) as $fieldName => $sortedPrivileges) {
-            $this->form->get($fieldName)->setData($sortedPrivileges);
             $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
         }
 
-        return $this->getFormPrivileges($allPrivileges);
+        return $this->encodeAclPrivileges($allPrivileges);
     }
 
     /**
@@ -301,6 +297,7 @@ class AclRoleHandler
 
     /**
      * @param AbstractRole $role
+     *
      * @return ArrayCollection|AclPrivilege[]
      */
     protected function getRolePrivileges(AbstractRole $role)
@@ -317,23 +314,7 @@ class AclRoleHandler
         $formPrivileges = [];
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $privilegesArray = $decodedPrivileges[$fieldName];
-            $privileges = [];
-            foreach ($privilegesArray as $privilege) {
-                $aclPrivilege = new AclPrivilege();
-                foreach ($privilege['permissions'] as $name => $permission) {
-                    $aclPrivilege->addPermission(new AclPermission($permission['name'], $permission['accessLevel']));
-                }
-                $aclPrivilegeIdentity = new AclPrivilegeIdentity(
-                    $privilege['identity']['id'],
-                    $privilege['identity']['name']
-                );
-                $aclPrivilege->setIdentity($aclPrivilegeIdentity);
-                $privileges[] = $aclPrivilege;
-            }
-            if ($config['fix_values']) {
-                $this->fxPrivilegeValue($privileges, $config['default_value']);
-            }
-            $formPrivileges = array_merge($formPrivileges, $privileges);
+            $formPrivileges = array_merge($formPrivileges, $this->decodeAclPrivileges($privilegesArray, $config));
         }
 
         array_walk(
@@ -347,12 +328,14 @@ class AclRoleHandler
             $this->aclManager->getSid($role),
             new ArrayCollection($formPrivileges)
         );
+
         $this->aclCache->clearCache();
     }
 
     /**
      * @param ArrayCollection $privileges
-     * @param array $rootIds
+     * @param array           $rootIds
+     *
      * @return ArrayCollection|AclPrivilege[]
      */
     protected function filterPrivileges(ArrayCollection $privileges, array $rootIds)
@@ -459,13 +442,18 @@ class AclRoleHandler
     }
 
     /**
-     * @param $allPrivileges
+     * Encode array of AclPrivilege objects into array of plain privileges
+     *
+     * @param array $allPrivileges
      *
      * @return array
      */
-    protected function getFormPrivileges($allPrivileges)
+    protected function encodeAclPrivileges($allPrivileges, $addExtensionName = true)
     {
         $formPrivileges = [];
+        if (!$allPrivileges) {
+            return $formPrivileges;
+        }
         foreach ($allPrivileges as $key => $privilege) {
             /** @var AclPrivilege $privilege */
             $result = [
@@ -475,6 +463,10 @@ class AclRoleHandler
                 ],
                 'permissions' => [],
             ];
+            $fields = $this->encodeAclPrivileges($privilege->getFields(), false);
+            if ($fields) {
+                $result['fields'] = $fields;
+            }
             foreach ($privilege->getPermissions() as $permissionName => $permission) {
                 /** @var AclPermission $permission */
                 $result['permissions'][$permissionName] = [
@@ -482,9 +474,46 @@ class AclRoleHandler
                     'accessLevel' => $permission->getAccessLevel(),
                 ];
             }
-            $formPrivileges[$privilege->getExtensionKey()][$key] = $result;
+            $addExtensionName
+                ? $formPrivileges[$privilege->getExtensionKey()][$key] = $result
+                : $formPrivileges[$key] = $result;
         }
 
         return $formPrivileges;
+    }
+
+    /**
+     * Decode array of plain privileges info into array of AclPrivilege objects
+     *
+     * @param array $privilegesArray
+     * @param array $config
+     *
+     * @return array|AclPrivilege[]
+     */
+    protected function decodeAclPrivileges($privilegesArray, $config)
+    {
+        $privileges = [];
+        foreach ($privilegesArray as $privilege) {
+            $aclPrivilege = new AclPrivilege();
+            foreach ($privilege['permissions'] as $permission) {
+                $aclPrivilege->addPermission(new AclPermission($permission['name'], $permission['accessLevel']));
+            }
+            $aclPrivilegeIdentity = new AclPrivilegeIdentity(
+                $privilege['identity']['id'],
+                $privilege['identity']['name']
+            );
+            $aclPrivilege->setIdentity($aclPrivilegeIdentity);
+            if (isset($privilege['fields']) && count($privilege['fields'])) {
+                $aclPrivilege->setFields(
+                    new ArrayCollection($this->decodeAclPrivileges($privilege['fields'], $config))
+                );
+            }
+            $privileges[] = $aclPrivilege;
+        }
+        if ($config['fix_values']) {
+            $this->fxPrivilegeValue($privileges, $config['default_value']);
+        }
+
+        return $privileges;
     }
 }

@@ -123,7 +123,7 @@ oro:
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time
-            siganture:           Signature (oro_html_filter should be applied to this variable to allow usage of it's html view)
+            siganture:           Signature (|oro_tag_filter should be removed to allow usage of it's html view)
 
         attachment:
             copy_to_record: Copy to Record

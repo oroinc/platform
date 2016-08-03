@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
 class HttpImportHandler extends AbstractImportHandler
 {
@@ -68,12 +69,13 @@ class HttpImportHandler extends AbstractImportHandler
 
         $errorsUrl           = null;
         $errorsAndExceptions = [];
+        $context = $jobResult->getContext();
         if (!empty($counts['errors'])) {
             $errorsUrl = $this->router->generate(
                 'oro_importexport_error_log',
                 ['jobCode' => $jobResult->getJobCode()]
             );
-            $context = $jobResult->getContext();
+
             $contextErrors = [];
             if ($context) {
                 $contextErrors = $context->getErrors();
@@ -83,6 +85,10 @@ class HttpImportHandler extends AbstractImportHandler
                 0,
                 100
             );
+        }
+        if ($context && $context instanceof StepExecutionProxyContext) {
+            // each warning is for an invalid item
+            $counts['invalid_entries'] = count($context->getWarnings());
         }
 
         return [

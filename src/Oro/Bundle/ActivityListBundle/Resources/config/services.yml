@@ -42,7 +42,6 @@ services:
         arguments:
             - "@oro_security.security_facade"
             - "@oro_entity.entity_name_resolver"
-            - "@oro_datagrid.extension.pager.orm.pager"
             - "@oro_config.user"
             - "@oro_activity_list.provider.chain"
             - "@oro_activity_list.filter.helper"

@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 
 class SegmentWidgetOptionsListener
 {
@@ -15,12 +17,25 @@ class SegmentWidgetOptionsListener
     /** @var HttpKernelInterface */
     protected $httpKernel;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var ContextChecker */
+    protected $contextChecker;
+
     /**
      * @param HttpKernelInterface $httpKernel
+     * @param SecurityFacade      $securityFacade
+     * @param ContextChecker      $contextChecker
      */
-    public function __construct(HttpKernelInterface $httpKernel)
-    {
-        $this->httpKernel = $httpKernel;
+    public function __construct(
+        HttpKernelInterface $httpKernel,
+        SecurityFacade $securityFacade,
+        ContextChecker $contextChecker
+    ) {
+        $this->httpKernel     = $httpKernel;
+        $this->securityFacade = $securityFacade;
+        $this->contextChecker = $contextChecker;
     }
 
     /**
@@ -36,7 +51,13 @@ class SegmentWidgetOptionsListener
      */
     public function onLoad(WidgetOptionsLoadEvent $event)
     {
+        if (!$this->securityFacade->isGranted('oro_dataaudit_history')) {
+            return;
+        }
         $widgetOptions = $event->getWidgetOptions();
+        if (!$this->contextChecker->isApplicableInContext($widgetOptions)) {
+            return;
+        }
         $fieldsLoader = $widgetOptions['fieldsLoader'];
 
         $auditFilters = array_map(function ($filter) {

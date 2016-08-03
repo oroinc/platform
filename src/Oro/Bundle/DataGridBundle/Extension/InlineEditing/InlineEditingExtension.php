@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -21,6 +25,9 @@ class InlineEditingExtension extends AbstractExtension
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
+    /** @var AuthorizationCheckerInterface */
+    protected $authChecker;
+
     /**
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
      * @param SecurityFacade $securityFacade
@@ -29,11 +36,13 @@ class InlineEditingExtension extends AbstractExtension
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
         SecurityFacade $securityFacade,
-        EntityClassNameHelper $entityClassNameHelper
+        EntityClassNameHelper $entityClassNameHelper,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->securityFacade = $securityFacade;
         $this->guesser = $inlineEditColumnOptionsGuesser;
         $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->authChecker = $authorizationChecker;
     }
 
     /**
@@ -87,6 +96,14 @@ class InlineEditingExtension extends AbstractExtension
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
+                // Check access to edit field in Class level.
+                // If access not granted - skip inline editing for such field.
+                if (!$this->authChecker->isGranted(
+                    'EDIT',
+                    new FieldVote(new ObjectIdentity('entity', $configItems['entity_name']), $columnName)
+                )) {
+                    continue;
+                }
                 $newColumn = $this->guesser->getColumnOptions(
                     $columnName,
                     $configItems['entity_name'],

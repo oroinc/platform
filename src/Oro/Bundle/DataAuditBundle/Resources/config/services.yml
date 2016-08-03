@@ -97,6 +97,8 @@ services:
         class: %oro_dataaudit.event_listener.segment_widget_options_listener.class%
         arguments:
             - '@http_kernel'
+            - '@oro_security.security_facade'
+            - '@oro_dataaudit.segment_widget.context_checker'
         calls:
             - [setRequest, ["@?request="]]
         tags:
@@ -124,3 +126,6 @@ services:
         class: %oro_dataaudit.migration.extension.audit_field.class%
         tags:
             - { name: oro_migration.extension, extension_name: audit_field }
+
+    oro_dataaudit.segment_widget.context_checker:
+        class: Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker
