@@ -30,7 +30,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
                 return '';
             }
             // Call one of formatDate formatTime formatDateTime
-            return this._getFormatterFunction('format').call(DateTimeFormatter, rawData);
+            return this._getFormatterFunction('format').call(DateTimeFormatter, rawData, true);
         },
 
         /**
