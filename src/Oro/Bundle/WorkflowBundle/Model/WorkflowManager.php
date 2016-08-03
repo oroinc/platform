@@ -193,6 +193,10 @@ class WorkflowManager
                     }
 
                     $workflow = $this->workflowRegistry->getWorkflow($startArguments->getWorkflowName());
+                    $entity = $startArguments->getEntity();
+                    if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
+                        continue;
+                    }
 
                     $workflowItem = $workflow->start(
                         $startArguments->getEntity(),
@@ -201,9 +205,8 @@ class WorkflowManager
                     );
 
                     $em->persist($workflowItem);
+                    $em->flush();
                 }
-
-                $em->flush();
             },
             WorkflowItem::class
         );
@@ -451,5 +454,22 @@ class WorkflowManager
     protected function getWorkflowItemRepository()
     {
         return $this->doctrineHelper->getEntityRepository(WorkflowItem::class);
+    }
+
+    /**
+     * @param object $entity
+     * @param array $recordGroups
+     * @return bool
+     */
+    protected function isStartAllowedByRecordGroups($entity, array $recordGroups)
+    {
+        $workflowItems = $this->getWorkflowItemsByEntity($entity);
+        foreach ($workflowItems as $workflowItem) {
+            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getRecordGroups())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
