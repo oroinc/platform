@@ -73,7 +73,8 @@ class OroBuildCommand extends ContainerAwareCommand
                 $JSEngine = isset($this->config['js_engine']) ? $this->config['js_engine'] : null;
 
                 if (!$JSEngine) {
-                    throw new \RuntimeException("JS engine not found");
+                    $output->writeln(sprintf('JS engine not found'));
+                    break;
                 }
 
                 $output->writeln(sprintf('Running code optimizer'));
