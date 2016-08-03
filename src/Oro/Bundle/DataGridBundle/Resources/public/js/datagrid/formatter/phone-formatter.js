@@ -28,12 +28,30 @@ define(['underscore', 'backgrid'
         },
 
         /**
+         * @param {string|number} phoneNumber
+         * @return {string}
+         */
+        formatWithNbsp: function(phoneNumber) {
+            return phoneNumber
+                // disallow line breaks
+                .replace(/\s/g, /* NON-BREAKING SPACE */'\u00A0')
+                .replace(/([^0-9a-z\u00A0])/ig, /* zero width no-break space */'\uFEFF$1\uFEFF')
+                // allow line break after closing bracket and comma
+                .replace(/([),]|\+\d*)\uFEFF\uFEFF/ig, '$1')
+                .replace(/([),]|\+\d*)\uFEFF/ig, '$1')
+                .replace(/([),]|\+\d*)\u00A0/ig, '$1 ')
+                .replace(/([),]|\+\d*)([^ ])/ig, /* ZERO WIDTH SPACE */'$1\u200B$2')
+                // dissallow space between +\d+ and open bracket
+                .replace(/(\+\d*)\s+\(/ig, '$1\u00A0(');
+        },
+
+        /**
          * Generate 'a' element
          * @param {string|number} phoneNumber
          * @return {string}
          */
         generateLinkHTML: function(phoneNumber) {
-            return '<a href="tel:' + _.escape(phoneNumber) + '">' + _.escape(phoneNumber) + '</a>';
+            return '<a href="tel:' + _.escape(phoneNumber) + '">' + _.escape(this.formatWithNbsp(phoneNumber)) + '</a>';
         }
     });
 
