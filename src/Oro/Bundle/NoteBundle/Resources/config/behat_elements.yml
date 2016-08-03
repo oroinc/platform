@@ -3,5 +3,5 @@ Note:
   class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
   options:
     mapping:
-      Message: oro_note_form[message]
-      Attachment: oro_note_form[attachment][file]
+      Message: 'oro_note_form[message]'
+      Attachment: 'oro_note_form[attachment][file]'
