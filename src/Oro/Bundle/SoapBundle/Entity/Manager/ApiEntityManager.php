@@ -74,7 +74,15 @@ class ApiEntityManager
     }
 
     /**
-     * Sets a event
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
+     * Sets a event dispatcher
      *
      * @param EventDispatcherInterface $eventDispatcher
      */

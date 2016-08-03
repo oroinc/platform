@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImapBundle\Mail\Protocol;
 
 use Zend\Mail\Storage\Exception as BaseException;
 
+use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
+
 /**
  * Class Imap
  * Add PEEK capability to Zend Imap Protocol
@@ -82,6 +84,9 @@ class Imap extends \Zend\Mail\Protocol\Imap
         }
 
         if ($to === null && !is_array($from)) {
+            if ($tokens[0] === 'OK' && $tokens[1] === 'FETCH' && $tokens[2] === 'completed.') {
+                throw new InvalidEmailFormatException('Invalid email format');
+            }
             throw new BaseException\RuntimeException('the single id was not found in response');
         }
 

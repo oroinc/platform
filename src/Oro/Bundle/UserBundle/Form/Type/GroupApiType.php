@@ -32,6 +32,14 @@ class GroupApiType extends GroupType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'group';
     }
 }

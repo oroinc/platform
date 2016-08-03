@@ -1,3 +1,5 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 <div class="widget-content">
     {% if saved is defined and saved %}
         <script type="text/javascript">
@@ -20,6 +22,18 @@
                 </div>
             </div>
         {% endif %}
+        {% set recurrencePattern = '' %}
+        {% if form.vars.value.recurrence is not null %}
+            {% set recurrencePattern = UI.renderProperty(
+                'oro.calendar.calendarevent.recurrence.label'|trans,
+                get_recurrence_text_value(form.vars.value.recurrence)
+            ) %}
+        {% elseif form.vars.value.recurringEvent is not null %}
+            {% set recurrencePattern = UI.renderProperty(
+                'oro.calendar.calendarevent.recurrence.exception.label'|trans,
+                get_recurrence_text_value(form.vars.value.recurringEvent.recurrence)
+            ) %}
+        {% endif %}
         <div class="form-container">
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post">
                 <fieldset class="form form-horizontal">
@@ -28,12 +42,17 @@
                     {{ form_row(form.start) }}
                     {{ form_row(form.end) }}
                     {{ form_row(form.allDay) }}
+                    {{ recurrencePattern }}
                     {{ form_row(form.backgroundColor) }}
                     {% if form.calendarUid is defined %}
                         {{ form_row(form.calendarUid) }}
                     {% endif %}
-                    {{ form_row(form.childEvents) }}
-                    {{ form_row(form.reminders) }}
+                    {{ form_row(form.attendees) }}
+                    {% if form.vars.value.recurrence is null %}
+                        {{ form_row(form.reminders) }}
+                    {% else %}
+                        {% do form.reminders.setRendered %}
+                    {% endif %}
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>

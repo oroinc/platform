@@ -5,12 +5,13 @@
     "keywords": ["BAP", "Activity"],
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": "2.7.*",
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*",
         "oro/ui-bundle": "dev-master",
         "oro/entity-config-bundle": "dev-master",
         "oro/entity-extend-bundle": "dev-master",
-        "oro/entity-bundle": "dev-master"
+        "oro/entity-bundle": "dev-master",
+        "oro/form-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\ActivityBundle": "" }
