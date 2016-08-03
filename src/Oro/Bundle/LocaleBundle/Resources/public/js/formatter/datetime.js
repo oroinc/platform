@@ -67,8 +67,33 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
         /**
          * @returns {string}
          */
-        getDateTimeFormat: function() {
+        getDateTimeFormat: function(addNbsp) {
+            if (addNbsp) {
+                if (!this.frontendFormats.datetimeNBSP) {
+                    this.frontendFormats.datetimeNBSP = this.prepareNbspFormat(this.frontendFormats.datetime);
+                }
+                return this.frontendFormats.datetimeNBSP;
+            }
             return this.frontendFormats.datetime;
+        },
+
+        /**
+         * Replaces spaces to nbsp in format
+         *
+         * @param {string} format
+         * @returns {string}
+         */
+        prepareNbspFormat: function(format) {
+            format = format.replace(/\s+/g, '\u00a0');
+            // format starts from time part
+            if (/[AaHsSzZ]/.test(format[0])) {
+                // first nbps before date part replace to usual space
+                format = format.replace(/([^xXgGYWwEdDQM\u00a0])\s([^HsSAazZ]+)$/, '$1 $2');
+            } else {
+                // first nbps before time part replace to usual space
+                format = format.replace(/([^HsSAazZ\u00a0])\s([^xXgGYWwEdDQM]+)$/, '$1 $2');
+            }
+            return format;
         },
 
         /**
@@ -270,9 +295,9 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @param {string} value
          * @returns {string}
          */
-        formatDateTime: function(value) {
+        formatDateTime: function(value, addNbsp) {
             return this.getMomentForBackendDateTime(value).tz(this.timezone)
-                .format(this.getDateTimeFormat());
+                .format(this.getDateTimeFormat(addNbsp));
         },
 
         /**
