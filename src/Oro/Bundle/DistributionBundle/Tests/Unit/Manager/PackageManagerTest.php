@@ -615,7 +615,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEventDispatcher')
             ->will($this->returnValue($eventDispatcher));
         $eventDispatcher->expects($this->once())
-            ->method('dispatchCommandEvent')
+            ->method('dispatchScript')
             ->with('cache-clear', false);
         $installationManager = $this->createInstallationManagerMock();
         $installationManager->expects($this->once())
@@ -808,7 +808,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEventDispatcher')
             ->will($this->returnValue($eventDispatcher));
         $eventDispatcher->expects($this->once())
-            ->method('dispatchCommandEvent')
+            ->method('dispatchScript')
             ->with('cache-clear', false);
 
         // Uninstalling
