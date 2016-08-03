@@ -1,4 +1,4 @@
-UPGRADE FROM 1.10 to 2.0
+UPGRADE FROM 1.10 to 2.0 
 ========================
 
 ####WorkflowBundle

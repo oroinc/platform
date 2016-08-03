@@ -17,6 +17,8 @@ Provide Current Localization
 For provide current localization, need create custom extension, implement `Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface`, and register it by tag `oro_locale.extension.current_localization`.
 
 ```yml
+services:
+    ...
     acme_demo.extension.current_localization:
         class: 'Acme\Bundle\DemoBundle\Extension\CurrentLocalizationExtension'
         arguments:
