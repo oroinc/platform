@@ -33,8 +33,8 @@ UPGRADE FROM 1.10 to 2.0
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryHelper`
-- Added provider `Oro\Bundle\LocaleBundle\Provider\LocalizationProvider` for providing localizations
 - Added provider `Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider` for providing current localization
+- Added manager `Oro\Bundle\LocaleBundle\Manager\LocalizationManager` for providing localizations
 - Added datagrid extension `Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension`
 - Added datagrid property `Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty`
 - Added extension interface `Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface` for providing current localization
