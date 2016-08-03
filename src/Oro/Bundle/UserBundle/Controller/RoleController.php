@@ -47,6 +47,7 @@ class RoleController extends Controller
      * )
      *
      * @param Role $role
+     *
      * @return array
      */
     public function viewAction(Role $role)
