@@ -231,8 +231,8 @@ class PackageManager
                 $packageIDs[$index] = $package->getId();
             }
             $preferredPackageID = (new DefaultPolicy(
-                                      $this->composer->getPackage()->getPreferStable()
-                                  ))->selectPreferredPackages($pool, [], $packageIDs)[0];
+                $this->composer->getPackage()->getPreferStable()
+            ))->selectPreferredPackages($pool, [], $packageIDs)[0];
 
             $package = $pool->literalToPackage($preferredPackageID);
         }
