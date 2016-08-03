@@ -1,10 +1,10 @@
-label:  ~ # Hidden Blank theme
+label: Blank theme
 description: Blank theme based on BEM methodology
 groups: [ main ]
 data:
     assets:
         styles:
             inputs:
-                - 'bundles/oroui/blank/blank.scss'
+                - 'bundles/oroui/blank/blocks/blocks.scss'
             filters: ['cssrewrite', 'cssmin']
-            output: 'css/layout/blank/blank.css'
+            output: 'css/layout/blank/styles.css'
