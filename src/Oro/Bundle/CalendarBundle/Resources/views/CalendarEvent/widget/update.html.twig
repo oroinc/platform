@@ -14,7 +14,6 @@
             });
         </script>
     {% else %}
-
         {% if not form.vars.valid and form.vars.errors|length %}
             <div class="alert alert-error">
                 <div class="message">
@@ -62,5 +61,18 @@
             </form>
             {{ oro_form_js_validation(form) }}
         </div>
+
+        <script type="text/javascript">
+            require(['oroui/js/widget-manager', 'orocalendar/js/app/views/all-day-view'],
+                function(widgetManager, AllDayView) {
+                    widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }},
+                        function(widget) {
+                            widget.once('widgetReady', function(){
+                                widget.subview('all_day', new AllDayView({'el': '#{{ form.vars.id }}'}));
+                            });
+                        }
+                    );
+                });
+        </script>
     {% endif %}
 </div>
