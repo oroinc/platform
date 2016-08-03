@@ -38,20 +38,23 @@ abstract class AbstractScopeManager
      * Return config value from current scope
      *
      * @param string $name Setting name, for example "oro_user.level"
-     * @param bool   $full
+     * @param bool $full
+     * @param null|int $entityId
      *
-     * @return array|string|null
+     * @return array|null|string
      */
-    public function getSettingValue($name, $full = false)
+    public function getSettingValue($name, $full = false, $entityId = null)
     {
-        $entityId = $this->getScopeId();
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
         $this->ensureStoredSettingsLoaded($entityId);
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
         $result = null;
         if (isset($this->storedSettings[$entityId][$section][$key])) {
             $setting = $this->storedSettings[$entityId][$section][$key];
-            if (is_array($setting) && array_key_exists('value', $setting) && null !== $setting['value']) {
+            if (isset($setting['value'])) {
                 if ($full) {
                     $result          = $setting;
                     $result['scope'] = $this->getScopedEntityName();
@@ -67,13 +70,16 @@ abstract class AbstractScopeManager
     /**
      * Get Additional Info of Config Value
      *
-     * @param $name
+     * @param string $name
+     * @param null|int $entityId
      *
      * @return array
      */
-    public function getInfo($name)
+    public function getInfo($name, $entityId = null)
     {
-        $entityId = $this->getScopeId();
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
         $this->ensureStoredSettingsLoaded($entityId);
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
@@ -83,7 +89,7 @@ abstract class AbstractScopeManager
 
         if (!empty($this->storedSettings[$entityId][$section][$key])) {
             $setting = $this->storedSettings[$entityId][$section][$key];
-            if (is_array($setting) && array_key_exists('value', $setting) && null !== $setting['value']) {
+            if (isset($setting['value'])) {
                 $isNullValue = false;
                 if (array_key_exists('createdAt', $setting)) {
                     $createdAt = $setting['createdAt'];
@@ -100,12 +106,15 @@ abstract class AbstractScopeManager
     /**
      * Set setting value. To save changes in a database you need to call flush method
      *
-     * @param string $name  Setting name, for example "oro_user.level"
-     * @param mixed  $value Setting value
+     * @param string $name Setting name, for example "oro_user.level"
+     * @param mixed $value Setting value
+     * @param null|int $entityId
      */
-    public function set($name, $value)
+    public function set($name, $value, $entityId = null)
     {
-        $entityId = $this->getScopeId();
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
         $this->ensureStoredSettingsLoaded($entityId);
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
@@ -124,7 +133,7 @@ abstract class AbstractScopeManager
             ];
         }
 
-        $this->changedSettings[$name] = [
+        $this->changedSettings[$entityId][$name] = [
             'value'                  => $value,
             'use_parent_scope_value' => false
         ];
@@ -134,36 +143,52 @@ abstract class AbstractScopeManager
      * Reset setting value to default. To save changes in a database you need to call flush method
      *
      * @param string $name Setting name, for example "oro_user.level"
+     * @param null|int $entityId
      */
-    public function reset($name)
+    public function reset($name, $entityId = null)
     {
-        $entityId = $this->getScopeId();
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
         $this->ensureStoredSettingsLoaded($entityId);
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
         unset($this->storedSettings[$entityId][$section][$key]);
+        $this->cache->delete($this->getCacheKey($this->getScopedEntityName(), $entityId));
 
-        $this->changedSettings[$name] = [
+        $this->changedSettings[$entityId][$name] = [
             'use_parent_scope_value' => true
         ];
     }
 
     /**
+     * @param null|int $entityId
      * @return array
      */
-    public function getChanges()
+    public function getChanges($entityId = null)
     {
-        return $this->changedSettings;
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
+        if (array_key_exists($entityId, $this->changedSettings)) {
+            return $this->changedSettings[$entityId];
+        }
+        
+        return [];
     }
 
     /**
      * Save changes made with set or reset methods in a database
+     * @param null|int $entityId
      */
-    public function flush()
+    public function flush($entityId = null)
     {
-        if (!empty($this->changedSettings)) {
-            $this->save($this->changedSettings);
-            $this->changedSettings = [];
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
+        if (count($this->changedSettings[$entityId]) > 0) {
+            $this->save($this->changedSettings[$entityId]);
+            $this->changedSettings[$entityId] = [];
         }
     }
 
@@ -171,13 +196,16 @@ abstract class AbstractScopeManager
      * Save settings with fallback to global scope (default)
      *
      * @param array $settings
+     * @param null|int $entityId
      *
      * @return array [updated, removed]
      */
-    public function save($settings)
+    public function save($settings, $entityId = null)
     {
         $entity   = $this->getScopedEntityName();
-        $entityId = $this->getScopeId();
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
 
         $em = $this->doctrine->getManagerForClass('Oro\Bundle\ConfigBundle\Entity\Config');
 
@@ -191,7 +219,7 @@ abstract class AbstractScopeManager
         }
         $this->storedSettings[$entityId] = $this->convertToSettings($config);
 
-        list ($updated, $removed) = $this->calculateChangeSet($settings);
+        list ($updated, $removed) = $this->calculateChangeSet($settings, $entityId);
         foreach ($removed as $name) {
             list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
             $config->removeValue($section, $key);
@@ -222,28 +250,26 @@ abstract class AbstractScopeManager
      * Does not modify anything, so even if you call flush after calculating you will not persist any changes
      *
      * @param array $settings
+     * @param null|int $entityId
      *
      * @return array [updated,              removed]
      *               [[name => value, ...], [name, ...]]
      */
-    public function calculateChangeSet(array $settings)
+    public function calculateChangeSet(array $settings, $entityId = null)
     {
         // find new and updated
         $updated = $removed = [];
         foreach ($settings as $name => $value) {
-            $currentValue = $this->getSettingValue($name, true);
+            $currentValue = $this->getSettingValue($name, true, $entityId);
+            $useCurrentScope = empty($value['use_parent_scope_value']);
 
             // save only if there's no default checkbox checked
-            if (empty($value['use_parent_scope_value'])) {
+            if ($useCurrentScope) {
                 $updated[$name] = $value['value'];
             }
 
-            $valueDefined      = isset($currentValue['use_parent_scope_value'])
-                && $currentValue['use_parent_scope_value'] == false;
-            $valueStillDefined = isset($value['use_parent_scope_value'])
-                && $value['use_parent_scope_value'] == false;
-
-            if ($valueDefined && !$valueStillDefined) {
+            $valueDefined = empty($currentValue['use_parent_scope_value']);
+            if ($valueDefined && !$useCurrentScope) {
                 $removed[] = $name;
             }
         }
@@ -253,10 +279,13 @@ abstract class AbstractScopeManager
 
     /**
      * Reload settings data
+     * @param null|int $entityId
      */
-    public function reload()
+    public function reload($entityId = null)
     {
-        $entityId = $this->getScopeId();
+        if (null === $entityId) {
+            $entityId = $this->getScopeId();
+        }
         unset($this->storedSettings[$entityId]);
     }
 
@@ -305,7 +334,7 @@ abstract class AbstractScopeManager
         if (!isset($this->storedSettings[$entityId])) {
             $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
             $settings = $this->cache->fetch($cacheKey);
-            if (false === $settings) {
+            if (!$this->cache->contains($cacheKey)) {
                 $settings = $this->loadStoredSettings($entityId);
                 $this->cache->save($cacheKey, $settings);
             }
@@ -326,9 +355,11 @@ abstract class AbstractScopeManager
             ->getRepository('Oro\Bundle\ConfigBundle\Entity\Config')
             ->findByEntity($this->getScopedEntityName(), $entityId);
 
-        return null !== $config
-            ? $this->convertToSettings($config)
-            : [];
+        if (null === $config) {
+            return [];
+        }
+
+        return $this->convertToSettings($config);
     }
 
     /**

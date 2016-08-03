@@ -126,7 +126,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $loadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false);
+        $loadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, 123);
 
         $this->userScopeManager->expects($this->once())
             ->method('getChanges')
@@ -187,8 +187,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getSettingValue')
             ->willReturnMap(
                 [
-                    [$greetingKey, false, 'old value'],
-                    [$levelKey, false, 2000]
+                    [$greetingKey, false, 123, 'old value'],
+                    [$levelKey, false, 123, 2000]
                 ]
             );
 
@@ -200,9 +200,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $greetingOldValueLoadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false);
-        $levelOldValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, '2000', false);
-        $levelNullValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, null, false);
+        $greetingOldValueLoadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, 123);
+        $levelOldValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, '2000', false, 123);
+        $levelNullValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, null, false, 123);
 
         $this->userScopeManager->expects($this->once())
             ->method('save')
@@ -371,5 +371,29 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getSettingValue');
 
         $this->assertEquals('', $this->manager->get($parameterName));
+    }
+
+    public function testGetValues()
+    {
+        $parameterName = 'oro_test.someValue';
+        $entityIds = [3, 5];
+
+        $this->userScopeManager->expects($this->exactly(2))
+            ->method('getSettingValue')
+            ->withConsecutive(
+                [$parameterName, false, 3],
+                [$parameterName, false, 5]
+            )
+            ->willReturnMap(
+                [
+                    [$parameterName, false, 3, 'val1'],
+                    [$parameterName, false, 5, 'val2']
+                ]
+            );
+
+        $this->globalScopeManager->expects($this->never())
+            ->method('getSettingValue');
+
+        $this->assertEquals([3 => 'val1', 5 => 'val2'], $this->manager->getValues($parameterName, $entityIds));
     }
 }
