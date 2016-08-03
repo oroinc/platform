@@ -127,10 +127,10 @@ define(function(require) {
                 success: function(response) {
                     self.trigger(successEventName, response);
                 },
-                error: function (jqXHR) {
+                error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
-            })
+            });
         },
 
         /**
@@ -152,8 +152,7 @@ define(function(require) {
          *
          * @param response
          */
-        updateCriteriaLabels: function(response)
-        {
+        updateCriteriaLabels: function(response) {
             this.updateLocalValues(response.results);
             this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
             this._updateCriteriaHint();
@@ -168,7 +167,7 @@ define(function(require) {
          */
         updateLocalValues: function(values) {
             var ids = [];
-            _.each(values, function (item) {
+            _.each(values, function(item) {
                 ids.push(item.id);
                 this.selectedData[item.id] = item;
             }, this);
@@ -462,7 +461,7 @@ define(function(require) {
             if (values) {
                 var foundItems = 0;
                 var self = this;
-                _.each(values, function (item) {
+                _.each(values, function(item) {
                     if (self.selectedData && self.selectedData[item]) {
                         foundItems++;
                     }
