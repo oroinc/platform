@@ -21,6 +21,11 @@ oro:
             type.label: Type
             shared_by: %name% (Shared by %owner%)
             columns_data.label: Columns data
+            appearance_type.label: Appearance type
+            appearance_data.label: Appearance data
+        appearance:
+            grid: Grid
+            board: Kanban Board
     grid:
         mass_action:
             label: Mass Actions

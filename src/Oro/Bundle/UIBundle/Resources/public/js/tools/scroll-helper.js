@@ -34,6 +34,23 @@ define(function(require) {
         },
 
         /**
+         * Returns true if el has visible scroll
+         */
+        hasScroll: function(el, a) {
+            if ($(el).css('overflow') === 'hidden') {
+                return false;
+            }
+            var scroll = (a && a === 'left') ? 'scrollLeft' : 'scrollTop';
+            if (el[scroll] > 0) {
+                return true;
+            }
+            el[scroll] = 1;
+            var has = (el[scroll] > 0);
+            el[scroll] = 0;
+            return has;
+        },
+
+        /**
          * Cached documentHeight value
          */
         _documentHeight: -1,
