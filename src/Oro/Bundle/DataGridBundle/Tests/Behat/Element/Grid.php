@@ -162,7 +162,6 @@ class Grid extends Element
     /**
      * @param string $content
      * @param string $action
-     * @throws ExpectationException
      */
     public function clickActionLink($content, $action)
     {
