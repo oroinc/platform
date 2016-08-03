@@ -14,7 +14,7 @@ For receive current localization use `Oro\Bundle\LocaleBundle\Helper\Localizatio
 Provide Current Localization
 ============================
 
-For provider current localization need create custom provider, implement `Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface`, and register by tag `oro_locale.extension.current_localization`.
+For provide current localization, need create custom extension, implement `Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface`, and register it by tag `oro_locale.extension.current_localization`.
 
 ```yml
     acme_demo.extension.current_localization:
@@ -28,7 +28,7 @@ For provider current localization need create custom provider, implement `Oro\Bu
 ```php
 <?php
 
-namespace Oro\Bundle\FrontendLocalizationBundle\Extension;
+namespace Acme\Bundle\DemoBundle\Extension;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface;
