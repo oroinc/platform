@@ -122,7 +122,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.settings'
-            - '@oro_locale.provider.localization'
+            - '@oro_locale.manager.localization'
             - '@oro_locale.provider.localization_choices'
         tags:
             - { name: form.type, alias: oro_locale_localization_selection }

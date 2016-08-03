@@ -4,28 +4,28 @@ namespace Oro\Bundle\LocaleBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 class LocalizationCacheCleaner implements CacheClearerInterface
 {
     /**
-     * @var LocalizationProvider
+     * @var LocalizationManager
      */
-    private $provider;
+    private $localizationManager;
 
     /**
-     * @param LocalizationProvider $provider
+     * @param LocalizationManager $localizationManager
      */
-    public function __construct(LocalizationProvider $provider)
+    public function __construct(LocalizationManager $localizationManager)
     {
-        $this->provider = $provider;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function clear($cacheDir)
     {
-        $this->provider->clearCache();
+        $this->localizationManager->clearCache();
     }
 }

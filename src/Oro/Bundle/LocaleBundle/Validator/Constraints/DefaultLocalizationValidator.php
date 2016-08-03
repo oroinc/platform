@@ -7,23 +7,23 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 class DefaultLocalizationValidator extends ConstraintValidator
 {
     const ENABLED_LOCALIZATIONS_NAME = 'oro_locale___enabled_localizations';
 
     /**
-     * @var LocalizationProvider
+     * @var LocalizationManager
      */
-    protected $localizationProvider;
+    protected $localizationManager;
 
     /**
-     * @param LocalizationProvider $localizationProvider
+     * @param LocalizationManager $localizationManager
      */
-    public function __construct(LocalizationProvider $localizationProvider)
+    public function __construct(LocalizationManager $localizationManager)
     {
-        $this->localizationProvider = $localizationProvider;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -45,7 +45,7 @@ class DefaultLocalizationValidator extends ConstraintValidator
             return;
         }
 
-        $localization = $this->localizationProvider->getLocalization((int)$defaultLocalization);
+        $localization = $this->localizationManager->getLocalization((int)$defaultLocalization);
         if ($localization instanceof Localization) {
             $message = 'oro.locale.validators.is_not_enabled';
             $params = ['%localization%' => $localization->getName()];
@@ -54,8 +54,7 @@ class DefaultLocalizationValidator extends ConstraintValidator
             $params = ['%localization_id%' => $defaultLocalization];
         }
 
-        $this->context->buildViolation($message, $params)
-            ->addViolation();
+        $this->context->buildViolation($message, $params)->addViolation();
     }
 
     /**
@@ -73,6 +72,6 @@ class DefaultLocalizationValidator extends ConstraintValidator
      */
     protected function isSyncApplicable(FormInterface $rootForm)
     {
-        return $rootForm->getName() == 'localization' && $rootForm->has(self::ENABLED_LOCALIZATIONS_NAME);
+        return $rootForm->getName() === 'localization' && $rootForm->has(self::ENABLED_LOCALIZATIONS_NAME);
     }
 }

@@ -39,19 +39,19 @@ class LocalizationProviderTest extends WebTestCase
 
     public function testCache()
     {
-        $provider = $this->getContainer()->get('oro_locale.provider.localization');
+        $manager = $this->getContainer()->get('oro_locale.manager.localization');
 
         $queryAnalyzer = new QueryAnalyzer($this->em->getConnection()->getDatabasePlatform());
         $prevLogger = $this->em->getConnection()->getConfiguration()->getSQLLogger();
 
         $this->em->getConnection()->getConfiguration()->setSQLLogger($queryAnalyzer);
 
-        $provider->getLocalizations();
-        $data = $provider->getLocalizations();
+        $manager->getLocalizations();
+        $data = $manager->getLocalizations();
 
         foreach ($data as $key => $localization) {
             $this->assertSame($key, $localization->getId());
-            $this->assertSame($localization, $provider->getLocalization($localization->getId()));
+            $this->assertSame($localization, $manager->getLocalization($localization->getId()));
         }
 
         $queries = $queryAnalyzer->getExecutedQueries();

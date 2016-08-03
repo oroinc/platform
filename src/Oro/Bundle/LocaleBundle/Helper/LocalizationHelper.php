@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 
 class LocalizationHelper
@@ -15,9 +15,9 @@ class LocalizationHelper
     use FallbackTrait;
 
     /**
-     * @var LocalizationProvider
+     * @var LocalizationManager
      */
-    protected $localizationProvider;
+    protected $localizationManager;
 
     /**
      * @var CurrentLocalizationProvider
@@ -25,14 +25,14 @@ class LocalizationHelper
     protected $currentLocalizationProvider;
 
     /**
-     * @param LocalizationProvider $localizationProvider
+     * @param LocalizationManager $localizationManager
      * @param CurrentLocalizationProvider $currentLocalizationProvider
      */
     public function __construct(
-        LocalizationProvider $localizationProvider,
+        LocalizationManager $localizationManager,
         CurrentLocalizationProvider $currentLocalizationProvider
     ) {
-        $this->localizationProvider = $localizationProvider;
+        $this->localizationManager = $localizationManager;
         $this->currentLocalizationProvider = $currentLocalizationProvider;
     }
 
@@ -49,7 +49,7 @@ class LocalizationHelper
      */
     public function getLocalizations()
     {
-        return $this->localizationProvider->getLocalizations();
+        return $this->localizationManager->getLocalizations();
     }
 
     /**

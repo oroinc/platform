@@ -14,7 +14,7 @@ services:
         public: false
         class: 'Oro\Bundle\LocaleBundle\Cache\LocalizationCacheWarmer'
         arguments:
-            - '@oro_locale.provider.localization'
+            - '@oro_locale.manager.localization'
         tags:
             - { name: kernel.cache_warmer, priority: 5 }
 
@@ -22,6 +22,6 @@ services:
         public: false
         class: 'Oro\Bundle\LocaleBundle\Cache\LocalizationCacheCleaner'
         arguments:
-            - '@oro_locale.provider.localization'
+            - '@oro_locale.manager.localization'
         tags:
             - { name: kernel.cache_clearer }
