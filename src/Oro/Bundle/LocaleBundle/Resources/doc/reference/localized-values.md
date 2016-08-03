@@ -3,18 +3,9 @@ Localized Values
 
 Table of Contents
 -----------------
- - [Formats source](#format-source)
- - [PHP Name Formatter](#php-name-formatter)
-    - [Methods and examples of usage](#methods-and-examples-of-usage)
-      - [format](#format)
-      - [getNameFormat](#getNameFormat)
-   - [Twig](#twig)
-    - [Filters](#filters)
-      - [oro_format_name](#oro_format_name)
-   - [JS](#js)
-    - [Methods and examples of usage](#js_methods-and-examples-of-usage)
-        - [format](#js_format)
-        - [getNameFormat](#js_getNameFormat)
+ - [Format localized values in twig](#format-localized-values-in-twig)
+ - [Format localized values in layout configs](#format-localized-values-in-layout-configs)
+ - [Format localized values in datagrids](#format-localized-values-in-datagrids)
 
 Format localized values in twig
 ===============================
@@ -23,7 +14,7 @@ Use `localized_value` twig filter
 
 ```twig
 {# mytwig.html.twig #}
-    localization.titles|localized_value
+localization.titles|localized_value
 ```
 
 Format localized values in layout configs
@@ -45,8 +36,8 @@ layout:
 Format localized values in datagrids
 ====================================
 
-Use `localized_value` datagrid property and `data_name` to set needed property by path, for example `titles`, `relation.subrelation.titles`
-If current localization not detected, will be join direct SQL relation to default fallback value, otherwhise values will be recieved by LocalizationHelper
+Use datagrid property with type `localized_value` and attribute `data_name` to set needed property by path, for example `titles`, `relation.subrelation.titles`
+If current localization not detected, will be join direct SQL relation to default fallback value, otherwhise values will be recieved by LocalizationHelper, sorters and filters will be removed.
 
 ```yml
 # .../Resources/config/datagrid.yml
