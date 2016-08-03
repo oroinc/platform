@@ -1,0 +1,87 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% oro_title_set({params : {"%label%": entity.label }}) %}
+
+{% set gridName = 'account-account-users-grid-view' %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('orob2b_account_account_user_role_index'),
+        'indexLabel': 'orob2b.account.accountuserrole.entity_plural_label'|trans,
+        'entityTitle': entity.label|default('N/A'|trans)
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set selfManagedProperty = '' %}
+    {% if entity.public %}
+        {% set selfManagedPropertyValue = '' %}
+        {% if entity.selfManaged %}
+            {% set selfManagedPropertyValue = 'orob2b.account.accountuserrole.self_managed.value.true.label'|trans %}
+        {% else %}
+            {% set selfManagedPropertyValue = 'orob2b.account.accountuserrole.self_managed.value.false.label'|trans %}
+        {% endif %}
+        {% set selfManagedProperty = UI.renderProperty('orob2b.account.accountuserrole.self_managed.label'|trans, selfManagedPropertyValue) %}
+    {% else %}
+        {% set selfManagedProperty = UI.renderProperty('orob2b.account.accountuserrole.self_managed.label'|trans, 'N/A'|trans) %}
+    {% endif %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'orob2b.account.sections.general'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [
+                    UI.renderProperty('orob2b.account.accountuserrole.label.label'|trans, entity.label),
+                    UI.renderProperty('orob2b.account.accountuserrole.account.label'|trans, entity.account),
+                    selfManagedProperty
+                ]}
+            ]
+        }
+    ] %}
+
+    {% set rolePermissionsGrid %}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/entity-category-tabs-component',
+            options: tabsOptions
+        }) }}></div>
+        {{ dataGrid.renderGrid('account-user-role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: true} }) }}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/capability-set-component',
+            options: capabilitySetOptions
+        }) }}></div>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': 'orob2b.account.sections.accountuserrole.entity'|trans,
+        'subblocks': [{
+            'data': [
+                rolePermissionsGrid
+            ]
+        }]
+    }]) %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'orob2b.account.accountuser.entity_plural_label'|trans,
+        'subblocks': [{
+            'title' : null,
+            'useSpan': false,
+            'data' : [
+                dataGrid.renderGrid(gridName, {role: entity.id}, { cssClass: 'inner-grid' })
+            ]
+        }]
+    }] ) %}
+
+    {% set id = 'account-account-user-role-view' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}
+
+{% block stats %}
+    {# Must be empty, because parent view uses this block to render dates, which are not implemented in this entity #}
+{% endblock stats %}
