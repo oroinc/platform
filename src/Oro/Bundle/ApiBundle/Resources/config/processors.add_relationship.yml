@@ -28,7 +28,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 30 }
 
