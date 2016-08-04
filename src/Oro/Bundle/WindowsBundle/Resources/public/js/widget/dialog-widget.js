@@ -421,6 +421,7 @@ define(function(require) {
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
+            this.widget.trigger('dialogreposition');
         },
 
         leftAndWidthAdjustments: function(dialog, containerEl) {

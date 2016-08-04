@@ -16,12 +16,19 @@
   }
 }
 
-.ui-dialog .form-horizontal .widget-sort-by {
-  .control-group .controls {
-    margin-left: 0;
-    select {
-      max-width: 280px;
+.ui-dialog .form-horizontal {
+  .widget-sort-by {
+    .control-group .controls {
+      margin-left: 0;
+      select {
+        max-width: 280px;
+      }
     }
+  }
+
+  .widget-query-filter .collapse-action {
+    padding-top: 4px;
+    display: inline-block;
   }
 }
 
@@ -490,6 +497,9 @@
     margin-right: 20px;
   }
   .date-range-filter {
+    & > div > .control-group {
+      margin-bottom: 0px;
+    }
     .filter-separator{
       top: 2px;
     }
@@ -497,6 +507,12 @@
       height: 20px;
       line-height: 20px;
       width: 120px;
+    }
+    .control-group .horizontal:last-of-type .selector {
+      margin-bottom: 10px;
+    }
+    .control-group .horizontal:nth-of-type(2) .selector {
+      margin-top: 10px;
     }
   }
   .filter-criteria{
@@ -542,7 +558,7 @@
 }
 .dashboard-widget-items {
   margin-bottom: 10px;
-  .controls {
+  .control-group.controls {
     width: 445px;
   }
   .mobile-version & {
@@ -570,4 +586,7 @@
       }
     }
   }
+}
+.ui-dialog .form-horizontal .control-group .conditions-group .controls {
+  margin-left: 0;
 }

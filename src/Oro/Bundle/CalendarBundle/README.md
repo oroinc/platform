@@ -9,6 +9,7 @@ Table of content
 - [UI](#ui)
 - [System Calendars](./Resources/doc/systemCalendars.md)
 - [Workflow Action](./Resources/doc/workflowAction.md)
+- [Recurring Events](./Resources/doc/recurringEvents.md)
 
 ##Overview
 

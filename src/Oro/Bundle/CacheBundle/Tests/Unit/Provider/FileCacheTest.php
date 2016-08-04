@@ -75,37 +75,37 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test',
                 null,
-                'test.ext',
+                '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test',
                 'namespace',
-                'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
+                'namespace' . DIRECTORY_SEPARATOR . '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test\\\\//::""**??<<>>||file',
                 'namespace\\\\//::""**??<<>>||',
-                'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
+                'namespace' . DIRECTORY_SEPARATOR . 'd3' . DIRECTORY_SEPARATOR . 'testfile.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test',
                 null,
-                'test.ext',
+                '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test',
                 'namespace',
-                'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
+                'namespace' . DIRECTORY_SEPARATOR . '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test\\\\//::""**??<<>>||file',
                 'namespace\\\\//::""**??<<>>||',
-                'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
+                'namespace' . DIRECTORY_SEPARATOR . 'd3' . DIRECTORY_SEPARATOR . 'testfile.ext',
             ],
         ];
     }

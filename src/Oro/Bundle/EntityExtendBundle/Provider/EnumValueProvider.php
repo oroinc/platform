@@ -60,4 +60,16 @@ class EnumValueProvider
 
         return $this->doctrineHelper->getEntityReference($enumClass, $id);
     }
+
+    /**
+     * @param string $enumCode
+     * @return AbstractEnumValue[]
+     */
+    public function getDefaultEnumValuesByCode($enumCode)
+    {
+        $enumClass = ExtendHelper::buildEnumValueClassName($enumCode);
+        $repo = $this->doctrineHelper->getEntityRepository($enumClass);
+
+        return $repo->getDefaultValues();
+    }
 }

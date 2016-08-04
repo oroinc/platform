@@ -4,7 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
 use Symfony\Component\Form\FormView;
 
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
@@ -163,7 +162,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
-            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => new Condition\FalseCondition()]
+            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => '=false']
         );
 
         $this->assertSame($formView, $view->vars['form']);

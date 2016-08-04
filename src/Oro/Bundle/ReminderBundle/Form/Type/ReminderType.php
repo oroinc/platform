@@ -40,6 +40,7 @@ class ReminderType extends AbstractType
                 'intention'            => 'reminder',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'cascade_validation'   => true,
+                'error_bubbling'       => false,
             )
         );
     }
@@ -48,6 +49,14 @@ class ReminderType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_reminder';
     }

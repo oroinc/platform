@@ -138,7 +138,15 @@ define([
 
             //Focus OK button
             if (self.options.focusOk) {
-                $el.find('.btn.ok').focus();
+                $el.find('.btn.ok')
+                    .one('focusin', function(e) {
+                        /*
+                         * Prevents jquery-ui from focusing different dialog
+                         * (which is happening when focusin is triggered on document
+                         */
+                        e.stopPropagation();
+                    })
+                    .focus();
             }
 
             return this;

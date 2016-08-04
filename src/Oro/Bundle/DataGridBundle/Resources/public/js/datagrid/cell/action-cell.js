@@ -43,7 +43,7 @@ define([
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
-                        'data-options="{&quot;html&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
+                        'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
                 '</div>' +
             '</div>',
 
@@ -173,15 +173,9 @@ define([
          * @protected
          */
         createLaunchers: function() {
-            var result = [];
-
-            _.each(this.actions, function(action) {
-                var options = {};
-                var launcher = action.createLauncher(options);
-                result.push(launcher);
+            return _.each(this.actions, function(action) {
+                return action.createLauncher({});
             }, this);
-
-            return result;
         },
 
         /**

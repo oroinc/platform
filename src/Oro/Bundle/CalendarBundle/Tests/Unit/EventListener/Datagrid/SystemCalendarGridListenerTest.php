@@ -7,6 +7,9 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var SystemCalendarGridListener */

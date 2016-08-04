@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -30,6 +31,8 @@ class GridViewTest extends \PHPUnit_Framework_TestCase
             ['gridName', 'grid'],
             ['filtersData', ['k' => 'v']],
             ['sortersData', ['k' => 'v']],
+            ['appearanceType', new AppearanceType('board')],
+            ['appearanceData', ['k' => 'v']],
             ['owner', $user],
             [
                 'columnsData',
@@ -44,6 +47,8 @@ class GridViewTest extends \PHPUnit_Framework_TestCase
         $gridView->setName('name');
         $gridView->setFiltersData(['f' => 'fv']);
         $gridView->setSortersData(['s' => 'sv']);
+        $gridView->setAppearanceData(['a' => 'av']);
+        $gridView->setAppearanceType(new AppearanceType('board'));
         $gridView->setColumnsData(['name' => ['order' => 4]]);
 
         $expectedView = new View(
@@ -51,9 +56,11 @@ class GridViewTest extends \PHPUnit_Framework_TestCase
             ['f' => 'fv'],
             ['s' => 'sv'],
             GridView::TYPE_PRIVATE,
-            ['name' => ['order' => 4]]
+            ['name' => ['order' => 4]],
+            'board'
         );
         $expectedView->setLabel('name');
+        $expectedView->setAppearanceData(['a' => 'av']);
         static::assertEquals($expectedView, $gridView->createView());
     }
 }
