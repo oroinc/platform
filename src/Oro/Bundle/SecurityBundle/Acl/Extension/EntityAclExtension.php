@@ -423,6 +423,8 @@ class EntityAclExtension extends AbstractAclExtension
     }
 
     /**
+     * That method returns the collection of permissions that used only if the level of osnership less than System
+     *
      * @return array
      */
     protected function getOwnershipPermissions()
