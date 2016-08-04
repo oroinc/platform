@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Datagrid;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
@@ -67,19 +68,45 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
         $allPrivileges = $this->preparePrivileges($this->role, 'entity');
         $categories = $this->categoryProvider->getPermissionCategories();
 
-        foreach ($allPrivileges as $key => $privilege) {
+        foreach ($allPrivileges as $privilege) {
             /** @var AclPrivilege $privilege */
             $item = [
                 'identity' => $privilege->getIdentity()->getId(),
                 'entity' => $this->translator->trans($privilege->getIdentity()->getName()),
                 'group' => $this->getPrivilegeCategory($privilege, $categories),
-                'permissions' => [],
+                'permissions' => []
             ];
+            $fields = $this->getFieldPrivileges($privilege->getFields());
+            if (count($fields)) {
+                $item['fields'] = $fields;
+            }
             $item = $this->preparePermissions($privilege, $item);
             $gridData[] = new ResultRecord($item);
         }
 
         return $gridData;
+    }
+
+    /**
+     * @param ArrayCollection $fields
+     *
+     * @return array
+     */
+    protected function getFieldPrivileges(ArrayCollection $fields)
+    {
+        $result = [];
+        foreach ($fields as $privilege) {
+            /** @var AclPrivilege $privilege */
+            $item =  [
+                'identity' => $privilege->getIdentity()->getId(),
+                'name' => $privilege->getIdentity()->getName(),
+                'label' => $this->translator->trans($privilege->getIdentity()->getName()),
+                'permissions' => []
+            ];
+            $result[] = $this->preparePermissions($privilege, $item);
+        }
+
+        return $result;
     }
 
     /**

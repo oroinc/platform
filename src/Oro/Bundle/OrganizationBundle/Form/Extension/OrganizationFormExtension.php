@@ -15,9 +15,12 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class OrganizationFormExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * @var ManagerRegistry
      */
@@ -106,14 +109,6 @@ class OrganizationFormExtension extends AbstractTypeExtension
         }
 
         $this->getPropertyAccessor()->setValue($entity, $organizationField, $organization);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 
     /**

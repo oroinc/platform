@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -34,6 +36,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
     protected $entityClassNameHelper;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface
+     */
+    protected $authChecker;
+
+    /**
      * @var InlineEditingExtension
      */
     protected $extension;
@@ -53,10 +60,14 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->authChecker = $this
+            ->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+
         $this->extension = new InlineEditingExtension(
             $this->guesser,
             $this->securityFacade,
-            $this->entityClassNameHelper
+            $this->entityClassNameHelper,
+            $this->authChecker
         );
     }
 
@@ -96,6 +107,9 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessConfigs(array $configValues, $entityName)
     {
+        $this->authChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
         $config = DatagridConfiguration::create($configValues);
 
         $callback = $this->getProcessConfigsCallBack();

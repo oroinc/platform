@@ -7,8 +7,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+
 class DataBlockExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * {@inheritdoc}
      */
@@ -46,13 +50,5 @@ class DataBlockExtension extends AbstractTypeExtension
         if (isset($options['tooltip'])) {
             $view->vars['tooltip'] = $options['tooltip'];
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 }

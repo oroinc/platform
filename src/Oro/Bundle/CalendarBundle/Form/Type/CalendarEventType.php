@@ -149,7 +149,7 @@ class CalendarEventType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -188,9 +188,17 @@ class CalendarEventType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_calendar_event';
     }

@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
 
     $.widget('oroui.dropdownSelect', {
         template: _.template(
-            '<% if (useButtonGroup) { %><div class="btn-group"><% } %>' +
+            '<% if (useButtonGroup) { %><div class="dropdown btn-group"><% } %>' +
                 '<a href="#" class="<%= buttonClass %> dropdown-toggle" ' +
                     'data-toggle="dropdown" data-value="<%= selected.value %>"' +
                     '><span><%= selected.label %></span><% if (useCaret) { %> <span class="caret"></span><% } %></a>' +

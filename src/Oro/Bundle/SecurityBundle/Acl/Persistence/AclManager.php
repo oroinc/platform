@@ -87,14 +87,16 @@ class AclManager extends AbstractAclManager
     /**
      * Get access levels list for object.
      *
-     * @param $object
+     * @param object|string $object
+     * @param string|null   $permissionName
+     *
      * @return array
      */
-    public function getAccessLevels($object)
+    public function getAccessLevels($object, $permissionName = null)
     {
         $extension = $this->getExtensionSelector()->select($object);
 
-        return $extension->getAccessLevelNames($object);
+        return $extension->getAccessLevelNames($object, $permissionName);
     }
 
     /**
@@ -495,7 +497,8 @@ class AclManager extends AbstractAclManager
      *
      * @param SID $sid
      * @param OID $oid
-     * @return EntryInterface[]
+     *
+     * @return \Symfony\Component\Security\Acl\Model\EntryInterface[]
      */
     public function getAces(SID $sid, OID $oid)
     {
@@ -635,6 +638,9 @@ class AclManager extends AbstractAclManager
         $key = $this->getKey($oid);
         if ($this->items[$key]->getState() !== BatchItem::STATE_DELETE) {
             $extension = $this->extensionSelector->select($oid);
+            if ($field) {
+                $extension = $extension->getFieldExtension();
+            }
             $extension->validateMask($mask, $oid);
             if ($acl === null && $this->items[$key]->getState() === BatchItem::STATE_CREATE) {
                 $this->items[$key]->addAce($type, $field, $sid, $granting, $mask, $strategy);
@@ -849,7 +855,7 @@ class AclManager extends AbstractAclManager
      *                           Set to not null class-field-based or object-field-based ACE
      * @return EntryInterface[]
      */
-    protected function doGetAces(SID $sid, OID $oid, $type, $field)
+    protected function doGetAces(SID $sid, OID $oid, $type, $field = null)
     {
         $acl = $this->getAcl($oid);
         if (!$acl) {

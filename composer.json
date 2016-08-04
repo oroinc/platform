@@ -11,6 +11,10 @@
     ],
     "repositories": [
         {
+            "type": "git",
+            "url": "https://github.com/orocrm/TranslationFormBundle.git"
+        },
+        {
             "type": "composer",
             "url": "https://packagist.orocrm.com"
         }
@@ -21,8 +25,8 @@
         "ext-mbstring": "*",
         "ext-gd": "*",
         "ext-xml": "*",
-        "symfony/symfony": "2.7.*",
-        "twig/twig": "1.20.0",
+        "symfony/symfony": "2.8.*",
+        "twig/twig": "1.24.*",
         "doctrine/orm": "2.5.1",
         "doctrine/doctrine-bundle": "~1.6.0",
         "doctrine/dbal": "2.5.1",
@@ -43,7 +47,7 @@
         "knplabs/knp-menu-bundle": "2.0.0-alpha2",
         "friendsofsymfony/rest-bundle": "1.7.1",
         "friendsofsymfony/jsrouting-bundle": "1.5.4",
-        "nelmio/api-doc-bundle": "2.9.0",
+        "nelmio/api-doc-bundle": "2.13.0",
         "ass/xmlsecurity": "1.0.0",
         "besimple/soap": "0.2.2",
         "stof/doctrine-extensions-bundle": "1.1.0",
@@ -52,13 +56,13 @@
         "leafo/lessphp": "0.4.0",
         "genemu/form-bundle": "2.2.1",
         "zendframework/zend-mail": "2.1.5",
-        "a2lix/translation-form-bundle": "1.3",
+        "a2lix/translation-form-bundle": "dev-1.x-symfony2.8",
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "0.1.*",
         "guzzle/guzzle": "3.7.*",
         "lexik/maintenance-bundle": "v1.0.3",
         "sylius/flow-bundle": "0.6.*",
-        "composer/composer": "1.0.0-p1",
+        "composer/composer": "1.2.*",
         "akeneo/batch-bundle": "0.4.2",
         "nesbot/Carbon": "1.8.*",
         "monolog/monolog": "1.8.*",

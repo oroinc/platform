@@ -203,6 +203,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
 
             $customizationContext = $this->createCustomizationContext($context);
             $customizationContext->setClassName($entityClass);
+            $customizationContext->setConfig($context->getResult());
             $customizationContext->setResult($item);
             $this->customizationProcessor->process($customizationContext);
 
@@ -235,6 +236,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
             $customizationContext->setRootClassName($rootEntityClass);
             $customizationContext->setPropertyPath($propertyPath);
             $customizationContext->setClassName($entityClass);
+            $customizationContext->setConfig($context->getResult());
             $customizationContext->setResult($item);
             $this->customizationProcessor->process($customizationContext);
 
