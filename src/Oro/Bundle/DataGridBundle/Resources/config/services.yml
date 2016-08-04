@@ -28,6 +28,7 @@ parameters:
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
     oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
+    oro_datagrid.choice.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper
 
     oro_datagrid.datagrid.inline_edit_column_options_guesser.class:          Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser
     oro_datagrid.datagrid.inline_edit_column_options.text_guesser.class:     Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\TextGuesser
@@ -35,6 +36,10 @@ parameters:
     oro_datagrid.datagrid.inline_edit_column_options.relation_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\RelationGuesser
     oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser
     oro_datagrid.datagrid.inline_edit_column_options.multi_relation_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiRelationGuesser
+
+    oro_datagrid.datagrid.board.processor.default.class: Oro\Bundle\DataGridBundle\Extension\Board\Processor\DefaultProcessor
+    oro_datagrid.datagrid.board.restriction_manager.class: Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager
+
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
@@ -144,6 +149,7 @@ services:
             - '@oro_security.acl_helper'
             - '@translator'
             - '@oro_datagrid.grid_view.manager'
+            - '@oro_datagrid.appearance_type.manager'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }
 
@@ -163,6 +169,12 @@ services:
             - '@oro_security.acl_helper'
             - '@doctrine'
             - '@oro_datagrid.datagrid.manager'
+            - '@oro_datagrid.datagrid.board.restriction_manager'
+
+    oro_datagrid.appearance_type.manager:
+        class: Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager
+        arguments:
+            - '@doctrine.orm.entity_manager'
 
     oro_datagrid.grid_view.manager.link:
         tags:
@@ -210,7 +222,7 @@ services:
         class: %oro_datagrid.datagrid.inline_edit_column_options.choices_guesser.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.acl_helper'
+            - '@oro_datagrid.choice.helper'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 90 }
 
@@ -218,7 +230,7 @@ services:
         class: %oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.acl_helper'
+            - '@oro_datagrid.choice.helper'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 92 }
 
@@ -249,3 +261,31 @@ services:
         class: Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper
         arguments:
              - '@oro_datagrid.configuration.provider'
+
+    oro_datagrid.datagrid.appearance.configuration:
+        class: Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration
+
+    oro_datagrid.datagrid.board.configuration:
+        class: Oro\Bundle\DataGridBundle\Extension\Board\Configuration
+
+    oro_datagrid.datagrid.board.processor.default:
+        class: %oro_datagrid.datagrid.board.processor.default.class%
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_datagrid.choice.helper'
+        tags:
+          - { name: oro_datagrid.board_processor }
+
+    oro_datagrid.datagrid.board.restriction_manager:
+        class: %oro_datagrid.datagrid.board.restriction_manager.class%
+        arguments:
+            - "@oro_workflow.registry"
+            - '@oro_ui.user_agent_provider'
+            - '@oro_datagrid.grid_configuration.helper'
+
+    oro_datagrid.choice.helper:
+        class: %oro_datagrid.choice.helper.class%
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_security.acl_helper'

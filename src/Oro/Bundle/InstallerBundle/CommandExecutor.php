@@ -43,7 +43,7 @@ class CommandExecutor
     /**
      * @var string
      */
-    protected $lastComamndLine;
+    protected $lastCommandLine;
 
     /** @var array */
     protected $defaultOptions;
@@ -95,7 +95,7 @@ class CommandExecutor
      */
     public function runCommand($command, $params = [])
     {
-        $this->lastComamndLine = null;
+        $this->lastCommandLine = null;
         $this->lastCommandExitCode = null;
 
         $params = $this->prepareParameters($command, $params);
@@ -126,7 +126,7 @@ class CommandExecutor
                 ->inheritEnvironmentVariables(true)
                 ->getProcess();
 
-            $this->lastComamndLine = $process->getCommandLine();
+            $this->lastCommandLine = $process->getCommandLine();
 
             $output = $this->output;
             $process->run(
@@ -145,7 +145,7 @@ class CommandExecutor
                 unset($params['--process-timeout']);
             }
 
-            $this->lastComamndLine = 'application->run(['.implode(', ', $params).'])';
+            $this->lastCommandLine = '';
 
             $this->application->setAutoExit(false);
             $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
@@ -210,7 +210,7 @@ class CommandExecutor
             } else {
                 throw new \RuntimeException(sprintf(
                     'The command %s terminated with an exit code: %u.',
-                    $this->lastComamndLine,
+                    $this->lastCommandLine,
                     $this->lastCommandExitCode
                 ));
             }

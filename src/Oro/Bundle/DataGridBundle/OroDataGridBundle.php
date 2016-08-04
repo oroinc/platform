@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ActionsPass;
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\BoardProcessorsPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\MassActionsPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\FormattersPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ConfigurationPass;
@@ -29,5 +30,6 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new GuessPass());
         $container->addCompilerPass(new InlineEditColumnOptionsGuesserPass());
         $container->addCompilerPass(new SetDatagridEventListenersLazyPass());
+        $container->addCompilerPass(new BoardProcessorsPass());
     }
 }
