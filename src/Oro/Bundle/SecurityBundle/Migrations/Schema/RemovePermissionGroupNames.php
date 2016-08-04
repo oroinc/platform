@@ -68,7 +68,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
             }
 
             if ($changed) {
-                $scheduledForUpdates = [
+                $scheduledForUpdates[] = [
                     'id' => $permission['id'],
                     'group_names' => $groupNames
                 ];
