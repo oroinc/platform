@@ -20,6 +20,7 @@ define(function(require) {
     var SelectAllHeaderCell = require('./header-cell/select-all-header-cell');
     var RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action');
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
+    var SelectDataAppearanceAction = require('oro/datagrid/action/select-data-appearance-action');
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
@@ -585,11 +586,16 @@ define(function(require) {
          */
         _createToolbar: function(options) {
             var toolbar;
+            var sortActions = this.sortActions;
             var toolbarOptions = {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
-                columns:      this.columns
+                columns:      this.columns,
+                addToolbarAction: function(action) {
+                    toolbarOptions.actions.push(action);
+                    sortActions(toolbarOptions.actions);
+                }
             };
             _.defaults(toolbarOptions, options);
 
@@ -598,6 +604,16 @@ define(function(require) {
             toolbar = new this.toolbar(toolbarOptions);
             this.trigger('afterToolbarInit', toolbar);
             return toolbar;
+        },
+
+        /**
+         * Sorts actions array
+         * @param actions
+         */
+        sortActions: function(actions) {
+            actions.sort(function(a, b) {
+                return (a.order || 500) - (b.order || 500);
+            });
         },
 
         /**
@@ -614,7 +630,34 @@ define(function(require) {
             if (this.toolbarOptions.addResetAction) {
                 actions.push(this.getResetAction());
             }
+            if (this.toolbarOptions.addAppearanceSwitcher) {
+                var action = new SelectDataAppearanceAction({
+                    datagrid: this,
+                    launcherOptions: {
+                        items: this.toolbarOptions.availableApperances,
+                        attributes: {
+                            'data-drop-secondary-location': 'left'
+                        }
+                    },
+                    order: 700
+                });
+                this.on('appearanceChanged', function(key, options) {
+                    var item = _.findWhere(action.launcherInstanse.items,
+                        {key: options.type, id: options.id || 'by_type'});
+                    if (!item) {
+                        throw new Error('Could not find corresponding launcher item');
+                    }
+                    action.launcherInstanse.selectedItem = item;
+                    action.launcherInstanse.render();
+                });
+                actions.push(action);
+            }
+            this.sortActions(actions);
             return actions;
+        },
+
+        changeAppearance: function(key, options) {
+            this.trigger('changeAppearance', key, options);
         },
 
         /**
@@ -644,7 +687,8 @@ define(function(require) {
                         label: __('oro_datagrid.action.refresh'),
                         className: 'btn',
                         iconClassName: 'icon-repeat'
-                    }
+                    },
+                    order: 100
                 });
                 this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
                     if (this.$el.is(':visible')) {
@@ -673,7 +717,8 @@ define(function(require) {
                         label: __('oro_datagrid.action.reset'),
                         className: 'btn',
                         iconClassName: 'icon-refresh'
-                    }
+                    },
+                    order: 200
                 });
 
                 this.listenTo(mediator, 'datagrid:doReset:' + this.name, _.debounce(function() {
@@ -762,7 +807,7 @@ define(function(require) {
         _listenToContentEvents: function() {
             this.listenTo(this.body, 'rowClicked', function(row, options) {
                 this.trigger('rowClicked', this, row);
-                this._runRowClickAction(row, options);
+                this.runRowClickAction(row.model, options);
             });
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
@@ -779,11 +824,11 @@ define(function(require) {
         /**
          * Create row click action
          *
-         * @param {orodatagrid.datagrid.Row} row
+         * @param {Backbone.Model} data
          * @param {Object} options
          * @private
          */
-        _runRowClickAction: function(row, options) {
+        runRowClickAction: function(model, options) {
             var config;
             if (!this.rowClickAction) {
                 return;
@@ -791,12 +836,12 @@ define(function(require) {
 
             var action = new this.rowClickAction({
                 datagrid: this,
-                model: row.model
+                model: model
             });
             if (typeof action.dispose === 'function') {
                 this.subviews.push(action);
             }
-            config = row.model.get('action_configuration');
+            config = model.get('action_configuration');
             if (!config || config[action.name] !== false) {
                 action.run(options);
             }

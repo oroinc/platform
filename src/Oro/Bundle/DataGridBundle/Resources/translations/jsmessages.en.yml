@@ -39,6 +39,7 @@
 "oro.datagrid.no.columns": "No columns configured for this grid"
 "oro.datagrid.pagination.label": "Page"
 "oro.datagrid.pagination.totalPages": "of {{ totalPages }}"
+"oro.datagrid.pagination.visibleItems": "Showing {{ count }} of {{ total }} records"
 "oro.datagrid.pagination.totalRecords": "Total of {{ totalRecords }} records"
 oro.datagrid.extension.export.label: "Export Grid"
 oro.datagrid.extension.export.tooltip: "With this button you will export the content of the grid as it appears to you, with filters and sorting applied. All pages will be exported."
@@ -68,6 +69,9 @@ oro_datagrid.action.refresh: "Refresh"
 "Export Confirmation": "Export Confirmation"
 oro:
     datagrid:
+        loading_failed_message: "Data loading failed, try reloading the page. If the issue appears again please contact your administrator."
+        toolbar_sorting:
+            label: "Sorted By"
         column_manager:
             title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
