@@ -169,7 +169,7 @@ define([
          * @protected
          */
         createLaunchers: function() {
-            return _.each(this.actions, function(action) {
+            return _.map(this.actions, function(action) {
                 return action.createLauncher({});
             }, this);
         },
