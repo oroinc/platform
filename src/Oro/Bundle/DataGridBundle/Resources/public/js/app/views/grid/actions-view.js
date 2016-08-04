@@ -1,29 +1,22 @@
-define([
-    'jquery',
-    'underscore',
-    'backgrid',
-    'module'
-], function($, _, Backgrid, module) {
+define(function(require) {
     'use strict';
 
-    var config = module.config();
-    config = _.extend({
-        showCloseButton: false
-    }, config);
-
-    var ActionCell;
-
     /**
-     * Cell for grid, contains actions
+     * Displays actions dropdown
      *
-     * @export  oro/datagrid/cell/action-cell
-     * @class   oro.datagrid.cell.ActionCell
-     * @extends Backgrid.Cell
+     * @param {Object}   options - options container
+     * @param {Object}   options.model - model
+     * @param {Object}   options.datagrid - datagrid link
+     * @param {Object}   options.actions - actions array
+     * @param {Object}   options.actions_configuration - additional actions configuration
      */
-    ActionCell = Backgrid.Cell.extend({
+    var ActionsView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var BaseView = require('oroui/js/app/views/base/view');
 
-        /** @property */
-        className: 'action-cell',
+    ActionsView = BaseView.extend({
 
         /** @property {Array} */
         actions: undefined,
@@ -35,7 +28,7 @@ define([
         launchers: undefined,
 
         /** @property Boolean */
-        showCloseButton: config.showCloseButton,
+        showCloseButton: false,
 
         /** @property */
         baseMarkup:
@@ -43,15 +36,16 @@ define([
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
-                        'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
+                    'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
                 '</div>' +
             '</div>',
 
         /** @property */
         simpleBaseMarkup: '<div class="more-bar-holder action-row"></div>',
+
         /** @property */
         closeButtonTemplate: _.template(
-            '<li class="dropdown-close"><i class="icon-remove hide-text">' + _.__('Close') + '</i></li>'
+            '<li class="dropdown-close"><i class="icon-remove hide-text">' + __('Close') + '</i></li>'
         ),
 
         /** @property */
@@ -95,16 +89,14 @@ define([
             var opts = options || {};
             this.subviews = [];
 
-            if (!_.isUndefined(opts.actionsHideCount)) {
+            if (!_.isEmpty(opts.actionsHideCount)) {
                 this.actionsHideCount = opts.actionsHideCount;
             }
 
-            if (!_.isUndefined(opts.themeOptions.actionsHideCount)) {
-                this.actionsHideCount = opts.themeOptions.actionsHideCount;
-            }
+            this.showCloseButton = opts.showCloseButton;
 
-            ActionCell.__super__.initialize.apply(this, arguments);
-            this.actions = this.createActions();
+            ActionsView.__super__.initialize.apply(this, arguments);
+            this.actions = this.createActions(opts);
             _.each(this.actions, function(action) {
                 this.listenTo(action, 'preExecute', this.onActionRun);
             }, this);
@@ -122,7 +114,7 @@ define([
             delete this.actions;
             delete this.column;
             this.$('.dropdown-toggle').dropdown('destroy');
-            ActionCell.__super__.dispose.apply(this, arguments);
+            ActionsView.__super__.dispose.apply(this, arguments);
         },
 
         /**
@@ -139,19 +131,23 @@ define([
          *
          * @return {Array}
          */
-        createActions: function() {
+        createActions: function(opts) {
             var result = [];
-            var actions = this.column.get('actions');
-            var config = this.model.get('action_configuration');
+            var actions = opts.actions;
+            var config = opts.actionConfiguration;
 
             _.each(actions, function(action, name) {
                 // filter available actions for current row
                 if (!config || config[name] !== false) {
-                    result.push(this.createAction(action));
+                    result.push(this.createAction(action, opts));
                 }
             }, this);
 
             return result;
+        },
+
+        isEmpty: function() {
+            return !this.actions.length;
         },
 
         /**
@@ -160,11 +156,11 @@ define([
          * @param {Function} Action
          * @protected
          */
-        createAction: function(Action) {
-            return new Action({
-                model: this.model,
-                datagrid: this.column.get('datagrid')
-            });
+        createAction: function(Action, opts) {
+            return new Action(_.extend({
+                model: opts.model,
+                datagrid: opts.datagrid
+            }, opts.actionOptions));
         },
 
         /**
@@ -173,7 +169,7 @@ define([
          * @protected
          */
         createLaunchers: function() {
-            return _.each(this.actions, function(action) {
+            return _.map(this.actions, function(action) {
                 return action.createLauncher({});
             }, this);
         },
@@ -222,7 +218,7 @@ define([
 
                 if (launchers.withIcons.length) {
                     this.renderLaunchersList(launchers.withIcons, {withIcons: true})
-                        .appendTo($listsContainer);
+                    .appendTo($listsContainer);
                 }
 
                 if (launchers.withIcons.length && launchers.withoutIcons.length) {
@@ -231,7 +227,7 @@ define([
 
                 if (launchers.withoutIcons.length) {
                     this.renderLaunchersList(launchers.withoutIcons, {withIcons: false})
-                        .appendTo($listsContainer);
+                    .appendTo($listsContainer);
                 }
             }
         },
@@ -320,5 +316,5 @@ define([
         }
     });
 
-    return ActionCell;
+    return ActionsView;
 });

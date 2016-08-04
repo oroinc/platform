@@ -50,7 +50,8 @@ define(function(require) {
                 boardPlugin: this,
                 columns: this.getColumns(),
                 boardCollection: this.getBoardCollection(),
-                serverCollection: this.main.collection
+                serverCollection: this.main.collection,
+                cardActions: this.main.grid.rowActions
             });
 
             this.listenTo(this.view, 'update', function(model, updateOptions) {
