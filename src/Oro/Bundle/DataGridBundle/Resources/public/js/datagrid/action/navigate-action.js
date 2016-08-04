@@ -61,6 +61,15 @@ define([
             var value = this.datagrid.collection.stateHashValue();
 
             url = this.addUrlParameter(url, key, value);
+
+            if (options.parameters) {
+                for (key in options.parameters) {
+                    if (options.parameters.hasOwnProperty(key)) {
+                        value = options.parameters[key];
+                        url = this.addUrlParameter(url, key,  value);
+                    }
+                }
+            }
             mediator.execute('redirectTo', {url: url}, options);
         },
 
