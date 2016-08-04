@@ -4,7 +4,7 @@ CREATE: Create
 EDIT: Edit
 DELETE: Delete
 ASSIGN: Assign
-SHARE: Share
+
 oro:
     security:
         access-level:

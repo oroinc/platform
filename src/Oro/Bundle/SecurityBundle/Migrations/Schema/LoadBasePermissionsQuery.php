@@ -10,6 +10,15 @@ use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 
 class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
 {
+    /** @var array */
+    protected $permissions = [
+        'VIEW',
+        'CREATE',
+        'EDIT',
+        'DELETE',
+        'ASSIGN'
+    ];
+    
     /**
      * {@inheritdoc}
      */
@@ -26,7 +35,7 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
             'description' => Type::STRING
         ];
 
-        foreach (['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE'] as $permission) {
+        foreach ($this->permissions as $permission) {
             $this->addSql(
                 $query,
                 [
