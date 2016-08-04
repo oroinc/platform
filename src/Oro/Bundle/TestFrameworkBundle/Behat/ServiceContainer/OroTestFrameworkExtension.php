@@ -72,10 +72,12 @@ class OroTestFrameworkExtension implements TestworkExtension
                         "Suites that applicable for application.\n".
                         'This suites will be run with --applicable-suites key in console'
                     )
+                    ->defaultValue([])
                 ->end()
                 ->arrayNode('shared_contexts')
                     ->prototype('scalar')->end()
                     ->info('Contexts that added to all autoload bundles suites')
+                    ->defaultValue([])
                 ->end()
             ->end();
     }
