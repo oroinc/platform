@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const XLSX_MAX_EXPORT_RECORDS = 10;
+    const XLSX_MAX_EXPORT_RECORDS = 10000;
 
     /**
      * {@inheritDoc}
