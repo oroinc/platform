@@ -8,6 +8,8 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
+use Oro\Bundle\WorkflowBundle\Model\StepManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
@@ -89,7 +91,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
 
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+        $workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->workflowManager->expects($this->once())
@@ -97,7 +99,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->with($workflowItem)
             ->willReturn([$workflow]);
 
-        $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
+        $stepManager = $this->getMock(StepManager::class);
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue(false));
 

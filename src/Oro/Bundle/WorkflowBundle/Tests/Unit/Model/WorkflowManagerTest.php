@@ -1041,8 +1041,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($entity)
             ->will($this->returnValue($entity->getId()));
 
-        $workflowItemsRepository =
-            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
+        $workflowItemsRepository = $this->getMockBuilder(WorkflowItemRepository::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['findAllByEntityMetadata'])
                 ->getMock();
