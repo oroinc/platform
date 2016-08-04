@@ -18,12 +18,14 @@ define([
         /** @property */
         template: _.template(
             '<% if (sortable) { %>' +
-                '<a href="#">' +
-                    '<%- label %> ' +
+                '<a class="grid-header-cell-link" href="#">' +
+                    '<span class="grid-header-cell-label"><%- label %></span>' +
                     '<span class="caret"></span>' +
                 '</a>' +
             '<% } else { %>' +
-                '<span><%- label %></span>' + // wrap label into span otherwise underscore will not render it
+                '<span class="grid-header-cell-label-container">' +
+                    '<span class="grid-header-cell-label"><%- label %></span>' +
+                '</span>' +
             '<% } %>'
         ),
 
@@ -31,6 +33,12 @@ define([
         allowNoSorting: true,
 
         keepElement: false,
+
+        events: {
+            mouseover: 'onMouseOver',
+            mouseout: 'onMouseOut',
+            click: 'onClick'
+        },
 
         /**
          * Initialize.
@@ -155,6 +163,35 @@ define([
                     cycleSort(this, column);
                 }
             }
+        },
+
+        onMouseOver: function() {
+            var _this = this;
+            var $label = this.$('.grid-header-cell-label');
+            // measure text content
+            $label.css({overflow: 'visible'});
+            if ($label[0].clientWidth <= $label[0].parentNode.clientWidth) {
+                // hint is not required all text is visible
+                $label.css({overflow: ''});
+                return;
+            }
+            $label.css({overflow: ''});
+
+            this.hintTimeout = setTimeout(function addHeaderCellHint() {
+                $(document.body).append('<span class="grid-header-cell-hint">' +
+                    _.escape(_this.column.get('label')) + '</span>');
+                var hint = $('body > .grid-header-cell-hint');
+                hint.position({
+                    my: 'left top',
+                    at: 'left bottom+5',
+                    of: $label
+                });
+            }, 300);
+        },
+
+        onMouseOut: function() {
+            clearTimeout(this.hintTimeout);
+            $('body > .grid-header-cell-hint').remove();
         }
     });
 
