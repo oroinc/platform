@@ -11,7 +11,9 @@ interface EngineV2Interface
      * Performs search in index according to passed query
      *
      * @param Query $query
+     * @param array $context
+     *
      * @return Result
      */
-    public function search(Query $query);
+    public function search(Query $query, $context = []);
 }
