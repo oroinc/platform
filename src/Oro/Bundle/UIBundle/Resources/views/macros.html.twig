@@ -1102,6 +1102,29 @@
     {{ _self.renderList(links) }}
 {%- endmacro -%}
 
+{#
+    Renders text that should be rendered instead of not accessable entity field
+    Parameters:
+        labelText - Text that should be rendered
+#}
 {%- macro renderDisabledLabel(labelText) -%}
     <i>{{ labelText }}</i>
+{%- endmacro -%}
+
+{#
+    Renders entity label by it's field. In case if VIEW permission is notgranted, returns
+    the 'view entity_name' string in case if entityLabelIfNotGranted was set and empty string otherwise
+    Parameters:
+        entity - Entity whete field value should be takes
+        fieldName - Field name wich value should be rendered
+        entityLabelIfNotGranted - Entity label that should be rendered in case if user have no access to see field value
+#}
+{%- macro renderEntiViewLabel(entity, fieldName, entityLabelIfNotGranted = null) -%}
+    {% if entity is not null and resource_granted('VIEW', entity, fieldName) %}
+        {{ attribute(entity, fieldName) }}
+    {% else %}
+        {% if entityLabelIfNotGranted is not null %}
+            {{ 'view %entityName%'|trans({'%entityName%' : entityLabelIfNotGranted|trans}) }}
+        {% endif %}
+    {% endif %}
 {%- endmacro -%}
