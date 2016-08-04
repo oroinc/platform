@@ -101,6 +101,25 @@ define([
             }
 
             return this.$loading;
+        },
+
+        /**
+         * Removes all elements that do not match current models from DOM
+         */
+        cleanup: function() {
+            var $list = this.listSelector ? this.$(this.listSelector) : this.$el;
+            if ($list.length === 0) {
+                throw new Error('could not find list DOM element');
+            }
+            var list = $list[0];
+            var validChildren = _.map(this.getItemViews(), function(view) {
+                return view.el;
+            });
+            var toRemove = _.difference(list.children, validChildren);
+            for (var i = 0; i < toRemove.length; i++) {
+                var child = toRemove[i];
+                list.removeChild(child);
+            }
         }
     });
 

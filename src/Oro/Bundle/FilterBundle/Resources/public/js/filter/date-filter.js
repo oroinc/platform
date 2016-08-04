@@ -294,44 +294,16 @@ define(function(require) {
             var value = _.extend({}, this.emptyValue, this.getValue());
             var part = {value: value.part, type: value.part};
 
-            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
             this.dateWidgetOptions.part = part.type;
 
-            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
-            var parts = [];
-
-            // add date parts only if embed template used
-            if (this.templateTheme !== '') {
-                parts.push(
-                    datePartTemplate({
-                        name: this.name + '_part',
-                        choices: this.dateParts,
-                        selectedChoice: value.part,
-                        selectedChoiceLabel: selectedPartLabel,
-                        selectedChoiceTooltip: this._getPartTooltip(value.part)
-                    })
-                );
-            }
-
             this._updateRangeFilter(value, false);
-
-            parts.push(
-                datePartTemplate({
-                    name: this.name,
-                    choices: this.choices,
-                    selectedChoice: value.type,
-                    selectedChoiceLabel: selectedChoiceLabel,
-                    popoverContent: __('oro.filter.date.info')
-                })
-            );
 
             var displayValue = this._formatDisplayValue(value);
             var $filter = $(
                 this.template({
                     inputClass: this.inputClass,
                     value: displayValue,
-                    parts: parts,
+                    parts: this._getParts(),
                     popoverContent: __('oro.filter.date.info')
                 })
             );
@@ -354,6 +326,41 @@ define(function(require) {
             }, this));
 
             this._criteriaRenderd = true;
+        },
+
+        _getParts: function() {
+            var value = _.extend({}, this.emptyValue, this.getValue());
+            var part = {value: value.part, type: value.part};
+
+            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
+            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
+            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var parts = [];
+
+            // add date parts only if embed template used
+            if (this.templateTheme !== '') {
+                parts.push(
+                    datePartTemplate({
+                        name: this.name + '_part',
+                        choices: this.dateParts,
+                        selectedChoice: value.part,
+                        selectedChoiceLabel: selectedPartLabel,
+                        selectedChoiceTooltip: this._getPartTooltip(value.part)
+                    })
+                );
+            }
+
+            parts.push(
+                datePartTemplate({
+                    name: this.name,
+                    choices: this.choices,
+                    selectedChoice: value.type,
+                    selectedChoiceLabel: selectedChoiceLabel,
+                    popoverContent: __('oro.filter.date.info')
+                })
+            );
+
+            return parts;
         },
 
         /**
