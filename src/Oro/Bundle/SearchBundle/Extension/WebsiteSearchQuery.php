@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Extension;
 
 use Oro\Bundle\SearchBundle\Engine\EngineV2Interface;
 use Oro\Bundle\SearchBundle\Query\Query;
-use Symfony\Component\Intl\Exception\NotImplementedException;
 
 class WebsiteSearchQuery extends AbstractSearchQuery
 {
@@ -15,6 +14,7 @@ class WebsiteSearchQuery extends AbstractSearchQuery
 
     /**
      * @param EngineV2Interface $engine
+     * @param Query             $query
      */
     public function __construct(EngineV2Interface $engine, Query $query)
     {
@@ -32,7 +32,7 @@ class WebsiteSearchQuery extends AbstractSearchQuery
      */
     public function query()
     {
-        throw new NotImplementedException('This method should not be called. Use execute() instead');
+        throw new \BadMethodCallException('This method should not be called. Use execute() instead');
     }
 
     /**
