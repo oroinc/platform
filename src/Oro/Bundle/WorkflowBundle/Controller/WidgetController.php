@@ -18,6 +18,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
+use Oro\Bundle\WorkflowBundle\Model\Tools\WorkflowStepHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -30,6 +31,94 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 class WidgetController extends Controller
 {
     const DEFAULT_TRANSITION_TEMPLATE = 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig';
+
+    /**
+     * @Route("/entity-workflows/{entityClass}/{entityId}", name="oro_workflow_widget_entity_workflows")
+     * @Template
+     * @AclAncestor("oro_workflow")
+     *
+     * @param string $entityClass
+     * @param int $entityId
+     * @return array
+     */
+    public function entityWorkflowsAction($entityClass, $entityId)
+    {
+        $entity = $this->getEntityReference($entityClass, $entityId);
+        if (!$entity) {
+            throw $this->createNotFoundException(
+                sprintf('Entity \'%s\' with id \'%d\' not found', $entityClass, $entityId)
+            );
+        }
+
+        $workflowManager = $this->get('oro_workflow.manager');
+
+        return [
+            'entityId' => $entityId,
+            'workflows' => array_map(
+                function (Workflow $workflow) use ($entity, $workflowManager) {
+                    return $this->getWorkflowData($entity, $workflow, $workflowManager);
+                },
+                $workflowManager->getApplicableWorkflows($entity)
+            )
+        ];
+    }
+
+    /**
+     * @param object $entity
+     * @param Workflow $workflow
+     * @param WorkflowManager $workflowManager
+     * @return array
+     */
+    protected function getWorkflowData($entity, Workflow $workflow, WorkflowManager $workflowManager)
+    {
+        $workflowItem = $workflowManager->getWorkflowItem($entity, $workflow->getName());
+        $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
+
+        $isStepsDisplayOrdered = $workflow->getDefinition()->isStepsDisplayOrdered();
+
+        $steps = [];
+        if ($isStepsDisplayOrdered) {
+            $steps = $workflow->getStepManager()->getOrderedSteps()->toArray();
+        } elseif ($currentStep) {
+            $steps = [$workflow->getStepManager()->getStep($currentStep->getName())];
+        }
+
+        $helper = new WorkflowStepHelper($workflow);
+
+        $steps = array_map(
+            function (Step $step) use ($currentStep, $helper) {
+                return [
+                    'label' => $step->getLabel(),
+                    'active' => $currentStep && $step->getName() === $currentStep->getName(),
+                    'possibleStepsCount' => count($helper->getStepsAfter($step))
+                ];
+            },
+            $steps
+        );
+
+        return [
+            'name' => $workflow->getName(),
+            'label' => $workflow->getLabel(),
+            'stepsData' => [
+                'is_ordered' => $isStepsDisplayOrdered,
+                'steps' => $steps
+            ],
+            'transitionsData' => $this->getTransitionData($entity, $workflow, $workflowItem)
+        ];
+    }
+
+    /**
+     * @param object $entity
+     * @param Workflow $workflow
+     * @param WorkflowItem|null $workflowItem
+     * @return array
+     */
+    protected function getTransitionData($entity, Workflow $workflow, WorkflowItem $workflowItem = null)
+    {
+        return $workflowItem
+            ? $this->getAvailableTransitionsDataByWorkflowItem($workflowItem)
+            : $this->getAvailableStartTransitionsData($workflow, $entity);
+    }
 
     /**
      * @Route("/steps/{entityClass}/{entityId}", name="oro_workflow_widget_steps")
@@ -79,7 +168,6 @@ class WidgetController extends Controller
         return [
             'stepsData' => $stepsData,
         ];
-
     }
 
     /**
