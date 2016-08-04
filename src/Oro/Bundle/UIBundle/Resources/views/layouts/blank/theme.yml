@@ -5,6 +5,6 @@ data:
     assets:
         styles:
             inputs:
-                - 'bundles/oroui/blank/blocks/blocks.scss'
+                - 'bundles/oroui/blank/scss/styles.scss'
             filters: ['cssrewrite', 'cssmin']
             output: 'css/layout/blank/styles.css'
