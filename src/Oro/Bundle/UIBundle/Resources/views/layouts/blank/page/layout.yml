@@ -1,8 +1,8 @@
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'default.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType: head
@@ -29,9 +29,6 @@ layout:
                         src: '=data["asset"].getUrl(data["theme"].getData()["assets"]["styles"]["output"])'
                 body:
                     blockType: body
-                    options:
-                        attr:
-                            class: page__body
             tree:
                 root:
                     head:
