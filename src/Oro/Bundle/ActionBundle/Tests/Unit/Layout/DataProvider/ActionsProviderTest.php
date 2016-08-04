@@ -9,9 +9,9 @@ use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
-use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
+use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsProvider;
 
-class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
+class ActionsProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var OperationManager|\PHPUnit_Framework_MockObject_MockObject
@@ -34,7 +34,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
-     * @var ActionsDataProvider
+     * @var ActionsProvider
      */
     protected $dataProvider;
 
@@ -57,7 +57,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->dataProvider = new ActionsDataProvider(
+        $this->dataProvider = new ActionsProvider(
             $this->operationManager,
             $this->contextHelper,
             $this->restrictHelper,

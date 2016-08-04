@@ -41,7 +41,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($expectedData));
 
         $this->assertEquals(
-            new DataProviderDecorator($expectedData, ['get']),
+            new DataProviderDecorator($expectedData, ['get', 'has', 'is']),
             $this->dataAccessor->get($name)
         );
     }
@@ -58,7 +58,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($expectedData));
 
         $this->assertEquals(
-            new DataProviderDecorator($expectedData, ['get']),
+            new DataProviderDecorator($expectedData, ['get', 'has', 'is']),
             $this->dataAccessor[$name]
         );
     }
@@ -161,7 +161,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($this->dataAccessor[$name]));
 
         $this->assertEquals(
-            new DataProviderDecorator($expectedData, ['get']),
+            new DataProviderDecorator($expectedData, ['get', 'has', 'is']),
             $this->dataAccessor[$name]
         );
     }

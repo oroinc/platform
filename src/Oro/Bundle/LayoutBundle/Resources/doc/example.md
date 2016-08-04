@@ -581,7 +581,7 @@ class LocaleDataProvider
 We need to register our data provider in the DI container by `layout.data_provider` tag:
 ```yaml
     acme_locale.layout.data_provider.locale:
-        class: Acme\Bundle\LocaleBundle\Layout\Extension\Provider\LocaleDataProvider
+        class: Acme\Bundle\LocaleBundle\Layout\DataProvider\LocaleProvider
         tags:
             - { name: layout.data_provider, alias: locale }
 ```

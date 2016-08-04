@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
-class ActionsDataProvider
+class ActionsProvider
 {
     /**
      * @var OperationManager

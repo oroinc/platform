@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Extension\Theme\DataProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class ThemeDataProvider
+class ThemeProvider
 {
     /** @var ThemeManager */
     protected $themeManager;

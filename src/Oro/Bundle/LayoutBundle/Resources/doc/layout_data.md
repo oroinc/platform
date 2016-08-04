@@ -83,7 +83,7 @@ To make the layout engine aware of your data provider it should be registered as
 
 ```yaml
 acme_product.layout.data_provider.product:
-    class: Acme\Bundle\ProductBundle\Layout\Extension\ProductDataProvider
+    class: Acme\Bundle\ProductBundle\Layout\DataProvider\ProductProvider
     tags:
         - { name: layout.data_provider, alias: product }
 ```

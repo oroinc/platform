@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 
-abstract class AbstractFormDataProvider
+abstract class AbstractFormProvider
 {
     /** @var array */
     protected $forms = [];

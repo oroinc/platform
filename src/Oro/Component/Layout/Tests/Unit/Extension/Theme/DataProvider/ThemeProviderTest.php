@@ -2,24 +2,24 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\DataProvider;
 
-use Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider;
+use Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
+class ThemeProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $themeManager;
 
-    /** @var ThemeDataProvider */
-    protected $dataProvider;
+    /** @var ThemeProvider */
+    protected $provider;
 
     protected function setUp()
     {
         $this->themeManager = $this->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\ThemeManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->dataProvider = new ThemeDataProvider($this->themeManager);
+        $this->provider = new ThemeProvider($this->themeManager);
     }
 
     public function testGetIcon()
@@ -33,7 +33,7 @@ class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
             ->with($themeName)
             ->willReturn($theme);
 
-        $this->assertSame('path/to/icon', $this->dataProvider->getIcon($themeName));
+        $this->assertSame('path/to/icon', $this->provider->getIcon($themeName));
     }
 
     public function testGetStylesOutput()
@@ -53,7 +53,7 @@ class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
             ->with($themeName)
             ->willReturn($theme);
 
-        $this->assertSame('path/to/output/css', $this->dataProvider->getStylesOutput($themeName));
+        $this->assertSame('path/to/output/css', $this->provider->getStylesOutput($themeName));
     }
 
     public function testGetStylesOutputNull()
@@ -66,6 +66,6 @@ class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
             ->with($themeName)
             ->willReturn($theme);
 
-        $this->assertNull($this->dataProvider->getStylesOutput($themeName));
+        $this->assertNull($this->provider->getStylesOutput($themeName));
     }
 }
