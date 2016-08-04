@@ -16,10 +16,6 @@ class PermissionCollectionType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['privileges_config'] = $options['options']['privileges_config'];
-
-        if ($key = array_search('SHARE', $view->vars['privileges_config']['permissions'], true)) {
-            unset($view->vars['privileges_config']['permissions'][$key]);
-        }
     }
 
     /**
