@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Query\Search;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension;
 
 use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Result;
