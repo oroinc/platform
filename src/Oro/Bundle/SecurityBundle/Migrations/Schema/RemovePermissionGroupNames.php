@@ -68,7 +68,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
             }
 
             if ($changed) {
-                $scheduledForUpdates = [
+                $scheduledForUpdates[] = [
                     'id' => $permission['id'],
                     'group_names' => $groupNames
                 ];
@@ -85,9 +85,9 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
      */
     protected function getSharePermissions(LoggerInterface $logger)
     {
-        $sql = 'SELECT id, group_names FROM oro_security_permission WHERE name IN :permission_name';
+        $sql = 'SELECT id, group_names FROM oro_security_permission WHERE name IN (:permission_name)';
         $params = ['permission_name' => $this->permissions];
-        $types = ['permission_name' => Type::TARRAY];
+        $types = ['permission_name' => Type::SIMPLE_ARRAY];
 
         $this->logQuery($logger, $sql, $params, $types);
 
