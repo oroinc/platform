@@ -702,6 +702,8 @@ define(function(require) {
                     links.push({
                         key: key,
                         label: val.label,
+                        show_max_export_records_dialog: val.show_max_export_records_dialog,
+                        max_export_records: val.max_export_records,
                         attributes: {
                             'class': 'no-hash',
                             'download': null

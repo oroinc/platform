@@ -65,6 +65,7 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.save_name": "Save"
 "oro.datagrid.gridView.error.not_found": "View not found"
 "Unexpected format": Unexpected format
+"Export Confirmation": "Export Confirmation"
 oro:
     datagrid:
         column_manager:
@@ -128,3 +129,7 @@ oro:
             currency:
                 ascending: Low to High
                 descending: High to Low
+        export:
+            max_limit_message: >
+                The maximum number of records that can be exported at once is {{ max_limit }}.<br/>
+                Are you sure you want to export {{ total }} records?
