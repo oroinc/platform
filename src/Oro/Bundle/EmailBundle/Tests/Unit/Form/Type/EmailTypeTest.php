@@ -166,13 +166,15 @@ class EmailTypeTest extends TypeTestCase
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
+        $entityTitleResolver = $this->getMock('Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface');
+
         $contextsSelectType = new ContextsSelectType(
             $em,
             $configManager,
             $translator,
-            $mapper,
             $securityTokenStorage,
-            $eventDispatcher
+            $eventDispatcher,
+            $entityTitleResolver
         );
 
         return [
