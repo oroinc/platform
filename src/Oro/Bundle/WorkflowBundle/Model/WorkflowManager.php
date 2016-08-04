@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -154,13 +155,28 @@ class WorkflowManager
      * @param object $entity
      * @param string|Transition|null $transition
      * @param array $data
+     * @param bool $throwGroupException
      * @return WorkflowItem
      * @throws \Exception
+     * @throws WorkflowRecordGroupException
      */
-    public function startWorkflow($workflow, $entity, $transition = null, array $data = [])
+    public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)
     {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
+        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
+            if ($throwGroupException) {
+                throw new WorkflowRecordGroupException(
+                    sprintf(
+                        'Workflow "%s" can not be started because it belongs to exclusive_record_group ' .
+                        'with already started other workflow for this entity',
+                        [$workflow->getName()]
+                    )
+                );
+            }
+
+            return null;
+        }
 
         return $this->inTransaction(
             function (EntityManager $em) use ($workflow, $entity, $transition, &$data) {
@@ -183,29 +199,18 @@ class WorkflowManager
     {
         $this->inTransaction(
             function (EntityManager $em) use (&$startArgumentsList) {
-                if (count($startArgumentsList) === 0) {
-                    return; //skip flush when nothing to do
-                }
-
                 foreach ($startArgumentsList as $startArguments) {
                     if (!$startArguments instanceof WorkflowStartArguments) {
                         continue;
                     }
 
-                    $workflow = $this->workflowRegistry->getWorkflow($startArguments->getWorkflowName());
-                    $entity = $startArguments->getEntity();
-                    if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
-                        continue;
-                    }
-
-                    $workflowItem = $workflow->start(
+                    $this->startWorkflow(
+                        $startArguments->getWorkflowName(),
                         $startArguments->getEntity(),
+                        $startArguments->getTransition(),
                         $startArguments->getData(),
-                        $startArguments->getTransition()
+                        false
                     );
-
-                    $em->persist($workflowItem);
-                    $em->flush();
                 }
             },
             WorkflowItem::class
