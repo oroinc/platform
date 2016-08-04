@@ -642,12 +642,13 @@ define(function(require) {
                     order: 700
                 });
                 this.on('appearanceChanged', function(key, options) {
-                    var item = _.findWhere(action.launcher.items, {key: options.type, id: options.id || 'by_type'});
+                    var item = _.findWhere(action.launcherInstanse.items,
+                        {key: options.type, id: options.id || 'by_type'});
                     if (!item) {
                         throw new Error('Could not find corresponding launcher item');
                     }
-                    action.launcher.selectedItem = item;
-                    action.launcher.render();
+                    action.launcherInstanse.selectedItem = item;
+                    action.launcherInstanse.render();
                 });
                 actions.push(action);
             }
