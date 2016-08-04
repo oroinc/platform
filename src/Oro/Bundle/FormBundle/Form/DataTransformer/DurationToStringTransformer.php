@@ -81,9 +81,9 @@ class DurationToStringTransformer implements DataTransformerInterface
 
         // matches JIRA style string
         $regex = '/^' .
-                 '(?:(?:(\d+(?:\.\d)?)?)h(?:[\s]*|$))?' .
-                 '(?:(?:(\d+(?:\.\d)?)?)m(?:[\s]*|$))?' .
-                 '(?:(?:(\d+(?:\.\d)?)?)s)?' .
+                 '(?:(?:(\d+(?:\.\d{0,2})?)?)h(?:[\s]*|$))?' .
+                 '(?:(?:(\d+(?:\.\d{0,2})?)?)m(?:[\s]*|$))?' .
+                 '(?:(?:(\d+(?:\.\d{0,2})?)?)s)?' .
                  '$/i';
 
         if (preg_match_all($regex, $time, $matches)) {
