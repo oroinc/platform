@@ -465,14 +465,29 @@ define(function(require) {
 
         onSaveSuccess: function(response) {
             if (!this.options.cell.disposed && this.options.cell.$el) {
-                if (response && response.hasOwnProperty('fields')) {
-                    var routeParametersRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
-                    _.each(response.fields, function(item, i) {
-                        var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
-                        if (this.options.cell.model.get(propName) !== void 0) {
-                            this.options.cell.model.set(propName, item);
-                        }
-                    }, this);
+                if (response) {
+                    if (response.hasOwnProperty('fields') ||
+                        /*
+                         * Make cell work with responses sending changed values directly
+                         * to not make bc break
+                         */
+                        _.every(_.keys(response), function(property) {
+                            return this.options.cell.model.attributes.hasOwnProperty(property);
+                        }, this)
+                    ) {
+                        var fields = response.hasOwnProperty('fields') ? response.fields : response;
+                        var routeParametersRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
+                        _.each(fields, function(item, i) {
+                            var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
+                            if (this.options.cell.model.get(propName) !== void 0) {
+                                this.options.cell.model.set(propName, item);
+                            }
+                        }, this);
+                    } else if (response.hasOwnProperty('httpMethod') && response.httpMethod === 'DELETE') {
+                        _.each(this.options.save_api_accessor.routeParametersRenameMap, function(v, property) {
+                            this.options.cell.model.set(property, '');
+                        }, this);
+                    }
                 }
                 this.options.cell.$el
                     .removeClass('save-fail')

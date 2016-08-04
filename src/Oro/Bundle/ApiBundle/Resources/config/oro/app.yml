@@ -12,8 +12,7 @@ security:
     firewalls:
         api_wsse_secured:
             pattern: ^/api/(?!(soap|rest|doc)($|/.*))
-            # @todo add listener as described here: https://github.com/symfony/symfony/issues/8614#issuecomment-31098429
-            # and uncomment stateless option
+            # @todo: should be enabled in scope of BAP-11128
             # stateless:  true
             wsse:
                 lifetime: 3600
