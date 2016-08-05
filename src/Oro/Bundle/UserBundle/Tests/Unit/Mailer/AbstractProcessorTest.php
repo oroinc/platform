@@ -67,8 +67,8 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturnMap(
                 [
-                    ['oro_notification.email_notification_sender_email', false, false, self::FROM_EMAIL],
-                    ['oro_notification.email_notification_sender_name', false, false, self::FROM_NAME]
+                    ['oro_notification.email_notification_sender_email', false, false, null, self::FROM_EMAIL],
+                    ['oro_notification.email_notification_sender_name', false, false, null, self::FROM_NAME]
                 ]
             );
 

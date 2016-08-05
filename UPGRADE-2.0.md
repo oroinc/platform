@@ -30,3 +30,7 @@ UPGRADE FROM 1.10 to 2.0
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder trough specified workflowItem alias
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
+
+####ConfigBundle
+- Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$entityId` as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
+- Class `Oro\Bundle\ConfigBundle\Config\ConfigManager` added `$entityId` as optional parameter for next methods: `get`, `getInfo`, `set`, `reset`, `flush`, `save`, `calculateChangeSet`, `reload`, `getValue`, `buildChangeSet`
