@@ -5,6 +5,8 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Validator\Validation;
@@ -61,8 +63,8 @@ class ImportTypeTest extends FormIntegrationTestCase
         $this->assertTrue($form->get('processorAlias')->getConfig()->getOption('required'));
         $key = ProcessorRegistry::TYPE_IMPORT . $formOptions['entityName'];
         $this->assertEquals(
-            array($key => 'oro.importexport.import.' . $key),
-            $form->get('processorAlias')->getConfig()->getOption('choices')
+            [new ChoiceView($key, $key, 'oro.importexport.import.' . $key)],
+            $form->createView()->offsetGet('processorAlias')->vars['choices']
         );
         $this->assertEquals(
             array('oro.importexport.import.' . $key),

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Selenium\Pages;
 
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Class Calendars

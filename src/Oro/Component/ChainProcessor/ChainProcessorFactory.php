@@ -7,7 +7,7 @@ class ChainProcessorFactory implements ProcessorFactoryInterface
     /** @var array */
     private $factories = [];
 
-    /** @var ProcessorFactoryInterface[]|null */
+    /** @var ProcessorFactoryInterface[] */
     private $sortedFactories;
 
     /**
@@ -19,7 +19,11 @@ class ChainProcessorFactory implements ProcessorFactoryInterface
     public function addFactory(ProcessorFactoryInterface $factory, $priority = 0)
     {
         $this->factories[$priority][] = $factory;
-        $this->sortedFactories        = null;
+        // sort by priority and flatten
+        // we do it here due to performance reasons (it is expected that it will be only several factories,
+        // but the getProcessor method will be called a lot of times)
+        krsort($this->factories);
+        $this->sortedFactories = call_user_func_array('array_merge', $this->factories);
     }
 
     /**
@@ -28,8 +32,7 @@ class ChainProcessorFactory implements ProcessorFactoryInterface
     public function getProcessor($processorId)
     {
         $processor = null;
-        $factories = $this->getFactories();
-        foreach ($factories as $factory) {
+        foreach ($this->sortedFactories as $factory) {
             $processor = $factory->getProcessor($processorId);
             if (null !== $processor) {
                 break;
@@ -37,18 +40,5 @@ class ChainProcessorFactory implements ProcessorFactoryInterface
         }
 
         return $processor;
-    }
-
-    /**
-     * @return ProcessorFactoryInterface[]
-     */
-    protected function getFactories()
-    {
-        if (null === $this->sortedFactories) {
-            krsort($this->factories);
-            $this->sortedFactories = call_user_func_array('array_merge', $this->factories);
-        }
-
-        return $this->sortedFactories;
     }
 }

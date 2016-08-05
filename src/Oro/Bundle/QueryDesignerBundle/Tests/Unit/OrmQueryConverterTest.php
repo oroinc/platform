@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
-use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,7 +73,7 @@ abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
      *                                 'Test\Entity1' => ['id'],
      *                                 'Test\Entity2' => ['id'],
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDoctrine(array $config = [], array $identifiersConfig = [])
     {

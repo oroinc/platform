@@ -1,5 +1,8 @@
 oro_entity:
     entity_aliases:
+        Oro\Bundle\ApiBundle\Model\EntityIdentifier:
+            alias:        entityidentifier
+            plural_alias: entityidentifiers
         Oro\Bundle\ApiBundle\Model\EntityDescriptor:
             alias:        entitydescriptor
             plural_alias: entitydescriptors

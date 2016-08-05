@@ -194,10 +194,20 @@ class WorkflowManager
 
                     $workflow = $this->workflowRegistry->getWorkflow($startArguments->getWorkflowName());
 
+                    if (!$startArguments->getTransition()) {
+                        $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
+
+                        if (!$workflow->isStartTransitionAvailable($transition, $startArguments->getEntity())) {
+                            continue;
+                        }
+                    } else {
+                        $transition = $startArguments->getTransition();
+                    }
+
                     $workflowItem = $workflow->start(
                         $startArguments->getEntity(),
                         $startArguments->getData(),
-                        $startArguments->getTransition()
+                        $transition
                     );
 
                     $em->persist($workflowItem);

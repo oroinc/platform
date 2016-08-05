@@ -33,11 +33,32 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
         $class->setProperty($factoryProperty);
 
+        $setFactoryMethod = PhpMethod::create('setParentUpdate');
+        $setFactoryMethod->addParameter(
+            PhpParameter::create('parentLayoutUpdate')
+                ->setType('\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface')
+        );
+        $setFactoryMethod->setBody(
+            $writer->reset()->write('$this->parentLayoutUpdate = $parentLayoutUpdate;')
+            ->getContent()
+        );
+        $class->setMethod($setFactoryMethod);
+
+        $factoryProperty = PhpProperty::create('parentLayoutUpdate');
+        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
+        $class->setProperty($factoryProperty);
+
+
         $visitContext->getUpdateMethodWriter()
             ->writeln('if (null === $this->import) {')
             ->writeln(
                 '    throw new \\RuntimeException(\'Missing import configuration for layout update\');'
             )
+            ->writeln('}')
+            ->writeln('')
+            ->writeln('if ($this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface')
+            ->writeln('    && !$this->parentLayoutUpdate->isApplicable()) {')
+            ->writeln('    return;')
             ->writeln('}')
             ->writeln('')
             ->writeln('$layoutManipulator  = new ImportLayoutManipulator($layoutManipulator, $this->import);')

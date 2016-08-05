@@ -9,7 +9,7 @@ services:
             - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.action_processor }
-    
+
     #
     # initialize
     #
