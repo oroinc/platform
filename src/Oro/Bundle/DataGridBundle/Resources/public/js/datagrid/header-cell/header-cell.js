@@ -1,7 +1,8 @@
 define([
     'underscore',
-    'backgrid'
-], function(_, Backgrid) {
+    'backgrid',
+    'oroui/js/tools/text-util'
+], function(_, Backgrid, textUtil) {
     'use strict';
 
     var HeaderCell;
@@ -31,6 +32,9 @@ define([
 
         /** @property {Boolean} */
         allowNoSorting: true,
+
+        /** @property {Number} */
+        minWordsToAbbreviate: 4,
 
         keepElement: false,
 
@@ -103,8 +107,15 @@ define([
         render: function() {
             this.$el.empty();
 
+            var label = this.column.get('label');
+            var abbreviation = textUtil.abbreviate(label, this.minWordsToAbbreviate);
+
+            this.isLabelAbbreviated = abbreviation !== label;
+
+            this.$el.toggleClass('abbreviated', this.isLabelAbbreviated);
+
             this.$el.append(this.template({
-                label: this.column.get('label'),
+                label: abbreviation,
                 sortable: this.column.get('sortable')
             }));
 
@@ -170,7 +181,7 @@ define([
             var $label = this.$('.grid-header-cell-label');
             // measure text content
             $label.css({overflow: 'visible'});
-            if ($label[0].clientWidth <= $label[0].parentNode.clientWidth) {
+            if (!this.isLabelAbbreviated && $label[0].clientWidth <= $label[0].parentNode.clientWidth) {
                 // hint is not required all text is visible
                 $label.css({overflow: ''});
                 return;

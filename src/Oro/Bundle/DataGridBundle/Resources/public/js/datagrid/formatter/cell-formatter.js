@@ -1,5 +1,5 @@
-define(['underscore', 'backgrid'
-    ], function(_, Backgrid) {
+define(['underscore', 'backgrid', 'oroui/js/tools/text-util'
+    ], function(_, Backgrid, textUtil) {
     'use strict';
 
     /**
@@ -21,7 +21,8 @@ define(['underscore', 'backgrid'
             if (rawData === null) {
                 return '';
             }
-            return Backgrid.CellFormatter.prototype.fromRaw.apply(this, arguments);
+            var result = Backgrid.CellFormatter.prototype.fromRaw.apply(this, arguments);
+            return textUtil.prepareText(result);
         }
     });
 

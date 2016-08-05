@@ -1,8 +1,9 @@
 define([
     'underscore',
     'backgrid',
-    'orodatagrid/js/datagrid/editor/select-cell-radio-editor'
-], function(_, Backgrid, SelectCellRadioEditor) {
+    'orodatagrid/js/datagrid/editor/select-cell-radio-editor',
+    'oroui/js/tools/text-util'
+], function(_, Backgrid, SelectCellRadioEditor, textUtil) {
     'use strict';
 
     var SelectCell;
@@ -26,7 +27,7 @@ define([
             if (options.column.get('metadata').choices) {
                 this.optionValues = [];
                 _.each(options.column.get('metadata').choices, function(value, key) {
-                    this.optionValues.push([value, key]);
+                    this.optionValues.push([textUtil.prepareText(value), key]);
                 }, this);
             } else {
                 throw new Error('Column metadata must have choices specified');
