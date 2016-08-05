@@ -19,6 +19,7 @@ class Query
     const ORDER_ASC  = 'asc';
     const ORDER_DESC = 'desc';
 
+    const KEYWORD_SELECT      = 'select';
     const KEYWORD_FROM        = 'from';
     const KEYWORD_WHERE       = 'where';
     const KEYWORD_AND         = 'and';
@@ -50,6 +51,9 @@ class Query
 
     /** @var  string */
     protected $query;
+
+    /** @var array */
+    protected $select;
 
     /** @var array */
     protected $from;
@@ -155,6 +159,24 @@ class Query
     public function createQuery($query)
     {
         $this->query = $query;
+
+        return $this;
+    }
+
+    /**
+     * Insert list of required fields to query select
+     *
+     * @param array|string $fields
+     *
+     * @return Query
+     */
+    public function select($fields)
+    {
+        if (!is_array($fields)) {
+            $fields = [$fields];
+        }
+
+        $this->select = $fields;
 
         return $this;
     }
@@ -282,6 +304,16 @@ class Query
     public function getQuery()
     {
         return $this->query;
+    }
+
+    /**
+     * Get fields to select
+     *
+     * @return array
+     */
+    public function getSelect()
+    {
+        return $this->select;
     }
 
     /**
