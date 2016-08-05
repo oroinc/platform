@@ -31,7 +31,7 @@ class BaseOrderItem
     /**
      * @var string
      *
-     * @ORM\Column(name="sku", type="string", length=255)
+     * @ORM\Column(name="sku", type="string", length=255, nullable=true)
      */
     protected $sku;
 
