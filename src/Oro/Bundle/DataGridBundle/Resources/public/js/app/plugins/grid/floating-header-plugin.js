@@ -39,6 +39,8 @@ define(function(require) {
 
             this.setupCache();
 
+            this.$el.attr('floating-header-enabled', true);
+
             this.isHeaderCellWidthFixed = false;
             this.rescrollCb = this.enableOtherScroll();
             if (!this.isHeaderCellWidthFixed) {
@@ -69,6 +71,9 @@ define(function(require) {
                 this.domCache.headerCells.attr('style', '');
                 this.domCache.firstRowCells.attr('style', '');
             }
+
+            this.$el.removeAttr('floating-header-enabled');
+
             FloatingHeaderPlugin.__super__.disable.call(this);
         },
 
@@ -164,10 +169,12 @@ define(function(require) {
             headerCells.each(function(i, headerCell) {
                 var cellWidth = widths[i] - widthDecrement;
                 headerCell.style.width = cellWidth + 'px';
+                headerCell.style.maxWidth = cellWidth + 'px';
                 headerCell.style.minWidth = cellWidth + 'px';
                 headerCell.style.boxSizing = 'border-box';
                 if (firstRowCells[i]) {
                     firstRowCells[i].style.width = cellWidth + 'px';
+                    firstRowCells[i].style.maxWidth = cellWidth + 'px';
                     firstRowCells[i].style.minWidth = cellWidth + 'px';
                     firstRowCells[i].style.boxSizing = 'border-box';
                 }
