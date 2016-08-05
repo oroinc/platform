@@ -139,7 +139,6 @@ class Parser
             && $this->stream->current->test(Token::KEYWORD_TYPE)
             && in_array($this->stream->current->value, $this->keywords)
         ) {
-            echo 'dd';
             $this->parseKeywords();
         }
 
