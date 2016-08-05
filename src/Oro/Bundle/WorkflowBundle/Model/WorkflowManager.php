@@ -170,7 +170,7 @@ class WorkflowManager
                     sprintf(
                         'Workflow "%s" can not be started because it belongs to exclusive_record_group ' .
                         'with already started other workflow for this entity',
-                        [$workflow->getName()]
+                        $workflow->getName()
                     )
                 );
             }
