@@ -164,7 +164,7 @@ class WorkflowManager
     {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
+        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
@@ -330,13 +330,41 @@ class WorkflowManager
 
     /**
      * @param object|string $entity
-     * @return Workflow[]|array
+     * @return Workflow[]
      */
     public function getApplicableWorkflows($entity)
     {
-        return $this->workflowRegistry->getActiveWorkflowsByEntityClass(
-            $this->doctrineHelper->getEntityClass($entity)
-        )->toArray();
+        $existingRecordsInGroups = [];
+
+        foreach ($this->getWorkflowItemsByEntity($entity) as $workflowItem) {
+            $groups = $workflowItem->getDefinition()->getExclusiveRecordGroups(); //todo think about getDefinition fetch
+            if (count($groups) !== 0) {
+                $name = $workflowItem->getWorkflowName();
+                foreach ($groups as $group) {
+                    $existingRecordsInGroups[$group] = $name;
+                }
+            }
+        }
+
+        return $this->workflowRegistry
+            ->getActiveWorkflowsByEntityClass($this->doctrineHelper->getEntityClass($entity))
+            ->filter(
+                function (Workflow $workflow) use (&$existingRecordsInGroups) {
+                    $workflowRecordGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
+                    foreach ($workflowRecordGroups as $workflowRecordGroup) {
+                        if (!array_key_exists($workflowRecordGroup, $existingRecordsInGroups)) {
+                            continue;
+                        }
+
+                        if ($existingRecordsInGroups[$workflowRecordGroup] !== $workflow->getName()) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            )
+            ->toArray();
     }
 
     /**
@@ -470,7 +498,7 @@ class WorkflowManager
     {
         $workflowItems = $this->getWorkflowItemsByEntity($entity);
         foreach ($workflowItems as $workflowItem) {
-            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getRecordGroups())) {
+            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getExclusiveRecordGroups())) {
                 return false;
             }
         }

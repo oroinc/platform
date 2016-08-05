@@ -69,8 +69,8 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testGroups()
     {
-        $this->assertEquals([], $this->workflowDefinition->getActiveGroups());
-        $this->assertEquals([], $this->workflowDefinition->getRecordGroups());
+        $this->assertEquals([], $this->workflowDefinition->getExclusiveActiveGroups());
+        $this->assertEquals([], $this->workflowDefinition->getExclusiveRecordGroups());
         $groups = [
             WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['active1', 'active2'],
             WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => ['record1', 'record2'],
@@ -79,11 +79,11 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE],
-            $this->workflowDefinition->getActiveGroups()
+            $this->workflowDefinition->getExclusiveActiveGroups()
         );
         $this->assertEquals(
             $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD],
-            $this->workflowDefinition->getRecordGroups()
+            $this->workflowDefinition->getExclusiveRecordGroups()
         );
     }
 
@@ -257,8 +257,8 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
             'steps' => $definition->getSteps(),
             'start_step' => $definition->getStartStep(),
             'configuration' => $definition->getConfiguration(),
-            'active_groups' => $definition->getActiveGroups(),
-            'record_groups' => $definition->getRecordGroups(),
+            'active_groups' => $definition->getExclusiveActiveGroups(),
+            'record_groups' => $definition->getExclusiveRecordGroups(),
         );
     }
 }

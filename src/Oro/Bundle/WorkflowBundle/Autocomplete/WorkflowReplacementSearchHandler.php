@@ -93,7 +93,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
         $workflow = $this->workflowRegistry->getWorkflow($workflowName);
         if ($workflow) {
             $activeWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
-                $workflow->getDefinition()->getActiveGroups()
+                $workflow->getDefinition()->getExclusiveActiveGroups()
             );
 
             $workflows = array_map(
