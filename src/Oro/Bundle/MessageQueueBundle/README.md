@@ -12,10 +12,11 @@ First, you have to configure a transport layer and set one to be default.
 
 oro_message_queue:
     transport:
-        default: amqp
-        amqp: { host: 'localhost', port: 5672, user: 'guest', password: 'guest', vhost: '/' }
+        default: 'dbal'
+        dbal: true
     client: ~
 ```
+[DBAL transport options](./Resources/doc/dbal.md)
 
 Once you configured everything you can start producing messages:
 
@@ -69,6 +70,24 @@ Now you can start consuming messages:
 
 _**Note**: Add -vvv to find out what is going while you are consuming messages. There is a lot of valuable debug info there._
 
+### Supervisord
+
+As you read before you must keep running `oro:message-queue:consume` command and to do this best
+we advise you to delegate this responsibility to [Supervisord](http://supervisord.org/).
+With next program configuration supervisord keeps running four simultaneous instances of
+`oro:message-queue:consume` command and cares about relaunch if instance has dead by any reason.
+
+```ini
+[program:oro_message_consumer]
+command=/path/to/app/console --env=prod --no-debug oro:message-queue:consume
+process_name=%(program_name)s_%(process_num)02d
+numprocs=4
+autostart=true
+autorestart=true
+startsecs=0
+user=apache
+redirect_stderr=true
+```
 
 ## Internals
 
