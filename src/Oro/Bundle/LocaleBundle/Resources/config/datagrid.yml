@@ -13,18 +13,16 @@ datagrid:
                     - l.formattingCode
                     - l.createdAt
                     - l.updatedAt
-                    - t.string as title
                 from:
                     - { table: %oro_locale.entity.localization.class%, alias: l }
                 join:
                     left:
-                        - { join: l.titles, alias: t}
                         - { join: l.parentLocalization, alias: pl }
-                where:
-                    and:
-                        - t.localization IS NULL
         properties:
             id: ~
+            title:
+                type: localized_value
+                data_name: titles
             view_link:
                 type:  url
                 route: oro_locale_localization_view

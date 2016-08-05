@@ -11,6 +11,7 @@ use Composer\IO\BufferIO;
 use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Link;
+use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\PackageInterface;
 use Composer\Package\Version\VersionParser;
 use Composer\Repository\ComposerRepository;
@@ -79,13 +80,13 @@ class PackageManager
     protected $maintenance;
 
     /**
-     * @param Composer $composer
-     * @param Installer $installer
-     * @param BufferIO $composerIO
-     * @param Runner $scriptRunner
+     * @param Composer        $composer
+     * @param Installer       $installer
+     * @param BufferIO        $composerIO
+     * @param Runner          $scriptRunner
      * @param MaintenanceMode $maintenance
      * @param LoggerInterface $logger
-     * @param string $pathToComposerJson
+     * @param string          $pathToComposerJson
      */
     public function __construct(
         Composer $composer,
@@ -149,6 +150,7 @@ class PackageManager
                     $repoPackages,
                     function ($result, PackageInterface $package) {
                         $result[] = $package->getPrettyName();
+
                         return $result;
                     },
                     $packageNames
@@ -160,6 +162,7 @@ class PackageManager
             array_unique($packageNames),
             function ($packages, $packageName) {
                 $packages[] = $this->getPreferredPackage($packageName);
+
                 return $packages;
             },
             []
@@ -196,7 +199,7 @@ class PackageManager
 
     /**
      * @param string $packageName
-     * @param mixed $version
+     * @param mixed  $version
      *
      * @return PackageInterface
      * @throws \RuntimeException
@@ -229,7 +232,7 @@ class PackageManager
             }
             $preferredPackageID = (new DefaultPolicy(
                 $this->composer->getPackage()->getPreferStable()
-            ))->selectPreferedPackages($pool, [], $packageIDs)[0];
+            ))->selectPreferredPackages($pool, [], $packageIDs)[0];
 
             $package = $pool->literalToPackage($preferredPackageID);
         }
@@ -263,6 +266,7 @@ class PackageManager
             function (array $requirements, Link $link) use ($installedPackages) {
                 $name = $link->getTarget();
                 $requirements[] = new PackageRequirement($name, in_array($name, $installedPackages));
+
                 return $requirements;
             },
             []
@@ -276,13 +280,13 @@ class PackageManager
      */
     public function isPackageInstalled($packageName)
     {
-        return (bool)$this->findInstalledPackage($packageName);
+        return (bool) $this->findInstalledPackage($packageName);
     }
 
     /**
      * @param string $packageName
      * @param string $packageVersion
-     * @param bool $loadDemoData
+     * @param bool   $loadDemoData
      *
      * @throws VerboseException
      * @throws \Exception
@@ -314,7 +318,8 @@ class PackageManager
                         return !in_array($package->getName(), $previousInstalled);
                     }
                 );
-                $this->scriptRunner->clearApplicationCache();
+
+                $this->scriptRunner->removeApplicationCache();
                 $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
@@ -343,6 +348,7 @@ class PackageManager
                     $justInstalledPackages,
                     function ($names, PackageInterface $p) {
                         $names[] = $p->getPrettyName();
+
                         return $names;
                     },
                     []
@@ -371,6 +377,7 @@ class PackageManager
                     array_merge($localPackage->getRequires(), $localPackage->getDevRequires()),
                     function (array $result, Link $item) {
                         $result[] = $item->getTarget();
+
                         return $result;
                     },
                     []
@@ -412,7 +419,7 @@ class PackageManager
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
 
-        $this->composer->getEventDispatcher()->dispatchCommandEvent('cache-clear', false);
+        $this->composer->getEventDispatcher()->dispatchScript('cache-clear', false);
 
         array_map(
             function ($name) use ($installationManager, $localRepository) {
@@ -441,6 +448,7 @@ class PackageManager
             $this->getInstalled(),
             function (array $result, PackageInterface $p) {
                 $result[] = $this->getPackageUpdate($p);
+
                 return $result;
             },
             []
@@ -458,7 +466,7 @@ class PackageManager
     {
         $package = $this->findInstalledPackage($packageName);
 
-        return (bool)$this->getPackageUpdate($package);
+        return (bool) $this->getPackageUpdate($package);
     }
 
     /**
@@ -614,11 +622,11 @@ class PackageManager
     /**
      * @param array $require
      */
-    protected function updateRootPackage(array $require = array())
+    protected function updateRootPackage(array $require = [])
     {
         $rootPackage = $this->composer->getPackage();
         $rootPackage->setRequires(
-            (new VersionParser())->parseLinks(
+            (new ArrayLoader())->parseLinks(
                 $rootPackage->getName(),
                 $rootPackage->getPrettyVersion(),
                 'requires',
@@ -636,6 +644,7 @@ class PackageManager
             $this->getInstalled(),
             function (array $packages, PackageInterface $package) {
                 $packages[] = $package->getPrettyName();
+
                 return $packages;
             },
             []
@@ -653,12 +662,13 @@ class PackageManager
         if (!$found) {
             return false;
         }
+
         return $found[0];
     }
 
     /**
      * @param PackageInterface $package
-     * @param string|null $version
+     * @param string|null      $version
      */
     protected function updateComposerJsonFile(PackageInterface $package, $version = null)
     {

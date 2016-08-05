@@ -2,8 +2,9 @@ define([
     'jquery',
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
-    'oroform/js/app/views/datepair-view'
-], function($, mediator, BaseView, DatepairView) {
+    'oroform/js/app/views/datepair-view',
+    'orocalendar/js/app/views/all-day-view'
+], function($, mediator, BaseView, DatepairView, AllDayView) {
     'use strict';
 
     var CalendarEventFormView;
@@ -44,6 +45,7 @@ define([
             opts = this.options;
             datepair = new DatepairView(opts);
             this.subview('datepair', datepair);
+            this.subview('all_day', new AllDayView(opts));
         },
 
         onContextChange: function() {

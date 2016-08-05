@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Model;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SoapBundle\Model\BinaryDataProviderInterface;
 
 class FileContentProvider implements BinaryDataProviderInterface
@@ -10,17 +10,17 @@ class FileContentProvider implements BinaryDataProviderInterface
     /** @var string */
     protected $fileName;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    /** @var FileManager */
+    protected $fileManager;
 
     /**
-     * @param string            $fileName
-     * @param AttachmentManager $attachmentManager
+     * @param string      $fileName
+     * @param FileManager $fileManager
      */
-    public function __construct($fileName, AttachmentManager $attachmentManager)
+    public function __construct($fileName, FileManager $fileManager)
     {
-        $this->fileName          = $fileName;
-        $this->attachmentManager = $attachmentManager;
+        $this->fileName    = $fileName;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -28,6 +28,6 @@ class FileContentProvider implements BinaryDataProviderInterface
      */
     public function getData()
     {
-        return $this->attachmentManager->getContent($this->fileName);
+        return $this->fileManager->getContent($this->fileName);
     }
 }
