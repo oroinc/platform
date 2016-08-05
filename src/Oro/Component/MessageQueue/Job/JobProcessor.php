@@ -98,58 +98,6 @@ class JobProcessor
 
         return $job;
     }
-    
-    /**
-     * @param string $name
-     * @param Job    $root
-     * @param bool   $unique
-     *
-     * @return Job
-     *
-     * @throws DuplicateJobException
-     */
-    public function createJob($name, Job $root = null, $unique = false)
-    {
-        if ($root && ! $root->isRoot()) {
-            throw new \LogicException(sprintf(
-                'You can append jobs only to root job but it is not. id: "%s"',
-                $root->getId()
-            ));
-        }
-
-        if ($root && $unique) {
-            throw new \LogicException('Can create only root unique jobs.');
-        }
-
-        $job = $this->jobStorage->createJob();
-        $job->setStatus(Job::STATUS_NEW);
-        $job->setName($name);
-        $job->setCreatedAt(new \DateTime());
-        $job->setRootJob($root);
-        $job->setUnique((bool) $unique);
-
-        if (! $root) {
-            $job->setStartedAt(new \DateTime());
-        }
-
-        try {
-            $this->jobStorage->saveJob($job);
-
-            if ($root) {
-                $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-                    'id' => $job->getId()
-                ]);
-            }
-
-            return $job;
-        } catch (DuplicateJobException $e) {
-            if ($unique) {
-                return;
-            }
-
-            throw $e;
-        }
-    }
 
     /**
      * @param Job $job

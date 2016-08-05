@@ -52,15 +52,18 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
         $storage->saveJob(new Job());
     }
 
-    public function testShouldSaveJobWithoutLockIfThereIsNoCallback()
+    public function testShouldSaveJobWithoutLockIfThereIsNoCallbackAndChildJob()
     {
         $job = new Job();
+
+        $child = new Job();
+        $child->setRootJob($job);
 
         $em = $this->createEntityManagerMock();
         $em
             ->expects($this->once())
             ->method('persist')
-            ->with($this->identicalTo($job))
+            ->with($this->identicalTo($child))
         ;
         $em
             ->expects($this->once())
@@ -79,7 +82,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
         ;
 
         $storage = new JobStorage($em, $repository, 'unique_table');
-        $storage->saveJob($job);
+        $storage->saveJob($child);
     }
 
     public function testShouldSaveJobWithLockIfWithCallback()
@@ -216,6 +219,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     public function testShouldInsertIntoUniqueTableIfJobIsUniqueAndNew()
     {
         $job = new Job();
+        $job->setOwnerId('owner-id');
         $job->setName('job-name');
         $job->setUnique(true);
 
@@ -228,8 +232,14 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             }))
         ;
         $connection
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('insert')
+            ->with('unique_table', ['name' => 'owner-id'])
+        ;
+        $connection
+            ->expects($this->at(1))
+            ->method('insert')
+            ->with('unique_table', ['name' => 'job-name'])
         ;
 
         $repository = $this->createRepositoryMock();
@@ -262,14 +272,21 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     {
         $job = new Job();
         $job->setId(12345);
+        $job->setOwnerId('owner-id');
         $job->setName('job-name');
         $job->setUnique(true);
         $job->setStoppedAt(new \DateTime());
 
         $connection = $this->createConnectionMock();
         $connection
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('delete')
+            ->with('unique_table', ['name' => 'owner-id'])
+        ;
+        $connection
+            ->expects($this->at(1))
+            ->method('delete')
+            ->with('unique_table', ['name' => 'job-name'])
         ;
 
         $repository = $this->createRepositoryMock();
@@ -293,7 +310,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             }))
         ;
         $em
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getConnection')
             ->will($this->returnValue($connection))
         ;

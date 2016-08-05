@@ -97,6 +97,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param string $ownerId
      */
     public function setOwnerId($ownerId)
