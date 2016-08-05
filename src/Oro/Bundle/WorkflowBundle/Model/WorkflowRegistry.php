@@ -123,7 +123,7 @@ class WorkflowRegistry
         $definitions = array_filter(
             $this->getEntityRepository()->findBy(['active' => true]),
             function (WorkflowDefinition $definition) use ($groupNames) {
-                $groups = $definition->getActiveGroups();
+                $groups = $definition->getExclusiveActiveGroups();
                 foreach ($groupNames as $groupName) {
                     if (in_array($groupName, $groups, true)) {
                         return true;

@@ -138,8 +138,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         /** @var WorkflowDefinition $workflowDefinition */
         $workflowDefinition = current($workflowDefinitions);
         $this->assertEquals($expectedData, $this->getDataAsArray($workflowDefinition));
-        $this->assertEquals($workflowDefinition->getActiveGroups(), $activeGroups);
-        $this->assertEquals($workflowDefinition->getRecordGroups(), $recordGroups);
+        $this->assertEquals($workflowDefinition->getExclusiveActiveGroups(), $activeGroups);
+        $this->assertEquals($workflowDefinition->getExclusiveRecordGroups(), $recordGroups);
 
         $actualAcls = $workflowDefinition->getEntityAcls()->toArray();
         $this->assertSameSize($expectedAcls, $actualAcls);
