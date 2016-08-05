@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
+use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
+
+use Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache;
 
 /**
  * Extends the default Symfony ACL provider with support of a root ACL.
@@ -16,6 +19,11 @@ class RootBasedAclProvider implements AclProviderInterface
      * @var AclProviderInterface
      */
     protected $baseAclProvider;
+
+    /**
+     * @var UnderlyingAclCache
+     */
+    protected $underlyingCache;
 
     /**
      * @var ObjectIdentityFactory
@@ -30,6 +38,16 @@ class RootBasedAclProvider implements AclProviderInterface
     public function __construct(ObjectIdentityFactory $objectIdentityFactory)
     {
         $this->objectIdentityFactory = $objectIdentityFactory;
+    }
+
+    /**
+     * Sets Underlying cache
+     *
+     * @param UnderlyingAclCache $underlyingCache
+     */
+    public function setUnderlyingCache(UnderlyingAclCache $underlyingCache)
+    {
+        $this->underlyingCache = $underlyingCache;
     }
 
     /**
@@ -53,7 +71,7 @@ class RootBasedAclProvider implements AclProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function findAcl(ObjectIdentityInterface $oid, array $sids = array())
+    public function findAcl(ObjectIdentityInterface $oid, array $sids = [])
     {
         $rootOid = $this->objectIdentityFactory->root($oid);
         try {
@@ -63,8 +81,7 @@ class RootBasedAclProvider implements AclProviderInterface
                 // Try to get ACL for underlying object
                 $underlyingOid = $this->objectIdentityFactory->underlying($oid);
                 $acl = $this->getAcl($underlyingOid, $sids, $rootOid);
-                // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-                //$this->baseAclProvider->cacheWithUnderlyingAcl($oid);
+                $this->underlyingCache->cacheUnderlying($oid);
             } catch (\Exception $noUnderlyingAcl) {
                 // Try to get ACL for root object
                 try {
@@ -87,7 +104,7 @@ class RootBasedAclProvider implements AclProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function findAcls(array $oids, array $sids = array())
+    public function findAcls(array $oids, array $sids = [])
     {
         return $this->baseAclProvider->findAcls($oids, $sids);
     }
@@ -98,15 +115,17 @@ class RootBasedAclProvider implements AclProviderInterface
      * @param ObjectIdentityInterface $oid
      * @param array $sids
      * @param ObjectIdentityInterface $rootOid
-     * @return RootBasedAclWrapper|\Symfony\Component\Security\Acl\Model\AclInterface
+     *
+     * @return RootBasedAclWrapper|AclInterface
      */
     protected function getAcl(ObjectIdentityInterface $oid, array $sids, ObjectIdentityInterface $rootOid)
     {
-        $acl = $this->baseAclProvider->findAcl($oid, $sids);
-        if ($this->baseAclProvider->isReplaceWithUnderlyingAcl($acl)) {
+        if ($this->underlyingCache->isUnderlying($oid)) {
             $underlyingOid = $this->objectIdentityFactory->underlying($oid);
             return $this->getAcl($underlyingOid, $sids, $rootOid);
         }
+
+        $acl = $this->baseAclProvider->findAcl($oid, $sids);
 
         try {
             $rootAcl = $this->baseAclProvider->findAcl($rootOid, $sids);

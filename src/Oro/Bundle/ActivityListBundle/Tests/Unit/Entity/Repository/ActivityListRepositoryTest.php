@@ -75,11 +75,11 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('leftJoin')
             ->will($this->returnSelf());
 
-        $qb->expects($this->once())
+        $qb->expects($this->any())
             ->method('orderBy')
             ->will($this->returnSelf());
 
-        $qb->expects($this->once())
+        $qb->expects($this->never())
             ->method('groupBy')
             ->will($this->returnSelf());
 

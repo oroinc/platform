@@ -110,26 +110,14 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
             );
             if ($existingRoute) {
                 // move existing route before the current route
-                $existingRouteName = $routes->getName($existingRoute);
-                $routes->remove($existingRouteName);
-                $routes->insert(
-                    $existingRouteName,
-                    $existingRoute,
-                    $routeName,
-                    true
-                );
+                $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
             } else {
                 // add an additional strict route based on the base route and current activity
                 $strictRoute = $routes->cloneRoute($route);
                 $strictRoute->setPath(str_replace(self::ACTIVITY_PLACEHOLDER, $activity, $strictRoute->getPath()));
                 $strictRoute->setDefault(self::ACTIVITY_ATTRIBUTE, $activity);
                 $this->completeRouteRequirements($strictRoute);
-                $routes->insert(
-                    $routes->generateRouteName($routeName),
-                    $strictRoute,
-                    $routeName,
-                    true
-                );
+                $routes->insert($routes->generateRouteName($routeName), $strictRoute, $routeName, true);
             }
         }
     }

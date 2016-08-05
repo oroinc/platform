@@ -119,6 +119,24 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             } else {
                 original.apply(this, _.rest(arguments));
             }
+        },
+        initContainer: function(original) {
+            original.apply(this, _.rest(arguments));
+
+            this.focusser.off('keyup-change input');
+            this.focusser.on('keyup-change input', this.bind(function(e) {
+                var showSearch = this.results[0].children.length >= this.opts.minimumResultsForSearch;
+
+                if (showSearch) {
+                    e.stopPropagation();
+                    if (this.opened()) {
+                        return;
+                    }
+                    this.open();
+                } else {
+                    this.clearSearch();
+                }
+            }));
         }
     };
 
@@ -268,6 +286,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
 
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
+        prototype.initContainer = _.wrap(prototype.initContainer, overrideMethods.initContainer);
 
     }(Select2['class'].single.prototype));
 
@@ -359,6 +378,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
                     '<div></div>' +
                     '</li>');
             var choice = enableChoice ? enabledItem : disabledItem;
+            if (data.hidden) {
+                choice.addClass('hide');
+            }
             var id = this.id(data);
             var formatted;
 

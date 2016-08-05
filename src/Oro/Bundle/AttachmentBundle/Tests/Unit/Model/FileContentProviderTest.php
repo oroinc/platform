@@ -9,20 +9,20 @@ class FileContentProviderTest extends \PHPUnit_Framework_TestCase
     const TEST_FILE_NAME = 'some_file.txt';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $attachmentManager;
+    protected $fileManager;
 
     /** @var FileContentProvider */
     protected $fileContentProvider;
 
     public function setUp()
     {
-        $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->fileContentProvider = new FileContentProvider(
             self::TEST_FILE_NAME,
-            $this->attachmentManager
+            $this->fileManager
         );
     }
 
@@ -30,7 +30,7 @@ class FileContentProviderTest extends \PHPUnit_Framework_TestCase
     {
         $data = 'some data';
 
-        $this->attachmentManager->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with(self::TEST_FILE_NAME)
             ->willReturn($data);

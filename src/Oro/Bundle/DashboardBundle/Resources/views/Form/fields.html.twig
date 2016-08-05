@@ -50,7 +50,9 @@
                     {% set encodeBitmask = constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_APOS') %}
                     var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(encodeBitmask)|raw }}');
                     var DatetimeFilterWithMeta = WidgetConfigDateRangeFilter.extend(metadata);
-                    var dateRangeFilter = new DatetimeFilterWithMeta();
+                    var dateRangeFilter = new DatetimeFilterWithMeta({
+                        $form: $('[name="' + '{{ form.vars.full_name }}[part]"]').closest('form')
+                    });
 
                     var valueConfig = {start: '', end: ''};
                     {% if form.vars.value.value != null %}
@@ -61,13 +63,15 @@
 
                     var value = {
                         part: 'value',
-                        type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
+                        type: {{ (form.vars.value.type != '')
+                            ? form.vars.value.type
+                            : (form.vars.datetime_range_metadata.valueTypes ? constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_THIS_MONTH') : 1) }},
                         value: valueConfig
                     };
                     dateRangeFilter.updateValue(value);
                     dateRangeFilter.render();
 
-                    $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
+                    $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el).trigger('content:changed');
                     $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
                     $('div.widget-configuration').closest('.ui-widget-content').trigger('dialogresize');
                 });
@@ -109,7 +113,7 @@
     <div id="{{ rowId }}" class="dashboard-widget-items">
         <div class="control-group">
             <label class="control-label">{{ label|trans }}</label>
-            <div class="controls">
+            <div class="control-group controls">
                 <div class="">
                     {{ UI.clientButton({
                         'aCss': 'no-hash add-button',
@@ -121,17 +125,17 @@
                     }) }}
                 </div>
             </div>
-        </div>
-        <div class="grid-container">
-            <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
-                <thead>
-                    <tr>
-                        <th><span>{{ form.vars.item_label|trans }}</span></th>
-                        <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
-                    </tr>
-                </thead>
-                <tbody class="item-container"></tbody>
-            </table>
+            <div class="controls">
+                <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th><span>{{ form.vars.item_label|trans }}</span></th>
+                            <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="item-container"></tbody>
+                </table>
+            </div>
         </div>
     </div>
     {{ form_javascript(form) }}
@@ -164,27 +168,103 @@
     <div class="widget-date-widget">
         {{ form_widget(form.useDate) }}
     </div>
-    <div class="widget-date-input-widget">
-        {{ form_widget(form.date) }}
-    </div>
-    <script type="text/javascript">
-        require(['jquery'], function ($) {
-            $(function () {
-                var useDate = $('input#{{ form.useDate.vars.id }}');
+    {% if form.date is defined %}
+        <div class="widget-date-input-widget">
+            {{ form_widget(form.date) }}
+        </div>
+        <script type="text/javascript">
+            require(['jquery'], function ($) {
+                $(function () {
+                    var useDate = $('input#{{ form.useDate.vars.id }}');
 
-                if (useDate.prop('checked') !== true) {
-                    $('input#{{ form.date.vars.id }}').attr('readonly', 'readonly');
-                }
-
-                $(useDate).change(function() {
-                    var date    = $('input#date_selector_{{ form.date.vars.id }}');
-                    if ($(this).is(':checked')) {
-                        $(date).datepicker('enable');
-                    } else {
-                        $(date).datepicker('disable');
+                    if (useDate.prop('checked') !== true) {
+                        $('input#{{ form.date.vars.id }}').attr('readonly', 'readonly');
                     }
+
+                    $(useDate).change(function() {
+                        var date    = $('input#date_selector_{{ form.date.vars.id }}');
+                        if ($(this).is(':checked')) {
+                            $(date).datepicker('enable');
+                        } else {
+                            $(date).datepicker('disable');
+                        }
+                    });
                 });
-            });
-        })
-    </script>
+            })
+        </script>
+    {% endif %}
 {% endblock oro_type_widget_date_widget %}
+
+{% block oro_dashboard_query_filter_row %}
+    <div class="control-group">
+        <div
+        {% if collapsible %}
+            class="control-group widget-query-filter collapsible{% if collapsed %} collapsed{% endif %}"
+                data-page-component-module="oroui/js/app/components/view-component"
+                data-page-component-options="{{ {'view': 'oroform/js/app/views/collapsible-form-row-view'}|json_encode }}">
+        {% else %}
+            class="control-group">
+        {% endif %}
+            <label class="control-label widget-query-filter">{{ label|trans }}</label>
+
+            {% if collapsible %}
+                {% set labelsMap = {
+                    0: 'oro.dashboard.query_filter.collapse'|trans,
+                    1: 'oro.dashboard.query_filter.expand'|trans,
+                } %}
+
+                <a class="collapse-action"
+                   data-toggle-label="{{ labelsMap[not collapsed] }}"
+                   data-name="collapse" href="#">{{ labelsMap[collapsed] }}</a>
+            {% endif %}
+
+            <div class="controls">
+                {{ form_row(form.entity) }}
+                {{ form_row(form.definition) }}
+                {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+                {{ QD.query_designer_column_chain_template('column-chain-template') }}
+                {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
+                {{ segmentQD.query_designer_condition_builder({
+                    'id': name ~ '-condition-builder',
+                    'criteria_list_id': 'filter-criteria-list',
+                    'entity_choice_id': widgetType ~ '_' ~ name ~ '_entity',
+                    'disable_audit': true
+                }) }}
+
+                {% set fieldsData = {} %}
+                {% if not form.entity.vars.value is empty %}
+                    {% set encodedEntityName = form.entity.vars.value|replace({'\\': '_'}) %}
+                    {% set routeParams       = {}|merge({'entityName': encodedEntityName}) %}
+
+                    {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
+                {% endif %}
+
+                {% set widgetOptions = {
+                    valueSource: '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_definition]',
+                    fieldsLoader: {
+                        entityChoice:      '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_entity]',
+                        loadingMaskParent: '#' ~ form.vars.id,
+                        router:            'oro_api_querydesigner_fields_entity',
+                        routingParams:     {},
+                        fieldsData:        fieldsData,
+                        confirmMessage:    name|replace('_', '.') ~ '.change_entity_confirmation',
+                    },
+                    filters: {
+                        criteriaList:     '#filter-criteria-list',
+                        conditionBuilder: '#' ~ name ~ '-condition-builder'
+                    },
+                    entities:                   oro_query_filter_entities(),
+                    metadata:                   oro_query_filter_metadata(),
+                    disable_audit:              true,
+                    initEntityChangeEvents:     false,
+                    select2FieldChoiceTemplate: '#column-chain-template',
+                } %}
+                {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
+                <div
+                    data-page-component-module="orosegment/js/app/components/segment-component"
+                    data-page-component-options="{{ widgetOptions|json_encode }}">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock oro_dashboard_query_filter_row %}

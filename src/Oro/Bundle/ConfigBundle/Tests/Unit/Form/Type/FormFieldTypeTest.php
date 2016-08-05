@@ -2,6 +2,8 @@
 
 namespace ConfigBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
@@ -87,5 +89,49 @@ class FormFieldTypeTest extends TypeTestCase
     public function testGetName()
     {
         $this->assertEquals('oro_config_form_field_type', $this->formType->getName());
+    }
+
+    public function listenersDataProvider()
+    {
+        return [
+            'resettable' => [true, 1],
+            'non-resettable' => [false, 0],
+        ];
+    }
+
+    /**
+     * @dataProvider listenersDataProvider
+     *
+     * @param bool $resettable
+     * @param int $expectedCount Expected invocation count
+     */
+    public function testListeners($resettable, $expectedCount)
+    {
+        /* @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        $builder = $this->getMock(FormBuilderInterface::class);
+        $fieldBuilder = $this->getMock(FormBuilderInterface::class);
+
+        $fieldBuilder->expects($this->exactly($expectedCount))
+            ->method('addEventListener')
+            ->with(FormEvents::POST_SUBMIT);
+
+        $builder->expects($this->exactly($expectedCount))
+            ->method('get')
+            ->with('use_parent_scope_value')
+            ->willReturn($fieldBuilder);
+
+        $builder->expects($this->exactly($expectedCount))
+            ->method('addEventListener')
+            ->with(FormEvents::PRE_SET_DATA);
+
+        $this->formType->buildForm(
+            $builder,
+            [
+                'parent_checkbox_label' => '',
+                'resettable' => $resettable,
+                'target_field_type' => 'array',
+                'target_field_options' => [],
+            ]
+        );
     }
 }

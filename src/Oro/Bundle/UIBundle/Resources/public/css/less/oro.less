@@ -2270,7 +2270,7 @@ div.selector span {
   text-overflow: ellipsis;
   position: relative;
   &:after {
-    margin: 3px 2px 0 0;
+    margin: 3px 3px 0 0;
     display:inline-block;
     font:16px 'FontAwesome';
     content: "\f0dd";
@@ -2280,13 +2280,15 @@ div.selector span {
 }
 
 div.selector select {
-  left: -2px;
   z-index: 1;
   padding: 0 5px;
+  left: 0;
+  width: auto;
+  box-sizing: border-box;
 }
 
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
-.controls select {width: 282px;}
+.controls select {width: 279px;}
 .controls .selector select {width: 100%;}
 /* end uniformjs customization */
 
@@ -3039,6 +3041,7 @@ span.validation-failed {
 }
 
 .popover {
+  position: fixed;
   max-width: 315px; /* little increase to fit usual content */
   .popover-content {
     padding: 13px 30px 13px 15px;
@@ -3230,5 +3233,22 @@ label .popover-content {
     [class^="icon-"], a [class*=" icon-"] {
       margin: 0;
     }
+  }
+}
+
+.chart-hint {
+  color: #666;
+  text-align: center;
+}
+
+.stackedbar-chart {
+  .flotr-overlay {
+    cursor: all-scroll;
+  }
+}
+
+.float-holder {
+  label.add-on {
+    margin-bottom: 0;
   }
 }

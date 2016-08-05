@@ -73,7 +73,7 @@ define(function(require) {
             /**
              * on adding activity item listen to "widget:doRefresh:activity-list-widget"
              */
-            mediator.on('widget:doRefresh:activity-list-widget', this._reload, this);
+            mediator.on('widget:doRefresh:activity-list-widget', this._reloadOnAdd, this);
 
             /**
              * on editing activity item listen to "widget_success:activity_list:item:update"
@@ -97,7 +97,7 @@ define(function(require) {
 
             delete this.itemEditDialog;
 
-            mediator.off('widget:doRefresh:activity-list-widget', this._reload, this);
+            mediator.off('widget:doRefresh:activity-list-widget', this._reloadOnAdd, this);
             mediator.off('widget_success:activity_list:item:update', this._reload, this);
 
             ActivityListView.__super__.dispose.call(this);
@@ -120,20 +120,33 @@ define(function(require) {
 
         refresh: function() {
             this.collection.setPage(1);
-            this._setPageNumber();
+            this.collection.resetPageFilter();
+
             this._reload();
 
             mediator.trigger('widget_success:activity_list:refresh');
         },
 
         _initPager: function() {
-            this._refreshStateButtons();
+            if (this.collection.getCount() && this.collection.getPage() === 1) {
+                this._toggleNext(true);
+            }
 
-            $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
-            $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
-            $('.activity-list-widget .pagination-current').val(this.collection.getPage());
+            if (this.collection.getPage() === 1) {
+                this._togglePrevious();
+            } else {
+                this._togglePrevious(true);
+            }
 
-            if (this.collection.getCount() === 0 && this.isFiltersEmpty) {
+            if (this.collection.getCount() < this.collection.getPageSize()) {
+                this._toggleNext();
+            }
+
+            if (this.collection.getCount() === 0 &&
+                this.isFiltersEmpty &&
+                this.collection.getPage() === 1 &&
+                !this.collection.models.length
+            ) {
                 this.gridToolbar.hide();
             } else {
                 this.gridToolbar.show();
@@ -165,75 +178,74 @@ define(function(require) {
 
         goto_previous: function() {
             var currentPage = this.collection.getPage();
-            if (currentPage > 1) {
-                var nextPage = currentPage - 1;
-                this.collection.setPage(nextPage);
-                this._setPageNumber(nextPage);
-                this._refreshStateButtons();
-                this._reload();
-            }
-        },
-
-        goto_page: function(e) {
-            var that = this.list;
-            var currentPage = that.collection.getPage();
-            var maxPage = that.collection.pager.total;
-            var nextPage = parseInt($(e.target).val());
-
-            if (_.isNaN(nextPage) || nextPage <= 0 || nextPage > maxPage || nextPage === currentPage) {
-                $(e.target).val(currentPage);
+            if (currentPage === 1) {
                 return;
             }
 
-            that.collection.setPage(nextPage);
-            that._setPageNumber(nextPage);
+            if (currentPage === 2) {
+                this.collection.setPage(1);
+                this.collection.resetPageFilter();
 
-            that._refreshStateButtons();
-            that._reload();
-        },
-
-        goto_next: function() {
-            var currentPage = this.collection.getPage();
-            if (currentPage < this.collection.pager.total) {
-                var nextPage = currentPage + 1;
+                this._reload();
+            } else {
+                var nextPage = currentPage - 1;
                 this.collection.setPage(nextPage);
-                this._setPageNumber(nextPage);
 
-                this._refreshStateButtons();
+                this._setupPageFilterForPrevAction();
+
                 this._reload();
             }
-        },
 
-        _setPageNumber: function(pageNumber) {
-            if (_.isUndefined(pageNumber)) {
-                pageNumber = 1;
+            this._toggleNext(true);
+        },
+        goto_next: function() {
+            if (this.collection.getCount() < this.collection.getPageSize()) {
+                return;
             }
-            $('.activity-list-widget .pagination-current').val(pageNumber);
+            var currentPage = this.collection.getPage();
+
+            this.collection.setPage(currentPage + 1);
+            this.collection.setPageTotal(this.collection.getPageTotal() + 1);
+
+            this._setupPageFilterForNextAction();
+
+            this._reload();
         },
 
-        _refreshStateButtons: function() {
-            this._updateStateButtonPreviousPage();
-            this._updateStateButtonNextPage();
-        },
+        _setupPageFilterForPrevAction: function() {
+            var model = this.collection.first();
+            var sameModelIds = this._findSameModelsBySortingField(model);
 
-        _updateStateButtonPreviousPage: function() {
-            if (this.collection.getPage() === 1) {
-                this._togglePrevious();
-            } else {
-                this._togglePrevious(true);
+            this.collection.setPageFilterDate(model.attributes[this.collection.pager.sortingField]);
+            this.collection.setPageFilterIds(sameModelIds.length ? sameModelIds : [model.id]);
+            this.collection.setPageFilterAction('prev');
+
+        },
+        _setupPageFilterForNextAction: function() {
+            var model = this.collection.last();
+            var sameModelIds = this._findSameModelsBySortingField(model);
+
+            this.collection.setPageFilterDate(model.attributes[this.collection.pager.sortingField]);
+            this.collection.setPageFilterIds(sameModelIds.length ? sameModelIds : [model.id]);
+            this.collection.setPageFilterAction('next');
+        },
+        /**
+         * Finds the same models in collection by sorting field
+         * @param model ActivityModel to be used for comparison
+         */
+        _findSameModelsBySortingField: function(model) {
+            var modelIds = [];
+            var sortingField = this.collection.pager.sortingField;
+            var sameModels = _.filter(this.collection.models, function(collectionModel) {
+                return collectionModel.attributes[sortingField] === model.attributes[sortingField];
+            }, this);
+            if (sameModels.length) {
+                modelIds = _.map(sameModels, function(collectionModel) {
+                    return collectionModel.id;
+                });
             }
-        },
 
-        _updateStateButtonNextPage: function() {
-            if (this.collection.getPageSize() < this.collection.getCount()) {
-                if (this.collection.getPage() === this.collection.pager.total) {
-                    this._toggleNext();
-                } else {
-                    this._toggleNext(true);
-                }
-            } else {
-                this._toggleNext();
-            }
+            return modelIds;
         },
 
         _togglePrevious: function(enable) {
@@ -249,6 +261,13 @@ define(function(require) {
                 $('.activity-list-widget .pagination-next').addClass('disabled');
             } else {
                 $('.activity-list-widget .pagination-next').removeClass('disabled');
+            }
+        },
+
+        _reloadOnAdd: function() {
+            if (this.collection.getPage() === 1) {
+                this.collection.resetPageFilter();
+                this._reload();
             }
         },
 
@@ -274,7 +293,10 @@ define(function(require) {
 
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(this._initPager, this),
+                    success: _.bind(function() {
+                        this._initPager();
+                        this._hideLoading();
+                    }, this),
                     error: _.bind(function(collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
                     }, this)
@@ -399,6 +421,19 @@ define(function(require) {
         _onItemDelete: function(model) {
             this._showLoading();
             try {
+                //in case deleting the last item on page - will show the previous one
+                if (this.collection.getCount() === 1) {
+                    //the first page never has pageFilters
+                    //in case 2nd page and last item deletion - just reset pageFilter, this will give the 1st page
+                    //in all other cases simulate `Prev` action
+                    if (this.collection.getPage() <= 2) {
+                        this.collection.resetPageFilter();
+                    } else {
+                        this.collection.setPage(this.collection.getPage() - 1);
+                        this._setupPageFilterForPrevAction();
+                    }
+                }
+
                 model.destroy({
                     wait: true,
                     url: this._getUrl('itemDelete', model),
@@ -446,7 +481,9 @@ define(function(require) {
         },
 
         _hideLoading: function() {
-            this.subview('loading').hide();
+            if (this.subview('loading')) {
+                this.subview('loading').hide();
+            }
         },
 
         _showLoadItemsError: function(err) {
