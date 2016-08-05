@@ -1,0 +1,40 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'default.html.twig'
+        - '@addTree':
+            items:
+                head:
+                    blockType: head
+                title:
+                    blockType: title
+                meta_charset:
+                    blockType: meta
+                    options:
+                        charset: 'utf-8'
+                meta_viewport:
+                    blockType: meta
+                    options:
+                        name: viewport
+                        content: 'width=device-width, initial-scale=1'
+                theme_icon:
+                    blockType: external_resource
+                    options:
+                        visible: '=data["theme"].getIcon()!=null'
+                        href: '=data["asset"].getUrl(data["theme"].getIcon())'
+                        rel: shortcut icon
+                styles:
+                    blockType: style
+                    options:
+                        src: '=data["asset"].getUrl(data["theme"].getData()["assets"]["styles"]["output"])'
+                body:
+                    blockType: body
+            tree:
+                root:
+                    head:
+                        title: ~
+                        meta_charset: ~
+                        meta_viewport: ~
+                        theme_icon: ~
+                        styles: ~
+                    body: ~
