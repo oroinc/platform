@@ -17,6 +17,11 @@ class Job
     /**
      * @var string
      */
+    protected $ownerId;
+
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
@@ -81,6 +86,22 @@ class Job
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwnerId()
+    {
+        return $this->ownerId;
+    }
+
+    /**
+     * @param string $ownerId
+     */
+    public function setOwnerId($ownerId)
+    {
+        $this->ownerId = $ownerId;
     }
 
     /**

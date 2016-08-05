@@ -34,7 +34,7 @@ oro:
 
         status:
             new: New
-            canceled: Canceled
+            cancelled: Cancelled
             running: Running
             success: Success
             failed: Failed

@@ -55,6 +55,44 @@ class JobStorage
     }
 
     /**
+     * @param string $ownerId
+     *
+     * @return Job
+     */
+    public function findRootJobByOwnerId($ownerId)
+    {
+        $qb = $this->repository->createQueryBuilder('job');
+
+        return $qb
+            ->addSelect('rootJob')
+            ->leftJoin('job.rootJob', 'rootJob')
+            ->where('job.ownerId = :ownerId')
+            ->setParameter('ownerId', $ownerId)
+            ->getQuery()->getOneOrNullResult()
+        ;
+    }
+
+    /**
+     * @param string  $name
+     * @param Job     $rootJob
+     *
+     * @return Job
+     */
+    public function findChildJobByName($name, Job $rootJob)
+    {
+        $qb = $this->repository->createQueryBuilder('job');
+
+        return $qb
+            ->addSelect('rootJob')
+            ->leftJoin('job.rootJob', 'rootJob')
+            ->where('rootJob = :rootJob AND job.name = :name')
+            ->setParameter('rootJob', $rootJob)
+            ->setParameter('name', $name)
+            ->getQuery()->getOneOrNullResult()
+        ;
+    }
+
+    /**
      * @return Job
      */
     public function createJob()
@@ -92,19 +130,31 @@ class JobStorage
 
                 $lockCallback($job);
 
-                if ($job->isUnique() && $job->getStoppedAt()) {
+                if ($job->getStoppedAt()) {
                     $em->getConnection()->delete($this->uniqueTableName, [
-                        'name' => $job->getName()
+                        'name' => $job->getOwnerId(),
                     ]);
+
+                    if ($job->isUnique()) {
+                        $em->getConnection()->delete($this->uniqueTableName, [
+                            'name' => $job->getName(),
+                        ]);
+                    }
                 }
             });
         } else {
-            if (! $job->getId() && $job->isUnique()) {
+            if (! $job->getId() && $job->isRoot()) {
                 $this->em->getConnection()->transactional(function (Connection $connection) use ($job) {
                     try {
                         $connection->insert($this->uniqueTableName, [
-                            'name' => $job->getName()
+                            'name' => $job->getOwnerId()
                         ]);
+
+                        if ($job->isUnique()) {
+                            $connection->insert($this->uniqueTableName, [
+                                'name' => $job->getName(),
+                            ]);
+                        }
                     } catch (UniqueConstraintViolationException $e) {
                         throw new DuplicateJobException();
                     }

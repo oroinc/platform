@@ -26,6 +26,14 @@ class JobProcessor
     }
 
     /**
+     * @return JobRunner
+     */
+    public function createJobRunner()
+    {
+        return new JobRunner($this);
+    }
+
+    /**
      * @param string $id
      *
      * @return Job
@@ -33,6 +41,62 @@ class JobProcessor
     public function findJobById($id)
     {
         return $this->jobStorage->findJobById($id);
+    }
+
+    /**
+     * @param string $ownerId
+     * @param string $name
+     * @param bool   $unique
+     *
+     * @return Job
+     */
+    public function findOrCreateRootJob($ownerId, $name, $unique = false)
+    {
+        $job = $this->jobStorage->createJob();
+        $job->setOwnerId($ownerId);
+        $job->setStatus(Job::STATUS_NEW);
+        $job->setName($name);
+        $job->setCreatedAt(new \DateTime());
+        $job->setStartedAt(new \DateTime());
+        $job->setUnique((bool) $unique);
+
+        try {
+            $this->jobStorage->saveJob($job);
+
+            return $job;
+        } catch (DuplicateJobException $e) {
+        }
+
+        return $this->jobStorage->findRootJobByOwnerId($ownerId);
+    }
+
+    /**
+     * @param string $name
+     * @param Job $rootJob
+     *
+     * @return Job
+     */
+    public function findOrCreateChildJob($name, Job $rootJob)
+    {
+        $job = $this->jobStorage->findChildJobByName($name, $rootJob);
+
+        if ($job) {
+            return $job;
+        }
+        
+        $job = $this->jobStorage->createJob();
+        $job->setStatus(Job::STATUS_NEW);
+        $job->setName($name);
+        $job->setCreatedAt(new \DateTime());
+        $job->setRootJob($rootJob);
+
+        $this->jobStorage->saveJob($job);
+
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+            'id' => $job->getId()
+        ]);
+
+        return $job;
     }
     
     /**
@@ -177,9 +241,9 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t cancel root jobs. id: "%s"', $job->getId()));
         }
 
-        if ($job->getStatus() !== Job::STATUS_NEW) {
+        if (! in_array($job->getStatus(), [Job::STATUS_NEW, Job::STATUS_RUNNING])) {
             throw new \LogicException(sprintf(
-                'Can cancel only new jobs. id: "%s", status: "%s"',
+                'Can cancel only new or running jobs. id: "%s", status: "%s"',
                 $job->getId(),
                 $job->getStatus()
             ));

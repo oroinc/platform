@@ -23,6 +23,13 @@ class Job extends BaseJob
     /**
      * @var string
      *
+     * @ORM\Column(name="owner_id", type="string", nullable=true)
+     */
+    protected $ownerId;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="name", type="string", nullable=false)
      */
     protected $name;
