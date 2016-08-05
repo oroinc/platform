@@ -392,4 +392,27 @@ class QueryUtils
 
         return sprintf('%s_%d', uniqid(str_replace('.', '', $prefix)), $n);
     }
+
+    /**
+     * Removes unused parameters from query builder
+     *
+     * @param QueryBuilder $qb
+     */
+    public static function removeUnusedParameters(QueryBuilder $qb)
+    {
+        $dql = $qb->getDQL();
+        $usedParameters = [];
+        /** @var $parameter \Doctrine\ORM\Query\Parameter */
+        foreach ($qb->getParameters() as $parameter) {
+            $parameterName = $parameter->getName();
+            $pattern = is_numeric($parameterName)
+                ? sprintf('/\?%s[^\w]/', preg_quote($parameterName))
+                : sprintf('/\:%s[^\w]/', preg_quote($parameterName));
+
+            if (preg_match($pattern, $dql . ' ')) {
+                $usedParameters[$parameterName] = $parameter->getValue();
+            }
+        }
+        $qb->setParameters($usedParameters);
+    }
 }
