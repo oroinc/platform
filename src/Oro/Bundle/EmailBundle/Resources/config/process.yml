@@ -24,7 +24,6 @@ definitions:
                     - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
-                        flush: true
                         arguments:
                             - 'oro:email:flag-sync'
                             - ['--seen=false', $.arguments]
@@ -43,7 +42,6 @@ definitions:
                     - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
-                        flush: true
                         arguments:
                             - 'oro:email:flag-sync'
                             - ['--seen=true', $.arguments]

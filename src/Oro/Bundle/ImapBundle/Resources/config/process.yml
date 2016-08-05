@@ -37,7 +37,7 @@ definitions:
                     - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
-                        flush: true
+                        flush: true # flush is used make sure that only one pending job will be created
                         arguments:
                             - $.command
     clear_imap_email_folder_on_sync_enabled_change:
@@ -80,7 +80,7 @@ definitions:
                     - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
-                        flush: true
+                        flush: true # flush is used make sure that only one pending job will be created
                         arguments:
                             - $.command
             - '@tree':
@@ -92,12 +92,9 @@ definitions:
                     - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
-                        flush: true
                         arguments:
                             - $.command
-                            - []
-                            - false
-                    - '@job_add_dependency':
+                    - '@job_add_dependency': # called flush to make sure that only one pending job will be created
                         job: $.syncJob
                         dependency: $.runningJob
 
