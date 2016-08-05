@@ -434,7 +434,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMassStartWorkflow(array $source, array $expected)
     {
-        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class, 1 + count($expected));
+        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class, count($expected));
 
         if ($expected) {
             foreach ($expected as $iteration => $row) {

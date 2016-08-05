@@ -191,30 +191,25 @@ class WorkflowManager
     }
 
     /**
-     * Start several workflows in one transaction
+     * Start several workflows
      *
      * @param array|WorkflowStartArguments[] $startArgumentsList instances of WorkflowStartArguments
      */
     public function massStartWorkflow(array $startArgumentsList)
     {
-        $this->inTransaction(
-            function (EntityManager $em) use (&$startArgumentsList) {
-                foreach ($startArgumentsList as $startArguments) {
-                    if (!$startArguments instanceof WorkflowStartArguments) {
-                        continue;
-                    }
+        foreach ($startArgumentsList as $startArguments) {
+            if (!$startArguments instanceof WorkflowStartArguments) {
+                continue;
+            }
 
-                    $this->startWorkflow(
-                        $startArguments->getWorkflowName(),
-                        $startArguments->getEntity(),
-                        $startArguments->getTransition(),
-                        $startArguments->getData(),
-                        false
-                    );
-                }
-            },
-            WorkflowItem::class
-        );
+            $this->startWorkflow(
+                $startArguments->getWorkflowName(),
+                $startArguments->getEntity(),
+                $startArguments->getTransition(),
+                $startArguments->getData(),
+                false
+            );
+        }
     }
 
     /**
