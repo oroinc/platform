@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'default.html.twig'
+            themes: 'layout.html.twig'
         - '@addTree':
             items:
                 head:
