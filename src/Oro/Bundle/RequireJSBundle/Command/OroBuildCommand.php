@@ -4,6 +4,7 @@ namespace Oro\Bundle\RequireJSBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,6 +55,11 @@ class OroBuildCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->config = $this->getContainer()->getParameter('oro_require_js');
+
+        if (!$this->config['js_engine']) {
+            $output->writeln(sprintf('JS engine not found'));
+            return;
+        }
         
         /** @var ConfigProviderManager $manager */
         $manager = $this->getContainer()->get(ConfigProviderCompilerPass::PROVIDER_SERVICE);
@@ -70,16 +76,9 @@ class OroBuildCommand extends ContainerAwareCommand
                 $buildConfig = '(' . json_encode($config->getBuildConfig()) . ')';
                 $this->writeFile($buildConfig, $configPath);
 
-                $JSEngine = isset($this->config['js_engine']) ? $this->config['js_engine'] : null;
-
-                if (!$JSEngine) {
-                    $output->writeln(sprintf('JS engine not found'));
-                    break;
-                }
-
                 $output->writeln(sprintf('Running code optimizer'));
 
-                $this->process($JSEngine, $configPath);
+                $this->process($this->config['js_engine'], $configPath);
 
                 $output->writeln('Cleaning up');
 
