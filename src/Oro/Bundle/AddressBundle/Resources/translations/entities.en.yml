@@ -4550,6 +4550,12 @@ region:
     UM-86: 'Jarvis Island'
     UM-89: 'Kingman Reef'
     UM-95: 'Palmyra Atoll'
+    US-AA: Armed Forces Americas
+    US-AP: Armed Forces Pacific
+    US-AF: Armed Forces Africa
+    US-AC: Armed Forces Canada
+    US-AE: Armed Forces Europe
+    US-AM: Armed Forces Middle East
     US-AK: Alaska
     US-AL: Alabama
     US-AR: Arkansas
