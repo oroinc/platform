@@ -175,7 +175,6 @@ oro:
             priority.label:               "Priority"
             exclusive_active_groups.label: "Exclusive Active Groups"
             exclusive_record_groups.label: "Exclusive Record Groups"
-            clone_label_prefix:           'Copy of '
 
             attribute:
                 property_path.tooltip:    "This is the field of the workflow entity or its related entities that will be appear on the view form of the transition. Use these if you want user to add or edit some entity data in the transition."
@@ -200,7 +199,6 @@ oro:
             datagrid:
                 view: View
                 update: Edit
-                clone:  Clone
                 delete: Delete
                 activate: Activate
                 deactivate: Deactivate

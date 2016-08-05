@@ -9,10 +9,25 @@ namespace Oro\Component\Layout;
 abstract class AbstractServerRenderDataProvider implements DataProviderInterface
 {
     /**
+     * @var ContextInterface
+     */
+    protected $context;
+    
+    /**
      * {@inheritDoc}
      */
     public function getIdentifier()
     {
         throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getData(ContextInterface $context)
+    {
+        $this->context = $context;
+
+        return $this;
     }
 }

@@ -164,6 +164,14 @@ class WorkflowManager
     {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
+        if (!$transition) {
+            $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
+
+            if (!$workflow->isStartTransitionAvailable($transition, $entity)) {
+                return;
+            }
+        }
+
         if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(

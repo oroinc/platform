@@ -46,11 +46,12 @@ define(function(require) {
 
         calcWysiwygHeight: function() {
             var content = this.getDialogContainer();
+            var widgetContent = this.$el.closest('.widget-content')[0] || content.children().first().get(0);
             var editorHeight = this.getEditorView().getHeight();
             var style = getComputedStyle(content[0]);
             var availableHeight = editorHeight +
                 content[0].offsetHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) +
-                -this.$el.closest('.widget-content')[0].offsetHeight;
+                -widgetContent.offsetHeight;
             return Math.floor(Math.max(availableHeight, this.minimalWysiwygEditorHeight));
         },
 
