@@ -33,16 +33,8 @@ class IndexerQuery extends AbstractSearchQuery
     /**
      * {@inheritdoc}
      */
-    public function query()
+    protected function query()
     {
         return $this->indexer->query($this->query);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function execute()
-    {
-        return $this->getResult()->getElements();
     }
 }

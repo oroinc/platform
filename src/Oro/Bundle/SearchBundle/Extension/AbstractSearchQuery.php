@@ -32,6 +32,14 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function execute()
+    {
+        return $this->getResult()->getElements();
+    }
+
+    /**
      * @return Query
      */
     public function getQuery()

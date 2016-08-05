@@ -16,13 +16,6 @@ interface SearchQueryInterface
     public function getResult();
 
     /**
-     * Perform the engine query.
-     *
-     * @return mixed
-     */
-    public function query();
-
-    /**
      * Execute the query() and return postprocessed data.
      *
      * @return mixed
