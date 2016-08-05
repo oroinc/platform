@@ -54,18 +54,18 @@ class ActionButtonsProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($result, $this->provider->getExecutionRoute());
     }
 
-    public function testGetRealClass()
-    {
-        $class = 'Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider';
-        
-        $this->assertEquals(ClassUtils::getRealClass($class), $this->provider->getRealClass($class));
-    }
-
-    public function testGetEntityClass()
+    public function testGetEntityClassFromObject()
     {
         $entity = new \stdClass();
 
         $this->assertEquals(ClassUtils::getClass($entity), $this->provider->getEntityClass($entity));
+    }
+
+    public function testGetEntityClassFromString()
+    {
+        $class = 'Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider';
+
+        $this->assertEquals(ClassUtils::getRealClass($class), $this->provider->getEntityClass($class));
     }
 
     public function testGetEntityId()

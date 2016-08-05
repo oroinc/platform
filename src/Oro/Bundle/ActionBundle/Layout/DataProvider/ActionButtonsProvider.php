@@ -45,23 +45,13 @@ class ActionButtonsProvider extends AbstractServerRenderDataProvider
     }
 
     /**
-     * @param $class
-     *
-     * @return string
-     */
-    public function getRealClass($class)
-    {
-        return ClassUtils::getRealClass($class);
-    }
-
-    /**
-     * @param $entity
+     * @param object|string $entity
      *
      * @return string
      */
     public function getEntityClass($entity)
     {
-        return ClassUtils::getClass($entity);
+        return is_object($entity) ? ClassUtils::getClass($entity) : ClassUtils::getRealClass($entity);
     }
 
     /**
