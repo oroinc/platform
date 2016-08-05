@@ -316,11 +316,8 @@ define(function(require) {
 
         _renderHandler: function() {
             this.resetDialogPosition();
-            // to give time finish "resetDialogPosition" action
-            _.defer(_.bind(function(){
-                this.widget.closest('.invisible').removeClass('invisible');
-                this.trigger('widgetReady', this);
-            }, this));
+            this.widget.closest('.invisible').removeClass('invisible');
+            this.trigger('widgetReady', this);
         },
 
         _initAdjustHeight: function(content) {
