@@ -30,6 +30,9 @@ class TestHelper
      */
     private $testCase;
 
+    /**
+     * @param \PHPUnit_Framework_TestCase $testCase
+     */
     public function __construct(\PHPUnit_Framework_TestCase $testCase)
     {
         $this->testCase = $testCase;
@@ -297,7 +300,7 @@ class TestHelper
                 'EDIT'   => 3,
                 'DELETE' => 4,
                 'ASSIGN' => 5,
-                'SHARE'  => 6
+                'PERMIT' => 6
             ]);
 
         return $permissionManager;

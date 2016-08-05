@@ -15,12 +15,20 @@ define(function(require) {
     var numberFormatter = require('orolocale/js/formatter/number');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var ActionsView = require('../grid/actions-view');
 
     CardView = BaseView.extend({
         /**
          * @inheritDoc
          */
         className: 'card-view',
+
+        /**
+         * Selector for element where to put card actions dropdown
+         *
+         * @type {String}
+         */
+        cardActionsElementSelector: '[data-placeholder-for="actions"]',
 
         /**
          * @inheritDoc
@@ -35,7 +43,7 @@ define(function(require) {
         /**
          * Timeout for early transition status change detection
          *
-         * @param {Number}
+         * @type {Number}
          */
         earlyTransitionStatusChangeTimeout: 2000,
 
@@ -59,6 +67,9 @@ define(function(require) {
         initialize: function(options) {
             CardView.__super__.initialize.call(this, options);
             this.readonly = options.readonly;
+            this.datagrid = options.datagrid;
+            this.actions = options.actions;
+            this.actionOptions = options.actionOptions;
             if (options.earlyTransitionStatusChangeTimeout) {
                 this.earlyTransitionStatusChangeTimeout = options.earlyTransitionStatusChangeTimeout;
             }
@@ -92,6 +103,7 @@ define(function(require) {
                 this.$el.removeAttr('data-non-valid');
                 this.$el.data({model: this.model});
             }
+            this.renderCardActionsDropdown(this.cardActionsElementSelector);
         },
 
         /**
@@ -137,6 +149,30 @@ define(function(require) {
         navigate: function(e) {
             e.preventDefault();
             this.trigger('navigate', this.model, {doExecute: true});
+        },
+
+        /**
+         * Renders card actions dropdown
+         */
+        renderCardActionsDropdown: function(selector) {
+            var $placeholder = this.$(selector);
+            if (!$placeholder.length) {
+                return;
+            }
+            if (!this.cardActionsView) {
+                this.cardActionsView = new ActionsView({
+                    el: $placeholder,
+                    actions: this.actions,
+                    model: this.model,
+                    actionConfiguration: this.model.get('action_configuration'),
+                    datagrid: this.datagrid,
+                    actionOptions: this.actionOptions,
+                    showCloseButton: false // have no idea how to reuse value from actions cell
+                });
+            } else {
+                this.cardActionsView.setElement($placeholder);
+            }
+            this.cardActionsView.render();
         }
     });
 

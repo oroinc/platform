@@ -11,6 +11,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
+use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
+
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
@@ -30,10 +32,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class Localization implements DatesAwareInterface
+class Localization extends ExtendLocalization implements DatesAwareInterface
 {
     use DatesAwareTrait;
-    use FallbackTrait;
 
     /**
      * @var int
@@ -107,8 +108,13 @@ class Localization implements DatesAwareInterface
      */
     protected $childLocalizations;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct()
     {
+        parent::__construct();
+
         $this->childLocalizations = new ArrayCollection();
         $this->titles = new ArrayCollection();
     }
@@ -276,40 +282,6 @@ class Localization implements DatesAwareInterface
         if ($this->titles->contains($title)) {
             $this->titles->removeElement($title);
         }
-
-        return $this;
-    }
-
-    /**
-     * @param Localization|null $localization
-     * @return LocalizedFallbackValue
-     */
-    public function getTitle(Localization $localization = null)
-    {
-        return $this->getLocalizedFallbackValue($this->titles, $localization);
-    }
-
-    /**
-     * @return LocalizedFallbackValue
-     */
-    public function getDefaultTitle()
-    {
-        return $this->getLocalizedFallbackValue($this->titles);
-    }
-
-    /**
-     * @param $string
-     * @return $this
-     */
-    public function setDefaultTitle($string)
-    {
-        $oldTitle = $this->getDefaultTitle();
-        if ($oldTitle) {
-            $this->removeTitle($oldTitle);
-        }
-        $newTitle = new LocalizedFallbackValue();
-        $newTitle->setString($string);
-        $this->addTitle($newTitle);
 
         return $this;
     }
