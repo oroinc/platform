@@ -285,6 +285,12 @@ define(function(require) {
          * @returns {Object}
          */
         formatResult: function(response) {
+            // if we didn't receive any content, we make assumption about what changed
+            // based on http method (for example when we send "DELETE" - entity was probably removed)
+            if (typeof response === 'undefined') {
+                return _.pick(this, 'httpMethod');
+            }
+
             return response;
         }
     });

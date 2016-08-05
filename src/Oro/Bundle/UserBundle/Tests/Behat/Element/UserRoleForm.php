@@ -16,12 +16,15 @@ class UserRoleForm extends Form
     {
         $entityRow = $this->getEntityRow($entity);
         $actionRow = $this->getActionRow($entityRow, $action);
-        /** todo: Move waitForAjax to driver. BAP-10843 */
-        sleep(1);
+        $this->getDriver()->waitForAjax();
         $levels = $actionRow->findAll('css', 'ul.dropdown-menu-collection__list li a');
+        $availableLevels = [];
 
         /** @var NodeElement $level */
         foreach ($levels as $level) {
+            $availableLevel = $level->getText();
+            $availableLevels[] = $availableLevel;
+
             if (preg_match(sprintf('/%s/i', $accessLevel), $level->getText())) {
                 $level->mouseOver();
                 $level->click();
@@ -29,7 +32,12 @@ class UserRoleForm extends Form
             }
         }
 
-        self::fail(sprintf('There is no "%s" entity row', $accessLevel));
+        self::fail(sprintf(
+            'Entity "%s" has no "%s" access level to choose. Available levels "%s"',
+            $entity,
+            $accessLevel,
+            implode(',', $availableLevels)
+        ));
     }
 
     /**
@@ -57,11 +65,12 @@ class UserRoleForm extends Form
      */
     protected function getEntityRow($entity)
     {
-        $entityTrs = $this->findAll("css", "div[id^=grid-role-permission-grid] table.grid tr.grid-row");
+        $entityTrs = $this->findAll('css', 'div[id^=grid-role-permission-grid] table.grid tbody tr');
+        self::assertNotCount(0, $entityTrs, 'Can\'t find table with permissions on the page');
 
         /** @var NodeElement $entityTr */
         foreach ($entityTrs as $entityTr) {
-            if (false !== strpos($entityTr->find('css', 'td.grid-body-cell-entity')->getText(), $entity)) {
+            if (false !== strpos($entityTr->find('css', 'td div.entity-name')->getText(), $entity)) {
                 return $entityTr;
             }
         }
