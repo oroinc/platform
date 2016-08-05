@@ -74,6 +74,33 @@ define([
             delete this.columns;
             delete this.filteredColumns;
             Header.__super__.dispose.apply(this, arguments);
+        },
+
+        render: function() {
+            if (this.template) {
+                this.renderCustomTemplate();
+            }
+            return Header.__super__.render.apply(this, arguments);
+        },
+
+        renderCustomTemplate: function() {
+            this.$el.html(this.template({
+                model: this.model ? this.model.attributes : {},
+                themeOptions: this.themeOptions ? this.themeOptions : {},
+                renderColumn: function (columnName) {
+                    this.renderColumn(columnName);
+                }
+            }));
+            return this;
+        },
+
+        renderColumn: function(columnName) {
+            var columnModel = _.find(this.columns.models, function(model) {
+                return model.get('name') === columnName;
+            });
+            if (columnModel) {
+               return this.render(columnModel);
+            }
         }
     });
 
