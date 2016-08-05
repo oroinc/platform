@@ -5,7 +5,6 @@ define(function(require) {
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     var $ = require('jquery');
     var __ = require('orotranslation/js/translator');
-    var _ = require('underscore');
     // current version: http://select2.github.io/select2/
     // last version: http://select2.github.io/examples.html
     require('jquery.select2');
@@ -29,7 +28,6 @@ define(function(require) {
 
         initialize: function(options) {
             //fix select2.each2 bug, when empty string is FALSE
-            this.initializeOptions = _.extend(this.initializeOptions, _.pick(options, 'minimumResultsForSearch'));
             this.$el.attr('class', $.trim(this.$el.attr('class')));
             Select2InputWidget.__super__.initialize.apply(this, arguments);
 

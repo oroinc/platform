@@ -36,7 +36,6 @@ define(function(require) {
 
         widgets: {},
 
-        options: {},
 
         _cachedWidgetsByPriority: null,
 
@@ -146,7 +145,7 @@ define(function(require) {
          * @param {Object} options
          */
         createWidget: function($input, Widget, options) {
-            options = $.extend(true, {}, $input.data('input-widget-options') || {}, _.extend(options, this.options) || {});
+            options = $.extend(true, {}, $input.data('input-widget-options') || {}, options || {});
             if (!options) {
                 options = {};
             }
