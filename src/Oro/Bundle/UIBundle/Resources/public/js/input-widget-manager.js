@@ -36,7 +36,6 @@ define(function(require) {
 
         widgets: {},
 
-
         _cachedWidgetsByPriority: null,
 
         /**
@@ -52,7 +51,6 @@ define(function(require) {
                 Widget: null
             });
 
-            this.options = widget.options;
             this.widgets[widget.key] = widget;
             delete this._cachedWidgetsByPriority;
             delete this._cachedCompoundQuery;
