@@ -394,8 +394,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Workflow can not be started
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException
+     * @expectedExceptionMessage Workflow "test_workflow" can not be started because it belongs to
      */
     public function testStartWorkflowRecordGroupException()
     {
@@ -413,6 +413,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
+        $workflow->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_workflow');
 
         $this->workflowRegistry->expects($this->once())->method('getWorkflow')
             ->with('test_workflow')->willReturn($workflow);
@@ -976,6 +979,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                     'start',
                     'isActive',
                     'getDefinition',
+                    'getName',
                     'getStepManager',
                     'transit'
                 ]
