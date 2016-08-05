@@ -17,6 +17,18 @@
                 'oro.workflow.workflowdefinition.steps_display_ordered.label'|trans,
                 entity.stepsDisplayOrdered ? 'Yes'|trans : 'No'|trans
             ) }}
+            {{ ui.renderProperty(
+                'oro.workflow.workflowdefinition.priority.label'|trans,
+                entity.priority
+            ) }}
+            {{ ui.renderHtmlProperty(
+                'oro.workflow.workflowdefinition.exclusive_active_groups.label'|trans,
+                ui.renderList(entity.activeGroups)
+            ) }}
+            {{ ui.renderHtmlProperty(
+                'oro.workflow.workflowdefinition.exclusive_record_groups.label'|trans,
+                ui.renderList(entity.recordGroups)
+            ) }}
         </div>
     </div>
 </div>

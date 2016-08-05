@@ -1,0 +1,4 @@
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+{{ ui.renderList(
+    value[constant('Oro\\Bundle\\WorkflowBundle\\Entity\\WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE')]|default([])
+) }}

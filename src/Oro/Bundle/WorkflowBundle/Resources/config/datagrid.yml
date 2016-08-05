@@ -110,9 +110,11 @@ datagrid:
                     - w.name as workflowDefinition
                     - w.relatedEntity
                     - w.relatedEntity as entityClass
-                    - w.active as active
+                    - w.active
                     - w.label
                     - w.system
+                    - w.priority
+                    - w.groups
                     - w.createdAt
                 from:
                     - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
@@ -126,12 +128,25 @@ datagrid:
                 choices:       "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
             active:
                 label:         oro.workflow.workflowdefinition.active.label
-                type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/active.html.twig
-                frontend_type: html
+                frontend_type: boolean
             system:
                 label:         oro.workflow.workflowdefinition.system.label
                 frontend_type: boolean
+            priority:
+                label:         oro.workflow.workflowdefinition.priority.label
+                frontend_type: integer
+            exclusiveActiveGroups:
+                label:         oro.workflow.workflowdefinition.exclusive_active_groups.label
+                data_name:     groups
+                type:          twig
+                template:      OroWorkflowBundle:Datagrid:Column/exclusiveActiveGroups.html.twig
+                frontend_type: html
+            exclusiveRecordGroups:
+                label:         oro.workflow.workflowdefinition.exclusive_record_groups.label
+                data_name:     groups
+                type:          twig
+                template:      OroWorkflowBundle:Datagrid:Column/exclusiveRecordGroups.html.twig
+                frontend_type: html
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
@@ -168,8 +183,12 @@ datagrid:
             columns:
                 label:
                     data_name: w.label
+                active:
+                    data_name: w.active
                 system:
                     data_name: w.system
+                priority:
+                    data_name: w.priority
                 createdAt:
                     data_name: w.createdAt
             default:
@@ -225,9 +244,15 @@ datagrid:
                         field_options:
                             multiple: true
                             choices: "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
+                active:
+                    type: boolean
+                    data_name: w.active
                 system:
                     type: boolean
                     data_name: w.system
+                priority:
+                    type: number
+                    data_name: w.priority
                 createdAt:
                     type:      datetime
                     data_name: w.createdAt
