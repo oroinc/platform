@@ -4,7 +4,6 @@ namespace Oro\Bundle\RequireJSBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputInterface;
