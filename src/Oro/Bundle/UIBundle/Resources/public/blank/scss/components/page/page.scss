@@ -1,0 +1,17 @@
+html {
+    height: 100%;
+}
+
+.page {
+    &__body {
+        min-height: 100%;
+        margin: 0;
+    }
+}
+
+// TODO: prepend symfony toolbar after content
+.page {
+    & .sf-toolbar {
+        position: absolute;
+    }
+}

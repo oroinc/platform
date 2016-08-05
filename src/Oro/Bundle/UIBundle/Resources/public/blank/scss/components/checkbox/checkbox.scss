@@ -1,0 +1,73 @@
+.checkbox {
+    margin: 0;
+}
+
+
+.checkbox {
+  position: relative;
+
+  display: inline-block;
+
+  margin-bottom: auto; // Reset bootstrap style
+
+  &__input {
+    position: absolute;
+
+    z-index: -1;
+
+    margin: 0;
+
+    opacity: 0;
+
+    &:focus {
+      ~ .checkbox__icon {
+        &:before {
+          outline: 2px solid rgba(99,153,239,0.47);
+          outline-offset: -2px;
+        }
+      }
+    }
+
+    &:checked {
+      ~ .checkbox__icon {
+
+        &:before {
+            content: '\e834';
+
+            color: #348fc6;
+        }
+      }
+    }
+  }
+
+  &__icon {
+    display: inline-block;
+    vertical-align: middle;
+
+    margin-right: 10px;
+
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga';
+
+    &:before {
+      content: '\e835';
+
+      display: inline-block;
+
+      font-family: 'custom-font-icon';
+      font-size: 17px;
+      line-height: 1;
+      color: #d1d1d1;
+    }
+  }
+
+  &__text {
+    vertical-align: middle;
+  }
+}
