@@ -548,14 +548,6 @@ class Query
     }
 
     /**
-     * @return array
-     */
-    public function getSelect()
-    {
-        return $this->select;
-    }
-
-    /**
      * @return string
      */
     private function getStringColumns()
