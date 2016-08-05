@@ -15,7 +15,6 @@ parameters:
     oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
-    oro_action.layout.block_type.action_line_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType
     oro_action.layout.data_provider.actions_data_rpovider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider
 
 services:
@@ -175,22 +174,6 @@ services:
     oro_action.datagrid.mass_action_provider.registry:
         class: %oro_action.datagrid.mass_action_provider.registry.class%
 
-    oro_action.layout.block_type.action_line_buttons:
-        class: %oro_action.layout.block_type.action_line_buttons.class%
-        arguments:
-            - '@oro_action.helper.applications'
-            - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: layout.block_type, alias: action_line_buttons }
-
-    oro_action.layout.block_type.action_combined_buttons:
-        parent: oro_layout.block_type.abstract_configurable
-        calls:
-            - [setName, ['action_combined_buttons']]
-            - [setParent, ['action_line_buttons']]
-        tags:
-            - { name: layout.block_type, alias: action_combined_buttons }
-
     oro_action.layout.data_provider.actions_data_rpovider:
         class: %oro_action.layout.data_provider.actions_data_rpovider.class%
         arguments:
@@ -200,3 +183,11 @@ services:
             - '@translator'
         tags:
             - { name: layout.data_provider, alias: actions }
+
+    oro_action.layout.data_provider.action_buttons:
+        class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider'
+        arguments:
+            - '@oro_action.helper.applications'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: layout.data_provider, alias: action_buttons }
