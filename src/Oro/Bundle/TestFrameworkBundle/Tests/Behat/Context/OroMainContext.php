@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -111,6 +112,16 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Close form error message
+     *
+     * @Then /^(?:|I )close error message$/
+     */
+    public function closeErrorMessage()
+    {
+        $this->createOroForm()->find('css', '.alert-error button.close')->press();
+    }
+
+    /**
      * This is available for collection fields
      * See Emails and Phones in Contact create page
      * Example: And set "charlie@gmail.com" as primary email
@@ -187,12 +198,11 @@ class OroMainContext extends MinkContext implements
      *
      * @Given /^(?:|I )add new (?P<fieldSetLabel>[^"]+) with:$/
      */
-    public function addNewAddressWith($fieldSetLabel, TableNode $table)
+    public function addNewFieldSetWith($fieldSetLabel, TableNode $table)
     {
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $form = $fieldSet->getLastSet();
         $form->fill($table);
     }
@@ -279,6 +289,22 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @When /^(?:|I )save form$/
+     */
+    public function iSaveForm()
+    {
+        $this->createOroForm()->save();
+    }
+
+    /**
+     * @Given /^(?:|I |I'm )edit entity$/
+     */
+    public function iMEditEntity()
+    {
+        $this->createElement('Entity Edit Button')->click();
+    }
+
+    /**
      * @When updated date must be grater then created date
      */
     public function updatedDateMustBeGraterThenCreatedDate()
@@ -307,6 +333,9 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Find and assert field value
+     * It's valid for entity edit or entity view page
+     *
      * @When /^([\w\s]*) field should have ([\w\s]*) value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
@@ -317,6 +346,13 @@ class OroMainContext extends MinkContext implements
         /** @var NodeElement $label */
         foreach ($labels as $label) {
             if (preg_match(sprintf('/%s/i', $fieldName), $label->getText())) {
+                if ($label->hasAttribute('for')) {
+                    return $this->getSession()
+                        ->getPage()
+                        ->find('css', '#'.$label->getAttribute('for'))
+                        ->getValue();
+                }
+
                 $value = $label->getParent()->find('css', 'div.control-label')->getText();
                 self::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
 

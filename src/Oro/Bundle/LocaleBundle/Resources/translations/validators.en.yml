@@ -4,3 +4,6 @@ oro.locale:
             circular_reference: 'Circular Reference Found.'
         titles:
             blank: 'Localization Title should not be blank.'
+    validators:
+        is_not_enabled: "Localization '%localization%' cannot be used as Default, because not enabled"
+        unknown_localization: 'Localization "#%localization_id%" not found'

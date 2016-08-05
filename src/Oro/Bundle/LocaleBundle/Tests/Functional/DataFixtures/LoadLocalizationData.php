@@ -5,10 +5,18 @@ namespace Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
-class LoadLocalizationData extends AbstractFixture
+class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var array
      */
@@ -60,6 +68,33 @@ class LoadLocalizationData extends AbstractFixture
 
         $manager->flush();
         $manager->clear();
+
+        $this->updateEnabledLocalizations($manager);
+    }
+
+    /**
+     * @param ObjectManager $manager
+     */
+    protected function updateEnabledLocalizations(ObjectManager $manager)
+    {
+        /* @var $configManager ConfigManager */
+        $configManager = $this->container->get('oro_config.global');
+
+        /* @var $localizations Localization[] */
+        $localizations = $manager->getRepository(Localization::class)->findAll();
+
+        $enabledLocalizations = [];
+
+        foreach ($localizations as $localization) {
+            $enabledLocalizations[] = $localization->getId();
+        }
+
+        $configManager->set(
+            Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
+            $enabledLocalizations
+        );
+
+        $configManager->flush();
     }
 
     /**
