@@ -21,7 +21,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultFalse()
                 ->end()
                 ->scalarNode('cleanup_interval')
-                    ->defaultValue('1 month')
+                    ->defaultValue('1 week')
                     ->cannotBeEmpty()
                     ->info('Sets the time interval to keep the batch job records in the database')
                     ->example('1 month')

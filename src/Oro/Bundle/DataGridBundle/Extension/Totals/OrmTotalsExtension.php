@@ -252,7 +252,7 @@ class OrmTotalsExtension extends AbstractExtension
                     /** @var Expr\Select $selectPart */
                     foreach ($selectParts as $selectPart) {
                         foreach ($selectPart->getParts() as $part) {
-                            if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
+                            if (preg_match('/^(.*)\sas\s(.*)$/is', $part, $matches)) {
                                 if (count($matches) === 3 && $groupPart === $matches[2]) {
                                     $rootIds[] = [
                                         'fieldAlias' => $matches[1],

@@ -67,6 +67,14 @@ class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return self::NAME;
     }
 }

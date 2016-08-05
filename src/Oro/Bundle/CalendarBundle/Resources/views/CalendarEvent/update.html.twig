@@ -43,6 +43,18 @@
 
 {% block content_data %}
     {% set id = 'calendarevent-form' %}
+    {% set recurrencePattern = '' %}
+    {% if entity.recurrence %}
+        {% set recurrencePattern = UI.renderProperty(
+            'oro.calendar.calendarevent.recurrence.label'|trans,
+            get_recurrence_text_value(entity.recurrence)
+        ) %}
+    {% elseif entity.recurringEvent %}
+        {% set recurrencePattern = UI.renderProperty(
+            'oro.calendar.calendarevent.recurrence.exception.label'|trans,
+            get_recurrence_text_value(entity.recurringEvent.recurrence)
+        ) %}
+    {% endif %}
 
     {% set dataBlocks = [{
         'title': 'General Information'|trans,
@@ -56,12 +68,13 @@
                     form_row(form.start),
                     form_row(form.end),
                     form_row(form.allDay),
+                    recurrencePattern,
                     form_row(form.backgroundColor),
                     form.calendarUid is defined ? form_row(form.calendarUid) : null,
-                    form_row(form.childEvents),
-                    form_row(form.reminders),
+                    form_row(form.attendees),
+                    entity.recurrence is null ? form_row(form.reminders) : null,
                     form_row(form.notifyInvitedUsers),
-                    entity.invitationStatus and entity.parent is null and entity.childEvents is not empty ? invitations.notifyGuestsComponent() : null
+                    entity.relatedAttendee  and entity.relatedAttendee.status and entity.parent is null and entity.childAttendees is not empty and entity.recurrence is null ? invitations.notifyGuestsComponent() : null
                 ]
             }
         ]

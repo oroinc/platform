@@ -6,9 +6,9 @@
     "homepage": "https://github.com/laboro/LocaleBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.5.9",
         "ext-intl": "*",
-        "symfony/symfony": ">=2.1",
+        "symfony/symfony": "2.8.*",
         "oro/config": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/config-bundle": "dev-master",

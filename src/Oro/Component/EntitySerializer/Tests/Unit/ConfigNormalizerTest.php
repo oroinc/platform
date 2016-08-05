@@ -181,7 +181,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'id'      => null,
                         'contact' => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id' => null
@@ -194,7 +194,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'id'      => [],
                         'contact' => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id' => []
@@ -262,7 +262,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'id'      => null,
                         'contact' => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id' => null
@@ -275,7 +275,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'id'      => [],
                         'contact' => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id' => []
@@ -477,7 +477,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'contactName' => ['property_path' => 'contact.name'],
                         'contact'     => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id'   => null,
@@ -491,7 +491,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'contactName' => ['property_path' => 'contact.name'],
                         'contact'     => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id'   => [],
@@ -505,7 +505,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                 'config'         => [
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
-                        'contact'     => ['exclude' => true]
+                        'contact'     => ['exclusion_policy' => 'all']
                     ]
                 ],
                 'expectedConfig' => [
@@ -644,7 +644,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'accountName' => ['property_path' => 'contact.account.name'],
                         'contact'     => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id'      => null,
@@ -662,7 +662,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                         'accountName' => ['property_path' => 'contact.account.name'],
                         'contact'     => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'collapse'         => true,
                             'fields'           => [
                                 'id'      => [],
@@ -671,6 +671,37 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                                         'name' => []
                                     ]
                                 ]
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            'dependency_on_excluded_field'                                   => [
+                'config'         => [
+                    'fields' => [
+                        'contactName' => ['property_path' => 'contact.name'],
+                        'contact'     => [
+                            'exclude' => true
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'contactName' => ['property_path' => 'contact.name'],
+                        'contact'     => [
+                            'exclude'          => false,
+                            'fields'           => [
+                                'name' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'configObject'   => [
+                    'fields' => [
+                        'contactName' => ['property_path' => 'contact.name'],
+                        'contact'     => [
+                            'fields'           => [
+                                'name' => []
                             ]
                         ]
                     ]

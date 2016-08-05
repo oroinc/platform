@@ -125,7 +125,7 @@ does not allow to mix both approaches in the same array node, so we recommend to
 **Conditions** -- an array node which contains conditions that must be satisfied for **layout update** to be executed.
 As a simple example, let's imagine that some set of actions should be executed only for a page that is currently served to a mobile device.
 The syntax of conditions declaration is very similar to *actions*, except that it should contain a single condition.
-Special grouping conditions (such as `@or`, `@and`) could be utilized in order to combine multiple conditions.
+Special grouping conditions (such as `or`, `and`) could be utilized in order to combine multiple conditions.
 
 **Example**
 
@@ -133,15 +133,12 @@ Special grouping conditions (such as `@or`, `@and`) could be utilized in order t
 layout:
     actions:
         ....
-    conditions:
-        - @or:
-            - @eq: [ $context.user_agent.mobile, true ]
-            - @eq: [ $context.navbar_position, 'top' ]
+    conditions: 'context["user_agent"].getMobile() == true or context["navbar_position"] == "top"'
 ```
 
 **[Layout context](./layout_context.md)** could be accessed through the condition expressions by referencing to `$context` variable.
 
-Please, refer to the [ConfigExpression component](../../../../Component/ConfigExpression/README.md) documentation for further detailed explanation.
+Please, refer to the [Symfony expression syntax](http://symfony.com/doc/current/components/expression_language/syntax.html) documentation for further detailed explanation.
 
 PHP syntax
 ----------

@@ -148,7 +148,7 @@ services:
             - '@oro_security.ownership_tree_provider'
             - '@oro_security.owner.entity_owner_accessor'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
     #
     # Organizations
     #
@@ -159,7 +159,7 @@ services:
             - '@oro_security.security_facade.link'
             - '@oro_security.owner.ownership_metadata_provider.link'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
     #
     # Listeners
     #
