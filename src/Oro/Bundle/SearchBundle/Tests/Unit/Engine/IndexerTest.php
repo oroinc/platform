@@ -84,7 +84,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertAttributeEquals($this->entityManager, 'em', $query);
         $this->assertEquals($this->config, $query->getMappingConfig());
-        $this->assertEquals('select', $query->getQuery());
     }
 
     public function testQuery()

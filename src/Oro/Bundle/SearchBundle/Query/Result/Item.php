@@ -49,6 +49,11 @@ class Item
     protected $em;
 
     /**
+     * @var array
+     */
+    protected $selectedData;
+
+    /**
      * @param ObjectManager $em
      * @param string|null   $entityName
      * @param string|null   $recordId
@@ -62,14 +67,16 @@ class Item
         $recordId = null,
         $recordTitle = null,
         $recordUrl = null,
-        $entityConfig = array()
+        $entityConfig = [],
+        $selectedData = []
     ) {
         $this->em           = $em;
         $this->entityName   = $entityName;
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
-        $this->entityConfig = empty($entityConfig) ? array() : $entityConfig;
+        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
+        $this->selectedData = $selectedData;
     }
 
     /**
@@ -188,13 +195,32 @@ class Item
     /**
      * @return array
      */
+    public function getSelectedData()
+    {
+        return $this->selectedData;
+    }
+
+    /**
+     * @param array $selectedData
+     * @return $this
+     */
+    public function setSelectedData($selectedData)
+    {
+        $this->selectedData = $selectedData;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
     public function toArray()
     {
-        return array(
+        return [
             'entity_name'   => $this->entityName,
             'record_id'     => $this->recordId,
             'record_string' => $this->recordTitle,
             'record_url'    => $this->recordUrl,
-        );
+            'selectedData'  => $this->selectedData
+        ];
     }
 }

@@ -138,4 +138,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($testString, $result);
     }
+
+    public function testAddingSelect()
+    {
+        $query = new Query();
+        $column = 'name';
+        $query->addSelect($column);
+        $columns = ['status', 'date'];
+        $query->addSelect($columns);
+        $this->assertCount(3, $query->getSelect());
+        $this->assertCount(3, $query->getSelect());
+        $this->assertEquals(['name', 'status', 'date'], $query->getSelect());
+    }
 }

@@ -89,7 +89,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         );
 
         $query = new Query();
-        $query->createQuery(Query::SELECT)
+        $query
             ->from(array('OroTestBundle:test', 'OroTestBundle:product'))
             ->andWhere('name', Query::OPERATOR_CONTAINS, 'test string', Query::TYPE_TEXT);
 

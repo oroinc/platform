@@ -40,7 +40,7 @@ class Parser
     public function __construct($query = null)
     {
         if (null === $query) {
-            $this->query = new Query(Query::SELECT);
+            $this->query = new Query();
             $this->query->from(['*']);
         } else {
             $this->query = $query;

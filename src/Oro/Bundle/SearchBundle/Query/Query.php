@@ -14,8 +14,6 @@ use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
  */
 class Query
 {
-    const SELECT = 'select';
-
     const ORDER_ASC  = 'asc';
     const ORDER_DESC = 'desc';
 
@@ -48,8 +46,8 @@ class Query
 
     const DELIMITER = ' ';
 
-    /** @var  string */
-    protected $query;
+    /** @var array */
+    protected $select = [];
 
     /** @var array */
     protected $from;
@@ -64,14 +62,9 @@ class Query
     protected $criteria;
 
     /**
-     * @param null|string $queryType
      */
-    public function __construct($queryType = null)
+    public function __construct()
     {
-        if ($queryType) {
-            $this->createQuery($queryType);
-        }
-
         $this->maxResults = 0;
         $this->from       = false;
 
@@ -143,20 +136,6 @@ class Query
     public function setEntityManager(ObjectManager $em)
     {
         $this->em = $em;
-    }
-
-    /**
-     * Init query
-     *
-     * @param string $query
-     *
-     * @return Query
-     */
-    public function createQuery($query)
-    {
-        $this->query = $query;
-
-        return $this;
     }
 
     /**
@@ -274,14 +253,6 @@ class Query
         }
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getQuery()
-    {
-        return $this->query;
     }
 
     /**
@@ -408,7 +379,7 @@ class Query
      */
     public function getOrderBy()
     {
-        $orders = array_keys($this->criteria->getOrderings());
+        $orders    = array_keys($this->criteria->getOrderings());
         $fieldName = array_pop($orders);
 
         return Criteria::explodeFieldTypeName($fieldName)[1];
@@ -423,7 +394,7 @@ class Query
      */
     public function getOrderType()
     {
-        $orders = array_keys($this->criteria->getOrderings());
+        $orders    = array_keys($this->criteria->getOrderings());
         $fieldName = array_pop($orders);
 
         return Criteria::explodeFieldTypeName($fieldName)[0];
@@ -475,14 +446,12 @@ class Query
      */
     public function getStringQuery()
     {
-        $selectString = $this->getQuery();
-
         $fromString = '';
         if ($this->getFrom()) {
-            $fromString .=  ' from ' . implode(', ', $this->getFrom());
+            $fromString .= ' from ' . implode(', ', $this->getFrom());
         }
 
-        $visitor = new QueryStringExpressionVisitor();
+        $visitor     = new QueryStringExpressionVisitor();
         $whereString = ' where ' . $this->criteria->getWhereExpression()->visit($visitor);
 
         $orderByString = '';
@@ -506,7 +475,53 @@ class Query
             $offsetString .= ' offset ' . $this->getFirstResult();
         }
 
-        return $selectString . $fromString. $whereString . $orderByString . $limitString . $offsetString;
+        $selectString = trim('select ' . $this->getStringColumns());
+
+        return $selectString
+               . $fromString . $whereString . $orderByString . $limitString . $offsetString;
+    }
+
+    /**
+     * @param string $column
+     * @return $this
+     */
+    public function addSelect($column)
+    {
+        if (is_string($column)) {
+            $this->select[] = $column;
+            return $this;
+        }
+
+        if (!is_array($column)) {
+            return $this;
+        }
+
+        $this->select = array_merge(
+            $this->select,
+            $column
+        );
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSelect()
+    {
+        return $this->select;
+    }
+
+    /**
+     * @return string
+     */
+    private function getStringColumns()
+    {
+        $result = $this->select;
+
+        $result = implode(', ', $result);
+
+        return $result;
     }
 
     /**
