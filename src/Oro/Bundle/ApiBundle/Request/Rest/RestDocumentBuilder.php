@@ -154,34 +154,12 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
-            if ($association->isCollection()) {
-                $value = [];
-                if (array_key_exists($name, $data)) {
-                    $val = $data[$name];
-                    if (!empty($val)) {
-                        foreach ($val as $object) {
-                            $value[] = $this->processRelatedObject($object, $association);
-                        }
-                    }
-                }
-            } else {
-                $value = null;
-                if (array_key_exists($name, $data)) {
-                    $val = $data[$name];
-                    if (null !== $val) {
-                        $value = $this->processRelatedObject($val, $association);
-                    }
-                }
-            }
-            $result[$name] = $value;
+            $result[$name] = $this->getRelationshipValue($data, $name, $association);
         }
     }
 
     /**
-     * @param mixed               $object
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     protected function processRelatedObject($object, AssociationMetadata $associationMetadata)
     {
