@@ -1,13 +1,13 @@
 <?php
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Async;
 
-use Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor;
+use Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolationPerTest
  */
-class SyncIntegrationProcessorTest extends WebTestCase
+class ReversSyncIntegrationProcessorTest extends WebTestCase
 {
     protected function setUp()
     {
@@ -18,8 +18,8 @@ class SyncIntegrationProcessorTest extends WebTestCase
 
     public function testCouldBeGetFromContainerAsService()
     {
-        $processor = $this->getContainer()->get('oro_integration.async.sync_integration_processor');
+        $processor = $this->getContainer()->get('oro_integration.async.revers_sync_integration_processor');
 
-        $this->assertInstanceOf(SyncIntegrationProcessor::class, $processor);
+        $this->assertInstanceOf(ReversSyncIntegrationProcessor::class, $processor);
     }
 }

@@ -308,3 +308,12 @@ services:
             - '@oro_integration.processor_registry'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_integration.async.revers_sync_integration_processor:
+        class: 'Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_integration.reverse_sync.processor'
+            - '@oro_integration.manager.types_registry'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

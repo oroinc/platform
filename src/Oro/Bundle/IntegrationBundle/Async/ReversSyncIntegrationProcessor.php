@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\IntegrationBundle\Async;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -11,7 +13,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -23,9 +24,9 @@ class ReversSyncIntegrationProcessor implements
     use ContainerAwareTrait;
 
     /**
-     * @var RegistryInterface
+     * @var DoctrineHelper
      */
-    private $doctrine;
+    private $doctrineHelper;
     
     /**
      * @var ReverseSyncProcessor
@@ -38,16 +39,16 @@ class ReversSyncIntegrationProcessor implements
     private $typesRegistry;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param DoctrineHelper $doctrineHelper
      * @param ReverseSyncProcessor $reverseSyncProcessor
      * @param TypesRegistry $typesRegistry
      */
     public function __construct(
-        RegistryInterface $doctrine,
+        DoctrineHelper $doctrineHelper,
         ReverseSyncProcessor $reverseSyncProcessor,
         TypesRegistry $typesRegistry
     ) {
-        $this->doctrine = $doctrine;
+        $this->doctrineHelper = $doctrineHelper;
         $this->reverseSyncProcessor = $reverseSyncProcessor;
         $this->typesRegistry = $typesRegistry;
     }
@@ -57,7 +58,7 @@ class ReversSyncIntegrationProcessor implements
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SYNC_INTEGRATION];
+        return [Topics::REVERS_SYNC_INTEGRATION];
     }
 
     /**
@@ -66,20 +67,21 @@ class ReversSyncIntegrationProcessor implements
     public function process(MessageInterface $message, SessionInterface $session)
     {
         // TODO CRM-5838 unique job
+        // TODO CRM-5838 message could be redelivered on dbal transport if run for a long time.
 
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
             'integrationId' => null,
             'connector' => null,
             'connector_parameters' => [],
-            'transport_batch_size' => 100,
         ], $body);
 
         if (false == $body['integrationId']) {
             throw new \LogicException('The message invalid. It must have integrationId set');
         }
 
-        $em = $this->doctrine->getManager();
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrineHelper->getEntityManagerForClass(Integration::class);
         
         /** @var Integration $integration */
         $integration = $em->find(Integration::class, $body['integrationId']);
@@ -90,9 +92,15 @@ class ReversSyncIntegrationProcessor implements
             return self::REJECT;
         }
 
+        $em->getConnection()->getConfiguration()->setSQLLogger(null);
+
         $connector = $this->typesRegistry->getConnectorType($integration->getType(), $body['connector']);
         if (!$connector instanceof TwoWaySyncConnectorInterface) {
-            throw new LogicException(sprintf('Unable to schedule job for "%s" connector type', $body['connector']));
+            throw new LogicException(sprintf(
+                'Unable to perform revers sync for integration "%s" and connector type "%s"',
+                $integration->getId(),
+                $body['connector']
+            ));
         }
 
         $this->reverseSyncProcessor->process(

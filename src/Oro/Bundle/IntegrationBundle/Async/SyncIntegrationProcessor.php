@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\IntegrationBundle\Async;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
@@ -42,7 +43,6 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         TokenStorageInterface $tokenStorage,
         SyncProcessorRegistry $syncProcessorRegistry
     ) {
-
         $this->doctrine = $doctrine;
         $this->tokenStorage = $tokenStorage;
         $this->syncProcessorRegistry = $syncProcessorRegistry;
@@ -62,6 +62,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
     public function process(MessageInterface $message, SessionInterface $session)
     {
         // TODO CRM-5839 unique job
+        // TODO CRM-5838 message could be redelivered on dbal transport if run for a long time.
 
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
@@ -75,6 +76,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
             throw new \LogicException('The message invalid. It must have integrationId set');
         }
 
+        /** @var EntityManagerInterface $em */
         $em = $this->doctrine->getManager();
         
         /** @var Integration $integration */
