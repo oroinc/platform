@@ -331,9 +331,16 @@ class WorkflowManager
     /**
      * @param object|string $entity
      * @return Workflow[]
+     * @throws \InvalidArgumentException
      */
     public function getApplicableWorkflows($entity)
     {
+        if (!is_object($entity)) {
+            throw new \InvalidArgumentException(
+                'Instance of entity object is required to getApplicableWorkflows as an argument.'
+            );
+        }
+
         $existingRecordsInGroups = [];
 
         foreach ($this->getWorkflowItemsByEntity($entity) as $workflowItem) {
