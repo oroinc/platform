@@ -78,6 +78,18 @@ class OroLayoutExtension extends Extension
         $themeManagerDef = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
         $themeManagerDef->replaceArgument(1, $config['themes']);
 
+        $this->loadLayoutUpdates($container, $excludedPaths);
+
+        $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
+    }
+
+
+    /**
+     * @param ContainerBuilder $container
+     * @param $excludedPaths
+     */
+    protected function loadLayoutUpdates(ContainerBuilder $container, $excludedPaths)
+    {
         $foundThemeLayoutUpdates = [];
         $updateFileExtensions    = [];
         $updateLoaderDef         = $container->getDefinition(self::UPDATE_LOADER_SERVICE_ID);
@@ -110,8 +122,6 @@ class OroLayoutExtension extends Extension
         $foundThemeLayoutUpdates = $this->excludeDirectories($foundThemeLayoutUpdates);
 
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
-
-        $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
     }
 
     /**
