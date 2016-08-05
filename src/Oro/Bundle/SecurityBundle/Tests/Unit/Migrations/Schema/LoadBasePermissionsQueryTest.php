@@ -13,47 +13,46 @@ class LoadBasePermissionsQueryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|Connection */
     protected $connection;
 
-    /** @var LoadBasePermissionsQuery */
-    protected $query;
-
     protected function setUp()
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
         $this->connection->expects($this->any())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
-
-        $this->query = new LoadBasePermissionsQuery();
-        $this->query->setConnection($this->connection);
     }
 
     protected function tearDown()
     {
-        unset($this->query, $this->connection);
+        unset($this->connection);
     }
 
     public function testExecute()
     {
-        $this->assertConnectionCalled();
+        $this->assertConnectionCalled(['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
 
-        $this->query->execute(new ArrayLogger());
+        $query = new LoadBasePermissionsQuery();
+        $query->setConnection($this->connection);
+        $query->execute(new ArrayLogger());
     }
 
-    protected function assertConnectionCalled()
+    /**
+     * @param array $permissions
+     */
+    protected function assertConnectionCalled(array $permissions)
     {
+        $permissions = array_map(
+            function ($permission) {
+                return [$permission, $permission, true, ['default'], null];
+            },
+            $permissions
+        );
+
         $data = array_map(
             function (array $values) {
                 return array_combine(['name', 'label', 'is_apply_to_all', 'group_names', 'description'], $values);
             },
-            [
-                ['VIEW', 'VIEW', true, ['default'], null],
-                ['CREATE', 'CREATE', true, ['default'], null],
-                ['EDIT', 'EDIT', true, ['default'], null],
-                ['DELETE', 'DELETE', true, ['default'], null],
-                ['ASSIGN', 'ASSIGN', true, ['default'], null],
-                ['SHARE', 'SHARE', true, ['default'], null]
-            ]
+            $permissions
         );
 
-        $this->connection->expects($this->exactly(6))
+        $this->connection->expects($this->exactly(count($permissions)))
             ->method('executeUpdate')
             ->willReturnCallback(
                 function ($query, array $params = [], array $types = []) use (&$data) {

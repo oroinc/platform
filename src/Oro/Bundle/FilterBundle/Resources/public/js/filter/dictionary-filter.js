@@ -354,7 +354,7 @@ define(function(require) {
             var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
             var rightWidth = this.$('.filter-update').outerWidth();
             valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('margin-right', rightWidth);
+            valueFrame.css('padding-right', rightWidth);
         },
 
         /**
