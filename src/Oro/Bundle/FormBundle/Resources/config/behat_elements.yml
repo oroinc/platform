@@ -2,6 +2,10 @@ OroForm:
   selector: 'form'
   class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm
 
+Action Button Chooser:
+  selector: 'div.title-buttons-container a.dropdown-toggle'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
 FileField:
   class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
 

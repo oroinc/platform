@@ -35,7 +35,7 @@ There are few ways how context could be accessed. Most common ways are the follo
     }
    ```
    
- - Access context using [ConfigExpression component](../../../../Component/ConfigExpression/README.md) by providing 
+ - Access context using [Symfony expression component](http://symfony.com/doc/current/components/expression_language/introduction.html) by providing 
    expression as an option for some block.
    Example:
 
@@ -47,7 +47,7 @@ There are few ways how context could be accessed. Most common ways are the follo
             parent: parentId
             blockType: typeName
             options:
-                optionName: { @value: $context.valueKey }
+                optionName: '=context["valueKey"]
    ```
    
 

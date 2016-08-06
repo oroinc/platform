@@ -34,6 +34,7 @@ use Oro\Component\Layout\ImportLayoutManipulator;
 
 class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportInterface
 {
+    private \$parentLayoutUpdate;
     private \$import;
 
     public function testMethod()
@@ -42,8 +43,18 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
             throw new \RuntimeException('Missing import configuration for layout update');
         }
 
+        if (\$this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface
+            && !\$this->parentLayoutUpdate->isApplicable()) {
+            return;
+        }
+
         \$layoutManipulator  = new ImportLayoutManipulator(\$layoutManipulator, \$this->import);
             echo 123;
+    }
+
+    public function setParentUpdate(\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface \$parentLayoutUpdate)
+    {
+        \$this->parentLayoutUpdate = \$parentLayoutUpdate;
     }
 
     public function setImport(\Oro\Component\Layout\Model\LayoutUpdateImport \$import)

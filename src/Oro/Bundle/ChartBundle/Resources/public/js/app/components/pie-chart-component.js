@@ -4,6 +4,7 @@ define(function(require) {
     var PieChartComponent;
     var Flotr = require('flotr2');
     var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var _ = require('underscore');
 
     /**
      * @class orochart.app.components.PieChartComponent
@@ -69,6 +70,17 @@ define(function(require) {
             var data = this.data;
             var settings = this.options.settings;
             var chartData = [];
+            var showPercentInTooltip = true;
+
+            this.valueSuffix = settings.hasOwnProperty('valueSuffix') ? settings.valueSuffix : '';
+            this.valuePrefix = settings.hasOwnProperty('valuePrefix') ? settings.valuePrefix : '';
+
+            if (settings.hasOwnProperty('showPercentInTooltip')) {
+                // handle boolean, int, string
+                showPercentInTooltip = !!(parseInt(settings.showPercentInTooltip) || settings.showPercentInTooltip > 0);
+            }
+
+            var trackFormatter = _.bind(showPercentInTooltip ? this.percentFormatter : this.valueFormatter, this);
 
             for (var i in data) {
                 if (data.hasOwnProperty(i)) {
@@ -101,16 +113,16 @@ define(function(require) {
                         show: true,
                         explode: 0,
                         sizeRatio: 0.8,
-                        startAngle: Math.PI / 3.5
+                        startAngle: Math.PI / 3.5,
+                        labelFormatter: function(total, value) {
+                            return parseFloat(parseFloat(value * 100).toFixed(2)) + '%';
+                        }
                     },
                     mouse: {
                         track: true,
                         relative: true,
                         lineColor: settings.chartHighlightColor,
-                        trackFormatter: function(obj) {
-                            return obj.series.label +
-                                '&nbsp;&nbsp;&nbsp;' + parseFloat(obj.fraction * 100).toFixed(2) + ' %';
-                        }
+                        trackFormatter: trackFormatter
                     },
                     legend: {
                         position: 'ne',
@@ -121,6 +133,23 @@ define(function(require) {
                     }
                 }
             );
+        },
+
+        percentFormatter: function(obj) {
+            var value = parseFloat(parseFloat(obj[this.options.settings.fraction_input_data_field] * 100).toFixed(2));
+
+            return this.getTooltipText(obj.series.label, value, '', '%');
+        },
+
+        valueFormatter: function(obj) {
+            var rawValue = this.data[obj.nearest.seriesIndex][this.options.settings.fraction_input_data_field];
+            var value = parseFloat(parseFloat(rawValue).toPrecision(2));
+
+            return this.getTooltipText(obj.series.label, value, this.valuePrefix, this.valueSuffix);
+        },
+
+        getTooltipText: function(label, value, valuePrefix, valueSuffix) {
+            return label + ':&nbsp;&nbsp;&nbsp;' + valuePrefix + value + valueSuffix;
         }
     });
 

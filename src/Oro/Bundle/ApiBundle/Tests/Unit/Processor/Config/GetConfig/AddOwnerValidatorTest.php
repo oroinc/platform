@@ -3,9 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -58,6 +60,40 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessForCreateAction()
+    {
+        $config = [
+            'fields' => [
+                'owner' => null,
+            ]
+        ];
+        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->ownershipMetadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($ownershipMetadata);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->context->setTargetAction(ApiActions::CREATE);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            ['constraints' => [new Owner()]],
+            $configObject->getFormOptions()
+        );
+        $this->assertEquals(
+            ['constraints' => [new NotNull(), new NotBlank()]],
+            $configObject->getField('owner')->getFormOptions()
+        );
+    }
+
     public function testProcess()
     {
         $config = [
@@ -79,6 +115,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
         $this->context->setResult($configObject);
+        $this->context->setTargetAction(ApiActions::UPDATE);
         $this->processor->process($this->context);
 
         $this->assertEquals(

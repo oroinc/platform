@@ -8,8 +8,6 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
-use Liip\ImagineBundle\Model\Binary;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -331,38 +329,23 @@ class EmailController extends Controller
      */
     public function getResizedAttachmentImageAction(EmailAttachment $attachment, $width, $height)
     {
-        $fileSystemMap = $this->get('knp_gaufrette.filesystem_map');
-        $fileSystem = $fileSystemMap->get('attachments');
-        $path = substr($this->get('request_stack')->getCurrentRequest()->getPathInfo(), 1);
-        if (!$fileSystem->has($path)) {
-            $filterName = 'attachment_' . $width . '_' . $height;
-            $this->get('liip_imagine.filter.configuration')->set(
-                $filterName,
-                [
-                    'filters' => [
-                        'thumbnail' => [
-                            'size' => [$width, $height]
-                        ]
-                    ]
-                ]
+        $path = substr($this->getRequest()->getPathInfo(), 1);
+        $fileManager = $this->get('oro_attachment.file_manager');
+        $content = $fileManager->getContent($path, false);
+        if (null === $content) {
+            $thumbnail = $this->get('oro_attachment.thumbnail_factory')->createThumbnail(
+                ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                ),
+                $width,
+                $height
             );
-            $content = ContentDecoder::decode(
-                $attachment->getContent()->getContent(),
-                $attachment->getContent()->getContentTransferEncoding()
-            );
-            $binary = $this->createBinaryFromContent($content, $attachment->getContent());
-            $filteredBinary = $this
-                ->get('liip_imagine.filter.manager')
-                ->applyFilter($binary, $filterName)
-                ->getContent();
-            $fileSystem->write($path, $filteredBinary);
-        } else {
-            $filteredBinary = $fileSystem->read($path);
+            $content = (string)$thumbnail->getImage();
+            $fileManager->writeToStorage($content, $path);
         }
 
-        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getContentType()));
-
-        return $response;
+        return new Response($content, 200, ['Content-Type' => $attachment->getContentType()]);
     }
 
     /**
@@ -797,17 +780,5 @@ class EmailController extends Controller
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
-    }
-
-    /**
-     * @param string $content
-     * @param string s$mimeType
-     * @return Binary
-     */
-    protected function createBinaryFromContent($content, $mimeType)
-    {
-        $format = $this->get('liip_imagine.extension_guesser')->guess($mimeType);
-
-        return new Binary($content, $mimeType, $format);
     }
 }

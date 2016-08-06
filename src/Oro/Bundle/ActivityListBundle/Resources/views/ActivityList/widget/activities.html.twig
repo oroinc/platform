@@ -5,7 +5,8 @@
         current: 1,
         pagesize: oro_config_value('oro_activity_list.per_page'),
         total: 1,
-        count: 1
+        count: 1,
+        sortingField: oro_config_value('oro_activity_list.sorting_field')
     } %}
     {% block widget_content %}
 
@@ -14,10 +15,7 @@
         {% block widget_actions %}
         <div class="grid-toolbar">
             <div class="filter-box oro-clearfix-width">
-                <div class="filter-container">
-                    <div class="date-range-filter filter-item oro-drop"></div>
-                    <div class="activity-type-filter filter-item oro-drop"></div>
-                </div>
+                <div class="filter-container"></div>
             </div>
             <div class="pull-right">
                 <div class="actions-panel pull-right">
@@ -30,24 +28,28 @@
                 </div>
             </div>
             <div class="pagination">
-                <label class="dib">{{ 'oro.activitylist.pagination.page'|trans }}</label>
                 <ul class="icons-holder">
                     <li class="pagination-previous {% if pager.current == 1 %} disabled {% endif %}">
-                        <a href="#" data-section="top" data-action-name="goto_previous"><i class="icon-chevron-left hide-text"></i></a>
+                        <a href="#" data-section="top" data-action-name="goto_previous">
+                            <i class="icon-chevron-left hide-text"></i>
+                            {% if oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
+                                {{ 'oro.activitylist.pagination.newer'|trans }}
+                            {% else %}
+                                {{ 'oro.activitylist.pagination.older'|trans }}
+                            {% endif %}
+                        </a>
                     </li>
-                    <li>
-                        <input class="pagination-current" data-section="top" data-action-name="goto_page" type="number" value="1" />
-                    </li>
-                    <li class="pagination-next {% if pager.current == pager.total %} disabled {% endif %}">
-                        <a href="#" data-section="top" data-action-name="goto_next"><i class="icon-chevron-right hide-text"></i></a>
+                    <li class="pagination-next">
+                        <a href="#" data-section="top" data-action-name="goto_next">
+                            {% if oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
+                                {{ 'oro.activitylist.pagination.older'|trans }}
+                            {% else %}
+                                {{ 'oro.activitylist.pagination.newer'|trans }}
+                            {% endif %}
+                            <i class="icon-chevron-right hide-text"></i>
+                        </a>
                     </li>
                 </ul>
-                <label class="dib">
-                    {{ ('oro.activitylist.pagination.total'~(isMobileVersion() ? '_mobile' : ''))|trans({
-                    '{{ pages }}': '<span class="pagination-total-num">#</span>',
-                    '{{ records }}': '<span class="pagination-total-count">#</span>'
-                    })|raw }}
-                </label>
             </div>
         </div>
         {% endblock %}
