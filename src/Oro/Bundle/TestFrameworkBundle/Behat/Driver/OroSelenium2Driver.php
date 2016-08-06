@@ -140,25 +140,6 @@ JS;
         ));
 
         foreach ($results as $result) {
-            $script = <<<JS
-                function getMethods(obj)
-                {
-                    var res = [];
-                    for(var m in obj) {
-                        if(typeof obj[m] == "function") {
-                            res.push(m)
-                        }
-                    }
-                    return res.join();
-                }
-
-                return getMethods({{ELEMENT}});
-JS;
-            var_dump($this->executeJsOnXpath($result, $script));
-            var_dump($this->findElement($this->xpathManipulator->prepend(
-                '/../../li',
-                $xpath
-            ))->text());
             $this->executeJsOnXpath($result, '{{ELEMENT}}.click()');
         }
 
