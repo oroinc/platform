@@ -66,6 +66,7 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.save_name": "Save"
 "oro.datagrid.gridView.error.not_found": "View not found"
 "Unexpected format": Unexpected format
+"Export Confirmation": "Export Confirmation"
 oro:
     datagrid:
         loading_failed_message: "Data loading failed, try reloading the page. If the issue appears again please contact your administrator."
@@ -132,3 +133,7 @@ oro:
             currency:
                 ascending: Low to High
                 descending: High to Low
+        export:
+            max_limit_message: >
+                The maximum number of records that can be exported at once is {{ max_limit }}.<br/>
+                Are you sure you want to export {{ total }} records?
