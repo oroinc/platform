@@ -312,6 +312,7 @@ Corresponding block type classes was removed.
  [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
 - Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
 - Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
+- Layout theme additional configuration such as assets, images or requirejs from now placed in `layout/{theme_name}/config` folder [Config definition](./src/Oro/Bundle/LayoutBundle/Resources/doc/config_definition.md).
 - Changed current expression language in layouts to symfony expression language, for details please check out documentation at
  [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
 
