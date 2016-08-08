@@ -60,8 +60,8 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
         $this->userAgentProvider->expects($this->once())->method('getUserAgent')->will($this->returnValue($userAgent));
 
         $this->gridConfigurationHelper->expects($this->once())->method('getEntity')->will($this->returnValue('entity'));
-        $this->workflowRegistry->expects($this->once())->method('hasActiveWorkflowsByEntityClass')->with('entity')
-            ->will($this->returnValue(false));
+        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByEntityClass')->with('entity')
+            ->will($this->returnValue([]));
 
         $this->assertTrue($this->manager->boardViewEnabled($config));
     }

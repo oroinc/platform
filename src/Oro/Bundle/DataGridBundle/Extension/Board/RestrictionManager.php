@@ -43,7 +43,7 @@ class RestrictionManager
     {
         $entityName = $this->gridConfigurationHelper->getEntity($config);
         $enabled = $this->userAgentProvider->getUserAgent()->isDesktop() &&
-            (!$entityName || !$this->workflowRegistry->hasActiveWorkflowsByEntityClass($entityName));
+            (!$entityName || !count($this->workflowRegistry->getActiveWorkflowsByEntityClass($entityName)));
 
         return $enabled;
     }
