@@ -32,7 +32,7 @@
         {{ value|trans }}
     </strong>
     {% if form.parent.parent.vars.value.description %}
-            {{ UI.tooltip(form.parent.parent.vars.value.description|trans) }}
+        {{ UI.tooltip(form.parent.parent.vars.value.description|trans) }}
     {% endif %}
     {% set type = type|default('hidden') %}
     {{ block('form_widget_simple') }}

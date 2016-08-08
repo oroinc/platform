@@ -32,11 +32,28 @@ services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
         arguments:
+            - '@router'
+            - %oro_attachment.files%
+            - '@oro_entity_extend.association_manager'
+        calls:
+            - [setFileManager, ['@oro_attachment.file_manager']]
+
+    oro_attachment.file_manager:
+        class: Oro\Bundle\AttachmentBundle\Manager\FileManager
+        arguments:
           - '@knp_gaufrette.filesystem_map'
-          - '@router'
-          - '@oro_security.security_facade.link'
-          - %oro_attachment.files%
-          - '@oro_entity_extend.association_manager'
+
+    oro_attachment.image_factory:
+        class: Oro\Bundle\AttachmentBundle\Tools\ImageFactory
+        arguments:
+          - '@liip_imagine'
+          - '@liip_imagine.filter.manager'
+
+    oro_attachment.thumbnail_factory:
+        class: Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory
+        arguments:
+          - '@oro_attachment.image_factory'
+          - '@liip_imagine.filter.configuration'
 
     oro_attachment.association_helper:
         class: Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper
@@ -61,11 +78,14 @@ services:
             - %oro_attachment.file.entity.class%
             - '@doctrine.orm.entity_manager'
             - '@oro_security.security_facade'
+            - '@oro_attachment.file_manager'
             - '@oro_attachment.manager'
 
     oro_attachment.listener.file_listener:
         class: %oro_attachment.listener.file_listener.class%
-        arguments: ['@oro_attachment.manager']
+        arguments:
+            - '@oro_attachment.file_manager'
+            - '@oro_security.security_facade.link'
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
@@ -107,6 +127,7 @@ services:
         class: %oro_attachment.serializer.file_normalizer.class%
         calls:
             - [setAttachmentManager, ['@oro_attachment.manager']]
+            - [setFileManager, ['@oro_attachment.file_manager']]
             - [setValidator, ['@oro_attachment.validator.file_config_validator']]
         tags:
             - { name: oro_importexport.normalizer}
@@ -161,7 +182,7 @@ services:
     oro_attachment.formatter.image_encoded:
         class: %oro_attachment.formatter.image_encoded.class%
         arguments:
-          - '@oro_attachment.manager'
+          - '@oro_attachment.file_manager'
           - '@file_locator'
         tags:
           - { name: oro_formatter, formatter: image_encoded }
