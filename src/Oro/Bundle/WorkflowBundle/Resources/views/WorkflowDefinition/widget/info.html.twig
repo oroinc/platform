@@ -23,11 +23,11 @@
             ) }}
             {{ ui.renderHtmlProperty(
                 'oro.workflow.workflowdefinition.exclusive_active_groups.label'|trans,
-                ui.renderList(entity.activeGroups)
+                ui.renderList(entity.exclusiveActiveGroups)
             ) }}
             {{ ui.renderHtmlProperty(
                 'oro.workflow.workflowdefinition.exclusive_record_groups.label'|trans,
-                ui.renderList(entity.recordGroups)
+                ui.renderList(entity.exclusiveRecordGroups)
             ) }}
         </div>
     </div>
