@@ -116,6 +116,13 @@ services:
         tags:
             - { name: form.type, alias: oro_config_checkbox }
 
+    oro_config.type.config_image:
+        class: 'Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType'
+        calls:
+            - [setEventSubscriber,  ['@oro_config.form.config_file_subscriber']]
+        tags:
+            - { name: form.type, alias: oro_config_file }
+
     oro_config.form.handler.config:
         class: %oro_config.form.handler.config.class%
         arguments:
@@ -125,3 +132,8 @@ services:
         class: %oro_config.manager.api.class%
         arguments:
             - '@oro_config.provider.system_configuration.form_provider'
+
+    oro_config.form.config_file_subscriber:
+        class: 'Oro\Bundle\ConfigBundle\Form\EventSubscriber\ConfigFileSubscriber'
+        arguments:
+            - '@oro_attachment.file_manager'
