@@ -1,3 +1,4 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% form_theme form with ['OroWorkflowBundle:Form:fields.html.twig'] %}
 
 <div class="widget-content">
@@ -46,7 +47,7 @@
                   name="{{ form.vars.name }}"
                   action="{{ app.request.uri }}"
                   class="form-dialog"
-            >
+            {% if transition.frontendOptions.pageComponent is defined %}{{ UI.renderPageComponentAttributes(transition.frontendOptions.pageComponent) }}{% endif %}>
                 {{ form_row(form) }}
             </form>
             {{ oro_form_js_validation(form) }}

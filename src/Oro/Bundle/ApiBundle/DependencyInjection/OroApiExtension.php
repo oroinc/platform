@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -169,8 +170,16 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             self::ACTION_PROCESSOR_BAG_SERVICE_ID
         );
         if (null !== $actionProcessorBagServiceDef) {
+            $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
             $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
             foreach ($taggedServices as $id => $attributes) {
+                // inject the logger for "api" channel into an action processor
+                // we have to do it in this way rather than in service.yml to avoid
+                // "The service definition "logger" does not exist." exception
+                $container->getDefinition($id)
+                    ->addTag('monolog.logger', ['channel' => 'api'])
+                    ->addMethodCall('setLogger', [$logger]);
+                // register an action processor in the bag
                 $actionProcessorBagServiceDef->addMethodCall(
                     'addProcessor',
                     [new Reference($id)]

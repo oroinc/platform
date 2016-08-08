@@ -1,0 +1,3 @@
+Entity Edit Button:
+  selector: 'a.edit-button'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

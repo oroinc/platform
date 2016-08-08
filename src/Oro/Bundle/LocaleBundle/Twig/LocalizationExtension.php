@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 
 class LocalizationExtension extends \Twig_Extension
 {
@@ -20,15 +21,23 @@ class LocalizationExtension extends \Twig_Extension
     protected $formattingCodeFormatter;
 
     /**
+     * @var LocalizationHelper
+     */
+    protected $localizationHelper;
+
+    /**
      * @param LanguageCodeFormatter $languageCodeFormatter
      * @param FormattingCodeFormatter $formattingCodeFormatter
+     * @param LocalizationHelper $localizationHelper
      */
     public function __construct(
         LanguageCodeFormatter $languageCodeFormatter,
-        FormattingCodeFormatter $formattingCodeFormatter
+        FormattingCodeFormatter $formattingCodeFormatter,
+        LocalizationHelper $localizationHelper
     ) {
         $this->languageCodeFormatter = $languageCodeFormatter;
         $this->formattingCodeFormatter = $formattingCodeFormatter;
+        $this->localizationHelper = $localizationHelper;
     }
 
     /**
@@ -45,6 +54,11 @@ class LocalizationExtension extends \Twig_Extension
             new \Twig_SimpleFilter(
                 'oro_formatting_code_title',
                 [$this, 'getFormattingTitleByCode'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFilter(
+                'localized_value',
+                [$this->localizationHelper, 'getLocalizedValue'],
                 ['is_safe' => ['html']]
             ),
         ];

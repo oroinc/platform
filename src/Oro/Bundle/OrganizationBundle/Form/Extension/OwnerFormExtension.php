@@ -31,6 +31,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 /**
  * Class OwnerFormExtension
@@ -38,6 +39,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnerFormExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -102,16 +105,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         $this->aclVoter                  = $aclVoter;
         $this->treeProvider              = $treeProvider;
         $this->entityOwnerAccessor       = $entityOwnerAccessor;
-    }
-
-    /**
-     * Returns the name of the type being extended.
-     *
-     * @return string The name of the type being extended
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 
     /**

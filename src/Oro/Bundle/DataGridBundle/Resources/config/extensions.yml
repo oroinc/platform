@@ -14,6 +14,8 @@ parameters:
     oro_datagrid.extension.columns.class:          Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension
     oro_datagrid.extension.mode.class:             Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension
     oro_datagrid.extension.postgresql_grid_modifier.class: Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier
+    oro_datagrid.extension.board.class:            Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension
+    oro_datagrid.extension.appearance.class:       Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension
 
 services:
     oro_datagrid.extension.formatter:
@@ -48,6 +50,7 @@ services:
             - '@oro_datagrid.datagrid.inline_edit_column_options_guesser'
             - '@oro_security.security_facade'
             - '@oro_entity.entity_class_name_helper'
+            - '@security.authorization_checker'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -138,5 +141,37 @@ services:
         arguments:
             - %database_driver%
             - '@oro_entity.orm.entity_class_resolver'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.field_acl:
+        class: Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension
+        arguments:
+            - "@oro_security.owner.ownership_metadata_provider"
+            - "@oro_entity.orm.entity_class_resolver"
+            - '@security.authorization_checker'
+            - '@oro_entity_config.provider.security'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.board:
+        class: %oro_datagrid.extension.board.class%
+        arguments:
+            - '@oro_security.security_facade'
+            - '@translator'
+            - '@oro_datagrid.datagrid.board.restriction_manager'
+            - '@oro_datagrid.datagrid.board.configuration'
+            - '@oro_entity.entity_class_name_helper'
+            - '@oro_datagrid.grid_configuration.helper'
+        calls:
+            - [setRequestStack, ["@request_stack"]]
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.appearance:
+        class: %oro_datagrid.extension.appearance.class%
+        arguments:
+            - '@oro_datagrid.datagrid.appearance.configuration'
+            - '@translator'
         tags:
             - { name: oro_datagrid.extension }

@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\WorkflowBundle\Model\WorkflowApplicabilityFilterInterface;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,14 +18,17 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowApplicabilityFilterInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -264,7 +266,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $stepManager->expects($this->once())->method('hasStartStep')->willReturn(true);
         $workflow->expects($this->once())->method('getStepManager')->willReturn($stepManager);
         $workflow->expects($this->once())->method('isActive')->willReturn(true);
-        $workflow->expects($this->once())->method('start')->with($entity, [], null)->willReturn($newItem);
+        $workflow->expects($this->once())
+            ->method('start')
+            ->with($entity, [], $workflow->getTransitionManager()->getDefaultStartTransition())
+            ->willReturn($newItem);
+        $workflow->expects($this->once())->method('isStartTransitionAvailable')->willReturn(true);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
@@ -417,8 +423,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Workflow can not be started
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException
+     * @expectedExceptionMessage Workflow "test_workflow" can not be started because it belongs to
      */
     public function testStartWorkflowRecordGroupException()
     {
@@ -436,6 +442,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
+        $workflow->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_workflow');
 
         $this->workflowRegistry->expects($this->once())->method('getWorkflow')
             ->with('test_workflow')->willReturn($workflow);
@@ -454,28 +463,48 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMassStartWorkflow(array $source, array $expected)
     {
-        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class, 1 + count($expected));
+        $expectedCalls = count(
+            array_filter(
+                $expected,
+                function (array $data) {
+                    return $data['startTransitionAllowed'];
+                }
+            )
+        );
+
+        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class, $expectedCalls);
 
         if ($expected) {
+            $emIterator = 0;
+
             foreach ($expected as $iteration => $row) {
-                $workflowName = $row['workflow'];
-                $workflow = $this->createWorkflow($workflowName);
                 $workflowDefinition = new WorkflowDefinition();
 
-                $workflow->expects($this->once())
+                $workflowName = $row['workflow'];
+                $workflow = $this->createWorkflow($workflowName);
+                $workflow->expects($this->any())
+                    ->method('isStartTransitionAvailable')
+                    ->willReturn($row['startTransitionAllowed']);
+                $workflow->expects($this->any())
                     ->method('getDefinition')
                     ->willReturn($workflowDefinition);
+
                 $workflowItem = $this->createWorkflowItem($workflowName);
 
-                $workflow->expects($this->once())->method('start')
+                $workflow->expects($this->exactly((int)$row['startTransitionAllowed']))->method('start')
                     ->with($row['entity'], $row['data'], $row['transition'])
                     ->will($this->returnValue($workflowItem));
 
-                $this->workflowRegistry->expects($this->at($iteration))->method('getWorkflow')->with($workflowName)
+                $this->workflowRegistry->expects($this->at($iteration))
+                    ->method('getWorkflow')
+                    ->with($workflowName)
                     ->will($this->returnValue($workflow));
 
-                $entityManager->expects($this->at($iteration * 2))->method('persist');
-                $entityManager->expects($this->at($iteration * 2 + 1))->method('flush');
+                if ($row['startTransitionAllowed']) {
+                    $entityManager->expects($this->at(++$emIterator))->method('persist')->with($workflowItem);
+                    $entityManager->expects($this->at(++$emIterator))->method('flush');
+                    $emIterator += 2; //transaction methods calls
+                }
             }
         } else {
             $this->workflowRegistry->expects($this->never())->method('getWorkflow');
@@ -505,8 +534,20 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                     new WorkflowStartArguments('second', $secondEntity),
                 ],
                 'expected' => [
-                    ['workflow' => 'first', 'entity' => $firstEntity, 'transition' => null, 'data' => []],
-                    ['workflow' => 'second', 'entity' => $secondEntity, 'transition' => null, 'data' => []],
+                    [
+                        'workflow' => 'first',
+                        'entity' => $firstEntity,
+                        'transition' => $this->getStartTransition(),
+                        'data' => [],
+                        'startTransitionAllowed' => true
+                    ],
+                    [
+                        'workflow' => 'second',
+                        'entity' => $secondEntity,
+                        'transition' => $this->getStartTransition(),
+                        'data' => [],
+                        'startTransitionAllowed' => false
+                    ],
                 ],
             ],
             'extra cases' => [
@@ -516,12 +557,19 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                     ['some', 'strange', 'data'],
                 ],
                 'expected' => [
-                    ['workflow' => 'first', 'entity' => $firstEntity, 'transition' => 'start', 'data' => []],
+                    [
+                        'workflow' => 'first',
+                        'entity' => $firstEntity,
+                        'transition' => 'start',
+                        'data' => [],
+                        'startTransitionAllowed' => true
+                    ],
                     [
                         'workflow' => 'second',
                         'entity' => $secondEntity,
                         'transition' => 'start',
                         'data' => ['field' => 'value'],
+                        'startTransitionAllowed' => true
                     ],
                 ],
             ]
@@ -970,11 +1018,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityAttributes));
 
         $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
-            ->setMethods(['getStartTransitions'])
+            ->setMethods(['getStartTransitions', 'getDefaultStartTransition'])
             ->getMock();
         $transitionManager->expects($this->any())
             ->method('getStartTransitions')
             ->will($this->returnValue(new ArrayCollection($startTransitions)));
+        $transitionManager->expects($this->any())
+            ->method('getDefaultStartTransition')
+            ->willReturn($this->getStartTransition());
 
         $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
 
@@ -999,6 +1050,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                     'start',
                     'isActive',
                     'getDefinition',
+                    'getName',
                     'getStepManager',
                     'transit'
                 ]
@@ -1047,6 +1099,18 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return Transition
+     */
+    private function getStartTransition()
+    {
+        $startTransition = new Transition();
+        $startTransition->setName('__start__');
+        $startTransition->setStart(true);
+
+        return $startTransition;
+    }
+
+    /**
      * @param object $entity
      * @param array|WorkflowItem[] $workflowItems
      */
@@ -1064,8 +1128,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($entity)
             ->will($this->returnValue($entity->getId()));
 
-        $workflowItemsRepository =
-            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
+        $workflowItemsRepository = $this->getMockBuilder(WorkflowItemRepository::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['findAllByEntityMetadata'])
                 ->getMock();

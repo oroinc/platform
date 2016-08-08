@@ -27,22 +27,21 @@ class ActionPermissionProvider
     public function getInvitationPermissions(ResultRecordInterface $record)
     {
         /** @var User $user */
-        $user = $this->securityFacade->getLoggedUser();
+        $user             = $this->securityFacade->getLoggedUser();
         $invitationStatus = $record->getValue('invitationStatus');
-        $parentId = $record->getValue('parentId');
-        $ownerId = $record->getValue('ownerId');
-        $childrenCount = $record->getValue('childrenCount');
+        $parentId         = $record->getValue('parentId');
+        $ownerId          = $record->getValue('ownerId');
+        $childrenCount    = $record->getValue('childrenCount');
+        $isEditable       = (!$invitationStatus || ($invitationStatus && !$parentId));
 
-        $isEditable = !$invitationStatus || ($invitationStatus && !$parentId);
-
-        return array(
+        return [
             'accept'      => $this->isAvailableResponseButton(
                 $user,
                 $parentId,
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::ACCEPTED
+                CalendarEvent::STATUS_ACCEPTED
             ),
             'decline'     => $this->isAvailableResponseButton(
                 $user,
@@ -50,7 +49,7 @@ class ActionPermissionProvider
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::DECLINED
+                CalendarEvent::STATUS_DECLINED
             ),
             'tentatively' => $this->isAvailableResponseButton(
                 $user,
@@ -58,11 +57,11 @@ class ActionPermissionProvider
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::TENTATIVELY_ACCEPTED
+                CalendarEvent::STATUS_TENTATIVE
             ),
             'view'        => true,
             'update'      => $isEditable
-        );
+        ];
     }
 
     /**

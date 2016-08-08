@@ -26,6 +26,30 @@ class ApiDocExtractor extends BaseExtractor implements
      */
     public function all($view = ApiDoc::DEFAULT_VIEW)
     {
-        return parent::all($this->resolveView($view));
+        /**
+         * disabling the garbage collector gives a significant performance gain (about 2 times)
+         * because a lot of config and metadata objects with short lifetime are used
+         * this happens because we work with clones of these objects
+         * @see Oro\Bundle\ApiBundle\Provider\ConfigProvider::getConfig
+         * @see Oro\Bundle\ApiBundle\Provider\RelationConfigProvider::getRelationConfig
+         * @see Oro\Bundle\ApiBundle\Provider\MetadataProvider::getMetadata
+         */
+        gc_disable();
+        $result = parent::all($this->resolveView($view));
+        gc_enable();
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function extractAnnotations(array $routes, $view = ApiDoc::DEFAULT_VIEW)
+    {
+        return $this->doExtractAnnotations(
+            $routes,
+            $view,
+            $this->container->getParameter('nelmio_api_doc.exclude_sections')
+        );
     }
 }

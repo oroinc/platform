@@ -178,9 +178,9 @@ define([
             var item = container.find(this.criteriaValueSelectors.value);
             var type = container.find(this.criteriaValueSelectors.type).val();
             var button = container.find(this.updateSelector);
+            var query = item.val();
 
             if (this.isEmptyType(type)) {
-                var query = item.val();
                 if (!this.isEmptyType(query)) {
                     this.query = query;
                     this.revertQuery = true;
@@ -190,6 +190,11 @@ define([
                 button.addClass(this.updateSelectorEmptyClass);
 
                 return;
+            }
+
+            // in case page was loaded with empty filter
+            if (this.isEmptyType(query)) {
+                item.val('');
             }
 
             if (this.revertQuery) {

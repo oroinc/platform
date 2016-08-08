@@ -18,6 +18,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowManager
 {
@@ -33,9 +34,7 @@ class WorkflowManager
     /** @var WorkflowRegistry */
     private $workflowRegistry;
 
-    /**
-     * @var WorkflowApplicabilityFilterInterface[]
-     */
+    /** @var WorkflowApplicabilityFilterInterface[] */
     private $applicabilityFilters = [];
 
     /**
@@ -169,13 +168,21 @@ class WorkflowManager
     {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
+        if (!$transition) {
+            $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
+
+            if (!$workflow->isStartTransitionAvailable($transition, $entity)) {
+                return null;
+            }
+        }
+
+        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
                         'Workflow "%s" can not be started because it belongs to exclusive_record_group ' .
                         'with already started other workflow for this entity',
-                        [$workflow->getName()]
+                        $workflow->getName()
                     )
                 );
             }
@@ -196,30 +203,25 @@ class WorkflowManager
     }
 
     /**
-     * Start several workflows in one transaction
+     * Start several workflows
      *
      * @param array|WorkflowStartArguments[] $startArgumentsList instances of WorkflowStartArguments
      */
     public function massStartWorkflow(array $startArgumentsList)
     {
-        $this->inTransaction(
-            function () use (&$startArgumentsList) {
-                foreach ($startArgumentsList as $startArguments) {
-                    if (!$startArguments instanceof WorkflowStartArguments) {
-                        continue;
-                    }
+        foreach ($startArgumentsList as $startArguments) {
+            if (!$startArguments instanceof WorkflowStartArguments) {
+                continue;
+            }
 
-                    $this->startWorkflow(
-                        $startArguments->getWorkflowName(),
-                        $startArguments->getEntity(),
-                        $startArguments->getTransition(),
-                        $startArguments->getData(),
-                        false
-                    );
-                }
-            },
-            WorkflowItem::class
-        );
+            $this->startWorkflow(
+                $startArguments->getWorkflowName(),
+                $startArguments->getEntity(),
+                $startArguments->getTransition(),
+                $startArguments->getData(),
+                false
+            );
+        }
     }
 
     /**
@@ -488,7 +490,7 @@ class WorkflowManager
     {
         $workflowItems = $this->getWorkflowItemsByEntity($entity);
         foreach ($workflowItems as $workflowItem) {
-            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getExclusiveRecordGroups())) {
+            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getRecordGroups())) {
                 return false;
             }
         }

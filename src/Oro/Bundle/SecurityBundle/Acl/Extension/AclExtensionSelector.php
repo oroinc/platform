@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 
@@ -50,6 +52,24 @@ class AclExtensionSelector
     }
 
     /**
+     * Gets ACL extension by its key
+     *
+     * @param string $extensionKey
+     *
+     * @return AclExtensionInterface|null
+     */
+    public function selectByExtensionKey($extensionKey)
+    {
+        foreach ($this->extensions as $extension) {
+            if ($extension->getExtensionKey() === $extensionKey) {
+                return $extension;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gets ACL extension responsible for work with the given domain object
      *
      * @param mixed $val A domain object, ObjectIdentity, object identity descriptor (id:type) or ACL annotation
@@ -62,14 +82,12 @@ class AclExtensionSelector
             return new NullAclExtension();
         }
 
+        $fieldName = null;
         $type = $id = null;
         if (is_string($val)) {
-            $delim = strpos($val, ':');
-            if ($delim) {
-                $type = ltrim(substr($val, $delim + 1), ' ');
-                $id = strtolower(substr($val, 0, $delim));
-            }
+            list($id, $type, $fieldName) = ObjectIdentityHelper::parseIdentityString($val);
         } elseif (is_object($val)) {
+            list($val, $fieldName) = $this->getObjectAndFieldForObject($val);
             if ($val instanceof ObjectIdentityInterface) {
                 $type = $val->getType();
                 $id = $val->getIdentifier();
@@ -85,14 +103,15 @@ class AclExtensionSelector
             }
         }
 
-        if ($type !== null && $id !== null) {
-            $cacheKey = $id . '!' . $type;
+        if ($type !== null) {
+            $cacheKey = $this->getStringValue($id) . '!' . $type . '::' . $this->getStringValue($fieldName);
             if (isset($this->localCache[$cacheKey])) {
                 return $this->localCache[$cacheKey];
             }
 
             foreach ($this->extensions as $extension) {
                 if ($extension->supports($type, $id)) {
+                    $extension = $fieldName ? $extension->getFieldExtension() : $extension;
                     $this->localCache[$cacheKey] = $extension;
 
                     return $extension;
@@ -130,5 +149,31 @@ class AclExtensionSelector
         return new InvalidDomainObjectException(
             sprintf('An ACL extension was not found for: %s. Type: %s. Id: %s', $objInfo, $type, (string)$id)
         );
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    protected function getStringValue($value)
+    {
+        return $value ? (string)$value : 'null';
+    }
+
+    /**
+     * @param object $val
+     *
+     * @return array [val, fieldName]
+     */
+    protected function getObjectAndFieldForObject($val)
+    {
+        $fieldName = null;
+        if ($val instanceof FieldVote) {
+            $fieldName = $val->getField();
+            $val = $val->getDomainObject();
+        }
+
+        return [$val, $fieldName];
     }
 }

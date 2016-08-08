@@ -109,4 +109,50 @@ class ResultRecordTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider setValueProvider
+     */
+    public function testSetValue($data, $itemName, $itemValue)
+    {
+        $resultRecord = new ResultRecord($data);
+
+        $resultRecord->setValue($itemName, $itemValue);
+
+        $this->assertEquals($itemValue, $resultRecord->getValue($itemName));
+    }
+    
+    public function setValueProvider()
+    {
+        $obj        = new \stdClass();
+        $obj->item1 = 'val1';
+
+        return [
+            [
+                'data'          => ['item1' => 'val1'],
+                'itemName'      => 'item1',
+                'itemValue' => '123'
+            ],
+            [
+                'data'          => $obj,
+                'itemName'      => 'item1',
+                'itemValue' => 'test'
+            ],
+            [
+                'data'          => $obj,
+                'itemName'      => 'item_1',
+                'itemValue' => '789'
+            ],
+            [
+                'data'          => ['item1' => []],
+                'itemName'      => '[item1][subItem1]',
+                'itemValue' => 123
+            ],
+            [
+                'data'          => ['item1' => ['subItem1' => 'val1']],
+                'itemName'      => '[item1][subItem1]',
+                'itemValue' => 'test'
+            ],
+        ];
+    }
 }

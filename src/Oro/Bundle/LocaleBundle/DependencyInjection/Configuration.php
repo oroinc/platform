@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 /**
@@ -13,20 +14,26 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
  */
 class Configuration implements ConfigurationInterface
 {
+    const ROOT_NAME   = 'oro_locale';
+
     const DEFAULT_LOCALE   = 'en';
     const DEFAULT_LANGUAGE = 'en';
     const DEFAULT_COUNTRY  = 'US';
     const DEFAULT_CURRENCY = 'USD';
 
+    const ENABLED_LOCALIZATIONS = 'enabled_localizations';
+    const DEFAULT_LOCALIZATION = 'default_localization';
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $treeBuilder
-            ->root('oro_locale')
+            ->root(self::ROOT_NAME)
             ->children()
                 ->arrayNode('name_format')
                     ->prototype('scalar')
@@ -102,21 +109,32 @@ class Configuration implements ConfigurationInterface
         // their values will be calculated by Extension based on chosen locale
         SettingsBuilder::append(
             $rootNode,
-            array(
-                'locale'                            => ['value' => '%locale%'],
-                'language'                          => ['value' => null],
-                'country'                           => ['value' => null],
-                'currency'                          => ['value' => null],
-                'timezone'                          => ['value' => date_default_timezone_get()],
+            [
+                'locale' => ['value' => '%locale%'],
+                'language' => ['value' => null],
+                'country' => ['value' => null],
+                'currency' => ['value' => null],
+                'timezone' => ['value' => date_default_timezone_get()],
                 'format_address_by_address_country' => ['value' => true, 'type' => 'boolean'],
-                'qwerty'                            => ['value' => [], 'type' => 'array'],
-                'languages'                         => ['value' => ['en'], 'type' => 'array'],
-                'quarter_start'                     => ['value' => ['month' => '1', 'day' => '1']],
-                'temperature_unit'                  => ['value' => 'fahrenheit'],
-                'wind_speed_unit'                   => ['value' => 'miles_per_hour']
-            )
+                'qwerty' => ['value' => [], 'type' => 'array'],
+                'languages' => ['value' => ['en'], 'type' => 'array'],
+                'quarter_start' => ['value' => ['month' => '1', 'day' => '1']],
+                'temperature_unit' => ['value' => 'fahrenheit'],
+                'wind_speed_unit' => ['value' => 'miles_per_hour'],
+                self::ENABLED_LOCALIZATIONS => ['value' => [], 'type' => 'array'],
+                self::DEFAULT_LOCALIZATION => ['value' => null]
+            ]
         );
 
         return $treeBuilder;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function getConfigKeyByName($name)
+    {
+        return sprintf('oro_locale%s%s', ConfigManager::SECTION_MODEL_SEPARATOR, $name);
     }
 }

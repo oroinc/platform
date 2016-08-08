@@ -142,7 +142,7 @@ There are few ways how data could be accessed. Most common ways are the followin
     }
    ```
    
- - Access data using [ConfigExpression component](../../../../Component/ConfigExpression/README.md) by providing 
+ - Access data using [Symfony expression component](http://symfony.com/doc/current/components/expression_language/introduction.html) by providing 
    expression as an option for some block.
    Example:
 
@@ -154,7 +154,7 @@ There are few ways how data could be accessed. Most common ways are the followin
             parent: product_details
             blockType: text
             options:
-                text: { @value: $data.product.code }
+                text: '=data["product"].getCode()'
    ```
 
 The way how you access the data does not depend on where the data are located, in the layout context or in the standalone data provider. But it is important to remember that standalone data providers have higher priority than data from the layout context. It means that if there are data with the same alias in both the layout context and a standalone data provider registry, the standalone data provider will be used.
