@@ -1,73 +1,58 @@
-.checkbox {
-    margin: 0;
-}
-
+@import '_config.scss';
 
 .checkbox {
-  position: relative;
+    position: relative;
 
-  display: inline-block;
-
-  margin-bottom: auto; // Reset bootstrap style
-
-  &__input {
-    position: absolute;
-
-    z-index: -1;
-
-    margin: 0;
-
-    opacity: 0;
-
-    &:focus {
-      ~ .checkbox__icon {
-        &:before {
-          outline: 2px solid rgba(99,153,239,0.47);
-          outline-offset: -2px;
-        }
-      }
-    }
-
-    &:checked {
-      ~ .checkbox__icon {
-
-        &:before {
-            content: '\e834';
-
-            color: #348fc6;
-        }
-      }
-    }
-  }
-
-  &__icon {
     display: inline-block;
-    vertical-align: middle;
+    margin: 0;
 
-    margin-right: 10px;
+    &__input {
+        position: absolute;
+        z-index: -1;
 
-    font-weight: normal;
-    font-style: normal;
-    line-height: 1;
-    text-transform: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    font-feature-settings: 'liga';
+        margin: 0;
 
-    &:before {
-      content: '\e835';
+        opacity: 0;
 
-      display: inline-block;
+        &:focus {
+            ~ .checkbox__icon {
+                &::before {
+                    outline: 2px solid rgba($checkbox-color, .7);
+                    outline-offset: -2px;
+                }
+            }
+        }
 
-      font-family: 'custom-font-icon';
-      font-size: 17px;
-      line-height: 1;
-      color: #d1d1d1;
+        &:checked {
+            ~ .checkbox__icon {
+                &::before {
+                    // icon--checkbox
+                    content: $checkbox-icon-checkbox;
+
+                    color: $checkbox-color-checked;
+                }
+            }
+        }
     }
-  }
 
-  &__text {
-    vertical-align: middle;
-  }
+    &__icon {
+        cursor: pointer;
+
+        &::before {
+            display: inline-block;
+
+            font-family: 'Icon';
+            // icon--box
+            content: $checkbox-icon-box;
+
+            color: $checkbox-color;
+        }
+    }
+
+    &__text {
+        vertical-align: middle;
+
+        // TODO: align checkbox and text in Firefox
+        // vertical-align: text-top;
+    }
 }

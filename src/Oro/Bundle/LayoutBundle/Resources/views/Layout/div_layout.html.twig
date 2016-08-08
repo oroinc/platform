@@ -76,11 +76,12 @@
                 placeholder: attr.placeholder|block_text(translation_domain)
             }) %}
         {% endif %}
-        <span class="checkbox">
+
+        <label class="checkbox">
             <input{{ block('block_attributes') }}/>
-            <span class="checkbox__text">asdasd</span>
-            <i class="checkbox__icon"></i>
-        </span>
+            <span class="checkbox__icon icon"></span>
+            <span class="checkbox__text">{{ label|block_text(translation_domain) }} </span>
+        </label>
     {% else %}
         {% set attr = layout_attr_defaults(attr, {
             '~class': ' input'
