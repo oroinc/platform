@@ -10,6 +10,15 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 abstract class BaseMultiChoiceFilter extends AbstractFilter
 {
     /**
+     * {@inheritdoc}
+     */
+    protected $joinOperators = [
+        FilterUtility::TYPE_NOT_EMPTY => FilterUtility::TYPE_EMPTY,
+        DictionaryFilterType::NOT_EQUAL => DictionaryFilterType::EQUAL,
+        DictionaryFilterType::TYPE_NOT_IN => DictionaryFilterType::TYPE_IN,
+    ];
+
+    /**
      * Constructor
      *
      * @param FormFactoryInterface $factory
