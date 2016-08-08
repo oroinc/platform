@@ -3,14 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
-/**
- * Provide filtering logic for Workflows that has exclusive groups conflicts in currently running entity record context
- * @package Oro\Bundle\WorkflowBundle\Model
- */
 class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterInterface
 {
     /**
@@ -23,6 +20,9 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
      */
     private $itemsRepository;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -69,7 +69,7 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|WorkflowItemRepository
+     * @return WorkflowItemRepository
      */
     private function getItemsRepository()
     {

@@ -50,8 +50,8 @@ class RestrictionManager
      */
     public function __construct(WorkflowRegistry $workflowRegistry, DoctrineHelper $doctrineHelper)
     {
-        $this->doctrineHelper = $doctrineHelper;
         $this->workflowRegistry = $workflowRegistry;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**

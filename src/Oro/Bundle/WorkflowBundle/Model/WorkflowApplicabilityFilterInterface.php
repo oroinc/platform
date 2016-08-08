@@ -7,8 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 interface WorkflowApplicabilityFilterInterface
 {
     /**
-     * @param ArrayCollection $workflows
+     * @param ArrayCollection|Workflow[] $workflows
      * @param WorkflowRecordContext $context
+     *
      * @return ArrayCollection
      */
     public function filter(ArrayCollection $workflows, WorkflowRecordContext $context);
