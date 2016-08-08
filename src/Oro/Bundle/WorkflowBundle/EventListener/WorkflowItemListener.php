@@ -72,14 +72,12 @@ class WorkflowItemListener
         $entity = $args->getEntity();
         $activeWorkflows = $this->workflowManager->getApplicableWorkflows($entity);
 
-        if ($activeWorkflows) {
-            foreach ($activeWorkflows as $activeWorkflow) {
-                if ($activeWorkflow->getStepManager()->hasStartStep()) {
-                    $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = new WorkflowStartArguments(
-                        $activeWorkflow->getName(),
-                        $entity
-                    );
-                }
+        foreach ($activeWorkflows as $activeWorkflow) {
+            if ($activeWorkflow->getStepManager()->hasStartStep()) {
+                $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = new WorkflowStartArguments(
+                    $activeWorkflow->getName(),
+                    $entity
+                );
             }
         }
     }

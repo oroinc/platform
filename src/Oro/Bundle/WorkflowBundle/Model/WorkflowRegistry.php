@@ -103,7 +103,7 @@ class WorkflowRegistry
         ];
 
         $workflows = new ArrayCollection();
-        foreach ($this->getEntityRepository()->findBy($criteria) as $definition) {
+        foreach ($this->getEntityRepository()->findBy($criteria, ['priority' => 'DESC']) as $definition) {
             /** @var WorkflowDefinition $definition */
             $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
         }

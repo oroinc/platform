@@ -8,6 +8,8 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
+use Oro\Bundle\WorkflowBundle\Model\StepManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
@@ -88,6 +90,20 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $em->expects($this->once())
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
+
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        $this->workflowManager->expects($this->once())
+            ->method('getApplicableWorkflows')
+            ->with($workflowItem)
+            ->willReturn([$workflow]);
+
+        $stepManager = $this->getMockBuilder(StepManager::class)->disableOriginalConstructor()->getMock();
+        $stepManager->expects($this->any())->method('hasStartStep')
+            ->will($this->returnValue(false));
+
+        $workflow->expects($this->any())
+            ->method('getStepManager')
+            ->will($this->returnValue($stepManager));
 
         $this->listener->postPersist($this->getEvent($workflowItem, $em));
     }
@@ -171,11 +187,13 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass();
 
-        $this->workflowManager->expects($this->atLeastOnce())
+        $this->workflowManager->expects($this->once())
             ->method('getApplicableWorkflows')
-            ->with($entity);
+            ->with($entity)
+            ->willReturn([]);
 
         $this->listener->postPersist($this->getEvent($entity));
+
         $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
     }
 
@@ -194,7 +212,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getStepManager')
             ->will($this->returnValue($stepManager));
 
-        $this->workflowManager->expects($this->atLeastOnce())
+        $this->workflowManager->expects($this->once())
             ->method('getApplicableWorkflows')
             ->with($entity)
             ->willReturn([$workflow]);
