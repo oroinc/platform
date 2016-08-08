@@ -34,6 +34,11 @@ class WorkflowManager
     private $workflowRegistry;
 
     /**
+     * @var WorkflowApplicabilityFilterInterface[]
+     */
+    private $applicabilityFilters = [];
+
+    /**
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
      * @param EventDispatcherInterface $eventDispatcher
@@ -198,7 +203,7 @@ class WorkflowManager
     public function massStartWorkflow(array $startArgumentsList)
     {
         $this->inTransaction(
-            function (EntityManager $em) use (&$startArgumentsList) {
+            function () use (&$startArgumentsList) {
                 foreach ($startArgumentsList as $startArguments) {
                     if (!$startArguments instanceof WorkflowStartArguments) {
                         continue;
@@ -335,43 +340,21 @@ class WorkflowManager
      */
     public function getApplicableWorkflows($entity)
     {
-        if (!is_object($entity)) {
-            throw new \InvalidArgumentException(
-                'Instance of entity object is required to getApplicableWorkflows as an argument.'
-            );
+        //todo move WorkflowRecordContext to argument level instead of construction here (in next iteration)
+        $recordContext = new WorkflowRecordContext($entity);
+
+        if (!$this->entityConnector->isApplicableEntity($entity)) {
+            return [];
         }
 
-        $existingRecordsInGroups = [];
+        $workflows = $this->workflowRegistry
+            ->getActiveWorkflowsByEntityClass($this->doctrineHelper->getEntityClass($entity));
 
-        foreach ($this->getWorkflowItemsByEntity($entity) as $workflowItem) {
-            $groups = $workflowItem->getDefinition()->getExclusiveRecordGroups(); //todo think about getDefinition fetch
-            if (count($groups) !== 0) {
-                $name = $workflowItem->getWorkflowName();
-                foreach ($groups as $group) {
-                    $existingRecordsInGroups[$group] = $name;
-                }
-            }
+        foreach ($this->applicabilityFilters as $applicabilityFilter) {
+            $workflows = $applicabilityFilter->filter($workflows, $recordContext);
         }
 
-        return $this->workflowRegistry
-            ->getActiveWorkflowsByEntityClass($this->doctrineHelper->getEntityClass($entity))
-            ->filter(
-                function (Workflow $workflow) use (&$existingRecordsInGroups) {
-                    $workflowRecordGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
-                    foreach ($workflowRecordGroups as $workflowRecordGroup) {
-                        if (!array_key_exists($workflowRecordGroup, $existingRecordsInGroups)) {
-                            continue;
-                        }
-
-                        if ($existingRecordsInGroups[$workflowRecordGroup] !== $workflow->getName()) {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-            )
-            ->toArray();
+        return $workflows->toArray();
     }
 
     /**
@@ -511,5 +494,13 @@ class WorkflowManager
         }
 
         return true;
+    }
+
+    /**
+     * @param WorkflowApplicabilityFilterInterface $applicabilityFilter
+     */
+    public function addApplicabilityFilter(WorkflowApplicabilityFilterInterface $applicabilityFilter)
+    {
+        $this->applicabilityFilters[] = $applicabilityFilter;
     }
 }

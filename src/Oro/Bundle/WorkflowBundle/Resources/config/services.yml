@@ -82,6 +82,13 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.changes.event.dispatcher'
             - '@oro_workflow.entity_connector'
+        calls:
+            - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
+
+    oro_workflow.applicability_filter.exclusive_record_group:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter
+        arguments:
+            - @oro_entity.doctrine_helper
 
     oro_workflow.abstract.workflow_aware_manager:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager
