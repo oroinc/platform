@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Symfony\Component\Validator\Constraint;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
@@ -10,7 +12,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 trait FormTrait
 {
     /**
-     * Gets the form type that should be used for the field.
+     * Gets the form type.
      *
      * @return string|null
      */
@@ -22,7 +24,7 @@ trait FormTrait
     }
 
     /**
-     * Sets the form type that should be used for the field.
+     * Sets the form type.
      *
      * @param string|null $formType
      */
@@ -36,7 +38,7 @@ trait FormTrait
     }
 
     /**
-     * Gets the form options that should be used for the field.
+     * Gets the form options.
      *
      * @return array|null
      */
@@ -48,7 +50,7 @@ trait FormTrait
     }
 
     /**
-     * Sets the form options that should be used for the field.
+     * Sets the form options.
      *
      * @param array|null $formOptions
      */
@@ -59,5 +61,17 @@ trait FormTrait
         } else {
             unset($this->items[EntityDefinitionConfig::FORM_OPTIONS]);
         }
+    }
+
+    /**
+     * Adds a validation constraint to the form options.
+     *
+     * @param Constraint $constraint
+     */
+    public function addFormConstraint(Constraint $constraint)
+    {
+        $entityOptions = $this->getFormOptions();
+        $entityOptions['constraints'][] = $constraint;
+        $this->setFormOptions($entityOptions);
     }
 }

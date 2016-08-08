@@ -8,6 +8,7 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Model\FileContentProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -20,21 +21,27 @@ class FileApiEntityManager extends ApiEntityManager
     /** @var AttachmentManager */
     protected $attachmentManager;
 
+    /** @var FileManager */
+    protected $fileManager;
+
     /**
      * @param string            $class
      * @param ObjectManager     $om
      * @param SecurityFacade    $securityFacade
+     * @param FileManager       $fileManager
      * @param AttachmentManager $attachmentManager
      */
     public function __construct(
         $class,
         ObjectManager $om,
         SecurityFacade $securityFacade,
+        FileManager $fileManager,
         AttachmentManager $attachmentManager
     ) {
         parent::__construct($class, $om);
         $this->securityFacade    = $securityFacade;
         $this->attachmentManager = $attachmentManager;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -73,6 +80,6 @@ class FileApiEntityManager extends ApiEntityManager
      */
     protected function postSerializeFile(array &$result)
     {
-        $result['content'] = new FileContentProvider($result['filename'], $this->attachmentManager);
+        $result['content'] = new FileContentProvider($result['filename'], $this->fileManager);
     }
 }

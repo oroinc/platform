@@ -4,22 +4,26 @@ namespace Oro\Bundle\AttachmentBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 
 class FileListener
 {
-    /**
-     * @var AttachmentManager
-     */
-    protected $manager;
+    /** @var FileManager */
+    protected $fileManager;
+
+    /** @var ServiceLink */
+    protected $securityFacadeLink;
 
     /**
-     * @param AttachmentManager $manager
+     * @param FileManager $fileManager
+     * @param ServiceLink $securityFacadeLink
      */
-    public function __construct(AttachmentManager $manager)
+    public function __construct(FileManager $fileManager, ServiceLink $securityFacadeLink)
     {
-        $this->manager = $manager;
+        $this->fileManager = $fileManager;
+        $this->securityFacadeLink = $securityFacadeLink;
     }
 
     /**
@@ -29,8 +33,12 @@ class FileListener
     {
         /** @var $entity File */
         $entity = $args->getEntity();
-        if ($entity instanceof File && $entity->isUploaded()) {
-            $this->manager->preUpload($entity);
+        if ($entity instanceof File) {
+            $this->fileManager->preUpload($entity);
+            $file = $entity->getFile();
+            if (null !== $file && $file->isFile()) {
+                $entity->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
+            }
         }
     }
 
@@ -49,9 +57,20 @@ class FileListener
     {
         /** @var $entity File */
         $entity = $args->getEntity();
-        if ($entity instanceof File && $entity->isUploaded()) {
-            $this->manager->upload($entity);
-            $this->manager->checkOnDelete($entity, $args->getEntityManager());
+        if ($entity instanceof File) {
+            $this->fileManager->upload($entity);
+            // delete File record from DB if delete button was clicked in UI form and new file was not provided
+            if ($entity->isEmptyFile() && null === $entity->getFilename()) {
+                $args->getEntityManager()->remove($entity);
+            }
+            // if needed, delete a previous file from the storage
+            $changeSet = $args->getEntityManager()->getUnitOfWork()->getEntityChangeSet($entity);
+            if (isset($changeSet['filename'])) {
+                $previousFileName = $changeSet['filename'][0];
+                if ($previousFileName) {
+                    $this->fileManager->deleteFile($previousFileName);
+                }
+            }
         }
     }
 
