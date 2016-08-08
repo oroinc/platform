@@ -68,11 +68,11 @@
     <div{{ block('block_attributes') }}></div>
 {% endblock %}
 
-{% block datagrid_row_container_widget %}
+{% block datagrid_row_widget %}
     <tr>{{ block_widget(block) }}</tr>
 {% endblock %}
 
-{% block datagrid_cell_container_widget %}
+{% block datagrid_cell_widget %}
     <td>{{ block_widget(block) }}</td>
 {% endblock %}
 
@@ -80,10 +80,10 @@
     <%= render('{{ column_name }}') %>
 {% endblock %}
 
-{% block datagrid_header_container_widget %}
+{% block datagrid_header_widget %}
     <tr>{{ block_widget(block) }}</tr>
 {% endblock %}
 
-{% block datagrid_header_cell_container_widget %}
+{% block datagrid_header_cell_widget %}
     <th><%= render_header('{{ column_name }}') %></th>
 {% endblock %}
