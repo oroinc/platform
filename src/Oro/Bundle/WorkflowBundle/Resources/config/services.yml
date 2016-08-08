@@ -176,7 +176,7 @@ services:
         class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager
         public: false
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.changes.event.dispatcher:

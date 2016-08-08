@@ -42,10 +42,10 @@ class WorkflowControllerTest extends WebTestCase
         $workflowOneName = $workflowOne->getName();
         $workflowTwoName = $workflowTwo->getName();
 
-        $workflowManager->activateWorkflow($workflowOne);
+        $workflowManager->activateWorkflow($workflowOne->getName());
         $this->assertActiveWorkflow($this->entityClass, $workflowOneName);
 
-        $workflowManager->activateWorkflow($workflowTwo);
+        $workflowManager->activateWorkflow($workflowTwo->getName());
         $this->assertActiveWorkflow($this->entityClass, $workflowTwoName);
 
         $activeWorkflowsCount = count($this->getWorkflowManager()->getApplicableWorkflows($this->entityClass));
