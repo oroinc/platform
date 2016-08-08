@@ -101,6 +101,7 @@ class PermissionConfigurationBuilder
         $repository = $this->doctrineHelper->getEntityRepositoryForClass('OroSecurityBundle:PermissionEntity');
 
         $entities = new ArrayCollection();
+        $configuration = array_unique($configuration);
         foreach ($configuration as $entityName) {
             $entityNameNormalized = strtolower($entityName);
 

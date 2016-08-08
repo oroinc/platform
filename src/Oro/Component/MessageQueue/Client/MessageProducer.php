@@ -87,6 +87,9 @@ class MessageProducer implements MessageProducerInterface
         $message->setHeaders($headers);
         $message->setBody($body);
 
+        $message->setMessageId(uniqid('oro', true));
+        $message->setTimestamp(time());
+
         $this->transportProducer->send($destination, $message);
     }
 }
