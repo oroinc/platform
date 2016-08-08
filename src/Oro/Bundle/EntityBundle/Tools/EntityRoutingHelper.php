@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tools;
 
+use Oro\Bundle\EntityBundle\Exception\RecordNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -221,8 +222,8 @@ class EntityRoutingHelper
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
         if (!$entity) {
-            throw new NotFoundHttpException(
-                sprintf('The entity "%s" with ID "%s" was not found.', $entityClass, $entityId)
+            throw new RecordNotFoundException(
+                sprintf("Record doesn't found.")
             );
         }
 
