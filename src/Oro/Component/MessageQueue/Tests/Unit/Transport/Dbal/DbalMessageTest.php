@@ -1,48 +1,48 @@
 <?php
-namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Null;
+namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
+use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class NullMessageTest extends \PHPUnit_Framework_TestCase
+class DbalMessageTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
 
     public function testShouldImplementMessageInterface()
     {
-        $this->assertClassImplements(MessageInterface::class, NullMessage::class);
+        $this->assertClassImplements(MessageInterface::class, DbalMessage::class);
     }
 
     public function testCouldBeConstructedWithoutAnyArguments()
     {
-        new NullMessage();
+        new DbalMessage();
     }
 
     public function testShouldNewMessageReturnEmptyBody()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $this->assertSame(null, $message->getBody());
     }
 
     public function testShouldNewMessageReturnEmptyProperties()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $this->assertSame([], $message->getProperties());
     }
 
     public function testShouldNewMessageReturnEmptyHeaders()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $this->assertSame([], $message->getHeaders());
     }
 
     public function testShouldAllowGetPreviouslySetBody()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $message->setBody('theBody');
 
@@ -51,7 +51,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAllowGetPreviouslySetHeaders()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $message->setHeaders(['foo' => 'fooVal']);
 
@@ -60,7 +60,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAllowGetPreviouslySetProperties()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $message->setProperties(['foo' => 'fooVal']);
 
@@ -69,7 +69,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAllowGetByNamePreviouslySetProperty()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $message->setProperties(['foo' => 'fooVal']);
 
@@ -78,7 +78,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAllowGetByNamePreviouslySetHeader()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $message->setHeaders(['foo' => 'fooVal']);
 
@@ -87,7 +87,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnDefaultIfPropertyNotSet()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $message->setProperties(['foo' => 'fooVal']);
 
@@ -96,7 +96,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnDefaultIfHeaderNotSet()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $message->setHeaders(['foo' => 'fooVal']);
 
@@ -105,14 +105,14 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSetRedeliveredFalseInConstructor()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         $this->assertFalse($message->isRedelivered());
     }
 
     public function testShouldAllowGetPreviouslySetRedelivered()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
         $message->setRedelivered(true);
 
         $this->assertTrue($message->isRedelivered());
@@ -120,14 +120,14 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnEmptyStringAsDefaultCorrelationId()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         self::assertSame('', $message->getCorrelationId());
     }
 
     public function testShouldAllowGetPreviouslySetCorrelationId()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
         $message->setCorrelationId('theId');
 
         self::assertSame('theId', $message->getCorrelationId());
@@ -135,7 +135,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCastCorrelationIdToStringOnSet()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
         $message->setCorrelationId(123);
 
         self::assertSame('123', $message->getCorrelationId());
@@ -143,14 +143,14 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnEmptyStringAsDefaultMessageId()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         self::assertSame('', $message->getMessageId());
     }
 
     public function testShouldAllowGetPreviouslySetMessageId()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
         $message->setMessageId('theId');
 
         self::assertSame('theId', $message->getMessageId());
@@ -158,7 +158,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCastMessageIdToStringOnSet()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
         $message->setMessageId(123);
 
         self::assertSame('123', $message->getMessageId());
@@ -166,14 +166,14 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnNullAsDefaultTimestamp()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
 
         self::assertSame(null, $message->getTimestamp());
     }
 
     public function testShouldAllowGetPreviouslySetTimestamp()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
         $message->setTimestamp(123);
 
         self::assertSame(123, $message->getTimestamp());
@@ -181,7 +181,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCastTimestampToIntOnSet()
     {
-        $message = new NullMessage();
+        $message = new DbalMessage();
         $message->setTimestamp('123');
 
         self::assertSame(123, $message->getTimestamp());
