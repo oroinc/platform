@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -15,6 +15,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 class EntitySecurityMetadataProvider
 {
     const ACL_SECURITY_TYPE = 'ACL';
+    const ALL_PERMISSIONS = 'All';
+    const PERMISSIONS_DELIMITER = ';';
 
     /** @var ConfigProvider */
     protected $securityConfigProvider;
@@ -293,10 +295,10 @@ class EntitySecurityMetadataProvider
     {
         $permissions = $securityConfig->get('permissions');
 
-        if (!$permissions || $permissions === 'All') {
+        if (!$permissions || $permissions === self::ALL_PERMISSIONS) {
             $permissions = [];
         } else {
-            $permissions = explode(';', $permissions);
+            $permissions = explode(self::PERMISSIONS_DELIMITER, $permissions);
         }
 
         return $permissions;
