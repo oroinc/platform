@@ -44,6 +44,25 @@ class WidgetControllerTest extends WebTestCase
         $this->entity = $this->createNewEntity();
     }
 
+    public function testEntityWorkflowsAction()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_workflow_widget_entity_workflows', [
+                '_widgetContainer' => 'dialog',
+                'entityClass' => self::ENTITY_CLASS,
+                'entityId' => $this->entity->getId()
+            ]),
+            [],
+            [],
+            $this->generateBasicAuthHeader()
+        );
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+
+        $this->assertNotEmpty($crawler->html());
+    }
+
     public function testStepsAction()
     {
         $crawler = $this->client->request(

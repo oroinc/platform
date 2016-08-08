@@ -96,6 +96,10 @@ class WidgetController extends Controller
             $steps
         );
 
+        $transitionData = $workflowItem
+            ? $this->getAvailableTransitionsDataByWorkflowItem($workflowItem)
+            : $this->getAvailableStartTransitionsData($workflow, $entity);
+
         return [
             'name' => $workflow->getName(),
             'label' => $workflow->getLabel(),
@@ -103,21 +107,8 @@ class WidgetController extends Controller
                 'is_ordered' => $isStepsDisplayOrdered,
                 'steps' => $steps
             ],
-            'transitionsData' => $this->getTransitionData($entity, $workflow, $workflowItem)
+            'transitionsData' => $transitionData
         ];
-    }
-
-    /**
-     * @param object $entity
-     * @param Workflow $workflow
-     * @param WorkflowItem|null $workflowItem
-     * @return array
-     */
-    protected function getTransitionData($entity, Workflow $workflow, WorkflowItem $workflowItem = null)
-    {
-        return $workflowItem
-            ? $this->getAvailableTransitionsDataByWorkflowItem($workflowItem)
-            : $this->getAvailableStartTransitionsData($workflow, $entity);
     }
 
     /**
