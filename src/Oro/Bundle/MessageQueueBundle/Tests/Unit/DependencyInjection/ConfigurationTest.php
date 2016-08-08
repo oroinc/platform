@@ -3,6 +3,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
+use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -127,6 +128,36 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ], $config);
     }
 
+    public function testShouldAllowConfigureDBALTransport()
+    {
+        $configuration = new Configuration([
+            new DefaultTransportFactory(),
+            new DbalTransportFactory()
+        ]);
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration($configuration, [[
+            'transport' => [
+                'default' => 'dbal',
+                'dbal' => true,
+            ]
+        ]]);
+
+        $this->assertEquals([
+            'transport' => [
+                'default' => [
+                    'alias' => 'dbal',
+                ],
+                'dbal' => [
+                    'connection' => 'default',
+                    'table' => 'oro_message_queue',
+                    'orphan_time' => 300,
+                    'polling_interval' => 1000,
+                ],
+            ]
+        ], $config);
+    }
+
     public function testShouldSetDefaultConfigurationForClient()
     {
         $configuration = new Configuration([new DefaultTransportFactory()]);
@@ -148,7 +179,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'router_processor' => null,
                 'router_destination' => 'default',
                 'default_destination' => 'default',
-                'traceable_producer' => false
+                'traceable_producer' => false,
+                'redelivered_delay_time' => 10
             ],
         ], $config);
     }

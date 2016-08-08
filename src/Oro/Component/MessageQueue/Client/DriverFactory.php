@@ -4,6 +4,7 @@ namespace Oro\Component\MessageQueue\Client;
 use Oro\Component\AmqpMessageQueue\Client\AmqpDriver;
 use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 
 class DriverFactory
@@ -18,6 +19,8 @@ class DriverFactory
     {
         if ($connection instanceof AmqpConnection) {
             return new AmqpDriver($connection->createSession(), $config);
+        } elseif ($connection instanceof DbalConnection) {
+            return new DbalDriver($connection->createSession(), $config);
         } elseif ($connection instanceof NullConnection) {
             return new NullDriver($connection->createSession(), $config);
         } else {

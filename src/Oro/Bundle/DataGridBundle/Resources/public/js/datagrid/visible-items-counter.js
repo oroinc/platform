@@ -11,7 +11,7 @@ define([
     /**
      * Datagrid simple pagination widget
      *
-     * @class   orodatagrid.datagrid.Pagination
+     * @class   orodatagrid.datagrid.VisibleItemsCounter
      * @extends Backbone.View
      */
     VisibleItemsCounter = Backbone.View.extend({
