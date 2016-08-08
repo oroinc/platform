@@ -7,6 +7,7 @@ use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -34,18 +35,26 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
     private $syncProcessorRegistry;
 
     /**
+     * @var JobProcessor
+     */
+    private $jobProcessor;
+
+    /**
      * @param RegistryInterface $doctrine
      * @param TokenStorageInterface $tokenStorage
      * @param SyncProcessorRegistry $syncProcessorRegistry
+     * @param JobProcessor $jobProcessor
      */
     public function __construct(
         RegistryInterface $doctrine,
         TokenStorageInterface $tokenStorage,
-        SyncProcessorRegistry $syncProcessorRegistry
+        SyncProcessorRegistry $syncProcessorRegistry,
+        JobProcessor $jobProcessor
     ) {
         $this->doctrine = $doctrine;
         $this->tokenStorage = $tokenStorage;
         $this->syncProcessorRegistry = $syncProcessorRegistry;
+        $this->jobProcessor = $jobProcessor;
     }
 
     /**
@@ -61,7 +70,6 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        // TODO CRM-5839 unique job
         // TODO CRM-5838 message could be redelivered on dbal transport if run for a long time.
 
         $body = JSON::decode($message->getBody());
@@ -76,28 +84,36 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
             throw new \LogicException('The message invalid. It must have integrationId set');
         }
 
-        /** @var EntityManagerInterface $em */
-        $em = $this->doctrine->getManager();
-        
-        /** @var Integration $integration */
-        $integration = $em->find(Integration::class, $body['integrationId']);
-        if (false == $integration) {
-            return self::REJECT;
-        }
-        if (false == $integration->isEnabled()) {
-            return self::REJECT;
-        }
+        $jobName = 'oro_integration:sync_integration:'.$body['integrationId'];
+        $ownerId = $message->getMessageId();
 
-        $em->getConnection()->getConfiguration()->setSQLLogger(null);
-        $this->updateToken($integration);
-        $integration->getTransport()->getSettingsBag()->set('page_size', $body['transport_batch_size']);
+        $jobRunner = $this->jobProcessor->createJobRunner();
+        $result = $jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
+            /** @var EntityManagerInterface $em */
+            $em = $this->doctrine->getManager();
 
-        $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
-        $result = $processor->process(
-            $integration,
-            $body['connector'],
-            $body['connector_parameters']
-        );
+            /** @var Integration $integration */
+            $integration = $em->find(Integration::class, $body['integrationId']);
+            if (false == $integration) {
+                return false;
+            }
+            if (false == $integration->isEnabled()) {
+                return false;
+            }
+
+            $em->getConnection()->getConfiguration()->setSQLLogger(null);
+
+            $this->updateToken($integration);
+            $integration->getTransport()->getSettingsBag()->set('page_size', $body['transport_batch_size']);
+
+            $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
+
+            return $processor->process(
+                $integration,
+                $body['connector'],
+                $body['connector_parameters']
+            );
+        });
 
         return $result ? self::ACK : self::REJECT;
     }
