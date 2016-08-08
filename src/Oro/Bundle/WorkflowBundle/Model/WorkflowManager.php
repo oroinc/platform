@@ -176,7 +176,7 @@ class WorkflowManager
             }
         }
 
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
+        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
@@ -490,7 +490,7 @@ class WorkflowManager
     {
         $workflowItems = $this->getWorkflowItemsByEntity($entity);
         foreach ($workflowItems as $workflowItem) {
-            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getRecordGroups())) {
+            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getExclusiveRecordGroups())) {
                 return false;
             }
         }
