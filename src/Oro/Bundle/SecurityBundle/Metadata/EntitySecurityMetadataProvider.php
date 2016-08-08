@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -198,13 +198,7 @@ class EntitySecurityMetadataProvider
                 }
 
                 $description = $securityConfig->get('description', false, '');
-                $permissions = $securityConfig->get('permissions');
-
-                if (!$permissions || $permissions == 'All') {
-                    $permissions = array();
-                } else {
-                    $permissions = explode(';', $permissions);
-                }
+                $permissions = $this->getPermissionsList($securityConfig);
 
                 $data[$className] = new EntitySecurityMetadata(
                     $securityType,
@@ -244,15 +238,18 @@ class EntitySecurityMetadataProvider
                 ->getMetadataFactory()
                 ->getMetadataFor($className);
 
-            foreach ($fieldsConfig as $fieldInfo) {
-                $fieldName = $fieldInfo->getId()->getFieldName();
+            foreach ($fieldsConfig as $fieldConfig) {
+                $fieldName = $fieldConfig->getId()->getFieldName();
                 if ($classMetadata->isIdentifier($fieldName)) {
                     // we should not limit access to identifier fields.
                     continue;
                 }
+                $permissions = $this->getPermissionsList($fieldConfig);
+
                 $fields[$fieldName] = new FieldSecurityMetadata(
                     $fieldName,
-                    $this->getFieldLabel($classMetadata, $fieldName)
+                    $this->getFieldLabel($classMetadata, $fieldName),
+                    $permissions
                 );
             }
         }
@@ -283,5 +280,25 @@ class EntitySecurityMetadataProvider
         return !empty($label)
             ? $label
             : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+    }
+
+    /**
+     * Returns array with supported permissions.
+     *
+     * @param ConfigInterface $securityConfig
+     *
+     * @return array|null Array with permissions, f.e. ['VIEW', 'CREATE']
+     */
+    protected function getPermissionsList(ConfigInterface $securityConfig)
+    {
+        $permissions = $securityConfig->get('permissions');
+
+        if (!$permissions || $permissions === 'All') {
+            $permissions = [];
+        } else {
+            $permissions = explode(';', $permissions);
+        }
+
+        return $permissions;
     }
 }

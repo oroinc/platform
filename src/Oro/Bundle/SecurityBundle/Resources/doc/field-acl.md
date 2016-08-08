@@ -9,7 +9,7 @@ By default, entity fields are not protected by ACL. To be able to manage field A
 
 If you need to allow manage ACL for field of your entity you can set `field_acl_supported` in entity config:
 
-```
+``` php
 
 <?php
 ....
@@ -42,7 +42,7 @@ If you need to allow manage ACL for field of your entity you can set `field_acl_
  
 If you need to allow manage ACL for field of an entity for which you cannot modify @Config annotation you can set `field_acl_supported` with migration:
  
-```
+``` php
  
 <?php
 
@@ -80,13 +80,48 @@ After that, in entity config page of this entity will be two additional paramete
 WIth `Field Level ACL` parameter, system manager will be able to turn on Field ACL for given entity. 
 
 When both Show Restricted and Field ACL options are enabled and an user does not have an access to a field this field will be read-only on create and edit pages.
+
+Developer can limit the list of available permissions for the field. This can be done with `permissions` parameter in Security scope for the field.
+The permissions should be listed as the string with `;` delimiter. 
+
+For example:
+
+``` php
+
+<?php
+....
+
+ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+...
+
+ class SomeEntity extends ExtendSomeEntity
+ {
+ ...
+     /**
+      * @var string
+      *
+      * @ORM\Column()
+      * @ConfigField(
+      *      defaultValues={
+      *          "security"={
+      *              "permissions"="VIEW;CREATE",
+      *          },
+      *      }
+      * )
+      */
+     protected $firstName;
+ ...    
+ }
+ 
+ ```
+
 Check Field ACL in php code
 ---------------------------
 
 You can check access to some field with `oro_security.security_facade` service. To do this, you should create an instance of FieldVote class and pass it as the second parameter of isGranted method:
 
 
-```
+``` php
 <?php
 ....
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -103,7 +138,7 @@ $entity parameter should contain an instance of entity you want to check.
 
 In case if you does not have entity instance but have the class name, id of record, owner and organization ids of this record, you can use `EntityObjectReference` class:
  
-```
+``` php
 <?php
 ....
 use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
@@ -121,7 +156,7 @@ Check Field ACL in twig templates
 
 In twig templates you can use `resource_granted` twig function with the field name as the third parameter:
  
-```
+``` php
 {% if  resource_granted('VIEW', entity, 'fieldName') %}
     {# do some job #}
 {% endif %}
