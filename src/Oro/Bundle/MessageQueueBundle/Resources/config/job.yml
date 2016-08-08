@@ -3,31 +3,31 @@ parameters:
 
 services:
     oro_message_queue.job.repository:
-        class: Doctrine\ORM\EntityRepository
+        class: 'Doctrine\ORM\EntityRepository'
         factory: ['@doctrine.orm.default_entity_manager', 'getRepository']
         arguments:
             - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
 
     oro_message_queue.job.storage:
-        class: Oro\Component\MessageQueue\Job\JobStorage
+        class: 'Oro\Component\MessageQueue\Job\JobStorage'
         arguments:
             - '@doctrine.orm.default_entity_manager'
             - '@oro_message_queue.job.repository'
             - '%oro_message_queue.job.unique_job_table_name%'
 
     oro_message_queue.job.processor:
-        class: Oro\Component\MessageQueue\Job\JobProcessor
+        class: 'Oro\Component\MessageQueue\Job\JobProcessor'
         arguments:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.client.message_producer'
 
     oro_message_queue.job.calculate_root_job_status_case:
-        class: Oro\Component\MessageQueue\Job\CalculateRootJobStatusCase
+        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobStatusCase'
         arguments:
             - '@oro_message_queue.job.storage'
 
     oro_message_queue.job.calculate_root_job_status_processor:
-        class: Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor
+        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor'
         arguments:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.job.calculate_root_job_status_case'
@@ -36,4 +36,4 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_message_queue.job.grid.root_job_action_configuration:
-        class: Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration
+        class: 'Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration'

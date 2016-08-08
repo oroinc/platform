@@ -52,6 +52,14 @@ class JobProcessor
      */
     public function findOrCreateRootJob($ownerId, $name, $unique = false)
     {
+        if (! $ownerId) {
+            throw new \LogicException('OwnerId must be not empty');
+        }
+
+        if (! $name) {
+            throw new \LogicException('Name must be not empty');
+        }
+
         $job = $this->jobStorage->createJob();
         $job->setOwnerId($ownerId);
         $job->setStatus(Job::STATUS_NEW);
@@ -78,6 +86,10 @@ class JobProcessor
      */
     public function findOrCreateChildJob($name, Job $rootJob)
     {
+        if (! $name) {
+            throw new \LogicException('Name must be not empty');
+        }
+
         $job = $this->jobStorage->findChildJobByName($name, $rootJob);
 
         if ($job) {

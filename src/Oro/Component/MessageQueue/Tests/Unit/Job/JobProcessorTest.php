@@ -15,6 +15,24 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
     }
 
+    public function testCreateRootJobShouldThrowIfOwnerIdIsEmpty()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $this->setExpectedException(\LogicException::class, 'OwnerId must be not empty');
+
+        $processor->findOrCreateRootJob(null, 'job-name', true);
+    }
+
+    public function testCreateRootJobShouldThrowIfNameIsEmpty()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $this->setExpectedException(\LogicException::class, 'Name must be not empty');
+
+        $processor->findOrCreateRootJob('owner-id', null, true);
+    }
+
     public function testShouldCreateRootJobAndReturnIt()
     {
         $job = new Job();
@@ -72,6 +90,15 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->findOrCreateRootJob('owner-id', 'job-name', true);
 
         $this->assertSame($job, $result);
+    }
+
+    public function testCreateChildJobShouldThrowIfNameIsEmpty()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $this->setExpectedException(\LogicException::class, 'Name must be not empty');
+
+        $processor->findOrCreateChildJob(null, new Job());
     }
 
     public function testCreateChildJobShouldFindAndReturnAlreadyCreatedJob()
