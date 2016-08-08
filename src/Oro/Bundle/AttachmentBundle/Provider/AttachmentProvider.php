@@ -90,7 +90,7 @@ class AttachmentProvider
                 );
             }
             $result = [
-                'attachmentURL'       => $this->attachmentManager->getAttachmentURL($entity, $attachment),
+                'attachmentURL'       => $this->getAttachmentURL($entity, $attachment),
                 'attachmentSize'      => $this->attachmentManager->getFileSize($attachment->getFileSize()),
                 'attachmentFileName'  => $attachment->getOriginalFilename(),
                 'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
@@ -99,5 +99,16 @@ class AttachmentProvider
         }
 
         return $result;
+    }
+
+    /**
+     * @param $entity
+     * @param File $attachment
+     *
+     * @return string
+     */
+    public function getAttachmentURL($entity, $attachment)
+    {
+        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
 }
