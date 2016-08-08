@@ -45,25 +45,25 @@ class JobProcessor
 
     /**
      * @param string $ownerId
-     * @param string $name
+     * @param string $jobName
      * @param bool   $unique
      *
      * @return Job
      */
-    public function findOrCreateRootJob($ownerId, $name, $unique = false)
+    public function findOrCreateRootJob($ownerId, $jobName, $unique = false)
     {
         if (! $ownerId) {
-            throw new \LogicException('OwnerId must be not empty');
+            throw new \LogicException('OwnerId must not be empty');
         }
 
-        if (! $name) {
-            throw new \LogicException('Name must be not empty');
+        if (! $jobName) {
+            throw new \LogicException('Job name must not be empty');
         }
 
         $job = $this->jobStorage->createJob();
         $job->setOwnerId($ownerId);
         $job->setStatus(Job::STATUS_NEW);
-        $job->setName($name);
+        $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setStartedAt(new \DateTime());
         $job->setUnique((bool) $unique);
@@ -79,18 +79,18 @@ class JobProcessor
     }
 
     /**
-     * @param string $name
+     * @param string $jobName
      * @param Job $rootJob
      *
      * @return Job
      */
-    public function findOrCreateChildJob($name, Job $rootJob)
+    public function findOrCreateChildJob($jobName, Job $rootJob)
     {
-        if (! $name) {
-            throw new \LogicException('Name must be not empty');
+        if (! $jobName) {
+            throw new \LogicException('Job name must not be empty');
         }
 
-        $job = $this->jobStorage->findChildJobByName($name, $rootJob);
+        $job = $this->jobStorage->findChildJobByName($jobName, $rootJob);
 
         if ($job) {
             return $job;
@@ -98,7 +98,7 @@ class JobProcessor
         
         $job = $this->jobStorage->createJob();
         $job->setStatus(Job::STATUS_NEW);
-        $job->setName($name);
+        $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
 

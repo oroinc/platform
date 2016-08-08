@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Job\Schema as UniqueJobSchema;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class OroCronBundle implements Migration, ContainerAwareInterface
+class OroMessageQueueBundle implements Migration, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 

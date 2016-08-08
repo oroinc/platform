@@ -19,7 +19,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
-        $this->setExpectedException(\LogicException::class, 'OwnerId must be not empty');
+        $this->setExpectedException(\LogicException::class, 'OwnerId must not be empty');
 
         $processor->findOrCreateRootJob(null, 'job-name', true);
     }
@@ -28,7 +28,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
-        $this->setExpectedException(\LogicException::class, 'Name must be not empty');
+        $this->setExpectedException(\LogicException::class, 'Job name must not be empty');
 
         $processor->findOrCreateRootJob('owner-id', null, true);
     }
@@ -96,7 +96,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
-        $this->setExpectedException(\LogicException::class, 'Name must be not empty');
+        $this->setExpectedException(\LogicException::class, 'Job name must not be empty');
 
         $processor->findOrCreateChildJob(null, new Job());
     }
