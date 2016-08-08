@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -129,7 +129,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()->getMock();
         $manager->expects($this->any())->method('getMetadataFactory')->willReturn($metadataFactory);
-        $metadata = new ClassMetadataInfo('SomeClass');
+        $metadata = new ClassMetadata('SomeClass');
         $metadata->identifier = ['id'];
         $metadataFactory->expects($this->any())->method('getMetadataFor')->willReturn($metadata);
         $this->doctrine->expects($this->any())->method('getManagerForClass')->willReturn($manager);
