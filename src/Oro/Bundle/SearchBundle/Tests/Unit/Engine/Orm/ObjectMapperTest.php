@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
@@ -14,8 +15,8 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     const TEST_PRICE = 150;
 
     const ENTITY_MANUFACTURER = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer';
-    const ENTITY_PRODUCT = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product';
-    const ENTITY_CATEGORY = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category';
+    const ENTITY_PRODUCT      = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product';
+    const ENTITY_CATEGORY     = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category';
 
     /** @var ObjectMapper */
     private $mapper;
@@ -330,5 +331,29 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     public function testNonExistsConfig()
     {
         $this->assertEquals(false, $this->mapper->getEntityConfig('non exists entity'));
+    }
+
+    public function testSelectedData()
+    {
+        $query = $this->getMockBuilder(Query::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query->expects($this->once())
+            ->method('getSelect')
+            ->willReturn(['text.sku', 'text.defaultName']);
+
+        $item = [
+            'item' => [
+                'id'       => 50,
+                'recordId' => 29
+            ],
+            'sku' => '2GH80',
+            'defaultName' => 'Example Headlamp'
+        ];
+
+        $result = $this->mapper->mapSelectedData($query, $item);
+
+        $this->assertEquals(['sku'=>'2GH80', 'defaultName'=>'Example Headlamp'], $result);
     }
 }

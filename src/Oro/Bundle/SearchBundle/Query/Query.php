@@ -295,7 +295,9 @@ class Query
      */
     public function getSelect()
     {
-        return $this->select;
+        $result = array_values($this->select);
+
+        return $result;
     }
 
     /**
@@ -525,24 +527,19 @@ class Query
     }
 
     /**
-     * @param string $column
+     * @param string $fieldName
+     * @param string $fieldType
      * @return $this
      */
-    public function addSelect($column)
+    public function addSelect($fieldName, $fieldType = self::TYPE_TEXT)
     {
-        if (is_string($column)) {
-            $this->select[] = $column;
+        $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);
+
+        if (!is_string($field)) {
             return $this;
         }
 
-        if (!is_array($column)) {
-            return $this;
-        }
-
-        $this->select = array_merge(
-            $this->select,
-            $column
-        );
+        $this->select[$field] = $field; // do not allow repeating fields
 
         return $this;
     }
@@ -552,7 +549,18 @@ class Query
      */
     private function getStringColumns()
     {
-        $result = $this->select;
+        $selects = $this->select;
+
+        if (empty($selects)) {
+            return '';
+        }
+
+        $result = [];
+
+        foreach ($selects as $select) {
+            $parts = Criteria::explodeFieldTypeName($select);
+            $result[] = $parts[1];
+        }
 
         $result = implode(', ', $result);
 

@@ -142,11 +142,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testAddingSelect()
     {
         $query = new Query();
-        $column = 'name';
-        $query->addSelect($column);
-        $columns = ['status', 'date'];
-        $query->addSelect($columns);
+        $query->addSelect('name', Query::TYPE_TEXT);
+        $query->addSelect('status', Query::TYPE_INTEGER);
+        $query->addSelect('date', Query::TYPE_DATETIME);
+        // this is not a bug, just testing dupe handling
+        $query->addSelect('name', Query::TYPE_TEXT);
         $this->assertCount(3, $query->getSelect());
-        $this->assertEquals(['name', 'status', 'date'], $query->getSelect());
+        $this->assertEquals(['text.name', 'integer.status', 'datetime.date'], $query->getSelect());
     }
 }
