@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Tools;
 
-use Oro\Bundle\EntityBundle\Exception\RecordNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use Oro\Bundle\EntityBundle\Exception\RecordNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 

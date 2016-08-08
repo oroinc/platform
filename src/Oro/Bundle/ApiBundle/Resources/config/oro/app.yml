@@ -2,9 +2,6 @@
 fos_rest:
     view:
         mime_types: {'json': ['application/json', 'application/x-json', 'application/vnd.api+json']}
-    exception:
-        messages:
-            'Oro\Bundle\EntityBundle\Exception\RecordNotFoundException' : true
 
 nelmio_api_doc:
     motd:
