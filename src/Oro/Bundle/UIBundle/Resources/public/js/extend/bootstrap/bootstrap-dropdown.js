@@ -45,7 +45,7 @@ define(function(require) {
     function Dropdown(element) {
         var $el = $(element).on('click.dropdown.data-api', this.toggle);
         var globalHandlers = {
-            'click.dropdown.data-api select2-open': function() {
+            'click.dropdown.data-api select2-open.dropdown.data-api showTimepicker.dropdown.data-api': function() {
                 var $dropdown = $el.parent();
                 if ($dropdown.is('.open')) {
                     $dropdown.trigger('hide.bs.dropdown').removeClass('open');
