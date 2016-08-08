@@ -82,7 +82,9 @@ class JobRunner
     {
         $job = $this->jobProcessor->findJobById($jobId);
         if ($job->getRootJob()->isInterrupted()) {
-            $this->jobProcessor->cancelChildJob($job);
+            if (! $job->getStoppedAt()) {
+                $this->jobProcessor->cancelChildJob($job);
+            }
 
             return;
         }

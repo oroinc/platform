@@ -199,7 +199,10 @@ class JobProcessor
 
         $job->setStatus(Job::STATUS_CANCELLED);
         $job->setStoppedAt($stoppedAt = new \DateTime());
-        $job->setStartedAt($stoppedAt);
+
+        if (! $job->getStartedAt()) {
+            $job->setStartedAt($stoppedAt);
+        }
 
         $this->jobStorage->saveJob($job);
 
