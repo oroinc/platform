@@ -69,21 +69,25 @@
 {% endblock %}
 
 {% block datagrid_row_widget %}
-    <tr>{{ block_widget(block) }}</tr>
+    <script type="text/html" id="template-datagrid-row">
+        <tr{{ block('block_attributes') }}>{{ block_widget(block) }}</tr>
+    </script>
 {% endblock %}
 
 {% block datagrid_cell_widget %}
-    <td>{{ block_widget(block) }}</td>
+    <td{{ block('block_attributes') }}>{{ block_widget(block) }}</td>
 {% endblock %}
 
 {% block datagrid_cell_value_widget %}
-    <%= render('{{ column_name }}') %>
+    <div{{ block('block_attributes') }}><%= render('{{ column_name }}') %></div>
 {% endblock %}
 
 {% block datagrid_header_widget %}
-    <tr>{{ block_widget(block) }}</tr>
+    <script type="text/html" id="template-datagrid-header">
+        <tr{{ block('block_attributes') }}>{{ block_widget(block) }}</tr>
+    </script>
 {% endblock %}
 
 {% block datagrid_header_cell_widget %}
-    <th><%= render_header('{{ column_name }}') %></th>
+    <th{{ block('block_attributes') }}><%= render_header('{{ column_name }}') %></th>
 {% endblock %}
