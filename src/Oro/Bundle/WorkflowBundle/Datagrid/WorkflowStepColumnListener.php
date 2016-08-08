@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
