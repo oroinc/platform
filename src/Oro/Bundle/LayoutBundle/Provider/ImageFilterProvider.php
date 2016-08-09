@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider;
 
-use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
+use Imagine\Image\ImageInterface;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+
+use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
 /**
  * Load dimensions from theme config to LiipImagine filters
@@ -13,7 +15,7 @@ class ImageFilterProvider
 {
     const IMAGE_QUALITY = 95;
     const BACKGROUND_COLOR = '#fff';
-    const RESIZE_MODE = 'inset';
+    const RESIZE_MODE = ImageInterface::THUMBNAIL_INSET;
 
     /**
      * @var ImageTypeProvider
@@ -73,28 +75,31 @@ class ImageFilterProvider
         $filterSettings = [
             'quality' => self::IMAGE_QUALITY,
             'filters' => [
-                'strip' => []
+                'strip' => [],
+//                'watermark' => [
+//                    'image' => 'Resources/watermark.png',
+//                    'size' => 0.8,
+//                    'position' => 'center' //topleft,top,topright,left,center,right,bottomleft,bottom,bottomright
+//                ]
             ]
         ];
 
         if ($withResize) {
             $filterSettings = array_merge_recursive(
-                $filterSettings,
                 [
                     'filters' => [
-                        'upscale' => [
-                            'min' => [$width, $height]
-                        ],
                         'thumbnail' => [
                             'size' => [$width, $height],
-                            'mode' => self::RESIZE_MODE
+                            'mode' => self::RESIZE_MODE,
+                            'allow_upscale' => true
                         ],
                         'background' => [
                             'size' => [$width, $height],
                             'color' => self::BACKGROUND_COLOR
                         ]
                     ]
-                ]
+                ],
+                $filterSettings
             );
         }
 
