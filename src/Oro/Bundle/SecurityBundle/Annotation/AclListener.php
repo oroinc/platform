@@ -2,62 +2,77 @@
 
 namespace Oro\Bundle\SecurityBundle\Annotation;
 
-use Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheWarmer;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+
+use Oro\Component\Config\CumulativeResource;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
 
 class AclListener
 {
-    /** @var ContainerInterface */
-    private $container;
+    /** @var AclAnnotationProvider */
+    protected $cacheProvider;
 
-    /** @var AclAnnotationCacheWarmer  */
-    private $cacheWarmer;
+    /** @var string */
+    protected $kernelCacheDir;
+
+    /** @var bool */
+    protected $kernelDebug;
 
     /**
-     * @param ContainerInterface $container
-     * @param AclAnnotationCacheWarmer $cacheWarmer
+     * @param AclAnnotationProvider       $cacheProvider
+     * @param AclAnnotationMetadataDumper $dumper
+     * @param string                      $kernelCacheDir
+     * @param bool                        $kernelDebug
      */
     public function __construct(
-        ContainerInterface $container,
-        AclAnnotationCacheWarmer $cacheWarmer
+        AclAnnotationProvider $cacheProvider,
+        AclAnnotationMetadataDumper $dumper,
+        $kernelCacheDir,
+        $kernelDebug
     ) {
-        $this->container = $container;
-        $this->cacheWarmer = $cacheWarmer;
-        $this->cacheDir = $this->container->getParameter('kernel.cache_dir');
-        $this->dumper = new AclAnnotationMetadataDumper($this->container->getParameterBag());
-        $this->file = $this->dumper->getMetaFile();
+        $this->cacheProvider = $cacheProvider;
+        $this->dumper = $dumper;
+        $this->kernelCacheDir = $kernelCacheDir;
+        $this->kernelDebug = $kernelDebug;
     }
 
+    /**
+     * @param GetResponseEvent $event
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$this->isFresh()) {
-            $this->cacheWarmer->warmUp($this->cacheDir.'/annotations');
+            $this->cacheProvider->warmUpCache();
             $this->dumper->dump();
         }
     }
 
     /**
-     * Check is meta file for acl annotations fresh
+     * Checks if meta file for acl annotations is up-to-date
+     *
      * @return bool
      */
     public function isFresh()
     {
-        if (!is_file($this->file)) {
+        $file = $this->dumper->getMetaFile();
+        if (!is_file($file)) {
             return false;
         }
-        if (!$this->container->getParameter('kernel.debug')) {
+
+        if (!$this->kernelDebug) {
             return true;
         }
-        $time = filemtime($this->file);
-        $meta = unserialize(file_get_contents($this->file));
+
+        $time = filemtime($file);
+        $meta = unserialize(file_get_contents($file));
         foreach ($meta as $resource) {
+            /** @var CumulativeResource $resource */
             if (!$resource->isFresh($time)) {
                 return false;
             }
         }
+
         return true;
     }
 }
