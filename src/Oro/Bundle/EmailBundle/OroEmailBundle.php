@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle;
 
+use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
@@ -59,6 +61,11 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
         $container->addCompilerPass(new EmailRecipientsProviderPass());
         $container->addCompilerPass(new MailboxProcessPass());
+
+        $addTopicPass = AddTopicMetaPass::create()
+            ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto responses')
+        ;
+        $container->addCompilerPass($addTopicPass);
     }
 
     /**
