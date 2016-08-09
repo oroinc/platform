@@ -292,6 +292,80 @@ class QueryUtilsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFixUnusedParameters()
+    {
+        $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
+                AND a.name != :param2 AND a.status = ?1';
+        $parameters = [
+            $this->getParameterMock(0),
+            $this->getParameterMock(1),
+            $this->getParameterMock('param1'),
+            $this->getParameterMock('param2'),
+            $this->getParameterMock('param3'),
+        ];
+        $expectedParameters = [
+            1 => '1_value',
+            'param1' => 'param1_value',
+            'param2' => 'param2_value',
+        ];
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->once())
+            ->method('getDql')
+            ->will($this->returnValue($dql));
+        $qb->expects($this->once())
+            ->method('getParameters')
+            ->will($this->returnValue($parameters));
+        $qb->expects($this->once())
+            ->method('setParameters')
+            ->with($expectedParameters);
+
+        QueryUtils::removeUnusedParameters($qb);
+    }
+
+    /**
+     * @dataProvider dqlParametersDataProvider
+     *
+     * @param string $dql
+     * @param string $parameter
+     * @param bool $expected
+     */
+    public function testDqlContainsParameter($dql, $parameter, $expected)
+    {
+        $this->assertEquals($expected, QueryUtils::dqlContainsParameter($dql, $parameter));
+    }
+
+    public function dqlParametersDataProvider()
+    {
+        $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
+            AND a.name != :param2 AND a.status = ?1';
+
+        return [
+            [$dql, 'param1', true],
+            [$dql, 'param5', false],
+            [$dql, 'param11', false],
+            [$dql, 0, false],
+            [$dql, 1, true],
+        ];
+    }
+
+    protected function getParameterMock($name)
+    {
+        $parameter = $this->getMockBuilder('\Doctrine\ORM\Query\Parameter')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $parameter->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+        $parameter->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue($name . '_value'));
+
+        return $parameter;
+    }
+
     /**
      * @return QueryBuilder
      */

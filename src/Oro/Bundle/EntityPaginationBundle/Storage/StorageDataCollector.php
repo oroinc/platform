@@ -18,6 +18,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 
 class StorageDataCollector
 {
+    const PAGINGATION_PARAM = 'entity_pagination';
+    
     /**
      * @var DataGridManager
      */
@@ -77,15 +79,17 @@ class StorageDataCollector
 
         $isDataCollected = false;
 
-        $gridNames = array();
-        if ($request->query->get('grid')) {
-            $gridNames = array_keys((array)$request->query->get('grid', []));
-        }
-        foreach ($gridNames as $gridName) {
+        foreach ($this->getGridNames($request) as $gridName) {
             try {
                 // datagrid manager automatically extracts all required parameters from request
                 $dataGrid = $this->datagridManager
-                    ->getDatagridByRequestParams($gridName, [Manager::REQUIRE_ALL_EXTENSIONS => false]);
+                    ->getDatagridByRequestParams(
+                        $gridName,
+                        [
+                            Manager::REQUIRE_ALL_EXTENSIONS => false,
+                            self::PAGINGATION_PARAM => true
+                        ]
+                    );
             } catch (\RuntimeException $e) {
                 // processing of invalid grid names
                 continue;
@@ -95,16 +99,7 @@ class StorageDataCollector
                 continue;
             }
 
-            /** @var OrmDatasource $dataSource */
-            $dataSource = $dataGrid->getDatasource();
-            $config = $dataGrid->getConfig();
-            $alias = null;
-
-            if ($config) {
-                $alias = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_TARGET_PATH);
-            }
-
-            $entityName = ($alias !== null ) ? $alias : $this->getEntityName($dataSource);
+            $entityName = $this->getEntityNameFromConfig($dataGrid);
             $stateHash = $this->generateStateHash($dataGrid);
 
             // if entities are not in storage
@@ -114,6 +109,8 @@ class StorageDataCollector
 
                 // if grid contains allowed number of entities
                 if ($totalCount <= $entitiesLimit) {
+                    /** @var OrmDatasource $dataSource */
+                    $dataSource = $dataGrid->getDatasource();
                     // collect and set entity IDs
                     $entityIds = $this->getAllEntityIds($dataSource, $scope);
                     $this->storage->setData($entityName, $stateHash, $entityIds, $scope);
@@ -213,5 +210,40 @@ class StorageDataCollector
     protected function getEntitiesLimit()
     {
         return $this->paginationManager->getLimit();
+    }
+
+    /**
+     * Returns grid names from request
+     *
+     * @param Request $request
+     * @return array
+     */
+    protected function getGridNames(Request $request)
+    {
+        $gridNames = array();
+
+        if ($request->query->get('grid')) {
+            $gridNames = (array)$request->query->get('grid', []);
+            $gridNames = array_keys($gridNames);
+        }
+        return $gridNames;
+    }
+
+    /**
+     * Returns entity name or alias from datagrid config
+     *
+     * @param DatagridInterface $dataGrid
+     * @return string
+     */
+    protected function getEntityNameFromConfig(DatagridInterface $dataGrid)
+    {
+        $config = $dataGrid->getConfig();
+        $alias = null;
+
+        if ($config) {
+            $alias = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_TARGET_PATH);
+        }
+
+        return ($alias !== null) ? $alias : $this->getEntityName($dataGrid->getDatasource());
     }
 }

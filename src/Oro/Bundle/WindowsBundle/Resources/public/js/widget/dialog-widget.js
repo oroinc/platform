@@ -51,7 +51,6 @@ define(function(require) {
         },
 
         listen: {
-            'adoptedFormResetClick': 'remove',
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange'
@@ -231,6 +230,10 @@ define(function(require) {
             }
         },
 
+        _onAdoptedFormResetClick: function() {
+            this.remove();
+        },
+
         /**
          * Removes dialog widget
          */
@@ -311,12 +314,10 @@ define(function(require) {
             }, this));
         },
 
-        _afterLayoutInit: function() {
+        _renderHandler: function() {
             this.resetDialogPosition();
             this.widget.closest('.invisible').removeClass('invisible');
-            if (this.deferredRender) {
-                this._resolveDeferredRender();
-            }
+            this.trigger('widgetReady', this);
         },
 
         _initAdjustHeight: function(content) {
