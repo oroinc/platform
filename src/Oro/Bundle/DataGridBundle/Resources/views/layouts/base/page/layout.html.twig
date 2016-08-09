@@ -82,12 +82,12 @@
     <div{{ block('block_attributes') }}><%= render('{{ column_name }}') %></div>
 {% endblock %}
 
-{% block datagrid_header_widget %}
-    <script type="text/html" id="template-datagrid-header">
+{% block datagrid_header_row_widget %}
+    <script type="text/html" id="template-datagrid-header-row">
         <tr{{ block('block_attributes') }}>{{ block_widget(block) }}</tr>
     </script>
 {% endblock %}
 
 {% block datagrid_header_cell_widget %}
-    <th{{ block('block_attributes') }}><%= render_header('{{ column_name }}') %></th>
+    <th{{ block('block_attributes') }}><%= render('{{ column_name }}') %></th>
 {% endblock %}

@@ -6,12 +6,12 @@ services:
         tags:
             - { name: layout.block_type, alias: datagrid }
 
-    oro_datagrid.block_type.datagrid_header:
-        parent: oro_layout.block_type.abstract_configurable
+    oro_datagrid.block_type.datagrid_header_row:
+        parent: oro_layout.block_type.abstract_configurable_container
         calls:
-            - [setName, ['datagrid_header']]
+            - [setName, ['datagrid_header_row']]
         tags:
-            - { name: layout.block_type, alias: datagrid_header }
+            - { name: layout.block_type, alias: datagrid_header_row }
 
     oro_datagrid.block_type.datagrid_header_cell:
         parent: oro_layout.block_type.abstract_configurable
@@ -22,14 +22,14 @@ services:
             - { name: layout.block_type, alias: datagrid_header_cell }
 
     oro_datagrid.block_type.datagrid_row:
-        parent: oro_layout.block_type.abstract_configurable
+        parent: oro_layout.block_type.abstract_configurable_container
         calls:
             - [setName, ['datagrid_row']]
         tags:
             - { name: layout.block_type, alias: datagrid_row }
 
     oro_datagrid.block_type.datagrid_cell:
-        parent: oro_layout.block_type.abstract_configurable
+        parent: oro_layout.block_type.abstract_configurable_container
         calls:
             - [setOptionsConfig, [{column_name: {required: true}}]]
             - [setName, ['datagrid_cell']]
