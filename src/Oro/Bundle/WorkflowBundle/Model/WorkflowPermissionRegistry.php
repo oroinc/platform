@@ -38,17 +38,17 @@ class WorkflowPermissionRegistry
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var WorkflowManager */
-    protected $workflowManager;
+    /** @var WorkflowRegistry */
+    protected $workflowRegistry;
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowRegistry $workflowRegistry
      */
-    public function __construct(DoctrineHelper $doctrineHelper, WorkflowManager $workflowManager)
+    public function __construct(DoctrineHelper $doctrineHelper, WorkflowRegistry $workflowRegistry)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->workflowManager = $workflowManager;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     /**
@@ -66,7 +66,8 @@ class WorkflowPermissionRegistry
         foreach ($supportedClasses as $relatedClass => $supportedClass) {
             $support = in_array($class, $supportedClass, true);
             if ($activeWorkflows) {
-                $support = $support && $this->workflowManager->hasApplicableWorkflows($relatedClass);
+                $support = $support && $this->workflowRegistry
+                        ->getActiveWorkflowsByEntityClass($relatedClass)->isEmpty() === false;
             }
 
             if ($support) {

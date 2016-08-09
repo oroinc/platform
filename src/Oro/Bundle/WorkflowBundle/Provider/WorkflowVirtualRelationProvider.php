@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterface
 {
@@ -14,19 +14,19 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
     const ITEMS_RELATION_NAME = 'workflowItems_virtual';
     const STEPS_RELATION_NAME = 'workflowSteps_virtual';
 
-    /** @var WorkflowManager */
-    protected $workflowManager;
+    /** @var WorkflowRegistry */
+    protected $workflowRegistry;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(WorkflowManager $workflowManager, DoctrineHelper $doctrineHelper)
+    public function __construct(WorkflowRegistry $workflowRegistry, DoctrineHelper $doctrineHelper)
     {
-        $this->workflowManager = $workflowManager;
+        $this->workflowRegistry = $workflowRegistry;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -36,7 +36,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
     public function isVirtualRelation($className, $fieldName)
     {
         return in_array($fieldName, [self::ITEMS_RELATION_NAME, self::STEPS_RELATION_NAME], true)
-            && $this->workflowManager->hasApplicableWorkflows($className);
+            && $this->workflowRegistry->getActiveWorkflowsByEntityClass($className)->isEmpty() === false;
     }
 
     /**
@@ -44,7 +44,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
      */
     public function getVirtualRelations($className)
     {
-        if (!$this->workflowManager->hasApplicableWorkflows($className)) {
+        if ($this->workflowRegistry->getActiveWorkflowsByEntityClass($className)->isEmpty()) {
             return [];
         }
 

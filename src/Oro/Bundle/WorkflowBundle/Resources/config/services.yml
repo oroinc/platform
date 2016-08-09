@@ -135,7 +135,7 @@ services:
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry'
 
     oro_workflow.exclusion_provider.workflow_item_step:
         class: Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider
@@ -146,7 +146,7 @@ services:
     oro_workflow.provider.virtual_relation.workflow:
         class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider'
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }

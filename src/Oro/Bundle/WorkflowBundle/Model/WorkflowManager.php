@@ -342,7 +342,6 @@ class WorkflowManager
      */
     public function getApplicableWorkflows($entity)
     {
-        //todo move WorkflowRecordContext to argument level instead of construction here (in next iteration)
         $recordContext = new WorkflowRecordContext($entity);
 
         if (!$this->entityConnector->isApplicableEntity($entity)) {

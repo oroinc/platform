@@ -33,32 +33,25 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
      */
     public function filter(ArrayCollection $workflows, WorkflowRecordContext $context)
     {
-        $entity = $context->getEntity();
+        /** @var Workflow[]|ArrayCollection $workflows */
 
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        $runningWorkflowNames = $this->getRunningWorkflowNames($context->getEntity());
 
-        $existingRecordsInGroups = [];
-        foreach ($this->getItemsRepository()->findAllByEntityMetadata($entityClass, $identifier) as $workflowItem) {
-            //todo think about getDefinition fetching resource consumption
-            $groups = $workflowItem->getDefinition()->getExclusiveRecordGroups();
-            if (count($groups) !== 0) {
-                $name = $workflowItem->getWorkflowName();
-                foreach ($groups as $group) {
-                    $existingRecordsInGroups[$group] = $name;
-                }
-            }
+        if (count($runningWorkflowNames) === 0) {
+            return $workflows;
         }
 
+        $busyGroups = $this->getBusyGroups($workflows, $runningWorkflowNames);
+
         return $workflows->filter(
-            function (Workflow $workflow) use (&$existingRecordsInGroups) {
+            function (Workflow $workflow) use (&$busyGroups) {
                 $workflowRecordGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
                 foreach ($workflowRecordGroups as $workflowRecordGroup) {
-                    if (!array_key_exists($workflowRecordGroup, $existingRecordsInGroups)) {
+                    if (!array_key_exists($workflowRecordGroup, $busyGroups)) {
                         continue;
                     }
 
-                    if ($existingRecordsInGroups[$workflowRecordGroup] !== $workflow->getName()) {
+                    if ($busyGroups[$workflowRecordGroup] !== $workflow->getName()) {
                         return false;
                     }
                 }
@@ -66,6 +59,49 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
                 return true;
             }
         );
+    }
+
+    /**
+     * @param object $entity
+     * @return array|string[] prioritized array of workflow names
+     */
+    private function getRunningWorkflowNames($entity)
+    {
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+        $repository = $this->getItemsRepository();
+
+        return array_map(
+            function (WorkflowItem $workflowItem) {
+                return $workflowItem->getWorkflowName();
+            },
+            $repository->findAllByEntityMetadata($entityClass, $identifier)
+        );
+    }
+
+
+    /**
+     * @param ArrayCollection $workflows
+     * @param $runningWorkflowNames
+     * @return array
+     */
+    private function getBusyGroups(ArrayCollection $workflows, $runningWorkflowNames)
+    {
+        $runningExclusiveGroups = [];
+        //reversing as they were fetched by priority, so last should override group as more prioritised
+        foreach (array_reverse($runningWorkflowNames) as $runningWorkflowName) {
+            if ($workflows->containsKey($runningWorkflowName)) {
+                $groups = (array)$workflows[$runningWorkflowName]->getDefinition()->getExclusiveRecordGroups();
+                if (count($groups)) {
+                    foreach ($groups as $group) {
+                        $runningExclusiveGroups[$group] = $runningWorkflowName;
+                    }
+                }
+            }
+        }
+
+        return $runningExclusiveGroups;
     }
 
     /**
