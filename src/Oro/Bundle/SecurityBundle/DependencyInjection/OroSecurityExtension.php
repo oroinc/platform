@@ -32,7 +32,6 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $aclMetadataManager = new AclAnnotationMetadataDumper(
             $parameterBag->get('kernel.cache_dir'),
             $parameterBag->get('kernel.environment'),
-            $parameterBag->get('kernel.debug'),
             $parameterBag->get('kernel.name')
         );
         $aclMetadataManager->dump();

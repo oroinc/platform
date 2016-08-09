@@ -350,7 +350,6 @@ services:
         arguments:
             - '@oro_security.acl.annotation_provider'
             - '@oro_security.acl.annotation.metadata.dumper'
-            - %kernel.cache_dir%
             - %kernel.debug%
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
@@ -359,7 +358,7 @@ services:
         class: Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper
         public: false
         lazy: true
-        arguments: [ %kernel.cache_dir%, %kernel.environment%, %kernel.debug%, %kernel.name% ]
+        arguments: [ %kernel.cache_dir%, %kernel.environment%, %kernel.name% ]
 
     oro_security.acl.config_loader:
         public: false

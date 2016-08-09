@@ -13,8 +13,8 @@ class AclListener
     /** @var AclAnnotationProvider */
     protected $cacheProvider;
 
-    /** @var string */
-    protected $kernelCacheDir;
+    /** @var AclAnnotationMetadataDumper */
+    protected $dumper;
 
     /** @var bool */
     protected $kernelDebug;
@@ -22,18 +22,15 @@ class AclListener
     /**
      * @param AclAnnotationProvider       $cacheProvider
      * @param AclAnnotationMetadataDumper $dumper
-     * @param string                      $kernelCacheDir
      * @param bool                        $kernelDebug
      */
     public function __construct(
         AclAnnotationProvider $cacheProvider,
         AclAnnotationMetadataDumper $dumper,
-        $kernelCacheDir,
         $kernelDebug
     ) {
         $this->cacheProvider = $cacheProvider;
         $this->dumper = $dumper;
-        $this->kernelCacheDir = $kernelCacheDir;
         $this->kernelDebug = $kernelDebug;
     }
 
