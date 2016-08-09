@@ -63,7 +63,7 @@ class AttachmentProvider
      *
      * @return File
      */
-    protected function getAttachmentByEntity($entity)
+    private function getAttachmentByEntity($entity)
     {
         $accessor   = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($entity, 'attachment');
@@ -107,7 +107,7 @@ class AttachmentProvider
      *
      * @return string
      */
-    public function getAttachmentURL($entity, $attachment)
+    private function getAttachmentURL($entity, $attachment)
     {
         return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
