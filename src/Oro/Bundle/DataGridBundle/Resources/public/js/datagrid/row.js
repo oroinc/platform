@@ -319,7 +319,8 @@ define([
             var $checkbox;
             this.$el.html(this.template({
                 model: this.model ? this.model.attributes : {},
-                themeOptions: this.themeOptions ? this.themeOptions : {}
+                themeOptions: this.themeOptions ? this.themeOptions : {},
+                render: this.renderColumn.bind(this)
             }));
             $checkbox = this.$('[data-role=select-row]:checkbox');
             if ($checkbox.length) {
@@ -334,6 +335,15 @@ define([
                 });
             }
             return this;
+        },
+
+        renderColumn: function(columnName) {
+            var columnModel = _.find(this.columns.models, function(model) {
+                return model.get('name') === columnName;
+            });
+            if (columnModel) {
+                return this.renderItem(columnModel).$el.html();
+            }
         }
     });
 
