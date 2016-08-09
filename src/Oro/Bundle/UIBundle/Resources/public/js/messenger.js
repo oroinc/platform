@@ -26,6 +26,9 @@ define([
     function showMessage(type, message, options) {
         var opt = _.extend({}, defaults, options || {});
         var $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container);
+        if (opt.onClose) {
+            $el.find('button.close').click(opt.onClose);
+        }
         var delay = opt.delay || (opt.flash && 5000);
         var actions = {
             close: function() {

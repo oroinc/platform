@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\EventListener\ORM;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -20,14 +21,24 @@ class LocalizationListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $strategy;
 
+    /**
+     * @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $localizationCacheProvider;
+
     protected function setUp()
     {
         $this->strategy = $this
-            ->getMockBuilder('Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy')
+            ->getMockBuilder(LocalizationFallbackStrategy::class)
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $this->listener = new LocalizationListener($this->strategy);
+    }
+
+    public function tearDown()
+    {
+        unset($this->strategy, $this->strategy);
     }
 
     public function testPostPersist()
@@ -42,6 +53,13 @@ class LocalizationListenerTest extends \PHPUnit_Framework_TestCase
         $args = $this->getLifecycleEventArgsMock();
         $this->strategy->expects($this->once())->method('clearCache');
         $this->listener->postUpdate(new Localization(), $args);
+    }
+
+    public function testPostRemove()
+    {
+        $args = $this->getLifecycleEventArgsMock();
+        $this->strategy->expects($this->once())->method('clearCache');
+        $this->listener->postRemove(new Localization(), $args);
     }
 
     /**

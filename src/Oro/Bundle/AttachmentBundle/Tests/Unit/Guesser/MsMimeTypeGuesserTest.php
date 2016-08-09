@@ -20,11 +20,11 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     private static $fileDefaults = [
-        'name' => null,
+        'name'     => null,
         'tmp_name' => null,
-        'error' => 0,
-        'size' => 0,
-        'type' => ''
+        'error'    => 0,
+        'size'     => 0,
+        'type'     => ''
     ];
 
     /**
@@ -48,8 +48,8 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider guessDataProvider
      *
-     * @param string $path
-     * @param array $files
+     * @param string      $path
+     * @param array       $files
      * @param string|null $expectedMimeType
      */
     public function testGuess($path, array $files, $expectedMimeType)
@@ -60,35 +60,64 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function guessDataProvider()
     {
-        $correctFile = $this->createFile(hex2bin('d0cf11e0a1b11ae1'));
-        $textFile = $this->createFile('text');
+        $correctFile = realpath(__DIR__ . '/../Fixtures/testFile/test.msg');
+        $incorrectFile = realpath(__DIR__ . '/../Fixtures/testFile/invalid.msg');
+        $textFile = realpath(__DIR__ . '/../Fixtures/testFile/test.txt');
 
         return [
-            'msg file simple form' => [
-                'path' => $correctFile,
-                'files' => $this->buildFilesArraySimple(
+            'msg file not uploaded'           => [
+                'path'             => $correctFile,
+                'files'            => $this->buildFilesArraySimple([]),
+                'expectedMimeType' => 'application/vnd.ms-outlook'
+            ],
+            'invalid msg file not uploaded'   => [
+                'path'             => $incorrectFile,
+                'files'            => $this->buildFilesArraySimple([]),
+                'expectedMimeType' => null
+            ],
+            'txt file not uploaded'           => [
+                'path'             => $textFile,
+                'files'            => $this->buildFilesArraySimple([]),
+                'expectedMimeType' => null
+            ],
+            'msg file simple form'            => [
+                'path'             => $correctFile,
+                'files'            => $this->buildFilesArraySimple(
                     [
-                        ['name' => 'text.txt','tmp_name' => $textFile],
-                        ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
+                        ['tmp_name' => $textFile],
+                        ['tmp_name' => $correctFile],
+                        ['tmp_name' => $incorrectFile]
                     ]
                 ),
                 'expectedMimeType' => 'application/vnd.ms-outlook'
             ],
-            'txt file simple form' => [
-                'path' => $textFile,
-                'files' => $this->buildFilesArraySimple(
+            'invalid msg file simple form'    => [
+                'path'             => $incorrectFile,
+                'files'            => $this->buildFilesArraySimple(
                     [
-                        ['name' => 'text.txt', 'tmp_name' => $textFile]
+                        ['tmp_name' => $textFile],
+                        ['tmp_name' => $correctFile],
+                        ['tmp_name' => $incorrectFile]
                     ]
                 ),
                 'expectedMimeType' => null
             ],
-            'bad extension simple form' => [
-                'path' => $correctFile,
-                'files' => $this->buildFilesArraySimple(
+            'txt file simple form'            => [
+                'path'             => $textFile,
+                'files'            => $this->buildFilesArraySimple(
+                    [
+                        ['tmp_name' => $textFile]
+                    ]
+                ),
+                'expectedMimeType' => null
+            ],
+            'bad extension simple form'       => [
+                'path'             => $correctFile,
+                'files'            => $this->buildFilesArraySimple(
                     [
                         ['name' => 'text.txt', 'tmp_name' => $correctFile]
                     ]
@@ -96,51 +125,51 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
                 'expectedMimeType' => null
             ],
             'msg file complex form (level 1)' => [
-                'path' => $correctFile,
-                'files' => $this->buildFilesArrayComplex(
+                'path'             => $correctFile,
+                'files'            => $this->buildFilesArrayComplex(
                     [
-                        ['name' => 'text.txt','tmp_name' => $textFile],
-                        ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
+                        ['tmp_name' => $textFile],
+                        ['tmp_name' => $correctFile]
                     ]
                 ),
                 'expectedMimeType' => 'application/vnd.ms-outlook'
             ],
             'msg file complex form (level 2)' => [
-                'path' => $correctFile,
-                'files' => $this->buildFilesArrayComplex(
+                'path'             => $correctFile,
+                'files'            => $this->buildFilesArrayComplex(
                     [
-                        ['name' => 'text.txt','tmp_name' => $textFile],
-                        ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
+                        ['tmp_name' => $textFile],
+                        ['tmp_name' => $correctFile]
                     ],
                     2
                 ),
                 'expectedMimeType' => 'application/vnd.ms-outlook'
             ],
             'msg file complex form (level 3)' => [
-                'path' => $correctFile,
-                'files' => $this->buildFilesArrayComplex(
+                'path'             => $correctFile,
+                'files'            => $this->buildFilesArrayComplex(
                     [
-                        ['name' => 'text.txt','tmp_name' => $textFile],
-                        ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
+                        ['tmp_name' => $textFile],
+                        ['tmp_name' => $correctFile]
                     ],
                     3
                 ),
                 'expectedMimeType' => 'application/vnd.ms-outlook'
             ],
-            'txt file complex form' => [
-                'path' => $textFile,
-                'files' => $this->buildFilesArrayComplex(
+            'txt file complex form'           => [
+                'path'             => $textFile,
+                'files'            => $this->buildFilesArrayComplex(
                     [
-                        ['name' => 'text.txt','tmp_name' => $textFile],
+                        ['tmp_name' => $textFile],
                     ]
                 ),
                 'expectedMimeType' => null
             ],
-            'bad extension complex form' => [
-                'path' => $correctFile,
-                'files' => $this->buildFilesArrayComplex(
+            'bad extension complex form'      => [
+                'path'             => $correctFile,
+                'files'            => $this->buildFilesArrayComplex(
                     [
-                        ['name' => 'text.txt','tmp_name' => $correctFile],
+                        ['name' => 'text.txt', 'tmp_name' => $correctFile],
                     ]
                 ),
                 'expectedMimeType' => null
@@ -149,20 +178,8 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $content
-     * @return string
-     */
-    private function createFile($content)
-    {
-        $file = tempnam(sys_get_temp_dir(), '');
-        file_put_contents($file, $content);
-        $this->files[] = $file;
-
-        return $file;
-    }
-
-    /**
      * @param array $files
+     *
      * @return array
      */
     private function buildFilesArraySimple(array $files)
@@ -170,6 +187,9 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $result = [];
         foreach ($files as $index => $file) {
             $key = 'file_' . $index;
+            if (!array_key_exists('name', $file)) {
+                $file['name'] = pathinfo($file['tmp_name'], PATHINFO_BASENAME);
+            }
             $result[$key] = array_merge(self::$fileDefaults, $file);
         }
 
@@ -178,18 +198,22 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $files
-     * @param int $level
+     * @param int   $level
+     *
      * @return array
      */
     private function buildFilesArrayComplex(array $files, $level = 1)
     {
-        $level = (int) $level ? : 1;
+        $level = (int)$level ?: 1;
         $result = [];
 
         foreach (self::$fileDefaults as $fileKey => $defaultValue) {
             $data = [];
             foreach ($files as $index => $file) {
                 $key = 'file_' . $index;
+                if (!array_key_exists('name', $file)) {
+                    $file['name'] = pathinfo($file['tmp_name'], PATHINFO_BASENAME);
+                }
                 $data[$key] = isset($file[$fileKey]) ? $file[$fileKey] : $defaultValue;
             }
 

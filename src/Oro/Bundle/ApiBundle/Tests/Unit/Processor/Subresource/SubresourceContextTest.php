@@ -391,8 +391,8 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
-                $metadataExtras,
-                $config
+                $config,
+                $metadataExtras
             )
             ->willReturn($metadata);
 
@@ -456,8 +456,8 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
-                $metadataExtras,
-                $config
+                $config,
+                $metadataExtras
             )
             ->willThrowException($exception);
 
