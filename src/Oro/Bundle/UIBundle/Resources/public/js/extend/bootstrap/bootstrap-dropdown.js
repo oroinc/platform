@@ -336,11 +336,14 @@ define(function(require) {
             var eventData = e && e.data || {};
             var $toggle = $(toggleDropdown, $dropdown);
             var $dropdownMenu = $('>.dropdown-menu', $dropdown);
-
             var scrollableRect = scrollHelper.getFinalVisibleRect($toggle.closest('.ui-dialog-content')[0]);
             var toggleRect = $toggle[0].getBoundingClientRect();
 
-            if ($dropdown.is('.dropdown') && scrollableRect.top > toggleRect.bottom) {
+            $dropdownMenu.css('display', '');
+
+            var dropdownMenuRect = $dropdownMenu[0].getBoundingClientRect();
+
+            if ($dropdown.is('.dropdown') && scrollableRect.top > Math.min(toggleRect.bottom, dropdownMenuRect.top)) {
                 // whole toggle-item is hidden at the top of scrollable container
                 flipToOpposite($dropdown);
             }
@@ -355,7 +358,7 @@ define(function(require) {
                 $dropdown.is('.dropup') && scrollableRect.top > toggleRect.top
             ) {
                 // dropdown menu is completely hidden behind scrollable container
-                $dropdownMenu.css({position: 'absolute', top: '', left: '', bottom: '', right: ''});
+                $dropdownMenu.hide();
                 return;
             }
 
