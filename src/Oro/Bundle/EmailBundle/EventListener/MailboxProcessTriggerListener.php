@@ -8,7 +8,9 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
@@ -85,7 +87,10 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
         /*
          * Retrieve all process definitions to trigger
          */
-        $definitions = $this->processStorage->getService()->getProcessDefinitionNames();
+        /** @var MailboxProcessStorage $processStorage */
+        $processStorage = $this->processStorage->getService();
+        $definitions = $processStorage->getProcessDefinitionNames();
+        /** @var ProcessDefinition[] $definitions */
         $definitions = $this->getDefinitionRepository()->findBy(['name' => $definitions]);
 
         /*
@@ -96,6 +101,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
             //id must be unique otherwise in cache will be saved and runned first definition with id = null
             $trigger->setId($definition->getName());
             $trigger->setDefinition($definition);
+            $trigger->setEvent(ProcessTrigger::EVENT_CREATE);
 
             $data = new ProcessData();
             $data->set('data', $emailBody);
