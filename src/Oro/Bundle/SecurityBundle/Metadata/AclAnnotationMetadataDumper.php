@@ -16,9 +16,6 @@ class AclAnnotationMetadataDumper
     /** @var string */
     protected $kernelCacheDir;
 
-    /** @var bool */
-    protected $kernelDebug;
-
     /** @var string */
     protected $kernelEnvironment;
 
@@ -28,14 +25,12 @@ class AclAnnotationMetadataDumper
     /**
      * @param string $kernelCacheDir
      * @param string $kernelEnvironment
-     * @param bool   $kernelDebug
      * @param string $kernelName
      */
-    public function __construct($kernelCacheDir, $kernelEnvironment, $kernelDebug, $kernelName)
+    public function __construct($kernelCacheDir, $kernelEnvironment, $kernelName)
     {
         $this->kernelCacheDir = $kernelCacheDir;
         $this->kernelEnvironment = $kernelEnvironment;
-        $this->kernelDebug = $kernelDebug;
         $this->kernelName = $kernelName;
     }
 
