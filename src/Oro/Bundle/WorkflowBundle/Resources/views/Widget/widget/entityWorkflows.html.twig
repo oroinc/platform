@@ -2,7 +2,6 @@
 
 <div class="widget-content">
     {% for workflow in workflows %}
-        {% if workflow.stepsData.steps|length %}
         <table class="workflow-entity">
             <tr>
                 <td class="workflow-label"><div class="workflow-label-text">{{ workflow.label|trans }}</div></td>
@@ -26,6 +25,5 @@
                 </td>
             </tr>
         </table>
-        {% endif %}
     {% endfor %}
 </div>
