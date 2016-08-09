@@ -18,7 +18,7 @@ placeholders:
                 order: 100
     page_title_after:
         items:
-            workflow_entity_view:
+            entity_workflows:
                 order: 100
 
 items:
@@ -28,5 +28,5 @@ items:
         template: OroWorkflowBundle:Widget:steps.html.twig
     workflow_steps_placeholder:
         template: OroWorkflowBundle:Widget:placeholder.html.twig
-    workflow_entity_view:
-        template: OroWorkflowBundle:Widget:entity_view.html.twig
+    entity_workflows:
+        template: OroWorkflowBundle:Widget:entityWorkflows.html.twig
