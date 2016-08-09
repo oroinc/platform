@@ -77,7 +77,6 @@ define([
             var _this = this;
             _.extend(this, _.pick(options, ['themeOptions', 'template', 'columns']));
             // let descendants override itemView
-
             if (!this.itemView) {
                 this.itemView = function(options) {
                     var column = options.model;
@@ -321,9 +320,7 @@ define([
             this.$el.html(this.template({
                 model: this.model ? this.model.attributes : {},
                 themeOptions: this.themeOptions ? this.themeOptions : {},
-                renderColumn: function (columnName) {
-                    this.renderColumn(columnName);
-                }
+                render: this.renderColumn.bind(this)
             }));
             $checkbox = this.$('[data-role=select-row]:checkbox');
             if ($checkbox.length) {
@@ -345,7 +342,7 @@ define([
                 return model.get('name') === columnName;
             });
             if (columnModel) {
-                return this.renderItem(columnModel);
+                return this.renderItem(columnModel).$el.html();
             }
         }
     });

@@ -27,6 +27,7 @@ define([
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
             var _this = this;
+            _.extend(this, _.pick(options, ['themeOptions', 'template']));
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(options) {
@@ -61,6 +62,36 @@ define([
             delete this.columns;
             delete this.dataCollection;
             HeaderRow.__super__.dispose.call(this);
+        },
+
+        render: function() {
+            this._deferredRender();
+            if (this.template) {
+                this.renderCustomTemplate();
+            }else {
+                HeaderRow.__super__.render.apply(this, arguments);
+            }
+            this._resolveDeferredRender();
+
+            return this;
+        },
+
+        renderCustomTemplate: function() {
+            this.$el.html(this.template({
+                model: this.model ? this.model.attributes : {},
+                themeOptions: this.themeOptions ? this.themeOptions : {},
+                render: this.renderColumn.bind(this)
+            }));
+            return this;
+        },
+
+        renderColumn: function(columnName) {
+            var columnModel = _.find(this.columns.models, function(model) {
+                return model.get('name') === columnName;
+            });
+            if (columnModel) {
+                return this.renderItem(columnModel).$el.html();
+            }
         }
     });
 
