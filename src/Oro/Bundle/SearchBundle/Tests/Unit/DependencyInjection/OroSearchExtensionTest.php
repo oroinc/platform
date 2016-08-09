@@ -9,9 +9,6 @@ use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle;
-
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ContainerBuilder */
@@ -239,29 +236,5 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->container->setParameter('oro_search.drivers', array('pro_pgSql'));
         $searchExtension->load($config, $this->container);
-    }
-
-    public function testLoadAllDefinedEngineConfigurations()
-    {
-        $firstBundle = new FirstESEngineBundle();
-        $secondBundle = new SecondESEngineBundle();
-
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->setBundles([
-                $firstBundle->getName() => get_class($firstBundle),
-                $secondBundle->getName() => get_class($secondBundle)
-            ]);
-
-        $config = [
-            'oro_search' => [
-                'engine' => 'elastic_search',
-            ]
-        ];
-
-        $searchExtension = new OroSearchExtension(array(), $this->container);
-        $searchExtension->load($config, $this->container);
-        
-        $this->assertCount(4, $this->container->getResources());
     }
 }
