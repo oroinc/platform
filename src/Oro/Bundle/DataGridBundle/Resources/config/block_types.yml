@@ -3,6 +3,8 @@ services:
         class: Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType
         arguments:
             - '@oro_datagrid.datagrid.name_strategy'
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_security.security_facade'
         tags:
             - { name: layout.block_type, alias: datagrid }
 
