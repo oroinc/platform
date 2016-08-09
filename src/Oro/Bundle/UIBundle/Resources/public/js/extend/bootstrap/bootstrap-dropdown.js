@@ -398,8 +398,8 @@ define(function(require) {
                     return;
                 }
                 var $dropdown = $(this);
-                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup')
-                    || $dropdown.has('>.dropdown-menu').length === 0) {
+                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup') ||
+                    $dropdown.has('>.dropdown-menu').length === 0) {
                     // handles only case when dropdown id opened in dialog
                     return;
                 }
