@@ -215,14 +215,26 @@ define(function(require) {
          */
         getDefaultTime: function() {
             var date;
-            var toDayDate;
+            var todayDate;
+            var currentTimeMoment;
+            var guessTimeMoment;
             var time = _.result(this, 'defaultTime');
             if (!time) {
                 date = this.$frontDateField.val();
-                toDayDate = moment().format(this.getDateFormat());
-                if (date === toDayDate) {
+                todayDate = moment().tz(this.timezone).format(this.getDateFormat());
+                if (date === todayDate) {
+                    currentTimeMoment = moment().tz(this.timezone);
                     // add 15 minutes to current time if it's today date
-                    time = moment().add(15, 'minutes').format('HH:mm');
+                    guessTimeMoment = currentTimeMoment.clone().add(15, 'minutes');
+                    // round up till 5 minutes
+                    guessTimeMoment.add(5 - (guessTimeMoment.minute() % 5 || 5), 'minutes');
+                    if (guessTimeMoment.diff(currentTimeMoment.clone().set('hour', 23).set('minute', 59)) < 0) {
+                        // if it is still same date
+                        time = guessTimeMoment.format('HH:mm');
+                    } else {
+                        // set max available time for today
+                        time = '23:59';
+                    }
                 } else {
                     // default time is beginning of the day
                     time = '00:00';
