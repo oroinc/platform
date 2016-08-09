@@ -5,6 +5,7 @@ define(function(require) {
      * Updates single property during transition
      */
     var UpdateMainPropertyTransition;
+    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var AbstractTransition = require('./abstract-transition');
     var mediator = require('oroui/js/mediator');
@@ -38,11 +39,11 @@ define(function(require) {
             // start saving
             return this.apiAccessor.send(model.toJSON(), properties, {}, {
                 processingMessage: __('oro.form.inlineEditing.saving_progress')
-            }).then(function() {
-                model.set({
+            }).then(function(response) {
+                model.set(_.extend({
                     transitionStatus: 'success',
                     transitionStatusUpdateTime: new Date()
-                });
+                }, response.fields || {}));
                 mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'), {
                     delay: transition.boardPlugin.view.earlyChangeTimeout
                 });
@@ -54,12 +55,14 @@ define(function(require) {
                     transitionStatus: 'error',
                     transitionStatusUpdateTime: new Date()
                 });
-                mediator.execute('showMessage', 'error', response.responseJSON.message, {onClose: function() {
-                    model.set({
-                        transitionStatus: 'not_started',
-                        transitionStatusUpdateTime: new Date()
-                    });
-                }});
+                mediator.execute('showMessage', 'error', response.responseJSON.message, {
+                    onClose: function() {
+                        model.set({
+                            transitionStatus: 'not_started',
+                            transitionStatusUpdateTime: new Date()
+                        });
+                    }
+                });
             });
         },
 

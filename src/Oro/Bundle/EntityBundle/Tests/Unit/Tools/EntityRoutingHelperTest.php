@@ -273,7 +273,7 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage The entity "Acme\Bundle\TestClass" with ID "123" was not found.
+     * @expectedExceptionMessage Record doesn't found.
      */
     public function testGetEntityForNotExistingEntity()
     {

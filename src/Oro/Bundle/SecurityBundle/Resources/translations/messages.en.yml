@@ -4,7 +4,8 @@ CREATE: Create
 EDIT: Edit
 DELETE: Delete
 ASSIGN: Assign
-SHARE: Share
+"view %entityName%": "View %entityName%"
+"view %fieldName% not granted": "You don't have permissions to view %fieldName%"
 oro:
     security:
         access-level:

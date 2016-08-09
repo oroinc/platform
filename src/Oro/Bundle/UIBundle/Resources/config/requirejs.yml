@@ -77,22 +77,22 @@ config:
         '*':
             'jquery': 'oroui/js/extend/jquery'
             'jquery.select2': 'oroui/js/extend/select2'
-            'jquery.multiselect': 'oroui/js/extend/multiselect'
-            'jquery.multiselect.filter': 'oroui/js/extend/multiselect-filter'
+            'jquery.multiselect': 'oroui/js/extend/jquery.multiselect'
+            'jquery.multiselect.filter': 'oroui/js/extend/jquery.multiselect-filter'
             'chaplin': 'oroui/js/extend/chaplin'
             'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
-            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/js/jquery-timepicker-l10n'
+            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
             'base64': 'oroui/js/extend/base64'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/select2':
             'jquery.select2': 'jquery.select2'
-        'oroui/js/extend/multiselect':
+        'oroui/js/extend/jquery.multiselect':
             'jquery.multiselect': 'jquery.multiselect'
-        'oroui/js/extend/multiselect-filter':
+        'oroui/js/extend/jquery.multiselect-filter':
             'jquery.multiselect.filter': 'jquery.multiselect.filter'
         'oroui/js/extend/jquery-ui':
             'jquery-ui': 'jquery-ui'
@@ -107,6 +107,8 @@ config:
         'oroui/js/jquery-ui-datepicker-l10n':
             'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/jquery-timepicker-l10n':
+            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker'
+        'oroui/js/extend/jquery.timepicker':
             'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker'
         'chaplin':
             'backbone': 'backbone'
