@@ -2,42 +2,65 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tools;
 
-use Imagine\Image\ImageInterface;
-use Imagine\Image\ImagineInterface;
+use Liip\ImagineBundle\Binary\BinaryInterface;
 
+use Liip\ImagineBundle\Model\Binary;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
+
+use Liip\ImagineBundle\Binary\MimeTypeGuesserInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 
 class ImageFactory
 {
-    /** @var ImagineInterface */
-    protected $imagine;
-
     /** @var FilterManager */
     protected $filterManager;
 
+    /** @var  MimeTypeGuesserInterface */
+    protected $mimeTypeGuesser;
+
+    /** @var  ExtensionGuesserInterface */
+    protected $extensionGuesser;
+
     /**
-     * @param ImagineInterface $imagine
-     * @param FilterManager    $filterManager
+     * @param FilterManager $filterManager
+     * @param MimeTypeGuesserInterface $mimeTypeGuesser
+     * @param ExtensionGuesserInterface $extensionGuesser
      */
-    public function __construct(ImagineInterface $imagine, FilterManager $filterManager)
-    {
-        $this->imagine = $imagine;
+    public function __construct(
+        FilterManager $filterManager,
+        MimeTypeGuesserInterface $mimeTypeGuesser,
+        ExtensionGuesserInterface $extensionGuesser
+    ) {
         $this->filterManager = $filterManager;
+        $this->mimeTypeGuesser = $mimeTypeGuesser;
+        $this->extensionGuesser = $extensionGuesser;
     }
 
     /**
      * @param string $content
      * @param string $filter
      *
-     * @return ImageInterface
+     * @return BinaryInterface
      */
     public function createImage($content, $filter)
     {
         $image = $this->filterManager->applyFilter(
-            $this->imagine->load($content),
+            $this->createBinary($content),
             $filter
         );
 
         return $image;
+    }
+
+    /**
+     * @param string $content
+     * @return Binary
+     */
+    protected function createBinary($content)
+    {
+        $mimeType = $this->mimeTypeGuesser->guess($content);
+        $format = $this->extensionGuesser->guess($mimeType);
+
+        return new Binary($content, $mimeType, $format);
     }
 }

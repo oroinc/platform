@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Model;
 
-use Imagine\Image\ImageInterface;
+use Liip\ImagineBundle\Binary\BinaryInterface;
 
 class Thumbnail
 {
-    /** @var ImageInterface */
-    protected $image;
+    /** @var BinaryInterface */
+    protected $binary;
 
     /** @var int */
     protected $width;
@@ -19,25 +19,25 @@ class Thumbnail
     protected $filter;
 
     /**
-     * @param ImageInterface $image
-     * @param int            $width
-     * @param int            $height
-     * @param string         $filter
+     * @param BinaryInterface $binary
+     * @param int $width
+     * @param int $height
+     * @param string $filter
      */
-    public function __construct(ImageInterface $image, $width, $height, $filter)
+    public function __construct(BinaryInterface $binary, $width, $height, $filter)
     {
-        $this->image = $image;
+        $this->binary = $binary;
         $this->width = $width;
         $this->height = $height;
         $this->filter = $filter;
     }
 
     /**
-     * @return ImageInterface
+     * @return BinaryInterface
      */
-    public function getImage()
+    public function getBinary()
     {
-        return $this->image;
+        return $this->binary;
     }
 
     /**

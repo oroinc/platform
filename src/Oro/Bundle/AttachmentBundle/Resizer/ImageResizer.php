@@ -3,13 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Resizer;
 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
-use Liip\ImagineBundle\Imagine\Filter\FilterManager;
-use Liip\ImagineBundle\Model\Binary;
-
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Tools\ImageFactory;
 
 class ImageResizer
 {
@@ -24,14 +22,14 @@ class ImageResizer
     private $cacheManager;
 
     /**
-     * @var ExtensionGuesserInterface
+     * @var FileManager
      */
-    private $extensionGuesser;
+    private $fileManager;
 
     /**
-     * @var FilterManager
+     * @var ImageFactory
      */
-    private $filterManager;
+    private $imageFactory;
 
     /**
      * @var string
@@ -41,22 +39,22 @@ class ImageResizer
     /**
      * @param AttachmentManager $attachmentManager
      * @param CacheManager $cacheManager
-     * @param FilterManager $filterManager
-     * @param ExtensionGuesserInterface $extensionGuesser
+     * @param FileManager $fileManager
+     * @param ImageFactory $imageFactory
      * @param string $cacheResolverName
      */
     public function __construct(
         AttachmentManager $attachmentManager,
         CacheManager $cacheManager,
-        FilterManager $filterManager,
-        ExtensionGuesserInterface $extensionGuesser,
+        FileManager $fileManager,
+        ImageFactory $imageFactory,
         $cacheResolverName
     ) {
         $this->attachmentManager = $attachmentManager;
         $this->cacheManager = $cacheManager;
-        $this->extensionGuesser = $extensionGuesser;
+        $this->fileManager = $fileManager;
+        $this->imageFactory = $imageFactory;
         $this->cacheResolverName = $cacheResolverName;
-        $this->filterManager = $filterManager;
     }
 
     /**
@@ -73,13 +71,8 @@ class ImageResizer
             return false;
         }
 
-        $mimeType = $image->getMimeType();
-        $format = $this->extensionGuesser->guess($mimeType);
-        $content = $this->attachmentManager->getContent($image);
-
-        $binary = new Binary($content, $mimeType, $format);
-        $filteredBinary = $this->filterManager->applyFilter($binary, $filterName);
-
+        $content = $this->fileManager->getContent($image);
+        $filteredBinary = $this->imageFactory->createImage($content, $filterName);
         $this->cacheManager->store($filteredBinary, $path, $filterName, $this->cacheResolverName);
 
         return true;

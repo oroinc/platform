@@ -49,8 +49,9 @@ services:
     oro_attachment.image_factory:
         class: Oro\Bundle\AttachmentBundle\Tools\ImageFactory
         arguments:
-          - '@liip_imagine'
           - '@liip_imagine.filter.manager'
+          - '@liip_imagine.binary.mime_type_guesser'
+          - '@liip_imagine.extension_guesser'
 
     oro_attachment.thumbnail_factory:
         class: Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory
@@ -215,11 +216,11 @@ services:
           - { name: liip_imagine.cache.resolver, resolver: %oro_attachment.imagine.cache.resolver.custom_web_path.name% }
 
     oro_attachment.image_resizer:
-        class: 'AttachmentBundle\Resizer\ImageResizer'
+        class: 'Oro\Bundle\AttachmentBundle\Resizer\ImageResizer'
         arguments:
             - '@oro_attachment.manager'
             - '@liip_imagine.cache.manager'
-            - '@liip_imagine.filter.manager'
-            - '@liip_imagine.extension_guesser'
+            - '@oro_attachment.file_manager'
+            - '@oro_attachment.image_factory'
             - '%oro_attachment.imagine.cache.resolver.custom_web_path.name%'
 
