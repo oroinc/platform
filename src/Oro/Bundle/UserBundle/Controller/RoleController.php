@@ -11,6 +11,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -32,6 +34,35 @@ class RoleController extends Controller
     public function createAction()
     {
         return $this->update(new Role());
+    }
+
+    /**
+     * @Route("/view/{id}", name="oro_user_role_view", requirements={"id"="\d+"})
+     * @Template
+     * @Acl(
+     *      id="oro_user_role_view",
+     *      type="entity",
+     *      class="OroUserBundle:Role",
+     *      permission="VIEW"
+     * )
+     *
+     * @param Role $role
+     *
+     * @return array
+     */
+    public function viewAction(Role $role)
+    {
+        return [
+            'entity' => $role,
+            'tabsOptions' => [
+                'data' => $this->getTabListOptions()
+            ],
+            'capabilitySetOptions' => [
+                'data' => $this->getRolePrivilegeCapabilityProvider()->getCapabilities($role),
+                'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabList(),
+                'readonly' => true
+            ]
+        ];
     }
 
     /**
@@ -117,5 +148,37 @@ class RoleController extends Controller
                     ->getRepository('OroUserBundle:Role')
                     ->hasAssignedUsers($role)
         ];
+    }
+
+    /**
+     * @return RolePrivilegeCategoryProvider
+     */
+    protected function getRolePrivilegeCategoryProvider()
+    {
+        return $this->get('oro_user.provider.role_privilege_category_provider');
+    }
+
+    /**
+     * @return RolePrivilegeCapabilityProvider
+     */
+    protected function getRolePrivilegeCapabilityProvider()
+    {
+        return $this->get('oro_user.provider.role_privilege_capability_provider');
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTabListOptions()
+    {
+        return array_map(
+            function (PrivilegeCategory $tab) {
+                return [
+                    'id' => $tab->getId(),
+                    'label' => $this->get('translator')->trans($tab->getLabel())
+                ];
+            },
+            $this->getRolePrivilegeCategoryProvider()->getTabbedCategories()
+        );
     }
 }

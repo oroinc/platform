@@ -104,4 +104,27 @@ class ControllersRoleTest extends WebTestCase
 
         $this->assertEquals(1, $result['id']);
     }
+
+    /**
+     * @depends testUpdate
+     */
+    public function testView()
+    {
+        $response = $this->client->requestGrid(
+            'roles-grid',
+            ['roles-grid[_filter][label][value]' => 'testRoleUpdated']
+        );
+
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
+        /** @var Crawler $crawler */
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_role_view', ['id' => $result['id']])
+        );
+
+        self::assertContains('testRoleUpdated', $crawler->filter('.responsive-section')->first()->html());
+        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->html());
+    }
 }
