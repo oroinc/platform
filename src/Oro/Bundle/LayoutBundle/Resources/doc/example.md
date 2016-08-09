@@ -1395,7 +1395,7 @@ services:
             - { name: layout.block_type, alias: datetime }
 ```
 
-`setOptions` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
+`setOptionsConfig` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
 
 Container block type:
 ```yaml
