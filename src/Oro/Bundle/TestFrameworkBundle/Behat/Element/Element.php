@@ -34,7 +34,7 @@ class Element extends NodeElement
      */
     public function __construct(Session $session, OroElementFactory $elementFactory, $selector = ['xpath' => '//'])
     {
-        parent::__construct($this->getSelectorAsXpath($session->getSelectorsHandler(), $selector), $session);
+        parent::__construct($selector, $session);
 
         $this->elementFactory = $elementFactory;
         $this->session = $session;
@@ -69,8 +69,20 @@ class Element extends NodeElement
     public function findLabel($locator)
     {
         $labelSelector = sprintf("label:contains('%s')", $locator);
+        $label = $this->find('css', $labelSelector);
 
-        return $this->find('css', $labelSelector);
+        if (null !== $label) {
+            return $label;
+        }
+
+        /** @var NodeElement $label */
+        foreach ($this->findAll('css', 'label') as $label) {
+            if (preg_match(sprintf('/%s/i', $locator), $label->getText())) {
+                return $label;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -107,19 +119,5 @@ class Element extends NodeElement
     protected function getName()
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
-    }
-
-    /**
-     * @param SelectorsHandler $selectorsHandler
-     * @param array|string $selector
-     *
-     * @return string
-     */
-    private function getSelectorAsXpath(SelectorsHandler $selectorsHandler, $selector)
-    {
-        $selectorType = is_array($selector) ? $selector['type'] : 'css';
-        $locator = is_array($selector) ? $selector['locator'] : $selector;
-
-        return $selectorsHandler->selectorToXpath($selectorType, $locator);
     }
 }
