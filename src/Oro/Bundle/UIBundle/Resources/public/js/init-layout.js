@@ -175,10 +175,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         });
 
-        $(document).on('focus', '.select2-focusser, .select2-input', function(e) {
-            $('.hasDatepicker').datepicker('hide');
-        });
-
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function(e) {
             var $target = $(e.target);
