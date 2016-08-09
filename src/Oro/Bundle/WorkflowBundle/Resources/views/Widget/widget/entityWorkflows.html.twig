@@ -11,15 +11,33 @@
                             <td class="workflow-steps">
                                 {% set isOrdered = workflow.stepsData.is_ordered %}
                                 {% set steps = workflow.stepsData.steps %}
-                                {% for step in steps %}
-                                    {% set active = step.active %}
-                                    {% set possibleStepsCount = step.possibleStepsCount %}
-                                    {{ step.label|trans }}
-                                {% endfor %}
+                                {% set stepWidth = 100 / steps|length %}
+                                <ul class="workflow-steps-list">
+                                    {% for step in steps %}
+                                        {% set active = step.active %}
+                                        {% set possibleStepsCount = step.possibleStepsCount %}
+                                        {% if isOrdered %}
+                                            <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}"
+                                                style="width:{{ stepWidth }}%">
+                                                <div class="workflow-steps-item-arrow-container">
+                                                    <span class="workflow-step-arrow-left"></span>
+                                                    <span class="workflow-step-arrow-right"></span>
+                                                    {{ step.label|trans }}
+                                                </div>
+                                            </li>
+                                        {% else %}
+                                            <li class="workflow-steps-item workflow-unordered-steps">
+                                                <span>{{ step.label|trans }}</span>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
                             </td>
-                            <td class="workflow-controls">
-                                {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
-                            </td>
+                            {% if workflow.transitionsData|length != 0 %}
+                                <td class="workflow-controls">
+                                    {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
+                                </td>
+                            {% endif %}
                         </tr>
                     </table>
                 </td>
