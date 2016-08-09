@@ -11,15 +11,21 @@
                             <td class="workflow-steps">
                                 {% set isOrdered = workflow.stepsData.is_ordered %}
                                 {% set steps = workflow.stepsData.steps %}
+                                <ul class="workflow-steps-list">
                                 {% for step in steps %}
                                     {% set active = step.active %}
                                     {% set possibleStepsCount = step.possibleStepsCount %}
-                                    {{ step.label|trans }}
+                                    <li class="workflow-steps-item {% if isOrdered %}workflow-ordered-steps {% if active %}active{% endif %}{% else %}workflow-unordered-steps{% endif %}">
+                                        <span>{{ step.label|trans }}</span>
+                                    </li>
                                 {% endfor %}
+                                </ul>
                             </td>
-                            <td class="workflow-controls">
-                                {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
-                            </td>
+                            {% if workflow.transitionsData|length != 0 %}
+                                <td class="workflow-controls">
+                                    {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
+                                </td>
+                            {% endif %}
                         </tr>
                     </table>
                 </td>

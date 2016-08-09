@@ -143,6 +143,7 @@ table.grid {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 700;
 }
 
 .workflow-content-container {
@@ -155,9 +156,42 @@ table.grid {
 
 .workflow-steps {
   padding: 0 10px;
+
+  &:last-child {
+    padding: 0 0 0 10px;
+  }
+}
+
+.workflow-steps-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+  font-size: 0;
+}
+
+.workflow-steps-item {
+  display: inline-block;
+  font-size: 13px;
+}
+
+.workflow-ordered-steps {
+
+}
+
+.workflow-unordered-steps {
+  span {
+    display: block;
+    padding: 4px 10px;
+    border-radius: 10px;
+    color: #2f8206;
+    background: #dff2d4;
+    text-align: center
+  }
 }
 
 .workflow-controls {
+  width: 2%;
   padding: 0 0 0 10px;
   text-align: right;
 }
