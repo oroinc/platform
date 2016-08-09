@@ -4,6 +4,7 @@ define(function(require) {
     var BUTreeAutocompleteComponent;
     var Select2TreeAutocompleteComponent = require('oro/select2-tree-autocomplete-component');
     var mediator = require('oroui/js/mediator');
+    var _ = require('underscore');
 
     BUTreeAutocompleteComponent = Select2TreeAutocompleteComponent.extend({
         organizations: {},
@@ -67,7 +68,7 @@ define(function(require) {
                 var checkedOrganization = values.filter(function(value) {
                     var selectedValue = that.getValueFromSelectedData(parseInt(value));
                     if (selectedValue) {
-                        return parseInt(selectedValue.organization_id) === data.organizationId;
+                        return parseInt(selectedValue.organization_id) === parseInt(data.organizationId);
                     }
                 });
 
@@ -86,9 +87,9 @@ define(function(require) {
         getValueFromSelectedData: function(val) {
             var selectedData = this.view.$el.data('selected-data');
 
-            return selectedData.filter(function(item) {
+            return _.find(selectedData, function(item) {
                 return item.id === val;
-            }).pop();
+            });
         }
     });
 
