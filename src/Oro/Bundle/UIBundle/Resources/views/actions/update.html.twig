@@ -60,7 +60,7 @@
                                                     <span class="separator">/</span>
                                                     {% endfor %}
                                                 {% endif %}
-                                                <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
+                                                <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
                                             </div>
                                             {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                         {% endblock breadcrumbs %}
@@ -69,20 +69,12 @@
                                         <ul class="inline">
                                             {% block stats %}
                                                 {% if breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.updatedAt is defined %}
-                                                    <li>
-                                                        {{ 'oro.ui.created_at'|trans }}:
-                                                        {{ breadcrumbs.entity.createdAt ?
-                                                            breadcrumbs.entity.createdAt|oro_format_datetime :
-                                                            'oro.ui.empty'|trans
-                                                        }}
-                                                    </li>
-                                                    <li>
-                                                        {{ 'oro.ui.updated_at'|trans }}:
-                                                        {{ breadcrumbs.entity.updatedAt ?
-                                                            breadcrumbs.entity.updatedAt|oro_format_datetime :
-                                                            'oro.ui.empty'|trans
-                                                        }}
-                                                    </li>
+                                                    {% if  resource_granted('VIEW', breadcrumbs.entity, 'createdAt') %}
+                                                        <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
+                                                    {% endif %}
+                                                    {% if  resource_granted('VIEW', breadcrumbs.entity, 'updatedAt') %}
+                                                        <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endblock stats %}
                                         </ul>
