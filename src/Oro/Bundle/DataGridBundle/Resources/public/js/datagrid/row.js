@@ -320,7 +320,8 @@ define([
             this.$el.html(this.template({
                 model: this.model ? this.model.attributes : {},
                 themeOptions: this.themeOptions ? this.themeOptions : {},
-                render: this.renderColumn.bind(this)
+                render: this.renderColumn.bind(this),
+                attributes: this.renderColumnAttributes.bind(this)
             }));
             $checkbox = this.$('[data-role=select-row]:checkbox');
             if ($checkbox.length) {
@@ -344,6 +345,32 @@ define([
             if (columnModel) {
                 return this.renderItem(columnModel).$el.html();
             }
+        },
+
+        renderColumnAttributes: function(columnName, additionalAttrs) {
+            var attributes = additionalAttrs || [];
+            var columnModel = _.find(this.columns.models, function(model) {
+                return model.get('name') === columnName;
+            });
+            if (columnModel) {
+                var $element = this.renderItem(columnModel).$el;
+                if($element.length){
+                    if(attributes.class) {
+                        var classes = attributes.class.split(' ');
+                        for (var i in classes) {
+                            $element.addClass(classes[i]);
+                        }
+                    }
+                    attributes.class = $element.attr('class');
+                }
+            }
+
+            var result = [];
+            for(var k in attributes){
+                result.push(k + '="' + attributes[k] + '"');
+            }
+
+            return result.join(' ');
         }
     });
 
