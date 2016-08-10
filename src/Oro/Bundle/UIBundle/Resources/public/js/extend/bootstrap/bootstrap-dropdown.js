@@ -339,16 +339,16 @@ define(function(require) {
             var scrollableRect = scrollHelper.getFinalVisibleRect($toggle.closest('.ui-dialog-content')[0]);
             var toggleRect = $toggle[0].getBoundingClientRect();
 
-            $dropdownMenu.css('display', '');
+            $dropdownMenu.css({position: 'absolute', display: '', top: '', left: '', bottom: '', right: ''});
 
             var dropdownMenuRect = $dropdownMenu[0].getBoundingClientRect();
 
-            if ($dropdown.is('.dropdown') && scrollableRect.top > Math.min(toggleRect.bottom, dropdownMenuRect.top)) {
+            if ($dropdown.is('.dropdown') && scrollableRect.top > dropdownMenuRect.top) {
                 // whole toggle-item is hidden at the top of scrollable container
                 flipToOpposite($dropdown);
             }
 
-            if ($dropdown.is('.dropup') && scrollableRect.bottom < toggleRect.top) {
+            if ($dropdown.is('.dropup') && scrollableRect.bottom < dropdownMenuRect.bottom) {
                 // whole toggle-item is hidden at the bottom of scrollable container
                 flipToOpposite($dropdown);
             }
@@ -365,8 +365,6 @@ define(function(require) {
             if (!eventData.preferCurrentState) {
                 flipToInitial($dropdown);
             }
-
-            $dropdownMenu.css({position: 'absolute', top: '', left: '', bottom: '', right: ''});
 
             if (!isInRange(document.body, $dropdownMenu[0])) {
                 flipToOpposite($dropdown);
