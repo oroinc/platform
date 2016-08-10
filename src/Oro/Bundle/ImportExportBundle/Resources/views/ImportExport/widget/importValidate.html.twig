@@ -112,15 +112,9 @@
             </tr>
 
             {% if counts.invalid_entries is defined %}
-                <tr class="error">
+                <tr {% if counts.invalid_entries %}class="error"{% endif %}>
                     <td>
-                        {% if counts.invalid_entries > 0 %}
-                            <a href="javascript: void(0)" class="error-toggle">
-                                {{ 'Invalid records '|trans }}
-                            </a>
-                        {% else %}
-                            {{ 'Invalid records '|trans }}
-                        {% endif %}
+                        {{ 'Invalid records '|trans }}
                     </td>
                     <td>
                         <div class="pull-right">
