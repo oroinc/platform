@@ -83,22 +83,22 @@ class Item
     /**
      * @ORM\OneToMany(targetEntity="IndexText", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $textFields;
+    protected $textFields;
 
     /**
      * @ORM\OneToMany(targetEntity="IndexInteger", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $integerFields;
+    protected $integerFields;
 
     /**
      * @ORM\OneToMany(targetEntity="IndexDecimal", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $decimalFields;
+    protected $decimalFields;
 
     /**
      * @ORM\OneToMany(targetEntity="IndexDatetime", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $datetimeFields;
+    protected $datetimeFields;
 
     /**
      * Constructor
@@ -571,7 +571,7 @@ class Item
      * @param string $fieldName
      * @param mixed  $fieldData
      */
-    private function setFieldData($record, $fieldName, $fieldData)
+    protected function setFieldData($record, $fieldName, $fieldData)
     {
         $record->setField($fieldName)
             ->setValue($fieldData)
