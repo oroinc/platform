@@ -17,7 +17,7 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 
 /**
  * @outputBuffering enabled
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class EmailSyncCommandTest extends WebTestCase
 {
@@ -154,7 +154,6 @@ class EmailSyncCommandTest extends WebTestCase
         return $results;
     }
 
-
     /**
      * @param string $folder
      *
@@ -165,8 +164,9 @@ class EmailSyncCommandTest extends WebTestCase
         $parameters = [];
         $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
         foreach ($testFiles as $fileName => $object) {
-            $parameters[$fileName] = Yaml::parse(file_get_contents($fileName)) ?: [];
+            $parameters[$object->getFilename()] = Yaml::parse(file_get_contents($fileName)) ?: [];
         }
+        ksort($parameters);
 
         return $parameters;
     }
