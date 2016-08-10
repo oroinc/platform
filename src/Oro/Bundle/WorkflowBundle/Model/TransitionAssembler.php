@@ -88,11 +88,12 @@ class TransitionAssembler extends BaseAbstractAssembler
             if (empty($options)) {
                 $options = array();
             }
-            $definitions[$name] = array(
+            $definitions[$name] = [
+                'preactions' => $this->getOption($options, 'preactions', []),
                 'pre_conditions' => $this->getOption($options, 'pre_conditions', array()),
                 'conditions' => $this->getOption($options, 'conditions', array()),
                 'post_actions' => $this->getOption($options, 'post_actions', array())
-            );
+            ];
         }
 
         return $definitions;
@@ -131,6 +132,11 @@ class TransitionAssembler extends BaseAbstractAssembler
             )
             ->setPageTemplate($this->getOption($options, 'page_template'))
             ->setDialogTemplate($this->getOption($options, 'dialog_template'));
+
+        if (!empty($definition['preactions'])) {
+            $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
+            $transition->setPreAction($preAction);
+        }
 
         $definition['pre_conditions'] = $this->addAclPreConditions($options, $definition);
         if (!empty($definition['pre_conditions'])) {

@@ -117,4 +117,73 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($message->isRedelivered());
     }
+
+    public function testShouldReturnEmptyStringAsDefaultCorrelationId()
+    {
+        $message = new NullMessage();
+
+        self::assertSame('', $message->getCorrelationId());
+    }
+
+    public function testShouldAllowGetPreviouslySetCorrelationId()
+    {
+        $message = new NullMessage();
+        $message->setCorrelationId('theId');
+
+        self::assertSame('theId', $message->getCorrelationId());
+    }
+
+    public function testShouldCastCorrelationIdToStringOnSet()
+    {
+        $message = new NullMessage();
+        $message->setCorrelationId(123);
+
+        self::assertSame('123', $message->getCorrelationId());
+    }
+
+    public function testShouldReturnEmptyStringAsDefaultMessageId()
+    {
+        $message = new NullMessage();
+
+        self::assertSame('', $message->getMessageId());
+    }
+
+    public function testShouldAllowGetPreviouslySetMessageId()
+    {
+        $message = new NullMessage();
+        $message->setMessageId('theId');
+
+        self::assertSame('theId', $message->getMessageId());
+    }
+
+    public function testShouldCastMessageIdToStringOnSet()
+    {
+        $message = new NullMessage();
+        $message->setMessageId(123);
+
+        self::assertSame('123', $message->getMessageId());
+    }
+
+    public function testShouldReturnNullAsDefaultTimestamp()
+    {
+        $message = new NullMessage();
+
+        self::assertSame(null, $message->getTimestamp());
+    }
+
+    public function testShouldAllowGetPreviouslySetTimestamp()
+    {
+        $message = new NullMessage();
+        $message->setTimestamp(123);
+
+        self::assertSame(123, $message->getTimestamp());
+    }
+
+    public function testShouldCastTimestampToIntOnSet()
+    {
+        $message = new NullMessage();
+        $message->setTimestamp('123');
+
+        self::assertSame(123, $message->getTimestamp());
+    }
 }

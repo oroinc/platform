@@ -39,7 +39,7 @@ always returning 204 (No Content), now it returns HTTP 200 (OK) if the response 
 
 ####ImportExportBundle
 - ACL resource (capability) `oro_importexport` was removed. Please, use `oro_importexport_import` or `oro_importexport_export` instead.
-- Added parameter `NewEntitiesHelper $newEntitiesHelper` to constructor of `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy`
+- Added `NewEntitiesHelper $newEntitiesHelper` and `DoctrineHelper $doctrineHelper` parameters to constructor of `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy`
 
 ####SecurityBundle
 - **IMPORTANT**: The behaviour of the [Access Decision Manager](http://symfony.com/doc/current/components/security/authorization.html#access-decision-manager) was changed. Now the `allowIfAllAbstainDecisions` flag is set to `true` by default. It means that an access to a resource is denied as soon as there is one voter denying access. The goal of this change is to grant access when all voters abstain.
@@ -312,6 +312,7 @@ Corresponding block type classes was removed.
  [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
 - Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
 - Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
+- Layout theme additional configuration such as assets, images or requirejs from now placed in `layout/{theme_name}/config` folder [Config definition](./src/Oro/Bundle/LayoutBundle/Resources/doc/config_definition.md).
 - Changed current expression language in layouts to symfony expression language, for details please check out documentation at
  [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
 

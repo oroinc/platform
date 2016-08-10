@@ -3,11 +3,12 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\Collection;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
 
@@ -79,8 +80,11 @@ class WsseAuthProvider extends Provider
         /** @var User $user */
         $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
         if ($user) {
+            if ($user instanceof AdvancedUserInterface && !$user->isEnabled()) {
+                throw new BadCredentialsException('User is not active.');
+            }
             $secret = $this->getSecret($user);
-            if ($secret instanceof PersistentCollection) {
+            if ($secret instanceof Collection) {
                 $validUserApi = $this->getValidUserApi($token, $secret, $user);
                 if ($validUserApi) {
                     $authenticatedToken = $this->tokenFactory->create($user->getRoles());
@@ -102,12 +106,12 @@ class WsseAuthProvider extends Provider
      * Get valid UserApi for given token
      *
      * @param TokenInterface       $token
-     * @param PersistentCollection $secrets
+     * @param Collection $secrets
      * @param User                 $user
      *
      * @return bool|UserApi
      */
-    protected function getValidUserApi(TokenInterface $token, PersistentCollection $secrets, User $user)
+    protected function getValidUserApi(TokenInterface $token, Collection $secrets, User $user)
     {
         $currentIteration = 0;
         $nonce            = $token->getAttribute('nonce');
