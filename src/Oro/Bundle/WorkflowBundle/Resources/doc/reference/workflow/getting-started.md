@@ -133,6 +133,31 @@ workflows:
     WorkflowItem instance or WorkflowDefinition instance;
 * **deactivateWorkflow(workflowIdentifier)** - deactivate workflow by workflow name, Workflow instance (same as above).
 
+Mutually Exclusive Workflows
+----------------------------
+In some cases, an application may be configured with several workflows that are mutually exclusive on different levels.
+For example, with default package, we have the standard workflow that somehow does not cover business logic that client might need.
+So we can implement another workflow for the same related entity and that two workflows are conflicting with each other by data or logic operations. 
+For that cases, we bring new approach for developers to configure their workflows on mutually exclusive manner.
+There two levels of exclusiveness at this moment: activation level and record level.
+
+###Activation level exclusiveness - `exclusive_active_groups` 
+If your custom workflow represents a replacement flow for some already existent workflows you may provide a possibility to secure your customization by ensuring  that only one of them can be activated in the system at a time. This can be performed by defining *common exclusive activation group* for both workflows. That can be done in workflow configuration node named `exclusive_active_groups`.
+For example, we have BasicSalesFlow and MyShopSalesFlow workflows. They are both use the same related entity (let's say Order) and MyShopSalesFlow is a full replacement for another one. So we need to force administrators to enable only one of them. In that case, we can provide a common group in workflows configurations under `exclusive_active_groups` node. Let's name it 'sales'.
+So, now, when an administrator will attempt to activate one of that groups there would be an additional check for group conflicts and notice generated if another workflow in the group 'sales' is already active. So that two workflows would never be active at once.
+
+###Record level exclusiveness - `exclusive_record_groups`
+Another level of exclusiveness is a record level. 
+This level provides a possibility to have several active workflows at one time with one limitation - only one workflow can be started for a related entity within a same *exclusive record group*. So that if you have workflows that can bring different ways to reach the goal of common business process around same entity (*but* not both at once), you may configure that workflow with the same group in `exclusive_record_groups` at their configurations.
+So, when **no** workflows were performed for an entity in same exclusive record group, there would be the possibility to launch starting transitions from any of them. But, when one of that workflows was started - you may not perform any actions from another workflow (and start it as well). That is a ramification of a business process that can be reached by the `exclusive_record_group` node in workflows configuration.
+
+###Priority Case
+Let's say, you have two exclusive workflows at the level of a single record and both of them has automated start transitions (e.g. automatically performs start transition when a new instance its related entity is created).
+In that case, you may configure `priority` flag in workflow configurations so when a new record of the related entity created workflows would be processed by that priority flag and the second one from same exclusive record group will not perform its start transition if there already present another workflow record from the same exclusive group.
+For example `checkout` and `alternative_checkout` workflows. In a case when we need to process `alternative_checkout` workflow before `checkout`, we can determine its priority level higher than another.
+Then, when new `Checkout` entity will be persisted, a system would perform `alternative_checkout` workflow start transition first.
+Additionally, if start transition of dominant workflow has unmet its conditions to start, then second workflow would have chance to starts its flow as well.
+
 Configuration
 -------------
 
