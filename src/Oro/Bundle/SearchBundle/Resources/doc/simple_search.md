@@ -23,7 +23,7 @@ Request return array with next data:
 
  - **records_count** - the total number of results (without `offset` and `max_results`) parameters
  - **count** - count of records in current request
- - **data**- array with data. Data consists from next values:
+ - **data** - array with data. Data consists from next values:
      - **entity_name** - class name of entity
      - **record_id** - id of record from this entity
      - **record_string** - the title of this record
