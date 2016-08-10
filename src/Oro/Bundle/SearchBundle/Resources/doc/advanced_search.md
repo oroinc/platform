@@ -24,12 +24,21 @@ Request return array with next data:
      - **entity_name** - class name of entity
      - **record_id** - id of record from this entity
      - **record_string** - the title of this record
+     - **selected_data** - if `select` keyword is used, this property  the selected data
 
  Query language
 ====================
 
 Keywords
 --------
+
+### select
+
+List all fields to gather data from. It can be one field or a group.
+```
+select field_name
+select (first_field_name, second_field_name)
+```
 
 ### from
 
@@ -153,6 +162,11 @@ Query examples
 * Search by demo products where name contains string `opportunity` and where price greater than `100`.
 ```
 from demo_product where name ~ opportunity and double price > 100
+```
+
+* Search and return indexed data about name and description from a demo product.
+```
+select (name, description) from demo_product
 ```
 
 * Search by all entities where integer field count not equals `10`.
