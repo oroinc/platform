@@ -1,8 +1,9 @@
 define([
     'underscore',
+    'jquery',
     'backgrid',
     'oroui/js/tools/text-util'
-], function(_, Backgrid, textUtil) {
+], function(_, $, Backgrid, textUtil) {
     'use strict';
 
     var HeaderCell;
@@ -179,14 +180,17 @@ define([
         onMouseOver: function() {
             var _this = this;
             var $label = this.$('.grid-header-cell-label');
+
             // measure text content
+            var realWidth = $label[0].clientWidth;
             $label.css({overflow: 'visible'});
-            if (!this.isLabelAbbreviated && $label[0].clientWidth <= $label[0].parentNode.clientWidth) {
+            var fullWidth = $label[0].clientWidth;
+            $label.css({overflow: ''});
+
+            if (!this.isLabelAbbreviated && fullWidth === realWidth) {
                 // hint is not required all text is visible
-                $label.css({overflow: ''});
                 return;
             }
-            $label.css({overflow: ''});
 
             this.hintTimeout = setTimeout(function addHeaderCellHint() {
                 $(document.body).append('<span class="grid-header-cell-hint">' +
