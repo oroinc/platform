@@ -4,21 +4,15 @@ namespace Oro\Component\Layout\Extension\Theme;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
-use Oro\Component\Layout\Exception\LogicException;
-use Oro\Component\Layout\Extension\AbstractExtension;
+use Oro\Component\Layout\Extension\AbstractLayoutUpdateLoaderExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
-use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
-use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
-use Oro\Component\Layout\Model\LayoutUpdateImport;
 
-class ThemeExtension extends AbstractExtension
+class ThemeExtension extends AbstractLayoutUpdateLoaderExtension
 {
     const THEME_KEY = 'theme';
-    const IMPORT_FOLDER = 'imports';
 
     /** @var array */
     protected $resources;
@@ -32,9 +26,6 @@ class ThemeExtension extends AbstractExtension
     /** @var PathProviderInterface */
     protected $pathProvider;
 
-    /** @var  ThemeManager */
-    protected $themeManager;
-
     /** @var  array */
     protected $updates;
 
@@ -43,20 +34,17 @@ class ThemeExtension extends AbstractExtension
      * @param LayoutUpdateLoaderInterface $loader
      * @param DependencyInitializer $dependencyInitializer
      * @param PathProviderInterface $provider
-     * @param ThemeManager $themeManager
      */
     public function __construct(
         array $resources,
         LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
-        PathProviderInterface $provider,
-        ThemeManager $themeManager
+        PathProviderInterface $provider
     ) {
         $this->resources = $resources;
         $this->loader = $loader;
         $this->dependencyInitializer = $dependencyInitializer;
         $this->pathProvider = $provider;
-        $this->themeManager = $themeManager;
     }
 
     /**
@@ -69,7 +57,7 @@ class ThemeExtension extends AbstractExtension
             $paths = $this->getPaths($context);
             $files = $this->findApplicableResources($paths);
             foreach ($files as $file) {
-                $this->loadLayoutUpdate($file, $context);
+                $this->loadLayoutUpdate($file);
             }
         }
 
@@ -78,11 +66,10 @@ class ThemeExtension extends AbstractExtension
 
     /**
      * @param string $file
-     * @param ContextInterface $context
      *
      * @return array
      */
-    protected function loadLayoutUpdate($file, ContextInterface $context)
+    protected function loadLayoutUpdate($file)
     {
         $update = $this->loader->load($file);
         if ($update) {
@@ -92,27 +79,6 @@ class ThemeExtension extends AbstractExtension
             $this->updates[$el][] = $update;
 
             $this->dependencyInitializer->initialize($update);
-
-            if ($update instanceof ImportsAwareLayoutUpdateInterface) {
-                // load imports
-                $imports = $update->getImports();
-                if (!is_array($imports)) {
-                    throw new LogicException(
-                        sprintf('Imports statement should be an array, %s given', gettype($imports))
-                    );
-                }
-                foreach ($imports as $importData) {
-                    $import = $this->createImport($importData);
-                    $files = $this->getImportResources($context->get(static::THEME_KEY), $import->getId());
-                    foreach ($files as $file) {
-                        $importUpdate = $this->loadLayoutUpdate($file, $context);
-                        if ($importUpdate instanceof LayoutUpdateImportInterface) {
-                            $importUpdate->setImport($import);
-                            $importUpdate->setParentUpdate($update);
-                        }
-                    }
-                }
-            }
         }
 
         return $update;
@@ -132,94 +98,5 @@ class ThemeExtension extends AbstractExtension
         }
 
         return $this->pathProvider->getPaths([]);
-    }
-
-    /**
-     * @param string $themeName
-     * @param string $importId
-     *
-     * @return array
-     */
-    protected function getImportResources($themeName, $importId)
-    {
-        $theme = $this->themeManager->getTheme($themeName);
-
-        $importPath = implode(
-            PathProviderInterface::DELIMITER,
-            [
-                $theme->getName(),
-                static::IMPORT_FOLDER,
-                $importId,
-            ]
-        );
-
-        $files = $this->findApplicableResources([$importPath]);
-        if ($theme->getParentTheme()) {
-            $files = array_merge(
-                $this->getImportResources($theme->getParentTheme(), $importId),
-                $files
-            );
-        }
-
-        return $files;
-    }
-
-    /**
-     * @param $importProperties
-     *
-     * @return LayoutUpdateImport
-     */
-    protected function createImport($importProperties)
-    {
-        if (!is_array($importProperties)) {
-            $importProperties = [ImportsAwareLayoutUpdateInterface::ID_KEY => $importProperties];
-        }
-
-        return LayoutUpdateImport::createFromArray($importProperties);
-    }
-
-    /**
-     * Filters resources by paths
-     *
-     * @param array $paths
-     *
-     * @return array
-     */
-    protected function findApplicableResources(array $paths)
-    {
-        $result = [];
-        foreach ($paths as $path) {
-            $pathArray = explode(PathProviderInterface::DELIMITER, $path);
-
-            $value = $this->resources;
-            for ($i = 0, $length = count($pathArray); $i < $length; ++$i) {
-                $value = $this->readValue($value, $pathArray[$i]);
-
-                if (null === $value) {
-                    break;
-                }
-            }
-
-            if ($value && is_array($value)) {
-                $result = array_merge($result, array_filter($value, 'is_string'));
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array $array
-     * @param string $property
-     *
-     * @return mixed
-     */
-    protected function readValue(&$array, $property)
-    {
-        if (is_array($array) && isset($array[$property])) {
-            return $array[$property];
-        }
-
-        return null;
     }
 }
