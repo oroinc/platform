@@ -103,7 +103,7 @@ class ImageTypeProvider
      */
     protected function extractDimensions(Theme $theme)
     {
-        return $theme->getDataByKey('images', ['dimensions' => []])['dimensions'];
+        return $theme->getConfigByKey('images', ['dimensions' => []])['dimensions'];
     }
 
     /**
