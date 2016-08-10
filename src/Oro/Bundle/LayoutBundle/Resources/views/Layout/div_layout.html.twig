@@ -76,7 +76,7 @@
         }) %}
     {% endif %}
 
-    {% if id is defined %}
+    {% if id is defined and id is not empty %}
         {% set attr = attr|merge({
             id: id
         }) %}
@@ -184,13 +184,13 @@
         }) %}
     {% endif %}
 
-    {% if async == 'true' %}
+    {% if async != false %}
         {% set attr = attr|merge({
             async: 'async'
         }) %}
     {% endif %}
 
-    {% if defer == 'true' %}
+    {% if defer != false %}
         {% set attr = attr|merge({
             defer: 'defer'
         }) %}
@@ -230,7 +230,7 @@
         }) %}
     {% endif %}
 
-    {% if scoped == 'true' %}
+    {% if scoped != false %}
         {% set attr = attr|merge({
             scoped: 'scoped'
         }) %}

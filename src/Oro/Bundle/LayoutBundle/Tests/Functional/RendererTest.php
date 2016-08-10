@@ -371,7 +371,7 @@ class RendererTest extends LayoutTestCase
     </head>
 <body class="content-body test-body class2" data-json="{&quot;0&quot;:&quot;test1&quot;}">
     <button type="button" name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
-    <input type="text" name="search" id="input_text"/>
+    <input type="text" name="search"/>
     <input type="submit" name="btn2" value="Btn2"/>
     <ul>
         <li>Hi World!</li>

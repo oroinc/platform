@@ -192,7 +192,7 @@ services:
                 -
                     -
                         type: {default: 'text'}
-                        id: ~
+                        id: {default: null}
                         name: ~
                         value: ~
                         placeholder: ~
