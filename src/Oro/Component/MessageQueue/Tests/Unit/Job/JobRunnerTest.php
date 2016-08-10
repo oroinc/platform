@@ -224,6 +224,24 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expJob, $child);
     }
 
+    public function testRunDelayedShouldThrowExceptionIfJobWasNotFoundById()
+    {
+        $jobProcessor = $this->createJobProcessorMock();
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with('job-id')
+            ->will($this->returnValue(null))
+        ;
+
+        $jobRunner = new JobRunner($jobProcessor);
+
+        $this->setExpectedException(\LogicException::class, 'Job was not found. id: "job-id"');
+
+        $jobRunner->runDelayed('job-id', function () {
+        });
+    }
+
     public function testRunDelayedShouldFindJobAndCallCallback()
     {
         $root = new Job();

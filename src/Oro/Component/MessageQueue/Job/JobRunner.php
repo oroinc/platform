@@ -81,6 +81,10 @@ class JobRunner
     public function runDelayed($jobId, \Closure $runCallback)
     {
         $job = $this->jobProcessor->findJobById($jobId);
+        if (! $job) {
+            throw new \LogicException(sprintf('Job was not found. id: "%s"', $jobId));
+        }
+
         if ($job->getRootJob()->isInterrupted()) {
             if (! $job->getStoppedAt()) {
                 $this->jobProcessor->cancelChildJob($job);

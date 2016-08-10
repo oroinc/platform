@@ -21,6 +21,11 @@ services:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.client.message_producer'
 
+    oro_message_queue.job.runner:
+        class: 'Oro\Component\MessageQueue\Job\JobRunner'
+        arguments:
+            - '@oro_message_queue.job.processor'
+
     oro_message_queue.job.calculate_root_job_status_case:
         class: 'Oro\Component\MessageQueue\Job\CalculateRootJobStatusCase'
         arguments:

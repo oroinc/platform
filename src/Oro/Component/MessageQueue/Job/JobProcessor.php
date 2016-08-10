@@ -26,14 +26,6 @@ class JobProcessor
     }
 
     /**
-     * @return JobRunner
-     */
-    public function createJobRunner()
-    {
-        return new JobRunner($this);
-    }
-
-    /**
      * @param string $id
      *
      * @return Job
