@@ -91,7 +91,8 @@ class WorkflowRegistry
      * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[]|ArrayCollection named array of active Workflow instances
+     * @return Workflow[]|ArrayCollection Named collection of active Workflow instances
+     *                                    with structure: ['workflowName' => Workflow $worfklowInstance]
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {

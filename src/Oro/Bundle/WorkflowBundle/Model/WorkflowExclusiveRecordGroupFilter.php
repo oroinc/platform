@@ -33,8 +33,6 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
      */
     public function filter(ArrayCollection $workflows, WorkflowRecordContext $context)
     {
-        /** @var Workflow[]|ArrayCollection $workflows */
-
         $runningWorkflowNames = $this->getRunningWorkflowNames($context->getEntity());
 
         if (count($runningWorkflowNames) === 0) {
@@ -83,10 +81,10 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
 
     /**
      * @param ArrayCollection $workflows
-     * @param $runningWorkflowNames
+     * @param array $runningWorkflowNames
      * @return array
      */
-    private function getBusyGroups(ArrayCollection $workflows, $runningWorkflowNames)
+    private function getBusyGroups(ArrayCollection $workflows, array $runningWorkflowNames)
     {
         $runningExclusiveGroups = [];
         //reversing as they were fetched by priority, so last should override group as more prioritised

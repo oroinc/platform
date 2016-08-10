@@ -7,7 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 interface WorkflowApplicabilityFilterInterface
 {
     /**
-     * @param ArrayCollection|Workflow[] $workflows named collection of Workflow instances
+     * @param ArrayCollection|Workflow[] $workflows Named collection of Workflow instances
+     *                                              with structure: ['workflowName' => Workflow $worfklowInstance]
      * @param WorkflowRecordContext $context
      *
      * @return ArrayCollection
