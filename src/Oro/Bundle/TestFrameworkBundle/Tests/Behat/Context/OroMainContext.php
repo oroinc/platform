@@ -67,49 +67,14 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        $file = sprintf(
+        $screenshot = sprintf(
             '%s/%s-%s-line.png',
             $this->getKernel()->getLogDir(),
             $scope->getFeature()->getTitle(),
             $scope->getScenario()->getLine()
         );
-        $screenshot = $this->getSession()->getScreenshot();
-        file_put_contents($file, $screenshot);
-        $screenshotUri = $this->uploadScreenshot('image-title', $screenshot);
-        print "Screenshot for '{$scope->getScenario()->getTitle()}' uploaded to $screenshotUri";
-    }
 
-    /**
-     * Upload a screenshot to Imgur
-     * @param string $title
-     * @param string $imageData
-     */
-    protected function uploadScreenshot($title, $imageData)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.imgur.com/3/image",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "image=".urlencode(base64_encode($imageData))."&title=$title",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Client-ID a6338dfc9b7a680",
-                "cache-control: no-cache",
-                "content-type: application/x-www-form-urlencoded"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $error = curl_error($curl);
-        curl_close($curl);
-        $payload = json_decode($response);
-        if ($error || (property_exists($payload, 'success') && $payload->success == false)) {
-            throw new \Exception($payload->data->error);
-        }
-        return $payload->data->link;
+        file_put_contents($screenshot, $this->getSession()->getScreenshot());
     }
 
     /**
