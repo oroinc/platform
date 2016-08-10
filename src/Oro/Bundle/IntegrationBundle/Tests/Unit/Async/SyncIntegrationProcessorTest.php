@@ -14,7 +14,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Test\JobExtensionTrait;
+use Oro\Component\MessageQueue\Test\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -27,7 +27,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
-    use JobExtensionTrait;
 
     public function testShouldImplementMessageProcessorInterface()
     {
@@ -55,7 +54,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createRegistryStub(),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
     }
 
@@ -69,7 +68,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createRegistryStub(),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -88,7 +87,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createRegistryStub(),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -113,7 +112,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -143,7 +142,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -169,13 +168,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($integration);
         ;
 
-        $jobRunner = $this->createJobRunner();
+        $jobRunner = new JobRunner();
 
         $processor = new SyncIntegrationProcessor(
             $this->createRegistryStub($entityManagerMock),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub($this->createSyncProcessorMock()),
-            $this->createJobProcessorStub($jobRunner)
+            $jobRunner
         );
 
         $message = new NullMessage();
@@ -220,7 +219,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $tokenStorageStub,
             $syncProcessorRegistryStub,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -263,7 +262,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $tokenStorageStub,
             $syncProcessorRegistryStub,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -302,7 +301,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -343,7 +342,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -385,7 +384,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -434,7 +433,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();

@@ -26,8 +26,8 @@ class OroIntegrationBundle extends Bundle
         $container->addCompilerPass(new ProcessorsPass());
 
         $addTopicPass = AddTopicMetaPass::create()
-            ->add(Topics::SYNC_INTEGRATION, 'Integration Sync')
-            ->add(Topics::REVERS_SYNC_INTEGRATION, '')
+            ->add(Topics::SYNC_INTEGRATION)
+            ->add(Topics::REVERS_SYNC_INTEGRATION)
         ;
         $container->addCompilerPass($addTopicPass);
     }

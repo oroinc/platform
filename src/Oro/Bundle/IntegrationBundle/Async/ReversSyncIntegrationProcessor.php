@@ -10,7 +10,7 @@ use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobProcessor;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -40,26 +40,26 @@ class ReversSyncIntegrationProcessor implements
     private $typesRegistry;
 
     /**
-     * @var JobProcessor
+     * @var JobRunner
      */
-    private $jobProcessor;
+    private $jobRunner;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param ReverseSyncProcessor $reverseSyncProcessor
      * @param TypesRegistry $typesRegistry
-     * @param JobProcessor $jobProcessor
+     * @param JobRunner $jobRunner
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ReverseSyncProcessor $reverseSyncProcessor,
         TypesRegistry $typesRegistry,
-        JobProcessor $jobProcessor
+        JobRunner $jobRunner
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->reverseSyncProcessor = $reverseSyncProcessor;
         $this->typesRegistry = $typesRegistry;
-        $this->jobProcessor = $jobProcessor;
+        $this->jobRunner = $jobRunner;
     }
 
     /**
@@ -91,8 +91,7 @@ class ReversSyncIntegrationProcessor implements
         $jobName = 'oro_integration:revers_sync_integration:'.$body['integrationId'];
         $ownerId = $message->getMessageId();
 
-        $jobRunner = $this->jobProcessor->createJobRunner();
-        $result = $jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
+        $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
             /** @var EntityManagerInterface $em */
             $em = $this->doctrineHelper->getEntityManagerForClass(Integration::class);
 

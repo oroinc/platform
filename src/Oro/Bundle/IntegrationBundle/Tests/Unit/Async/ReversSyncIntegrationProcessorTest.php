@@ -15,7 +15,7 @@ use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Test\JobExtensionTrait;
+use Oro\Component\MessageQueue\Test\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
-    use JobExtensionTrait;
 
     public function testShouldImplementMessageProcessorInterface()
     {
@@ -53,7 +52,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createDoctrineHelperStub(),
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
     }
 
@@ -67,7 +66,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createDoctrineHelperStub(),
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -86,7 +85,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createDoctrineHelperStub(),
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -111,7 +110,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $doctrineHelperStub,
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -141,7 +140,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $doctrineHelperStub,
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -186,7 +185,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $doctrineHelperStub,
             $reversSyncProcessorMock,
             $typeRegistryMock,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();
@@ -219,13 +218,13 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->getMock(TwoWaySyncConnectorInterface::class))
         ;
 
-        $jobRunner = $this->createJobRunner();
+        $jobRunner = new JobRunner();
 
         $processor = new ReversSyncIntegrationProcessor(
             $doctrineHelperStub,
             $this->createReversSyncProcessorMock(),
             $typeRegistryMock,
-            $this->createJobProcessorStub($jobRunner)
+            $jobRunner
         );
 
         $message = new NullMessage();
@@ -268,7 +267,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $doctrineHelperStub,
             $this->createReversSyncProcessorMock(),
             $typeRegistryMock,
-            $this->createJobProcessorStub()
+            new JobRunner()
         );
 
         $message = new NullMessage();

@@ -7,7 +7,7 @@ use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobProcessor;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAwareInterface, TopicSubscriberInterface
 {
     use ContainerAwareTrait;
+
     /**
      * @var RegistryInterface
      */
@@ -35,26 +36,26 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
     private $syncProcessorRegistry;
 
     /**
-     * @var JobProcessor
+     * @var JobRunner
      */
-    private $jobProcessor;
+    private $jobRunner;
 
     /**
      * @param RegistryInterface $doctrine
      * @param TokenStorageInterface $tokenStorage
      * @param SyncProcessorRegistry $syncProcessorRegistry
-     * @param JobProcessor $jobProcessor
+     * @param JobRunner $jobRunner
      */
     public function __construct(
         RegistryInterface $doctrine,
         TokenStorageInterface $tokenStorage,
         SyncProcessorRegistry $syncProcessorRegistry,
-        JobProcessor $jobProcessor
+        JobRunner $jobRunner
     ) {
         $this->doctrine = $doctrine;
         $this->tokenStorage = $tokenStorage;
         $this->syncProcessorRegistry = $syncProcessorRegistry;
-        $this->jobProcessor = $jobProcessor;
+        $this->jobRunner = $jobRunner;
     }
 
     /**
@@ -87,8 +88,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         $jobName = 'oro_integration:sync_integration:'.$body['integrationId'];
         $ownerId = $message->getMessageId();
 
-        $jobRunner = $this->jobProcessor->createJobRunner();
-        $result = $jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
+        $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
             /** @var EntityManagerInterface $em */
             $em = $this->doctrine->getManager();
 
