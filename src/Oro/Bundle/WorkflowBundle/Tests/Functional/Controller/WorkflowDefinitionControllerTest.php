@@ -101,14 +101,14 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
     public function testDeactivateFormAction()
     {
-        $this->workflowManager->deactivateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_GROUPS1);
 
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_workflow_definition_activate_from_widget', [
                 '_widgetContainer' => 'dialog',
                 '_wid' => uniqid('test', true),
-                'name' => LoadWorkflowDefinitions::MULTISTEP,
+                'name' => LoadWorkflowDefinitions::WITH_GROUPS2,
             ]),
             [],
             [],
@@ -118,10 +118,12 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $this->assertNotEmpty($crawler->html());
-        $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
+        $this->assertContains(LoadWorkflowDefinitions::WITH_GROUPS2, $crawler->html());
         $this->assertContains('name="oro_workflow_replacement_select"', $crawler->html());
         $this->assertContains('Activate', $crawler->html());
         $this->assertContains('Cancel', $crawler->html());
+        $this->assertContains('The following workflows will be deactivated', $crawler->html());
+        $this->assertContains(LoadWorkflowDefinitions::WITH_GROUPS1, $crawler->html());
 
         $form = $crawler->selectButton('Activate')->form();
 
