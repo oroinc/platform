@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
-use Oro\Bundle\UserBundle\Entity\Ownership\AuditableUserAwareTrait;
+use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
 
 /**
  * @ORM\Table(name="oro_language")
@@ -36,7 +36,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\AuditableUserAwareTrait;
  */
 class Language implements DatesAwareInterface, OrganizationAwareInterface
 {
-    use AuditableUserAwareTrait;
+    use UserAwareTrait;
     use DatesAwareTrait;
 
     /**
@@ -67,7 +67,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
      *
      * @ORM\Column(name="installed_build_date", type="date", nullable=true)
      */
-    protected $instaledBuildDate;
+    protected $installedBuildDate;
 
     /**
      * Get id
@@ -99,12 +99,12 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     }
 
     /**
-     * @param \DateTime $instaledBuildDate
+     * @param \DateTime $installedBuildDate
      * @return $this
      */
-    public function setInstalledBuildDate(\DateTime $instaledBuildDate = null)
+    public function setInstalledBuildDate(\DateTime $installedBuildDate = null)
     {
-        $this->instaledBuildDate = $instaledBuildDate;
+        $this->installedBuildDate = $installedBuildDate;
 
         return $this;
     }
@@ -114,7 +114,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
      */
     public function getInstalledBuildDate()
     {
-        return $this->instaledBuildDate;
+        return $this->installedBuildDate;
     }
 
     /**
