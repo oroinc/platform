@@ -72,12 +72,12 @@ class ConfigFileDataTransformer implements DataTransformerInterface
 
             return null;
         }
-
         if (
             $file->getFile() &&
             $file->getFile()->isFile() &&
-            0 === count($this->validator->validate($file->getFile(), [new Image()]))
+            0 === count($this->validator->validate($file->getFile(), $this->fileConstraints))
         ) {
+            $file->preUpdate();
             $em->persist($file);
             $em->flush($file);
         }
