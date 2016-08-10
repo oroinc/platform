@@ -336,7 +336,7 @@ class WorkflowManager
     }
 
     /**
-     * @param object|string $entity
+     * @param object $entity
      * @return Workflow[]
      * @throws \InvalidArgumentException
      */

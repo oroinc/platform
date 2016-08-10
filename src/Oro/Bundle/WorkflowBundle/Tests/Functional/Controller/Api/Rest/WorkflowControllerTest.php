@@ -48,12 +48,9 @@ class WorkflowControllerTest extends WebTestCase
         $entity = $this->createNewEntity();
 
         $this->assertActiveWorkflow($entity, $workflowOneName);
-
-        $workflowManager->activateWorkflow($workflowTwo->getName());
         $this->assertActiveWorkflow($entity, $workflowTwoName);
 
-        $activeWorkflowsCount = count($this->getWorkflowManager()->getApplicableWorkflows($entity));
-        $this->assertGreaterThanOrEqual(2, $activeWorkflowsCount);
+        $this->assertCount(2, $this->getWorkflowManager()->getApplicableWorkflows($entity));
 
         $workflowManager->startWorkflow($workflowOneName, $entity, LoadWorkflowDefinitions::START_TRANSITION);
         $this->assertEntityWorkflowItem($entity, $workflowOneName);
