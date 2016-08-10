@@ -5,8 +5,11 @@ define(function(require) {
     var Select2TreeAutocompleteComponent = require('oro/select2-tree-autocomplete-component');
     var mediator = require('oroui/js/mediator');
     var _ = require('underscore');
+    var Select2BuTreeAutocompleteView = require('oroorganization/js/app/views/select2-bu-tree-autocomplete-view');
 
     BUTreeAutocompleteComponent = Select2TreeAutocompleteComponent.extend({
+        ViewType: Select2BuTreeAutocompleteView,
+
         organizations: {},
 
         initialize: function(options) {
