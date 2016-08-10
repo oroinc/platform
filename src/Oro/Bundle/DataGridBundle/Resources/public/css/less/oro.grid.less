@@ -373,11 +373,11 @@ td > .nowrap-ellipsis {
     overflow: hidden;
     float: left;
   }
-  &.floatThead .grid-header.thead-sizing .grid-header-cell-label {
+  &.floatThead .grid-header.thead-sizing .grid-header-cell:not(.abbreviated) .grid-header-cell-label {
     width: 0 !important;
   }
-  &:not(.floatThead) .grid-header .grid-header-cell-label,
-  .grid-header.thead-sizing .grid-header-cell-label {
+  &:not(.floatThead) .grid-header .grid-header-cell:not(.abbreviated) .grid-header-cell-label,
+  .grid-header.thead-sizing  .grid-header-cell:not(.abbreviated) .grid-header-cell-label {
     width: 40px !important;
   }
 }
