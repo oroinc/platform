@@ -13,6 +13,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ConfigFileDataTransformer implements DataTransformerInterface
 {
     /**
+     * @var array
+     */
+    protected $fileConstraints;
+
+    /**
      * @var DoctrineHelper
      */
     private $doctrineHelper;
@@ -26,6 +31,14 @@ class ConfigFileDataTransformer implements DataTransformerInterface
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->validator = $validator;
+    }
+
+    /**
+     * @param array $fileConstraints
+     */
+    public function setFileConstraints(array $fileConstraints)
+    {
+        $this->fileConstraints = $fileConstraints;
     }
 
     /**

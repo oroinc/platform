@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ConfigBundle\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\FileType as ComponentFileType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
-use Symfony\Component\Validator\Constraints\Image;
 
-class ConfigFileType extends FileType
+class ConfigFileType extends AbstractType
 {
-    const NAME = 'oro_config_file';
-
     /**
      * @var ConfigFileDataTransformer
      */
@@ -28,18 +28,14 @@ class ConfigFileType extends FileType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'file',
-            'file',
-            [
-                'label' => 'oro.attachment.file.label',
-                'constraints' => [
-                    new Image()
-                ]
-            ]
-        );
-
         $builder
+            ->add(
+                'file',
+                ComponentFileType::class,
+                [
+                    'constraints' => $options['fileConstraints']
+                ]
+            )
             ->add(
                 'emptyFile',
                 HiddenType::class,
@@ -48,15 +44,26 @@ class ConfigFileType extends FileType
                 ]
             );
 
+        $this->transformer->setFileConstraints($builder->get('file')->getOption('constraints'));
         $builder->addModelTransformer($this->transformer);
-        $builder->addEventSubscriber($this->eventSubscriber);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'addEventSubscriber' => false,
+            'fileConstraints' => []
+        ]);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getParent()
     {
-        return self::NAME;
+        return FileType::class;
     }
 }
