@@ -42,3 +42,6 @@ oro_entity_config:
                             required:       false
                             label:          oro.security.field_acl.show_restricted_fields.label
                             tooltip:        oro.security.field_acl.show_restricted_fields.tooltip
+        field:
+            items:
+                permissions: ~

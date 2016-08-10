@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport;
 
+use Oro\Component\MessageQueue\Transport\Exception\Exception;
+
 /**
  * The Message interface is the root interface of all transport messages.
  * Most message-oriented middleware (MOM) products
@@ -80,4 +82,75 @@ interface MessageInterface
      * @return boolean
      */
     public function isRedelivered();
+
+    /**
+     * Sets the correlation ID for the message.
+     * A client can use the correlation header field to link one message with another.
+     * A typical use is to link a response message with its request message.
+     *
+     * @param string $correlationId the message ID of a message being referred to
+     *
+     * @throws Exception if the provider fails to set the correlation ID due to some internal error.
+     *
+     * @return void
+     */
+    public function setCorrelationId($correlationId);
+
+    /**
+     * Gets the correlation ID for the message.
+     * This method is used to return correlation ID values that are either provider-specific message IDs
+     * or application-specific String values.
+     *
+     * @throws Exception if the provider fails to get the correlation ID due to some internal error.
+     * @return string
+     */
+    public function getCorrelationId();
+
+    /**
+     * Sets the message ID.
+     * Providers set this field when a message is sent.
+     * This method can be used to change the value for a message that has been received.
+     *
+     * @param string $messageId the ID of the message
+     *
+     * @throws Exception if the provider fails to set the message ID due to some internal error.
+     *
+     * @return void
+     */
+    public function setMessageId($messageId);
+
+    /**
+     * Gets the message Id.
+     * The MessageId header field contains a value that uniquely identifies each message sent by a provider.
+     *
+     * When a message is sent, MessageId can be ignored.
+     *
+     * @throws Exception if the provider fails to get the message ID due to some internal error.
+     *
+     * @return string
+     */
+    public function getMessageId();
+
+    /**
+     * Gets the message timestamp.
+     * The JMSTimestamp header field contains the time a message was handed off to a provider to be sent.
+     * It is not the time the message was actually transmitted,
+     * because the actual send may occur later due to transactions or other client-side queueing of messages.
+     *
+     * @return int
+     */
+    public function getTimestamp();
+
+    /**
+     * Sets the message timestamp.
+     * Providers set this field when a message is sent.
+     * This method can be used to change the value for a message that has been received.
+     *
+     * @param int $timestamp
+     *
+     * @throws Exception if the provider fails to set the timestamp due to some internal error.
+     *
+     * @return void
+     */
+    public function setTimestamp($timestamp);
 }
