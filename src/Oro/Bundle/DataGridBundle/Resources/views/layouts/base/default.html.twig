@@ -1,6 +1,6 @@
 {% set grid_parameters = {'enableFullScreenLayout': true}|merge(grid_parameters) %}
 {% block datagrid_widget %}
-    {% if (split_to_cells) %}
+    {% if split_to_cells != false %}
         {% set themeOptions = grid_render_parameters.themeOptions|default({}) %}
         {% set grid_render_parameters = grid_render_parameters|merge({'themeOptions': themeOptions|merge({
             'headerRowTemplateSelector': '#template-datagrid-header-row',

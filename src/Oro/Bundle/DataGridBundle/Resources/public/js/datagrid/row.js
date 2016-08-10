@@ -4,8 +4,9 @@ define([
     'chaplin',
     'backbone',
     'oroui/js/tools',
+    '../app/components/column-renderer-component',
     './util'
-], function($, _, Chaplin, Backbone, tools, util) {
+], function($, _, Chaplin, Backbone, tools, ColumnRendererComponent, util) {
     'use strict';
 
     var Row;
@@ -100,6 +101,8 @@ define([
             this.listenTo(this.cellEvents, 'change', this.delegateEvents);
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
+
+            this.columnRenderer = new ColumnRendererComponent(options);
 
             Row.__super__.initialize.apply(this, arguments);
             this.cells = this.subviews;
@@ -316,12 +319,30 @@ define([
         },
 
         renderCustomTemplate: function() {
+            var self = this;
             var $checkbox;
             this.$el.html(this.template({
                 model: this.model ? this.model.attributes : {},
                 themeOptions: this.themeOptions ? this.themeOptions : {},
-                render: this.renderColumn.bind(this),
-                attributes: this.renderColumnAttributes.bind(this)
+                render: function(columnName){
+                    var columnModel = _.find(self.columns.models, function(model) {
+                        return model.get('name') === columnName;
+                    });
+                    if(columnModel) {
+                        return self.columnRenderer.render(self.renderItem(columnModel).$el);
+                    }
+                    return '';
+                },
+                attributes: function(columnName, additionalAttributes){
+                    var attributes = additionalAttributes || {};
+                    var columnModel = _.find(self.columns.models, function(model) {
+                        return model.get('name') === columnName;
+                    });
+                    if(columnModel) {
+                        return self.columnRenderer.renderAttributes(self.renderItem(columnModel).$el, attributes);
+                    }
+                    return '';
+                }
             }));
             $checkbox = this.$('[data-role=select-row]:checkbox');
             if ($checkbox.length) {
@@ -336,41 +357,6 @@ define([
                 });
             }
             return this;
-        },
-
-        renderColumn: function(columnName) {
-            var columnModel = _.find(this.columns.models, function(model) {
-                return model.get('name') === columnName;
-            });
-            if (columnModel) {
-                return this.renderItem(columnModel).$el.html();
-            }
-        },
-
-        renderColumnAttributes: function(columnName, additionalAttrs) {
-            var attributes = additionalAttrs || [];
-            var columnModel = _.find(this.columns.models, function(model) {
-                return model.get('name') === columnName;
-            });
-            if (columnModel) {
-                var $element = this.renderItem(columnModel).$el;
-                if($element.length){
-                    if(attributes.class) {
-                        var classes = attributes.class.split(' ');
-                        for (var i in classes) {
-                            $element.addClass(classes[i]);
-                        }
-                    }
-                    attributes.class = $element.attr('class');
-                }
-            }
-
-            var result = [];
-            for(var k in attributes){
-                result.push(k + '="' + attributes[k] + '"');
-            }
-
-            return result.join(' ');
         }
     });
 
