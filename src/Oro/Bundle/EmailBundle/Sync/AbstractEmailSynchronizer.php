@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr;
+
+use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -14,6 +14,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
+use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -30,6 +31,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     const SYNC_CODE_FAILURE    = 2;
     const SYNC_CODE_SUCCESS    = 3;
 
+    const ID_OPTION = 'id';
+
+    /** @var string */
+    static protected $jobCommand;
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -45,6 +51,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     /** @var TokenInterface */
     private $currentToken;
 
+    /** @var JobManager */
+    private $jobManager;
+
     /**
      * Constructor
      *
@@ -57,6 +66,14 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     ) {
         $this->doctrine                        = $doctrine;
         $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
+    }
+
+    /**
+     * @param JobManager $jobManager
+     */
+    public function setJobManager(JobManager $jobManager)
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -185,6 +202,45 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         $this->assertSyncSuccess($failedOriginIds);
+    }
+
+    /**
+     * Schedule origins sync job
+     *
+     * @return bool
+     */
+    public function supportScheduleJob()
+    {
+        return false;
+    }
+
+    /**
+     * Schedule origins sync job
+     *
+     * @param int[] $originIds
+     */
+    public function scheduleSyncOriginsJob(array $originIds)
+    {
+        // todo: order ids to correct check in queue
+        if (static::$jobCommand && $this->jobManager) {
+            $jobArgs = array_map(
+                function ($id) {
+                    return sprintf(
+                        '--%s=%s',
+                        self::ID_OPTION,
+                        $id
+                    );
+                },
+                $originIds
+            );
+
+            if (!$this->jobManager->hasJobInQueue(static::$jobCommand, json_encode($jobArgs))) {
+                $job = new Job(static::$jobCommand, $jobArgs);
+                $em = $this->getEntityManager();
+                $em->persist($job);
+                $em->flush();
+            }
+        }
     }
 
     /**

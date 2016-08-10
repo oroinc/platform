@@ -9,7 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Intl\Intl;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
@@ -42,6 +44,19 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $localization->setName($title)->setDefaultTitle($title);
 
         $manager->flush();
+
+        /* @var $configManager ConfigManager */
+        $configManager = $this->container->get('oro_config.global');
+
+        $configManager->set(
+            Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
+            [$localization->getId()]
+        );
+        $configManager->set(
+            Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION),
+            $localization->getId()
+        );
+        $configManager->flush();
 
         $this->addReference('default_localization', $localization);
     }

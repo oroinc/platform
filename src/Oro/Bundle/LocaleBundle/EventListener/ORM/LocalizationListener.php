@@ -42,6 +42,16 @@ class LocalizationListener
         $this->handleChanges();
     }
 
+    /**
+     * @param Localization $localization
+     * @param LifecycleEventArgs $event
+     * @throws \Exception
+     */
+    public function postRemove(Localization $localization, LifecycleEventArgs $event)
+    {
+        $this->handleChanges();
+    }
+
     protected function handleChanges()
     {
         $this->localizationFallbackStrategy->clearCache();

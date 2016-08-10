@@ -11,7 +11,6 @@ use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\HttpKernel\Tests\Fragment\Foo;
 
 class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -209,5 +208,26 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
         $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
         $this->assertEquals(TraceableMessageProducer::class, $messageProducer->getClass());
+    }
+
+    public function testShouldConfigureDelayRedeliveredMessageExtension()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load([[
+            'client' => [
+                'redelivered_delay_time' => 12345,
+            ],
+            'transport' => [
+                'default' => 'foo',
+            ]
+        ]], $container);
+
+        $extension = $container->getDefinition('oro_message_queue.client.delay_redelivered_message_extension');
+        $this->assertEquals(12345, $extension->getArgument(1));
     }
 }

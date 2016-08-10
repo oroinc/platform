@@ -412,12 +412,17 @@ workflows:
 Transition Definition Configuration
 ===================================
 
-Transition Definition is used by Transition to check Conditions and to perform Init Action and Post Actions.
+Transition Definition is used by Transition to check Pre Conditions and Conditions, to perform Init Action and Post
+Actions.
 
 Transition definition configuration has next options.
 
+* **preactions**
+    Configuration of Pre Actions that must be performed before Pre Conditions check.
+* **pre_conditions**
+    Configuration of Pre Conditions that must satisfy to allow displaying transition.
 * **conditions**
-    Configuration of Conditions that must satisfy to allow transition
+    Configuration of Conditions that must satisfy to allow transition.
 * **post_actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
 * **init_actions**
@@ -432,6 +437,9 @@ workflows:
         # ...
         transition_definitions:
             connected_definition: # Try to make call connected
+                # Set timeout value
+                preactions:
+                    - @assign_value: [$call_timeout, 120]
                 # Check that timeout is set
                 conditions:
                     @not_blank: [$call_timeout]
@@ -441,6 +449,9 @@ workflows:
                 init_actions:
                     - @increment_value: [$call_attempt]
             not_answered_definition: # Callee did not answer
+                # Set timeout value
+                preactions:
+                    - @assign_value: [$call_timeout, 30]
                 # Make sure that caller waited at least 60 seconds
                 conditions: # call_timeout not empty and >= 60
                     @and:
@@ -584,10 +595,12 @@ workflows:
                                     - @greater: [$call_timeout, 0]
 ```
 
-Post Actions and Init Action
-============================
+Pre Actions, Post Actions and Init Action
+=========================================
 
-Post Actions and Init Action configuration complements Transition Definition configuration.
+Pre Action, Post Actions and Init Action configuration complements Transition Definition configuration.
+
+Pre Actions will be performed BEFORE the Pre Conditions will be qualified.
 
 Post Actions will be performed during transition AFTER conditions will be qualified and current Step of Workflow Item
 will be changed to the corresponding one (step_to option) in the Transition.
@@ -610,6 +623,8 @@ workflows:
         # ...
         transition_definitions:
             # some transition definition
+                preactions:
+                    - @some_action: ~
                 init_actions:
                     - @assign_value: [$call_attempt, 1]
                 post_actions:

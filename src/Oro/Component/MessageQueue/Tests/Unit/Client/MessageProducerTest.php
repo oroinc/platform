@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\Client\MessageProducer;
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class MessageProducerTest extends \PHPUnit_Framework_TestCase
@@ -192,6 +192,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $queue = new NullQueue('');
         $message = new NullMessage();
 
+        /** @var MessageInterface $sentMessage */
         $sentMessage = null;
 
         $messageProcessor = $this->createTransportMessageProducer();
@@ -207,7 +208,11 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer->send($queue, 12345);
 
         $this->assertInstanceOf(MessageInterface::class, $sentMessage);
-        $this->assertEquals(['content_type' => 'text/plain'], $sentMessage->getHeaders());
+
+        $headers = $sentMessage->getHeaders();
+        self::assertArrayHasKey('content_type', $headers);
+        self::assertEquals('text/plain', $headers['content_type']);
+
         $this->assertInternalType('string', $sentMessage->getBody());
         $this->assertEquals('12345', $sentMessage->getBody());
     }
@@ -233,9 +238,63 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer->send($queue, null);
 
         $this->assertInstanceOf(MessageInterface::class, $sentMessage);
-        $this->assertEquals(['content_type' => 'text/plain'], $sentMessage->getHeaders());
+
+        $headers = $sentMessage->getHeaders();
+        self::assertArrayHasKey('content_type', $headers);
+        self::assertEquals('text/plain', $headers['content_type']);
+
         $this->assertInternalType('string', $sentMessage->getBody());
         $this->assertEquals('', $sentMessage->getBody());
+    }
+
+    public function testSendShouldSetTimestampHeader()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+        $message = new NullMessage();
+
+        /** @var MessageInterface $sentMessage */
+        $sentMessage = null;
+
+        $messageProcessor = $this->createTransportMessageProducer();
+        $messageProcessor
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function ($destination, $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            })
+        ;
+
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub($message, $config, $queue));
+        $producer->send($queue, null);
+
+        self::assertLessThan(time() + 5, $sentMessage->getTimestamp());
+        self::assertGreaterThan(time() - 5, $sentMessage->getTimestamp());
+    }
+
+    public function testSendShouldSetMessageIdHeader()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+        $message = new NullMessage();
+
+        /** @var MessageInterface $sentMessage */
+        $sentMessage = null;
+
+        $messageProcessor = $this->createTransportMessageProducer();
+        $messageProcessor
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function ($destination, $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            })
+        ;
+
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub($message, $config, $queue));
+        $producer->send($queue, null);
+
+        self::assertInternalType('string', $sentMessage->getMessageId());
+        self::assertNotEmpty($sentMessage->getMessageId());
     }
 
     public function testSendShouldThrowExceptionIfBodyIsObject()
