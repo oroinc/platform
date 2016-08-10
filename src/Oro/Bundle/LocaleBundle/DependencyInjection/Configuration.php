@@ -21,6 +21,8 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_COUNTRY  = 'US';
     const DEFAULT_CURRENCY = 'USD';
 
+    const LANGUAGE = 'language';
+    const LANGUAGES = 'languages';
     const ENABLED_LOCALIZATIONS = 'enabled_localizations';
     const DEFAULT_LOCALIZATION = 'default_localization';
 
@@ -111,13 +113,13 @@ class Configuration implements ConfigurationInterface
             $rootNode,
             [
                 'locale' => ['value' => '%locale%'],
-                'language' => ['value' => null],
+                self::LANGUAGE => ['value' => null],
                 'country' => ['value' => null],
                 'currency' => ['value' => null],
                 'timezone' => ['value' => date_default_timezone_get()],
                 'format_address_by_address_country' => ['value' => true, 'type' => 'boolean'],
                 'qwerty' => ['value' => [], 'type' => 'array'],
-                'languages' => ['value' => ['en'], 'type' => 'array'],
+                self::LANGUAGES => ['value' => ['en'], 'type' => 'array'],
                 'quarter_start' => ['value' => ['month' => '1', 'day' => '1']],
                 'temperature_unit' => ['value' => 'fahrenheit'],
                 'wind_speed_unit' => ['value' => 'miles_per_hour'],

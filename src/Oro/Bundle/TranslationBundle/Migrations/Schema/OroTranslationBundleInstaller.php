@@ -42,11 +42,12 @@ class OroTranslationBundleInstaller implements Installation
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('code', 'string', ['length' => 16]);
-        $table->addColumn('enabled', 'boolean', []);
+        $table->addColumn('enabled', 'boolean', ['default' => false]);
         $table->addColumn('installed_build_date', 'date', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['code']);
     }
 
     /**
