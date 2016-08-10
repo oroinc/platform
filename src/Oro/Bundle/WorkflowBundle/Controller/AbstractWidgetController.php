@@ -60,6 +60,7 @@ abstract class AbstractWidgetController extends Controller
         return [
             'name' => $workflow->getName(),
             'label' => $workflow->getLabel(),
+            'isStarted' => $workflowItem !== null,
             'stepsData' => [
                 'is_ordered' => $isStepsDisplayOrdered,
                 'steps' => $steps
