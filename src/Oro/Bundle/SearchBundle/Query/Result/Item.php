@@ -221,7 +221,7 @@ class Item
             'record_id'     => $this->recordId,
             'record_string' => $this->recordTitle,
             'record_url'    => $this->recordUrl,
-            'selectedData'  => $this->selectedData
+            'selected_data'  => $this->selectedData
         ];
     }
 }

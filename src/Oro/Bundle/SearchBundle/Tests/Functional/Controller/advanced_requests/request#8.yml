@@ -10,7 +10,7 @@ response:
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item1@mail.com
                 record_url: http://localhost/search/
-                selectedData:
+                selected_data:
                     stringValue: item1@mail.com
                     integerValue: 1000
     soap:
@@ -19,6 +19,6 @@ response:
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item1@mail.com
                 recordUrl: http://localhost/search/
-                selectedData:
+                selected_data:
                     stringValue: item1@mail.com
                     integerValue: 1000
