@@ -243,8 +243,6 @@ services:
         tags:
              - { name: layout.block_type, alias: ordered_list }
 
-           - { name: layout.block_type, alias: meta }
-
     oro_layout.block_type.meta:
         parent: oro_layout.block_type.abstract_configurable
         calls:

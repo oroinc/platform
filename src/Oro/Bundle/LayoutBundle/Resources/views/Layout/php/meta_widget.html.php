@@ -1,2 +1,2 @@
 <?php //@codingStandardsIgnoreFile ?>
-<meta <?php echo $view['layout']->block($block, 'block_attributes') ?> />
+<meta <?php echo $view['layout']->block($block, 'block_attributes') ?><?php if (isset($charset)): ?> charset="<?php echo $charset ?>"<?php endif ?><?php if (isset($http_equiv)): ?> http_equiv="<?php echo $http_equiv ?>"<?php endif ?><?php if (isset($name)): ?> name="<?php echo $name ?>"<?php endif ?><?php if (isset($content)): ?> content="<?php echo $content ?>"<?php endif ?>/>
