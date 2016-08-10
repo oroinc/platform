@@ -4,6 +4,7 @@ define([
     'orotranslation/js/translator',
     'routing',
     'oro/dialog-widget',
+    'oroui/js/mediator',
     'oroui/js/app/views/loading-mask-view',
     'orocalendar/js/form-validation',
     'oroui/js/delete-confirmation',
@@ -15,6 +16,7 @@ define([
     __,
     routing,
     DialogWidget,
+    mediator,
     LoadingMask,
     FormValidation,
     DeleteConfirmation,
@@ -24,7 +26,6 @@ define([
     'use strict';
 
     var $ = Backbone.$;
-
     /**
      * @export  orocalendar/js/calendar/event/view
      * @class   orocalendar.calendar.event.View
@@ -215,6 +216,13 @@ define([
         },
 
         _handleResponseError: function(model, response) {
+            if (response.status === 404) {
+                mediator.execute(
+                    'showMessage',
+                    'error',
+                    __('Calendar event doesn\'t exist. Please refresh page.')
+                );
+            }
             this.showError(response.responseJSON || {});
         },
 
