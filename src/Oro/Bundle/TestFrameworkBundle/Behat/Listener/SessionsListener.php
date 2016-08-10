@@ -58,6 +58,10 @@ class SessionsListener extends MinkSessionsListener
         $this->mink->stopSessions();
         gc_collect_cycles();
 
+        if (0 === count($event->getFeature()->getScenarios())) {
+            return;
+        }
+
         $newEvent = new BeforeScenarioTested(
             $event->getEnvironment(),
             $event->getFeature(),
