@@ -3,7 +3,7 @@
 namespace Oro\Component\Layout\Loader\Generator\Extension;
 
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
-use Oro\Component\Layout\Extension\Theme\ThemeExtension;
+use Oro\Component\Layout\Extension\Import\ImportExtension;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
@@ -26,7 +26,7 @@ class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensi
 
         // imported layout update
         $delimiter = PathProviderInterface::DELIMITER;
-        if (strpos($data->getFilename(), $delimiter.ThemeExtension::IMPORT_FOLDER.$delimiter) !== false) {
+        if (strpos($data->getFilename(), $delimiter.ImportExtension::IMPORT_FOLDER.$delimiter) !== false) {
             $visitorCollection->append(new ImportLayoutUpdateVisitor());
         }
     }
