@@ -188,3 +188,23 @@ services:
         class: '%oro_translation.strategy.provider.class%'
         arguments:
             - '@oro_translation.strategy.default'
+
+    oro_translation.listener.datagrid.language:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener'
+        arguments:
+            - '@oro_translation.statistic_provider'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-language-grid, method: onResultAfter }
+
+    oro_translation.repository.language:
+        class: Doctrine\ORM\EntityRepository
+        public: false
+        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        arguments:
+            - '%oro_translation.entity.language.class%'
+
+    oro_translation.provider.language:
+        class: 'Oro\Bundle\TranslationBundle\Provider\LanguageProvider'
+        arguments:
+            - '@oro_translation.repository.language'
+            - '@oro_locale.settings'

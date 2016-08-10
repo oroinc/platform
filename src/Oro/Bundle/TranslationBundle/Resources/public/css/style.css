@@ -53,3 +53,9 @@
     color: #666;
     padding: 10px 0;
 }
+
+.oro-translation-languages .translation-completeness b {
+    text-align: center;
+    display: block;
+    margin-top: -36px;
+}

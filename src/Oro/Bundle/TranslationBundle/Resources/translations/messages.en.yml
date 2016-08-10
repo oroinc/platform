@@ -22,3 +22,10 @@ oro.translation:
         installed_build_date.label: 'Installed Build Date'
         owner.label: 'Owner'
         organization.label: 'Organization'
+        status.label: 'Status'
+        enabled.label: 'Enabled'
+        disabled.label: 'Disabled'
+        translation_completeness.label: 'Translation Completeness'
+
+    menu:
+        languages.label: Languages

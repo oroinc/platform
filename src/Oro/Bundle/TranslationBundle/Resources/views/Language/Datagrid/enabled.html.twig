@@ -1,0 +1,5 @@
+{% if record.getValue('enabled') == true %}
+    {{ 'oro.translation.language.enabled.label'|trans }}
+{% else %}
+    {{ 'oro.translation.language.disabled.label'|trans }}
+{% endif %}

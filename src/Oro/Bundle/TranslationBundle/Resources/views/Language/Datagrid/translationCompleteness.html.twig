@@ -1,0 +1,12 @@
+{% set translationCompleteness = record.getValue('translationCompleteness') %}
+
+{% if translationCompleteness is not null %}
+    <div class="translation-completeness">
+        <div class="progress">
+            <div class="bar bar-success" style="width: {{ translationCompleteness }}%;"></div>
+        </div>
+        <b>{{ (translationCompleteness / 100)|oro_format_percent }}</b>
+    </div>
+{% else %}
+    {{ 'N/A'|trans }}
+{% endif %}

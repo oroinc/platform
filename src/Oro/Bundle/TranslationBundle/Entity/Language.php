@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
 
 /**
  * @ORM\Table(name="oro_language")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
