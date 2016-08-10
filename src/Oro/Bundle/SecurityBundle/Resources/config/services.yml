@@ -346,12 +346,19 @@ services:
             - { name: oro_security.acl.config_loader }
 
     oro_security.acl.annotation_listener:
-        class: %oro_security.acl.annotation_listener.class%
+        class: Oro\Bundle\SecurityBundle\Annotation\AclListener
         arguments:
-            - '@service_container'
-            - '@oro_security.acl.annotation_provider.cache.warmer'
+            - '@oro_security.acl.annotation_provider'
+            - '@oro_security.acl.annotation.metadata.dumper'
+            - %kernel.debug%
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_security.acl.annotation.metadata.dumper:
+        class: Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper
+        public: false
+        lazy: true
+        arguments: [ %kernel.cache_dir%, %kernel.environment%, %kernel.name% ]
 
     oro_security.acl.config_loader:
         public: false
