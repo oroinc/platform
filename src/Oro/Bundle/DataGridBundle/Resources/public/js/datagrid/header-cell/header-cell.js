@@ -1,14 +1,9 @@
 define([
     'underscore',
-<<<<<<< HEAD
+    'jquery',
     'backgrid',
     'oroui/js/tools/text-util'
-], function(_, Backgrid, textUtil) {
-=======
-    'jquery',
-    'backgrid'
-], function(_, $, Backgrid) {
->>>>>>> ticket/11327_4
+], function(_, $, Backgrid, textUtil) {
     'use strict';
 
     var HeaderCell;
