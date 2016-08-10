@@ -4,7 +4,6 @@
   }
   &.dropdown, &.dropup {
     display: inline-block;
-    position: relative;
   }
   &.disabled.open > .dropdown-menu {
     display: none;
@@ -206,15 +205,17 @@
   }
 }
 
-.dropup .column-manager .dropdown-menu {
-  top: auto;
-  bottom: 0;
-  &:before {
+.dropup, .dropup-area {
+  .column-manager .dropdown-menu {
     top: auto;
-    bottom: 6px;
-  }
-  &:after {
-    top: auto;
-    bottom: 7px;
+    bottom: 0;
+    &:before {
+      top: auto;
+      bottom: 6px;
+    }
+    &:after {
+      top: auto;
+      bottom: 7px;
+    }
   }
 }
