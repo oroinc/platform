@@ -67,7 +67,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                     '"' . implode('", "', array_keys($this->getKnownExtras())) . '"',
                     'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
                 ),
-                ['definition', 'filters', 'sorters']
+                ['definition', 'filters', 'sorters', 'customize_loaded_data', 'data_transformers']
             )
             ->addOption(
                 'action',
