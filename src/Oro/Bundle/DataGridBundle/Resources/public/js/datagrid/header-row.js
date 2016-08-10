@@ -88,7 +88,7 @@ define([
                     var columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;
                     });
-                    if(columnModel) {
+                    if (columnModel) {
                         return self.columnRenderer.getHtml(self.renderItem(columnModel).$el);
                     }
                     return '';
@@ -98,7 +98,7 @@ define([
                     var columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;
                     });
-                    if(columnModel) {
+                    if (columnModel) {
                         return self.columnRenderer.getRawAttributes(self.renderItem(columnModel).$el, attributes);
                     }
                     return '';

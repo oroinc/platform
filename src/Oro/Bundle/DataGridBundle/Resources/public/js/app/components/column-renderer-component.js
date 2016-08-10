@@ -41,7 +41,7 @@ define(function(Chaplin) {
         getRawAttributes: function($element, attributes) {
             attributes.class = attributes.class || '';
 
-            if($element.length){
+            if ($element.length) {
                 attributes.class = this._getElementClasses($element, attributes.class)
             }
             return this._getAttributesRaw(attributes);

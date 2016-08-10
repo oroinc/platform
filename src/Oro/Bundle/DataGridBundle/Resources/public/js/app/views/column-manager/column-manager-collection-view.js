@@ -73,7 +73,7 @@ define(function(require) {
          */
         render: function() {
             ColumnManagerCollectionView.__super__.render.apply(this, arguments);
-            if(this.addSorting) {
+            if (this.addSorting) {
                 this.initSorting();
             }
             this.updateHeaderWidths();
