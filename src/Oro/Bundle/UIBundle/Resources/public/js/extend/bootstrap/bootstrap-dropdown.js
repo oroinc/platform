@@ -97,9 +97,15 @@ define(function(require) {
                 css.left = 'auto';
             }
 
+            var containerOffset = $container.offset();
+            var dropdownMenuOffset = $dropdownMenu.offset();
+
             var originalPosition = {
                 parent: $parent.offset(),
-                dropdownMenu: $dropdownMenu.offset()
+                dropdownMenu: {
+                    left: dropdownMenuOffset.left - containerOffset.left,
+                    top: dropdownMenuOffset.top - containerOffset.top
+                }
             };
             $placeholder = $('<div class="dropdown-menu__placeholder"/>');
             $dropdownMenu.data('related-toggle', $this);
@@ -392,7 +398,8 @@ define(function(require) {
                     return;
                 }
                 var $dropdown = $(this);
-                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup')) {
+                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup') ||
+                    $dropdown.has('>.dropdown-menu').length === 0) {
                     // handles only case when dropdown id opened in dialog
                     return;
                 }

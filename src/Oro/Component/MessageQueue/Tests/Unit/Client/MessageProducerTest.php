@@ -160,6 +160,30 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('application/json', $message->getHeader('content_type'));
     }
 
+    public function testShouldSendTransportMessage()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $message = new NullMessage();
+
+        $messageProducer = $this->createTransportMessageProducer();
+        $messageProducer
+            ->expects($this->once())
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
+        ;
+
+        $driver = $this->createDriverStub(null, $config, $queue);
+        $driver
+            ->expects(self::never())
+            ->method('createMessage')
+        ;
+
+        $producer = new MessageProducer($messageProducer, $driver);
+        $producer->send('topic', $message);
+    }
+
     public function testThrowIfBodyIsNotSerializable()
     {
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
@@ -183,8 +207,6 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         );
         $producer->send('topic', new \stdClass());
     }
-
-
 
     public function testSendShouldForceScalarsToStringAndSetTextContentType()
     {
@@ -312,6 +334,76 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             'The message\'s body must be either null, scalar or array. Got: stdClass'
         );
         $producer->send($queue, new \stdClass);
+    }
+
+    public function testShouldCreateMessageForNullBody()
+    {
+        $expectedMessage = new NullMessage();
+
+        $producer = new MessageProducer(
+            $this->createTransportMessageProducer(),
+            $this->createDriverStub($expectedMessage, null, null)
+        );
+
+        $actualMessage = $producer->createMessage(null);
+
+        self::assertSame($expectedMessage, $actualMessage);
+        self::assertNotEmpty($actualMessage->getMessageId());
+        self::assertNotEmpty($actualMessage->getTimestamp());
+        self::assertEquals('text/plain', $actualMessage->getHeader('content_type'));
+        self::assertEquals('', $actualMessage->getBody());
+    }
+
+    public function testShouldCreateMessageForStringBody()
+    {
+        $expectedMessage = new NullMessage();
+
+        $producer = new MessageProducer(
+            $this->createTransportMessageProducer(),
+            $this->createDriverStub($expectedMessage, null, null)
+        );
+
+        $actualMessage = $producer->createMessage('aString');
+
+        self::assertSame($expectedMessage, $actualMessage);
+        self::assertNotEmpty($actualMessage->getMessageId());
+        self::assertNotEmpty($actualMessage->getTimestamp());
+        self::assertEquals('text/plain', $actualMessage->getHeader('content_type'));
+        self::assertEquals('aString', $actualMessage->getBody());
+    }
+
+    public function testShouldCreateMessageForArray()
+    {
+        $expectedMessage = new NullMessage();
+
+        $producer = new MessageProducer(
+            $this->createTransportMessageProducer(),
+            $this->createDriverStub($expectedMessage, null, null)
+        );
+
+        $actualMessage = $producer->createMessage(['foo' => 'fooVal']);
+
+        self::assertSame($expectedMessage, $actualMessage);
+        self::assertNotEmpty($actualMessage->getMessageId());
+        self::assertNotEmpty($actualMessage->getTimestamp());
+        self::assertEquals('application/json', $actualMessage->getHeader('content_type'));
+        self::assertEquals('{"foo":"fooVal"}', $actualMessage->getBody());
+    }
+
+    public function testShouldThrowExceptionIfBodyIsObjectOnCreateMessage()
+    {
+        $expectedMessage = new NullMessage();
+
+        $producer = new MessageProducer(
+            $this->createTransportMessageProducer(),
+            $this->createDriverStub($expectedMessage, null, null)
+        );
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'The message\'s body must be either null, scalar or array. Got: stdClass'
+        );
+        $producer->createMessage(new \stdClass());
     }
 
     /**
