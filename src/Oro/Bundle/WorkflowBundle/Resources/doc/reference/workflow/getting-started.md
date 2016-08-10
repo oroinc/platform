@@ -60,7 +60,7 @@ associated workflow.
 How it works?
 -------------
 
-Entity can have assigned workflow - it means that on entity view page there will be list of passed steps and
+Entity can have assigned workflows - it means that on entity view page there will be list of passed steps and
 allowed transition buttons. When user clicks button with start transition (and submit transition form if it's exist)
 in the background a new instance of Workflow Item of specific Workflow is created.
 
@@ -97,30 +97,20 @@ User can activate workflow through UI in Workflow datagrid - it available in men
 Here each workflow can be activated either using row actions "Activate" and "Deactivate", or from Workflow view page
 using appropriate buttons.
 
-### Annotation
+### Configuration
 
-Developer can add workflow configuration to @Config entity annotation where active workflow will be specified.
+Developer can add workflow configuration corresponded workflow YAML config in sub-node `active` of node `defaults`.
 This approach can be used if there is a need to automatically activate workflow on application installation.
 Here is example of such configuration:
 
-```php
-/**
- * ...
- *
- * @Config(
- *  ...
- *  defaultValues={
- *      ...
- *      "workflow"={
- *          "active_workflows"={"example_user_flow", "another_flow"}
- *      }
- *  }
- * )
- */
-class User
-{
-    ...
-}
+```YAML
+workflows:
+    b2b_flow_sales:
+        label: B2B Sales Flow
+        defaults:
+            active: true #workflow will be automatically activated during installation
+        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity
+        entity_attribute: opportunity
 ```
 
 ### REST API
@@ -157,7 +147,12 @@ workflows:
         entity_attribute: user                    # attribute name of current entity that can be used in configuration
         start_step: started                       # step that will be assigned automatically to new entities
         steps_display_ordered: true               # defines whether all steps will be shown on view page in steps widget
-
+        defaults:
+            active: true                          # active by default
+        exclusive_active_groups: [group_flow]     # active only single workflow for a specified groups
+        exclusive_record_groups:
+            - unique_run                          # only one run for an `entity` from specified groups can be performed
+        priority: 100                             # has priotiry of 100
         steps:                                    # list of all existing steps in workflow
             started:                              # step where user should enter firstname and lastname
                 label: 'Started'                  # step label
