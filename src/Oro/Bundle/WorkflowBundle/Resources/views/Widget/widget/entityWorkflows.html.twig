@@ -1,6 +1,6 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
-<div class="widget-content">
+<div class="widget-content widget-content-bordered">
     {% for workflow in workflows %}
         <table class="workflow-entity">
             <tr>
@@ -9,29 +9,31 @@
                     <table class="workflow-content">
                         <tr>
                             <td class="workflow-steps">
-                                {% set isOrdered = workflow.stepsData.is_ordered %}
-                                {% set steps = workflow.stepsData.steps %}
-                                {% set stepWidth = 100 / steps|length %}
-                                <ul class="workflow-steps-list">
-                                    {% for step in steps %}
-                                        {% set active = step.active %}
-                                        {% set possibleStepsCount = step.possibleStepsCount %}
-                                        {% if isOrdered %}
-                                            <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}"
-                                                style="width:{{ stepWidth }}%">
-                                                <div class="workflow-steps-item-arrow-container">
-                                                    <span class="workflow-step-arrow-left"></span>
-                                                    <span class="workflow-step-arrow-right"></span>
-                                                    {{ step.label|trans }}
-                                                </div>
-                                            </li>
-                                        {% else %}
-                                            <li class="workflow-steps-item workflow-unordered-steps">
-                                                <span>{{ step.label|trans }}</span>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
+                                {% if workflow.isStarted %}
+                                    {% set isOrdered = workflow.stepsData.is_ordered %}
+                                    {% set steps = workflow.stepsData.steps %}
+                                    {% set stepWidth = 100 / steps|length  %}
+                                    <ul class="workflow-steps-list">
+                                        {% for step in steps %}
+                                            {% set active = step.active %}
+                                            {% set possibleStepsCount = step.possibleStepsCount %}
+                                            {% if isOrdered %}
+                                                <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}"
+                                                    style="width:{{ stepWidth }}%">
+                                                    <div class="workflow-steps-item-arrow-container">
+                                                        <span class="workflow-step-arrow-left"></span>
+                                                        <span class="workflow-step-arrow-right"></span>
+                                                        {{ step.label|trans }}
+                                                    </div>
+                                                </li>
+                                            {% else %}
+                                                <li class="workflow-steps-item workflow-unordered-steps">
+                                                    <span>{{ step.label|trans }}</span>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </td>
                             {% if workflow.transitionsData|length != 0 %}
                                 <td class="workflow-controls">
