@@ -1,0 +1,47 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+{% oro_title_set({ params: { '%name%': entity.name, '%id%': entity.id } }) %}
+
+{% block breadcrumbs %}
+    {{ parent() }}
+
+    <div class="pull-left">
+        {% include 'OroMessageQueueBundle:Job/Datagrid:status.html.twig' with {'record': {'rootEntity': entity}} %}
+
+        {% if entity.unique %}
+            <div class="badge badge-info status-box"><i class="icon-status-enabled icon-circle"></i>{{ 'oro.message_queue_job.header.unique'|trans }}</div>
+        {% endif %}
+
+        {% if entity.interrupted %}
+            <div class="badge badge-info status-box"><i class="icon-status-enabled icon-circle"></i>{{ 'oro.message_queue_job.header.interrupted'|trans }}</div>
+        {% endif %}
+    </div>
+{% endblock breadcrumbs %}
+
+{% block stats %}
+    <li>{{ 'oro.message_queue_job.header.startedAt'|trans }}: {{ entity.startedAt is defined and entity.startedAt ? entity.startedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.message_queue_job.header.stoppedAt'|trans }}: {{ entity.stoppedAt is defined and entity.stoppedAt ? entity.stoppedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        entity: entity,
+        indexPath: path('oro_message_queue_root_jobs'),
+        indexLabel:  'oro.message_queue_job.header.root_jobs'|trans,
+        entityTitle: 'oro.message_queue_job.header.name'|trans({'%name%': entity.name})
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set gridName  = 'oro_message_queue_child_jobs' %}
+    {% set params  = {'root_job_id': entity.id} %}
+    {% set renderParams = {
+            'enableFullScreenLayout': true,
+            'enableViews': true,
+            'showViewsInNavbar': true,
+    } %}
+
+    {{ dataGrid.renderGrid(gridName, params, renderParams) }}
+{% endblock content_data %}

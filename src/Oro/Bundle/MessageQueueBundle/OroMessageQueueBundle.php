@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle;
 
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
@@ -10,6 +11,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Oro\Component\MessageQueue\Job\Topics;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -31,5 +33,10 @@ class OroMessageQueueBundle extends Bundle
         $extension->addTransportFactory(new DefaultTransportFactory());
         $extension->addTransportFactory(new NullTransportFactory());
         $extension->addTransportFactory(new DbalTransportFactory());
+
+        $addTopicPass = AddTopicMetaPass::create()
+            ->add(Topics::CALCULATE_ROOT_JOB_STATUS, 'Calculate root job status')
+        ;
+        $container->addCompilerPass($addTopicPass);
     }
 }
