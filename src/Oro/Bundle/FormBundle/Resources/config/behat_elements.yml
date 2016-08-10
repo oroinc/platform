@@ -14,3 +14,6 @@ CollectionField:
 
 FieldSet:
   class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
+Checkbox:
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Checkbox
