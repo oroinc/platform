@@ -59,7 +59,7 @@ class StartTransitionHandler
         }
 
         $responseCode = null;
-
+        $workflowItem = null;
         try {
             $dataArray = [];
             $workflowName = $workflow->getName();

@@ -1,4 +1,9 @@
-{% import 'OroUIBundle::macros.html.twig' as ui %}
-{{ ui.renderList(
-    value[constant('Oro\\Bundle\\WorkflowBundle\\Entity\\WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD')]|default([])
-) }}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set key = constant('Oro\\Bundle\\WorkflowBundle\\Entity\\WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD') %}
+
+{% if value[key] is defined and value[key] is not empty %}
+    {{ UI.renderList(value[key]) }}
+{% else %}
+    {{ 'N/A'|trans }}
+{% endif %}

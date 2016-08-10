@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -15,7 +16,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
      */
     protected $doctrineHelper;
 
@@ -70,11 +71,15 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         return [
             'foreign group' => $this->foreignGroupCase(),
             'same group' => $this->sameGroupCase(),
+            'items with same group are covered by priority' => $this->itemsWithSameGroupsCase(),
             'no group' => $this->noGroupCase(),
             'mixed' => $this->mixedCase()
         ];
     }
 
+    /**
+     * @return array
+     */
     protected function sameGroupCase()
     {
         $workflow1 = $this->getWorkflow('workflow1', ['group1']);
@@ -83,12 +88,15 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem1 = $this->getWorkflowItem('workflow1', ['group1']);
 
         return [
-            new ArrayCollection([$workflow1]),
+            new ArrayCollection(['workflow1' => $workflow1]),
             [$workflowItem1],
-            new ArrayCollection([$workflow1, $workflow2])
+            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
         ];
     }
 
+    /**
+     * @return array
+     */
     protected function foreignGroupCase()
     {
         $workflow1 = $this->getWorkflow('workflow1', ['group1']);
@@ -97,12 +105,15 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem1 = $this->getWorkflowItem('workflow1', ['group1']);
 
         return [
-            new ArrayCollection([$workflow1, $workflow2]),
+            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2]),
             [$workflowItem1],
-            new ArrayCollection([$workflow1, $workflow2])
+            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
         ];
     }
 
+    /**
+     * @return array
+     */
     private function noGroupCase()
     {
         $workflow1 = $this->getWorkflow('workflow1', []);
@@ -112,13 +123,15 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem2 = $this->getWorkflowItem('workflow2', []);
 
         return [
-            new ArrayCollection([$workflow1, $workflow2]),
+            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2]),
             [$workflowItem1, $workflowItem2],
-            new ArrayCollection([$workflow1, $workflow2])
+            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
         ];
     }
 
-
+    /**
+     * @return array
+     */
     private function mixedCase()
     {
         $workflow1 = $this->getWorkflow('w1', ['g1']);
@@ -130,9 +143,27 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem2 = $this->getWorkflowItem('w2', ['g2']);
 
         return [
-            new ArrayCollection([$workflow1, $workflow2, $workflow3]),
+            new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2, 'w3' => $workflow3]),
             [$workflowItem1, $workflowItem2],
-            new ArrayCollection([$workflow1, $workflow2, $workflow3, $workflow4])
+            new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2, 'w3' => $workflow3, 'w4' => $workflow4])
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function itemsWithSameGroupsCase()
+    {
+        $workflow1 = $this->getWorkflow('w1', ['g1', 'g2']);
+        $workflow2 = $this->getWorkflow('w2', ['g1', 'g3']);
+
+        $workflowItem1 = $this->getWorkflowItem('w1', ['g1', 'g2']);
+        $workflowItem2 = $this->getWorkflowItem('w2', ['g1', 'g3']);
+
+        return [
+            new ArrayCollection(['w1'=> $workflow1]),
+            [$workflowItem1, $workflowItem2],
+            new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2])
         ];
     }
 
@@ -174,8 +205,8 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItemMock = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
 
         $workflowItemMock->expects($this->any())->method('getWorkflowName')->willReturn($workflowName);
-        $workflowItemMock->expects($this->any())->method('getDefinition')->willReturn($definition);
 
         return $workflowItemMock;
     }
+
 }

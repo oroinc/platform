@@ -72,6 +72,10 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
+        $this->assertContains('active_group1', $crawler->html());
+        $this->assertContains('active_group2', $crawler->html());
+        $this->assertContains('record_group1', $crawler->html());
+        $this->assertContains('record_group2', $crawler->html());
     }
 
     public function testInfoAction()

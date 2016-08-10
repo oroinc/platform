@@ -40,6 +40,12 @@ workflows:
         label: 'Test MultiStep Flow'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: starting_point
+        exclusive_active_groups:
+            - active_group1
+            - active_group2
+        exclusive_record_groups:
+            - record_group1
+            - record_group2
         steps:
             starting_point:
                  label: '(Start)'
