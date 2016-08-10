@@ -231,26 +231,34 @@ datagrid:
 
         properties:
             id: ~
+            view_link:
+                type:   url
+                route:  oro_user_role_view
+                params:
+                    - id
             update_link:
                 type: url
                 route: oro_user_role_update
                 params:
                     - id
-
             delete_link:
                 type: url
                 route: oro_api_delete_role
                 params:
                     - id
-
         actions:
+            view:
+                type:          navigate
+                label:         oro.grid.action.view
+                link:          view_link
+                icon:          eye-open
+                rowAction:     true
             update:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_role_update
-                rowAction:     true
             delete:
                 type:          delete
                 label:         oro.grid.action.delete

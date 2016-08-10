@@ -70,7 +70,7 @@ class ImageTypeProvider
      */
     protected function extractImageTypes(Theme $theme)
     {
-        $config = $theme->getDataByKey('images', ['types' => []])['types'];
+        $config = $theme->getConfigByKey('images', ['types' => []])['types'];
         $types = [];
 
         foreach ($config as $name => $type) {
@@ -103,7 +103,7 @@ class ImageTypeProvider
      */
     protected function extractDimensions(Theme $theme)
     {
-        return $theme->getDataByKey('images', ['dimensions' => []])['dimensions'];
+        return $theme->getConfigByKey('images', ['dimensions' => []])['dimensions'];
     }
 
     /**
