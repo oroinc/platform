@@ -34,7 +34,7 @@ class Element extends NodeElement
      */
     public function __construct(Session $session, OroElementFactory $elementFactory, $selector = ['xpath' => '//'])
     {
-        parent::__construct($selector, $session);
+        parent::__construct($this->getSelectorAsXpath($session->getSelectorsHandler(), $selector), $session);
 
         $this->elementFactory = $elementFactory;
         $this->session = $session;
@@ -119,5 +119,19 @@ class Element extends NodeElement
     protected function getName()
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
+    }
+
+    /**
+     * @param SelectorsHandler $selectorsHandler
+     * @param array|string $selector
+     *
+     * @return string
+     */
+    private function getSelectorAsXpath(SelectorsHandler $selectorsHandler, $selector)
+    {
+        $selectorType = is_array($selector) ? $selector['type'] : 'css';
+        $locator = is_array($selector) ? $selector['locator'] : $selector;
+
+        return $selectorsHandler->selectorToXpath($selectorType, $locator);
     }
 }
