@@ -112,20 +112,23 @@ class Router
      */
     public function redirect($context)
     {
-        $arrayData = json_decode($this->getRawRouteData($this->request), true);
+        $rawRouteData = json_decode($this->getRawRouteData($this->request), true);
 
         /**
          * Default route should be used in case of no input_action in request
          */
-        if (!is_array($arrayData)) {
+        if (!is_array($rawRouteData)) {
             return new RedirectResponse($this->request->getUri());
         }
 
-        $routeName = $this->parseRouteName($arrayData);
-        $routeParams = $this->parseRouteParams($arrayData, $context);
-        $routeParams = $this->mergeRequestQueryParams($routeParams);
-        $redirectUrl = $this->router->generate($routeName, $routeParams);
-
+        if ($this->hasRedirectUrl($rawRouteData)) {
+            $redirectUrl = $this->parseRedirectUrl($rawRouteData);
+        } else {
+            $routeName = $this->parseRouteName($rawRouteData);
+            $routeParams = $this->parseRouteParams($rawRouteData, $context);
+            $routeParams = $this->mergeRequestQueryParams($routeParams);
+            $redirectUrl = $this->router->generate($routeName, $routeParams);
+        }
         return new RedirectResponse($redirectUrl);
     }
 
@@ -215,6 +218,62 @@ class Router
         }
 
         return $arrayData['route'];
+    }
+
+    /**
+     * Check redirectUrl for existence.
+     *
+     * @param array $arrayData
+     * @return string
+     */
+    protected function hasRedirectUrl(array $arrayData)
+    {
+        return !empty($arrayData['redirectUrl']);
+    }
+
+    /**
+     * Parses redirectUrl.
+     *
+     * @param array $arrayData
+     * @return string
+     */
+    protected function parseRedirectUrl(array $arrayData)
+    {
+        if (empty($arrayData['redirectUrl'])) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot parse route name from request parameter "%s". Value of key "%s" cannot be empty: %s',
+                    self::ACTION_PARAMETER,
+                    'redirectUrl',
+                    json_encode($arrayData)
+                )
+            );
+        }
+
+        if (!is_string($arrayData['redirectUrl'])) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot parse route name from request parameter "%s". Value of key "%s" must be string: %s',
+                    self::ACTION_PARAMETER,
+                    'redirectUrl',
+                    json_encode($arrayData)
+                )
+            );
+        }
+
+        // check for mailformed URL
+        if (parse_url($arrayData['redirectUrl']) === false) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot parse route name from request parameter "%s". Value of key "%s" is not valid URL',
+                    self::ACTION_PARAMETER,
+                    'redirectUrl',
+                    json_encode($arrayData)
+                )
+            );
+        }
+
+        return $arrayData['redirectUrl'];
     }
 
     /**

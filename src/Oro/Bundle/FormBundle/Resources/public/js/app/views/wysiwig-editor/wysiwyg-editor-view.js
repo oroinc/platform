@@ -122,13 +122,13 @@ define(function(require) {
                             }
                         });
                     }
-                    _.defer(function() {
+                    _.delay(function() {
                         /**
                          * fixes jumping dialog on refresh page
                          * (promise should be resolved in a separate process)
                          */
                         self._resolveDeferredRender();
-                    });
+                    }, 20);
                 }
             }, options));
             this.tinymceConnected = true;
