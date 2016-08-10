@@ -7,6 +7,9 @@ use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Bundle\AddressBundle\Entity\Region;
 
 class ReferenceRepositoryInitializer
 {
@@ -43,6 +46,20 @@ class ReferenceRepositoryInitializer
         $this->referenceRepository->set('adminRole', $user->getRole(User::ROLE_ADMINISTRATOR));
         $this->referenceRepository->set('organization', $user->getOrganization());
         $this->referenceRepository->set('business_unit', $user->getOwner());
+
+        /** will be removed after BAP-11430 resolution */
+
+        /** @var CountryRepository $repository */
+        $repository = $this->em->getRepository('OroAddressBundle:Country');
+        /** @var Country $germany */
+        $germany = $repository->findOneBy(['name' => 'Germany']);
+        $this->referenceRepository->set('germany', $germany);
+
+        /** @var RegionRepository $repository */
+        $repository = $this->em->getRepository('OroAddressBundle:Region');
+        /** @var Region $berlin */
+        $berlin = $repository->findOneBy(['name' => 'Berlin']);
+        $this->referenceRepository->set('berlin', $berlin);
     }
 
     /**
@@ -51,15 +68,16 @@ class ReferenceRepositoryInitializer
      */
     public function refresh()
     {
-        $references = $this->referenceRepository->toArray();
-        $this->referenceRepository->clear();
-
-        foreach ($references as $key => $object) {
-            $class = get_class($object);
-            $newReference = $this->em->getReference($class, $object->getId());
-
-            $this->referenceRepository->set($key, $newReference);
-        }
+        /**  BAP-11316 */
+//        $references = $this->referenceRepository->toArray();
+//        $this->referenceRepository->clear();
+//
+//        foreach ($references as $key => $object) {
+//            $class = get_class($object);
+//            $newReference = $this->em->getReference($class, $object->getId());
+//
+//            $this->referenceRepository->set($key, $newReference);
+//        }
     }
 
     /**
