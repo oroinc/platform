@@ -64,9 +64,12 @@ class GroupChoiceField extends Element
      */
     protected function getCheckbox($label)
     {
-        return array_shift(array_intersect_key(
+        $choices = array_intersect_key(
             $this->choices,
             array_flip(preg_grep(sprintf('/%s/i', $label), array_keys($this->choices)))
-        ));
+        );
+        self::assertCount(1, $choices, sprintf('Too many results for "%s" label', $label));
+
+        return array_shift($choices);
     }
 }
