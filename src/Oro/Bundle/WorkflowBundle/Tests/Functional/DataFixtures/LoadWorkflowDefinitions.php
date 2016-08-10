@@ -16,6 +16,8 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
     const START_TRANSITION = 'start_transition';
     const MULTISTEP_START_TRANSITION = 'starting_point_transition';
     const MULTISTEP = 'test_multistep_flow';
+    const WITH_GROUPS1 = 'test_groups_flow1';
+    const WITH_GROUPS2 = 'test_groups_flow2';
 
     /**
      * @var ContainerInterface

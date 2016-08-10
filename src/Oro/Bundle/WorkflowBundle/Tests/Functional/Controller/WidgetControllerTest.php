@@ -90,6 +90,15 @@ class WidgetControllerTest extends WebTestCase
         $this->assertTransitionFromSubmit($crawler, $workflowItem);
     }
 
+    public function testStartTransitionFormActionExclusiveGroups()
+    {
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_GROUPS1);
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_GROUPS2);
+        $this->entity = $this->createNewEntity();
+        $this->assertNotEmpty($this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::WITH_GROUPS1));
+        $this->assertEmpty($this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::WITH_GROUPS2));
+    }
+
     public function testTransitionFormAction()
     {
         $workflowItem = $this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);

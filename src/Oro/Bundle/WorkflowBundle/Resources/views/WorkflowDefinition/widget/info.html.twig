@@ -23,16 +23,16 @@
             ) }}
 
             {% set activeGroups %}
-                {% if entity.activeGroups is not empty %}
-                    {{ UI.renderList(entity.activeGroups) }}
+                {% if entity.exclusiveActiveGroups is not empty %}
+                    {{ UI.renderList(entity.exclusiveActiveGroups) }}
                 {% else %}
                     {{ 'N/A'|trans }}
                 {% endif %}
             {% endset %}
 
             {% set recordGroups %}
-                {% if entity.recordGroups is not empty %}
-                    {{ UI.renderList(entity.recordGroups) }}
+                {% if entity.exclusiveRecordGroups is not empty %}
+                    {{ UI.renderList(entity.exclusiveRecordGroups) }}
                 {% else %}
                     {{ 'N/A'|trans }}
                 {% endif %}

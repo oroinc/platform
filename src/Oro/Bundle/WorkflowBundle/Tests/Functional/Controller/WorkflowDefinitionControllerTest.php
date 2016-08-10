@@ -41,6 +41,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertNotEmpty($crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::WITH_START_STEP, $crawler->html());
+        $this->assertContainGroups($crawler->html());
     }
 
     public function testUpdateActionForSystem()
@@ -72,10 +73,6 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
-        $this->assertContains('active_group1', $crawler->html());
-        $this->assertContains('active_group2', $crawler->html());
-        $this->assertContains('record_group1', $crawler->html());
-        $this->assertContains('record_group2', $crawler->html());
     }
 
     public function testInfoAction()
@@ -84,7 +81,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
             'GET',
             $this->getUrl('oro_workflow_definition_info', [
                 '_widgetContainer' => 'dialog',
-                'name' => LoadWorkflowDefinitions::MULTISTEP
+                'name' => LoadWorkflowDefinitions::WITH_GROUPS1
             ]),
             [],
             [],
@@ -94,11 +91,12 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $this->assertNotEmpty($crawler->html());
-        $workflow = $this->workflowManager->getWorkflow(LoadWorkflowDefinitions::MULTISTEP);
+        $workflow = $this->workflowManager->getWorkflow(LoadWorkflowDefinitions::WITH_GROUPS1);
         $this->assertContains($workflow->getLabel(), $crawler->html());
         if ($workflow->getStepManager()->getStartStep()) {
             $this->assertContains($workflow->getStepManager()->getStartStep()->getLabel(), $crawler->html());
         }
+        $this->assertContainGroups($crawler->html());
     }
 
     public function testDeactivateFormAction()
@@ -133,5 +131,16 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertNotEmpty($crawler->html());
+    }
+
+    /**
+     * @param string $content
+     */
+    private function assertContainGroups($content)
+    {
+        $this->assertContains('active_group1', $content);
+        $this->assertContains('active_group2', $content);
+        $this->assertContains('record_group1', $content);
+        $this->assertContains('record_group2', $content);
     }
 }
