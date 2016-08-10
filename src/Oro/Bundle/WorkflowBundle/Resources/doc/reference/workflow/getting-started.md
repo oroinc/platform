@@ -143,7 +143,9 @@ There two levels of exclusiveness at this moment: activation level and record le
 
 ###Activation level exclusiveness - `exclusive_active_groups` 
 If your custom workflow represents a replacement flow for some already existent workflows you may provide a possibility to secure your customization by ensuring  that only one of them can be activated in the system at a time. This can be performed by defining *common exclusive activation group* for both workflows. That can be done in workflow configuration node named `exclusive_active_groups`.
-For example, we have BasicSalesFlow and MyShopSalesFlow workflows. They are both use the same related entity (let's say Order) and MyShopSalesFlow is a full replacement for another one. So we need to force administrators to enable only one of them. In that case, we can provide a common group in workflows configurations under `exclusive_active_groups` node. Let's name it 'sales'.
+For example, we have `basic_sales_flow` and `my_shop_sales_flow` workflows.
+They are both use the same related entity (let's say Order) and `my_shop_sales_flow` is a full replacement for another one. 
+So we need to force administrators to enable only one of them. In that case, we can provide a common group in workflows configurations under `exclusive_active_groups` node. Let's name it 'sales'.
 So, now, when an administrator will attempt to activate one of that groups there would be an additional check for group conflicts and notice generated if another workflow in the group 'sales' is already active. So that two workflows would never be active at once.
 
 ###Record level exclusiveness - `exclusive_record_groups`
@@ -156,7 +158,7 @@ Let's say, you have two exclusive workflows at the level of a single record and 
 In that case, you may configure `priority` flag in workflow configurations so when a new record of the related entity created workflows would be processed by that priority flag and the second one from same exclusive record group will not perform its start transition if there already present another workflow record from the same exclusive group.
 For example `checkout` and `alternative_checkout` workflows. In a case when we need to process `alternative_checkout` workflow before `checkout`, we can determine its priority level higher than another.
 Then, when new `Checkout` entity will be persisted, a system would perform `alternative_checkout` workflow start transition first.
-Additionally, if start transition of dominant workflow has unmet its conditions to start, then second workflow would have chance to starts its flow as well.
+Additionally, if start transition of dominant workflow has unmet its conditions to start, then the second workflow would have a chance to start its flow as well.
 
 Configuration
 -------------
