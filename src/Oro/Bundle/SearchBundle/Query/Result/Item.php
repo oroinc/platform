@@ -60,6 +60,7 @@ class Item
      * @param string|null   $recordTitle
      * @param string|null   $recordUrl
      * @param array         $entityConfig
+     * @param array         $selectedData
      */
     public function __construct(
         ObjectManager $em,
