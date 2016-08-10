@@ -1,30 +1,21 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Migrations\Schema;
+namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroTranslationBundleInstaller implements Installation
+class OroTranslationBundle implements Migration
 {
     /**
      * @inheritdoc
-     */
-    public function getMigrationVersion()
-    {
-        return 'v1_2';
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
         $this->createOroLanguageTable($schema);
-        $this->createOroTranslationTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroLanguageForeignKeys($schema);
@@ -47,25 +38,6 @@ class OroTranslationBundleInstaller implements Installation
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
-    }
-
-    /**
-     * Create oro_translation table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroTranslationTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_translation');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('key', 'string', ['length' => 255]);
-        $table->addColumn('value', 'text', ['notnull' => false]);
-        $table->addColumn('locale', 'string', ['length' => 5]);
-        $table->addColumn('domain', 'string', ['length' => 255]);
-        $table->addColumn('scope', 'smallint', []);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['locale', 'domain'], 'MESSAGES_IDX', []);
-        $table->addIndex(['`key`'], 'MESSAGE_IDX', []);
     }
 
     /**

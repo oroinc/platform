@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
 
 /**
  * @ORM\Table(name="oro_language")
- * @ORM\Entity
+ * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
@@ -51,7 +51,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=16, nullable=false)
+     * @ORM\Column(type="string", length=16)
      */
     protected $code;
 
