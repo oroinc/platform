@@ -41,7 +41,48 @@ define(['underscore', 'asap'], function(_, asap) {
                     return i;
                 }
             }
+        },
+
+        trim: function(text) {
+            return text.replace(/^\s*/, '').replace(/\s*$/, '');
         }
+    });
+
+    _.template = _.wrap(_.template, function(original, text, settings, oldSettings) {
+        text = _.trim(text).replace(/^<%#/, '').replace(/#%>$/, '');
+        var escapedText = text;
+
+        var levelOffsets = {};
+        var level = 0;
+        var offsetDelta = 0;
+
+        var escapeText = function(text) {
+            text = text.replace(/&([amplgt;]+%)/g, '&amp;$1');
+            text = text.replace(/<%/g, '&lt;%')
+                .replace(/%>/g, '%&gt;');
+            return text;
+        };
+
+        text.replace(/(<%#)|(#%>)/g, function(match, open, close, offset) {
+            offset += offsetDelta;
+            if (open) {
+                level++;
+                levelOffsets[level] = offset;
+            }
+            if (close && level) {
+                var start = escapedText.slice(0, levelOffsets[level]);
+                var end = escapedText.slice(offset + close.length);
+                var escape = escapedText.slice(levelOffsets[level] + 3, offset);
+                var newEscape = escapeText(escape);
+                offsetDelta += newEscape.length - escape.length - 6;
+                escapedText = start + newEscape + end;
+                level--;
+            }
+            // Adobe VMs need the match returned to produce the correct offest.
+            return match;
+        });
+        arguments[1] = _.trim(escapedText);
+        return original.apply(this, _.rest(arguments));
     });
 
     _.defer = asap;
