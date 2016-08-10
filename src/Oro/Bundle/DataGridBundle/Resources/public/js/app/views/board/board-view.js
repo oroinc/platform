@@ -56,6 +56,7 @@ define(function(require) {
             this.cardView = options.cardView;
             this.boardCollection = options.boardCollection;
             this.serverCollection = options.serverCollection;
+            this.cardActions = options.cardActions;
             this.listenTo(this.serverCollection, 'change reset add remove', this.updateNoDataBlock);
             BoardView.__super__.initialize.call(this, options);
         },
@@ -100,9 +101,17 @@ define(function(require) {
                 itemView: function(columnViewOptions) {
                     columnViewOptions.readonly = board.readonly;
                     columnViewOptions.boardCollection = board.boardCollection;
+                    var boardColumnIds = columnViewOptions.model.get('ids');
                     var columnView = new board.columnView(_.extend(columnViewOptions, {
                         cardView: function(options) {
                             options.readonly = board.readonly;
+                            options.actions = $.extend(true, {}, board.cardActions);
+                            options.actionOptions = {
+                                parameters: {
+                                    boardColumnIds: JSON.stringify(boardColumnIds)
+                                }
+                            };
+                            options.datagrid = board.boardPlugin.main.grid;
                             options.earlyTransitionStatusChangeTimeout = board.earlyChangeTimeout;
                             var card = new board.cardView(options);
                             board.listenTo(card, 'navigate', function retriggerNavigate(model, options) {

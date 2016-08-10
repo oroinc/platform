@@ -26,7 +26,8 @@ define(function(require) {
             type: 'dialog',
             dialogOptions: null,
             stateEnabled: true,
-            incrementalPosition: true
+            incrementalPosition: true,
+            preventModelRemoval: false
         }),
 
         // Windows manager global variables
@@ -51,7 +52,6 @@ define(function(require) {
         },
 
         listen: {
-            'adoptedFormResetClick': 'remove',
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange'
@@ -140,7 +140,7 @@ define(function(require) {
                 return;
             }
             dialogManager.remove(this);
-            if (this.model) {
+            if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
                         // Suppress error if it's 404 response and not debug mode
@@ -231,6 +231,10 @@ define(function(require) {
             }
         },
 
+        _onAdoptedFormResetClick: function() {
+            this.remove();
+        },
+
         /**
          * Removes dialog widget
          */
@@ -270,6 +274,7 @@ define(function(require) {
 
         _clearActionsContainer: function() {
             this.widget.dialog('actionsContainer').empty();
+            this.actionsEl = null;
         },
 
         _renderActions: function() {
@@ -311,12 +316,10 @@ define(function(require) {
             }, this));
         },
 
-        _afterLayoutInit: function() {
+        _renderHandler: function() {
             this.resetDialogPosition();
             this.widget.closest('.invisible').removeClass('invisible');
-            if (this.deferredRender) {
-                this._resolveDeferredRender();
-            }
+            this.trigger('widgetReady', this);
         },
 
         _initAdjustHeight: function(content) {

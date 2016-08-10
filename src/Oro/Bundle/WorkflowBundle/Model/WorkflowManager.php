@@ -253,7 +253,17 @@ class WorkflowManager
 
                     $workflow = $this->getWorkflow($row['workflow']);
                     $entity = $row['entity'];
-                    $transition = !empty($row['transition']) ? $row['transition'] : null;
+
+                    if (empty($row['transition'])) {
+                        $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
+
+                        if (!$workflow->isStartTransitionAvailable($transition, $entity)) {
+                            continue;
+                        }
+                    } else {
+                        $transition = $row['transition'];
+                    }
+
                     $rowData = !empty($row['data']) ? $row['data'] : [];
 
                     $workflowItem = $workflow->start($entity, $rowData, $transition);

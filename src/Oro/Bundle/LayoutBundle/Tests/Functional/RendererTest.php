@@ -176,7 +176,7 @@ class RendererTest extends LayoutTestCase
                     'class_prefix' => 'content',
                     'attr' => [
                         'class' => '{{ class_prefix }}-body',
-                        'data-json' => ['test1'],
+                        'data-json' => '{"0":"test1"}',
                     ],
                 ]
             )

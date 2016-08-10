@@ -45,7 +45,7 @@ define(function(require) {
     function Dropdown(element) {
         var $el = $(element).on('click.dropdown.data-api', this.toggle);
         var globalHandlers = {
-            'click.dropdown.data-api': function() {
+            'click.dropdown.data-api select2-open.dropdown.data-api showTimepicker.dropdown.data-api': function() {
                 var $dropdown = $el.parent();
                 if ($dropdown.is('.open')) {
                     $dropdown.trigger('hide.bs.dropdown').removeClass('open');
@@ -97,9 +97,15 @@ define(function(require) {
                 css.left = 'auto';
             }
 
+            var containerOffset = $container.offset();
+            var dropdownMenuOffset = $dropdownMenu.offset();
+
             var originalPosition = {
                 parent: $parent.offset(),
-                dropdownMenu: $dropdownMenu.offset()
+                dropdownMenu: {
+                    left: dropdownMenuOffset.left - containerOffset.left,
+                    top: dropdownMenuOffset.top - containerOffset.top
+                }
             };
             $placeholder = $('<div class="dropdown-menu__placeholder"/>');
             $dropdownMenu.data('related-toggle', $this);
@@ -392,7 +398,8 @@ define(function(require) {
                     return;
                 }
                 var $dropdown = $(this);
-                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup')) {
+                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup') ||
+                    $dropdown.has('>.dropdown-menu').length === 0) {
                     // handles only case when dropdown id opened in dialog
                     return;
                 }

@@ -139,7 +139,7 @@ define([
             }
             _.defaults(options, this.launcherOptions);
             launcher = new (this.launcher)(options);
-            this.launcher = launcher;
+            this.launcherInstanse = launcher;
             // schedule dispose
             this.subviews.push(launcher);
             return launcher;

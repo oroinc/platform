@@ -46,8 +46,8 @@ maximize: maximize
 restore: restore
 minimize: minimize
 close: close
-Undo: Undo
-Redo: Redo
+Save: Save
+Discard: Discard
 "Copy to Clipboard": "Copy to Clipboard"
 oro:
     ui:
@@ -57,6 +57,8 @@ oro:
         item_add_error: Item adding failed.
         item_delete_error: Item deleting failed.
         leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
+        leave_page_save_data_or_discard_title: "Navigation confirmation"
+        leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
         page_header:
             button:
                 more: "More"

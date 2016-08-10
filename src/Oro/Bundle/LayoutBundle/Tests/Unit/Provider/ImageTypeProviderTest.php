@@ -50,7 +50,7 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function prepareTheme($name, array $imageTypes)
     {
-        $data = [
+        $config = [
             'images' => [
                 'types' => []
             ]
@@ -58,7 +58,7 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
 
         foreach ($imageTypes as $key => $imageType) {
             list($label, $maxNumber) = $imageType;
-            $data['images']['types'][$key] = [
+            $config['images']['types'][$key] = [
                 'label' => $label,
                 'dimensions' => [],
                 'max_number' => $maxNumber
@@ -66,7 +66,7 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         $theme = new Theme($name);
-        $theme->setData($data);
+        $theme->setConfig($config);
 
         return $theme;
     }

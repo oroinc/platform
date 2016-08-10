@@ -84,6 +84,11 @@ return array(
         ),
         'transition_definitions' => array(
             'first_transition_definition' => array(
+                'preactions' => array(
+                    array(
+                        '@custom_pre_action' => null
+                    )
+                ),
                 'pre_conditions' => array(
                     '@true' => null
                 ),
@@ -151,6 +156,7 @@ return array(
         ),
         'transition_definitions' => array(
             'second_transition_definition' => array(
+                'preactions' => array(),
                 'pre_conditions' => array(),
                 'conditions' => array(),
                 'post_actions' => array()
