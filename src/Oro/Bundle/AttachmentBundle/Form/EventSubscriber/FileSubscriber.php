@@ -80,12 +80,7 @@ class FileSubscriber implements EventSubscriberInterface
             $this->validate($form, $entity);
         }
 
-        if (($form->has('emptyFile') && $form->get('emptyFile')->getData())
-            || (is_object($entity) && $entity->getFile() !== null)
-        ) {
-            // trigger update in entity
-            $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        }
+        $this->triggerEntityUpdate($form, $entity);
     }
 
     /**
@@ -123,6 +118,20 @@ class FileSubscriber implements EventSubscriberInterface
                 );
                 $fileField->addError($error);
             }
+        }
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param mixed $entity
+     */
+    protected function triggerEntityUpdate(FormInterface $form, $entity)
+    {
+        if (($form->has('emptyFile') && $form->get('emptyFile')->getData())
+            || (is_object($entity) && $entity->getFile() !== null)
+        ) {
+            // trigger update in entity
+            $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         }
     }
 }
