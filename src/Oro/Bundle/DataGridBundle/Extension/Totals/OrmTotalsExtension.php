@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -304,8 +305,8 @@ class OrmTotalsExtension extends AbstractExtension
         $parameters = $queryBuilder->getParameters();
         if ($parameters->count()) {
             $queryBuilder->resetDQLPart('where')
-                ->resetDQLPart('having')
-                ->setParameters(new ArrayCollection());
+                ->resetDQLPart('having');
+            QueryUtils::removeUnusedParameters($queryBuilder);
         }
 
         $this->addPageLimits($queryBuilder, $pageData, $perPage);
