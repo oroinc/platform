@@ -42,10 +42,17 @@ define(function(require) {
         filterModel: null,
 
         /**
+         * Check if sorting enabled
+         *
+         * @type {boolean}
+         */
+        addSorting: true,
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['orderShift', 'filterModel']));
+            _.extend(this, _.pick(options, ['orderShift', 'filterModel', 'addSorting']));
             if (!(this.filterModel instanceof ColumnFilterModel)) {
                 throw new TypeError('Invalid required option "filterModel"');
             }
@@ -66,7 +73,9 @@ define(function(require) {
          */
         render: function() {
             ColumnManagerCollectionView.__super__.render.apply(this, arguments);
-            this.initSorting();
+            if (this.addSorting) {
+                this.initSorting();
+            }
             this.updateHeaderWidths();
             return this;
         },

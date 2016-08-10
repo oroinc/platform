@@ -1,8 +1,9 @@
 define([
     './header-cell/header-cell',
     'chaplin',
+    '../app/components/column-renderer-component',
     './util'
-], function(HeaderCell, Chaplin, util) {
+], function(HeaderCell, Chaplin, ColumnRendererComponent, util) {
     'use strict';
 
     var HeaderRow;
@@ -47,6 +48,9 @@ define([
                     return new CurrentHeaderCell(cellOptions);
                 };
             }
+
+            this.columnRenderer = new ColumnRendererComponent(options);
+
             HeaderRow.__super__.initialize.apply(this, arguments);
             this.cells = this.subviews;
         },
@@ -77,21 +81,30 @@ define([
         },
 
         renderCustomTemplate: function() {
+            var self = this;
             this.$el.html(this.template({
-                model: this.model ? this.model.attributes : {},
                 themeOptions: this.themeOptions ? this.themeOptions : {},
-                render: this.renderColumn.bind(this)
+                render: function(columnName){
+                    var columnModel = _.find(self.columns.models, function(model) {
+                        return model.get('name') === columnName;
+                    });
+                    if (columnModel) {
+                        return self.columnRenderer.getHtml(self.renderItem(columnModel).$el);
+                    }
+                    return '';
+                },
+                attributes: function(columnName, additionalAttributes){
+                    var attributes = additionalAttributes || {};
+                    var columnModel = _.find(self.columns.models, function(model) {
+                        return model.get('name') === columnName;
+                    });
+                    if (columnModel) {
+                        return self.columnRenderer.getRawAttributes(self.renderItem(columnModel).$el, attributes);
+                    }
+                    return '';
+                }
             }));
             return this;
-        },
-
-        renderColumn: function(columnName) {
-            var columnModel = _.find(this.columns.models, function(model) {
-                return model.get('name') === columnName;
-            });
-            if (columnModel) {
-                return this.renderItem(columnModel).$el.html();
-            }
         }
     });
 

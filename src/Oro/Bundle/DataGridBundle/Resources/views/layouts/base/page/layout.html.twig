@@ -70,24 +70,24 @@
 
 {% block datagrid_row_widget %}
     <script type="text/html" id="template-datagrid-row">
-        <tr{{ block('block_attributes') }}>{{ block_widget(block) }}</tr>
+        {{ block_widget(block) }}
     </script>
 {% endblock %}
 
 {% block datagrid_cell_widget %}
-    <td{{ block('block_attributes') }}>{{ block_widget(block) }}</td>
+    <td <%= attributes('{{ column_name }}', {{ attr|json_encode|raw }}) %>>{{ block_widget(block) }}</td>
 {% endblock %}
 
-{% block datagrid_cell_value_widget %}
-    <div{{ block('block_attributes') }}><%= render('{{ column_name }}') %></div>
-{% endblock %}
+{%- block datagrid_cell_value_widget -%}
+    <%= render('{{ column_name }}') %>
+{%- endblock -%}
 
 {% block datagrid_header_row_widget %}
     <script type="text/html" id="template-datagrid-header-row">
-        <tr{{ block('block_attributes') }}>{{ block_widget(block) }}</tr>
+        {{ block_widget(block) }}
     </script>
 {% endblock %}
 
 {% block datagrid_header_cell_widget %}
-    <th{{ block('block_attributes') }}><%= render('{{ column_name }}') %></th>
+    <th <%= attributes('{{ column_name }}', {{ attr|json_encode|raw }}) %>><%= render('{{ column_name }}') %></th>
 {% endblock %}

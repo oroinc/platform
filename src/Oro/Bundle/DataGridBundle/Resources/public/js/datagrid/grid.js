@@ -105,7 +105,9 @@ define(function(require) {
                 addRefreshAction: true,
                 addColumnManager: true,
                 addSorting: false,
-                columnManager: {},
+                columnManager: {
+                    addSorting: true
+                },
                 placement: {
                     top: true,
                     bottom: false
