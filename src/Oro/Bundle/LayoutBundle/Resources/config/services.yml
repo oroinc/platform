@@ -185,5 +185,7 @@ services:
         arguments:
             - '@oro_layout.provider.image_type'
             - '@liip_imagine.filter.configuration'
+            - '@oro_config.global'
+            - '@oro_entity.doctrine_helper'
 
 

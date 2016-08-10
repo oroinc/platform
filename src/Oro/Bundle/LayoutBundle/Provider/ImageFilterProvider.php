@@ -6,7 +6,12 @@ use Imagine\Image\ImageInterface;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
+
+use OroB2B\Bundle\ProductBundle\DependencyInjection\Configuration;
 
 /**
  * Load dimensions from theme config to LiipImagine filters
@@ -17,24 +22,34 @@ class ImageFilterProvider
     const BACKGROUND_COLOR = '#fff';
     const RESIZE_MODE = ImageInterface::THUMBNAIL_INSET;
 
-    /**
-     * @var ImageTypeProvider
-     */
+    /** @var ImageTypeProvider */
     protected $imageTypeProvider;
 
-    /**
-     * @var FilterConfiguration
-     */
+    /** @var FilterConfiguration */
     protected $filterConfiguration;
+
+    /** @var  ConfigManager */
+    protected $configManager;
+
+    /** @var  DoctrineHelper */
+    protected $doctrineHelper;
 
     /**
      * @param ImageTypeProvider $imageTypeProvider
      * @param FilterConfiguration $filterConfiguration
+     * @param ConfigManager $configManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ImageTypeProvider $imageTypeProvider, FilterConfiguration $filterConfiguration)
-    {
+    public function __construct(
+        ImageTypeProvider $imageTypeProvider,
+        FilterConfiguration $filterConfiguration,
+        ConfigManager $configManager,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->imageTypeProvider = $imageTypeProvider;
         $this->filterConfiguration = $filterConfiguration;
+        $this->configManager = $configManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     public function load()
@@ -76,13 +91,10 @@ class ImageFilterProvider
             'quality' => self::IMAGE_QUALITY,
             'filters' => [
                 'strip' => [],
-//                'watermark' => [
-//                    'image' => 'Resources/watermark.png',
-//                    'size' => 0.8,
-//                    'position' => 'center' //topleft,top,topright,left,center,right,bottomleft,bottom,bottomright
-//                ]
             ]
         ];
+
+        $filterSettings = array_merge_recursive($filterSettings, $this->getWatermarkFilterSettings());
 
         if ($withResize) {
             $filterSettings = array_merge_recursive(
@@ -104,5 +116,38 @@ class ImageFilterProvider
         }
 
         return $filterSettings;
+    }
+
+    /**
+     * @return array
+     */
+    private function getWatermarkFilterSettings()
+    {
+        $config = [];
+        $fileConfigKey = Configuration::ROOT_NODE . '.' . Configuration::PRODUCT_IMAGE_WATERMARK_FILE;
+        $sizeConfigKey = Configuration::ROOT_NODE . '.' . Configuration::PRODUCT_IMAGE_WATERMARK_SIZE;
+        $positionConfigKey = Configuration::ROOT_NODE . '.' . Configuration::PRODUCT_IMAGE_WATERMARK_POSITION;
+
+        $imageId = $this->configManager->get($fileConfigKey);
+        $size = $this->configManager->get($sizeConfigKey);
+        $position = $this->configManager->get($positionConfigKey);
+
+        if ($imageId) {
+            /** @var File $image */
+            $image = $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($imageId);
+            $filePath = 'attachment/' . $image->getFilename();
+
+            $config = [
+                'filters' => [
+                    'watermark' => [
+                        'image' => $filePath,
+                        'size' => round($size / 100, 2),
+                        'position' => $position
+                    ]
+                ]
+            ];
+        }
+
+        return $config;
     }
 }
