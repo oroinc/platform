@@ -34,11 +34,11 @@ define(function(Chaplin) {
             ColumnRendererComponent.__super__.dispose.apply(this, arguments);
         },
         
-        render: function($element) {
+        getHtml: function($element) {
             return $element.html();
         },
 
-        renderAttributes: function($element, attributes) {
+        getRawAttributes: function($element, attributes) {
             attributes.class = attributes.class || '';
 
             if($element.length){

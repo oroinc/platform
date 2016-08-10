@@ -329,7 +329,7 @@ define([
                         return model.get('name') === columnName;
                     });
                     if(columnModel) {
-                        return self.columnRenderer.render(self.renderItem(columnModel).$el);
+                        return self.columnRenderer.getHtml(self.renderItem(columnModel).$el);
                     }
                     return '';
                 },
@@ -339,7 +339,7 @@ define([
                         return model.get('name') === columnName;
                     });
                     if(columnModel) {
-                        return self.columnRenderer.renderAttributes(self.renderItem(columnModel).$el, attributes);
+                        return self.columnRenderer.getRawAttributes(self.renderItem(columnModel).$el, attributes);
                     }
                     return '';
                 }
