@@ -65,7 +65,6 @@ class EmailRepository extends EntityRepository
             ->from('OroEmailBundle:EmailUser', 'eu')
             ->leftJoin('eu.email', 'e')
             ->where($this->getAclWhereCondition($user, $organization))
-            ->groupBy('eu.email, eu.seen')
             ->orderBy('eu.seen', 'ASC')
             ->addOrderBy('e.sentAt', 'DESC')
             ->setParameter('organization', $organization)
