@@ -113,8 +113,8 @@ class WorkflowManager
         array $data = [],
         Collection $errors = null
     ) {
-        //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
-        //any way. if developer has Workflow instance already it is possible to get decision from it directly as below
+        //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are.
+        //Any way - if developer has Workflow instance already it is possible to get decision from it directly as below
         $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
 
         return $workflow->isStartTransitionAvailable($transition, $entity, $data, $errors);
