@@ -181,6 +181,7 @@ Now controller's action is not responsible to configure redirect data at all.
 ```
 Redirect data is now configured directly in the button rendered in Twig template using macroses: saveAndCloseButton, saveAndStayButton, saveAndNewButton and saveActionButton.
 See other related information in section `OroUIBundle` of this document.
+- Constructor for `Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType` changed. New arguments: `EntityManager $entityManager`, `SearchRegistry $searchRegistry`.
 
 ####TranslationBundle
 - Added translation strategies to dynamically handle translation fallbacks
