@@ -96,7 +96,6 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
      * @param string   $targetTableName  Target entity table name
      * @param string[] $allowedMimeTypes The list of allowed MIME types
      * @param int      $maxFileSize      Max allowed file size in megabytes
-     * @param array    $columnOptions
      */
     public function addAttachmentAssociation(
         Schema $schema,
