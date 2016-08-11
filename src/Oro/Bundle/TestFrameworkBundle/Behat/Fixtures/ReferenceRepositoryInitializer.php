@@ -10,6 +10,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 use Oro\Bundle\AddressBundle\Entity\Region;
+use OroB2B\Bundle\AccountBundle\Entity\AccountUserRole;
+use OroB2B\Bundle\ProductBundle\Entity\ProductUnit;
 
 class ReferenceRepositoryInitializer
 {
@@ -60,6 +62,18 @@ class ReferenceRepositoryInitializer
         /** @var Region $berlin */
         $berlin = $repository->findOneBy(['name' => 'Berlin']);
         $this->referenceRepository->set('berlin', $berlin);
+
+        /** @var AccountUserRoleRepository $repository */
+        $repository = $this->em->getRepository('OroB2BAccountBundle:AccountUserRole');
+        /** @var AccountUserRole buyer */
+        $buyer = $repository->findOneBy(['role' => 'ROLE_FRONTEND_BUYER']);
+        $this->referenceRepository->set('buyer', $buyer);
+
+        /** @var ProductUnitRepository $repository */
+        $repository = $this->em->getRepository('OroB2BProductBundle:ProductUnit');
+        /** @var ProductUnit item*/
+        $item = $repository->findOneBy(['code' => 'item']);
+        $this->referenceRepository->set('item', $item);
     }
 
     /**
