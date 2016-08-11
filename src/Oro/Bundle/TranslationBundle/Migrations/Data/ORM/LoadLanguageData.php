@@ -11,10 +11,11 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
 class LoadLanguageData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -26,7 +27,7 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
     public function getDependencies()
     {
         return [
-            LoadOrganizationAndBusinessUnitData::class
+            LoadAdminUserData::class
         ];
     }
 
@@ -43,13 +44,15 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         $downloadedLanguages = array_keys($configManager->get(TranslationStatusInterface::CONFIG_KEY));
 
         $languages = array_unique(array_merge([$defaultLanguage], $enabledLanguages, $downloadedLanguages));
-        $organization = $this->getOrganization($manager);
+        $user = $this->getUser($manager);
 
         foreach ($languages as $languageCode) {
             $language = new Language();
             $language->setCode($languageCode)
                 ->setEnabled(in_array($languageCode, $enabledLanguages, true) || $defaultLanguage === $languageCode)
-                ->setOrganization($organization);
+                ->setOwner($user)
+                ->setOrganization($user->getOrganization())
+                ->setOwner(null);
 
             $manager->persist($language);
         }
@@ -59,22 +62,22 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
 
     /**
      * @param ObjectManager $manager
-     * @return Organization
+     * @return User
      */
-    protected function getOrganization(ObjectManager $manager)
+    protected function getUser(ObjectManager $manager)
     {
-        $repository = $manager->getRepository('OroOrganizationBundle:Organization');
-
-        $organization = $repository->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION]);
-
-        if (!$organization) {
-            $organization = $repository->getFirst();
+        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
+        if (!$role) {
+            throw new \RuntimeException(sprintf('%s role should exist.', LoadRolesData::ROLE_ADMINISTRATOR));
         }
 
-        if (!$organization) {
-            throw new \RuntimeException('At least ane organization should be exist.');
+        $user = $manager->getRepository('OroUserBundle:Role')->getFirstMatchedUser($role);
+        if (!$user) {
+            throw new \RuntimeException(
+                sprintf('At least one user with role %s should exist.', LoadRolesData::ROLE_ADMINISTRATOR)
+            );
         }
 
-        return $organization;
+        return $user;
     }
 }
