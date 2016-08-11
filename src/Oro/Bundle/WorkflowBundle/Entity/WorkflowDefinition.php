@@ -777,7 +777,7 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @return array
      */
-    public function getActiveGroups()
+    public function getExclusiveActiveGroups()
     {
         return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE])
             ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]
@@ -787,7 +787,7 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @return array
      */
-    public function getRecordGroups()
+    public function getExclusiveRecordGroups()
     {
         return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD])
             ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]

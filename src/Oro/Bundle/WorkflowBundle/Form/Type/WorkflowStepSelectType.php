@@ -14,21 +14,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowStepSelectType extends AbstractType
 {
     const NAME = 'oro_workflow_step_select';
 
-    /** @var WorkflowManager */
-    protected $workflowManager;
+    /** @var WorkflowRegistry */
+    protected $workflowRegistry;
 
     /**
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowRegistry $workflowRegistry
      */
-    public function __construct(WorkflowManager $workflowManager)
+    public function __construct(WorkflowRegistry $workflowRegistry)
     {
-        $this->workflowManager = $workflowManager;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     /**
@@ -130,10 +130,10 @@ class WorkflowStepSelectType extends AbstractType
     {
         if (isset($options['workflow_name'])) {
             $workflowName = $options['workflow_name'];
-            $workflows = [$this->workflowManager->getWorkflow($workflowName)];
+            $workflows = [$this->workflowRegistry->getWorkflow($workflowName)];
         } elseif (isset($options['workflow_entity_class'])) {
             $workflows = array_values(
-                $this->workflowManager->getApplicableWorkflows($options['workflow_entity_class'])
+                $this->workflowRegistry->getActiveWorkflowsByEntityClass($options['workflow_entity_class'])
             );
         } else {
             throw new \InvalidArgumentException('Either "workflow_name" or "workflow_entity_class" must be set');

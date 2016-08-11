@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class RestrictionManager
 {
@@ -40,18 +40,18 @@ class RestrictionManager
     protected $doctrineHelper;
 
     /**
-     * @var WorkflowManager
+     * @var WorkflowRegistry
      */
-    protected $workflowManager;
+    protected $workflowRegistry;
 
     /**
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(WorkflowManager $workflowManager, DoctrineHelper $doctrineHelper)
+    public function __construct(WorkflowRegistry $workflowRegistry, DoctrineHelper $doctrineHelper)
     {
+        $this->workflowRegistry = $workflowRegistry;
         $this->doctrineHelper = $doctrineHelper;
-        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -226,7 +226,7 @@ class RestrictionManager
             foreach ($classRestrictions as $classRestriction) {
                 $workflowName = $classRestriction['workflowName'];
                 if (!isset($this->workflows[$entityClass][$workflowName])) {
-                    $workflows = $this->workflowManager->getApplicableWorkflows(
+                    $workflows = $this->workflowRegistry->getActiveWorkflowsByEntityClass(
                         $classRestriction['relatedEntity']
                     );
 

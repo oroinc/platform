@@ -17,9 +17,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowApplicabilityFilterInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
@@ -300,23 +302,40 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         return $entityManager;
     }
 
+    public function testGetApplicableWorkflowsNotApplicableEntity()
+    {
+        $entity = new EntityStub(42);
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(false);
+        $this->assertEquals([], $this->workflowManager->getApplicableWorkflows($entity));
+    }
+
     public function testGetApplicableWorkflows()
     {
-        $entity = new \DateTime('now');
-        $entityClass = get_class($entity);
-        $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
+        $filterMock = $this->getMockBuilder(WorkflowApplicabilityFilterInterface::class)->getMock();
+        $entity = new EntityStub(42);
+        $workflow1 = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        $workflow2 = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(true);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entity)
-            ->will($this->returnValue($entityClass));
+            ->willReturn(EntityStub::class);
 
+        $activeWorkflows = new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2]);
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByEntityClass')
-            ->with($entityClass)
-            ->will($this->returnValue(new ArrayCollection([$workflow])));
+            ->with(EntityStub::class)
+            ->willReturn($activeWorkflows);
 
-        $this->assertEquals([$workflow], $this->workflowManager->getApplicableWorkflows($entity));
+        $filterMock->expects($this->once())
+            ->method('filter')
+            ->with($activeWorkflows, new WorkflowRecordContext($entity))
+            ->willReturn(new ArrayCollection(['w1' => $workflow1]));
+
+        $this->workflowManager->addApplicabilityFilter($filterMock);
+        $this->assertEquals(['w1' => $workflow1], $this->workflowManager->getApplicableWorkflows($entity));
     }
 
     public function testHasApplicableWorkflowsTrue()
@@ -324,6 +343,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entity = new \DateTime('now');
         $entityClass = get_class($entity);
         $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
+
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(true);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
@@ -342,6 +363,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \DateTime('now');
         $entityClass = get_class($entity);
+
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(true);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')

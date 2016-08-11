@@ -34,6 +34,9 @@ class WorkflowManager
     /** @var WorkflowRegistry */
     private $workflowRegistry;
 
+    /** @var WorkflowApplicabilityFilterInterface[] */
+    private $applicabilityFilters = [];
+
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
@@ -173,7 +176,7 @@ class WorkflowManager
             }
         }
 
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getRecordGroups())) {
+        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
@@ -334,13 +337,25 @@ class WorkflowManager
 
     /**
      * @param object|string $entity
-     * @return Workflow[]|array
+     * @return Workflow[]
+     * @throws \InvalidArgumentException
      */
     public function getApplicableWorkflows($entity)
     {
-        return $this->workflowRegistry->getActiveWorkflowsByEntityClass(
-            $this->doctrineHelper->getEntityClass($entity)
-        )->toArray();
+        $recordContext = new WorkflowRecordContext($entity);
+
+        if (!$this->entityConnector->isApplicableEntity($entity)) {
+            return [];
+        }
+
+        $workflows = $this->workflowRegistry
+            ->getActiveWorkflowsByEntityClass($this->doctrineHelper->getEntityClass($entity));
+
+        foreach ($this->applicabilityFilters as $applicabilityFilter) {
+            $workflows = $applicabilityFilter->filter($workflows, $recordContext);
+        }
+
+        return $workflows->toArray();
     }
 
     /**
@@ -474,11 +489,19 @@ class WorkflowManager
     {
         $workflowItems = $this->getWorkflowItemsByEntity($entity);
         foreach ($workflowItems as $workflowItem) {
-            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getRecordGroups())) {
+            if (array_intersect($recordGroups, $workflowItem->getDefinition()->getExclusiveRecordGroups())) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * @param WorkflowApplicabilityFilterInterface $applicabilityFilter
+     */
+    public function addApplicabilityFilter(WorkflowApplicabilityFilterInterface $applicabilityFilter)
+    {
+        $this->applicabilityFilters[] = $applicabilityFilter;
     }
 }

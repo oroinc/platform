@@ -213,7 +213,7 @@ class WorkflowDefinitionController extends Controller
     protected function getWorkflowsToDeactivation(WorkflowDefinition $workflowDefinition)
     {
         $workflows = $this->get('oro_workflow.registry')
-            ->getActiveWorkflowsByActiveGroups($workflowDefinition->getActiveGroups());
+            ->getActiveWorkflowsByActiveGroups($workflowDefinition->getExclusiveActiveGroups());
 
         return array_filter(
             $workflows,

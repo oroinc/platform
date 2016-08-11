@@ -42,14 +42,14 @@ services:
     oro_workflow.form.type.workflow_step_select:
         class: %oro_workflow.form.type.workflow_step_select.class%
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry'
         tags:
             - { name: form.type, alias: oro_workflow_step_select }
 
     oro_workflow.form.type.workflow_definition_select:
         class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry'
         tags:
             - { name: form.type, alias: oro_workflow_definition_select }
 

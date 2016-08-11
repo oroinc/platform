@@ -296,7 +296,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $definition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
         $definition->expects($this->any())->method('getName')->willReturn($name);
-        $definition->expects($this->any())->method('getActiveGroups')->willReturn([$name . '_group']);
+        $definition->expects($this->any())->method('getExclusiveActiveGroups')->willReturn([$name . '_group']);
 
         $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
         $workflow->expects($this->any())->method('getName')->willReturn($name);
