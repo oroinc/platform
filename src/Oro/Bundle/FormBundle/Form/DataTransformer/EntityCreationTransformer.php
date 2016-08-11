@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
@@ -32,13 +31,6 @@ class EntityCreationTransformer extends EntityToIdTransformer
     protected $allowEmptyProperty = false;
 
     /**
-     * If true, allow to create new entity
-     *
-     * @var bool
-     */
-    protected $isCreateGranted;
-
-    /**
      * @param string $newEntityPropertyName
      */
     public function setNewEntityPropertyName($newEntityPropertyName)
@@ -60,14 +52,6 @@ class EntityCreationTransformer extends EntityToIdTransformer
     public function setAllowEmptyProperty($allowEmptyProperty)
     {
         $this->allowEmptyProperty = $allowEmptyProperty;
-    }
-
-    /**
-     * @param bool $isCreateGranted
-     */
-    public function setIsCreateGranted($isCreateGranted)
-    {
-        $this->isCreateGranted = $isCreateGranted;
     }
 
     /**
@@ -111,10 +95,6 @@ class EntityCreationTransformer extends EntityToIdTransformer
             throw new InvalidConfigurationException(
                 'No data provided for new entity property.'
             );
-        }
-
-        if (!$this->isCreateGranted) {
-            throw new AccessDeniedException();
         }
 
         $object = new $this->className();
