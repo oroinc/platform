@@ -3,8 +3,10 @@ define([
     'underscore',
     'backbone',
     'backbone-pageable-collection',
+    'oroui/js/mediator',
+    'orotranslation/js/translator',
     'oroui/js/tools'
-], function($, _, Backbone, BackbonePageableCollection, tools) {
+], function($, _, Backbone, BackbonePageableCollection, mediator, __, tools) {
     'use strict';
 
     var PageableCollection;
@@ -21,6 +23,8 @@ define([
         filters: 'f',
         columns: 'c',
         gridView: 'v',
+        appearanceType: 'a',
+        appearanceData: 'ad',
         urlParams: 'g'
     };
 
@@ -84,7 +88,7 @@ define([
         options: {},
 
         /**
-         * Initial state of collection
+         * Default initial state of collection
          *
          * @property
          */
@@ -94,8 +98,18 @@ define([
             totals: null,
             filters: {},
             sorters: {},
-            columns: {}
+            columns: {},
+            appearanceType: 'grid'
         },
+
+        /**
+         * Default current state of collection
+         *
+         * @property
+         */
+        state: _.extend({
+            appearanceType: 'grid'
+        }, BackbonePageableCollection.prototype.state),
 
         /**
          * Declaration of URL parameters
@@ -188,6 +202,9 @@ define([
                 if (options.state.pageSize) {
                     options.state.pageSize = parseInt(options.state.pageSize);
                 }
+                if (options.state.appearanceType) {
+                    this.appearanceType = options.state.appearanceType;
+                }
             }
 
             if (options.toolbarOptions && options.toolbarOptions.pagination) {
@@ -197,10 +214,12 @@ define([
             }
 
             _.extend(this.queryParams, {
-                currentPage: this.inputName + '[_pager][_page]',
-                pageSize:    this.inputName + '[_pager][_per_page]',
-                sortBy:      this.inputName + '[_sort_by][%field%]',
-                parameters:  this.inputName + '[_parameters]'
+                currentPage:    this.inputName + '[_pager][_page]',
+                pageSize:       this.inputName + '[_pager][_per_page]',
+                sortBy:         this.inputName + '[_sort_by][%field%]',
+                parameters:     this.inputName + '[_parameters]',
+                appearanceType: this.inputName + '[_appearance][_type]',
+                appearanceData: this.inputName + '[_appearance][_data]'
             });
 
             this.on('remove', this.onRemove, this);
@@ -702,16 +721,35 @@ define([
             options.url = url;
             options.data = data;
 
-            data = this.processQueryParams(data, state);
-            data = this.processFiltersParams(data, state);
+            if (!options.error) {
+                options.error = function() {
+                    mediator.execute('showMessage', 'error', __('oro.datagrid.loading_failed_message'));
+                };
+            }
 
+            // @todo rewrite this, use mode=infinite (if possible)
+            data.appearanceType = state.appearanceType;
+            if (state.appearanceType === 'board') {
+                state = _.extend({}, state);
+                // any first load should get first page
+                if (!options.loadMore) {
+                    this.infiniteCurrentPage = 1;
+                }
+                // first page is already displayed when use data from cache or from server
+                if (!this.infiniteCurrentPage) {
+                    this.infiniteCurrentPage = 2;
+                }
+                state.currentPage = this.infiniteCurrentPage++;
+            }
+            data = this.processQueryParams(data, state);
+            this.processFiltersParams(data, state);
+
+            var self = this;
+            var success = options.success;
             var fullCollection = this.fullCollection;
             var links = this.links;
 
             if (mode !== 'server') {
-
-                var self = this;
-                var success = options.success;
                 options.success = function(col, resp, opts) {
 
                     // make sure the caller's intent is obeyed
@@ -758,6 +796,23 @@ define([
             }
 
             return BBColProto.fetch.call(this, options);
+        },
+
+        hasExtraRecordsToLoad: function() {
+            return this.state.totalRecords > this.models.length;
+        },
+
+        loadMore: function() {
+            var collection = this;
+            this.isLoadingMore = true;
+            this.fetch({
+                loadMore: true,
+                reset: false,
+                remove: false,
+                success: function() {
+                    collection.isLoadingMore = false;
+                }
+            });
         },
 
         /**
@@ -1101,6 +1156,21 @@ define([
                 } else {
                     return 1;
                 }
+            };
+        },
+
+        setAppearance: function(type, data) {
+            this.updateState({
+                appearanceType: type,
+                appearanceData: data
+            });
+            this.fetch({reset: true});
+        },
+
+        getAppearance: function() {
+            return {
+                type: this.state.appearanceType,
+                data: this.state.appearanceData
             };
         }
     });

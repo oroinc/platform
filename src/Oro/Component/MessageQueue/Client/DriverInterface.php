@@ -32,6 +32,15 @@ interface DriverInterface
     public function createQueue($queueName);
 
     /**
+     * @param QueueInterface   $queue
+     * @param MessageInterface $message
+     * @param int              $delaySec
+     *
+     * @return void
+     */
+    public function delayMessage(QueueInterface $queue, MessageInterface $message, $delaySec);
+
+    /**
      * @return Config
      */
     public function getConfig();

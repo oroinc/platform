@@ -13,6 +13,7 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 /**
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class Transition
 {
@@ -40,6 +41,11 @@ class Transition
      * @var ExpressionInterface|null
      */
     protected $preCondition;
+
+    /**
+     * @var ActionInterface|null
+     */
+    protected $preAction;
 
     /**
      * @var ActionInterface|null
@@ -200,6 +206,24 @@ class Transition
     }
 
     /**
+     * @param ActionInterface $preAction
+     * @return Transition
+     */
+    public function setPreAction(ActionInterface $preAction = null)
+    {
+        $this->preAction = $preAction;
+        return $this;
+    }
+
+    /**
+     * @return ActionInterface|null
+     */
+    public function getPreAction()
+    {
+        return $this->preAction;
+    }
+
+    /**
      * Set post action.
      *
      * @param ActionInterface $postAction
@@ -268,6 +292,10 @@ class Transition
      */
     protected function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
     {
+        if ($this->preAction) {
+            $this->preAction->execute($workflowItem);
+        }
+
         if (!$this->preCondition) {
             return true;
         }

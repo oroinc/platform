@@ -26,7 +26,7 @@ layout:
                 styles:
                     blockType: style
                     options:
-                        src: '=data["asset"].getUrl(data["theme"].getData()["assets"]["styles"]["output"])'
+                        src: '=data["asset"].getUrl(data["theme"].getConfig()["assets"]["styles"]["output"])'
                 body:
                     blockType: body
                 scripts_before:
