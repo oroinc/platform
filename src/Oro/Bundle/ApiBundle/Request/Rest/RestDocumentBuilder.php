@@ -168,7 +168,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
 
         $targetMetadata = $associationMetadata->getTargetMetadata();
-        if ($targetMetadata && $this->isIdentity($targetMetadata)) {
+        if ($targetMetadata && $this->hasIdentifierFieldsOnly($targetMetadata)) {
             $data = $this->objectAccessor->toArray($object);
 
             return count($data) === 1
@@ -182,12 +182,12 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function isIdentity(EntityMetadata $metadata)
+    protected function hasIdentifierFieldsOnly(EntityMetadata $metadata)
     {
         if (count($metadata->getMetaProperties()) > 0) {
             return false;
         }
 
-        return parent::isIdentity($metadata);
+        return parent::hasIdentifierFieldsOnly($metadata);
     }
 }

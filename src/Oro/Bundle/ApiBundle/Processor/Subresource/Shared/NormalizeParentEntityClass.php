@@ -11,8 +11,8 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * Makes sure that the class name of the parent entity exists in the Context,
- * if required converts it to FQCN of an entity.
+ * Makes sure that the class name of the parent entity exists in the Context.
+ * Converts entity type to FQCN of an entity.
  */
 class NormalizeParentEntityClass implements ProcessorInterface
 {

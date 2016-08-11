@@ -33,7 +33,7 @@ class AssociationToArrayAttributeConverter
             $result = $this->objectAccessor->toArray($object);
         } else {
             $data = $this->objectAccessor->toArray($object);
-            if ($metadata->isIdentity()) {
+            if ($metadata->hasIdentifierFieldsOnly()) {
                 $result = count($data) === 1
                     ? reset($data)
                     : $data;

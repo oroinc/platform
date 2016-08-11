@@ -81,7 +81,7 @@ class SetDataTransformers implements ProcessorInterface
                 }
             } else {
                 $dataType = $field->getDataType();
-                if (!$dataType && $metadata) {
+                if (null !== $metadata && !$dataType) {
                     $propertyPath = $field->getPropertyPath() ?: $fieldName;
                     if ($metadata->hasField($propertyPath)) {
                         $dataType = $metadata->getTypeOfField($propertyPath);
