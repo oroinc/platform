@@ -17,6 +17,7 @@ class LanguageTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyAccessors(new Language(), [
             ['id', 1],
             ['code', 'test_code'],
+            ['enabled', true],
             ['installedBuildDate', new \DateTime()],
             ['owner', new User()],
             ['organization', new Organization()],

@@ -51,16 +51,16 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=16)
+     * @ORM\Column(type="string", length=16, unique=true)
      */
     protected $code;
 
     /**
      * @var bool
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", options={"default"=false})
      */
-    protected $enabled;
+    protected $enabled = false;
 
     /**
      * @var \DateTime
