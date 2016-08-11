@@ -13,7 +13,7 @@ use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
 
 class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
@@ -27,7 +27,14 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     public function load(array $configs, ContainerBuilder $container)
     {
         self::getAclConfigLoader()->registerResources($container);
-        self::getAclAnnotationLoader()->registerResources($container);
+
+        $parameterBag = $container->getParameterBag();
+        $aclMetadataManager = new AclAnnotationMetadataDumper(
+            $parameterBag->get('kernel.cache_dir'),
+            $parameterBag->get('kernel.environment'),
+            $parameterBag->get('kernel.name')
+        );
+        $aclMetadataManager->dump();
 
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
@@ -58,17 +65,6 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         return new CumulativeConfigLoader(
             'oro_acl_config',
             new YamlCumulativeFileLoader('Resources/config/acl.yml')
-        );
-    }
-
-    /**
-     * @return CumulativeConfigLoader
-     */
-    public static function getAclAnnotationLoader()
-    {
-        return new CumulativeConfigLoader(
-            'oro_acl_annotation',
-            new AclAnnotationCumulativeResourceLoader(['Controller'])
         );
     }
 

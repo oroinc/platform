@@ -31,10 +31,11 @@ define(function(require) {
                     columns: this.main.columns,
                     managedColumns: this.managedColumns,
                     addSorting: true
-                }, toolbarOptions.columnManager)
+                }, toolbarOptions.columnManager),
+                order: 600
             };
 
-            toolbarOptions.actions.push(new ShowComponentAction(options));
+            toolbarOptions.addToolbarAction(new ShowComponentAction(options));
         },
 
         /**

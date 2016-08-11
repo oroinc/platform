@@ -60,9 +60,9 @@ define(function(require) {
                 el: $('<div><div class="comment-form-container"/></div>'),
                 stateEnabled: false,
                 incrementalPosition: false,
-                resizable: false,
                 dialogOptions: {
                     modal: true,
+                    resizable: false,
                     width: '510px',
                     dialogClass: 'add-comment-dialog'
                 }

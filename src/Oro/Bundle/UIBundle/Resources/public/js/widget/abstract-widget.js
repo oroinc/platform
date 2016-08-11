@@ -748,20 +748,24 @@ define(function(require) {
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
             this.initLayout()
-                .done(_.bind(function() {
-                    if (this.disposed) {
-                        return;
-                    }
-                    this._afterLayoutInit();
-                    this.trigger('widgetReady', this);
-                }, this));
+                .done(_.bind(this._afterLayoutInit, this));
         },
 
         _afterLayoutInit: function() {
-            this.widget.removeClass('invisible');
-            if (this.deferredRender) {
-                this._resolveDeferredRender();
+            if (this.disposed) {
+                return;
             }
+            if (this.deferredRender) {
+                this.deferredRender.done(_.bind(this._renderHandler, this));
+                this._resolveDeferredRender();
+            } else {
+                this._renderHandler();
+            }
+        },
+
+        _renderHandler: function() {
+            this.widget.removeClass('invisible');
+            this.trigger('widgetReady', this);
         },
 
         /**

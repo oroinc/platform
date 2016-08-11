@@ -14,6 +14,7 @@ define(function(require) {
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
+    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
@@ -31,13 +32,19 @@ define(function(require) {
     };
 
     DataGridComponent = BaseComponent.extend({
+        currentApperanceKey: 'grid',
+        currentApperanceId: void 0,
+        changeAppearanceEnabled: false,
         initialize: function(options) {
+            this.pluginManager = new PluginManager(this);
+            this.changeAppearanceEnabled = 'appearanceData' in options.metadata.state;
             if (!options.enableFilters) {
                 options.builders = _.reject(options.builders, function(module) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
             }
             options.builders.push('orodatagrid/js/inline-editing/builder');
+            options.builders.push('orodatagrid/js/appearance/builder');
 
             var self = this;
             this._deferredInit();
@@ -99,6 +106,9 @@ define(function(require) {
                         /**
                          * #4. Done
                          */
+                        if (self.changeAppearanceEnabled) {
+                            self.selectAppearanceById(options.metadata.state.appearanceData.id);
+                        }
                         self.subComponents = _.compact(arguments);
                         self._resolveDeferredInit();
                         self.$componentEl.find('.view-loading').remove();
@@ -222,12 +232,23 @@ define(function(require) {
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
+            if (this.changeAppearanceEnabled) {
+                grid.on('changeAppearance', _.bind(this.onChangeAppearance, this));
+                collection.on('updateState', _.bind(function() {
+                    if (this.currentApperanceKey !== collection.state.appearanceType ||
+                        this.currentAppearanceId !== collection.state.appearanceData.id) {
+                        this.selectAppearanceById(collection.state.appearanceData.id);
+                    }
+                }, this));
+            }
             mediator.trigger('datagrid:rendered', grid);
 
             if (options.routerEnabled !== false) {
                 // trace collection changes
                 gridContentManager.trace(collection);
             }
+
+            this.collection = collection;
 
             var deferredBuilt = this.built;
             if (grid.deferredRender) {
@@ -237,6 +258,51 @@ define(function(require) {
             } else {
                 deferredBuilt.resolve(grid);
             }
+        },
+
+        onChangeAppearance: function(key, options) {
+            this.selectAppearance(key, options);
+        },
+
+        selectAppearanceById: function(id) {
+            var appearanceOptions = _.find(this.metadata.options.appearances, function(item) {
+                return item.id === id;
+            });
+            if (!appearanceOptions) {
+                var error = new Error('Could not find appearance `' + id + '`');
+                setTimeout(function() {
+                    throw error;
+                }, 0);
+                return;
+            }
+            this.selectAppearance(appearanceOptions.type,  appearanceOptions);
+        },
+
+        selectAppearance: function(key, options) {
+            if (this.currentApperanceKey === key &&
+                this.currentAppearanceId === options.id) {
+                return;
+            }
+
+            this.currentApperanceKey = key;
+            this.currentAppearanceId = options.id;
+
+            if (this.lastAppearancePlugin) {
+                this.pluginManager.remove(this.lastAppearancePlugin);
+                delete this.lastAppearancePlugin;
+            }
+            this.grid.trigger('appearanceChanged', key, options);
+            if (key === 'grid') {
+                // grid doesn't need any modifications
+                return;
+            }
+            var Plugin = options.plugin;
+            if (!Plugin) {
+                throw new Error('Could not find plugin for appearance key `' + key + '`');
+            }
+            this.lastAppearancePlugin = Plugin;
+            this.pluginManager.create(Plugin, options || {});
+            this.pluginManager.enable(Plugin);
         },
 
         /**
@@ -315,6 +381,27 @@ define(function(require) {
 
             if (this.themeOptions.showMassActionOnToolbar) {
                 plugins.push(ToolbarMassActionPlugin);
+            }
+
+            var appearances = metadata.options.appearances || [];
+            switch (appearances.length) {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                default:
+                    metadata.options.toolbarOptions.addAppearanceSwitcher = true;
+                    metadata.options.toolbarOptions.availableApperances = appearances.map(function(item) {
+                            return {
+                                key: item.type,
+                                id: item.id || 'by_type',
+                                label: item.label,
+                                className: 'btn',
+                                iconClassName: item.icon,
+                                options: item
+                            };
+                        }
+                    );
             }
 
             return {

@@ -1,0 +1,59 @@
+@import "oroui/css/less/mixins";
+@light-border-color: #e7e7e7;
+@dark-border-color: #ccc;
+.card-view{
+  background: white;
+  border: solid 1px @light-border-color;
+  border-radius: 3px;
+  z-index: 0;
+  &:hover{
+    background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+    border-color: @dark-border-color;
+    z-index: 1;
+    & + .card-view {
+      border-top-color: @dark-border-color;
+    }
+  }
+  .card-title {
+    font-weight: bold;
+  }
+  .card-actions {
+    float: right;
+    .dropdown-toggle {
+      padding: 0 5px;
+      width: auto;
+      margin-right: -4px;
+      margin-top: 1px;
+    }
+    .dropdown-menu {
+      right: 100%;
+      left: auto;
+      top: -10px;
+    }
+    .launchers-list {
+      padding: 0%;
+    }
+  }
+  .card-amount {
+    color: #777;
+    font-weight: bold;
+  }
+  .card-additional {
+    color: #777;
+    margin-top: 10px;
+    line-height: 17px;
+  }
+  .card-date{
+    color: #CCC;
+    font-size: 11px;
+  }
+  &[data-transition-status="error"] {
+    background: @cellErrorBackground;
+  }
+  &[data-transition-status="success"].transition-status-just-changed {
+    background: @cellSuccessBackground;
+  }
+  &[data-transition-status="in_progress"] {
+    background: @cellLoadingBackground;
+  }
+}

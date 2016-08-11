@@ -95,7 +95,7 @@ define(function(require) {
             }
             this._deferredRender();
             var options = this.options;
-            if ($(this.$el).prop('disabled')) {
+            if ($(this.$el).prop('disabled') || $(this.$el).prop('readonly')) {
                 options.readonly = true;
             }
             this.$el.tinymce(_.extend({
@@ -122,13 +122,13 @@ define(function(require) {
                             }
                         });
                     }
-                    _.defer(function() {
+                    _.delay(function() {
                         /**
                          * fixes jumping dialog on refresh page
                          * (promise should be resolved in a separate process)
                          */
                         self._resolveDeferredRender();
-                    });
+                    }, 20);
                 }
             }, options));
             this.tinymceConnected = true;

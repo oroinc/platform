@@ -44,7 +44,6 @@ class MergeFieldType extends AbstractType
             'entity',
             array(
                 'class'                   => $metadata->getEntityMetadata()->getClassName(),
-                'data_class'              => $metadata->getEntityMetadata()->getClassName(),
                 'choices'                 => $options['entities'],
                 'multiple'                => false,
                 'expanded'                => true,
@@ -159,6 +158,14 @@ class MergeFieldType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_entity_merge_field';
     }

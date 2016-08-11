@@ -25,7 +25,8 @@
     {% set html = UI.saveAndCloseButton({
         'type': 'button',
         'class': 'btn-success role-submit',
-        'route': 'oro_user_role_index'
+        'route': 'oro_user_role_view',
+        'params': {'id': '$id'}
     }) %}
     {% if resource_granted('oro_user_role_create') %}
         {% set html = html ~ UI.saveAndNewButton({
@@ -43,7 +44,7 @@
     {{ UI.dropdownSaveButton({'html': html}) }}
     {% set fields = [] %}
     {% for name, child in form %}
-        {% if name not in ['appendUsers', 'removeUsers', 'entity', 'privileges', 'action'] %}
+        {% if name not in ['appendUsers', 'removeUsers', 'privileges'] %}
             {% set fields = fields|merge({(name): '#' ~ child.vars.id}) %}
         {% endif %}
     {% endfor %}
@@ -101,13 +102,14 @@
     {% endfor %}
     {% if additionalData is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Additional'|trans,
-            'subblocks': [{
-                'title': '',
-                'useSpan': false,
-                'data' : additionalData
+                'title': 'Additional'|trans,
+                'subblocks': [{
+                    'title': '',
+                    'useSpan': false,
+                    'data' : additionalData
+                }]
             }]
-        }] ) %}
+        ) %}
     {% endif %}
 
     {% set rolePermissionsGrid %}
@@ -115,7 +117,7 @@
             module: 'orouser/js/components/role/entity-category-tabs-component',
             options: tabsOptions
         }) }}></div>
-        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid' }) }}
+        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
         <div {{ UI.renderPageComponentAttributes({
             module: 'orouser/js/components/role/capability-set-component',
             options: capabilitySetOptions

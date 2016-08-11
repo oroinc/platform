@@ -48,7 +48,8 @@ class EntityDataController extends FOSRestController
         if ($form->getErrors(true)->count() > 0) {
             $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
         } else {
-            $view = $this->view($data, Codes::HTTP_NO_CONTENT);
+            $statusCode = !empty($data) ? Codes::HTTP_OK : Codes::HTTP_NO_CONTENT;
+            $view = $this->view($data, $statusCode);
         }
         $response = parent::handleView($view);
 

@@ -82,28 +82,6 @@ class MutableAclProvider extends BaseMutableAclProvider
     }
 
     /**
-     * Put in cache empty ACL object for the given OID indicates that we should use
-     * underlying ACL instead it
-     *
-     * @param ObjectIdentityInterface $oid
-     */
-    public function cacheWithUnderlyingAcl(ObjectIdentityInterface $oid)
-    {
-        $this->cache->putInCache(new Acl(-1, $oid, $this->permissionStrategy, array(), false));
-    }
-
-    /**
-     * Checks whether the given ACL should be replaced with underlying ACL
-     *
-     * @param AclInterface $acl
-     * @return bool
-     */
-    public function isReplaceWithUnderlyingAcl(AclInterface $acl)
-    {
-        return method_exists($acl, 'getId') && $acl->getId() === -1;
-    }
-
-    /**
      * Initiates a transaction
      */
     public function beginTransaction()

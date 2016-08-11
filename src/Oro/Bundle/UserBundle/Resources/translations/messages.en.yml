@@ -159,11 +159,15 @@ oro:
             owner.label:  Owner
             has_role.label: Has role
             extend_description.label: Description
+            organization.label: Organization
+            actions:
+              edit: Edit
 
         invite:
             label: Send an Email Invitation
         privileges:
             entity.label: Entity
+            field.label:  Fields
             action.label: Capabilities
         privilege:
             category:
