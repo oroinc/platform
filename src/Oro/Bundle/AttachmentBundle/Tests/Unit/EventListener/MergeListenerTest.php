@@ -85,7 +85,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('abc.html.twig', $fieldsMetadata[$fieldName]->get('template'));
     }
 
-    public function testShouldOverwriteMergeModes()
+    public function testShouldCombineMergeModes()
     {
         $fieldName = $this->fieldPrefix . 'field1';
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
@@ -98,7 +98,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
         $fieldsMetadata = $entityMetadata->getFieldsMetadata();
         $this->assertEquals(
-            [MergeModes::UNITE, MergeModes::REPLACE],
+            [MergeModes::UNITE, MergeModes::REPLACE, 'test_mode'],
             $fieldsMetadata[$fieldName]->get('merge_modes')
         );
     }

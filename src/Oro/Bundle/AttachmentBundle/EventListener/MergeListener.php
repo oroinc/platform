@@ -39,9 +39,14 @@ class MergeListener
             return;
         }
 
-        // always overwrite merge modes, but don't overwrite template
         $fieldMetadata = $this->getFieldMetadata($entityMetadata, $fieldName);
-        $fieldMetadata->set('merge_modes', [MergeModes::UNITE, MergeModes::REPLACE]);
+
+        $mergeModes = [MergeModes::UNITE, MergeModes::REPLACE];
+        if ($fieldMetadata->has('merge_modes')) {
+            $mergeModes = array_merge($mergeModes, (array) $fieldMetadata->get('merge_modes'));
+        }
+
+        $fieldMetadata->set('merge_modes', $mergeModes);
 
         if (!$fieldMetadata->has('template')) {
             $fieldMetadata->set('template', self::TEMPLATE_NAME);
