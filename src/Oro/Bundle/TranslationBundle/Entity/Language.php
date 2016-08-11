@@ -7,9 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField; // for date fields
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
-use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
+use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
 
 /**
  * @ORM\Table(name="oro_language")
@@ -21,11 +21,9 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *              "icon"="icon-flag"
  *          },
  *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -36,7 +34,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  */
 class Language implements DatesAwareInterface, OrganizationAwareInterface
 {
-    use UserAwareTrait;
+    use OrganizationAwareTrait;
     use DatesAwareTrait;
 
     /**
@@ -65,14 +63,12 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="installed_build_date", type="date", nullable=true)
+     * @ORM\Column(name="installed_build_date", type="datetime", nullable=true)
      */
     protected $installedBuildDate;
 
     /**
-     * Get id
-     *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -81,6 +77,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
 
     /**
      * @param string $code
+     *
      * @return $this
      */
     public function setCode($code)
@@ -100,6 +97,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
 
     /**
      * @param \DateTime $installedBuildDate
+     *
      * @return $this
      */
     public function setInstalledBuildDate(\DateTime $installedBuildDate = null)
