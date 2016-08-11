@@ -1,7 +1,0 @@
-oro_api:
-    entities:
-        Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem: ~
-        Oro\Bundle\NavigationBundle\Entity\NavigationItem: ~
-        Oro\Bundle\NavigationBundle\Entity\PageState: ~
-        Oro\Bundle\NavigationBundle\Entity\PinbarTab: ~
-        Oro\Bundle\NavigationBundle\Entity\Title: ~

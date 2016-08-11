@@ -70,9 +70,10 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         RequestType $requestType
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $fields   = $definition->getFields();
+        $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
+            // skip a field if it is already excluded or the "exclude" flag is set explicitly
+            if ($field->isExcluded() || $field->hasExcluded()) {
                 continue;
             }
 
@@ -81,7 +82,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
                 continue;
             }
 
-            $mapping        = $metadata->getAssociationMapping($propertyPath);
+            $mapping = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
             if (!$this->isResourceForRelatedEntityAccessible($targetMetadata, $version, $requestType)) {
                 $field->setExcluded();
