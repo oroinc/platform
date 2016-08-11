@@ -76,6 +76,12 @@ services:
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
             - '@oro_layout.loader.path_provider'
+
+    oro_layout.import_extension:
+        class: Oro\Component\Layout\Extension\Import\ImportExtension
+        arguments:
+            - %oro_layout.theme_updates_resources%
+            - '@oro_layout.loader'
             - '@oro_layout.theme_manager'
 
     oro_layout.data_provider.theme:
