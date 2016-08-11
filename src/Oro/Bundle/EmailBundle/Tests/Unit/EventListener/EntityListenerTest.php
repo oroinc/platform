@@ -4,8 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use JMS\JobQueueBundle\Entity\Job;
-
+use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 use Oro\Bundle\EmailBundle\EventListener\EntityListener;
@@ -40,8 +41,8 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $emailActivityUpdates;
 
-    /** @var ActivityListChainProvider */
-    private $chainProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface */
+    private $producer;
 
     protected function setUp()
     {
@@ -65,9 +66,8 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->chainProvider =
-            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-                ->disableOriginalConstructor()->getMock();
+
+        $this->producer = $this->getMock(MessageProducerInterface::class);
 
         $this->emailOwnerStorage = new EmailOwnerProviderStorage();
         $this->emailOwnerStorage->addProvider($this->userEmailOwnerProvider);
@@ -80,12 +80,14 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             $this->emailOwnerManager,
             new ServiceLink($this->emailActivityManager),
             new ServiceLink($this->emailThreadManager),
-            $this->emailActivityUpdates
+            $this->emailActivityUpdates,
+            $this->producer
         );
     }
 
     public function testOnFlush()
     {
+        $emailOwner = new TestEmailOwner(123);
         $contactsArray = [new User(), new User(), new User()];
         $updatedEmailAddresses = [new EmailAddress(1), new EmailAddress(2)];
 
@@ -108,9 +110,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $em->expects($this->any())
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
-        $em
-            ->expects($this->once())
-            ->method('flush');
         $uow->expects($this->exactly(2))
             ->method('computeChangeSet')
             ->withConsecutive(
@@ -144,8 +143,17 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->emailActivityUpdates
             ->expects($this->once())
-            ->method('createJobs')
-            ->will($this->returnValue([new Job('command')]));
+            ->method('getFilteredOwnerEntitiesToUpdate')
+            ->will($this->returnValue([$emailOwner]));
+
+        $this->producer
+            ->expects($this->once())
+            ->method('send')
+            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
+                'ownerClass' => TestEmailOwner::class,
+                'ownerIds' => [123],
+            ])
+        ;
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
@@ -153,6 +161,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnFlushNotSupported()
     {
+        $emailOwner = new TestEmailOwner(123);
         $contactsArray = [new User(), new User(), new User()];
         $createdEmailsArray = [new Email(), new Email(), new Email()];
         $updatedEmailsArray = [new Email()];
@@ -229,8 +238,8 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
                 ->method('processUpdatedEmailAddresses')
                 ->with([]);
         $this->emailActivityUpdates->expects($this->once())
-            ->method('createJobs')
-            ->will($this->returnValue([new Job('command')]));
+            ->method('getFilteredOwnerEntitiesToUpdate')
+            ->will($this->returnValue([$emailOwner]));
         $this->userEmailOwnerProvider
             ->expects($this->never())
             ->method('getEmailOwnerClass')
@@ -239,6 +248,15 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->emailActivityManager
             ->expects($this->never())
             ->method('addAssociation');
+
+        $this->producer
+            ->expects($this->once())
+            ->method('send')
+            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
+                'ownerClass' => TestEmailOwner::class,
+                'ownerIds' => [123],
+            ])
+        ;
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
