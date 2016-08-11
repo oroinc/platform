@@ -30,6 +30,9 @@ class TestHelper
      */
     private $testCase;
 
+    /**
+     * @param \PHPUnit_Framework_TestCase $testCase
+     */
     public function __construct(\PHPUnit_Framework_TestCase $testCase)
     {
         $this->testCase = $testCase;
@@ -269,13 +272,18 @@ class TestHelper
                 )
             );
 
+        $entityMetadataProvider =
+            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
+                ->disableOriginalConstructor()
+                ->getMock();
         return new FieldAclExtension(
             $idAccessor,
             new EntityClassResolver($doctrine),
             $metadataProvider,
             $decisionMaker,
             $entityOwnerAccessor,
-            $configProvider
+            $configProvider,
+            $entityMetadataProvider
         );
     }
 
@@ -297,7 +305,7 @@ class TestHelper
                 'EDIT'   => 3,
                 'DELETE' => 4,
                 'ASSIGN' => 5,
-                'SHARE'  => 6
+                'PERMIT' => 6
             ]);
 
         return $permissionManager;

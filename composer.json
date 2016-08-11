@@ -62,7 +62,7 @@
         "guzzle/guzzle": "3.7.*",
         "lexik/maintenance-bundle": "v1.0.3",
         "sylius/flow-bundle": "0.6.*",
-        "composer/composer": "1.0.0-p1",
+        "composer/composer": "1.2.*",
         "akeneo/batch-bundle": "0.4.2",
         "nesbot/Carbon": "1.8.*",
         "monolog/monolog": "1.8.*",
@@ -80,7 +80,8 @@
         "oro/jsplumb": "~1.7",
         "oro/moment-timezone": "0.3.*",
         "vakata/jstree": "^3.2",
-        "symfony/polyfill-php70":"1.*"
+        "symfony/polyfill-php70":"1.*",
+        "liuggio/excelbundle": "~2.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",

@@ -2,27 +2,36 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
 
 class AclAnnotationMetadataDumper
 {
     const ANNOTATION_CACHE_CLASS = 'AclAnnotation';
-    
-    /** @var  array */
-    protected $options;
 
-    public function __construct(ParameterBag $parameterBag)
+    /** @var string */
+    protected $kernelCacheDir;
+
+    /** @var string */
+    protected $kernelEnvironment;
+
+    /** @var string */
+    protected $kernelName;
+
+    /**
+     * @param string $kernelCacheDir
+     * @param string $kernelEnvironment
+     * @param string $kernelName
+     */
+    public function __construct($kernelCacheDir, $kernelEnvironment, $kernelName)
     {
-        $this->options['cache_dir']   = $parameterBag->get('kernel.cache_dir');
-        $this->options['environment'] = $parameterBag->get('kernel.environment');
-        $this->options['debug']       = $parameterBag->get('kernel.debug');
-        $this->options['name']        = $parameterBag->get('kernel.name');
+        $this->kernelCacheDir = $kernelCacheDir;
+        $this->kernelEnvironment = $kernelEnvironment;
+        $this->kernelName = $kernelName;
     }
 
     /**
@@ -30,23 +39,20 @@ class AclAnnotationMetadataDumper
      */
     public function dump()
     {
-        $aclContainer = new ContainerBuilder();
-        self::getAclAnnotationLoader()->registerResources($aclContainer);
+        $container = new ContainerBuilder();
+        self::getAclAnnotationLoader()->registerResources($container);
 
-        $metaFile = $this->getMetaFile();
-        $metadata = $aclContainer->getResources();
-
+        $metadata = $container->getResources();
         $mode = 0666;
         $umask = umask();
         $filesystem = new Filesystem();
 
-        if (null !== $metadata && true === $this->options['debug']) {
-            $filesystem->dumpFile($metaFile, serialize($metadata), null);
-            try {
-                $filesystem->chmod($metaFile, $mode, $umask);
-            } catch (IOException $e) {
-                // discard chmod failure (some filesystem may not support it)
-            }
+        $metaFile = $this->getMetaFile();
+        $filesystem->dumpFile($metaFile, serialize($metadata), null);
+        try {
+            $filesystem->chmod($metaFile, $mode, $umask);
+        } catch (IOException $e) {
+            // discard chmod failure (some filesystem may not support it)
         }
     }
 
@@ -55,10 +61,9 @@ class AclAnnotationMetadataDumper
      */
     public function getMetaFile()
     {
-        $cacheDir    = $this->options['cache_dir'];
-        $name        = $this->options['name'];
-        $environment = $this->options['environment'];
-        return $cacheDir.'/'.$name.ucfirst($environment).self::ANNOTATION_CACHE_CLASS.'.php.meta';
+        return
+            $this->kernelCacheDir . '/' . $this->kernelName
+            . ucfirst($this->kernelEnvironment) . self::ANNOTATION_CACHE_CLASS . '.php.meta';
     }
 
     /**

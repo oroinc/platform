@@ -4,12 +4,12 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\PreloadedExtension;
 
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LanguageSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
@@ -22,7 +22,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    const DATA_CLASS = 'Oro\Bundle\LocaleBundle\Entity\Localization';
+    const DATA_CLASS = Localization::class;
 
     /**
      * @var LocalizationType
@@ -83,7 +83,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     public function submitDataProvider()
     {
         $localizationItem = $this->createLocalization('name', 'title', 'en', 'en');
-        $parent = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1]);
+        $parent = $this->getEntity(Localization::class, ['id' => 1]);
 
         return [
             'without entity' => [
@@ -134,7 +134,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     ) {
         /** @var Localization $localization */
         $localization = $this->getEntity(
-            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            Localization::class,
             [
                 'name' => $name,
                 'languageCode' => $languageCode,
@@ -161,7 +161,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     FormattingSelectType::NAME => new FormattingSelectTypeStub(),
                     LocalizationParentSelectType::NAME => new EntityType(
                         [
-                            '1' => $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1])
+                            '1' => $this->getEntity(Localization::class, ['id' => 1])
                         ],
                         LocalizationParentSelectType::NAME
                     ),

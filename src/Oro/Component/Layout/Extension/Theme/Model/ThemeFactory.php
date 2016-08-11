@@ -37,8 +37,8 @@ class ThemeFactory implements ThemeFactoryInterface
         if (isset($themeDefinition['description'])) {
             $theme->setDescription($themeDefinition['description']);
         }
-        if (isset($themeDefinition['data'])) {
-            $theme->setData($themeDefinition['data']);
+        if (isset($themeDefinition['config'])) {
+            $theme->setConfig($themeDefinition['config']);
         }
 
         return $theme;
