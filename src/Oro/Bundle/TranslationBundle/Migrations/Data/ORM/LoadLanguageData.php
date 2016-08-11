@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
@@ -42,7 +43,7 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         $downloadedLanguages = array_keys($configManager->get(TranslationStatusInterface::CONFIG_KEY));
 
         $languages = array_unique(array_merge([$defaultLanguage], $enabledLanguages, $downloadedLanguages));
-        $organization = $this->getReference('default_organization');
+        $organization = $this->getOrganization($manager);
 
         foreach ($languages as $languageCode) {
             $language = new Language();
@@ -54,5 +55,26 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         }
 
         $manager->flush();
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @return Organization
+     */
+    protected function getOrganization(ObjectManager $manager)
+    {
+        $repository = $manager->getRepository('OroOrganizationBundle:Organization');
+
+        $organization = $repository->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION]);
+
+        if (!$organization) {
+            $organization = $repository->getFirst();
+        }
+
+        if (!$organization) {
+            throw new \RuntimeException('At least ane organization should be exist.');
+        }
+
+        return $organization;
     }
 }
