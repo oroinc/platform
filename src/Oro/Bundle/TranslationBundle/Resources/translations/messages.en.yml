@@ -26,5 +26,13 @@ oro.translation:
         disabled.label: 'Disabled'
         translation_completeness.label: 'Translation Completeness'
 
+        action:
+            disable.label: 'Disable'
+            enable.label: 'Enable'
+
+        message:
+            disabled: 'Language has been disabled'
+            enabled: 'Language User has been enabled'
+
     menu:
         languages.label: Languages

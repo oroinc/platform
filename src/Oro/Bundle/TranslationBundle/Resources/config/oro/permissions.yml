@@ -1,0 +1,4 @@
+oro_permissions:
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\TranslationBundle\Entity\Language

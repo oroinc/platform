@@ -208,3 +208,18 @@ services:
         arguments:
             - '@oro_translation.repository.language'
             - '@oro_locale.settings'
+
+    oro_translation.helper.language:
+        class: 'Oro\Bundle\TranslationBundle\Helper\LanguageHelper'
+        arguments:
+            - '@oro_config.global'
+
+    oro_translation.acl.voter.language:
+        class: 'Oro\Bundle\TranslationBundle\Acl\Voter\LanguageVoter'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_config.global'
+        calls:
+            - [setClassName, ['%oro_translation.entity.language.class%']]
+        tags:
+            - { name: security.voter }

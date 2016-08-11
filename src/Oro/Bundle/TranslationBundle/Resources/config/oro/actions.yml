@@ -1,0 +1,62 @@
+operations:
+    oro_translation_disable_language:
+        label: oro.translation.language.action.disable.label
+        applications: [backend]
+        datagrids:
+            - oro-translation-language-grid
+        order: 10
+        button_options:
+            icon: icon-remove
+        acl_resource: [EDIT, $.data]
+        preconditions:
+            '@equal': [$enabled, true]
+        actions:
+            - '@run_action_group':
+                action_group: oro_translation_language_set_enabled
+                parameters_mapping:
+                    data: $.data
+                    value: false
+            - '@flash_message':
+                message: oro.translation.language.message.disabled
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
+
+    oro_translation_enable_language:
+        label: oro.translation.language.action.enable.label
+        applications: [backend]
+        datagrids:
+            - oro-translation-language-grid
+        order: 10
+        button_options:
+            icon: icon-ok
+        acl_resource: [EDIT, $.data]
+        preconditions:
+            '@equal': [$enabled, false]
+        actions:
+            - '@run_action_group':
+                action_group: oro_translation_language_set_enabled
+                parameters_mapping:
+                    data: $.data
+                    value: true
+            - '@flash_message':
+                message: oro.translation.language.message.enabled
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
+
+action_groups:
+    oro_translation_language_set_enabled:
+        parameters:
+            data:
+                type: Oro\Bundle\TranslationBundle\Entity\Language
+            value:
+                type: boolean
+        acl_resource: [EDIT, $.data]
+        conditions:
+            '@not_equal': [$.data.enabled, $.value]
+        actions:
+            - '@assign_value': [$.data.enabled, $.value]
+            - '@flush_entity': $.data
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: updateSystemConfiguration
+                method_parameters: [$.data]
