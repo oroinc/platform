@@ -34,7 +34,7 @@ class SyncScheduler
     public function schedule($integrationId, $connector, array $connectorParameters = [])
     {
         $this->producer->send(Topics::REVERS_SYNC_INTEGRATION, [
-            'integrationId' => $integrationId,
+            'integration_id' => $integrationId,
             'connector_parameters' => $connectorParameters,
             'connector' => $connector,
             'transport_batch_size' => 100,

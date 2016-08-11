@@ -30,7 +30,7 @@ class GenuineSyncScheduler
     public function schedule($integrationId, $connector = null, array $connectorParameters = [])
     {
         $this->producer->send(Topics::SYNC_INTEGRATION, [
-            'integrationId' => $integrationId,
+            'integration_id' => $integrationId,
             'connector_parameters' => $connectorParameters,
             'connector' => $connector,
             'transport_batch_size' => 100,

@@ -75,17 +75,17 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
 
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
-            'integrationId' => null,
+            'integration_id' => null,
             'connector' => null,
             'connector_parameters' => [],
             'transport_batch_size' => 100,
         ], $body);
 
-        if (false == $body['integrationId']) {
-            throw new \LogicException('The message invalid. It must have integrationId set');
+        if (false == $body['integration_id']) {
+            throw new \LogicException('The message invalid. It must have integration_id set');
         }
 
-        $jobName = 'oro_integration:sync_integration:'.$body['integrationId'];
+        $jobName = 'oro_integration:sync_integration:'.$body['integration_id'];
         $ownerId = $message->getMessageId();
 
         $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
@@ -93,7 +93,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
             $em = $this->doctrine->getManager();
 
             /** @var Integration $integration */
-            $integration = $em->find(Integration::class, $body['integrationId']);
+            $integration = $em->find(Integration::class, $body['integration_id']);
             if (false == $integration) {
                 return false;
             }

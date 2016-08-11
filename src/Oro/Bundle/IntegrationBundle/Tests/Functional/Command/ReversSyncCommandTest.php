@@ -41,7 +41,7 @@ class ReversSyncCommandTest extends WebTestCase
         $this->assertCount(1, $traces);
 
         $this->assertEquals([
-            'integrationId' => $integration->getId(),
+            'integration_id' => $integration->getId(),
             'connector_parameters' => [ ],
             'connector' => null,
             'transport_batch_size' => 100,
@@ -69,7 +69,7 @@ class ReversSyncCommandTest extends WebTestCase
         $this->assertCount(1, $traces);
 
         $this->assertEquals([
-            'integrationId' => $integration->getId(),
+            'integration_id' => $integration->getId(),
             'connector_parameters' => [
                 'fooConnectorOption' => 'fooValue',
                 'barConnectorOption' => 'barValue',

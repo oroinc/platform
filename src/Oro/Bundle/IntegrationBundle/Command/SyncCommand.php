@@ -6,8 +6,6 @@ use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
-use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
-use Oro\Component\Log\OutputLogger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -61,17 +59,12 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-        }
-
-        /** @var ChannelRepository $integrationRepository */
-        /** @var SyncProcessor $processor */
         $connector = $input->getOption('connector');
         $integrationId = $input->getOption('integration');
         $connectorParameters = $this->getConnectorParameters($input);
+
+        /** @var ChannelRepository $integrationRepository */
         $integrationRepository = $this->getEntityManager()->getRepository(Integration::class);
-        $logger = new OutputLogger($output);
 
         if ($integrationId) {
             $integration = $integrationRepository->getOrLoadById($integrationId);
@@ -86,12 +79,12 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
 
         /* @var Integration $integration */
         foreach ($integrations as $integration) {
-            $logger->info(sprintf('Run sync for "%s" integration.', $integration->getName()));
+            $output->writeln(sprintf('Run sync for "%s" integration.', $integration->getName()));
 
             $this->getSyncScheduler()->schedule($integration->getId(), $connector, $connectorParameters);
         }
 
-        $logger->info('Completed');
+        $output->writeln('Completed');
     }
 
     /**

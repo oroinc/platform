@@ -114,7 +114,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $status = $processor->process($message, new NullSession());
 
@@ -144,7 +144,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $status = $processor->process($message, new NullSession());
 
@@ -189,7 +189,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId', 'connector' => 'theConnector']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
 
         $this->setExpectedException(LogicException::class, 'Unable to perform revers sync');
         $processor->process($message, new NullSession());
@@ -228,7 +228,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId', 'connector' => 'theConnector']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
         $message->setMessageId('theMessageId');
 
         $processor->process($message, new NullSession());
@@ -271,7 +271,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId', 'connector' => 'theConnector']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
 
         $status = $processor->process($message, new NullSession());
 

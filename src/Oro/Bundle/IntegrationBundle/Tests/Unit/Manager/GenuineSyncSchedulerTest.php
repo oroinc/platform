@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\IntegrationBundle\Async\Topics;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -31,7 +30,7 @@ class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Topics::SYNC_INTEGRATION, $traces[0]['topic']);
         $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
         $this->assertEquals([
-            'integrationId' => 'theIntegrationId',
+            'integration_id' => 'theIntegrationId',
             'connector' => null,
             'connector_parameters' => [],
             'transport_batch_size' => 100,
@@ -53,7 +52,7 @@ class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Topics::SYNC_INTEGRATION, $traces[0]['topic']);
         $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
         $this->assertEquals([
-            'integrationId' => 'theIntegrationId',
+            'integration_id' => 'theIntegrationId',
             'connector' => 'theConnectorName',
             'connector_parameters' => ['theOption' => 'theValue'],
             'transport_batch_size' => 100,

@@ -116,7 +116,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $status = $processor->process($message, new NullSession());
 
@@ -146,7 +146,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $status = $processor->process($message, new NullSession());
 
@@ -178,7 +178,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('theMessageId');
 
         $processor->process($message, new NullSession());
@@ -223,7 +223,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $processor->process($message, new NullSession());
     }
@@ -266,7 +266,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $processor->process($message, new NullSession());
     }
@@ -305,7 +305,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $status = $processor->process($message, new NullSession());
 
@@ -346,7 +346,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $status = $processor->process($message, new NullSession());
 
@@ -388,7 +388,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['integrationId' => 'theIntegrationId']));
+        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
         $status = $processor->process($message, new NullSession());
 
@@ -438,7 +438,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(JSON::encode([
-            'integrationId' => 'theIntegrationId',
+            'integration_id' => 'theIntegrationId',
             'connector' => 'theConnection',
             'connector_parameters' => [
                 'foo' => 'fooVal',

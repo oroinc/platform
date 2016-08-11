@@ -22,7 +22,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 Topics::REVERS_SYNC_INTEGRATION,
                 [
-                    'integrationId' => 'theIntegrationId',
+                    'integration_id' => 'theIntegrationId',
                     'connector_parameters' => ['connectorOption' => 'connectorOptionValue'],
                     'connector' => 'theConnectorName',
                     'transport_batch_size' => 100,
