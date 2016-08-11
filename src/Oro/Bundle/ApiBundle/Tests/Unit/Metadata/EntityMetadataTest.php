@@ -365,68 +365,68 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($entityMetadata->get('attribute1'));
     }
 
-    public function testIsIdentityForEmptyMetadata()
+    public function testHasIdentifierFieldsOnlyForEmptyMetadata()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertFalse($entityMetadata->isIdentity());
+        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWithoutFields()
+    public function testHasIdentifierFieldsOnlyWithoutFields()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
 
-        $this->assertFalse($entityMetadata->isIdentity());
+        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWithoutIdentifierFieldNames()
+    public function testHasIdentifierFieldsOnlyWithoutIdentifierFieldNames()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->addField(new FieldMetadata('id'));
 
-        $this->assertFalse($entityMetadata->isIdentity());
+        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWhenMetadataContainsOnlySingleIdentityField()
+    public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlySingleIdentityField()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
-        $this->assertTrue($entityMetadata->isIdentity());
+        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWhenMetadataContainsSingleIdentityFieldAndMetaProperty()
+    public function testHasIdentifierFieldsOnlyWhenMetadataContainsSingleIdentityFieldAndMetaProperty()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addMetaProperty(new MetaPropertyMetadata('meta'));
 
-        $this->assertTrue($entityMetadata->isIdentity());
+        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWhenMetadataContainsOnlyCompositeIdentityFields()
+    public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlyCompositeIdentityFields()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id1', 'id2']);
         $entityMetadata->addField(new FieldMetadata('id1'));
         $entityMetadata->addField(new FieldMetadata('id2'));
 
-        $this->assertTrue($entityMetadata->isIdentity());
+        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWhenMetadataContainsOnlyCompositeIdentityFieldsReverseOrderOfFields()
+    public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlyCompositeIdentityFieldsReverseOrderOfFields()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id1', 'id2']);
         $entityMetadata->addField(new FieldMetadata('id2'));
         $entityMetadata->addField(new FieldMetadata('id1'));
 
-        $this->assertTrue($entityMetadata->isIdentity());
+        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWhenMetadataContainsCompositeIdentityFieldsAndMetaProperty()
+    public function testHasIdentifierFieldsOnlyWhenMetadataContainsCompositeIdentityFieldsAndMetaProperty()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id1', 'id2']);
@@ -434,26 +434,26 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $entityMetadata->addField(new FieldMetadata('id2'));
         $entityMetadata->addMetaProperty(new MetaPropertyMetadata('meta'));
 
-        $this->assertTrue($entityMetadata->isIdentity());
+        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWhenMetadataContainsAdditionField()
+    public function testHasIdentifierFieldsOnlyWhenMetadataContainsAdditionField()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('field1'));
 
-        $this->assertFalse($entityMetadata->isIdentity());
+        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    public function testIsIdentityWhenMetadataContainsAssociation()
+    public function testHasIdentifierFieldsOnlyWhenMetadataContainsAssociation()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
-        $this->assertFalse($entityMetadata->isIdentity());
+        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 }

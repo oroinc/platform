@@ -537,7 +537,7 @@ class EntityMetadata implements ToArrayInterface
      *
      * @return bool
      */
-    public function isIdentity()
+    public function hasIdentifierFieldsOnly()
     {
         $idFields = $this->getIdentifierFieldNames();
         if (empty($idFields)) {
@@ -545,7 +545,7 @@ class EntityMetadata implements ToArrayInterface
         }
 
         $fields = $this->getFields();
-        if (empty($idFields)) {
+        if (empty($fields)) {
             return false;
         }
 

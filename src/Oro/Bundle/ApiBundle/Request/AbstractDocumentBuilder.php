@@ -177,9 +177,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
      *
      * @return bool
      */
-    protected function isIdentity(EntityMetadata $metadata)
+    protected function hasIdentifierFieldsOnly(EntityMetadata $metadata)
     {
-        return $metadata->isIdentity();
+        return $metadata->hasIdentifierFieldsOnly();
     }
 
     /**

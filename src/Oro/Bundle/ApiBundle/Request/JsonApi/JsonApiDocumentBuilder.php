@@ -229,7 +229,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                     );
                 }
 
-                if ($this->isIdentity($targetMetadata)) {
+                if ($this->hasIdentifierFieldsOnly($targetMetadata)) {
                     $idOnly = true;
                     $idFieldNames = $targetMetadata->getIdentifierFieldNames();
                     if (count($idFieldNames) === 1) {

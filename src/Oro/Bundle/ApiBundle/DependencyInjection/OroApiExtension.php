@@ -200,28 +200,13 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $entityAliasProviderDef = $container->getDefinition(self::ENTITY_ALIAS_PROVIDER_SERVICE_ID);
         $entityAliasProviderDef->replaceArgument(0, $entityAliases);
-        $entityAliasProviderDef->replaceArgument(1, $this->extractClassNames($exclusions));
+        $entityAliasProviderDef->replaceArgument(1, array_column($exclusions, 'entity'));
 
         $exclusionProviderDef = $container->getDefinition(self::CONFIG_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID);
         $exclusionProviderDef->replaceArgument(1, $exclusions);
 
         $chainProviderDef = $container->getDefinition(self::ENTITY_EXCLUSION_PROVIDER_SERVICE_ID);
         $chainProviderDef->replaceArgument(1, $inclusions);
-    }
-
-    /**
-     * @param array $exclusions
-     *
-     * @return array
-     */
-    protected function extractClassNames(array $exclusions)
-    {
-        return array_map(
-            function ($item) {
-                return $item['entity'];
-            },
-            $exclusions
-        );
     }
 
     /**
