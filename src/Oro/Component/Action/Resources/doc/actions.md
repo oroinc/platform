@@ -6,6 +6,7 @@ Table of Contents
  - [Assign Value](#assign-value)
  - [Assign Active User](#assign-active-user)
  - [Unset Value](#unset-value)
+ - [Count] (#count)
  - [Create Object](#create-object)
  - [Create Entity](#create-entity)
  - [Remove Entity](#remove-entity)
@@ -20,6 +21,7 @@ Table of Contents
  - [Flash Message](#flash-message)
  - [Call Service Method](#call-service-method)
  - [Find Entities](#find-entities)
+ 
 
 
 Assign Value
@@ -104,6 +106,21 @@ OR
 
 - @unset_value: [$call_successfull]
 ```
+
+Count
+-----
+**Class** \Oro\Component\Action\Action\Count
+
+**Alias** count
+
+**Description** Counts size of provided value (`array` or `\Countable`) and assigns result by `attribute` path.
+
+**Parameters:**
+- value - value or path to the value which should be counted
+- attribute - path to the attribute that will contain result of count
+
+**Note** If value contains unsupported type `0` will be returned.
+
 
 Create Object
 -------------

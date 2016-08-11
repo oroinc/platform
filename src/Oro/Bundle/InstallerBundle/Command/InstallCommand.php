@@ -144,6 +144,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'please run <comment>cache:clear</comment> command with <comment>--env prod</comment> parameter</info>'
             );
         }
+        if ('prod' == $input->getOption('env')) {
+            $output->writeln(
+                '<info>Please run <comment>oro:api:doc:cache:clear</comment> command to warm-up ' .
+                'API documentation cache</info>'
+            );
+        }
     }
 
     /**
@@ -529,7 +535,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 array(
                     '--process-isolation' => true,
                 )
-            );
+            )
+            ->runCommand(
+                'oro:message-queue:create-queues',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+        ;
+
         if (!$skipAssets) {
             $commandExecutor->runCommand(
                 'fos:js-routing:dump',
