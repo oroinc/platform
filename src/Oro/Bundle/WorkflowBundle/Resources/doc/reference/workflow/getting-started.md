@@ -178,8 +178,8 @@ workflows:
             active: true                          # active by default
         exclusive_active_groups: [group_flow]     # active only single workflow for a specified groups
         exclusive_record_groups:
-            - unique_run                          # only one run for an `entity` from specified groups can be performed
-        priority: 100                             # has priotiry of 100
+            - unique_run                          # only one started workflow for the `entity` from specified groups can exist at time
+        priority: 100                             # has priority of 100
         steps:                                    # list of all existing steps in workflow
             started:                              # step where user should enter firstname and lastname
                 label: 'Started'                  # step label

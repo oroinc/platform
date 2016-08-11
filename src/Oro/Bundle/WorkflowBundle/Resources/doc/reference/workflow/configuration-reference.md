@@ -152,9 +152,9 @@ workflows:                                                    # Root elements
         start_step: qualify                                   # Name of start step
         steps_display_ordered: true                           # Show all steps in step widget
         priority: 100                                         # Priority level
-        exclusive_active_groups: [b2b_sales]                  # Only one active workflow can be with 'b2b_sales' group
+        exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
         exclusive_record_groups:
-            - sales                                           # Onlu one workflow can be performed at time with group 'sales'
+            - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps
@@ -659,7 +659,6 @@ workflows:
     phone_call:
         label: 'Demo Call Workflow'
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-        enabled: true
         start_step: start_call
         steps:
             start_call:
