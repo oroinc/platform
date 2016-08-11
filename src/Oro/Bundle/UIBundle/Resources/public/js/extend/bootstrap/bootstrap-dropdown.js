@@ -343,12 +343,12 @@ define(function(require) {
 
             var dropdownMenuRect = $dropdownMenu[0].getBoundingClientRect();
 
-            if ($dropdown.is('.dropdown') && scrollableRect.top > dropdownMenuRect.top) {
+            if ($dropdown.is('.dropdown') && scrollableRect.top > Math.min(dropdownMenuRect.top, toggleRect.bottom)) {
                 // whole toggle-item is hidden at the top of scrollable container
                 flipToOpposite($dropdown);
             }
 
-            if ($dropdown.is('.dropup') && scrollableRect.bottom < dropdownMenuRect.bottom) {
+            if ($dropdown.is('.dropup') && scrollableRect.bottom < Math.max(dropdownMenuRect.bottom, toggleRect.top)) {
                 // whole toggle-item is hidden at the bottom of scrollable container
                 flipToOpposite($dropdown);
             }
