@@ -34,7 +34,7 @@ class LanguageListener
         foreach ($records as $record) {
             $code = $record->getValue('code');
 
-            $record->setValue(self::DATA_NAME, isset($stats[$code]) ? (int)$stats[$code] : 0);
+            $record->setValue(self::DATA_NAME, isset($stats[$code]) ? (int)$stats[$code] : null);
         }
     }
 
@@ -49,6 +49,9 @@ class LanguageListener
         foreach ($stats as $stat) {
             $result[$stat['code']] = $stat['translationStatus'];
         }
+
+        // TODO: should be fixed in https://magecore.atlassian.net/browse/BAP-10608
+        $result['en'] = 100;
 
         return $result;
     }
