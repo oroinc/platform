@@ -29,10 +29,12 @@ oro.translation:
         action:
             disable.label: 'Disable'
             enable.label: 'Enable'
+            add.label: 'Add Language'
 
         message:
             disabled: 'Language has been disabled'
-            enabled: 'Language User has been enabled'
+            enabled: 'Language has been enabled'
+            added: 'Language has been added'
 
     menu:
         languages.label: Languages

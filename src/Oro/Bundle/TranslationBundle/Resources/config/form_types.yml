@@ -25,3 +25,10 @@ services:
         class: %oro_translation.form.extension.translatable_choice.class%
         tags:
             - { name: form.type_extension, alias: choice }
+
+    oro_translation.form.type.select_language:
+        class: 'Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: form.type, alias: oro_translation_add_language }
