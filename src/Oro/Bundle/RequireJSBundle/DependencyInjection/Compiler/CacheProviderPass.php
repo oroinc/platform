@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler;
 
+use Doctrine\Common\Cache\PhpFileCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -21,7 +22,7 @@ class CacheProviderPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('oro.cache.abstract')) {
-            $definition = new Definition('Doctrine\\Common\\Cache\\PhpFileCache', array('%kernel.cache_dir%/oro_data'));
+            $definition = new Definition(PhpFileCache::class, ['%kernel.cache_dir%/oro_data']);
             $definition->setDecoratedService('oro_requirejs.cache');
 
             $container->setDefinition('oro_requirejs.decorating_cache', $definition);
