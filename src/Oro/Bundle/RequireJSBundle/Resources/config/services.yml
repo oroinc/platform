@@ -12,9 +12,10 @@ services:
             - { name: twig.extension }
 
     oro_requirejs.cache:
-          parent: oro.cache.abstract
-          calls:
-              - [setNamespace, [ 'oro_requirejs' ] ]
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_requirejs' ] ]
 
     oro_requirejs_config_provider:
         class: %oro_requirejs.provider.config.class%
