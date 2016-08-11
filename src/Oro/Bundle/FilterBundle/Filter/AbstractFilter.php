@@ -92,9 +92,6 @@ abstract class AbstractFilter implements FilterInterface
         if ($relatedJoin) {
             $qb = $ds->getQueryBuilder();
 
-            $subQb = clone $qb;
-            $subQb->andWhere($comparisonExpr);
-
             $entities = $qb->getRootEntities();
             $idField = $qb
                 ->getEntityManager()
@@ -103,6 +100,11 @@ abstract class AbstractFilter implements FilterInterface
 
             $rootAliases = $qb->getRootAliases();
             $idFieldExpr = sprintf('%s.%s', reset($rootAliases), $idField);
+
+            $subQb = clone $qb;
+            $subQb
+                ->select($idFieldExpr)
+                ->andWhere($comparisonExpr);
             $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
 
             $this->applyFilterToClause(
