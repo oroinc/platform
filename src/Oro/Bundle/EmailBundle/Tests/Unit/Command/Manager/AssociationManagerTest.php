@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AssociationManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,11 +48,14 @@ class AssociationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->producer = $this->getMock(MessageProducerInterface::class);
+
         $this->ssociationManager = new AssociationManager(
             $this->doctrineHelper,
             $this->emailActivityManager,
             $this->emailOwnersProvider,
-            $this->emailManager
+            $this->emailManager,
+            $this->producer
         );
     }
 

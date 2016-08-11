@@ -1,19 +1,17 @@
 <?php
-
 namespace Oro\Bundle\EmailBundle\Command\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EmailBundle\Command\AddAssociationCommand;
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AssociationManager
 {
@@ -31,16 +29,21 @@ class AssociationManager
     /** @var EmailManager */
     protected $emailManager;
 
+    /** @var MessageProducerInterface */
+    protected $producer;
+
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EmailActivityManager $emailActivityManager,
         EmailOwnersProvider $emailOwnersProvider,
-        EmailManager $emailManager
+        EmailManager $emailManager,
+        MessageProducerInterface $producer
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->emailActivityManager = $emailActivityManager;
         $this->emailOwnersProvider = $emailOwnersProvider;
         $this->emailManager = $emailManager;
+        $this->producer = $producer;
     }
 
     /**
@@ -82,7 +85,6 @@ class AssociationManager
     {
         $ownerQb = $this->createOwnerQb($ownerClassName, $ownerId);
         $owners = $this->getOwnerIterator($ownerQb);
-        $dependenceJob = null;
         $countNewJob = 0;
         foreach ($owners as $owner) {
             $emailsQB = $this->emailOwnersProvider->getQBEmailsByOwnerEntity($owner);
@@ -95,15 +97,18 @@ class AssociationManager
                     ->setPageCallback(function () use (
                         &$owner,
                         &$emailId,
-                        &$dependenceJob,
                         &$ownerClassName,
                         &$countNewJob
                     ) {
                         $this->clear();
-                        $job = $this->createJob($emailId, $ownerClassName, $owner->getId(), $dependenceJob);
+
+                        $this->producer->send(Topics::ADD_ASSOCIATION, [
+                            'emailIds' => $emailId,
+                            'targetClass' => $ownerClassName,
+                            'targetId' => $owner->getId(),
+                        ]);
 
                         $emailId = [];
-                        $dependenceJob = $job;
                         $countNewJob++;
                     });
 
@@ -131,34 +136,6 @@ class AssociationManager
         foreach ($clearClass as $item) {
             $this->getEmailEntityManager()->clear($item);
         }
-    }
-
-    /**
-     * @param $emailId
-     * @param $ownerClassName
-     * @param $ownerId
-     * @param $dependenceJob
-     *
-     * @return Job
-     */
-    protected function createJob($emailId, $ownerClassName, $ownerId, $dependenceJob)
-    {
-        foreach ($emailId as $id) {
-            $arguments[] = '--id='.$id;
-        }
-        $arguments[] = '--targetClass=' . $ownerClassName;
-        $arguments[] = '--targetId=' . $ownerId;
-
-        $job = new Job(AddAssociationCommand::COMMAND_NAME, $arguments);
-        if ($dependenceJob) {
-            $job->addDependency($dependenceJob);
-        }
-
-        $jobEntityManager = $this->doctrineHelper->getEntityManager($job);
-        $jobEntityManager->persist($job);
-        $jobEntityManager->flush();
-
-        return $job;
     }
 
     /**
