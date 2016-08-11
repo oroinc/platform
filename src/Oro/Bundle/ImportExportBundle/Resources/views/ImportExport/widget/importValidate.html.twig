@@ -110,19 +110,6 @@
                     </div>
                 </td>
             </tr>
-
-            {% if counts.invalid_entries is defined %}
-                <tr {% if counts.invalid_entries %}class="error"{% endif %}>
-                    <td>
-                        {{ 'Invalid records '|trans }}
-                    </td>
-                    <td>
-                        <div class="pull-right">
-                            {{ counts.invalid_entries|default(0) }}
-                        </div>
-                    </td>
-                </tr>
-            {% endif %}
             </tbody>
         </table>
     </div>
