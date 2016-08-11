@@ -68,9 +68,9 @@ class EmailNotificationManager
 
         $emailsData = [];
         /** @var $email Email */
-        foreach ($emails as $element) {
-            $isSeen = $element['seen'];
-            $email = $element[0];
+        foreach ($emails as $emailUser) {
+            $isSeen = $emailUser->isSeen();
+            $email = $emailUser->getEmail();
             $bodyContent = '';
             $emailBody = $email->getEmailBody();
             if ($emailBody) {
