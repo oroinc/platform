@@ -9,6 +9,7 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class MergeListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +21,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
         $this->fieldPrefix = str_replace('\\', '_', Attachment::class) . '_';
     }
 
-    public function testShouldSetTemplateOnAttachmentAssociations()
+    public function testShouldSetMetadataToAttachmentAssociations()
     {
         $fieldName = $this->fieldPrefix . 'field1';
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
@@ -31,10 +32,17 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
         $fieldsMetadata = $entityMetadata->getFieldsMetadata();
         $this->assertArrayHasKey($fieldName, $fieldsMetadata);
-        $this->assertEquals(MergeListener::TEMPLATE_NAME, $fieldsMetadata[$fieldName]->get('template'));
+        $this->assertEquals(
+            [
+                'template' => MergeListener::TEMPLATE_NAME,
+                'merge_modes' => [MergeModes::UNITE, MergeModes::REPLACE],
+                'field_name' => $fieldName,
+            ],
+            $fieldsMetadata[$fieldName]->all()
+        );
     }
 
-    public function testShouldNotSetTemplateOnOtherAssociations()
+    public function testShouldNotSetMetadataToUnknownAssociations()
     {
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
         $event = $this->getEvent('Foo\\Foo');
@@ -46,13 +54,13 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $fieldsMetadata);
     }
 
-    public function testShouldNotOverwriteFieldMetadata()
+    public function testShouldNotOverwriteFieldMetadataReference()
     {
         $fieldName = $this->fieldPrefix . 'field1';
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
         $event = $this->getEvent('Foo\\Bar');
         $entityMetadata = $event->getEntityMetadata();
-        $fieldMetadata = $this->addFieldMetadata($entityMetadata, $fieldName);
+        $fieldMetadata = $this->addFieldMetadata($entityMetadata, ['field_name' => $fieldName]);
 
         $listener->onBuildMetadata($event);
 
@@ -68,12 +76,31 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
         $event = $this->getEvent('Foo\\Bar');
         $entityMetadata = $event->getEntityMetadata();
-        $this->addFieldMetadata($entityMetadata, $fieldName, 'abc.html.twig');
+        $fieldOptions = ['template' => 'abc.html.twig', 'field_name' => $fieldName];
+        $this->addFieldMetadata($entityMetadata, $fieldOptions);
 
         $listener->onBuildMetadata($event);
 
         $fieldsMetadata = $entityMetadata->getFieldsMetadata();
         $this->assertEquals('abc.html.twig', $fieldsMetadata[$fieldName]->get('template'));
+    }
+
+    public function testShouldOverwriteMergeModes()
+    {
+        $fieldName = $this->fieldPrefix . 'field1';
+        $listener = $this->getListener(['Foo\\Bar' => 'field1']);
+        $event = $this->getEvent('Foo\\Bar');
+        $entityMetadata = $event->getEntityMetadata();
+        $fieldOptions = ['merge_modes' => 'test_mode', 'field_name' => $fieldName];
+        $this->addFieldMetadata($entityMetadata, $fieldOptions);
+
+        $listener->onBuildMetadata($event);
+
+        $fieldsMetadata = $entityMetadata->getFieldsMetadata();
+        $this->assertEquals(
+            [MergeModes::UNITE, MergeModes::REPLACE],
+            $fieldsMetadata[$fieldName]->get('merge_modes')
+        );
     }
 
     /**
@@ -110,14 +137,12 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param  EntityMetadata $entityMetadata
-     * @param  string         $fieldName
-     * @param  string         $template
+     * @param  array          $options
      * @return FieldMetadata
      */
-    private function addFieldMetadata(EntityMetadata $entityMetadata, $fieldName, $template = '')
+    private function addFieldMetadata(EntityMetadata $entityMetadata, array $options)
     {
-        $fieldMetadata = new FieldMetadata(['field_name' => $fieldName]);
-        $fieldMetadata->set('template', $template);
+        $fieldMetadata = new FieldMetadata($options);
         $entityMetadata->addFieldMetadata($fieldMetadata);
 
         return $fieldMetadata;

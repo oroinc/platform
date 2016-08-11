@@ -102,8 +102,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
         Schema $schema,
         $targetTableName,
         array $allowedMimeTypes = [],
-        $maxFileSize = 1,
-        array $columnOptions = []
+        $maxFileSize = 1
     ) {
         $attachmentTable = $schema->getTable(self::ATTACHMENT_TABLE_NAME);
         $targetTable     = $schema->getTable($targetTableName);
@@ -126,8 +125,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
             $attachmentTable,
             $associationName,
             $targetTable,
-            $targetColumnName,
-            $columnOptions
+            $targetColumnName
         );
     }
 }

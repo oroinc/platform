@@ -114,7 +114,9 @@ oro_entity_config:
                 # Date Time pattern
                 # Example m/d/Y
                 render_datetime_pattern: ~
-                # Autoescape template values. Can be disabled to render HTML values.
+                # Control escaping of the value when rendered in Merge table.
+                # Use 'false' to disable escaping for the field (i.e. RichText) or set a Twig 'escape' method to enable:
+                # 'html' (or true), 'html_attr', 'css', 'js', 'url'
                 autoescape: true
 ```
 
