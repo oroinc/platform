@@ -391,18 +391,18 @@ abstract class BaseDriver
         }
 
         foreach ($selects as $select) {
-            list($type, $name) = Criteria::explodeFieldTypeName($select);
+            $type = $this->resolveTypeFromFieldName($query, $select);
 
-            $index     = $this->getUniqueId();
+            $uniqIndex = uniqid();
             $joinField = $this->getJoinField($type);
-            $joinAlias = $this->getJoinAlias($type, $index);
+            $joinAlias = $this->getJoinAlias($type, $uniqIndex);
 
-            $withClause = sprintf('%s.field = :param%s', $joinAlias, $index);
+            $withClause = sprintf('%s.field = :param%s', $joinAlias, $uniqIndex);
 
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
-                ->setParameter('param' . $index, $name);
+                ->setParameter('param' . $uniqIndex, $select);
 
-            $qb->addSelect($joinAlias . '.value as ' . $name);
+            $qb->addSelect($joinAlias . '.value as ' . $select);
         }
     }
 
@@ -463,6 +463,7 @@ abstract class BaseDriver
             $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
                 ->orderBy('orderTable.value', $direction)
                 ->setParameter('orderField', $fieldName);
+            $qb->addSelect('orderTable.value');
         }
     }
 
@@ -474,5 +475,43 @@ abstract class BaseDriver
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
+    }
+
+    /**
+     * @param Query $query
+     * @param $fieldName
+     * @return string
+     */
+    private function resolveTypeFromFieldName(Query $query, $fieldName)
+    {
+        $mappingConfig = $query->getMappingConfig();
+        $entityName = $query->getEntityByAlias($query->getFrom()[0]);
+        $entityMappingConfig = [];
+
+        if (isset($mappingConfig[$entityName])) {
+            $entityMappingConfig = $mappingConfig[$entityName];
+        } else {
+            throw new \OutOfBoundsException(
+                'Cannot find mapping for entity `'.$entityName
+                .'` when adding `select` statement in ORM BaseDriver.'
+            );
+        }
+
+        $type = null;
+
+        foreach ($entityMappingConfig['fields'] as $fieldConfig) {
+            if ($fieldConfig['name'] == $fieldName) {
+                $type = $fieldConfig['target_type'];
+            }
+        }
+
+        if ($type === null) {
+            throw new \RuntimeException(
+                'Cannot resolve type for field '
+                .'`'.$fieldName.'`.'
+            );
+        }
+
+        return $type;
     }
 }
