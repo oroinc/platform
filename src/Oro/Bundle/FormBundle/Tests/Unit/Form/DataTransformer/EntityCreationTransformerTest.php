@@ -63,7 +63,6 @@ class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer->setValuePath($valuePath);
         $this->transformer->setAllowEmptyProperty($allowEmptyProperty);
         $this->transformer->setNewEntityPropertyName($newEntityPropertyName);
-        $this->transformer->setIsCreateGranted(true);
         if (null !== $exception) {
             $this->setExpectedException(get_class($exception), $exception->getMessage());
         }

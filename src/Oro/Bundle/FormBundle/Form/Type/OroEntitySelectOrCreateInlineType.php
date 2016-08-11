@@ -193,7 +193,6 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $resolver->setNormalizers(
             [
                 'configs' => function (Options $options, $configs) {
-
                     if (!empty($options['autocomplete_alias'])) {
                         $autoCompleteAlias            = $options['autocomplete_alias'];
                         $configs['autocomplete_alias'] = $autoCompleteAlias;
@@ -262,12 +261,11 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $newItemValuePath = null,
         $isCreateGranted = true
     ) {
-        if ($newItemPropertyName) {
+        if ($newItemPropertyName && $isCreateGranted) {
             $transformer = new EntityCreationTransformer($this->entityManager, $entityClass);
             $transformer->setNewEntityPropertyName($newItemPropertyName);
             $transformer->setAllowEmptyProperty($newItemAllowEmptyProperty);
             $transformer->setValuePath($newItemValuePath);
-            $transformer->setIsCreateGranted($isCreateGranted);
         } else {
             $transformer = new EntityToIdTransformer($this->entityManager, $entityClass);
         }
