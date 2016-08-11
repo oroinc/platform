@@ -113,7 +113,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
 
         $this->logQuery($logger, $query, $params, $types);
 
-        $rows = $rows = $this->connection->fetchAll($query, $params, $types);
+        $rows = $this->connection->fetchAll($query, $params, $types);
         $groupedAces = [];
 
         foreach ($rows as $row) {
@@ -251,12 +251,12 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
     protected function getSqlForSelectByObjectIdentifier()
     {
         return sprintf(
-            'SELECT e.* FROM %s AS o INNER JOIN %s AS c ON c.id = o.class_id LEFT JOIN %s AS e ' .
+            'SELECT e.* FROM %s AS e INNER JOIN %s AS o ' .
             'ON e.class_id = o.class_id AND (e.object_identity_id = o.id OR e.object_identity_id IS NULL) ' .
-            'WHERE o.object_identifier = :oid',
+            'INNER JOIN %s AS c ON c.id = o.class_id WHERE o.object_identifier = :oid',
+            $this->entriesTableName,
             $this->objectIdentitiesTableName,
-            $this->aclClassesTableName,
-            $this->entriesTableName
+            $this->aclClassesTableName
         );
     }
 

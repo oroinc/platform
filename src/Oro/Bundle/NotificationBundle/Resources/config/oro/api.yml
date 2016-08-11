@@ -1,5 +1,0 @@
-oro_api:
-    entities:
-        Oro\Bundle\NotificationBundle\Entity\EmailNotification: ~
-        Oro\Bundle\NotificationBundle\Entity\Event: ~
-        Oro\Bundle\NotificationBundle\Entity\RecipientList: ~

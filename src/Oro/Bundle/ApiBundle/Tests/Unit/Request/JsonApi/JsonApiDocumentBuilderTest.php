@@ -480,6 +480,149 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    public function testAssociationsAsArrayAttributes()
+    {
+        $object = [
+            'id'         => 123,
+            'category'   => 456,
+            'group'      => null,
+            'role'       => ['id' => 789],
+            'categories' => [
+                ['id' => 456],
+                ['id' => 457]
+            ],
+            'groups'     => null,
+            'products'   => [],
+            'roles'      => [
+                ['id' => 789, 'name' => 'Role1'],
+                ['id' => 780, 'name' => 'Role2']
+            ],
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
+        $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+        $metadata->addAssociation($this->createAssociationMetadata('groups', 'Test\Group', true));
+        $metadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
+        $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
+        foreach ($metadata->getAssociations() as $association) {
+            $association->setDataType('array');
+        }
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'category'      => 456,
+                        'group'         => null,
+                        'role'          => 789,
+                        'categories'    => [456, 457],
+                        'groups'        => [],
+                        'products'      => [],
+                        'roles'         => [
+                            ['id' => 789, 'name' => 'Role1'],
+                            ['id' => 780, 'name' => 'Role2']
+                        ],
+                        'missingToOne'  => null,
+                        'missingToMany' => []
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testNestedAssociationAsArrayAttribute()
+    {
+        $object = [
+            'id'          => 1,
+            'association' => [
+                'id'         => 123,
+                'name'       => 'Name',
+                'meta1'      => 'Meta1',
+                'category'   => 456,
+                'group'      => null,
+                'role'       => ['id' => 789],
+                'categories' => [
+                    ['id' => 456],
+                    ['id' => 457]
+                ],
+                'groups'     => null,
+                'products'   => [],
+                'roles'      => [
+                    ['id' => 789, 'name' => 'Role1'],
+                    ['id' => 780, 'name' => 'Role2']
+                ],
+                'unknown'    => 'test'
+            ],
+        ];
+
+        $targetMetadata = $this->getEntityMetadata('Test\Target', ['id']);
+        $targetMetadata->addField($this->createFieldMetadata('id'));
+        $targetMetadata->addField($this->createFieldMetadata('name'));
+        $targetMetadata->addField($this->createFieldMetadata('missingField'));
+        $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('groups', 'Test\Group', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $targetMetadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $associationMetadata = $metadata->addAssociation(
+            $this->createAssociationMetadata('association', 'Test\Target')
+        );
+        $associationMetadata->setTargetMetadata($targetMetadata);
+        $associationMetadata->setDataType('array');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '1',
+                    'attributes' => [
+                        'association' => [
+                            'id'            => 123,
+                            'name'          => 'Name',
+                            'missingField'  => null,
+                            'meta1'         => 'Meta1',
+                            'category'      => 456,
+                            'group'         => null,
+                            'role'          => 789,
+                            'categories'    => [456, 457],
+                            'groups'        => [],
+                            'products'      => [],
+                            'roles'         => [
+                                ['id' => 789, 'name' => 'Role1'],
+                                ['id' => 780, 'name' => 'Role2']
+                            ],
+                            'missingToOne'  => null,
+                            'missingToMany' => []
+                        ]
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetErrorObject()
     {
         $error = new Error();

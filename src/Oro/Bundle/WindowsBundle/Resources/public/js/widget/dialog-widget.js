@@ -26,7 +26,8 @@ define(function(require) {
             type: 'dialog',
             dialogOptions: null,
             stateEnabled: true,
-            incrementalPosition: true
+            incrementalPosition: true,
+            preventModelRemoval: false
         }),
 
         // Windows manager global variables
@@ -139,7 +140,7 @@ define(function(require) {
                 return;
             }
             dialogManager.remove(this);
-            if (this.model) {
+            if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
                         // Suppress error if it's 404 response and not debug mode
@@ -153,6 +154,8 @@ define(function(require) {
 
             // need to remove components in widget before DOM will be deleted
             this.disposePageComponents();
+            _.invoke(this.subviews, 'dispose');
+
             if (this.widget) {
                 this.widget.remove();
                 delete this.widget;
@@ -273,6 +276,7 @@ define(function(require) {
 
         _clearActionsContainer: function() {
             this.widget.dialog('actionsContainer').empty();
+            this.actionsEl = null;
         },
 
         _renderActions: function() {

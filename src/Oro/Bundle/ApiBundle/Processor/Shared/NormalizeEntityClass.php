@@ -13,9 +13,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * Makes sure that an entity class name exists in the Context,
- * if required converts it to FQCN of an entity
- * and check that this entity is accessible through Data API.
+ * Makes sure that an entity class name exists in the Context.
+ * Converts entity type to FQCN of an entity.
+ * Checks that this entity is accessible through Data API.
  */
 class NormalizeEntityClass implements ProcessorInterface
 {

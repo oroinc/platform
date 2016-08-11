@@ -167,10 +167,11 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 continue;
             }
 
-            if (isset($data[$childForm->getName()]) && $data[$childForm->getName()] !== $childForm->getData()) {
-                $data[$childForm->getName()] = $childForm->getData();
+            $fieldName = $childForm->getName();
+            if (isset($data[$fieldName]) && $data[$fieldName] && $data[$fieldName] !== $childForm->getData()) {
                 $this->disabledFields[] = $childForm->getName();
             }
+            $data[$childForm->getName()] = $childForm->getData();
         }
         $event->setData($data);
     }
