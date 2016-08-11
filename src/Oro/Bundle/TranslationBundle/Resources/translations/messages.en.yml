@@ -11,3 +11,14 @@ oro.translation:
         enable: 'Enable'
         disable: 'Disable'
         update: 'Update'
+        
+    language:
+        entity_label: 'Language'
+        entity_plural_label: 'Languages'
+
+        id.label: 'Id'
+        code.label: 'Code'
+        enabled.label: 'Enabled'
+        installed_build_date.label: 'Installed Build Date'
+        owner.label: 'Owner'
+        organization.label: 'Organization'
