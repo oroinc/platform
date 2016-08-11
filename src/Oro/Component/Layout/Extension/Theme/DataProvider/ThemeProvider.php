@@ -38,7 +38,7 @@ class ThemeProvider
      */
     public function getStylesOutput($themeName)
     {
-        $assets = $this->getTheme($themeName)->getDataByKey('assets');
+        $assets = $this->getTheme($themeName)->getConfigByKey('assets');
         if ($assets && array_key_exists('styles', $assets)) {
             return array_key_exists('output', $assets['styles']) ? $assets['styles']['output'] : null;
         }
