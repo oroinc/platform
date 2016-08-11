@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Layout\Extension\Theme;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\Extension\AbstractLayoutUpdateLoaderExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
+use Oro\Component\Layout\ContextInterface;
 
 class ThemeExtension extends AbstractLayoutUpdateLoaderExtension
 {
@@ -48,30 +47,15 @@ class ThemeExtension extends AbstractLayoutUpdateLoaderExtension
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function loadLayoutUpdates(ContextInterface $context)
-    {
-        $this->updates = [];
-        if ($context->getOr(static::THEME_KEY)) {
-            $paths = $this->getPaths($context);
-            $files = $this->findApplicableResources($paths);
-            foreach ($files as $file) {
-                $this->loadLayoutUpdate($file);
-            }
-        }
-
-        return $this->updates;
-    }
-
-    /**
      * @param string $file
+     * @param ContextInterface $context
      *
      * @return array
      */
-    protected function loadLayoutUpdate($file)
+    protected function loadLayoutUpdate($file, ContextInterface $context)
     {
         $update = $this->loader->load($file);
+        //var_dump($this->updates);
         if ($update) {
             $el = $update instanceof ElementDependentLayoutUpdateInterface
                 ? $update->getElement()
@@ -82,21 +66,5 @@ class ThemeExtension extends AbstractLayoutUpdateLoaderExtension
         }
 
         return $update;
-    }
-
-    /**
-     * Return paths that comes from provider and returns array of resource files
-     *
-     * @param ContextInterface $context
-     *
-     * @return array
-     */
-    protected function getPaths(ContextInterface $context)
-    {
-        if ($this->pathProvider instanceof ContextAwareInterface) {
-            $this->pathProvider->setContext($context);
-        }
-
-        return $this->pathProvider->getPaths([]);
     }
 }

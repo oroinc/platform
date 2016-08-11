@@ -12,6 +12,8 @@ use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
+use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
+use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 
 class ImportExtension extends AbstractLayoutUpdateLoaderExtension
 {
@@ -23,22 +25,37 @@ class ImportExtension extends AbstractLayoutUpdateLoaderExtension
     /** @var LayoutUpdateLoaderInterface */
     protected $loader;
 
+    /** @var DependencyInitializer */
+    protected $dependencyInitializer;
+
     /** @var  ThemeManager */
     protected $themeManager;
+
+    /** @var PathProviderInterface */
+    protected $pathProvider;
+
+    /** @var  array */
+    protected $updates;
 
     /**
      * @param array $resources
      * @param LayoutUpdateLoaderInterface $loader
      * @param ThemeManager $themeManager
+     * @param DependencyInitializer $dependencyInitializer
+     * @param PathProviderInterface $provider
      */
     public function __construct(
         array $resources,
         LayoutUpdateLoaderInterface $loader,
-        ThemeManager $themeManager
+        ThemeManager $themeManager,
+        DependencyInitializer $dependencyInitializer,
+        PathProviderInterface $provider
     ) {
         $this->resources = $resources;
         $this->loader = $loader;
         $this->themeManager = $themeManager;
+        $this->dependencyInitializer = $dependencyInitializer;
+        $this->pathProvider = $provider;
     }
 
     /**
@@ -47,10 +64,15 @@ class ImportExtension extends AbstractLayoutUpdateLoaderExtension
      *
      * @return array
      */
-    protected function loadImports($file, ContextInterface $context)
+    protected function loadLayoutUpdate($file, ContextInterface $context)
     {
         $update = $this->loader->load($file);
         if ($update instanceof ImportsAwareLayoutUpdateInterface) {
+            $el = $update instanceof ElementDependentLayoutUpdateInterface
+                ? $update->getElement()
+                : 'root';
+
+            $this->dependencyInitializer->initialize($update);
             // load imports
             $imports = $update->getImports();
             if (!is_array($imports)) {
@@ -62,10 +84,11 @@ class ImportExtension extends AbstractLayoutUpdateLoaderExtension
                 $import = $this->createImport($importData);
                 $files = $this->getImportResources($context->get(ThemeExtension::THEME_KEY), $import->getId());
                 foreach ($files as $file) {
-                    $importUpdate = $this->loadImports($file, $context);
+                    $importUpdate = $this->loadLayoutUpdate($file, $context);
                     if ($importUpdate instanceof LayoutUpdateImportInterface) {
                         $importUpdate->setImport($import);
                         $importUpdate->setParentUpdate($update);
+                        $this->updates[$el][] = $importUpdate;
                     }
                 }
             }

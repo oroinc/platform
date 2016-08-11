@@ -3,11 +3,37 @@
 namespace Oro\Component\Layout\Extension;
 
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\ContextAwareInterface;
+use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 
 abstract class AbstractLayoutUpdateLoaderExtension extends AbstractExtension
 {
     /** @var array */
     protected $resources;
+
+    /** @var PathProviderInterface */
+    protected $pathProvider;
+
+    /** @var  array */
+    protected $updates;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function loadLayoutUpdates(ContextInterface $context)
+    {
+        $this->updates = [];
+        if ($context->getOr(ThemeExtension::THEME_KEY)) {
+            $paths = $this->getPaths($context);
+            $files = $this->findApplicableResources($paths);
+            foreach ($files as $file) {
+                $this->loadLayoutUpdate($file, $context);
+            }
+        }
+
+        return $this->updates;
+    }
 
     /**
      * Filters resources by paths
@@ -52,5 +78,32 @@ abstract class AbstractLayoutUpdateLoaderExtension extends AbstractExtension
         }
 
         return null;
+    }
+
+    /**
+     * Return paths that comes from provider and returns array of resource files
+     *
+     * @param ContextInterface $context
+     *
+     * @return array
+     */
+    protected function getPaths(ContextInterface $context)
+    {
+        if ($this->pathProvider instanceof ContextAwareInterface) {
+            $this->pathProvider->setContext($context);
+        }
+
+        return $this->pathProvider->getPaths([]);
+    }
+
+    /**
+     * @param string $file
+     * @param ContextInterface $context
+     *
+     * @return array
+     */
+    protected function loadLayoutUpdate($file, ContextInterface $context)
+    {
+        return [];
     }
 }
