@@ -4,34 +4,24 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
-use Gaufrette\Stream;
-
-use Symfony\Component\Security\Core\Util\ClassUtils;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
-use Symfony\Component\HttpFoundation\File\File as FileType;
-
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
-use Gaufrette\Filesystem;
-use Gaufrette\StreamMode;
-use Gaufrette\Adapter\MetadataSupporter;
-use Gaufrette\Stream\Local as LocalStream;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class AttachmentManager
 {
-    const READ_COUNT = 100000;
+    /**
+     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::READ_BATCH_SIZE instead
+     */
+    const READ_COUNT = FileManager::READ_BATCH_SIZE;
+
     const DEFAULT_IMAGE_WIDTH = 100;
     const DEFAULT_IMAGE_HEIGHT = 100;
     const SMALL_IMAGE_WIDTH = 32;
@@ -39,69 +29,70 @@ class AttachmentManager
     const THUMBNAIL_WIDTH  = 110;
     const THUMBNAIL_HEIGHT = 80;
 
-    /** @var Filesystem */
-    protected $filesystem;
+    /** this constant is used as a replacement of empty file name to avoid an error during URL generation */
+    const UNKNOWN_FILE_NAME = 'unknown.png';
 
-    /** @var  Router */
+    /** @var FileManager */
+    private $fileManager;
+
+    /** @var RouterInterface */
     protected $router;
 
-    /** @var  array */
+    /** @var array */
     protected $fileIcons;
-
-    /** @var ServiceLink */
-    protected $securityFacadeLink;
 
     /** @var AssociationManager */
     protected $associationManager;
 
     /**
-     * @param FilesystemMap      $filesystemMap
-     * @param Router             $router
-     * @param ServiceLink        $securityFacadeLink
+     * @param RouterInterface    $router
      * @param array              $fileIcons
      * @param AssociationManager $associationManager
      */
     public function __construct(
-        FilesystemMap $filesystemMap,
-        Router $router,
-        ServiceLink $securityFacadeLink,
+        RouterInterface $router,
         $fileIcons,
         AssociationManager $associationManager
     ) {
-        $this->filesystem         = $filesystemMap->get('attachments');
-        $this->router             = $router;
-        $this->fileIcons          = $fileIcons;
-        $this->securityFacadeLink = $securityFacadeLink;
+        $this->router = $router;
+        $this->fileIcons = $fileIcons;
         $this->associationManager = $associationManager;
     }
 
     /**
-     * Copy file by $fileUrl (local path or remote file), copy it to temp dir and return Attachment entity record
+     * @param FileManager $fileManager
+     */
+    public function setFileManager(FileManager $fileManager)
+    {
+        $this->fileManager = $fileManager;
+    }
+
+    /**
+     * Copy file by $fileUrl (local path or remote file), copy it to temp dir and return File entity record
      *
      * @param string $fileUrl
      * @return File|null
+     * @deprecated since 1.10. See Oro\Bundle\AttachmentBundle\Manager\FileManager::createFileEntity
      */
     public function prepareRemoteFile($fileUrl)
     {
         try {
-            $fileName           = pathinfo($fileUrl)['basename'];
+            $fileName = pathinfo($fileUrl, PATHINFO_BASENAME);
             $parametersPosition = strpos($fileName, '?');
             if ($parametersPosition) {
                 $fileName = substr($fileName, 0, $parametersPosition);
             }
-            $filesystem = new SymfonyFileSystem();
-            $tmpDir = ini_get('upload_tmp_dir');
-            if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
-                $tmpDir = sys_get_temp_dir();
-            }
-            $tmpFile    = realpath($tmpDir) . DIRECTORY_SEPARATOR . $fileName;
-            $filesystem->copy($fileUrl, $tmpFile, true);
-            $file       = new FileType($tmpFile);
-            $attachment = new File();
-            $attachment->setFile($file);
-            $this->preUpload($attachment);
 
-            return $attachment;
+            $tmpFile = $this->fileManager->getTemporaryFileName($fileName);
+            $filesystem = new SymfonyFileSystem();
+            $filesystem->copy($fileUrl, $tmpFile, true);
+
+            $entity = new File();
+            $entity->setFile(new ComponentFile($tmpFile));
+            $this->fileManager->preUpload($entity);
+            $entity->setOriginalFilename($fileName);
+
+            return $entity;
         } catch (\Exception $e) {
             return null;
         }
@@ -111,59 +102,22 @@ class AttachmentManager
      * Update attachment entity before upload
      *
      * @param File $entity
+     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::preUpload instead
      */
     public function preUpload(File $entity)
     {
-        if ($entity->isEmptyFile()) {
-            if ($entity->getFilename() !== null && $this->filesystem->has($entity->getFilename())) {
-                $this->filesystem->delete($entity->getFilename());
-            }
-            $entity->setFilename(null);
-            $entity->setExtension(null);
-            $entity->setOriginalFilename(null);
-        }
-
-        if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
-            $entity->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
-            $file = $entity->getFile();
-            if ($entity->getFilename() !== null && $this->filesystem->has($entity->getFilename())) {
-                $this->filesystem->delete($entity->getFilename());
-            }
-            $entity->setExtension($file->guessExtension());
-
-            if ($file instanceof UploadedFile) {
-                $entity->setOriginalFilename($file->getClientOriginalName());
-                $entity->setMimeType($file->getMimeType());
-                $entity->setFileSize($file->getClientSize());
-            } else {
-                $entity->setOriginalFilename($file->getFileName());
-                $entity->setMimeType($file->getMimeType());
-                $entity->setFileSize($file->getSize());
-            }
-
-            $entity->setFilename($this->generateFileName($entity->getExtension()));
-
-            $fsAdapter = $this->filesystem->getAdapter();
-            if ($fsAdapter instanceof MetadataSupporter) {
-                $fsAdapter->setMetadata(
-                    $entity->getFilename(),
-                    ['contentType' => $entity->getMimeType()]
-                );
-            }
-        }
+        $this->fileManager->preUpload($entity);
     }
 
     /**
      * Upload attachment file
      *
      * @param File $entity
+     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::upload instead
      */
     public function upload(File $entity)
     {
-        if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
-            $file = $entity->getFile();
-            $this->copyLocalFileToStorage($file->getPathname(), $entity->getFilename());
-        }
+        $this->fileManager->upload($entity);
     }
 
     /**
@@ -171,11 +125,11 @@ class AttachmentManager
      *
      * @param string $localFilePath
      * @param string $destinationFileName
+     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::writeFileToStorage instead
      */
     public function copyLocalFileToStorage($localFilePath, $destinationFileName)
     {
-        $srcStream = new LocalStream($localFilePath);
-        $this->copyStreamToStorage($srcStream, $destinationFileName);
+        $this->fileManager->writeFileToStorage($localFilePath, $destinationFileName);
     }
 
     /**
@@ -184,12 +138,11 @@ class AttachmentManager
      * @param File|string $file The File object or file name
      *
      * @return string
+     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::getContent instead
      */
     public function getContent($file)
     {
-        return $this->filesystem
-            ->get($file instanceof File ? $file->getFilename() : $file)
-            ->getContent();
+        return $this->fileManager->getContent($file);
     }
 
     /**
@@ -331,7 +284,7 @@ class AttachmentManager
         File $entity,
         $width = self::DEFAULT_IMAGE_WIDTH,
         $height = self::DEFAULT_IMAGE_HEIGHT,
-        $referenceType = Router::ABSOLUTE_PATH
+        $referenceType = RouterInterface::ABSOLUTE_PATH
     ) {
         return $this->router->generate(
             'oro_resize_attachment',
@@ -339,7 +292,7 @@ class AttachmentManager
                 'width'    => $width,
                 'height'   => $height,
                 'id'       => $entity->getId(),
-                'filename' => $entity->getOriginalFilename()
+                'filename' => $entity->getFilename() ?: self::UNKNOWN_FILE_NAME
             ],
             $referenceType
         );
@@ -371,7 +324,7 @@ class AttachmentManager
             'oro_filtered_attachment',
             [
                 'id'       => $entity->getId(),
-                'filename' => $entity->getOriginalFilename(),
+                'filename' => $entity->getFilename() ?: self::UNKNOWN_FILE_NAME,
                 'filter'   => $filerName
             ]
         );
@@ -382,6 +335,7 @@ class AttachmentManager
      *
      * @param File          $entity
      * @param EntityManager $em
+     * @deprecated since 1.10. This method is never used and will be removed
      */
     public function checkOnDelete(File $entity, EntityManager $em)
     {
@@ -448,16 +402,11 @@ class AttachmentManager
      * @param File $file
      *
      * @return File
+     * @deprecated since 1.10. Use Oro\Bundle\AttachmentBundle\Manager\FileManager::cloneFileEntity instead
      */
     public function copyAttachmentFile(File $file)
     {
-        $fileCopy = clone $file;
-        $fileCopy->setFilename($this->generateFileName($file->getExtension()));
-
-        $sourceStream =  $this->filesystem->createStream($file->getFilename());
-        $this->copyStreamToStorage($sourceStream, $fileCopy->getFilename());
-
-        return $fileCopy;
+        return $this->fileManager->cloneFileEntity($file);
     }
     
     /**
@@ -470,7 +419,8 @@ class AttachmentManager
     {
         return in_array(
             $contentType,
-            ['image/gif','image/jpeg','image/pjpeg','image/png']
+            ['image/gif','image/jpeg','image/pjpeg','image/png'],
+            true
         );
     }
 
@@ -480,49 +430,5 @@ class AttachmentManager
     public function getFileIcons()
     {
         return $this->fileIcons;
-    }
-
-    /**
-     * Copy stream to storage
-     *
-     * @param Stream $srcStream
-     * @param string $destinationFileName
-     */
-    protected function copyStreamToStorage(Stream $srcStream, $destinationFileName)
-    {
-        $dstStream = $this->filesystem->createStream($destinationFileName);
-
-        $srcStream->open(new StreamMode('rb+'));
-        $dstStream->open(new StreamMode('wb+'));
-
-        while (!$srcStream->eof()) {
-            $dstStream->write($srcStream->read(self::READ_COUNT));
-        }
-
-        $dstStream->close();
-        $srcStream->close();
-    }
-
-    /**
-     * Generate unique file name with specific extension
-     *
-     * @param string $extension
-     *
-     * @return string
-     */
-    protected function generateFileName($extension)
-    {
-        return sprintf('%s.%s', uniqid(), $extension);
-    }
-
-    /**
-     * @param $entity
-     * @param File $attachment
-     *
-     * @return string
-     */
-    public function getAttachmentURL($entity, $attachment)
-    {
-        return $this->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
@@ -33,8 +34,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var array [entity type => ApiResource, ...] */
-    protected $resources;
+    /** @var array [request type + version => [entity type => ApiResource, ...], ...] */
+    protected $resources = [];
 
     /**
      * @param RestDocViewDetector  $docViewDetector
@@ -86,24 +87,26 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function getResources()
     {
-        if (null === $this->resources) {
-            $this->resources = [];
-            $requestType = $this->docViewDetector->getRequestType();
-            $resources = $this->resourcesProvider->getResources(
-                $this->docViewDetector->getVersion(),
-                $requestType
-            );
-            foreach ($resources as $resource) {
-                $entityType = $this->valueNormalizer->normalizeValue(
-                    $resource->getEntityClass(),
-                    DataType::ENTITY_TYPE,
-                    $requestType
-                );
-                $this->resources[$entityType] = $resource;
-            }
+        $version = $this->docViewDetector->getVersion();
+        $requestType = $this->docViewDetector->getRequestType();
+        $cacheKey = $version . (string)$requestType;
+        if (isset($this->resources[$cacheKey])) {
+            return $this->resources[$cacheKey];
         }
 
-        return $this->resources;
+        $result = [];
+        $resources = $this->resourcesProvider->getResources($version, $requestType);
+        foreach ($resources as $resource) {
+            $entityType = $this->valueNormalizer->normalizeValue(
+                $resource->getEntityClass(),
+                DataType::ENTITY_TYPE,
+                $requestType
+            );
+            $result[$entityType] = $resource;
+        }
+        $this->resources[$cacheKey] = $result;
+
+        return $result;
     }
 
     /**
@@ -115,14 +118,33 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     {
         $routeName = $routes->getName($route);
 
+        $cache = new RouteCollection();
         $action = $route->getDefault('_action');
         foreach ($resources as $entityType => $resource) {
             $entityClass = $resource->getEntityClass();
             if ($this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER)) {
-                $this->addSubresources($action, $entityType, $entityClass, $routeName, $route, $routes);
+                $cache = $this->addSubresources(
+                    $action,
+                    $entityType,
+                    $entityClass,
+                    $routeName,
+                    $route,
+                    $routes,
+                    $cache
+                );
             } elseif (!in_array($action, $resource->getExcludedActions(), true)) {
-                $this->addResource($entityType, $routeName, $route, $routes);
+                $cache = $this->addResource(
+                    $entityType,
+                    $routeName,
+                    $route,
+                    $routes,
+                    $cache
+                );
             }
+        }
+        // add cached routes before the current route
+        if ($cache->count()) {
+            $routes->insertCollection($cache, $routeName, true);
         }
     }
 
@@ -131,22 +153,29 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      * @param string                  $routeName
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
+     * @param RouteCollection         $cache
+     *
+     * @return RouteCollection
      */
     protected function addResource(
         $entityType,
         $routeName,
         Route $route,
-        RouteCollectionAccessor $routes
+        RouteCollectionAccessor $routes,
+        RouteCollection $cache
     ) {
         $existingRoute = $routes->getByPath(
             str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath()),
             $route->getMethods()
         );
         if ($existingRoute) {
+            // add cached routes before the current route and reset the cache
+            if ($cache->count()) {
+                $routes->insertCollection($cache, $routeName, true);
+                $cache = new RouteCollection();
+            }
             // move existing route before the current route
-            $existingRouteName = $routes->getName($existingRoute);
-            $routes->remove($existingRouteName);
-            $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+            $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
         } else {
             // add an additional strict route based on the base route and current entity
             $strictRoute = $routes->cloneRoute($route);
@@ -155,13 +184,10 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             $requirements = $strictRoute->getRequirements();
             unset($requirements[self::ENTITY_ATTRIBUTE]);
             $strictRoute->setRequirements($requirements);
-            $routes->insert(
-                $routes->generateRouteName($routeName),
-                $strictRoute,
-                $routeName,
-                true
-            );
+            $cache->add(sprintf('%s_%d', $routes->generateRouteName($routeName), $cache->count()), $strictRoute);
         }
+
+        return $cache;
     }
 
     /**
@@ -171,6 +197,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      * @param string                  $routeName
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
+     * @param RouteCollection         $cache
+     *
+     * @return RouteCollection
      */
     protected function addSubresources(
         $action,
@@ -178,7 +207,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         $entityClass,
         $routeName,
         Route $route,
-        RouteCollectionAccessor $routes
+        RouteCollectionAccessor $routes,
+        RouteCollection $cache
     ) {
         $entitySubresources = $this->subresourcesProvider->getSubresources(
             $entityClass,
@@ -187,7 +217,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         );
         $subresources = $entitySubresources->getSubresources();
         if (empty($subresources)) {
-            return;
+            return $cache;
         }
 
         $entityRoutePath = str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath());
@@ -201,10 +231,13 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 $route->getMethods()
             );
             if ($existingRoute) {
+                // add cached routes before the current route and reset the cache
+                if ($cache->count()) {
+                    $routes->insertCollection($cache, $routeName, true);
+                    $cache = new RouteCollection();
+                }
                 // move existing route before the current route
-                $existingRouteName = $routes->getName($existingRoute);
-                $routes->remove($existingRouteName);
-                $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+                $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
@@ -221,14 +254,11 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 unset($requirements[self::ENTITY_ATTRIBUTE]);
                 unset($requirements[self::ASSOCIATION_ATTRIBUTE]);
                 $strictRoute->setRequirements($requirements);
-                $routes->insert(
-                    $routes->generateRouteName($routeName),
-                    $strictRoute,
-                    $routeName,
-                    true
-                );
+                $cache->add(sprintf('%s_%d', $routes->generateRouteName($routeName), $cache->count()), $strictRoute);
             }
         }
+
+        return $cache;
     }
 
     /**

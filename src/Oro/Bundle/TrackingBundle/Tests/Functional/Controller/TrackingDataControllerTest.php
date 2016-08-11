@@ -32,6 +32,8 @@ class TrackingDataControllerTest extends WebTestCase
         $this->assertArrayHasKey('success', $result);
         $this->assertArrayNotHasKey('errors', $result);
         $this->assertArrayNotHasKey('validation', $result);
+
+        $this->runCommand('oro:cron:batch:cleanup', ['-i' => '1 day']);
     }
 
     /**
@@ -82,6 +84,8 @@ class TrackingDataControllerTest extends WebTestCase
         foreach ($expectedMessages as $expectedMessage) {
             $this->assertContains($expectedMessage, $errors);
         }
+
+        $this->runCommand('oro:cron:batch:cleanup', ['-i' => '1 day']);
     }
 
     /**

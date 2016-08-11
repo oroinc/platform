@@ -13,9 +13,12 @@ use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class RestrictionsExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * @var WorkflowManager
      */
@@ -89,14 +92,6 @@ class RestrictionsExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['disable_workflow_restrictions' => false]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 
     /**

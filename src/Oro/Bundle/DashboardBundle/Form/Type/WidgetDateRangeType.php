@@ -35,6 +35,14 @@ class WidgetDateRangeType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return self::NAME;
     }
 
@@ -57,14 +65,15 @@ class WidgetDateRangeType extends AbstractType
             'choices'                => $view->children['type']->vars['choices'],
             'typeValues'             => $view->vars['type_values'],
             'dateParts'              => $view->vars['date_parts'],
+            'valueTypes'             => $form->getConfig()->getOption('value_types'),
             'externalWidgetOptions'  => array_merge(
                 $view->vars['widget_options'],
                 ['dateVars' => $view->vars['date_vars']]
             ),
             'templateSelector'       => '#date-filter-template-wo-actions',
             'criteriaValueSelectors' => [
-                'type'      => 'select',
-                'date_type' => 'select[name][name!=date_part]',
+                'type'      => 'select[name=date_part], input[name$=\"[type]\"]',
+                'date_type' => 'input[name$=\"[type]\"]',
                 'date_part' => 'select[name=date_part]',
                 'value'     => [
                     'start' => 'input[name=\"' . $view->vars['full_name'] . '[value][start]\"]',

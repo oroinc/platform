@@ -31,7 +31,8 @@ oro_api:
 
 If an auto-generated alias for your entity looks bad for you, you can change it in `Resources/config/oro/entity.yml`. More details you can find in [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
-Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. Also please see other [debug commands](./debug_commands.md) that may be helpful.
+Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. If you use API sandbox run `oro:api:doc:cache:clear` CLI command to apply the changes for it. Also please see other [debug commands](./debug_commands.md) that may be helpful.
+
 
 Configuration structure
 -----------------------
@@ -210,6 +211,7 @@ This section describes entity fields' configuration.
 * **meta_property** *boolean* A flag indicates whether the field represents a meta information. For JSON.API such fields will be returned in [meta](http://jsonapi.org/format/#document-meta) section. By default `false`.
 * **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
+* **depends_on** *string[]* A list of fields on which this field depends on. This option can be helpful for computed fields. These fields will be loaded from the database even if they are excluded.
 
 Examples:
 
@@ -268,6 +270,11 @@ oro_api:
                     data_type: integer # the data type of an identifier field of the target
                     target_class: Acme\Bundle\AcmeBundle\Api\Model\AcmeTargetEntity
                     target_type: collection
+
+                # computed field
+                field9:
+                    data_type: string
+                    depends_on: [field1]
 ```
 
 "filters" configuration section

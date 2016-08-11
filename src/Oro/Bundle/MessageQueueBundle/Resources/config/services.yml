@@ -1,0 +1,41 @@
+services:
+    oro_message_queue.consumption.extensions:
+        class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
+        public: false
+        arguments:
+            - []
+
+    oro_message_queue.consumption.signal_extension:
+        class: 'Oro\Component\MessageQueue\Consumption\Extension\SignalExtension'
+        public: false
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.docrine_ping_connection_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
+        public: false
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.docrine_clear_identity_map_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
+        public: false
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.queue_consumer:
+        class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
+        arguments:
+            - '@oro_message_queue.transport.connection'
+            - '@oro_message_queue.consumption.extensions'
+
+    oro_message_queue.command.consume_messages:
+        class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
+        arguments:
+            - '@oro_message_queue.consumption.queue_consumer'
+        tags:
+            - { name: 'console.command' }

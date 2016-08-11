@@ -744,10 +744,8 @@ services:
     oro_email.manager.email_attachment_manager:
         class: %oro_email.manager.email_attachment_manager.class%
         arguments:
-            - '@knp_gaufrette.filesystem_map'
+            - '@oro_attachment.file_manager'
             - '@doctrine.orm.entity_manager'
-            - '@kernel'
-            - '@oro_security.security_facade.link'
             - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
@@ -781,8 +779,8 @@ services:
     oro_email.email_attachment_transformer:
         class: %oro_email.email_attachment_transformer.class%
         arguments:
-            - '@knp_gaufrette.filesystem_map'
             - '@oro_email.form.factory'
+            - '@oro_attachment.file_manager'
             - '@oro_attachment.manager'
             - '@oro_email.manager.email_attachment_manager'
 
@@ -911,6 +909,8 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: %oro_email.autocomplete.mailbox_user_search_handler.class%

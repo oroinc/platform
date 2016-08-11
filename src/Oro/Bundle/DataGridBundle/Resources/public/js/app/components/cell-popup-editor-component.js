@@ -466,14 +466,28 @@ define(function(require) {
         onSaveSuccess: function(response) {
             if (!this.options.cell.disposed && this.options.cell.$el) {
                 if (response) {
-                    var routeParametersRenameMap = _.invert(this.options.cell.column.get('metadata').inline_editing.
-                        save_api_accessor.route_parameters_rename_map);
-                    _.each(response, function(item, i) {
-                        var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
-                        if (this.options.cell.model.get(propName) !== void 0) {
-                            this.options.cell.model.set(propName, item);
-                        }
-                    }, this);
+                    if (response.hasOwnProperty('fields') ||
+                        /*
+                         * Make cell work with responses sending changed values directly
+                         * to not make bc break
+                         */
+                        _.every(_.keys(response), function(property) {
+                            return this.options.cell.model.attributes.hasOwnProperty(property);
+                        }, this)
+                    ) {
+                        var fields = response.hasOwnProperty('fields') ? response.fields : response;
+                        var routeParamsRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
+                        _.each(fields, function(item, i) {
+                            var propName = routeParamsRenameMap.hasOwnProperty(i) ? routeParamsRenameMap[i] : i;
+                            if (this.options.cell.model.get(propName) !== void 0) {
+                                this.options.cell.model.set(propName, item);
+                            }
+                        }, this);
+                    } else if (response.hasOwnProperty('httpMethod') && response.httpMethod === 'DELETE') {
+                        _.each(this.options.save_api_accessor.routeParametersRenameMap, function(v, property) {
+                            this.options.cell.model.set(property, '');
+                        }, this);
+                    }
                 }
                 this.options.cell.$el
                     .removeClass('save-fail')
@@ -487,7 +501,10 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
-            var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
+            var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON ?
+                jqXHR.responseJSON.code :
+                jqXHR.status;
+
             var errors = [];
             var fieldLabel;
 
@@ -547,6 +564,20 @@ define(function(require) {
                         backendErrors = {value: responseErrors.errors[0]};
                     }
                     this.errorHolderView.setErrorMessages(backendErrors);
+                }
+            } else if (_.isArray(jqXHR.responseJSON)) {
+                var allErrors = _.chain(jqXHR.responseJSON)
+                    .map(_.property('detail'))
+                    .filter()
+                    .value();
+
+                if (this.disposed || this.options.cell.disposed) {
+                    _.each(allErrors, _.partial(mediator.execute, 'showMessage', 'error'));
+                } else {
+                    var error = _.first(allErrors);
+                    if (error) {
+                        this.errorHolderView.setErrorMessages({value: error});
+                    }
                 }
             }
         }

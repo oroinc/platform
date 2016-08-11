@@ -1,0 +1,17 @@
+services:
+    oro_attachment.api.customize_loaded_data.compute_file_content:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
+        arguments:
+            - '@oro_attachment.file_manager'
+            - '@logger'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\AttachmentBundle\Entity\File }
+            - { name: monolog.logger, channel: api }
+
+    oro_attachment.api.add_file_content_form_listener:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\AddFileContentFormListener
+        arguments:
+            - '@oro_attachment.file_manager'
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 90 }
+            - { name: oro.api.processor, action: update, group: transform_data, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 90 }

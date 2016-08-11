@@ -6,7 +6,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var console = window.console;
 
-    var gridViewsBuilder = {
+    var inlineEdititngBuilder = {
         /**
          * This column type is used by default for editing
          */
@@ -124,7 +124,7 @@ define(function(require) {
                 }
                 if (!editor.view) {
                     options.metadata.inline_editing.defaultEditorsLoadPromise.then(function(defaultEditors) {
-                        var realization = defaultEditors[(columnMeta.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE)];
+                        var realization = defaultEditors[columnMeta.type || inlineEdititngBuilder.DEFAULT_COLUMN_TYPE];
                         editor.view = realization;
                         if (realization === void 0) {
                             columnMeta.inline_editing.enable = false;
@@ -182,5 +182,5 @@ define(function(require) {
         }
     };
 
-    return gridViewsBuilder;
+    return inlineEdititngBuilder;
 });
