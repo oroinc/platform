@@ -84,7 +84,7 @@ class LanguageVoterTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'abstain when not supported attribute' => [
-                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'en']),
+                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'en', 'enabled' => true]),
                 'attribute' => 'TEST',
                 'expected' => VoterInterface::ACCESS_ABSTAIN
             ],
@@ -98,13 +98,23 @@ class LanguageVoterTest extends \PHPUnit_Framework_TestCase
                 'attribute' => 'EDIT',
                 'expected' => VoterInterface::ACCESS_ABSTAIN
             ],
-            'abstain when not default language' => [
-                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'fr']),
+            'abstain when not default language and disabled' => [
+                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'fr', 'enabled' => false]),
                 'attribute' => 'EDIT',
                 'expected' => VoterInterface::ACCESS_ABSTAIN
             ],
-            'denied when default language' => [
-                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'en']),
+            'abstain when not default language and enabled' => [
+                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'fr', 'enabled' => true]),
+                'attribute' => 'EDIT',
+                'expected' => VoterInterface::ACCESS_ABSTAIN
+            ],
+            'abstain when default language and disabled' => [
+                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'en', 'enabled' => false]),
+                'attribute' => 'EDIT',
+                'expected' => VoterInterface::ACCESS_ABSTAIN
+            ],
+            'denied when default language and enabled' => [
+                'object' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'en', 'enabled' => true]),
                 'attribute' => 'EDIT',
                 'expected' => VoterInterface::ACCESS_DENIED
             ]

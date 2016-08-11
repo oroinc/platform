@@ -47,7 +47,7 @@ class LanguageVoter extends AbstractEntityVoter
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
-        if ($this->isDefaultLanguage()) {
+        if ($this->isDefaultLanguage() && $this->object->isEnabled()) {
             return self::ACCESS_DENIED;
         }
 
