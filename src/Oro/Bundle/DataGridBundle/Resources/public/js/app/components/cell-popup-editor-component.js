@@ -501,7 +501,6 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
-            debugger;
             var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON ?
                 jqXHR.responseJSON.code :
                 jqXHR.status;
