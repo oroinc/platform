@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\SetDataTransformers;
+use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataTransformers;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataTransformersTest extends ConfigProcessorTestCase
@@ -155,7 +155,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                     'data_transformer' => [
                         $this->getMock('Oro\Component\EntitySerializer\DataTransformerInterface')
                     ]
-                ]
+                ],
             ]
         ];
 
@@ -190,7 +190,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->exactly(1))
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME, false)
             ->willReturn($metadata);
@@ -204,6 +204,91 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         $expectedConfig['fields']['field1']['data_transformer'] = [$timeDataTransformer];
         $expectedConfig['fields']['field3']['data_transformer'] = [$timeDataTransformer];
         $expectedConfig['fields']['field5']['data_transformer'] = [$timeDataTransformer];
+        $this->assertConfig(
+            $expectedConfig,
+            $configObject
+        );
+    }
+
+    public function testProcessForManageableEntityWithAssociation()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'fields' => [
+                        'field11' => null,
+                        'field12' => null,
+                        'field13' => [
+                            'property_path' => 'realField13'
+                        ],
+                    ]
+                ],
+            ]
+        ];
+
+        $timeDataTransformer = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $this->dataTransformerRegistry->expects($this->any())
+            ->method('getDataTransformer')
+            ->willReturnMap(
+                [
+                    ['time', $timeDataTransformer],
+                ]
+            );
+
+        $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, false, $metadata],
+                    ['Test\Association1Target', true, $association1Metadata],
+                ]
+            );
+
+        $metadata->expects($this->exactly(1))
+            ->method('hasAssociation')
+            ->willReturnMap(
+                [
+                    ['association1', true],
+                ]
+            );
+        $metadata->expects($this->exactly(1))
+            ->method('getAssociationTargetClass')
+            ->willReturnMap(
+                [
+                    ['association1', 'Test\Association1Target'],
+                ]
+            );
+
+        $association1Metadata->expects($this->exactly(3))
+            ->method('hasField')
+            ->willReturnMap(
+                [
+                    ['field11', true],
+                    ['field12', true],
+                    ['realField13', true],
+                ]
+            );
+        $association1Metadata->expects($this->exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap(
+                [
+                    ['field11', 'time'],
+                    ['field12', 'integer'],
+                    ['realField13', 'time'],
+                ]
+            );
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $expectedConfig = $config;
+        $expectedConfig['fields']['association1']['fields']['field11']['data_transformer'] = [$timeDataTransformer];
+        $expectedConfig['fields']['association1']['fields']['field13']['data_transformer'] = [$timeDataTransformer];
         $this->assertConfig(
             $expectedConfig,
             $configObject
