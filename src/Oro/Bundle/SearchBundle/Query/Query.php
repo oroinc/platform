@@ -172,6 +172,28 @@ class Query
     }
 
     /**
+     * @param $fields
+     * @return $this
+     */
+    public function addSelect($fields)
+    {
+        if (empty($fields)) {
+            return $this;
+        }
+
+        if (is_array($fields)) {
+            foreach ($fields as $value) {
+                $this->addSelect($value);
+            }
+            return $this;
+        }
+
+        $this->select[$fields] = $fields; // do not allow repeating fields
+
+        return $this;
+    }
+
+    /**
      * Insert entities array to query from
      *
      * @param array|string $entities
@@ -536,24 +558,6 @@ class Query
     }
 
     /**
-     * @param string $fieldName
-     * @param string $fieldType
-     * @return $this
-     */
-    public function addSelect($fieldName, $fieldType = self::TYPE_TEXT)
-    {
-        $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);
-
-        if (!is_string($field)) {
-            return $this;
-        }
-
-        $this->select[$field] = $field; // do not allow repeating fields
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     private function getStringColumns()
@@ -564,17 +568,9 @@ class Query
             return '';
         }
 
-        $result = [];
-        $columns = [];
+        $result = implode(', ', $selects);
 
-        foreach ($selects as $select) {
-            $parts = Criteria::explodeFieldTypeName($select);
-            $columns[] = $parts[1];
-        }
-
-        $result = implode(', ', $columns);
-
-        if (count($columns) > 1) {
+        if (count($selects) > 1) {
             $result = '('.$result.')';
         }
 

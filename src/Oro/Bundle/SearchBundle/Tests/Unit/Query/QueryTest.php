@@ -148,6 +148,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         // this is not a bug, just testing dupe handling
         $query->addSelect('name', Query::TYPE_TEXT);
         $this->assertCount(3, $query->getSelect());
-        $this->assertEquals(['text.name', 'integer.status', 'datetime.date'], $query->getSelect());
+        $query->addSelect(['name', 'status', 'email']);
+        $this->assertCount(4, $query->getSelect());
+        $this->assertEquals(['name', 'status', 'date', 'email'], $query->getSelect());
     }
 }
