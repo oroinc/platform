@@ -501,6 +501,7 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
+            debugger;
             var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON ?
                 jqXHR.responseJSON.code :
                 jqXHR.status;
@@ -558,6 +559,10 @@ define(function(require) {
                     }
                 } else {
                     fieldErrors = _.result(responseErrors.children, this.options.cell.column.get('name'));
+                    if (!fieldErrors && this.options.viewOptions) {
+                        fieldErrors = _.result(responseErrors.children, this.options.viewOptions.value_field_name);
+                    }
+
                     if (fieldErrors && _.isArray(fieldErrors.errors)) {
                         backendErrors = {value: fieldErrors.errors[0]};
                     } else if (_.isArray(responseErrors.errors)) {
