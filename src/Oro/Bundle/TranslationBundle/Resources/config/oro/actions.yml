@@ -88,6 +88,11 @@ operations:
                 attribute: $.isAvailableInstall
         preconditions:
             @eq: [$.isAvailableInstall, true]
+        actions:
+            - '@flash_message':
+                message: oro.translation.language.message.installed
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
 
     oro_translation_language_update:
         label: oro.translation.action.update
@@ -103,6 +108,11 @@ operations:
                 attribute: $.isAvailableUpdate
         preconditions:
             @eq: [$.isAvailableUpdate, true]
+        actions:
+            - '@flash_message':
+                message: oro.translation.language.message.updated
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
 
 action_groups:
     oro_translation_language_set_enabled:

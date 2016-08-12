@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Helper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
-
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
 class LanguageHelper
@@ -64,15 +63,13 @@ class LanguageHelper
         $stats = $this->getStatistic();
 
         // TODO: should be fixed in https://magecore.atlassian.net/browse/BAP-10608
-        $stats['en'] = [
-            'translationStatus' => 100,
-        ];
+        $stats['en'] = ['translationStatus' => 100];
 
         return isset($stats[$language->getCode()]) ? (int)$stats[$language->getCode()]['translationStatus'] : null;
     }
 
     /**
-     * @return type
+     * @return array
      */
     protected function getStatistic()
     {

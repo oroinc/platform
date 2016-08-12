@@ -24,7 +24,6 @@ oro.translation:
         installed_build_date.label: 'Installed Build Date'
         organization.label: 'Organization'
         status:
-            label: 'Status'
             enabled: 'Enabled'
             disabled: 'Disabled'
         translation_status:
@@ -37,6 +36,8 @@ oro.translation:
             disabled: 'Language has been disabled'
             enabled: 'Language has been enabled'
             added: 'Language has been added'
+            installed: 'Language has been installed'
+            updated: 'Language has been updated'
 
     menu:
         languages.label: Languages

@@ -44,19 +44,11 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildBefore()
     {
-        $event = new BuildBefore(
-            $this->getMock(DatagridInterface::class),
-            DatagridConfiguration::create([])
-        );
+        $event = new BuildBefore($this->getMock(DatagridInterface::class), DatagridConfiguration::create([]));
 
         $this->listener->onBuildBefore($event);
 
-        $this->assertEquals(
-            [
-                'columns' => $this->getColumns(),
-            ],
-            $event->getConfig()->toArray()
-        );
+        $this->assertEquals(['columns' => $this->getColumns()], $event->getConfig()->toArray());
     }
 
     public function testOnBuildBeforeAndExistingDefinition()
@@ -78,16 +70,10 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onBuildBefore($event);
 
         $columns = $this->getColumns();
-
         $columns[LanguageListener::COLUMN_STATUS]['label'] = 'custom_label1';
         $columns[LanguageListener::COLUMN_COVERAGE]['label'] = 'custom_label2';
 
-        $this->assertEquals(
-            [
-                'columns' => $columns,
-            ],
-            $event->getConfig()->toArray()
-        );
+        $this->assertEquals(['columns' => $columns], $event->getConfig()->toArray());
     }
 
     public function testOnResultAfter()

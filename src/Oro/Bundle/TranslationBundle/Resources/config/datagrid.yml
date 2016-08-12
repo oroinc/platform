@@ -19,7 +19,7 @@ datagrid:
                 frontend_type: html
                 template: OroTranslationBundle:Language:Datagrid/code.html.twig
             enabled:
-                label: oro.translation.language.status.label
+                label: oro.translation.language.enabled.label
                 type: twig
                 frontend_type: html
                 template: OroTranslationBundle:Language:Datagrid/enabled.html.twig

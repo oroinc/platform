@@ -44,7 +44,7 @@ class LanguageListener
         $records = $event->getRecords();
 
         foreach ($records as $record) {
-            /* @var $language Language */
+            /** @var Language $language */
             $language = $this->doctrineHelper->getEntity(Language::class, $record->getValue('id'));
 
             $record->setValue(self::STATS_COVERAGE_NAME, $this->languageHelper->getTranslationStatus($language));
@@ -85,6 +85,6 @@ class LanguageListener
             isset($columns[self::COLUMN_STATUS]) ? $columns[self::COLUMN_STATUS] : []
         );
 
-        $columns = $config->offsetSetByPath('[columns]', $columns);
+        $config->offsetSetByPath('[columns]', $columns);
     }
 }

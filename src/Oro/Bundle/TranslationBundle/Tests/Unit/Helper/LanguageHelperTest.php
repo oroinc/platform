@@ -6,6 +6,9 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var TranslationStatisticProvider|\PHPUnit_Framework_MockObject_MockObject */
@@ -46,9 +49,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsAvailableInstallTranslatesAndUnknownCode()
     {
-        $this->provider->expects($this->once())
-            ->method('get')
-            ->willReturn([]);
+        $this->provider->expects($this->once())->method('get')->willReturn([]);
 
         $language = (new Language())->setCode('unknown');
 
@@ -86,9 +87,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsAvailableUpdateTranslatesAndUnknownCode()
     {
-        $this->provider->expects($this->once())
-            ->method('get')
-            ->willReturn([]);
+        $this->provider->expects($this->once())->method('get')->willReturn([]);
 
         $language = (new Language())->setCode('unknown')->setInstalledBuildDate(new \DateTime());
 
