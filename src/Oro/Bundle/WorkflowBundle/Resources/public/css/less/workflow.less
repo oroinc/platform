@@ -166,6 +166,7 @@ table.grid {
 
 .workflow-steps {
   padding: 0 10px;
+  vertical-align: middle;
 
   &:last-child {
     padding: 0 0 0 10px;
@@ -173,16 +174,17 @@ table.grid {
 }
 
 .workflow-steps-list {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
-  white-space: nowrap;
-  font-size: 0;
 }
 
 .workflow-steps-item {
-  display: inline-block;
-  font-size: 13px;
+  display: table-cell;
+  vertical-align: middle;
 }
 
 .workflow-ordered-steps {
@@ -290,6 +292,16 @@ table.grid {
   }
 }
 
+.workflow-step-name {
+  display: block;
+  padding: 0 10px 0 20px;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
 .workflow-steps-item-arrow-container {
   position: relative;
   box-sizing: border-box;
@@ -342,8 +354,19 @@ table.grid {
   }
 }
 
-.workflow-unordered-steps {
+.workflow-not-started {
+  .workflow-steps-item-arrow-container {
+    border-top: 1px solid #f3f3f3;
+    border-bottom: 1px solid #f3f3f3;
+    color: #909092;
+    background: #f3f3f3;
 
+    .workflow-step-arrow-right {
+      &:after {
+        border-left: 9px solid #f3f3f3;
+      }
+    }
+  }
 }
 
 .workflow-controls {
