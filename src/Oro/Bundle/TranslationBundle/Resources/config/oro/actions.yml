@@ -55,11 +55,6 @@ operations:
                 method: isAvailableInstallTranslates
                 method_parameters: [$.data]
                 attribute: $.isAvailableInstall
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: isAvailableUpdateTranslates
-                method_parameters: [$.data]
-                attribute: $.isAvailableUpdate
         preconditions:
             @eq: [$.isAvailableInstall, true]
 

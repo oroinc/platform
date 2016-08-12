@@ -25,7 +25,7 @@ oro.translation:
         translation_status:
             label: 'Translation Status'
             up_to_date: 'Up to date'
-            update_needed: 'Update needed'
+            update_needed: 'Available update'
         translation_completeness.label: 'Translation Completeness'
 
         action:
