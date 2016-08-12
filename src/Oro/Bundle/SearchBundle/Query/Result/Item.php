@@ -51,7 +51,7 @@ class Item
     /**
      * @var array
      */
-    protected $selectedData;
+    protected $selectedData = [];
 
     /**
      * @param ObjectManager $em
@@ -77,7 +77,7 @@ class Item
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
         $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
-        $this->selectedData = $selectedData;
+        $this->selectedData = is_array($selectedData) ? $selectedData : [];
     }
 
     /**
