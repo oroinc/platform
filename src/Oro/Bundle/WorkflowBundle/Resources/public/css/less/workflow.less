@@ -127,19 +127,19 @@ table.grid {
 }
 
 .widget-content-bordered {
-  padding-top: 10px;
+  padding-top: 7px;
   margin-left: -20px;
   border-top: 1px solid #f2f2f2;
 }
 
 .workflow-entity {
   width: 100%;
-  margin-bottom: 5px;
+  margin-bottom: 7px;
   border-collapse: collapse;
   border-spacing: 0;
 
   &:last-child {
-    margin-bottom: 10px;
+    margin-bottom: 7px;
   }
 }
 
@@ -202,6 +202,10 @@ table.grid {
   &.active {
     z-index: 3;
     padding: 0 5px 0 4px;
+
+    &:first-child {
+      padding-left: 0;
+    }
 
     &:last-child {
       .workflow-steps-item-arrow-container {
@@ -398,7 +402,7 @@ table.grid {
 
 .workflow-collapse-button {
   position: absolute;
-  left: 0;
+  left: 22px;
   top: 7px;
   display: block;
   width: 14px;
