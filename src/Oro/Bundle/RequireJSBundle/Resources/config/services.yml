@@ -12,8 +12,10 @@ services:
             - { name: twig.extension }
 
     oro_requirejs.cache:
-        parent: oro.cache.abstract
+        parent: doctrine_cache.abstract.file_system
         public: false
+        arguments:
+            - '%kernel.cache_dir%/oro_data'
         calls:
             - [ setNamespace, [ 'oro_requirejs' ] ]
 
