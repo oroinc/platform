@@ -117,8 +117,25 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadataForClass');
 
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Association1Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -128,8 +145,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'association1' => [
-                        'target_class'     => 'Test\Association1Target',
-                        'exclusion_policy' => 'all'
+                        'target_class'           => 'Test\Association1Target',
+                        'exclusion_policy'       => 'all',
+                        'identifier_field_names' => ['id']
                     ],
                 ]
             ],
@@ -521,8 +539,25 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Association1Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -534,7 +569,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'id'           => null,
                     'association1' => [
-                        'exclusion_policy' => 'all'
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'identifier_field_names' => ['id']
                     ],
                 ]
             ],
