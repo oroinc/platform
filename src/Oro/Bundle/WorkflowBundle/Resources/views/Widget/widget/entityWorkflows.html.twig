@@ -1,45 +1,60 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 <div class="widget-content widget-content-bordered">
-    {% for workflow in workflows %}
-        <table class="workflow-entity">
-            <tr>
-                <td class="workflow-label"><div class="workflow-label-text">{{ workflow.label|trans }}</div></td>
-                <td class="workflow-content-container">
-                    <table class="workflow-content">
-                        <tr>
-                            <td class="workflow-steps">
-                                {% set isOrdered = workflow.stepsData.is_ordered %}
-                                {% set steps = workflow.stepsData.steps %}
-                                <ul class="workflow-steps-list {% if not workflow.isStarted %}workflow-not-started{% endif %}">
-                                    {% for step in steps %}
-                                        {% set active = step.active %}
-                                        {% set possibleStepsCount = step.possibleStepsCount %}
-                                        {% if isOrdered %}
-                                            <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
-                                                <div class="workflow-steps-item-arrow-container" title="{{ step.label|trans }}">
-                                                    <span class="workflow-step-arrow-left"></span>
-                                                    <span class="workflow-step-arrow-right"></span>
-                                                    <span class="workflow-step-name">{{ step.label|trans }}</span>
-                                                </div>
-                                            </li>
-                                        {% else %}
-                                            <li class="workflow-steps-item workflow-unordered-steps">
-                                                <span>{{ step.label|trans }}</span>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            </td>
-                            {% if workflow.transitionsData|length != 0 %}
-                                <td class="workflow-controls">
-                                    {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
-                                </td>
-                            {% endif %}
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    {% endfor %}
+    <div class="workflow-collapse" {% if workflows|length > 1 %}
+        data-page-component-module="oroui/js/app/components/jquery-widget-component"
+        data-page-component-options="{{ {
+            widgetModule: 'oroui/js/widget/collapse-widget',
+            storageKey: 'entityWorkflow' ~ entityId
+        }|json_encode() }}"
+            {% endif %}>
+        <span class="workflow-collapse-button" data-collapse-trigger></span>
+        {% for workflow in workflows %}
+            {% if loop.index == 2 %}
+            <div class="workflow-collapse-container" data-collapse-container>
+            {% endif %}
+                <table class="workflow-entity">
+                    <tr>
+                        <td class="workflow-label"><div class="workflow-label-text">{{ workflow.label|trans }}</div></td>
+                        <td class="workflow-content-container">
+                            <table class="workflow-content">
+                                <tr>
+                                    <td class="workflow-steps">
+                                        {% set isOrdered = workflow.stepsData.is_ordered %}
+                                        {% set steps = workflow.stepsData.steps %}
+                                        <ul class="workflow-steps-list {% if not workflow.isStarted %}workflow-not-started{% endif %}">
+                                            {% for step in steps %}
+                                                {% set active = step.active %}
+                                                {% set possibleStepsCount = step.possibleStepsCount %}
+                                                {% if isOrdered %}
+                                                    <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
+                                                        <div class="workflow-steps-item-arrow-container" title="{{ step.label|trans }}">
+                                                            <span class="workflow-step-arrow-left"></span>
+                                                            <span class="workflow-step-arrow-right"></span>
+                                                            <span class="workflow-step-name">{{ step.label|trans }}</span>
+                                                        </div>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="workflow-steps-item workflow-unordered-steps">
+                                                        <span>{{ step.label|trans }}</span>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    {% if workflow.transitionsData|length != 0 %}
+                                        <td class="workflow-controls">
+                                            {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            {% if loop.last %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>

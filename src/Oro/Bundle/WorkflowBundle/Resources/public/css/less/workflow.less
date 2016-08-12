@@ -375,5 +375,45 @@ table.grid {
   text-align: right;
 }
 
+.workflow-collapse {
+  position: relative;
+  padding-left: 22px;
+
+  &.expanded {
+    .workflow-collapse-button {
+      &:before {
+        content: "-";
+      }
+    }
+
+    .workflow-collapse-container {
+      display: block;
+    }
+  }
+}
+
+.workflow-collapse-container {
+  display: none;
+}
+
+.workflow-collapse-button {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #ababab;
+  border-radius: 3px;
+  color: #ababab;
+  line-height: 12px;
+  text-align: center;
+  cursor: pointer;
+
+  &:before {
+    content: "+"
+  }
+}
+
 /* mobile version */
 @import "mobile/workflow";
