@@ -4,14 +4,18 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Doctrine\ORM\EntityManager;
 use Nelmio\Alice\Instances\Collection as AliceCollection;
+use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 use Oro\Bundle\AddressBundle\Entity\Region;
+use OroB2B\Bundle\AccountBundle\Entity\AccountUserAddress;
 use OroB2B\Bundle\AccountBundle\Entity\AccountUserRole;
 use OroB2B\Bundle\ProductBundle\Entity\ProductUnit;
+
+
 
 class ReferenceRepositoryInitializer
 {
@@ -74,6 +78,22 @@ class ReferenceRepositoryInitializer
         /** @var ProductUnit item*/
         $item = $repository->findOneBy(['code' => 'item']);
         $this->referenceRepository->set('item', $item);
+
+        /** @var AddressTypeRepository $repository */
+        $repository = $this->em->getRepository('OroAddressBundle:AddressType');
+        /** @var AddressType $billingType*/
+        $billingType = $repository->findOneBy(['name' => 'billing']);
+        $this->referenceRepository->set('billingType', $billingType);
+        /** @var AddressType $shippingType*/
+        $shippingType = $repository->findOneBy(['name' => 'shipping']);
+        $this->referenceRepository->set('shippingType', $shippingType);
+
+//        /** @var AccountUserAddressRepository $repository */
+//        $repository = $this->em->getRepository('OroB2BAccountBundle:AccountUserAddress');
+//        /** @var AccountUserAddress $address1 */
+//        $address1 = $repository->findOneBy(['id'=> '1']);
+//        $this->referenceRepository->set('address1', $address1);
+
     }
 
     /**
