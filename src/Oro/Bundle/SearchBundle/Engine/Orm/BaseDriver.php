@@ -486,7 +486,6 @@ abstract class BaseDriver
     {
         $mappingConfig = $query->getMappingConfig();
         $entityName = $query->getEntityByAlias($query->getFrom()[0]);
-        $entityMappingConfig = [];
 
         if (isset($mappingConfig[$entityName])) {
             $entityMappingConfig = $mappingConfig[$entityName];
