@@ -315,12 +315,6 @@ Corresponding block type classes was removed.
 - Layout theme additional configuration such as assets, images or requirejs from now placed in `layout/{theme_name}/config` folder [Config definition](./src/Oro/Bundle/LayoutBundle/Resources/doc/config_definition.md).
 - Changed current expression language in layouts to symfony expression language, for details please check out documentation at
  [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
-- Interface `Oro\Component\Layout\DataProviderInterface` was removed.
-- Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
-- Methods `Oro\Component\Layout\DataAccessorInterface::getIdentifier()` and `Oro\Component\Layout\DataAccessorInterface::get()`  was removed.
-- Added class `Oro\Component\Layout\DataProviderDecorator`.
-- Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
-- Method `Oro\Component\Layout\ContextDataCollection::getIdentifier()` was removed.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
