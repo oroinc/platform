@@ -1,31 +1,24 @@
 @import '_config.scss';
 
 .input {
-    display: inline-block;
+    display: block;
     margin: 0;
-    padding: 8px 12px 6px 12px;
+    padding: 10px 14px 12px 14px;
 
-    font: 400 #{$input-font-size}/#{$input-line-height} $input-font-family;
     vertical-align: middle;
 
-    color: #000;
+
+    color: red;
     border-radius: 4px;
-    border: 0;
-    background: transparent;
-    box-shadow: inset 1px 0 0 0 $input-color,
-                inset 0 1px 0 0 $input-color,
-                inset -1px 0 0 0 $input-color,
-                0 1px $input-color;
+    border: 1px solid #b7b7b7;
+
     appearance: none;
+
+    &:hover {
+        border-color: #626365;
+    }
 
     &:focus {
         outline: none;
-        box-shadow: inset 2px 0 0 0 $input-color,
-                    inset 0 2px 0 0 $input-color,
-                    inset -2px 0 0 0 $input-color,
-                    0 2px $input-color; }
-
-    &::placeholder {
-        color: #000;
     }
 }

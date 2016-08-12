@@ -1,0 +1,64 @@
+@import './_config';
+
+.grid {
+    &__row {
+        margin-bottom: $offset-y;
+
+        @include clearfix;
+
+        &--offset {
+            &-none {
+                margin-bottom: 0;
+            }
+
+            &-s {
+                margin-bottom: 5px;
+            }
+
+            &-m {
+                margin-bottom: $offset-y-m;
+            }
+        }
+
+        &--has-twin-row {
+            &:not(:last-child) {
+                margin-bottom: 50px;
+            }
+        }
+    }
+
+    &__column {
+        &-half {
+            width: (100% - $oro-grid-offset) / 2;
+
+            float: left;
+
+            &:first-child {
+                margin-right: $oro-grid-offset;
+            }
+
+            @media (max-width: 991px) {
+                width: 100%;
+                margin-right: auto;
+
+                clear: left;
+            }
+        }
+
+        &--both {
+            clear: both;
+        }
+
+        &--offset {
+            &-m {
+                margin-right: $oro-grid-offset;
+            }
+        }
+    }
+
+    @for $i from 1 through $oro-grid-count {
+        &__column-#{$i} {
+            width: (($i* 100%) / $oro-grid-count);
+        }
+    }
+}

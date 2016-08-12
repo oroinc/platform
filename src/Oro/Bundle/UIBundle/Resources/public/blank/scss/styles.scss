@@ -1,7 +1,9 @@
-@import 'components/page/page.scss';
-@import 'components/link/link.scss';
-@import 'components/icon/icon.scss';
-@import 'components/input/input.scss';
-@import 'components/checkbox/checkbox.scss';
-@import 'components/button/button.scss';
-@import 'components/presentation/presentation.scss';
+@import './_global-settings';
+
+@import 'components/page/page';
+@import 'components/page-title/page-title';
+@import 'components/link/link';
+@import 'components/icon/icon';
+@import 'components/centered-container/centered-container';
+@import 'components/grid/grid';
+@import 'components/notifications/notifications';

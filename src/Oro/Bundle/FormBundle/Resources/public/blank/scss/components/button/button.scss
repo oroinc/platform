@@ -2,24 +2,29 @@
 
 .button {
     display: inline-block;
-    margin: 0;
-    padding: 6px 12px;
-
-    font: 400 #{$button-font-size}/#{$button-line-height} $button-font-family;
+    padding: 15px 18px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
 
-    cursor: pointer;
+    background-color: #acacac;
 
-    color: #fff;
-    border-radius: 4px;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
     border: 1px solid transparent;
-    background: $button-color;
-    appearance: none;
+    border-radius: 4px;
 
     &:hover {
-        background: lighten($button-color, 5%);
+        background-color: #acacac;
     }
 
     &:active {
@@ -28,10 +33,10 @@
     }
 
     &--action {
-        background: $button-color-action;
+
 
         &:hover {
-            background: lighten($button-color-action, 5%);
+
         }
     }
 }

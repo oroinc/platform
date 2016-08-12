@@ -17,7 +17,6 @@
         &:focus {
             ~ .checkbox__icon {
                 &::before {
-                    outline: 2px solid rgba($checkbox-color, .7);
                     outline-offset: -2px;
                 }
             }
@@ -26,10 +25,6 @@
         &:checked {
             ~ .checkbox__icon {
                 &::before {
-                    // icon--checkbox
-                    content: $checkbox-icon-checkbox;
-
-                    color: $checkbox-color-checked;
                 }
             }
         }
@@ -42,17 +37,10 @@
             display: inline-block;
 
             font-family: 'Icon';
-            // icon--box
-            content: $checkbox-icon-box;
-
-            color: $checkbox-color;
         }
     }
 
     &__text {
         vertical-align: middle;
-
-        // TODO: align checkbox and text in Firefox
-        // vertical-align: text-top;
     }
 }

@@ -1,4 +1,4 @@
 // Colors
-$link-color: $lightblue-color !default;
-$link-color-hover: $link-color !default;
-$link-color-active: $link-color !default;
+$link-color: get-color('ui', 'normal') !default;
+$link-color-hover: get-color('ui', 'focus') !default;
+$link-color-active: get-color('ui', 'focus') !default;
