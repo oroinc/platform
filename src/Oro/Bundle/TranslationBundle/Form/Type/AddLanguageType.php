@@ -2,25 +2,23 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 
 class AddLanguageType extends AbstractType
 {
-    /** @var ManagerRegistry */
-    protected $managerRegistry;
+    /** @var LanguageRepository */
+    protected $languageRepository;
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param LanguageRepository $languageRepository
      */
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(LanguageRepository $languageRepository)
     {
-        $this->managerRegistry = $managerRegistry;
+        $this->languageRepository = $languageRepository;
     }
 
     /**
@@ -30,7 +28,7 @@ class AddLanguageType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'     => array_flip($this->getLanguageChoices()),
+                'choices'     => $this->getLanguageChoices(),
                 'empty_value' => 'Please select...',
             ]
         );
@@ -42,18 +40,9 @@ class AddLanguageType extends AbstractType
     protected function getLanguageChoices()
     {
         $allLanguages = Intl::getLocaleBundle()->getLocaleNames('en');
-        $data = $this->managerRegistry
-            ->getManagerForClass(Language::class)
-            ->getRepository(Language::class)
-            ->createQueryBuilder('l')
-            ->select('l.code')
-            ->getQuery()
-            ->getArrayResult();
+        $codes = $this->languageRepository->getAvailableLanguageCodes();
 
-        return array_diff_key(
-            $allLanguages,
-            array_flip(array_column($data, 'code'))
-        );
+        return array_diff(array_flip($allLanguages), $codes);
     }
 
     /**
