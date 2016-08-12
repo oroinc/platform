@@ -197,3 +197,10 @@
     border-width: 8px 4px 0;
   }
 }
+
+.text-line-truncate(@width: 100%) {
+  width: @width;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
