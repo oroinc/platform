@@ -24,10 +24,12 @@ class LanguageHelper
      */
     public function updateSystemConfiguration(Language $language)
     {
-        $languages = $this->configManager->get($this->getConfigurationName(), []);
+        $languages = $this->configManager->get($this->getConfigurationName(), true);
 
         if ($language->isEnabled()) {
-            !in_array($language->getCode(), $languages, true) and $languages[] = $language->getCode();
+            if(!in_array($language->getCode(), $languages, true)){
+                $languages[] = $language->getCode();
+            }
         } else {
             if (false !== ($index = array_search($language->getCode(), $languages, true))) {
                 unset($languages[$index]);
