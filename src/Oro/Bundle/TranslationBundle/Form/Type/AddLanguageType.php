@@ -6,6 +6,7 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 
 class AddLanguageType extends AbstractType
@@ -13,12 +14,17 @@ class AddLanguageType extends AbstractType
     /** @var LanguageRepository */
     protected $languageRepository;
 
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
     /**
      * @param LanguageRepository $languageRepository
+     * @param LocaleSettings $localeSettings
      */
-    public function __construct(LanguageRepository $languageRepository)
+    public function __construct(LanguageRepository $languageRepository, LocaleSettings $localeSettings)
     {
         $this->languageRepository = $languageRepository;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -39,7 +45,7 @@ class AddLanguageType extends AbstractType
      */
     protected function getLanguageChoices()
     {
-        $allLanguages = Intl::getLocaleBundle()->getLocaleNames('en');
+        $allLanguages = Intl::getLocaleBundle()->getLocaleNames($this->localeSettings->getLanguage());
         $codes = $this->languageRepository->getAvailableLanguageCodes();
 
         return array_diff(array_flip($allLanguages), $codes);

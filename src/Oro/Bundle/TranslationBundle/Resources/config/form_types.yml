@@ -30,5 +30,6 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType'
         arguments:
             - '@oro_translation.repository.language'
+            - '@oro_locale.settings'
         tags:
             - { name: form.type, alias: oro_translation_add_language }
