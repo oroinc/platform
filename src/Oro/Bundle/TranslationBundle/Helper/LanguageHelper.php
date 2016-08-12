@@ -27,7 +27,7 @@ class LanguageHelper
         $languages = $this->configManager->get($this->getConfigurationName(), true);
 
         if ($language->isEnabled()) {
-            if(!in_array($language->getCode(), $languages, true)){
+            if (!in_array($language->getCode(), $languages, true)) {
                 $languages[] = $language->getCode();
             }
         } else {
