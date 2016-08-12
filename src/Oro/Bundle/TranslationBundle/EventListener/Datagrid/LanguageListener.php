@@ -36,6 +36,27 @@ class LanguageListener
     }
 
     /**
+     * @param OrmResultAfter $event
+     */
+    public function onResultAfter(OrmResultAfter $event)
+    {
+        /** @var ResultRecord[] $records */
+        $records = $event->getRecords();
+
+        foreach ($records as $record) {
+            /* @var $language Language */
+            $language = $this->doctrineHelper->getEntity(Language::class, $record->getValue('id'));
+
+            $record->setValue(self::STATS_COVERAGE_NAME, $this->languageHelper->getTranslationStatus($language));
+            $record->setValue(self::STATS_INSTALLED, null !== $language->getInstalledBuildDate());
+            $record->setValue(
+                self::STATS_AVAILABLE_UPDATE,
+                $this->languageHelper->isAvailableUpdateTranslates($language)
+            );
+        }
+    }
+
+    /**
      * @param BuildBefore $event
      */
     public function onBuildBefore(BuildBefore $event)
@@ -65,26 +86,5 @@ class LanguageListener
         );
 
         $columns = $config->offsetSetByPath('[columns]', $columns);
-    }
-
-    /**
-     * @param OrmResultAfter $event
-     */
-    public function onResultAfter(OrmResultAfter $event)
-    {
-        /** @var ResultRecord[] $records */
-        $records = $event->getRecords();
-
-        foreach ($records as $record) {
-            /* @var $language Language */
-            $language = $this->doctrineHelper->getEntity(Language::class, $record->getValue('id'));
-
-            $record->setValue(self::STATS_COVERAGE_NAME, $this->languageHelper->getTranslationStatus($language));
-            $record->setValue(self::STATS_INSTALLED, null !== $language->getInstalledBuildDate());
-            $record->setValue(
-                self::STATS_AVAILABLE_UPDATE,
-                $this->languageHelper->isAvailableUpdateTranslates($language)
-            );
-        }
     }
 }
