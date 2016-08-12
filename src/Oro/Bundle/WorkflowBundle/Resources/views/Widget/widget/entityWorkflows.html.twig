@@ -1,16 +1,17 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 <div class="widget-content">
-    <div class="workflow-collapse expanded" {% if workflows|length > 1 %}
+    <div class="workflow-collapse" {% if workflows|length > 1 %}
         data-page-component-module="oroui/js/app/components/jquery-widget-component"
         data-page-component-options="{{ {
-            widgetModule: 'oroui/js/widget/collapse-widget'
+            widgetModule: 'oroui/js/widget/collapse-widget',
+            storageKey: entityId
         }|json_encode() }}"
     {% endif %}>
         <span class="workflow-collapse-button" data-collapse-trigger></span>
         {% for workflow in workflows %}
             {% if loop.index == 2 %}
-            <div data-collapse-container>
+            <div class="workflow-collapse-container" data-collapse-container>
             {% endif %}
                 <table class="workflow-entity">
                     <tr>
