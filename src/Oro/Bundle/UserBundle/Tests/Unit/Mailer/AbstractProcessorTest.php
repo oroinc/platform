@@ -62,6 +62,21 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:EmailTemplate')
             ->willReturn($this->objectManager);
 
+        $this->setConfigManager();
+
+        $this->renderer = $this->getMockForClass('Oro\Bundle\EmailBundle\Provider\EmailRenderer');
+
+        $this->emailHolderHelper = $this->getMockForClass('Oro\Bundle\EmailBundle\Tools\EmailHolderHelper');
+
+        $this->mailer = $this->getMockForClass('\Swift_Mailer');
+
+        $this->mailProcessor = $this->setProcessor();
+
+        $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
+    }
+
+    protected function setConfigManager()
+    {
         $this->configManager = $this->getMockForClass('Oro\Bundle\ConfigBundle\Config\ConfigManager');
         $this->configManager->expects($this->any())
             ->method('get')
@@ -71,22 +86,20 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
                     ['oro_notification.email_notification_sender_name', false, false, null, self::FROM_NAME]
                 ]
             );
-
-        $this->renderer = $this->getMockForClass('Oro\Bundle\EmailBundle\Provider\EmailRenderer');
-
-        $this->emailHolderHelper = $this->getMockForClass('Oro\Bundle\EmailBundle\Tools\EmailHolderHelper');
-
-        $this->mailer = $this->getMockForClass('\Swift_Mailer');
-
-        $this->mailProcessor = new BaseProcessor(
+    }
+    
+    /**
+     * @return BaseProcessor
+     */
+    protected function setProcessor()
+    {
+        return new BaseProcessor(
             $this->managerRegistry,
             $this->configManager,
             $this->renderer,
             $this->emailHolderHelper,
             $this->mailer
         );
-
-        $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
     }
 
     protected function tearDown()

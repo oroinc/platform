@@ -10,7 +10,6 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
@@ -100,6 +99,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 // set seen flags from previously synchronized emails
                 $this->checkFlags($imapFolder, $checkStartDate);
 
+                $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
+
             } catch (UnselectableFolderException $e) {
                 $folder->setSyncEnabled(false);
                 $this->logger->info(
@@ -120,8 +121,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 break;
             }
         }
-
-        $this->removeManager->removeRemotelyRemovedEmails($this->manager, $imapFolders);
 
         // run removing of empty outdated folders every N synchronizations
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
