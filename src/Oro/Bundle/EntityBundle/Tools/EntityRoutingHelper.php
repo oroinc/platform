@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use Oro\Bundle\EntityBundle\Exception\RecordNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -208,7 +209,7 @@ class EntityRoutingHelper
      * @return object The entity object
      *
      * @throws BadRequestHttpException
-     * @throws NotFoundHttpException
+     * @throws RecordNotFoundException in case entity not found
      */
     public function getEntity($entityClass, $entityId)
     {
@@ -221,8 +222,8 @@ class EntityRoutingHelper
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
         if (!$entity) {
-            throw new NotFoundHttpException(
-                sprintf('The entity "%s" with ID "%s" was not found.', $entityClass, $entityId)
+            throw new RecordNotFoundException(
+                sprintf("Record doesn't found.")
             );
         }
 

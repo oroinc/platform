@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
 
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,31 +39,43 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected static $transitionDefinitions = array(
-        'empty_definition' => array(),
-        'with_pre_condition' => array(
-            'pre_conditions' => array('@true' => null)
-        ),
-        'with_condition' => array(
-            'conditions' => array('@true' => null)
-        ),
-        'with_post_actions' => array(
-            'post_actions' => array('@assign_value' => array('parameters' => array('$attribute', 'first_value')))
-        ),
-        'full_definition' => array(
+    protected static $actions = [
+        'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]],
+        'post_actions' => ['@assign_value' => ['parameters' => ['$attribute', 'post_action_value']]]
+    ];
+
+    /**
+     * @var array
+     */
+    protected static $transitionDefinitions = [
+        'empty_definition' => [],
+        'with_preactions' => [
+            'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]
+        ],
+        'with_pre_condition' => [
+            'pre_conditions' => ['@true' => null]
+        ],
+        'with_condition' => [
+            'conditions' => ['@true' => null]
+        ],
+        'with_post_actions' => [
+            'post_actions' => ['@assign_value' => ['parameters' => ['$attribute', 'post_action_value']]]
+        ],
+        'full_definition' => [
             'page_template' => 'Test:Page:template',
             'dialog_template' => 'Test:Dialog:template',
-            'pre_conditions' => array('@true' => null),
-            'conditions' => array('@true' => null),
-            'post_actions' => array('@assign_value' => array('parameters' => array('$attribute', 'first_value'))),
-        )
-    );
+            'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]],
+            'pre_conditions' => ['@true' => null],
+            'conditions' => ['@true' => null],
+            'post_actions' => ['@assign_value' => ['parameters' => ['$attribute', 'post_action_value']]],
+        ]
+    ];
 
     protected function setUp()
     {
         $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler')
             ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
+            ->setMethods(['assemble'])
             ->getMock();
 
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
@@ -82,25 +98,28 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssembleNoRequiredTransitionDefinitionException($configuration)
     {
-        $this->assembler->assemble($configuration, array(), array(), array());
+        $this->assembler->assemble($configuration, [], [], []);
     }
 
+    /**
+     * @return array
+     */
     public function missedTransitionDefinitionDataProvider()
     {
-        return array(
-            'no options' => array(
-                array(
-                    'name' => array()
-                )
-            ),
-            'no transition_definition' => array(
-                array(
-                    'name' => array(
+        return [
+            'no options' => [
+                [
+                    'name' => []
+                ]
+            ],
+            'no transition_definition' => [
+                [
+                    'name' => [
                         '' => 'test'
-                    )
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -110,27 +129,30 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnknownTransitionDefinitionAssembler($definitions)
     {
-        $configuration = array(
-            'test' => array(
+        $configuration = [
+            'test' => [
                 'transition_definition' => 'unknown'
-            )
-        );
-        $this->assembler->assemble($configuration, $definitions, array(), array());
+            ]
+        ];
+        $this->assembler->assemble($configuration, $definitions, [], []);
     }
 
+    /**
+     * @return array
+     */
     public function incorrectTransitionDefinitionDataProvider()
     {
-        return array(
-            'no definitions' => array(
-                array()
-            ),
-            'definitions as null' => array(
-                array('some' => null)
-            ),
-            'unknown definition' => array(
-                array('known' => array())
-            )
-        );
+        return [
+            'no definitions' => [
+                []
+            ],
+            'definitions as null' => [
+                ['some' => null]
+            ],
+            'unknown definition' => [
+                ['known' => []]
+            ]
+        ];
     }
 
     /**
@@ -140,27 +162,30 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnknownStepException($steps)
     {
-        $configuration = array(
-            'test' => array(
+        $configuration = [
+            'test' => [
                 'transition_definition' => 'transition_definition',
                 'label' => 'label',
                 'step_to' => 'unknown'
-            )
-        );
-        $definitions = array('transition_definition' => array());
-        $this->assembler->assemble($configuration, $definitions, $steps, array());
+            ]
+        ];
+        $definitions = ['transition_definition' => []];
+        $this->assembler->assemble($configuration, $definitions, $steps, []);
     }
 
+    /**
+     * @return array
+     */
     public function incorrectStepsDataProvider()
     {
-        return array(
-            'no steps' => array(
-                array()
-            ),
-            'unknown step' => array(
-                array('known' => $this->createStep())
-            )
-        );
+        return [
+            'no steps' => [
+                []
+            ],
+            'unknown step' => [
+                ['known' => $this->createStep()]
+            ]
+        ];
     }
 
     /**
@@ -169,29 +194,31 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      * @param array $transitionDefinition
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testAssemble(array $configuration, array $transitionDefinition)
     {
-        $steps = array(
+        $steps = [
             'step' => $this->createStep()
-        );
+        ];
 
-        $attributes = array(
+        $attributes = [
             'attribute' => $this->createAttribute()
-        );
+        ];
 
+        $expectedPreAction      = null;
         $expectedCondition      = null;
         $expectedPreCondition   = $this->createCondition();
-        $expectedAction         = null;
-        $defaultAclPrecondition = array();
-        $preConditions          = array();
+        $expectedPostAction     = null;
+        $defaultAclPrecondition = [];
+        $preConditions          = [];
 
         if (isset($configuration['acl_resource'])) {
-            $defaultAclPrecondition = array(
-                '@acl_granted' => array(
-                    'parameters' => array($configuration['acl_resource'])
-                )
-            );
+            $defaultAclPrecondition = [
+                '@acl_granted' => [
+                    'parameters' => [$configuration['acl_resource']]
+                ]
+            ];
 
             if (isset($configuration['acl_message'])) {
                 $defaultAclPrecondition['@acl_granted']['message'] = $configuration['acl_message'];
@@ -199,12 +226,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         }
 
         if (isset($transitionDefinition['pre_conditions']) && $defaultAclPrecondition) {
-            $preConditions = array(
-                '@and' => array(
+            $preConditions = [
+                '@and' => [
                     $defaultAclPrecondition,
                     $transitionDefinition['pre_conditions']
-                )
-            );
+                ]
+            ];
         } elseif (isset($transitionDefinition['pre_conditions'])) {
             $preConditions = $transitionDefinition['pre_conditions'];
         }
@@ -227,28 +254,29 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($expectedCondition));
         }
 
-        $actionFactoryCallCount = 0;
+        $this->actionFactory->expects($this->any())
+            ->method('create')
+            ->with(ConfigurableAction::ALIAS, self::isType('array'))
+            ->willReturnCallback(
+                function ($type, $config) use (&$expectedPreAction, &$expectedPostAction) {
+                    $action = $this->createAction();
 
-        if (array_key_exists('post_actions', $transitionDefinition)) {
-            $actionFactoryCallCount++;
-        }
+                    if ($config === self::$actions['preactions']) {
+                        $expectedPreAction = $action;
+                    }
 
-        if (array_key_exists('init_actions', $transitionDefinition)) {
-            $actionFactoryCallCount++;
-        }
+                    if ($config === self::$actions['post_actions']) {
+                        $expectedPostAction = $action;
+                    }
 
-        if ($actionFactoryCallCount) {
-            $expectedAction = $this->createAction();
-            $this->actionFactory->expects($this->exactly($actionFactoryCallCount))
-                ->method('create')
-                ->with(ConfigurableAction::ALIAS, $transitionDefinition['post_actions'])
-                ->will($this->returnValue($this->createAction()));
-        }
+                    return $action;
+                }
+            );
 
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
             ->with(
-                isset($configuration['form_options']) ? $configuration['form_options'] : array(),
+                isset($configuration['form_options']) ? $configuration['form_options'] : [],
                 $attributes,
                 'transition',
                 'test'
@@ -256,19 +284,19 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            array('test' => $configuration),
+            ['test' => $configuration],
             self::$transitionDefinitions,
             $steps,
             $attributes
         );
 
         $configuration = array_merge(
-            array(
+            [
                 'is_start' => false,
                 'form_type' => WorkflowTransitionType::NAME,
-                'form_options' => array(),
-                'frontend_options' => array(),
-            ),
+                'form_options' => [],
+                'frontend_options' => [],
+            ],
             $configuration
         );
 
@@ -319,8 +347,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->assertEquals($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
-        $this->assertEquals($expectedAction, $actualTransition->getPostAction(), 'Incorrect post_action');
+        $this->assertSame($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
+        $this->assertSame($expectedPreAction, $actualTransition->getPreAction(), 'Incorrect preaction');
+        $this->assertSame($expectedPostAction, $actualTransition->getPostAction(), 'Incorrect post_action');
     }
 
     /**
@@ -345,41 +374,49 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function configurationDataProvider()
     {
-        return array(
-            'empty_definition' => array(
-                'configuration' => array(
+        return [
+            'empty_definition' => [
+                'configuration' => [
                     'transition_definition' => 'empty_definition',
                     'label' => 'label',
                     'step_to' => 'step',
                     'form_type' => 'custom_workflow_transition',
                     'display_type' => 'page',
-                    'form_options' => array(
-                        'attribute_fields' => array(
-                            'attribute_on_be' => array('type' => 'text')
-                        )
-                    ),
-                    'frontend_options' => array('class' => 'foo', 'icon' => 'bar'),
-                ),
+                    'form_options' => [
+                        'attribute_fields' => [
+                            'attribute_on_be' => ['type' => 'text']
+                        ]
+                    ],
+                    'frontend_options' => ['class' => 'foo', 'icon' => 'bar'],
+                ],
                 'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
-            ),
-            'with_condition' => array(
-                'configuration' => array(
+            ],
+            'with_condition' => [
+                'configuration' => [
                     'transition_definition' => 'with_condition',
                     'label' => 'label',
                     'step_to' => 'step',
-                ),
+                ],
                 'transitionDefinition' => self::$transitionDefinitions['with_condition'],
-            ),
-            'with_post_actions' => array(
-                'configuration' => array(
+            ],
+            'with_preactions' => [
+                'configuration' => [
+                    'transition_definition' => 'with_condition',
+                    'label' => 'label',
+                    'step_to' => 'step',
+                ],
+                'transitionDefinition' => self::$transitionDefinitions['with_preactions'],
+            ],
+            'with_post_actions' => [
+                'configuration' => [
                     'transition_definition' => 'with_post_actions',
                     'label' => 'label',
                     'step_to' => 'step',
-                ),
+                ],
                 'transitionDefinition' => self::$transitionDefinitions['with_post_actions'],
-            ),
-            'full_definition' => array(
-                'configuration' => array(
+            ],
+            'full_definition' => [
+                'configuration' => [
                     'transition_definition' => 'full_definition',
                     'acl_resource' => 'test_acl',
                     'acl_message' => 'test acl message',
@@ -389,46 +426,52 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                         'cron' => '1 * * * *',
                         'filter' => 'e.field < 1'
                     ],
-                ),
+                ],
                 'transitionDefinition' => self::$transitionDefinitions['full_definition'],
-            ),
-            'start_transition' => array(
-                'configuration' => array(
+            ],
+            'start_transition' => [
+                'configuration' => [
                     'transition_definition' => 'empty_definition',
                     'acl_resource' => 'test_acl',
                     'acl_message' => 'test acl message',
                     'label' => 'label',
                     'step_to' => 'step',
                     'is_start' => true,
-                ),
+                ],
                 'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
-            ),
-        );
+            ],
+        ];
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Step
+     */
     protected function createStep()
     {
-        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->getMockBuilder(Step::class)->disableOriginalConstructor()->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Attribute
+     */
     protected function createAttribute()
     {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->getMockBuilder(Attribute::class)->disableOriginalConstructor()->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExpressionInterface
+     */
     protected function createCondition()
     {
-        return $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
-            ->getMockForAbstractClass();
+        return $this->getMock(ExpressionInterface::class);
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ActionInterface
+     */
     protected function createAction()
     {
-        return $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
-            ->getMockForAbstractClass();
+        return $this->getMock(ActionInterface::class);
     }
 }
