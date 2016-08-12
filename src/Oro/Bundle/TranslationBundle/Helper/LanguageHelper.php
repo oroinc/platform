@@ -46,9 +46,13 @@ class LanguageHelper
 
         $stats = $this->getStatistic();
 
+        if (!isset($stats[$language->getCode()])) {
+            return false;
+        }
+
         $lastBuildDate = $this->getDateTimeFromString($stats[$language->getCode()]['lastBuildDate']);
 
-        return isset($stats[$language->getCode()]) && $language->getInstalledBuildDate() < $lastBuildDate;
+        return $language->getInstalledBuildDate() < $lastBuildDate;
     }
 
     /**
@@ -70,7 +74,7 @@ class LanguageHelper
     /**
      * @return type
      */
-    public function getStatistic()
+    protected function getStatistic()
     {
         $stats = [];
         foreach ($this->translationStatisticProvider->get() as $info) {

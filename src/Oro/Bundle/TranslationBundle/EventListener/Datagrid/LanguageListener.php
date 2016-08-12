@@ -44,19 +44,25 @@ class LanguageListener
 
         $columns = $config->offsetGetByPath('[columns]', []);
 
-        $columns[self::COLUMN_COVERAGE] = [
-            'label' => 'oro.translation.language.translation_completeness.label',
-            'type' => 'twig',
-            'frontend_type' => 'html',
-            'template' => 'OroTranslationBundle:Language:Datagrid/translationCompleteness.html.twig',
-        ];
+        $columns[self::COLUMN_COVERAGE] = array_merge(
+            [
+                'label' => 'oro.translation.language.translation_completeness.label',
+                'type' => 'twig',
+                'frontend_type' => 'html',
+                'template' => 'OroTranslationBundle:Language:Datagrid/translationCompleteness.html.twig',
+            ],
+            isset($columns[self::COLUMN_COVERAGE]) ? $columns[self::COLUMN_COVERAGE] : []
+        );
 
-        $columns[self::COLUMN_STATUS] = [
-            'label' => 'oro.translation.language.translation_status.label',
-            'type' => 'twig',
-            'frontend_type' => 'html',
-            'template' => 'OroTranslationBundle:Language:Datagrid/translationStatus.html.twig',
-        ];
+        $columns[self::COLUMN_STATUS] = array_merge(
+            [
+                'label' => 'oro.translation.language.translation_status.label',
+                'type' => 'twig',
+                'frontend_type' => 'html',
+                'template' => 'OroTranslationBundle:Language:Datagrid/translationStatus.html.twig',
+            ],
+            isset($columns[self::COLUMN_STATUS]) ? $columns[self::COLUMN_STATUS] : []
+        );
 
         $columns = $config->offsetSetByPath('[columns]', $columns);
     }
