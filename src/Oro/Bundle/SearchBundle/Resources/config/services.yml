@@ -204,7 +204,7 @@ services:
             - { name: kernel.cache_warmer }
 
     oro_search.resolver.entity_title.title_fields:
-        private: true
+        public: false
         class: Oro\Bundle\SearchBundle\Resolver\EntityFieldsTitleResolver
         arguments:
             - '@oro_search.mapper'
