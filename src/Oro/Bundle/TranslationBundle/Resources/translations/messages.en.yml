@@ -6,13 +6,6 @@ oro.translation:
         fields:
             available_translations.label: 'Available translations'
 
-    action:
-        download: 'Download'
-        enable: 'Enable'
-        disable: 'Disable'
-        install: 'Install'
-        update: 'Update'
-
     language:
         entity_label: 'Language'
         entity_plural_label: 'Languages'
@@ -31,6 +24,9 @@ oro.translation:
         action:
             disable.label: 'Disable'
             enable.label: 'Enable'
+            download.label: 'Download'
+            install.label: 'Install'
+            update.label: 'Update'
             add.label: 'Add Language'
 
         message:

@@ -75,7 +75,7 @@ operations:
             - '@refresh_grid': oro-translation-language-grid
 
     oro_translation_language_install:
-        label: oro.translation.action.install
+        label: oro.translation.language.action.install.label
         button_options:
             icon: icon-download
         datagrids:
@@ -90,7 +90,7 @@ operations:
             @eq: [$.isAvailableInstall, true]
 
     oro_translation_language_update:
-        label: oro.translation.action.update
+        label: oro.translation.language.action.update.label
         button_options:
             icon: icon-refresh
         datagrids:
