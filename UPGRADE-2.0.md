@@ -42,3 +42,6 @@ UPGRADE FROM 1.10 to 2.0
 - Added ExpressionFunction `localized_value` to `Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider` - can be used in Layouts
 - Added Localization Settings page in System configuration
 - Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values
+
+####DataGridBundle:
+- Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts. 
