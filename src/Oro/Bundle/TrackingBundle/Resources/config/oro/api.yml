@@ -1,5 +1,0 @@
-oro_api:
-    entities:
-        Oro\Bundle\TrackingBundle\Entity\TrackingEvent: ~
-        Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent: ~
-        Oro\Bundle\TrackingBundle\Entity\TrackingWebsite: ~
