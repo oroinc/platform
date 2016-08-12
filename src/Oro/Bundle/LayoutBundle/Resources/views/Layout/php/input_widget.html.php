@@ -1,3 +1,6 @@
 <?php //@codingStandardsIgnoreFile ?>
-<?php if (isset($attr['placeholder'])) $attr['placeholder'] = $view['layout']->text($attr['placeholder'], $translation_domain); ?>
-<input <?php echo $view['layout']->block($block, 'block_attributes') ?><?php if (isset($type)): ?> type="<?php echo $type ?>"<?php endif ?><?php if (isset($name)): ?> name="<?php echo $name ?>"<?php endif ?><?php if (isset($id)): ?> id="<?php echo $id ?>"<?php endif ?>/>
+<?php if (!empty($id)) $attr['id'] = $id; ?>
+<?php if (!empty($type)) $attr['type'] = $type; ?>
+<?php if (!empty($name)) $attr['name'] = $name; ?>
+<?php if (!empty($attr['placeholder'])) $attr['placeholder'] = $view['layout']->text($attr['placeholder'], $translation_domain); ?>
+<input <?php echo $view['layout']->block($block, 'block_attributes', array('attr' => $attr)) ?>/>

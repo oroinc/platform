@@ -1,8 +1,14 @@
 <?php //@codingStandardsIgnoreFile ?>
+<?php if (!empty($type)) $attr['type'] = $type; ?>
+<?php if (!empty($media)) $attr['media'] = $media; ?>
+<?php if (!empty($scoped)) $attr['scoped'] = 'scoped'; ?>
+<?php if (!empty($crossorigin)) $attr['crossorigin'] = $crossorigin; ?>
 <?php if (!empty($src)): ?>
-    <link rel="stylesheet" <?php echo $view['layout']->block($block, 'block_attributes', array('attr' => $attr)) ?> type="<?php echo $type ?>"<?php if (isset($src)): ?> href="<?php echo $src ?>"<?php endif ?><?php if (isset($media)): ?> media="<?php echo $media ?>"<?php endif ?><?php if ($scoped == 'true'): ?> scoped="scoped"<?php endif ?><?php if (isset($crossorigin)): ?> crossorigin="<?php echo $crossorigin ?>"<?php endif ?>/>
+    <?php $attr['href'] = $src; ?>
+    <?php $attr = array_merge(['rel' => 'stylesheet'], $attr); ?>
+    <link <?php echo $view['layout']->block($block, 'block_attributes', array('attr' => $attr)) ?>/>
 <?php else: ?>
-    <style <?php echo $view['layout']->block($block, 'block_attributes', array('attr' => $attr)) ?><?php if (isset($type)): ?> type="<?php echo $type ?>"<?php endif ?><?php if (isset($media)): ?> media="<?php echo $media ?>"<?php endif ?><?php if ($scoped == 'true'): ?> scoped="scoped"<?php endif ?><?php if (isset($crossorigin)): ?> crossorigin="<?php echo $crossorigin ?>"<?php endif ?>>
+    <style <?php echo $view['layout']->block($block, 'block_attributes', array('attr' => $attr)) ?>>
         <?php echo $content ?>
     </style>
 <?php endif ?>
