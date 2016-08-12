@@ -368,7 +368,7 @@ abstract class AbstractFilter implements FilterInterface
         return array_reduce(
             $replacements,
             function ($carry, array $replacement) {
-                return preg_replace(sprintf('/(?<=\b)%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
+                return preg_replace(sprintf('/(?<=[^\w\.])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
             },
             $qb->getDql()
         );
