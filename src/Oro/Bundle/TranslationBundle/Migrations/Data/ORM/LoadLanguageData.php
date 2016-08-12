@@ -44,7 +44,7 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         $downloadedLanguages = array_keys($configManager->get(TranslationStatusInterface::CONFIG_KEY));
 
         /** English language must be in list by default, because we already have translations in *.en.yml files */
-        $languages = array_unique(array_merge(['en'], [$defaultLanguage], $enabledLanguages, $downloadedLanguages));
+        $languages = array_unique(array_merge(['en', $defaultLanguage], $enabledLanguages, $downloadedLanguages));
         $user = $this->getUser($manager);
 
         foreach ($languages as $languageCode) {

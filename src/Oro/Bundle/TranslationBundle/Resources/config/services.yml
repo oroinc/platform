@@ -19,7 +19,6 @@ parameters:
     oro_translation.guzzle_client.class:                        Guzzle\Http\Client
 
     oro_translation.twig.translation.extension.class:           Oro\Bundle\TranslationBundle\Twig\TranslationExtension
-    oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
     oro_translation.event_listener.language_change.class:       Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener
 
@@ -137,14 +136,6 @@ services:
         class: %oro_translation.twig.translation.extension.class%
         arguments:
             - %oro_translation.debug_translator%
-        tags:
-            - { name: twig.extension }
-
-    oro_translation.twig.translation_status.extension:
-        class: %oro_translation.twig.translation_status.extension.class%
-        arguments:
-            - '@oro_config.global'
-            - '@oro_translation.statistic_provider'
         tags:
             - { name: twig.extension }
 
