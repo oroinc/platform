@@ -29,6 +29,7 @@ class ConfigurationController extends Controller
      *      class="OroUserBundle:User",
      *      permission="CONFIGURE"
      * )
+     *
      * @param User $entity
      * @param null $activeGroup
      * @param null $activeSubGroup
