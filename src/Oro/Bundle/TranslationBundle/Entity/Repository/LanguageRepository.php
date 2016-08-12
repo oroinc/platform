@@ -11,13 +11,8 @@ class LanguageRepository extends EntityRepository
      */
     public function getAvailableLanguageCodes()
     {
-        $codes = $this->createQueryBuilder('language')->select('language.code')->getQuery()->getArrayResult();
+        $data = $this->createQueryBuilder('language')->select('language.code')->getQuery()->getArrayResult();
 
-        return array_map(
-            function (array $row) {
-                return $row['code'];
-            },
-            $codes
-        );
+        return array_column($data, 'code');
     }
 }

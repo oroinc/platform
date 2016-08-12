@@ -1,4 +1,35 @@
 operations:
+    oro_translation_add_language:
+        label: oro.translation.language.action.add.label
+        applications: [backend]
+        routes:
+            - oro_translation_language_index
+        button_options:
+            icon: icon-plus
+        acl_resource: ['CREATE', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
+
+        attributes:
+            language_code:
+                label: oro.translation.language.entity_label
+                type: string
+        form_options:
+            attribute_fields:
+                language_code:
+                    form_type: oro_translation_add_language
+                    options:
+                        required: true
+        actions:
+            - '@create_entity':
+                class: Oro\Bundle\TranslationBundle\Entity\Language
+                attribute: $.language
+                data:
+                    code: $.language_code
+                flush: true
+            - '@flash_message':
+                message: oro.translation.language.message.added
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
+
     oro_translation_disable_language:
         label: oro.translation.language.action.disable
         applications: [backend]
