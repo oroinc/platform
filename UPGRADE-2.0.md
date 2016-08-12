@@ -50,3 +50,4 @@ UPGRADE FROM 1.10 to 2.0
 - Added class `Oro\Component\Layout\DataProviderDecorator`.
 - Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
 - Method `Oro\Component\Layout\ContextDataCollection::getIdentifier()` was removed.
+- Twig method `layout_attr_merge` was renamed to `layout_attr_defaults`.
