@@ -61,7 +61,12 @@ class RoleController extends Controller
                 'data' => $this->getRolePrivilegeCapabilityProvider()->getCapabilities($role),
                 'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabList(),
                 'readonly' => true
-            ]
+            ],
+            'allow_delete' =>
+                $role->getId() &&
+                !$this->get('doctrine.orm.entity_manager')
+                    ->getRepository('OroUserBundle:Role')
+                    ->hasAssignedUsers($role)
         ];
     }
 
