@@ -44,9 +44,6 @@ parameters:
     oro_email.email_websocket.processor.class:    Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor
     oro_email.placeholder.send_email.filter.class: Oro\Bundle\EmailBundle\Placeholder\SendEmailPlaceholderFilter
     oro_email.tools.email_origin_helper.class:    Oro\Bundle\EmailBundle\Tools\EmailOriginHelper
-    oro_email.async.processor.auto_response.class: 'Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor'
-    oro_email.async.processor.add_association.class: 'Oro\Bundle\EmailBundle\Async\AddAssociationMessageProcessor'
-    oro_email.async.processor.update_email_owner_associations.class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor'
 
     oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -292,6 +289,7 @@ services:
             - '@oro_email.link.email.activity.manager'
             - '@oro_email.link.email.thread.manager'
             - '@oro_email.model.email_activity_updates'
+            - '@oro_message_queue.client.message_producer'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -318,7 +316,7 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
 
     oro_email.async.processor.auto_response:
-        class: '%oro_email.async.processor.auto_response.class%'
+        class: 'Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor'
         arguments:
             - '@doctrine'
             - '@oro_email.autoresponserule_manager'
@@ -327,7 +325,7 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_email.async.processor.add_association:
-        class: '%oro_email.async.processor.add_association.class%'
+        class: 'Oro\Bundle\EmailBundle\Async\AddAssociationMessageProcessor'
         arguments:
             - '@oro_email.command.association_manager'
             - '@logger'
@@ -335,9 +333,18 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_email.async.processor.update_email_owner_associations:
-        class: '%oro_email.async.processor.update_email_owner_associations.class%'
+        class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor'
         arguments:
             - '@oro_email.command.association_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.processor.sync_email_seen_flag:
+        class: 'Oro\Bundle\EmailBundle\Async\SyncEmailSeenFlagMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_email.email.flag.manager'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
