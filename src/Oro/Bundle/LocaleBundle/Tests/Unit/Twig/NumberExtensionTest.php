@@ -70,7 +70,6 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Twig_SimpleFilter', $filters[6]);
         $this->assertEquals('oro_format_ordinal', $filters[6]->getName());
-
     }
 
     public function testGetAttribute()
