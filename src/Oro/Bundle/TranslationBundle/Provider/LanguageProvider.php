@@ -37,4 +37,12 @@ class LanguageProvider
 
         return array_intersect_key($locales, array_flip($codes));
     }
+
+    /**
+     * @return array
+     */
+    public function getEnabledLanguages()
+    {
+        return $this->repository->getAvailableLanguageCodes(true);
+    }
 }

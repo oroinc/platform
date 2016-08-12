@@ -10,11 +10,6 @@ services:
         tags:
             - { name: form.type, alias: translatable_entity }
 
-    oro_translation.form.type.available_translations:
-        class: %oro_translation.form.type.available_translations.class%
-        tags:
-            - { name: form.type, alias: oro_translation_available_translations }
-
     oro_translation.form.type.jqueryselect2_translatable_entity:
         parent: genemu.form.jquery.type.select2
         arguments: ["translatable_entity"]

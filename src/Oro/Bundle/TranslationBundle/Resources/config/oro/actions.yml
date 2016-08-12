@@ -56,7 +56,3 @@ action_groups:
         actions:
             - '@assign_value': [$.data.enabled, $.value]
             - '@flush_entity': $.data
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: updateSystemConfiguration
-                method_parameters: [$.data]

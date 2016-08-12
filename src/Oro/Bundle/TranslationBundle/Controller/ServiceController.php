@@ -4,51 +4,23 @@ namespace Oro\Bundle\TranslationBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
 
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\LocaleBundle\Form\Type\LanguageType;
 use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 
 class ServiceController extends BaseController
 {
-    /**
-     * @Route("/available-translations", name="oro_translation_available_translations")
-     * @Template
-     */
-    public function availableTranslationsAction()
-    {
-        $statisticProvider = $this->get('oro_translation.statistic_provider');
-        $cm                = $this->get('oro_config.global');
-
-        $stats        = $statisticProvider->get();
-        $defaultValue = $cm->get(LanguageType::CONFIG_KEY, true);
-
-        // @TODO find better solution
-        if ($defaultValue == 'en') {
-            $defaultValue = \Locale::composeLocale(['language' => $defaultValue, 'region' => 'US']);
-        }
-        $configValues  = $cm->get(TranslationStatusInterface::CONFIG_KEY);
-        $localeChoices = Intl::getLocaleBundle()->getLocaleNames();
-
-        return [
-            'statistic'       => $stats,
-            'defaultLanguage' => $defaultValue,
-            'config'          => (array)$configValues,
-            'locale'          => $localeChoices
-        ];
-    }
-
     /**
      * @Route(
      *      "/download/{code}",
      *      name="oro_translation_download",
      *      defaults={"code" = null}
      * )
+     * @param string $code
+     * @return JsonResponse
      */
     public function downloadAction($code)
     {

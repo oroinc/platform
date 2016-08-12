@@ -7,11 +7,18 @@ use Doctrine\ORM\EntityRepository;
 class LanguageRepository extends EntityRepository
 {
     /**
+     * @param bool $onlyEnabled
      * @return array
      */
-    public function getAvailableLanguageCodes()
+    public function getAvailableLanguageCodes($onlyEnabled = false)
     {
-        $codes = $this->createQueryBuilder('language')->select('language.code')->getQuery()->getArrayResult();
+        $qb = $this->createQueryBuilder('language')->select('language.code');
+
+        if ($onlyEnabled) {
+            $qb->where($qb->expr()->eq('language.enabled', ':enabled'))->setParameter('enabled', true);
+        }
+
+        $codes = $qb->getQuery()->getArrayResult();
 
         return array_map(
             function (array $row) {

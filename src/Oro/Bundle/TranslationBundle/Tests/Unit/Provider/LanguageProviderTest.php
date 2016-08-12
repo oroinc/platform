@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Intl\Util\IntlTestHelper;
+
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LanguageProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,6 +38,7 @@ class LanguageProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->repository->expects($this->once())
             ->method('getAvailableLanguageCodes')
+            ->with(false)
             ->willReturn(['en', 'en_CA', 'fr_FR']);
 
         $this->localeSettings->expects($this->once())->method('getLanguage')->willReturn('en');
@@ -49,5 +51,17 @@ class LanguageProviderTest extends \PHPUnit_Framework_TestCase
             ],
             $this->provider->getAvailableLanguages()
         );
+    }
+
+    public function testGetEnabledLanguages()
+    {
+        $data = ['en', 'en_CA', 'fr_FR'];
+
+        $this->repository->expects($this->once())
+            ->method('getAvailableLanguageCodes')
+            ->with(true)
+            ->willReturn($data);
+
+        $this->assertEquals($data, $this->provider->getEnabledLanguages());
     }
 }

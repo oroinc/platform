@@ -7,7 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
 class LanguageType extends AbstractType
 {
@@ -16,12 +16,17 @@ class LanguageType extends AbstractType
     /** @var ConfigManager */
     protected $cm;
 
+    /** @var LanguageProvider */
+    protected $languageProvider;
+
     /**
      * @param ConfigManager $cm
+     * @param LanguageProvider $languageProvider
      */
-    public function __construct(ConfigManager $cm)
+    public function __construct(ConfigManager $cm, LanguageProvider $languageProvider)
     {
         $this->cm = $cm;
+        $this->languageProvider = $languageProvider;
     }
 
     /**
@@ -43,15 +48,8 @@ class LanguageType extends AbstractType
     protected function getLanguageChoices()
     {
         // ensure that default value is always in choice list
-        $defaultValue          = $this->cm->get(self::CONFIG_KEY, true);
-        $availableTranslations = (array)$this->cm->get(TranslationStatusInterface::CONFIG_KEY);
-        $availableTranslations = array_filter(
-            $availableTranslations,
-            function ($languageStatus) {
-                return $languageStatus === TranslationStatusInterface::STATUS_ENABLED;
-            }
-        );
-        $availableLanguages    = array_merge(array_keys($availableTranslations), [$defaultValue]);
+        $defaultValue = $this->cm->get(self::CONFIG_KEY, true);
+        $availableLanguages = array_merge($this->languageProvider->getEnabledLanguages(), [$defaultValue]);
 
         $allLanguages = Intl::getLocaleBundle()->getLocaleNames('en');
 

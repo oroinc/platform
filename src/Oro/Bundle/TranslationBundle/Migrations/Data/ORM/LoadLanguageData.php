@@ -40,10 +40,11 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         $configManager = $this->container->get('oro_config.global');
 
         $defaultLanguage = $configManager->get(Configuration::getConfigKeyByName(Configuration::LANGUAGE));
-        $enabledLanguages = $configManager->get(Configuration::getConfigKeyByName(Configuration::LANGUAGES));
+        $enabledLanguages = (array)$configManager->get(Configuration::getConfigKeyByName('languages'));
         $downloadedLanguages = array_keys($configManager->get(TranslationStatusInterface::CONFIG_KEY));
 
-        $languages = array_unique(array_merge([$defaultLanguage], $enabledLanguages, $downloadedLanguages));
+        /** English language must be in list by default, because we already have translations in *.en.yml files */
+        $languages = array_unique(array_merge(['en'], [$defaultLanguage], $enabledLanguages, $downloadedLanguages));
         $user = $this->getUser($manager);
 
         foreach ($languages as $languageCode) {
@@ -52,7 +53,7 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
                 ->setEnabled(in_array($languageCode, $enabledLanguages, true) || $defaultLanguage === $languageCode)
                 ->setOwner($user)
                 ->setOrganization($user->getOrganization())
-                ->setOwner(null);
+                ->setOwner($user);
 
             $manager->persist($language);
         }
