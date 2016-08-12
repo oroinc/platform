@@ -558,7 +558,10 @@ define(function(require) {
                     }
                 } else {
                     fieldErrors = _.result(responseErrors.children, this.options.cell.column.get('name'));
-                    if (!fieldErrors && this.options.viewOptions) {
+                    if (!fieldErrors
+                        && this.options.viewOptions != 'undefined'
+                        && this.options.viewOptions.value_field_name != 'undefined'
+                    ) {
                         fieldErrors = _.result(responseErrors.children, this.options.viewOptions.value_field_name);
                     }
 
