@@ -18,6 +18,7 @@
 
 {% block navButtonContainer %}
     {% block navButtons %}
+        {% placeholder view_navButtons with {entity: entity} %}
         {% if entity.id is defined and resource_granted('DELETE', entity) %}
             {{ UI.deleteButton({
                 'dataUrl': path('oro_api_delete_role', {'id': entity.id}),
@@ -30,7 +31,6 @@
             })
             }}
         {% endif %}
-        {% placeholder view_navButtons with {entity: entity} %}
     {% endblock navButtons %}
 {% endblock navButtonContainer %}
 
