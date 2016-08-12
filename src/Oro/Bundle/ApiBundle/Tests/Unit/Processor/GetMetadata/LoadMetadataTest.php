@@ -752,12 +752,6 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "data_type" configuration attribute should be specified for the "field1" field of the "Test\Class" entity.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessForManageableEntityWithNotManageableFieldWithoutDataTypeInConfig()
     {
         $config = [
@@ -793,14 +787,18 @@ class LoadMetadataTest extends MetadataProcessorTestCase
 
         $this->context->setConfig($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "data_type" configuration attribute should be specified for the "association1" field of the "Test\Class" entity.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessForManageableEntityWithNotManageableAssociationWithoutDataTypeInConfig()
     {
         $config = [
@@ -838,6 +836,16 @@ class LoadMetadataTest extends MetadataProcessorTestCase
 
         $this->context->setConfig($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessForExtendedAssociation()
