@@ -10,7 +10,7 @@ services:
             - '@translator'
             - '@security.token_storage'
             - '@event_dispatcher'
-            - '@oro_activity.resolver.entity_title.form'
+            - '@oro_activity.resolver.entity_title'
         tags:
             - { name: form.type, alias: oro_activity_contexts_select }
 
