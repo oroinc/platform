@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ConfigurationController extends Controller
 {
