@@ -23,7 +23,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
-use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\OrmDatasourceExtension;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
@@ -199,8 +199,24 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 AND ('
-                    . '(user_status < :datetime2 OR user_status > :datetime3) AND '
-                    . '(address.country LIKE :string4 OR address.city LIKE :string5 OR address.zip LIKE :string6)'
+                    . '(user_status < :datetime2 OR user_status > :datetime3) '
+                    . 'AND (user.id IN('
+                    . 'SELECT string4.id '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string4 '
+                    . 'INNER JOIN string4.string5 string5 '
+                    . 'WHERE string5.country LIKE :string4) '
+                    . 'OR user.id IN('
+                    . 'SELECT string7.id '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string7 '
+                    . 'INNER JOIN string7.string8 string8 '
+                    . 'WHERE string8.city LIKE :string5) OR '
+                    . 'user.id IN('
+                    . 'SELECT string10.id '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string10 '
+                    . 'INNER JOIN string10.string11 string11 '
+                    . 'WHERE string11.zip LIKE :string6'
+                    . ')'
+                    . ')'
                     . ')'
             ],
             'test with OR conditions' => [
@@ -250,8 +266,13 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . 'user_status < :datetime2 OR user_status > :datetime3 OR '
-                    . 'address.country LIKE :string4'
+                    . 'user_status < :datetime2 OR user_status > :datetime3 '
+                    . 'OR user.id IN('
+                    . 'SELECT string4.id '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string4 '
+                    . 'INNER JOIN string4.string5 string5 '
+                    . 'WHERE string5.country LIKE :string4'
+                    . ')'
                     . ')'
             ],
             'test with OR filters between simple and group conditions' => [
@@ -301,8 +322,13 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . '(user_status < :datetime2 OR user_status > :datetime3) AND '
-                    . 'address.country LIKE :string4'
+                    . '(user_status < :datetime2 OR user_status > :datetime3) '
+                    . 'AND user.id IN('
+                    . 'SELECT string4.id '
+                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string4 '
+                    . 'INNER JOIN string4.string5 string5 '
+                    . 'WHERE string5.country LIKE :string4'
+                    . ')'
                     . ')'
             ],
         ];

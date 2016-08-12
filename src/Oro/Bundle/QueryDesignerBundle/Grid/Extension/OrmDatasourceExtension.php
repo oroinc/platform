@@ -55,9 +55,19 @@ class OrmDatasourceExtension extends AbstractExtension
 
         /** @var QueryBuilder $qb */
         $qb      = $datasource->getQueryBuilder();
-        $ds      = new GroupingOrmFilterDatasourceAdapter($qb);
+        $ds      = $this->createDatasourceAdapter($qb);
         $filters = $config->offsetGetByPath('[source][query_config][filters]');
         $this->restrictionBuilder->buildRestrictions($filters, $ds);
         $this->appliedFor[$gridName . $parametersKey] = true;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     *
+     * @return GroupingOrmFilterDatasourceAdapter
+     */
+    protected function createDatasourceAdapter(QueryBuilder $qb)
+    {
+        return new GroupingOrmFilterDatasourceAdapter($qb);
     }
 }
