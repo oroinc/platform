@@ -17,6 +17,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
@@ -48,6 +49,9 @@ class FieldAclExtension extends AbstractAclExtension
 
     /** @var ConfigProvider */
     protected $securityConfigProvider;
+
+    /** @var EntitySecurityMetadataProvider */
+    protected $entityMetadataProvider;
 
     /**
      * key = Permission
@@ -82,7 +86,8 @@ class FieldAclExtension extends AbstractAclExtension
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         EntityOwnerAccessor $entityOwnerAccessor,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        EntitySecurityMetadataProvider $entityMetadataProvider
     ) {
         $this->entityClassResolver = $entityClassResolver;
         $this->metadataProvider = $metadataProvider;
@@ -90,6 +95,7 @@ class FieldAclExtension extends AbstractAclExtension
         $this->decisionMaker = $decisionMaker;
         $this->objectIdAccessor = $objectIdAccessor;
         $this->securityConfigProvider = $configProvider;
+        $this->entityMetadataProvider = $entityMetadataProvider;
 
         $this->permissionToMaskBuilderIdentity = [
             'VIEW'   => FieldMaskBuilder::IDENTITY,
@@ -135,7 +141,18 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
-        return array_keys($this->permissionToMaskBuilderIdentity);
+        $config = $this->entityMetadataProvider->getMetadata($oid->getType())->getFields()[$fieldName];
+        $result = $config->getPermissions();
+        if (empty($result)) {
+            $result = array_keys($this->permissionToMaskBuilderIdentity);
+        }
+
+        $metadata = $this->getMetadata($oid);
+        if (!$metadata->hasOwner()) {
+            $result = array_diff($result, $this->permissionToMaskBuilderIdentity);
+        }
+
+        return $result;
     }
 
     /**

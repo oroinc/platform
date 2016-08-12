@@ -1,4 +1,4 @@
-# we should add application/vnd.api+json content type as "json" type to be able to recive processed JSON.API data from the Request
+# we should add application/vnd.api+json content type as "json" type to be able to receive JSON.API data from the Request
 fos_rest:
     view:
         mime_types: {'json': ['application/json', 'application/x-json', 'application/vnd.api+json']}
@@ -7,12 +7,17 @@ nelmio_api_doc:
     motd:
         template: OroApiBundle::ApiDoc/motd.html.twig
     default_sections_opened: false
+    request_listener:
+        enabled: false
+    cache:
+        enabled: true
 
 security:
     firewalls:
         api_wsse_secured:
             pattern: ^/api/(?!(soap|rest|doc)($|/.*))
-            stateless:  true
+            # @todo: should be enabled in scope of BAP-11128
+            # stateless:  true
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"

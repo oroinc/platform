@@ -32,7 +32,7 @@ class Theme
     protected $groups = [];
 
     /** @var array */
-    protected $data = [];
+    protected $config = [];
 
     /**
      * @param string $name
@@ -181,19 +181,19 @@ class Theme
     }
 
     /**
-     * @param array $data
+     * @param array $config
      */
-    public function setData(array $data)
+    public function setConfig(array $config)
     {
-        $this->data = $data;
+        $this->config = $config;
     }
 
     /**
      * @return array
      */
-    public function getData()
+    public function getConfig()
     {
-        return $this->data;
+        return $this->config;
     }
 
     /**
@@ -201,9 +201,9 @@ class Theme
      * @param mixed $value
      * @return $this
      */
-    public function setDataByKey($key, $value)
+    public function setConfigByKey($key, $value)
     {
-        $this->data[$key] = $value;
+        $this->config[$key] = $value;
         return $this;
     }
 
@@ -212,10 +212,10 @@ class Theme
      * @param mixed $default
      * @return mixed|null
      */
-    public function getDataByKey($key, $default = null)
+    public function getConfigByKey($key, $default = null)
     {
-        if (array_key_exists($key, $this->data)) {
-            return $this->data[$key];
+        if (array_key_exists($key, $this->config)) {
+            return $this->config[$key];
         }
         return $default;
     }

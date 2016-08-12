@@ -10,8 +10,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\LocaleBundle\Model\ExtendLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
-
 /**
  * @ORM\Table(
  *      name="oro_fallback_localization_val",

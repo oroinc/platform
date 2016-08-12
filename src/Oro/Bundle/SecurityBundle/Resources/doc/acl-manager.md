@@ -99,7 +99,7 @@ $manager->getMaskBuilder($manager->getOid('entity: AcmeBundle:AcmeEntity'), 'VIE
 $manager->getMaskBuilder($manager->getOid('entity: AcmeBundle:AcmeEntity'), 'DELETE')
 ```
 
-because VIEW, CREATE, EDIT, DELETE, ASSIGN and SHARE permissions are supported by EntityMaskBuilder class and it is the default mask builder for 'Entity' extension.
+because VIEW, CREATE, EDIT, DELETE and ASSIGN permissions are supported by EntityMaskBuilder class and it is the default mask builder for 'Entity' extension.
 
 If you sure that some ACL extension supports only one mask, you can omit $permission argument as well.
 
