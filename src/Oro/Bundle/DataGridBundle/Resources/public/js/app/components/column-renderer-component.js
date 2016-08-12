@@ -49,12 +49,14 @@ define(function(Chaplin) {
         
         _getElementClasses: function($element, additionalRawClasses) {
             var elementRawClasses = $element.attr('class') || '';
-            return _.union(additionalRawClasses.split(' '), elementRawClasses.split(' '));
+            var elementClasses = _.union(additionalRawClasses.split(' '), elementRawClasses.split(' '));
+
+            return _.without(elementClasses, '');
         },
 
         _getAttributesRaw: function(attributes) {
             var raw = '';
-            _.each(attributes, function(name, value){
+            _.each(attributes, function(value, name){
                 raw += ' ' + name + '=' + value;
             });
             return raw.trim();
