@@ -1,6 +1,5 @@
 parameters:
     oro_translation.form.type.translatable_entity.class:     Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType
-    oro_translation.form.type.available_translations.class: Oro\Bundle\TranslationBundle\Form\Type\AvailableTranslationsConfigurationType
     oro_translation.form.extension.translatable_choice.class: Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension
 
 services:
