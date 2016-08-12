@@ -2,6 +2,7 @@
 @light-border-color: #e7e7e7;
 @dark-border-color: #ccc;
 .card-view{
+  position: relative;
   background: white;
   border: solid 1px @light-border-color;
   border-radius: 3px;
@@ -15,14 +16,16 @@
     }
   }
   .card-title {
+    .text-line-truncate(calc(~"100% - 15px"));
     font-weight: bold;
   }
   .card-actions {
-    float: right;
+    position: absolute;
+    top: 5px;
+    right: 5px;
     .dropdown-toggle {
       padding: 0 5px;
       width: auto;
-      margin-right: -4px;
       margin-top: 1px;
     }
     .dropdown-menu {
@@ -35,6 +38,7 @@
     }
   }
   .card-amount {
+    .text-line-truncate();
     color: #777;
     font-weight: bold;
   }
@@ -42,8 +46,12 @@
     color: #777;
     margin-top: 10px;
     line-height: 17px;
+    .card-additional-line {
+      .text-line-truncate();
+    }
   }
   .card-date{
+    .text-line-truncate();
     color: #CCC;
     font-size: 11px;
   }
