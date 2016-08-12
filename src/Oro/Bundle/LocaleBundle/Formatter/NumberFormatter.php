@@ -157,11 +157,13 @@ class NumberFormatter
     /**
      * Format duration
      *
-     * @param float|\DateTime $value If value is a DateTime then it's timestamp will be used.
-     * @param array $attributes Set of attributes of \NumberFormatter
-     * @param array $textAttributes Set of text attributes of \NumberFormatter
-     * @param array $symbols Set of symbols of \NumberFormatter
-     * @param string|null $locale Locale of formatting
+     * @param float|\DateTime $value          If value is a DateTime then it's timestamp will be used.
+     * @param array           $attributes     Set of attributes of \NumberFormatter
+     * @param array           $textAttributes Set of text attributes of \NumberFormatter
+     * @param array           $symbols        Set of symbols of \NumberFormatter
+     * @param string|null     $locale         Locale of formatting
+     * @param bool            $useDefaultFormat
+     *
      * @return string
      */
     public function formatDuration(
@@ -169,13 +171,18 @@ class NumberFormatter
         array $attributes = array(),
         array $textAttributes = array(),
         array $symbols = array(),
-        $locale = null
+        $locale = null,
+        $useDefaultFormat = false
     ) {
         if ($value instanceof \DateTime) {
             $value = $value->getTimestamp();
         }
 
         $value = abs($value);
+
+        if ($useDefaultFormat) {
+            return $this->formatDefaultDuration($value);
+        }
 
         $result = $this->format($value, \NumberFormatter::DURATION, $attributes, $textAttributes, $symbols, $locale);
 

@@ -15,7 +15,7 @@ define(function(require) {
             var propName = config.renderedPropertyName || 'name';
             config.result_template = config.result_template || this.makeItemTemplate(propName, true);
             config.selection_template = config.selection_template || this.makeItemTemplate(propName, false);
-            config.className = 'select2-tree-autocomplete';
+            config.containerCssClass = 'select2-tree-autocomplete';
             config.onAfterInit = function(select2Instance) {
                 var oldPositionDropdown = select2Instance.positionDropdown;
                 select2Instance.positionDropdown = function() {

@@ -178,4 +178,61 @@ class DbalMessage implements MessageInterface
     {
         $this->delay = $delay;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCorrelationId($correlationId)
+    {
+        $headers = $this->getHeaders();
+        $headers['correlation_id'] = (string) $correlationId;
+
+        $this->setHeaders($headers);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCorrelationId()
+    {
+        return $this->getHeader('correlation_id', '');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageId($messageId)
+    {
+        $headers = $this->getHeaders();
+        $headers['message_id'] = (string) $messageId;
+
+        $this->setHeaders($headers);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessageId()
+    {
+        return $this->getHeader('message_id', '');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTimestamp()
+    {
+        return $this->getHeader('timestamp');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTimestamp($timestamp)
+    {
+        $headers = $this->getHeaders();
+        $headers['timestamp'] = (int) $timestamp;
+
+        $this->setHeaders($headers);
+    }
 }

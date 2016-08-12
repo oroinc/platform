@@ -476,9 +476,9 @@ define(function(require) {
                         }, this)
                     ) {
                         var fields = response.hasOwnProperty('fields') ? response.fields : response;
-                        var routeParametersRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
+                        var routeParamsRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
                         _.each(fields, function(item, i) {
-                            var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
+                            var propName = routeParamsRenameMap.hasOwnProperty(i) ? routeParamsRenameMap[i] : i;
                             if (this.options.cell.model.get(propName) !== void 0) {
                                 this.options.cell.model.set(propName, item);
                             }
@@ -558,6 +558,12 @@ define(function(require) {
                     }
                 } else {
                     fieldErrors = _.result(responseErrors.children, this.options.cell.column.get('name'));
+                    if (!fieldErrors && this.options.viewOptions !== 'undefined' &&
+                        this.options.viewOptions.value_field_name !== 'undefined'
+                    ) {
+                        fieldErrors = _.result(responseErrors.children, this.options.viewOptions.value_field_name);
+                    }
+
                     if (fieldErrors && _.isArray(fieldErrors.errors)) {
                         backendErrors = {value: fieldErrors.errors[0]};
                     } else if (_.isArray(responseErrors.errors)) {
