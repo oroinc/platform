@@ -155,7 +155,7 @@ class Parser
     protected function parseKeywords()
     {
         switch ($this->stream->current->value) {
-            case QUERY::KEYWORD_SELECT:
+            case Query::KEYWORD_SELECT:
                 $this->parseSelectExpression();
                 break;
             case Query::KEYWORD_FROM:

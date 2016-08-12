@@ -197,6 +197,9 @@ class Orm extends AbstractEngine
     protected function doSearch(Query $query)
     {
         $results       = [];
+
+        $query->setMappingConfig($this->mapper->getMappingConfig());
+
         $searchResults = $this->getIndexRepository()->search($query);
         if (($query->getCriteria()->getMaxResults() > 0 || $query->getCriteria()->getFirstResult() > 0)) {
             $recordsCount = $this->getIndexRepository()->getRecordsCount($query);

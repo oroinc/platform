@@ -173,7 +173,13 @@ class ObjectMapper extends AbstractMapper
         foreach ($selects as $select) {
             list ($type, $name) = Criteria::explodeFieldTypeName($select);
             if (isset($item[$name])) {
-                $result[$name] = $item[$name];
+                $value = $item[$name];
+
+                if (is_array($value)) {
+                    $value = array_shift($value);
+                }
+
+                $result[$name] = $value;
             }
         }
 

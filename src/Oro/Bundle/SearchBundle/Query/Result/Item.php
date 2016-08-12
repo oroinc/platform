@@ -51,7 +51,7 @@ class Item
     /**
      * @var array
      */
-    protected $selectedData;
+    protected $selectedData = [];
 
     /**
      * @param ObjectManager $em
@@ -60,6 +60,7 @@ class Item
      * @param string|null   $recordTitle
      * @param string|null   $recordUrl
      * @param array         $entityConfig
+     * @param array         $selectedData
      */
     public function __construct(
         ObjectManager $em,
@@ -76,7 +77,7 @@ class Item
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
         $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
-        $this->selectedData = $selectedData;
+        $this->selectedData = is_array($selectedData) ? $selectedData : [];
     }
 
     /**
@@ -220,7 +221,7 @@ class Item
             'record_id'     => $this->recordId,
             'record_string' => $this->recordTitle,
             'record_url'    => $this->recordUrl,
-            'selectedData'  => $this->selectedData
+            'selected_data'  => $this->selectedData
         ];
     }
 }

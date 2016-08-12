@@ -493,7 +493,7 @@ class Query
     {
         $fromString = '';
         if ($this->getFrom()) {
-            $fromString .= ' from ' . implode(', ', $this->getFrom());
+            $fromString .= 'from ' . implode(', ', $this->getFrom());
         }
 
         $visitor     = new QueryStringExpressionVisitor();
@@ -520,10 +520,19 @@ class Query
             $offsetString .= ' offset ' . $this->getFirstResult();
         }
 
-        $selectString = trim('select ' . $this->getStringColumns());
+        $selectColumnsString = $this->getStringColumns();
+
+        $selectString = '';
+        if (!empty($selectColumnsString)) {
+            $selectString = trim('select (' . $selectColumnsString . ')').' ';
+        }
 
         return $selectString
-               . $fromString . $whereString . $orderByString . $limitString . $offsetString;
+                . $fromString
+                . $whereString
+                . $orderByString
+                . $limitString
+                . $offsetString;
     }
 
     /**
@@ -556,13 +565,18 @@ class Query
         }
 
         $result = [];
+        $columns = [];
 
         foreach ($selects as $select) {
             $parts = Criteria::explodeFieldTypeName($select);
-            $result[] = $parts[1];
+            $columns[] = $parts[1];
         }
 
-        $result = implode(', ', $result);
+        $result = implode(', ', $columns);
+
+        if (count($columns) > 1) {
+            $result = '('.$result.')';
+        }
 
         return $result;
     }
