@@ -58,7 +58,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage The message invalid. It must have integrationId set
+     * @expectedExceptionMessage The message invalid. It must have integration_id set
      */
     public function testThrowIfMessageBodyMissIntegrationId()
     {

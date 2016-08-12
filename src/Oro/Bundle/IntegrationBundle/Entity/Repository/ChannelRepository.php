@@ -15,7 +15,7 @@ class ChannelRepository extends EntityRepository
     const BUFFER_SIZE = 100;
 
     /**
-     * @deprecated TODO CRM-5839 remove it
+     * @deprecated TODO CRM-5838 remove it
      *
      * @info Check if task is running
      *
@@ -34,7 +34,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @deprecated TODO CRM-5839 remove it
+     * @deprecated TODO CRM-5838 remove it
      *
      * @info Check if task is pending or running
      *
@@ -53,7 +53,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @deprecated TODO CRM-5839 remove it
+     * @deprecated TODO CRM-5838 remove it
      *
      * @param string   $commandName
      * @param int|null $integrationId
@@ -91,7 +91,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @deprecated TODO CRM-5839 remove it
+     * @deprecated TODO CRM-5838 remove it
      *
      * @param string[]|string      $commandName
      * @param string[]|string|null $arguments
@@ -142,7 +142,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @deprecated TODO CRM-5839 remove it
+     * @deprecated TODO CRM-5838 remove it
      *
      * @param string[]|string      $commandName
      * @param string[]|string|null $arguments
@@ -159,7 +159,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * @deprecated TODO CRM-5839 remove it
+     * @deprecated TODO CRM-5838 remove it
      *
      * @param string               $commandName
      * @param string[]|string|null $arguments
