@@ -63,7 +63,7 @@ class GetContextValue extends AbstractFunction
         $count = count($options);
         if ($count >= 1 && $count <= 2) {
             $this->value = reset($options);
-            if(!is_string($this->value)) {
+            if (!is_string($this->value)) {
                 throw new Exception\InvalidArgumentException(
                     sprintf('The first option should be a string, but %s given.', gettype($this->value))
                 );

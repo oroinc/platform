@@ -40,7 +40,7 @@ class ThemeProviderTest extends \PHPUnit_Framework_TestCase
     {
         $themeName = 'test';
         $theme     = new Theme($themeName);
-        $theme->setData([
+        $theme->setConfig([
             'assets' => [
                 'styles' => [
                     'output' => 'path/to/output/css'
