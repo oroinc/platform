@@ -417,7 +417,7 @@ abstract class AbstractScopeManager
      * @param null|int|object $identifier
      * @return int|null
      */
-    protected function resolveIdentifier($identifier)
+    public function resolveIdentifier($identifier)
     {
         if (is_object($identifier)) {
             $identifier = $this->getScopeIdByEntity($identifier);
