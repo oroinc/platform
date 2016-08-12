@@ -9,6 +9,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             container: '[data-collapse-container]',
             storageKey: '',
             open: null,
+            uid: '',
             openClass: 'expanded',
             animationSpeed: 250
         },
@@ -19,12 +20,12 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         },
 
         _init: function() {
-            var storedState = this.options.storageKey ? JSON.parse(localStorage.getItem(this.options.storageKey)) : false;
+            var storedState = this.options.storageKey ? JSON.parse(localStorage.getItem(this.options.storageKey + this.options.uid)) : null;
 
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);
 
-            this.options.open = !_.isNull(this.options.open) ? this.options.open : storedState;
+            this.options.open = _.isBoolean(storedState) ? storedState : this.options.open;
 
             this.$el.toggleClass(this.options.openClass, this.options.open);
 
@@ -66,7 +67,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 mediator.trigger('layout:adjustHeight');
 
                 if (self.options.storageKey) {
-                    localStorage.setItem(self.options.storageKey, isOpen);
+                    localStorage.setItem(self.options.storageKey + self.options.uid, isOpen);
                 }
             });
         }
