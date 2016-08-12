@@ -44,6 +44,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('router_processor')->defaultNull()->end()
                 ->scalarNode('router_destination')->defaultValue('default')->cannotBeEmpty()->end()
                 ->scalarNode('default_destination')->defaultValue('default')->cannotBeEmpty()->end()
+                ->integerNode('redelivered_delay_time')->min(1)->defaultValue(10)->cannotBeEmpty()->end()
             ->end()->end()
         ;
 

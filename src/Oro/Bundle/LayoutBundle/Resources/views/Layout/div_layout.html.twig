@@ -36,7 +36,7 @@
     {%- endif -%}
     {%- for attrname, attrvalue in attr -%}
         {%- if (attrvalue is iterable) -%}
-            {% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}
+            {% set attrvalue = attrvalue|json_encode() %}
         {%- endif -%}
         {%- if attrname is same as('title') -%}
             {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain) }}"

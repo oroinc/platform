@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Component\Testing\ClassExtensionTrait;

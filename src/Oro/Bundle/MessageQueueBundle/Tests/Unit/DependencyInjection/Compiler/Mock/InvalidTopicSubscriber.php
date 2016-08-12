@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock;
 
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
