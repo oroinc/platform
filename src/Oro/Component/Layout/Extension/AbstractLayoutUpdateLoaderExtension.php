@@ -2,29 +2,47 @@
 
 namespace Oro\Component\Layout\Extension;
 
-use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
-use Oro\Component\Layout\Extension\Theme\ThemeExtension;
+use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
+use Oro\Component\Layout\LayoutUpdateInterface;
+use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
 
 abstract class AbstractLayoutUpdateLoaderExtension extends AbstractExtension
 {
+    const THEME_KEY = 'theme';
+
     /** @var array */
-    protected $resources;
+    protected $resources = [];
 
     /** @var PathProviderInterface */
     protected $pathProvider;
 
-    /** @var  array */
-    protected $updates;
+    /** @var array */
+    protected $updates = [];
+
+    /**
+     * @param array $resources
+     * @param PathProviderInterface $provider
+     */
+    public function __construct(array $resources, PathProviderInterface $provider)
+    {
+        $this->resources = $resources;
+        $this->pathProvider = $provider;
+    }
+
+    /**
+     * @param string $file
+     * @param ContextInterface $context
+     */
+    abstract protected function loadLayoutUpdate($file, ContextInterface $context);
 
     /**
      * {@inheritdoc}
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
-        $this->updates = [];
-        if ($context->getOr(ThemeExtension::THEME_KEY)) {
+        if ($context->getOr(self::THEME_KEY)) {
             $paths = $this->getPaths($context);
             $files = $this->findApplicableResources($paths);
             foreach ($files as $file) {
@@ -36,13 +54,23 @@ abstract class AbstractLayoutUpdateLoaderExtension extends AbstractExtension
     }
 
     /**
+     * @param LayoutUpdateInterface $update
+     *
+     * @return string
+     */
+    protected function getElement(LayoutUpdateInterface $update)
+    {
+        return $update instanceof ElementDependentLayoutUpdateInterface ? $update->getElement() : 'root';
+    }
+
+    /**
      * Filters resources by paths
      *
      * @param array $paths
      *
      * @return array
      */
-    public function findApplicableResources(array $paths)
+    protected function findApplicableResources(array $paths)
     {
         $result = [];
         foreach ($paths as $path) {
@@ -71,7 +99,7 @@ abstract class AbstractLayoutUpdateLoaderExtension extends AbstractExtension
      *
      * @return mixed
      */
-    public function readValue(&$array, $property)
+    protected function readValue(&$array, $property)
     {
         if (is_array($array) && isset($array[$property])) {
             return $array[$property];
@@ -94,16 +122,5 @@ abstract class AbstractLayoutUpdateLoaderExtension extends AbstractExtension
         }
 
         return $this->pathProvider->getPaths([]);
-    }
-
-    /**
-     * @param string $file
-     * @param ContextInterface $context
-     *
-     * @return array
-     */
-    protected function loadLayoutUpdate($file, ContextInterface $context)
-    {
-        return [];
     }
 }

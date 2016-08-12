@@ -2,27 +2,17 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
-use Oro\Component\Layout\Extension\Theme\Model\Theme;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
-use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
+use Oro\Component\Layout\Extension\Theme\ThemeExtension;
+use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItem;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoader;
-use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
 use Oro\Component\Layout\Loader\Driver\DriverInterface;
-use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
-use Oro\Component\Layout\Extension\Theme\ThemeExtension;
-use Oro\Component\Layout\Model\LayoutUpdateImport;
 use Oro\Component\Layout\RawLayoutBuilder;
-use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdate;
-use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdateWithImports;
-use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithImports;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ThemeExtension */
@@ -40,9 +30,6 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|DependencyInitializer */
     protected $dependencyInitializer;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|ThemeManager */
-    protected $themeManager;
-
     /** @var array */
     protected static $resources = [
         'oro-default' => [
@@ -55,7 +42,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             'index' => [
                 'resource-update.yml'
             ]
-        ]
+        ],
     ];
 
     protected function setUp()
