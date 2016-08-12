@@ -1,0 +1,38 @@
+$color-palette: (
+    'primary': (
+        'main': #cc5c28,
+        'base': #d86936,
+        'light': #f2994b,
+        'dark': #b84926
+    ),
+    'secondary': (
+        'base': #fcb91d,
+        'light': #dd8f3d,
+        'dark': #c57623
+    ),
+    'gray': (
+        'ultra': #fff,
+        'slight-lightest': #f0f0f0,
+        'slight-light': #d1d1d1,
+        'lighter': #ebebeb,
+        'light': #b7b7b7,
+        'slight-middle': #acacac,
+        'middle': #626365,
+        'dark:': #252525
+    ),
+    'ui': (
+        'error': #7a0026,
+        'success': #7ea6a4,
+        'info': #678684,
+        'warring': #f7941d,
+        'focus': #4597ca
+    ),
+) !default;
+
+
+// Use for example: color: get-color('primary', 'base');
+@function get-color($palette, $key) {
+    $current-palette: map-get($color-palette,  $palette);
+
+    @return map-get($current-palette, $key);
+}

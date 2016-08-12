@@ -1,0 +1,12 @@
+{% block presentation_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+    '~class': ' presentation'
+    }) %}
+
+    12312321312
+    <div {{ block('block_attributes') }}>
+        <div class="presentation__centered">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
