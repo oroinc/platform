@@ -7,10 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * Class BasePerson
- *
- * @package Oro\Bundle\BusinessEntitiesBundle\Entity
- *
  * @ORM\MappedSuperclass
  */
 class BaseCart

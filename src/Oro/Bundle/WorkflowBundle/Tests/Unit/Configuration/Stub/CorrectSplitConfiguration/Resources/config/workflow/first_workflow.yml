@@ -49,6 +49,8 @@ workflows:
                     check_conditions_before_job_creation: true
         transition_definitions:
             first_transition_definition:
+                preactions:
+                    - '@custom_pre_action': ~
                 pre_conditions:
                     '@true': ~
                 conditions:

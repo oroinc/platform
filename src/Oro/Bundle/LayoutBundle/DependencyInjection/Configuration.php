@@ -123,9 +123,9 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $node        = $treeBuilder->root('themes');
 
-        $dataTreeBuilder = new TreeBuilder();
-        $dataNode = $dataTreeBuilder->root('data');
-        $dataNode->info('Layout theme additional data')->end();
+        $configTreeBuilder = new TreeBuilder();
+        $configNode = $configTreeBuilder->root('config');
+        $configNode->info('Layout theme additional config')->end();
 
         $node
             ->useAttributeAsKey('theme-identifier')
@@ -160,11 +160,11 @@ class Configuration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                         ->cannotBeEmpty()
                     ->end()
-                    ->append($dataNode)
+                    ->append($configNode)
                 ->end()
             ->end();
 
-        $this->appendDataNodes($dataNode);
+        $this->appendConfigNodes($configNode);
 
         $parentNode
             ->append($node)
@@ -180,9 +180,9 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param ArrayNodeDefinition $dataNode
+     * @param ArrayNodeDefinition $configNode
      */
-    protected function appendDataNodes($dataNode)
+    protected function appendConfigNodes($configNode)
     {
         $treeBuilder = new TreeBuilder();
         $assetsNode = $treeBuilder->root('assets');
@@ -221,7 +221,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        $dataNode->append($assetsNode);
-        $dataNode->append($imagesNode);
+        $configNode->append($assetsNode);
+        $configNode->append($imagesNode);
     }
 }

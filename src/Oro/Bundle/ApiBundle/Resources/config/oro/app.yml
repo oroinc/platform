@@ -16,7 +16,8 @@ security:
     firewalls:
         api_wsse_secured:
             pattern: ^/api/(?!(soap|rest|doc)($|/.*))
-            stateless:  true
+            # @todo: should be enabled in scope of BAP-11128
+            # stateless:  true
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"
