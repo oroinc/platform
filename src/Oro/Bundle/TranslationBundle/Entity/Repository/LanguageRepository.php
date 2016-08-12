@@ -18,13 +18,8 @@ class LanguageRepository extends EntityRepository
             $qb->where($qb->expr()->eq('language.enabled', ':enabled'))->setParameter('enabled', true);
         }
 
-        $codes = $qb->getQuery()->getArrayResult();
+        $data = $qb->getQuery()->getArrayResult();
 
-        return array_map(
-            function (array $row) {
-                return $row['code'];
-            },
-            $codes
-        );
+        return array_column($data, 'code');
     }
 }

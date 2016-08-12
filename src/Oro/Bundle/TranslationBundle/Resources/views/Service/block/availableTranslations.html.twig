@@ -45,18 +45,18 @@
                 </td>
                 <td>
                     {% if status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
-                        {{ _self.renderButton(language.code, 'download', 'oro.translation.action.download'|trans) }}
+                        {{ _self.renderButton(language.code, 'download', 'oro.translation.language.action.download.label'|trans) }}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_DOWNLOADED') %}
-                        {{ _self.renderButton(language.code, 'enable', 'oro.translation.action.enable'|trans) }}
+                        {{ _self.renderButton(language.code, 'enable', 'oro.translation.language.action.enable.label'|trans) }}
 
                         {% if not oro_translation_is_fresh(language.code) %}
-                            {{ _self.renderButton(language.code, 'update', 'oro.translation.action.update'|trans) }}
+                            {{ _self.renderButton(language.code, 'update', 'oro.translation.language.action.update.label'|trans) }}
                         {% endif %}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_ENABLED') %}
-                        {{ _self.renderButton(language.code, 'disable', 'oro.translation.action.disable'|trans) }}
+                        {{ _self.renderButton(language.code, 'disable', 'oro.translation.language.action.disable.label'|trans) }}
 
                         {% if not oro_translation_is_fresh(language.code) %}
-                            {{ _self.renderButton(language.code, 'update', 'oro.translation.action.update'|trans) }}
+                            {{ _self.renderButton(language.code, 'update', 'oro.translation.language.action.update.label'|trans) }}
                         {% endif %}
                     {% endif %}
                 </td>

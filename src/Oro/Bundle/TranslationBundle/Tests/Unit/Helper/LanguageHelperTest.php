@@ -1,101 +1,168 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\tests\Unit\Helper;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
+use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
-use Oro\Component\Testing\Unit\EntityTrait;
-
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 {
-    use EntityTrait;
-
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
+    /** @var TranslationStatisticProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $provider;
 
     /** @var LanguageHelper */
     protected $helper;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
+        $this->provider = $this->getMockBuilder(TranslationStatisticProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->helper = new LanguageHelper($this->configManager);
+        $this->helper = new LanguageHelper($this->provider);
     }
 
     protected function tearDown()
     {
-        unset($this->helper, $this->configManager);
+        unset($this->helper, $this->provider);
     }
 
-    /**
-     * @dataProvider updateSystemConfigurationDataProvider
-     * @param Language $language
-     * @param array $currentConfig
-     * @param array $expected
-     */
-    public function testUpdateSystemConfiguration(Language $language, array $currentConfig, array $expected)
+    public function testIsAvailableInstallTranslatesAndNoCode()
     {
-        $this->configManager->expects($this->once())
+        $this->provider->expects($this->never())->method('get');
+
+        $this->assertFalse($this->helper->isAvailableInstallTranslates(new Language()));
+    }
+
+    public function testIsAvailableInstallTranslatesAndInstalledBuildDate()
+    {
+        $this->provider->expects($this->never())->method('get');
+
+        $language = (new Language())->setInstalledBuildDate(new \DateTime());
+
+        $this->assertFalse($this->helper->isAvailableInstallTranslates($language));
+    }
+
+    public function testIsAvailableInstallTranslatesAndUnknownCode()
+    {
+        $this->provider->expects($this->once())->method('get')->willReturn([]);
+
+        $language = (new Language())->setCode('unknown');
+
+        $this->assertFalse($this->helper->isAvailableInstallTranslates($language));
+    }
+
+    public function testIsAvailableInstallTranslates()
+    {
+        $this->provider->expects($this->once())
             ->method('get')
-            ->with('oro_locale.languages', [])
-            ->willReturn($currentConfig);
+            ->willReturn([
+                ['code' => 'en']
+            ]);
 
-        $actual = null;
+        $language = (new Language())->setCode('en');
 
-        $this->configManager->expects($this->once())
-            ->method('set')
-            ->willReturnCallback(
-                function ($name, $value) use (&$actual) {
-                    $actual = $value;
-                }
-            );
-
-        $this->configManager->expects($this->once())->method('flush');
-
-        $this->helper->updateSystemConfiguration($language);
-
-        $this->assertEquals($expected, array_values($actual));
+        $this->assertTrue($this->helper->isAvailableInstallTranslates($language));
     }
 
-    /**
-     * @return array
-     */
-    public function updateSystemConfigurationDataProvider()
+    public function testIsAvailableUpdateTranslatesAndNoCode()
     {
-        return [
-            [
-                'language' => $this->getLanguage('en', true),
-                'currentConfig' => ['fr_FR'],
-                'expected' => ['fr_FR', 'en']
-            ],
-            [
-                'language' => $this->getLanguage('en', true),
-                'currentConfig' => ['en', 'fr_FR'],
-                'expected' => ['en', 'fr_FR']
-            ],
-            [
-                'language' => $this->getLanguage('fr_FR', false),
-                'currentConfig' => ['en', 'fr_FR', 'js_JP'],
-                'expected' => ['en', 'js_JP']
-            ],
-            [
-                'language' => $this->getLanguage('pl_PL', false),
-                'currentConfig' => ['en', 'fr_FR', 'js_JP'],
-                'expected' => ['en', 'fr_FR', 'js_JP']
-            ]
-        ];
+        $this->provider->expects($this->never())->method('get');
+
+        $this->assertFalse($this->helper->isAvailableUpdateTranslates(new Language()));
     }
 
-    /**
-     * @param string $code
-     * @param bool $enabled
-     * @return Language
-     */
-    protected function getLanguage($code, $enabled)
+    public function testIsAvailableUpdateTranslatesAndNoInstalledBuildDate()
     {
-        return $this->getEntity(Language::class, ['id' => mt_rand(1, 1000), 'code' => $code, 'enabled' => $enabled]);
+        $this->provider->expects($this->never())->method('get');
+
+        $language = (new Language())->setCode('en');
+
+        $this->assertFalse($this->helper->isAvailableUpdateTranslates($language));
+    }
+
+    public function testIsAvailableUpdateTranslatesAndUnknownCode()
+    {
+        $this->provider->expects($this->once())->method('get')->willReturn([]);
+
+        $language = (new Language())->setCode('unknown')->setInstalledBuildDate(new \DateTime());
+
+        $this->assertFalse($this->helper->isAvailableUpdateTranslates($language));
+    }
+
+    public function testIsAvailableUpdateTranslatesAndNoUpdates()
+    {
+        $date = new \DateTime();
+
+        $this->provider->expects($this->once())
+            ->method('get')
+            ->willReturn([
+                [
+                    'code' => 'en',
+                    'lastBuildDate' => $date->format('Y-m-d\TH:i:sO'),
+                ]
+            ]);
+
+        $language = (new Language())->setCode('en')->setInstalledBuildDate($date);
+
+        $this->assertFalse($this->helper->isAvailableUpdateTranslates($language));
+    }
+
+    public function testIsAvailableUpdateTranslatesAndHasUpdates()
+    {
+        $date = new \DateTime();
+
+        $this->provider->expects($this->once())
+            ->method('get')
+            ->willReturn([
+                [
+                    'code' => 'en',
+                    'lastBuildDate' => $date->format('Y-m-d\TH:i:sO'),
+                ]
+            ]);
+
+        $date->sub(new \DateInterval('P1D'));
+
+        $language = (new Language())->setCode('en')->setInstalledBuildDate($date);
+
+        $this->assertTrue($this->helper->isAvailableUpdateTranslates($language));
+    }
+
+    public function testGetTranslationStatusAndUnknownCode()
+    {
+        $this->provider->expects($this->once())
+            ->method('get')
+            ->willReturn([]);
+
+        $this->assertNull($this->helper->getTranslationStatus(new Language()));
+    }
+
+    public function testGetTranslationStatusAndEnCode()
+    {
+        // TODO: should be removed in https://magecore.atlassian.net/browse/BAP-10608
+        $this->provider->expects($this->once())
+            ->method('get')
+            ->willReturn([]);
+
+        $language = (new Language())->setCode('en');
+
+        $this->assertEquals(100, $this->helper->getTranslationStatus($language));
+    }
+
+    public function testGetTranslationStatus()
+    {
+        $this->provider->expects($this->once())
+            ->method('get')
+            ->willReturn([
+                ['code' => 'en_US', 'translationStatus' => 50],
+            ]);
+
+        $language = (new Language())->setCode('en_US');
+
+        $this->assertEquals(50, $this->helper->getTranslationStatus($language));
     }
 }

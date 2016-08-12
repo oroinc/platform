@@ -1,6 +1,37 @@
 operations:
+    oro_translation_add_language:
+        label: oro.translation.action.add
+        applications: [backend]
+        routes:
+            - oro_translation_language_index
+        button_options:
+            icon: icon-plus
+        acl_resource: ['CREATE', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
+
+        attributes:
+            language_code:
+                label: oro.translation.language.entity_label
+                type: string
+        form_options:
+            attribute_fields:
+                language_code:
+                    form_type: oro_translation_add_language
+                    options:
+                        required: true
+        actions:
+            - '@create_entity':
+                class: Oro\Bundle\TranslationBundle\Entity\Language
+                attribute: $.language
+                data:
+                    code: $.language_code
+                flush: true
+            - '@flash_message':
+                message: oro.translation.language.message.added
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
+
     oro_translation_disable_language:
-        label: oro.translation.language.action.disable.label
+        label: oro.translation.action.disable
         applications: [backend]
         datagrids:
             - oro-translation-language-grid
@@ -22,7 +53,7 @@ operations:
             - '@refresh_grid': oro-translation-language-grid
 
     oro_translation_enable_language:
-        label: oro.translation.language.action.enable.label
+        label: oro.translation.action.enable
         applications: [backend]
         datagrids:
             - oro-translation-language-grid
@@ -40,6 +71,46 @@ operations:
                     value: true
             - '@flash_message':
                 message: oro.translation.language.message.enabled
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
+
+    oro_translation_language_install:
+        label: oro.translation.action.install
+        button_options:
+            icon: icon-download
+        datagrids:
+            - oro-translation-language-grid
+        preactions:
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isAvailableInstallTranslates
+                method_parameters: [$.data]
+                attribute: $.isAvailableInstall
+        preconditions:
+            @eq: [$.isAvailableInstall, true]
+        actions:
+            - '@flash_message':
+                message: oro.translation.language.message.installed
+                type: 'success'
+            - '@refresh_grid': oro-translation-language-grid
+
+    oro_translation_language_update:
+        label: oro.translation.action.update
+        button_options:
+            icon: icon-refresh
+        datagrids:
+            - oro-translation-language-grid
+        preactions:
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isAvailableUpdateTranslates
+                method_parameters: [$.data]
+                attribute: $.isAvailableUpdate
+        preconditions:
+            @eq: [$.isAvailableUpdate, true]
+        actions:
+            - '@flash_message':
+                message: oro.translation.language.message.updated
                 type: 'success'
             - '@refresh_grid': oro-translation-language-grid
 

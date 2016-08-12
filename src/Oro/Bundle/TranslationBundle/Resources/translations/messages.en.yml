@@ -7,10 +7,12 @@ oro.translation:
             available_translations.label: 'Available translations'
 
     action:
-        download: 'Download'
-        enable: 'Enable'
         disable: 'Disable'
+        enable: 'Enable'
+        download: 'Download'
+        install: 'Install'
         update: 'Update'
+        add: 'Add Language'
 
     language:
         entity_label: 'Language'
@@ -21,18 +23,21 @@ oro.translation:
         enabled.label: 'Enabled'
         installed_build_date.label: 'Installed Build Date'
         organization.label: 'Organization'
-        status.label: 'Status'
-        enabled.label: 'Enabled'
-        disabled.label: 'Disabled'
+        status:
+            enabled: 'Enabled'
+            disabled: 'Disabled'
+        translation_status:
+            label: 'Translation Status'
+            up_to_date: 'Up to date'
+            update_needed: 'Available update'
         translation_completeness.label: 'Translation Completeness'
-
-        action:
-            disable.label: 'Disable'
-            enable.label: 'Enable'
 
         message:
             disabled: 'Language has been disabled'
-            enabled: 'Language User has been enabled'
+            enabled: 'Language has been enabled'
+            added: 'Language has been added'
+            installed: 'Language has been installed'
+            updated: 'Language has been updated'
 
     menu:
         languages.label: Languages
