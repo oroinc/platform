@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ConfigurationController extends Controller
 {
@@ -28,7 +29,6 @@ class ConfigurationController extends Controller
      *      class="OroUserBundle:User",
      *      permission="CONFIGURE"
      * )
-     *
      * @param User $entity
      * @param null $activeGroup
      * @param null $activeSubGroup
@@ -36,6 +36,11 @@ class ConfigurationController extends Controller
      */
     public function userConfigAction(User $entity, $activeGroup = null, $activeSubGroup = null)
     {
+
+        if (!$this->get('oro_security.security_facade')->isGranted('update_own_configuration')) {
+            throw new AccessDeniedException();
+        }
+
         $result = $this->config($entity, $activeGroup, $activeSubGroup);
         $result['routeName'] = 'oro_user_config';
         $result['routeParameters'] = ['id' => $entity->getId()];
