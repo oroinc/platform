@@ -28,7 +28,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 30 }
 
@@ -234,16 +233,20 @@ services:
         arguments:
             - '@oro_api.rest.document_builder'
             - '@oro_api.rest.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest&!json_api, priority: -50 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.delete_relationship.json_api.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildListResultDocument
         arguments:
             - '@oro_api.json_api.document_builder'
             - '@oro_api.json_api.relationship_error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: json_api, priority: -55 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.delete_relationship.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors

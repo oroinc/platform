@@ -336,11 +336,6 @@ class CompleteDefinition implements ProcessorInterface
         $version,
         RequestType $requestType
     ) {
-        $targetEntity = $field->getTargetEntity();
-        if ($targetEntity && $targetEntity->isExcludeAll()) {
-            return;
-        }
-
         $config = $this->configProvider->getConfig(
             $targetClass,
             $version,
@@ -348,20 +343,26 @@ class CompleteDefinition implements ProcessorInterface
             [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
         );
         if ($config->hasDefinition()) {
+            $targetDefinition = $config->getDefinition();
+
             if (!$field->getTargetClass()) {
                 $field->setTargetClass($targetClass);
             }
+
+            $targetEntity = $field->getTargetEntity();
+            $isExcludeAll = $targetEntity && $targetEntity->isExcludeAll();
             if (!$targetEntity) {
                 $targetEntity = $field->createAndSetTargetEntity();
             }
-            $targetEntity->setExcludeAll();
-            $targetDefinition = $config->getDefinition();
-            $targetFields = $targetDefinition->getFields();
-            foreach ($targetFields as $targetFieldName => $targetField) {
-                $targetEntity->addField($targetFieldName, $targetField);
-            }
             $targetEntity->setIdentifierFieldNames($targetDefinition->getIdentifierFieldNames());
-            $field->setCollapsed();
+            if (!$isExcludeAll) {
+                $targetEntity->setExcludeAll();
+                $targetFields = $targetDefinition->getFields();
+                foreach ($targetFields as $targetFieldName => $targetField) {
+                    $targetEntity->addField($targetFieldName, $targetField);
+                }
+                $field->setCollapsed();
+            }
         }
     }
 
