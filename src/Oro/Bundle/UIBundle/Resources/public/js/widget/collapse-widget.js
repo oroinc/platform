@@ -1,11 +1,14 @@
-define(['oroui/js/mediator', 'jquery', 'jquery-ui'], function(mediator, $) {
+define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, mediator, _) {
     'use strict';
+
+    var localStorage = window.localStorage;
 
     $.widget('oroui.collapseWidget', {
         options: {
             trigger: '[data-collapse-trigger]',
             container: '[data-collapse-container]',
-            open: false,
+            storageKey: '',
+            open: null,
             openClass: 'expanded',
             animationSpeed: 250
         },
@@ -16,12 +19,14 @@ define(['oroui/js/mediator', 'jquery', 'jquery-ui'], function(mediator, $) {
         },
 
         _init: function() {
+            var storedState = this.options.storageKey ? JSON.parse(localStorage.getItem(this.options.storageKey)) : false;
+
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);
 
-            if (this.options.open) {
-                this.$el.addClass(this.options.openClass);
-            }
+            this.options.open = !_.isNull(this.options.open) ? this.options.open : storedState;
+
+            this.$el.toggleClass(this.options.openClass, this.options.open);
 
             this.$el.addClass('init');
 
@@ -59,6 +64,10 @@ define(['oroui/js/mediator', 'jquery', 'jquery-ui'], function(mediator, $) {
                 self.$el.toggleClass(self.options.openClass, isOpen);
                 $trigger.trigger('collapse:toggle', params);
                 mediator.trigger('layout:adjustHeight');
+
+                if (self.options.storageKey) {
+                    localStorage.setItem(self.options.storageKey, isOpen);
+                }
             });
         }
     });
