@@ -15,9 +15,15 @@
                                 {% for step in steps %}
                                     {% set active = step.active %}
                                     {% set possibleStepsCount = step.possibleStepsCount %}
-                                    <li class="workflow-steps-item {% if isOrdered %}workflow-ordered-steps {% if active %}active{% endif %}{% else %}workflow-unordered-steps{% endif %}">
-                                        <span>{{ step.label|trans }}</span>
-                                    </li>
+                                    {% if isOrdered %}
+                                        <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
+                                            <span>{{ step.label|trans }}</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="workflow-steps-item workflow-unordered-steps">
+                                            <span class="workflow-unordered-step-name">{{ step.label|trans }}</span>
+                                        </li>
+                                    {% endif %}
                                 {% endfor %}
                                 </ul>
                             </td>

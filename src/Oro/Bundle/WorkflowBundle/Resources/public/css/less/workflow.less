@@ -175,19 +175,18 @@ table.grid {
   font-size: 13px;
 }
 
-.workflow-ordered-steps {
-
-}
-
-.workflow-unordered-steps {
-  span {
-    display: block;
-    padding: 4px 10px;
-    border-radius: 10px;
-    color: #2f8206;
-    background: #dff2d4;
-    text-align: center
-  }
+.workflow-unordered-step-name {
+  display: inline-block;
+  max-width: 100px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  vertical-align: middle;
+  color: #2f8206;
+  background: #dff2d4;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .workflow-controls {
