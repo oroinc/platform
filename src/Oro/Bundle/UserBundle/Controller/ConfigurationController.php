@@ -37,11 +37,6 @@ class ConfigurationController extends Controller
      */
     public function userConfigAction(User $entity, $activeGroup = null, $activeSubGroup = null)
     {
-
-        if (!$this->get('oro_security.security_facade')->isGranted('update_own_configuration')) {
-            throw new AccessDeniedException();
-        }
-
         $result = $this->config($entity, $activeGroup, $activeSubGroup);
         $result['routeName'] = 'oro_user_config';
         $result['routeParameters'] = ['id' => $entity->getId()];

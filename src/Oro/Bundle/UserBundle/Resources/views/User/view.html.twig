@@ -6,13 +6,22 @@
 
 {% block navButtons %}
     {% if isDesktopVersion() %}
-        {% if (resource_granted('CONFIGURE', entity) and resource_granted('update_own_configuration')) or (isProfileView and resource_granted('update_own_configuration')) %}
+        {% if resource_granted('CONFIGURE', entity) and not isProfileView %}
             {{ UI.button({
                 'path' : isProfileView ? path('oro_user_profile_configuration') : path('oro_user_config', { 'id': entity.id }),
                 'label': 'oro.user.user_configuration.label'|trans,
                 'title': 'oro.user.user_configuration.label'|trans,
                 'iCss': 'icon-cog',
             }) }}
+        {% else %}
+            {% if isProfileView and resource_granted('update_own_configuration')  %}
+                {{ UI.button({
+                    'path' : isProfileView ? path('oro_user_profile_configuration') : path('oro_user_config', { 'id': entity.id }),
+                    'label': 'oro.user.user_configuration.label'|trans,
+                    'title': 'oro.user.user_configuration.label'|trans,
+                    'iCss': 'icon-cog',
+                }) }}
+            {% endif %}
         {% endif %}
     {% endif %}
     {% if resource_granted('EDIT', entity) %}
