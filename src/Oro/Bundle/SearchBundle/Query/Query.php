@@ -156,39 +156,42 @@ class Query
     /**
      * Insert list of required fields to query select
      *
-     * @param array|string $fields
+     * @param mixed  $field
+     *
+     * @param string $fieldType
      *
      * @return Query
      */
-    public function select($fields)
+    public function select($field, $fieldType = self::TYPE_TEXT)
     {
-        if (!is_array($fields)) {
-            $fields = [$fields];
+        $this->select = [];
+
+        if (is_array($field)) {
+            foreach ($field as $_field) {
+                $this->addSelect($_field, $fieldType);
+            }
+            return $this;
         }
 
-        $this->select = $fields;
+        $this->addSelect($field, $fieldType);
 
         return $this;
     }
 
     /**
-     * @param $fields
+     * @param string $fieldName
+     * @param string $fieldType
      * @return $this
      */
-    public function addSelect($fields)
+    public function addSelect($fieldName, $fieldType = self::TYPE_TEXT)
     {
-        if (empty($fields)) {
+        $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);
+
+        if (!is_string($field)) {
             return $this;
         }
 
-        if (is_array($fields)) {
-            foreach ($fields as $value) {
-                $this->addSelect($value);
-            }
-            return $this;
-        }
-
-        $this->select[$fields] = $fields; // do not allow repeating fields
+        $this->select[$field] = $field; // do not allow repeating fields
 
         return $this;
     }
@@ -546,15 +549,15 @@ class Query
 
         $selectString = '';
         if (!empty($selectColumnsString)) {
-            $selectString = trim('select (' . $selectColumnsString . ')').' ';
+            $selectString = trim('select (' . $selectColumnsString . ')') . ' ';
         }
 
         return $selectString
-                . $fromString
-                . $whereString
-                . $orderByString
-                . $limitString
-                . $offsetString;
+               . $fromString
+               . $whereString
+               . $orderByString
+               . $limitString
+               . $offsetString;
     }
 
     /**
@@ -571,7 +574,7 @@ class Query
         $result = implode(', ', $selects);
 
         if (count($selects) > 1) {
-            $result = '('.$result.')';
+            $result = '(' . $result . ')';
         }
 
         return $result;

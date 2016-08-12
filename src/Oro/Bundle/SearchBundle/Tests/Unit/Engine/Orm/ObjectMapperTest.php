@@ -341,7 +341,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
         $query->expects($this->once())
             ->method('getSelect')
-            ->willReturn(['sku', 'defaultName']);
+            ->willReturn(['text.sku', 'text.defaultName']);
 
         $item = [
             'item' => [

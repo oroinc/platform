@@ -391,7 +391,7 @@ abstract class BaseDriver
         }
 
         foreach ($selects as $select) {
-            $type = $this->resolveTypeFromFieldName($query, $select);
+            list($type, $name) = Criteria::explodeFieldTypeName($select);
 
             $uniqIndex = uniqid();
             $joinField = $this->getJoinField($type);
@@ -400,9 +400,9 @@ abstract class BaseDriver
             $withClause = sprintf('%s.field = :param%s', $joinAlias, $uniqIndex);
 
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
-                ->setParameter('param' . $uniqIndex, $select);
+                ->setParameter('param' . $uniqIndex, $name);
 
-            $qb->addSelect($joinAlias . '.value as ' . $select);
+            $qb->addSelect($joinAlias . '.value as ' . $name);
         }
     }
 
@@ -475,42 +475,5 @@ abstract class BaseDriver
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
-    }
-
-    /**
-     * @param Query $query
-     * @param $fieldName
-     * @return string
-     */
-    private function resolveTypeFromFieldName(Query $query, $fieldName)
-    {
-        $mappingConfig = $query->getMappingConfig();
-        $entityName = $query->getEntityByAlias($query->getFrom()[0]);
-
-        if (isset($mappingConfig[$entityName])) {
-            $entityMappingConfig = $mappingConfig[$entityName];
-        } else {
-            throw new \OutOfBoundsException(
-                'Cannot find mapping for entity `'.$entityName
-                .'` when adding `select` statement in ORM BaseDriver.'
-            );
-        }
-
-        $type = null;
-
-        foreach ($entityMappingConfig['fields'] as $fieldConfig) {
-            if ($fieldConfig['name'] == $fieldName) {
-                $type = $fieldConfig['target_type'];
-            }
-        }
-
-        if ($type === null) {
-            throw new \RuntimeException(
-                'Cannot resolve type for field '
-                .'`'.$fieldName.'`.'
-            );
-        }
-
-        return $type;
     }
 }
