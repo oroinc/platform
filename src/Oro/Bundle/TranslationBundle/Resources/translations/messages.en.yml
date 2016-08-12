@@ -10,6 +10,7 @@ oro.translation:
         download: 'Download'
         enable: 'Enable'
         disable: 'Disable'
+        install: 'Install'
         update: 'Update'
 
     language:
@@ -21,14 +22,15 @@ oro.translation:
         enabled.label: 'Enabled'
         installed_build_date.label: 'Installed Build Date'
         organization.label: 'Organization'
-        status.label: 'Status'
-        enabled.label: 'Enabled'
-        disabled.label: 'Disabled'
+        translation_status:
+            label: 'Translation Status'
+            up_to_date: 'Up to date'
+            update_needed: 'Update needed'
         translation_completeness.label: 'Translation Completeness'
 
         action:
-            disable.label: 'Disable'
-            enable.label: 'Enable'
+            disable: 'Disable'
+            enable: 'Enable'
 
         message:
             disabled: 'Language has been disabled'

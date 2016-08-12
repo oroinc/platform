@@ -1,6 +1,6 @@
 operations:
     oro_translation_disable_language:
-        label: oro.translation.language.action.disable.label
+        label: oro.translation.language.action.disable
         applications: [backend]
         datagrids:
             - oro-translation-language-grid
@@ -22,7 +22,7 @@ operations:
             - '@refresh_grid': oro-translation-language-grid
 
     oro_translation_enable_language:
-        label: oro.translation.language.action.enable.label
+        label: oro.translation.language.action.enable
         applications: [backend]
         datagrids:
             - oro-translation-language-grid
@@ -42,6 +42,41 @@ operations:
                 message: oro.translation.language.message.enabled
                 type: 'success'
             - '@refresh_grid': oro-translation-language-grid
+
+    oro_translation_language_install:
+        label: oro.translation.action.install
+        button_options:
+            icon: icon-download
+        datagrids:
+            - oro-translation-language-grid
+        preactions:
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isAvailableInstallTranslates
+                method_parameters: [$.data]
+                attribute: $.isAvailableInstall
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isAvailableUpdateTranslates
+                method_parameters: [$.data]
+                attribute: $.isAvailableUpdate
+        preconditions:
+            @eq: [$.isAvailableInstall, true]
+
+    oro_translation_language_update:
+        label: oro.translation.action.update
+        button_options:
+            icon: icon-refresh
+        datagrids:
+            - oro-translation-language-grid
+        preactions:
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isAvailableUpdateTranslates
+                method_parameters: [$.data]
+                attribute: $.isAvailableUpdate
+        preconditions:
+            @eq: [$.isAvailableUpdate, true]
 
 action_groups:
     oro_translation_language_set_enabled:

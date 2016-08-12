@@ -19,15 +19,10 @@ datagrid:
                 frontend_type: html
                 template: OroTranslationBundle:Language:Datagrid/code.html.twig
             enabled:
-                label: oro.translation.language.status.label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Language:Datagrid/enabled.html.twig
-            translationCompleteness:
-                label: oro.translation.language.translation_completeness.label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Language:Datagrid/translationCompleteness.html.twig
+                label: oro.translation.language.enabled.label
+                frontend_type: boolean
+            translationCompleteness: ~
+            translationStatus: ~
             createdAt:
                 label: oro.ui.created_at
                 frontend_type: datetime

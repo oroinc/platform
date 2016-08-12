@@ -2,47 +2,102 @@
 
 namespace Oro\Bundle\TranslationBundle\Helper;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+
+use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
 class LanguageHelper
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var TranslationStatisticProvider */
+    protected $translationStatisticProvider;
 
     /**
-     * @param ConfigManager $configManager
+     * @param TranslationStatisticProvider $translationStatisticProvider
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(TranslationStatisticProvider $translationStatisticProvider)
     {
-        $this->configManager = $configManager;
+        $this->translationStatisticProvider = $translationStatisticProvider;
     }
 
     /**
      * @param Language $language
+     * @return bool
      */
-    public function updateSystemConfiguration(Language $language)
+    public function isAvailableInstallTranslates(Language $language)
     {
-        $languages = $this->configManager->get($this->getConfigurationName(), []);
-
-        if ($language->isEnabled()) {
-            !in_array($language->getCode(), $languages, true) and $languages[] = $language->getCode();
-        } else {
-            if (false !== ($index = array_search($language->getCode(), $languages, true))) {
-                unset($languages[$index]);
-            }
+        if (null === $language->getCode() || null !== $language->getInstalledBuildDate()) {
+            return false;
         }
 
-        $this->configManager->set($this->getConfigurationName(), $languages);
-        $this->configManager->flush();
+        $stats = $this->getStatistic();
+
+        return isset($stats[$language->getCode()]);
     }
 
     /**
-     * @return string
+     * @param Language $language
+     * @return bool
      */
-    protected function getConfigurationName()
+    public function isAvailableUpdateTranslates(Language $language)
     {
-        return Configuration::getConfigKeyByName(Configuration::LANGUAGES);
+        if (null === $language->getCode() || null === $language->getInstalledBuildDate()) {
+            return false;
+        }
+
+        $stats = $this->getStatistic();
+
+        $lastBuildDate = $this->getDateTimeFromString($stats[$language->getCode()]['lastBuildDate']);
+
+        return isset($stats[$language->getCode()]) && $language->getInstalledBuildDate() < $lastBuildDate;
+    }
+
+    /**
+     * @param Language $language
+     * @return int
+     */
+    public function getTranslationStatus(Language $language)
+    {
+        $stats = $this->getStatistic();
+
+        // TODO: should be fixed in https://magecore.atlassian.net/browse/BAP-10608
+        $stats['en'] = [
+            'translationStatus' => 100,
+        ];
+
+        return isset($stats[$language->getCode()]) ? (int)$stats[$language->getCode()]['translationStatus'] : null;
+    }
+
+    /**
+     * @return type
+     */
+    public function getStatistic()
+    {
+        $stats = [];
+        foreach ($this->translationStatisticProvider->get() as $info) {
+            $stats[$info['code']] = $info;
+        }
+
+        return $stats;
+    }
+
+    /**
+     * @param string $stringDate
+     *
+     * @return \DateTime
+     */
+    protected function getDateTimeFromString($stringDate)
+    {
+        $date = strtotime($stringDate);
+
+        $defaultTimezone = date_default_timezone_get();
+
+        date_default_timezone_set('UTC');
+
+        $result = new \DateTime();
+        $result->setTimestamp($date);
+
+        date_default_timezone_set($defaultTimezone);
+
+        return $result;
     }
 }
