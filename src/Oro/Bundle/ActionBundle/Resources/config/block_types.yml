@@ -8,8 +8,8 @@ services:
                 -
                     -
                         actions: {required: true}
-                        entityId: ~
-                        entityClass: ~
+                        entityId: {default: null}
+                        entityClass: {default: null}
                         dialogRoute: ~
                         executionRoute: ~
         tags:

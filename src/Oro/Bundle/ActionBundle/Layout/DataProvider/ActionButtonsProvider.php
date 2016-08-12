@@ -7,10 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-// TODO: Remove extends from AbstractServerRenderDataProvider after closing ticket BB-2188
-use Oro\Component\Layout\AbstractServerRenderDataProvider;
-
-class ActionButtonsProvider extends AbstractServerRenderDataProvider
+class ActionButtonsProvider
 {
     /** @var ApplicationsHelper */
     protected $applicationsHelper;
