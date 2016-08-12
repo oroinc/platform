@@ -125,6 +125,8 @@ class ControllersRoleTest extends WebTestCase
         );
 
         self::assertContains('testRoleUpdated', $crawler->filter('.responsive-section')->first()->html());
-        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->html());
+        self::assertContains('Delete', $crawler->filter('.navigation .title-buttons-container a')->eq(0)->html());
+        self::assertContains('Clone', $crawler->filter('.navigation .title-buttons-container a')->eq(1)->html());
+        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->eq(2)->html());
     }
 }
