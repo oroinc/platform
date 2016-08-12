@@ -32,7 +32,7 @@ define(function(require) {
             var template = require('tpl!oroform/templates/select2-tree-autocomplete-result.html');
 
             var mixData = {
-                newKey: 'oro.form.new',
+                newKey: 'oro.form.add_new',
                 getLabel: function(item, highlight) {
                     var label = _.escape(item[propName]);
                     if (forSelection) {
