@@ -355,17 +355,22 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
     {
-        $aliases = $qb->getAllAliases();
-        $replacedAliases = array_map(
-            function () use ($ds) {
-                return $ds->generateParameterName($this->getName());
+        $replacements = array_map(
+            function ($alias) use ($ds) {
+                return [
+                    $alias,
+                    $ds->generateParameterName($this->getName()),
+                ];
             },
-            $aliases
+            $qb->getAllAliases()
         );
 
-        return strtr(
-            $qb->getDQL(),
-            array_combine($aliases, $replacedAliases)
+        return array_reduce(
+            $replacements,
+            function ($carry, array $replacement) {
+                return preg_replace(sprintf('/(?<=\b)%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
+            },
+            $qb->getDql()
         );
     }
 
