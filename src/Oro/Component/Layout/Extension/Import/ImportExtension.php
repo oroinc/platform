@@ -25,9 +25,6 @@ class ImportExtension extends AbstractLayoutUpdateLoaderExtension
     /** @var LayoutUpdateLoaderInterface */
     protected $loader;
 
-    /** @var DependencyInitializer */
-    protected $dependencyInitializer;
-
     /** @var  ThemeManager */
     protected $themeManager;
 
@@ -41,20 +38,17 @@ class ImportExtension extends AbstractLayoutUpdateLoaderExtension
      * @param array $resources
      * @param LayoutUpdateLoaderInterface $loader
      * @param ThemeManager $themeManager
-     * @param DependencyInitializer $dependencyInitializer
      * @param PathProviderInterface $provider
      */
     public function __construct(
         array $resources,
         LayoutUpdateLoaderInterface $loader,
         ThemeManager $themeManager,
-        DependencyInitializer $dependencyInitializer,
         PathProviderInterface $provider
     ) {
         $this->resources = $resources;
         $this->loader = $loader;
         $this->themeManager = $themeManager;
-        $this->dependencyInitializer = $dependencyInitializer;
         $this->pathProvider = $provider;
     }
 
@@ -72,7 +66,6 @@ class ImportExtension extends AbstractLayoutUpdateLoaderExtension
                 ? $update->getElement()
                 : 'root';
 
-            $this->dependencyInitializer->initialize($update);
             // load imports
             $imports = $update->getImports();
             if (!is_array($imports)) {

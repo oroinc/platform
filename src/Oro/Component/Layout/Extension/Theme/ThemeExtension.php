@@ -55,7 +55,6 @@ class ThemeExtension extends AbstractLayoutUpdateLoaderExtension
     protected function loadLayoutUpdate($file, ContextInterface $context)
     {
         $update = $this->loader->load($file);
-        //var_dump($this->updates);
         if ($update) {
             $el = $update instanceof ElementDependentLayoutUpdateInterface
                 ? $update->getElement()
