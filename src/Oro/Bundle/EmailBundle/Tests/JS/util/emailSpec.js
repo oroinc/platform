@@ -31,6 +31,14 @@ define([
         {
             fullEmailAddress: '"john@example.com" <john@example.com>',
             pureEmailAddress: 'john@example.com'
+        },
+        {
+            fullEmailAddress: '"john@example.com" <john@example.com> (Contact)',
+            pureEmailAddress: 'john@example.com'
+        },
+        {
+            fullEmailAddress: '<john@example.com> (Contact)',
+            pureEmailAddress: 'john@example.com'
         }
     ];
 
