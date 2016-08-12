@@ -24,7 +24,7 @@ class LanguageHelper
      */
     public function updateSystemConfiguration(Language $language)
     {
-        $languages = $this->configManager->get($this->getConfigurationName(), true);
+        $languages = (array)$this->configManager->get($this->getConfigurationName(), true);
 
         if ($language->isEnabled()) {
             if (!in_array($language->getCode(), $languages, true)) {
