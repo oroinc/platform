@@ -137,7 +137,8 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\LayoutBundle\Exception\CircularReferenceException
      * @expectedExceptionMessage Circular reference "first > second > third > first" on expression "true == first".
      */
-    public function testProcessExpressionsWithCircularReference() {
+    public function testProcessExpressionsWithCircularReference()
+    {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
         $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');

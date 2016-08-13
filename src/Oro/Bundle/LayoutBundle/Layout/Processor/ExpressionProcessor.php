@@ -64,6 +64,7 @@ class ExpressionProcessor
             return;
         }
         $this->values = $values;
+        $this->processedValues = [];
         foreach ($values as $key => &$value) {
             if (array_key_exists($key, $this->processedValues)) {
                 $value = $this->processedValues[$key];
@@ -73,6 +74,7 @@ class ExpressionProcessor
                 $this->processedValues[$key] = $value;
             }
         }
+        $values = $this->processedValues;
     }
 
     /**
@@ -138,7 +140,7 @@ class ExpressionProcessor
     ) {
         $deps = $this->getNotProcessedDependencies($expr->getNodes());
         foreach ($deps as $key => $dep) {
-            if(in_array($key, $this->processingValues)) {
+            if (in_array($key, $this->processingValues)) {
                 $path = implode(' > ', array_merge($this->processingValues, [$key]));
                 throw new CircularReferenceException(
                     sprintf('Circular reference "%s" on expression "%s".', $path, (string) $expr)
