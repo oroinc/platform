@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Form\Extension;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -84,7 +85,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
         // Filter submitted data and ignore data for restricted fields
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit'], -255);
     }
 
     /**
@@ -137,8 +138,21 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             return;
         }
         $form = $event->getForm();
+
+        $clearFormErrors = function (Form $form, $fieldName) {
+            $form->$fieldName = [];
+        };
+
         foreach ($this->disabledFields as $field) {
-            $form->get($field)->addError(
+            $fieldInstance = $form->get($field);
+            // Clear all other validation errors
+            if ($fieldInstance->getErrors()->count()) {
+                $clearClosure = \Closure::bind($clearFormErrors, $fieldInstance, 'Symfony\Component\Form\Form');
+                $clearClosure($fieldInstance, 'errors');
+            }
+
+            // add Field ACL validation error
+            $fieldInstance->addError(
                 new FormError(
                     sprintf('You are not allowed to modify \'%s\' field.', $field)
                     // do not use message template and 'message parameters' params here

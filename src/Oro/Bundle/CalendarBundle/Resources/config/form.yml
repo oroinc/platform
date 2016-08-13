@@ -195,10 +195,10 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity_config.config_manager'
             - '@translator'
-            - '@oro_search.mapper'
             - '@security.token_storage'
             - '@event_dispatcher'
             - '@oro_calendar.attendee_relation_manager'
+            - '@oro_activity.resolver.entity_title'
 
     oro_calendar.user_ids_to_users.tranformer:
         class: %oro_calendar.user_ids_to_users.tranformer.class%
