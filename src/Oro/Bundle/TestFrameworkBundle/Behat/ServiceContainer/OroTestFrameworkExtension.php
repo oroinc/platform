@@ -93,33 +93,12 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
-        $this->loadSessionsListener($container);
-        $this->loadRegistryController($container);
     }
 
     public function processDbDumpers(ContainerBuilder $container)
     {
         $dbDumper = $this->getDbDumper($container);
         $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
-    }
-
-    private function loadSessionsListener(ContainerBuilder $container)
-    {
-        $container
-            ->getDefinition('mink.listener.sessions')
-            ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
-    }
-
-    private function loadRegistryController(ContainerBuilder $container)
-    {
-        $definition = new Definition(SuiteController::class, [
-            new Reference(SuiteExtension::REGISTRY_ID),
-            '%suite.configurations%',
-            '%oro_test.application_suites%'
-        ]);
-
-        $definition->addTag(CliExtension::CONTROLLER_TAG, array('priority' => 1100));
-        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.suite', $definition);
     }
 
     /**

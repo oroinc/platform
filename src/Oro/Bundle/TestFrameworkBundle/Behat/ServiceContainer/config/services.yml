@@ -20,6 +20,24 @@ services:
         tags:
             - { name: oro_test.dumper, priority: 20 }
 
+    cli.controller.suite:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
+        arguments:
+            - suite.registry
+            - '%suite.configurations%'
+            - '%oro_test.application_suites%'
+        tags:
+            - { name: cli.controller, priority: 1100 }
+
+    mink.listener.sessions:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
+        arguments:
+            - mink
+            - '%mink.default_session%'
+            - '%mink.javascript_session%'
+            - '%mink.available_javascript_sessions%'
+        tags:
+            - { name: event_dispatcher.subscriber, priority: 0 }
 
     oro_test.listener.feature_isolation_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureIsolationSubscriber
