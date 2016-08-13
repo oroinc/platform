@@ -32,7 +32,7 @@ services:
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
         arguments:
-            - mink
+            - '@mink'
             - '%mink.default_session%'
             - '%mink.javascript_session%'
             - '%mink.available_javascript_sessions%'
