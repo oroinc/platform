@@ -50,6 +50,7 @@ class EmailRepository extends EntityRepository
 
     /**
      * Get $limit last emails
+     * todo: BAP-11456 Move method getNewEmails from EmailRepository to EmailUserRepository
      *
      * @param User         $user
      * @param Organization $organization
