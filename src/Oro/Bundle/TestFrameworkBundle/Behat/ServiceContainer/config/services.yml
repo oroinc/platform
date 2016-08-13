@@ -23,7 +23,7 @@ services:
     cli.controller.suite:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
         arguments:
-            - suite.registry
+            - '@suite.registry'
             - '%suite.configurations%'
             - '%oro_test.application_suites%'
         tags:
