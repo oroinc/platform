@@ -9,12 +9,9 @@ use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
-use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
+use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsProvider;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\LayoutContext;
-
-class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
+class ActionsProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var OperationManager|\PHPUnit_Framework_MockObject_MockObject
@@ -37,7 +34,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
-     * @var ActionsDataProvider
+     * @var ActionsProvider
      */
     protected $dataProvider;
 
@@ -60,7 +57,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->dataProvider = new ActionsDataProvider(
+        $this->dataProvider = new ActionsProvider(
             $this->operationManager,
             $this->contextHelper,
             $this->restrictHelper,
@@ -68,30 +65,18 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetData()
-    {
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->getMock('Oro\Component\Layout\ContextInterface');
-        $this->assertSame($this->dataProvider, $this->dataProvider->getData($context));
-    }
-
     public function testGetByGroup()
     {
         $groups = 'test';
         $expected = $this->assertGetByGroups($groups);
-        $this->assertEquals($expected, $this->dataProvider->getByGroup($groups));
+        $this->assertEquals($expected, $this->dataProvider->getByGroup(null, $groups));
     }
 
     public function testGetByGroupWithEntity()
     {
         $entity = new \stdClass();
 
-        $layoutContext = new LayoutContext();
-        $layoutContext->data()->set('entity', 'entity', $entity);
-
         $actionContext = ['entityId' => null, 'entityClass' => '\stdClass'];
-
-        $this->assertSame($this->dataProvider, $this->dataProvider->getData($layoutContext));
 
         $this->contextHelper->expects($this->once())
             ->method('getActionParameters')
@@ -100,7 +85,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $groups = 'test';
         $expected = $this->assertGetByGroups($groups, $actionContext);
-        $this->assertEquals($expected, $this->dataProvider->getByGroup($groups));
+        $this->assertEquals($expected, $this->dataProvider->getByGroup($entity, $groups));
     }
 
     public function testGetAll()

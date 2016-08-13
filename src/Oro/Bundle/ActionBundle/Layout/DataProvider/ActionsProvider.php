@@ -9,10 +9,7 @@ use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataProviderInterface;
-
-class ActionsDataProvider implements DataProviderInterface
+class ActionsProvider
 {
     /**
      * @var OperationManager
@@ -35,11 +32,6 @@ class ActionsDataProvider implements DataProviderInterface
     protected $translator;
 
     /**
-     * @var ContextInterface
-     */
-    protected $context;
-
-    /**
      * @param OperationManager $operationManager
      * @param ContextHelper $contextHelper
      * @param RestrictHelper $restrictHelper
@@ -58,14 +50,6 @@ class ActionsDataProvider implements DataProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getIdentifier()
-    {
-        return 'oro_action';
-    }
-
-    /**
      * @param string $var
      * @return mixed
      */
@@ -79,36 +63,39 @@ class ActionsDataProvider implements DataProviderInterface
                 $group = implode('_', $groupNameParts);
             }
 
-            return $this->getByGroup($groups);
+            return $this->getByGroup(null, $groups);
         } else {
             throw new \RuntimeException('Property ' . $var . ' is unknown');
         }
     }
 
     /**
+     * @param null $entity
      * @return array
      */
-    public function getAll()
+    public function getAll($entity = null)
     {
-        return $this->getByGroup();
+        return $this->getByGroup($entity);
     }
 
     /**
+     * @param null $entity
      * @return array
      */
-    public function getWithoutGroup()
+    public function getWithoutGroup($entity = null)
     {
-        return $this->getByGroup(false);
+        return $this->getByGroup($entity, false);
     }
 
     /**
+     * @param object|null $entity
      * @param array|null|bool|string $groups
      * @return array
      */
-    public function getByGroup($groups = null)
+    public function getByGroup($entity = null, $groups = null)
     {
-        if ($this->context && $this->context->data()->has('entity')) {
-            $context = $this->contextHelper->getActionParameters(['entity' => $this->context->data()->get('entity')]);
+        if ($entity) {
+            $context = $this->contextHelper->getActionParameters(['entity' => $entity]);
         } else {
             $context = null;
         }
@@ -156,15 +143,5 @@ class ActionsDataProvider implements DataProviderInterface
         }
 
         return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getData(ContextInterface $context)
-    {
-        $this->context = $context;
-
-        return $this;
     }
 }

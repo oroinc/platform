@@ -30,43 +30,13 @@ class DataContextConfigurator implements ContextConfiguratorInterface
                 );
             }
             if (is_array($val)) {
-                $context->data()->set($key, $this->getDataIdentifier($key, $val), $this->getData($key, $val));
+                $context->data()->set($key, $this->getData($key, $val));
             } else {
-                $context->data()->set($key, null, $val);
+                $context->data()->set($key, $val);
             }
         }
 
         $context->remove('data');
-    }
-
-    /**
-     * @param string $key
-     * @param array  $val
-     *
-     * @return string
-     */
-    protected function getDataIdentifier($key, $val)
-    {
-        if (isset($val['id'])) {
-            $identifier = $val['id'];
-        } elseif (isset($val['identifier'])) {
-            $identifier = $val['identifier'];
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf('The data item "%s" must have either "id" or "identifier" key.', $key)
-            );
-        }
-        if (!is_string($identifier)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The data identifier for the data item "%s" must be a string, but "%s" given.',
-                    $key,
-                    is_object($identifier) ? get_class($identifier) : gettype($identifier)
-                )
-            );
-        }
-
-        return $identifier;
     }
 
     /**
