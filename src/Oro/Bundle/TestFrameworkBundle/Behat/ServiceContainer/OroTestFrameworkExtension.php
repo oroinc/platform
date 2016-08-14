@@ -83,12 +83,18 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->loadSessionsListener($container);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     public function processDbDumpers(ContainerBuilder $container)
     {
         $dbDumper = $this->getDbDumper($container);
         $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     private function loadSessionsListener(ContainerBuilder $container)
     {
         $container
