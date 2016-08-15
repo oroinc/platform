@@ -75,13 +75,3 @@ datagrid:
                     data_name: language.updatedAt
         properties:
             id: ~
-            view_link:
-                type:  url
-                route: oro_locale_localization_view
-                params: [ id ]
-        actions:
-            view:
-                type: navigate
-                label: oro.grid.action.view
-                link: view_link
-                icon: eye-open
