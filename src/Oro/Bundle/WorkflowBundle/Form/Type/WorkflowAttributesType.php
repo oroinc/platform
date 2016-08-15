@@ -8,6 +8,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
@@ -15,6 +17,7 @@ use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
 
@@ -60,6 +63,11 @@ class WorkflowAttributesType extends AbstractType
     protected $dispatcher;
 
     /**
+     * @var AuthorizationCheckerInterface
+     */
+    protected $authorizationChecker;
+
+    /**
      * @param WorkflowRegistry $workflowRegistry
      * @param AttributeGuesser $attributeGuesser ,
      * @param DefaultValuesListener $defaultValuesListener
@@ -67,6 +75,7 @@ class WorkflowAttributesType extends AbstractType
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
      * @param EventDispatcherInterface $dispatcher
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
@@ -75,7 +84,8 @@ class WorkflowAttributesType extends AbstractType
         InitActionsListener $initActionsListener,
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
@@ -84,6 +94,7 @@ class WorkflowAttributesType extends AbstractType
         $this->requiredAttributesListener = $requiredAttributesListener;
         $this->contextAccessor = $contextAccessor;
         $this->dispatcher = $dispatcher;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -136,6 +147,12 @@ class WorkflowAttributesType extends AbstractType
     {
         /** @var Workflow $workflow */
         $workflow = $options['workflow'];
+        $entity = null;
+        if (isset($options['data'])) {
+            /** @var WorkflowData $data */
+            $data = $options['data'];
+            $entity = $data->get($workflow->getDefinition()->getEntityAttributeName());
+        }
 
         foreach ($options['attribute_fields'] as $attributeName => $attributeOptions) {
             $attribute = $workflow->getAttributeManager()->getAttribute($attributeName);
@@ -151,8 +168,24 @@ class WorkflowAttributesType extends AbstractType
             if (null === $attributeOptions) {
                 $attributeOptions = array();
             }
-            $this->addAttributeField($builder, $attribute, $attributeOptions, $options);
+            if (!$entity || $this->isEditableField($entity, $attribute->getName())) {
+                $this->addAttributeField($builder, $attribute, $attributeOptions, $options);
+            }
         }
+    }
+
+    /**
+     * @param object $entity
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isEditableField($entity, $fieldName)
+    {
+        return $this->authorizationChecker->isGranted(
+            'EDIT',
+            new FieldVote($entity, $fieldName)
+        );
     }
 
     /**
