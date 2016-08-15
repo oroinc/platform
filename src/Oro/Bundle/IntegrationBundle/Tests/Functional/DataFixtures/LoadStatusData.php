@@ -5,11 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 class LoadStatusData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -98,8 +96,6 @@ class LoadStatusData extends AbstractFixture implements ContainerAwareInterface,
      */
     public function getDependencies()
     {
-        return [
-            'Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData'
-        ];
+        return [LoadChannelData::class];
     }
 }
