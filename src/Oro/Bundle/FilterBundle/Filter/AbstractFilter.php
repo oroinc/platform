@@ -375,7 +375,7 @@ abstract class AbstractFilter implements FilterInterface
                  * Replaces old parameter names by newly generated parameter names, so that we don't have
                  * conflicts in the query.
                  */
-                return preg_replace(sprintf('/(?<=[^\w\.])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
+                return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
             },
             $qb->getDql()
         );
