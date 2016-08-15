@@ -1,5 +1,6 @@
 parameters:
     oro_translation.entity.language.class:                      Oro\Bundle\TranslationBundle\Entity\Language
+    oro_translation.entity.translation.class:                   Oro\Bundle\TranslationBundle\Entity\Translation
 
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
     oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker
@@ -216,3 +217,8 @@ services:
             - [setClassName, ['%oro_translation.entity.language.class%']]
         tags:
             - { name: security.voter }
+
+    oro_translation.form.type.import:
+        class: 'Oro\Bundle\TranslationBundle\Form\Type\TranslationImportType'
+        tags:
+            - { name: form.type, alias: oro_translation_import }

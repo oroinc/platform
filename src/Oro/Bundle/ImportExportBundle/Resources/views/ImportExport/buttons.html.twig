@@ -58,7 +58,7 @@
             {% set buttonsHtml %}
                 <a type="button"
                    class="btn import-btn icons-holder-text no-hash"
-                   href="{{ path('oro_importexport_import_form', defaultRouteParams|merge({'entity': entity_class})) }}">
+                   href="{{ path(importRoute|default('oro_importexport_import_form'), defaultRouteParams|merge({'entity': entity_class})) }}">
                     <i class="icon-download-alt hide-text">{{ importLabel }}</i>{{ importLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}

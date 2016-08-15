@@ -1,0 +1,51 @@
+services:
+    # Strategy
+    oro_translation.importexport.strategy.translation.add_or_replace:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy'
+        public: false
+        parent: oro_importexport.strategy.configurable_add_or_replace
+
+    # Import processor
+    oro_translation.importexport.processor.import.translation:
+        public: false
+        parent: oro_importexport.processor.import_abstract
+        calls:
+             - [setStrategy, ['@oro_translation.importexport.strategy.translation.add_or_replace']]
+        tags:
+            - { name: oro_importexport.processor, type: import, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
+            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
+
+    # Export processor
+    oro_translation.importexport.processor.export.translation:
+        public: false
+        parent: oro_importexport.processor.export_abstract
+        tags:
+            - { name: oro_importexport.processor, type: export, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation }
+
+    # Reader
+    oro_translation.importexport.reader.translations:
+        parent: oro_importexport.reader.entity
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader'
+        public: false
+
+    oro_translation.importexport.reader.translations_yml:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationYmlReader'
+        public: false
+
+    oro_translation.importexport.reader.translations_zip:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationZipReader'
+        public: false
+
+    # Writer
+    oro_translation.importexport.writer.translations:
+        parent: oro_integration.writer.persistent_batch_writer
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter'
+        public: false
+
+    oro_translation.importexport.writer.translations_yml:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationYmlWriter'
+        public: false
+
+    oro_translation.importexport.writer.translations_zip:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationZipWriter'
+        public: false
