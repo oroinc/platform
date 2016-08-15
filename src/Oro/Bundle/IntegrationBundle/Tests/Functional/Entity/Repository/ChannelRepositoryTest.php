@@ -7,7 +7,6 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadStatusData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use OroCRM\Bundle\AnalyticsBundle\Tests\Functional\DataFixtures\LoadJobData;
 
 /**
  * @dbIsolationPerTest
@@ -22,7 +21,7 @@ class ChannelRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures([LoadStatusData::class, LoadJobData::class]);
+        $this->loadFixtures([LoadStatusData::class]);
         $this->repository = $this->getContainer()->get('doctrine')->getRepository(Channel::class);
     }
 
