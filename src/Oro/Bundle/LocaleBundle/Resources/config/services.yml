@@ -329,9 +329,9 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_locale.expression_language_provider:
-        class: Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider
+    oro_locale.layout.data_provider.locale:
+        class: Oro\Bundle\LocaleBundle\Layout\LocaleProvider
         arguments:
             - '@oro_locale.helper.localization'
         tags:
-            - { name: oro_layout.expression_language_provider }
+            - { name: layout.data_provider, alias: locale }
