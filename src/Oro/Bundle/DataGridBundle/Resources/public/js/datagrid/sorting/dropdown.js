@@ -1,9 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
+    'oroui/js/app/views/base/view',
     'tpl!orodatagrid/templates/datagrid/sorting-dropdown.html'
-], function($, _, Backbone, template) {
+], function($, _, BaseView, template) {
     'use strict';
 
     var SortingDropdown;
@@ -15,9 +15,11 @@ define([
      * @class   orodatagrid.datagrid.SortingDropdown
      * @extends Backbone.View
      */
-    SortingDropdown = Backbone.View.extend({
+    SortingDropdown = BaseView.extend({
         /** @property */
         template: template,
+
+        noWrap: true,
 
         /** @property */
         events: {
@@ -56,6 +58,8 @@ define([
 
             this.listenTo(this.columns, 'change:direction', this._selectCurrentSortableColumn);
             this.listenTo(this.columns, 'change:renderable', this._columnRenderableChanged);
+            this.listenTo(this.columns, 'change:sortable', this._columnSortableChanged);
+            this.listenTo(this.collection, 'updateState', this.render);
             this._initCurrentSortableColumn();
 
             SortingDropdown.__super__.initialize.call(this, options);
@@ -96,11 +100,24 @@ define([
 
         /**
          * @param {Object} column
-         * @param {string} renderable
+         * @param {boolean} renderable
          * @private
          */
         _columnRenderableChanged: function(column, renderable) {
             if (!renderable && this.currentColumn === column) {
+                this.currentColumn = null;
+                this.currentDirection = null;
+            }
+            this.render();
+        },
+
+        /**
+         * @param {Object} column
+         * @param {boolean} sortable
+         * @private
+         */
+        _columnSortableChanged: function(column, sortable) {
+            if (!sortable && this.currentColumn === column) {
                 this.currentColumn = null;
                 this.currentDirection = null;
             }
@@ -176,6 +193,19 @@ define([
             }
         },
 
+        getTemplateData: function() {
+            var data = SortingDropdown.__super__.getTemplateData.apply(this, arguments);
+            data = _.extend(data, {
+                columns: _.filter(this.columns.models, function(model) {
+                    return model.get('sortable') && model.get('renderable');
+                }),
+                currentColumn: this.currentColumn,
+                currentDirection: this.currentDirection,
+                getColumnValue: _.bind(this._getColumnValue, this)
+            });
+            return data;
+        },
+
         /**
          * @returns {orodatagrid.datagrid.SortingDropdown}
          */
@@ -183,14 +213,7 @@ define([
             if (!this.enabled) {
                 return this;
             }
-            this.$el.html(this.template({
-                columns: _.filter(this.columns.models, function(model) {
-                    return model.get('sortable') && model.get('renderable');
-                }),
-                currentColumn: this.currentColumn,
-                currentDirection: this.currentDirection,
-                getColumnValue: _.bind(this._getColumnValue, this)
-            }));
+            SortingDropdown.__super__.render.call(this);
 
             return this;
         }

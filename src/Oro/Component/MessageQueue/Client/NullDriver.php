@@ -64,6 +64,20 @@ class NullDriver implements DriverInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function delayMessage(QueueInterface $queue, MessageInterface $message, $delaySec)
+    {
+        $delayMessage = $this->session->createMessage(
+            $message->getBody(),
+            $message->getProperties(),
+            $message->getHeaders()
+        );
+
+        $this->session->createProducer()->send($queue, $delayMessage);
+    }
+
+    /**
      * @return Config
      */
     public function getConfig()

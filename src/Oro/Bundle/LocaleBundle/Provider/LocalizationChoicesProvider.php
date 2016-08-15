@@ -2,20 +2,16 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
-use Doctrine\Common\Persistence\ObjectRepository;
-
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 class LocalizationChoicesProvider
 {
-    /** @var ObjectRepository */
-    protected $repository;
-
     /** @var ConfigManager */
     protected $configManager;
 
@@ -25,22 +21,25 @@ class LocalizationChoicesProvider
     /** @var FormattingCodeFormatter */
     protected $formattingFormatter;
 
+    /** @var LocalizationManager */
+    protected $localizationManager;
+
     /**
-     * @param ObjectRepository $repository
      * @param ConfigManager $configManager
      * @param LanguageCodeFormatter $languageFormatter
      * @param FormattingCodeFormatter $formattingFormatter
+     * @param LocalizationManager $localizationManager
      */
     public function __construct(
-        ObjectRepository $repository,
         ConfigManager $configManager,
         LanguageCodeFormatter $languageFormatter,
-        FormattingCodeFormatter $formattingFormatter
+        FormattingCodeFormatter $formattingFormatter,
+        LocalizationManager $localizationManager
     ) {
-        $this->repository = $repository;
         $this->configManager = $configManager;
         $this->languageFormatter = $languageFormatter;
         $this->formattingFormatter = $formattingFormatter;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -59,10 +58,13 @@ class LocalizationChoicesProvider
         return Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage());
     }
 
+    /**
+     * @return array
+     */
     public function getLocalizationChoices()
     {
         /** @var Localization[] $choices */
-        $choices = $this->repository->findBy([], ['name' => 'ASC']);
+        $choices = $this->localizationManager->getLocalizations();
         $data = [];
 
         foreach ($choices as $choice) {

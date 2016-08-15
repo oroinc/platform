@@ -36,7 +36,6 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertEquals('dialog', $context['widget_container']);
-        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
         $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
     }
 
@@ -53,7 +52,6 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertEquals('dialog', $context['widget_container']);
-        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
         $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
     }
 
@@ -68,7 +66,6 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertNull($context['widget_container']);
-        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
         $this->assertNull($context->data()->get('widget_id'));
     }
 
@@ -81,13 +78,12 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $context                     = new LayoutContext();
         $context['widget_container'] = 'updated_widget';
-        $context->data()->set('widget_id', 'updated_id', 'updated_widget_id');
+        $context->data()->set('widget_id', 'updated_widget_id');
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
         $this->assertEquals('updated_widget', $context['widget_container']);
-        $this->assertEquals('updated_id', $context->data()->getIdentifier('widget_id'));
         $this->assertEquals('updated_widget_id', $context->data()->get('widget_id'));
     }
 

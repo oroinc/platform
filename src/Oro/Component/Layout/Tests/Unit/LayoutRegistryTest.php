@@ -137,7 +137,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testFindDataProvider()
     {
         $name         = 'test';
-        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+        $dataProvider = $this->getMock(\stdClass::class);
 
         $this->extension->expects($this->once())
             ->method('hasDataProvider')

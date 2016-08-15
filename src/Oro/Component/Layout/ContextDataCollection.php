@@ -11,9 +11,6 @@ class ContextDataCollection
     private $items = [];
 
     /** @var array */
-    private $ids = [];
-
-    /** @var array */
     private $defaults = [];
 
     /**
@@ -22,32 +19,6 @@ class ContextDataCollection
     public function __construct(ContextInterface $context)
     {
         $this->context = $context;
-    }
-
-    /**
-     * Returns an unique identifier of tied data.
-     * The identifier can be a url, route, some unique key or something else that uniquely identifies the data.
-     *
-     * Examples:
-     * * "/api/rest/products/$context.product_id"
-     * * array('route' => 'api_get_product', 'parameters' => array('id' => '$context.product_id'))
-     * Please note that in these examples "$context.product_id" means that the id of a product
-     * is received from the layout context.
-     *
-     * @param string $name The data item name
-     *
-     * @return mixed
-     */
-    public function getIdentifier($name)
-    {
-        if (!isset($this->ids[$name])
-            && !array_key_exists($name, $this->ids)
-            && !$this->applyDefaultValue($name)
-        ) {
-            throw new \OutOfBoundsException(sprintf('Undefined data item index: %s.', $name));
-        };
-
-        return $this->ids[$name];
     }
 
     /**
@@ -90,32 +61,26 @@ class ContextDataCollection
      * Sets a value in the context data variable.
      *
      * @param string $name       The data item name
-     * @param mixed  $identifier The unique identifier of tied data
      * @param mixed  $value      The data to set
      */
-    public function set($name, $identifier, $value)
+    public function set($name, $value)
     {
-        $this->ids[$name]   = $identifier;
         $this->items[$name] = $value;
     }
 
     /**
-     * Sets callbacks to be used to get default unique identifier and value of the context data variable.
+     * Sets callbacks to be used to get default value of the context data variable.
      *
      * @param string $name      The data item name
-     * @param mixed $identifier The the unique identifier of tied data or the callback method
-     *                          to be used to get the unique identifier
-     *                          function (array|\ArrayAccess $options) : mixed
-     *                          where $options argument represents the context variables
      * @param mixed $value      The default data item value or the callback method
      *                          to be used to get the default value
      *                          function (array|\ArrayAccess $options) : mixed
      *                          where $options argument represents the context variables
      *                          must throw an \BadMethodCallException if data cannot be loaded
      */
-    public function setDefault($name, $identifier, $value)
+    public function setDefault($name, $value)
     {
-        $this->defaults[$name] = [$identifier, $value];
+        $this->defaults[$name] = $value;
     }
 
     /**
@@ -125,7 +90,7 @@ class ContextDataCollection
      */
     public function remove($name)
     {
-        unset($this->ids[$name], $this->items[$name]);
+        unset($this->items[$name]);
     }
 
     /**
@@ -149,7 +114,7 @@ class ContextDataCollection
             return false;
         }
 
-        $value = $this->defaults[$name][1];
+        $value = $this->defaults[$name];
         if (is_callable($value)) {
             try {
                 $this->items[$name] = call_user_func($value, $this->context);
@@ -159,11 +124,6 @@ class ContextDataCollection
         } else {
             $this->items[$name] = $value;
         }
-
-        $id               = $this->defaults[$name][0];
-        $this->ids[$name] = is_callable($id)
-            ? call_user_func($id, $this->context)
-            : $id;
 
         return true;
     }
