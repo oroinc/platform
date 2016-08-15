@@ -22,7 +22,7 @@ define(function(require) {
     var localeSettings = require('orolocale/js/locale-settings');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
-    require('jquery.fullcalendar');
+    require('fullcalendar');
 
     CalendarView = BaseView.extend({
         MOMENT_BACKEND_FORMAT: dateTimeFormatter.backendFormats.datetime,
