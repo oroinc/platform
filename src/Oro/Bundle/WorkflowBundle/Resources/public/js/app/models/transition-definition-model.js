@@ -7,12 +7,16 @@ define(function(require) {
     TransitionDefinitionModel = BaseModel.extend({
         defaults: {
             name: null,
+            preactions: null,
             pre_conditions: null,
             conditions: null,
             post_actions: null
         },
 
         initialize: function() {
+            if (this.get('preactions') === null) {
+                this.set('preactions', {});
+            }
             if (this.get('pre_conditions') === null) {
                 this.set('pre_conditions', {});
             }

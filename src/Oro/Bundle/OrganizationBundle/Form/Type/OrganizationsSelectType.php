@@ -112,7 +112,7 @@ class OrganizationsSelectType extends AbstractType
             'oro_type_business_unit_select_autocomplete',
             [
                 'required' => false,
-                'label' => 'oro.user.form.access_settings.label',
+                'label' => 'oro.user.form.business_units.label',
                 'autocomplete_alias' => 'business_units_tree_search_handler',
                 'configs'            => [
                     'multiple'    => true,

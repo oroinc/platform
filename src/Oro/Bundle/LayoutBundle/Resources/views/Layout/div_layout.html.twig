@@ -36,7 +36,7 @@
     {%- endif -%}
     {%- for attrname, attrvalue in attr -%}
         {%- if (attrvalue is iterable) -%}
-            {% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}
+            {% set attrvalue = attrvalue|json_encode() %}
         {%- endif -%}
         {%- if attrname is same as('title') -%}
             {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain) }}"
@@ -92,6 +92,7 @@
                 placeholder: attr.placeholder|block_text(translation_domain)
             }) %}
         {% endif %}
+
         <input{{ block('block_attributes') }}/>
     {%- endif -%}
 {%- endblock %}
@@ -166,7 +167,7 @@
         '~class': ' page__body'
     }) %}
 
-    <body{{ block('block_attributes') }}>
+     <body{{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </body>
 {% endblock %}

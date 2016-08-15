@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class OrmTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +22,9 @@ class OrmTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityTitleResolver;
+
     protected function setUp()
     {
         $config                = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
@@ -34,11 +38,18 @@ class OrmTest extends \PHPUnit_Framework_TestCase
         $mapperProvider->setMappingConfig($config);
         $this->mapper->setMappingProvider($mapperProvider);
         $this->doctrineHelper  = new DoctrineHelper($this->registry);
+        $this->entityTitleResolver = $this->getMock(EntityTitleResolverInterface::class);
     }
 
     protected function tearDown()
     {
-        unset($this->doctrineHelper, $this->mapper, $this->registry, $this->eventDispatcher);
+        unset(
+            $this->doctrineHelper,
+            $this->mapper,
+            $this->registry,
+            $this->eventDispatcher,
+            $this->entityTitleResolver
+        );
     }
 
     public function testReindexAll()
@@ -133,7 +144,8 @@ class OrmTest extends \PHPUnit_Framework_TestCase
             $this->registry,
             $this->eventDispatcher,
             $this->doctrineHelper,
-            $this->mapper
+            $this->mapper,
+            $this->entityTitleResolver
         ];
 
         return $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Orm')

@@ -1,0 +1,58 @@
+@import '_config.scss';
+
+.checkbox {
+    position: relative;
+
+    display: inline-block;
+    margin: 0;
+
+    &__input {
+        position: absolute;
+        z-index: -1;
+
+        margin: 0;
+
+        opacity: 0;
+
+        &:focus {
+            ~ .checkbox__icon {
+                &::before {
+                    outline: 2px solid rgba($checkbox-color, .7);
+                    outline-offset: -2px;
+                }
+            }
+        }
+
+        &:checked {
+            ~ .checkbox__icon {
+                &::before {
+                    // icon--checkbox
+                    content: $checkbox-icon-checkbox;
+
+                    color: $checkbox-color-checked;
+                }
+            }
+        }
+    }
+
+    &__icon {
+        cursor: pointer;
+
+        &::before {
+            display: inline-block;
+
+            font-family: 'Icon';
+            // icon--box
+            content: $checkbox-icon-box;
+
+            color: $checkbox-color;
+        }
+    }
+
+    &__text {
+        vertical-align: middle;
+
+        // TODO: align checkbox and text in Firefox
+        // vertical-align: text-top;
+    }
+}
