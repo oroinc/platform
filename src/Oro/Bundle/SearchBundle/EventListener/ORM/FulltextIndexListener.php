@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
-use Oro\Bundle\SearchBundle\Entity\IndexText;
 
 class FulltextIndexListener
 {
