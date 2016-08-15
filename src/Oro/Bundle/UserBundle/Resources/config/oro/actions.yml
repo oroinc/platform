@@ -6,11 +6,13 @@ operations:
             - Oro\Bundle\UserBundle\Entity\Role
     clone_role:
         extends: CLONE
+        order: 4
         datagrids:
             - roles-grid
         routes:
             - oro_user_role_index
             - oro_user_role_update
+            - oro_user_role_view
         acl_resource: [CREATE, entity:Oro\Bundle\UserBundle\Entity\Role]
         preactions:
             - '@tree':
@@ -83,6 +85,8 @@ operations:
             - oro_user_role_view
         acl_resource: [EDIT, entity:Oro\Bundle\UserBundle\Entity\Role]
         order: 10
+        groups:
+            - view_navButtons
         button_options:
             icon: icon-pencil
         actions:

@@ -42,3 +42,12 @@ UPGRADE FROM 1.10 to 2.0
 - Added ExpressionFunction `localized_value` to `Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider` - can be used in Layouts
 - Added Localization Settings page in System configuration
 - Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values
+
+###Layout Component:
+- Interface `Oro\Component\Layout\DataProviderInterface` was removed.
+- Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
+- Methods `Oro\Component\Layout\DataAccessorInterface::getIdentifier()` and `Oro\Component\Layout\DataAccessorInterface::get()`  was removed.
+- Added class `Oro\Component\Layout\DataProviderDecorator`.
+- Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
+- Method `Oro\Component\Layout\ContextDataCollection::getIdentifier()` was removed.
+- Twig method `layout_attr_merge` was renamed to `layout_attr_defaults`.

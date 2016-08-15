@@ -96,6 +96,7 @@ services:
             - '@router'
             - '@oro_search.mapper'
             - '@doctrine.orm.entity_manager'
+            - '@oro_search.resolver.entity_title'
         tags:
             - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: process }
 
@@ -201,3 +202,14 @@ services:
             - '@oro_search.provider.search_mapping'
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_search.resolver.entity_title.title_fields:
+        public: false
+        class: Oro\Bundle\SearchBundle\Resolver\EntityFieldsTitleResolver
+        arguments:
+            - '@oro_search.mapper'
+
+    oro_search.resolver.entity_title:
+        class: Oro\Bundle\SearchBundle\Resolver\EntityToStringTitleResolver
+        arguments:
+            - '@oro_search.resolver.entity_title.title_fields'
