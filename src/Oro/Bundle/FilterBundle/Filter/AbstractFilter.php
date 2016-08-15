@@ -88,6 +88,9 @@ abstract class AbstractFilter implements FilterInterface
         $relatedJoin = $this->findRelatedJoin($ds);
         $type = ($joinOperator && $relatedJoin) ? $joinOperator : $data['type'];
         $comparisonExpr = $this->buildExpr($ds, $type, $this->get(FilterUtility::DATA_NAME_KEY), $data);
+        if (!$comparisonExpr) {
+            return true;
+        }
 
         if ($relatedJoin) {
             $qb = $ds->getQueryBuilder();

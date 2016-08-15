@@ -82,27 +82,17 @@ class ChoiceTreeFilter extends AbstractFilter
     /**
      * {@inheritDoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        $data = $this->parseData($data);
-        if (!$data) {
-            return false;
-        }
-
-        $type =  $data['type'];
         if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
             $parameterName = $ds->generateParameterName($this->getName());
 
-            $this->applyFilterToClause(
-                $ds,
-                $this->get(FilterUtility::DATA_NAME_KEY) . ' in (:'. $parameterName .')'
-            );
-
-            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
                 $ds->setParameter($parameterName, $data['value']);
             }
+
+            return $fieldName . ' in (:'. $parameterName .')';
         }
-        return true;
     }
 
     /**

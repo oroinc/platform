@@ -19,19 +19,6 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
     ];
 
     /**
-     * Constructor
-     *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     */
-    public function __construct(
-        FormFactoryInterface $factory,
-        FilterUtility $util
-    ) {
-        parent::__construct($factory, $util);
-    }
-
-    /**
      * @return array
      */
     public function getMetadata()
@@ -53,9 +40,7 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
      */
     protected function parseValue($value)
     {
-        $value = count($value) === 1 ? $value[0] : $value;
-
-        return $value;
+        return count($value) === 1 ? $value[0] : $value;
     }
 
     /**
@@ -108,16 +93,12 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
         switch ($comparisonType) {
             case DictionaryFilterType::TYPE_NOT_IN:
                 return $ds->expr()->notIn($fieldName, $parameterName, true);
-                break;
             case DictionaryFilterType::EQUAL:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
-                break;
             case DictionaryFilterType::NOT_EQUAL:
                 return $ds->expr()->neq($fieldName, $parameterName, true);
-                break;
             default:
                 return $ds->expr()->in($fieldName, $parameterName, true);
-                break;
         }
     }
 }
