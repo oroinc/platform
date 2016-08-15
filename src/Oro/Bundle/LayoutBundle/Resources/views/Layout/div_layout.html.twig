@@ -66,12 +66,35 @@
 {%- endblock %}
 
 {% block input_widget -%}
-    {% if attr.placeholder is defined %}
-        {% set attr = attr|merge({
-            placeholder: attr.placeholder|block_text(translation_domain)
+    {%- if type == 'checkbox' -%}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' checkbox__input'
         }) %}
-    {% endif %}
-    <input{{ block('block_attributes') }}/>
+
+        {% if attr.placeholder is defined %}
+            {% set attr = attr|merge({
+                placeholder: attr.placeholder|block_text(translation_domain)
+            }) %}
+        {% endif %}
+
+        <label class="checkbox">
+            <input{{ block('block_attributes') }}/>
+            <span class="checkbox__icon icon"></span>
+            <span class="checkbox__text">{{ label|block_text(translation_domain) }} </span>
+        </label>
+    {% else %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' input'
+        }) %}
+
+        {% if attr.placeholder is defined %}
+            {% set attr = attr|merge({
+                placeholder: attr.placeholder|block_text(translation_domain)
+            }) %}
+        {% endif %}
+
+        <input{{ block('block_attributes') }}/>
+    {%- endif -%}
 {%- endblock %}
 
 {% block container_widget -%}
@@ -140,7 +163,11 @@
 {% endblock %}
 
 {% block body_widget %}
-    <body{{ block('block_attributes') }}>
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page__body'
+    }) %}
+
+     <body{{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </body>
 {% endblock %}
@@ -197,6 +224,10 @@
 {%- endblock %}
 
 {% block link_widget -%}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' link'
+    }) %}
+
     {% spaceless %}
         <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
             {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
@@ -214,6 +245,10 @@
 {%- endblock %}
 
 {% block button_widget_input -%}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' button'
+    }) %}
+
     {% spaceless %}
         <input{{ block('block_attributes') }}
             type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
@@ -223,6 +258,10 @@
 {%- endblock %}
 
 {% block button_widget_button -%}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' button'
+    }) %}
+
     {% spaceless %}
         <button{{ block('block_attributes') }}
                 type="{{ action in ['submit', 'reset'] ? action : 'button' }}"

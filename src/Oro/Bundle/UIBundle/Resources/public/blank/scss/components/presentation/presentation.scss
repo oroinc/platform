@@ -1,0 +1,30 @@
+.presentation {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    text-align: center;
+
+    // TODO: use flexbox for vertical and horizontal centering
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    &__centered {
+        display: inline-block;
+
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    &::before {
+        display: inline-block;
+        width: 0;
+        height: 100%;
+
+        vertical-align: middle;
+        content: ''
+    }
+}

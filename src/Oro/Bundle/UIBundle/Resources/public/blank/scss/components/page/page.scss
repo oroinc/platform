@@ -1,0 +1,45 @@
+@import '_config.scss';
+
+@font-face {
+    font-family: 'Lato';
+    src: url('components/page/--regular/page--regular.eot');
+    src: local('Lato Regular'), local('Lato-Regular'), url('components/page/--regular/page--regular.eot?#iefix') format('embedded-opentype'),
+        url('components/page/--regular/page--regular.ttf') format('truetype'),
+        url('components/page/--regular/page--regular.woff2') format('woff2'),
+        url('components/page/--regular/page--regular.woff') format('woff'),
+        url('components/page/--regular/page--regular.svg#latoregular') format('svg');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('components/page/--bold/page--bold.eot');
+  src: local('Lato Bold'), local('Lato-Bold'), url('components/page/--bold/page--bold.eot?#iefix') format('embedded-opentype'),
+        url('components/page/--bold/page--bold.ttf') format('truetype'),
+        url('components/page/--bold/page--bold.woff2') format('woff2'),
+        url('components/page/--bold/page--bold.woff') format('woff'),
+        url('components/page/--bold/page--bold.svg#latobold') format('svg');
+  font-weight: 700;
+  font-style: normal;
+}
+
+html {
+    height: 100%;
+}
+
+.page {
+    &__body {
+        min-height: 100%;
+        margin: 0;
+
+        font: #{$page-font-size}/#{$page-line-height} $page-font-family;
+    }
+}
+
+// TODO: prepend symfony toolbar after content
+.page {
+    & .sf-toolbar {
+        position: absolute;
+    }
+}
