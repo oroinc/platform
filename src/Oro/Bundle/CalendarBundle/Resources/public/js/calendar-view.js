@@ -143,7 +143,12 @@ define(function(require) {
                 }
 
                 if (defaultDate && !isNaN(defaultDate)) {
-                    this.options.eventsOptions.defaultDate =  moment.unix(defaultDate);
+                    defaultDate = moment.unix(defaultDate);
+                    this.options.eventsOptions.defaultDate = defaultDate;
+                    /**
+                     * @TODO This is hotfix. Should be fixed in CRM-6061
+                     */
+                    this.enableEventLoading = (defaultDate.format('M') !== moment().format('M'));
                 }
             }
 

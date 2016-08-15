@@ -4,17 +4,11 @@
     "description": "BAP Email Bundle",
     "keywords": ["BAP"],
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/orocrm/TranslationFormBundle.git"
-        }
-    ],
     "require": {
         "php": ">=5.5.9",
         "symfony/symfony": "2.8.*",
         "doctrine/orm": ">=2.3,<2.4-dev",
-        "a2lix/translation-form-bundle" : "dev-1.x-symfony2.8",
+        "a2lix/translation-form-bundle" : "1.x-dev",
         "oro/attachment-bundle": "dev-master",
         "oro/user-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
