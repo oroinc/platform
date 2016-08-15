@@ -42,6 +42,7 @@ UPGRADE FROM 1.10 to 2.0
 - Added Localization Settings page in System configuration
 - Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values
 
+
 ####OroIntegrationBundle:
 - The option `--integration-id` renamed to `--integration` in `oro:cron:integration:sync` cli command.
 - The option `--force` were removed from `oro:cron:integration:sync` cli command. Pass it as connector option  `force=true`.
@@ -51,3 +52,12 @@ UPGRADE FROM 1.10 to 2.0
 - The `GenuineSyncScheduler::schedule` method signature was changed.
 - The parameter `oro_integration.genuine_sync_scheduler.class` was removed.
 - The parameter `oro_integration.reverse_sync.processor.class` was removed.
+
+###Layout Component:
+- Interface `Oro\Component\Layout\DataProviderInterface` was removed.
+- Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
+- Methods `Oro\Component\Layout\DataAccessorInterface::getIdentifier()` and `Oro\Component\Layout\DataAccessorInterface::get()`  was removed.
+- Added class `Oro\Component\Layout\DataProviderDecorator`.
+- Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
+- Method `Oro\Component\Layout\ContextDataCollection::getIdentifier()` was removed.
+- Twig method `layout_attr_merge` was renamed to `layout_attr_defaults`.
