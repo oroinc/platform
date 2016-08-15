@@ -42,8 +42,7 @@ class RecipientTest extends \PHPUnit_Framework_TestCase
             ['john@example.com', '"John" <john@example.com>', 'John (Contact)', '"John" <john@example.com> (Contact)'],
             ['john@example.com', '<john@example.com>', 'john (Contact)', '<john@example.com> (Contact)'],
             ['john@example.com', 'john@example.com', '(Contact)', '<john@example.com> (Contact)'],
-            ['john@example.com', 'john@example.com', '(org)', '<john@example.com> (org)'],
-
+            ['john@example.com', 'john@example.com', '(org)', '<john@example.com> (org)']
         ];
     }
 
@@ -58,7 +57,6 @@ class RecipientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLabel($email, $name, $label, $organization, $expected)
     {
-
         /** @var RecipientEntity $recipientEntity */
         $recipientEntity = new RecipientEntity(
             'class',
@@ -78,8 +76,7 @@ class RecipientTest extends \PHPUnit_Framework_TestCase
             ['john@example.com', '<john@example.com>', '', '', '<john@example.com>'],
             ['john@example.com', '<john@example.com>', 'john (Contact)', '', '<john@example.com> (Contact)'],
             ['john@example.com', 'john@example.com', '(Contact)', 'Org', '<john@example.com> (Org Contact)'],
-            ['john@example.com', 'john@example.com', '', 'Org', '<john@example.com> (Org)'],
-
+            ['john@example.com', 'john@example.com', '', 'Org', '<john@example.com> (Org)']
         ];
     }
 }

@@ -49,6 +49,7 @@ class Recipient
         if ($this->entity && false !== $start = strrpos($this->entity->getLabel(), '(')) {
             $label = substr($this->entity->getLabel(), $start);
             $name = $this->getFormattedName($this->name);
+
             return sprintf('%s %s', $name, $label);
         }
 
@@ -59,6 +60,7 @@ class Recipient
      * Email should be in brackets < > for identification and extracting 'pure' email from label with additional text
      *
      * @param string $name
+     *
      * @return string
      */
     public function getFormattedName($name)
@@ -68,7 +70,8 @@ class Recipient
         if ($addrPos === false && $atPos) {
             return sprintf('<%s>', $name);
         }
-         return $name;
+
+        return $name;
     }
 
     /**
