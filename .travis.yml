@@ -9,7 +9,7 @@ php:
 
 cache:
   directories:
-    - $HOME/.composer/cache/files
+    - $HOME/.composer/cache/
 
 before_script:
   - phpenv config-rm xdebug.ini
@@ -18,5 +18,5 @@ before_script:
   - composer install
 
 script:
-  - ./vendor/bin/phpunit -c . --testsuite="Project Unit Tests"
+  - ./vendor/bin/phpunit --verbose --testsuite=unit
   - ./vendor/bin/phpcs ./src -p --encoding=utf-8 --extensions=php --standard=psr2
