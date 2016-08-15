@@ -1,8 +1,5 @@
-
 @mixin appearance() {
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
 }
 
 @mixin focus-state() {

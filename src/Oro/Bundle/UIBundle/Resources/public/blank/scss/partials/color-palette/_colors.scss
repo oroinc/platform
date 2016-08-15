@@ -10,15 +10,13 @@ $color-palette: (
         'light': #dd8f3d,
         'dark': #c57623
     ),
-    'addditiolan': (
+    'additional': (
         'ultra': #fff,
-        'slight-lightest': #f0f0f0,
-        'slight-lighter': #ebebeb,
-        'light': #d1d1d1,
-        'light': #b7b7b7,
-        'slight-middle': #acacac,
-        'middle': #626365,
-        'dark:': #252525
+        'base': #f9f9f9,
+        'light': #d7d7d7,
+        'middle': #cacaca,
+        'dark': #959595,
+        'darker': #000
     ),
     'ui': (
         'error': #f9caca,
@@ -27,7 +25,7 @@ $color-palette: (
         'success-dark': #598253,
         'warring': #fad6b7,
         'warring-dark': #785e22,
-        'normal': #348fc6,
-        'focus': #4597ca
+        'normal': #0081d0,
+        'focus': #009dff
     ),
 ) !default;

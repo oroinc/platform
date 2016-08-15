@@ -1,7 +1,7 @@
 @import './colors';
 
 // Use for example: color: get-color('primary', 'base');
-@function get-color($palette, $key) {
+@function get-color($palette: 'primary', $key: 'main') {
     $current-palette: map-get($color-palette,  $palette);
 
     @return map-get($current-palette, $key);

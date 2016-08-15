@@ -1,8 +1,9 @@
-//// Typography
-//$button-font-family: $lato-font-family !default;
-//$button-font-size: $page-font-size !default;
-//$button-line-height: $page-line-height !default;
-//
-//// Colors
-//$button-color: $lightgrey-color !default;
-//$button-color-action: #cc5c28 !default;
+// Colors
+$button-color: get-color('additional', 'darker') !default;
+$button-bg-color: get-color('additional', 'base') !default;
+$button-bg-color-hover: get-color('additional', 'light') !default;
+$button-border: 1px solid get-color('additional', 'light') !default;
+$button-border-radius: 2px !default;
+$button-font-size: $base-font-size !default;
+$button-inner-offset: 12px 10px !default;
+$button-line-height: 1 !default;

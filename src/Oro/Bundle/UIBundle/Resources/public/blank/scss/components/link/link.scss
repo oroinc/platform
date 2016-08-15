@@ -1,17 +1,9 @@
 @import '_config.scss';
 
 .link {
-    text-decoration: none;
-
     color: $link-color;
 
     &:hover {
-        text-decoration: underline;;
-
         color: $link-color-hover;
-    }
-
-    &:active {
-        color: $link-color-active;
     }
 }

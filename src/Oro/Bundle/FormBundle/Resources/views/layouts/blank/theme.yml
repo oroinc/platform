@@ -1,5 +1,3 @@
-data:
-    assets:
-        styles:
-            inputs:
-                - 'bundles/oroform/blank/scss/styles.scss'
+label: Blank theme
+description: Blank theme.
+groups: [ main ]

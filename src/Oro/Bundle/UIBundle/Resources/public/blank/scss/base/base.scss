@@ -1,0 +1,19 @@
+@import './_config';
+
+@if ($use-base-styles) {
+    html,
+    body {
+        min-height: 100%;
+        height: 100%;
+    }
+
+    .body {
+        min-width: $breakpoint-mobile;
+        margin: 0;
+
+        font: #{$base-font-size}/#{$base-line-height} $base-font;
+
+        background-color: get-color('additional', 'ultra');
+        color: get-color('additional', 'darker');
+    }
+}

@@ -1,10 +1,8 @@
 @import './_config';
 
 .notifications {
-    padding: $notifications-offset;
-    margin: 5px 0 0 0;
-
-    line-height: 1;
+    padding: $notifications-inner-offset;
+    margin: $notifications-offset;
 
     background-color: $notifications-color;
     color: $notifications-text-color;

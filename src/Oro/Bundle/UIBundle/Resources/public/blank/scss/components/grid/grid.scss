@@ -12,32 +12,26 @@
             }
 
             &-s {
-                margin-bottom: 5px;
+                margin-bottom: $offset-y-m;
             }
 
             &-m {
                 margin-bottom: $offset-y-m;
             }
         }
-
-        &--has-twin-row {
-            &:not(:last-child) {
-                margin-bottom: 50px;
-            }
-        }
     }
 
     &__column {
         &-half {
-            width: (100% - $oro-grid-offset) / 2;
+            width: (100% - $grid-offset) / 2;
 
             float: left;
 
             &:first-child {
-                margin-right: $oro-grid-offset;
+                margin-right: $grid-offset;
             }
 
-            @media (max-width: 991px) {
+            @include breakpoint('tablet') {
                 width: 100%;
                 margin-right: auto;
 
@@ -51,14 +45,14 @@
 
         &--offset {
             &-m {
-                margin-right: $oro-grid-offset;
+                margin-right: $grid-offset;
             }
         }
     }
 
-    @for $i from 1 through $oro-grid-count {
+    @for $i from 1 through $grid-count {
         &__column-#{$i} {
-            width: (($i* 100%) / $oro-grid-count);
+            width: (($i* 100%) / $grid-count);
         }
     }
 }

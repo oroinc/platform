@@ -2,41 +2,24 @@
 
 .button {
     display: inline-block;
-    padding: 15px 18px;
-    margin-bottom: 0;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.42857143;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
+    padding: $button-inner-offset;
 
-    background-color: #acacac;
+    font-size: $button-font-size;
+    line-height: $button-line-height;
+
+    background-color: $button-bg-color;
+
+    border: $button-border;
+    border-radius: $button-border-radius;
+    color: $button-color;
 
     touch-action: manipulation;
     cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
-
-    border: 1px solid transparent;
-    border-radius: 4px;
+    white-space: nowrap;
+    vertical-align: middle;
 
     &:hover {
-        background-color: #acacac;
-    }
-
-    &:active {
-        color: #fff;
-        box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
-    }
-
-    &--action {
-
-
-        &:hover {
-
-        }
+        background-color: $button-bg-color-hover;
     }
 }

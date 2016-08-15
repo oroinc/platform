@@ -1,0 +1,5 @@
+styles:
+    inputs:
+        - 'bundles/oroform/blank/scss/styles.scss'
+    filters: ['cssrewrite', 'cssmin']
+    output: 'css/layout/blank/styles.css'
