@@ -58,6 +58,19 @@ services:
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
+    oro_test.listener.step_duration_measure_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
+        arguments:
+            - '@definition.finder'
+
+    cli.controller.mesure_execution_time:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
+        arguments:
+            - '@oro_test.listener.step_duration_measure_subscriber'
+            - '@event_dispatcher'
+        tags:
+            - { name: 'cli.controller' }
+
     oro_element_factory:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory'
         arguments:
