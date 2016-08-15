@@ -12,14 +12,13 @@ use JMS\JobQueueBundle\Entity\Job;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 /**
  * Connector abstract class
@@ -40,25 +39,31 @@ abstract class AbstractEngine implements EngineInterface
     /** @var ObjectMapper */
     protected $mapper;
 
+    /** @var EntityTitleResolverInterface */
+    protected $entityTitleResolver;
+
     /** @var bool */
     protected $logQueries = false;
 
     /**
-     * @param ManagerRegistry          $registry
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param DoctrineHelper           $doctrineHelper
-     * @param ObjectMapper             $mapper
+     * @param ManagerRegistry               $registry
+     * @param EventDispatcherInterface      $eventDispatcher
+     * @param DoctrineHelper                $doctrineHelper
+     * @param ObjectMapper                  $mapper
+     * @param EntityTitleResolverInterface  $entityTitleResolver
      */
     public function __construct(
         ManagerRegistry $registry,
         EventDispatcherInterface $eventDispatcher,
         DoctrineHelper $doctrineHelper,
-        ObjectMapper $mapper
+        ObjectMapper $mapper,
+        EntityTitleResolverInterface $entityTitleResolver
     ) {
-        $this->registry        = $registry;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->mapper          = $mapper;
+        $this->registry             = $registry;
+        $this->eventDispatcher      = $eventDispatcher;
+        $this->doctrineHelper       = $doctrineHelper;
+        $this->mapper               = $mapper;
+        $this->entityTitleResolver  = $entityTitleResolver;
     }
 
     /**
@@ -232,18 +237,7 @@ abstract class AbstractEngine implements EngineInterface
      */
     protected function getEntityTitle($entity)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        $fields      = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
-        if ($fields) {
-            $title = [];
-            foreach ($fields as $field) {
-                $title[] = $this->mapper->getFieldValue($entity, $field);
-            }
-        } else {
-            $title = [(string) $entity];
-        }
-
-        return implode(' ', $title);
+        return $this->entityTitleResolver->resolve($entity);
     }
 
     /**
