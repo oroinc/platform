@@ -16,25 +16,19 @@ abstract class AbstractTagsFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $this->checkDataSourceAdapter($ds);
         /** @var OrmFilterDatasourceAdapter $ds */
 
-        $data = $this->parseData($data);
-        if ($data !== false) {
-            $className = $this->getEntityClassName();
-            $entityClassParam = 'tags_filter_entity_class_' . $this->clearEntityClassName($className);
-            $filterExpr = $this->buildFilterExpr($ds, $data, $entityClassParam);
-            if (false !== $filterExpr) {
-                $this->applyFilterToClause($ds, $filterExpr);
-                $ds->setParameter($entityClassParam, $className);
-
-                return true;
-            }
+        $className = $this->getEntityClassName();
+        $entityClassParam = 'tags_filter_entity_class_' . $this->clearEntityClassName($className);
+        $filterExpr = $this->buildFilterExpr($ds, $data, $entityClassParam);
+        if (false !== $filterExpr) {
+            $ds->setParameter($entityClassParam, $className);
         }
 
-        return false;
+        return $filterExpr;
     }
 
     /**
