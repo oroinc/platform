@@ -85,7 +85,7 @@ class AssociationManager
     {
         $ownerQb = $this->createOwnerQb($ownerClassName, $ownerId);
         $owners = $this->getOwnerIterator($ownerQb);
-        $countNewJob = 0;
+        $countNewMessages = 0;
         foreach ($owners as $owner) {
             $emailsQB = $this->emailOwnersProvider->getQBEmailsByOwnerEntity($owner);
 
@@ -98,7 +98,7 @@ class AssociationManager
                         &$owner,
                         &$emailId,
                         &$ownerClassName,
-                        &$countNewJob
+                        &$countNewMessages
                     ) {
                         $this->clear();
 
@@ -109,7 +109,7 @@ class AssociationManager
                         ]);
 
                         $emailId = [];
-                        $countNewJob++;
+                        $countNewMessages++;
                     });
 
                 foreach ($emails as $email) {
@@ -118,7 +118,7 @@ class AssociationManager
             }
         }
 
-        return $countNewJob;
+        return $countNewMessages;
     }
 
     /**

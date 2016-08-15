@@ -5,8 +5,7 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
-use JMS\JobQueueBundle\Entity\Job;
-
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -14,7 +13,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
-use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -31,10 +29,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     const SYNC_CODE_FAILURE    = 2;
     const SYNC_CODE_SUCCESS    = 3;
 
-    const ID_OPTION = 'id';
-
     /** @var string */
-    static protected $jobCommand;
+    static protected $messageQueueTopic;
 
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -51,8 +47,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     /** @var TokenInterface */
     private $currentToken;
 
-    /** @var JobManager */
-    private $jobManager;
+    /** @var MessageProducerInterface */
+    private $producer;
 
     /**
      * Constructor
@@ -69,11 +65,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     }
 
     /**
-     * @param JobManager $jobManager
+     * @param MessageProducerInterface $producer
      */
-    public function setJobManager(JobManager $jobManager)
+    public function setMessageProducer(MessageProducerInterface $producer)
     {
-        $this->jobManager = $jobManager;
+        $this->producer = $producer;
     }
 
     /**
@@ -221,26 +217,17 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      */
     public function scheduleSyncOriginsJob(array $originIds)
     {
-        // todo: order ids to correct check in queue
-        if (static::$jobCommand && $this->jobManager) {
-            $jobArgs = array_map(
-                function ($id) {
-                    return sprintf(
-                        '--%s=%s',
-                        self::ID_OPTION,
-                        $id
-                    );
-                },
-                $originIds
-            );
-
-            if (!$this->jobManager->hasJobInQueue(static::$jobCommand, json_encode($jobArgs))) {
-                $job = new Job(static::$jobCommand, $jobArgs);
-                $em = $this->getEntityManager();
-                $em->persist($job);
-                $em->flush();
-            }
+        if (! static::$messageQueueTopic) {
+            throw new \LogicException('Message queue topic is not set');
         }
+
+        if (! $this->producer) {
+            throw new \LogicException('Message producer is not set');
+        }
+
+        $this->producer->send(static::$messageQueueTopic, [
+            'ids' => $originIds,
+        ]);
     }
 
     /**

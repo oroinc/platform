@@ -84,12 +84,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 'The maximum number of email origins which can be synchronized. -1 for unlimited.',
                 self::MAX_TASKS
             )
-            ->addOption(
-                'id',
-                null,
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'The identifier of email origin to be synchronized.'
-            );
+        ;
     }
 
     /**
@@ -101,17 +96,12 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
         $synchronizer = $this->getContainer()->get('oro_imap.email_synchronizer');
         $synchronizer->setLogger(new OutputLogger($output));
 
-        $originIds = $input->getOption('id');
-        if (!empty($originIds)) {
-            $synchronizer->syncOrigins($originIds);
-        } else {
-            $synchronizer->sync(
-                (int)$input->getOption('max-concurrent-tasks'),
-                (int)$input->getOption('min-exec-interval'),
-                (int)$input->getOption('max-exec-time'),
-                (int)$input->getOption('max-tasks')
-            );
-        }
+        $synchronizer->sync(
+            (int)$input->getOption('max-concurrent-tasks'),
+            (int)$input->getOption('min-exec-interval'),
+            (int)$input->getOption('max-exec-time'),
+            (int)$input->getOption('max-tasks')
+        );
     }
 
     /**
