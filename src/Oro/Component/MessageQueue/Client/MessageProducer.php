@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -35,36 +34,29 @@ class MessageProducer implements MessageProducerInterface
     {
         $config = $this->driver->getConfig();
 
-        $transportMessage = $this->driver->createMessage();
-        $this->driver->setMessagePriority($transportMessage, $priority);
+        if (false == $message instanceof MessageInterface) {
+            $message = $this->createMessage($message);
+        }
 
-        $transportMessage->setBody($message);
+        $this->driver->setMessagePriority($message, $priority);
 
-        $properties = $transportMessage->getProperties();
+        $properties = $message->getProperties();
         $properties[Config::PARAMETER_TOPIC_NAME] = $topic;
         $properties[Config::PARAMETER_PROCESSOR_NAME] = $config->getRouterMessageProcessorName();
         $properties[Config::PARAMETER_QUEUE_NAME] = $config->getRouterQueueName();
-        $transportMessage->setProperties($properties);
+        $message->setProperties($properties);
         
         $queue = $this->driver->createQueue($config->getRouterQueueName());
-        
-        $this->sendMessage($queue, $transportMessage);
+
+        $this->transportProducer->send($queue, $message);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function sendMessage(DestinationInterface $destination, MessageInterface $message)
+    public function createMessage($body)
     {
-        if (false == $message->getProperty(Config::PARAMETER_TOPIC_NAME)) {
-            throw new \LogicException(sprintf('Parameter "%s" is required.', Config::PARAMETER_TOPIC_NAME));
-        }
-
-        if (false == $message->getProperty(Config::PARAMETER_PROCESSOR_NAME)) {
-            throw new \LogicException(sprintf('Parameter "%s" is required.', Config::PARAMETER_PROCESSOR_NAME));
-        }
-
-        $body = $message->getBody();
+        $message = $this->driver->createMessage();
         $headers = $message->getHeaders();
 
         if (is_scalar($body) || is_null($body)) {
@@ -90,6 +82,6 @@ class MessageProducer implements MessageProducerInterface
         $message->setMessageId(uniqid('oro', true));
         $message->setTimestamp(time());
 
-        $this->transportProducer->send($destination, $message);
+        return $message;
     }
 }
