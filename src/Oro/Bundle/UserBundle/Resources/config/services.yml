@@ -288,3 +288,10 @@ services:
             - @security.context.link
             - @session.flash_bag
             - @translator
+
+   oro_user.validator.user_authentication_fields:
+        class: Oro\Bundle\UserBundle\Validator\UserAuthenticationFieldsValidator
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.user_authentication_fields }
