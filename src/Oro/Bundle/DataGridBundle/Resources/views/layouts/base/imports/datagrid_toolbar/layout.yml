@@ -1,0 +1,35 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'layout.html.twig'
+        - '@addTree':
+            items:
+                __datagrid_toolbar:
+                    blockType: container
+                __datagrid_toolbar_actions_container:
+                    blockType: container
+                __datagrid_toolbar_mass_actions:
+                    blockType: container
+                __datagrid_toolbar_extra_actions:
+                    blockType: container
+                __datagrid_toolbar_tools_container:
+                    blockType: container
+                __datagrid_toolbar_actions:
+                    blockType: container
+                __datagrid_toolbar_page_size:
+                    blockType: block
+                __datagrid_toolbar_pagination:
+                    blockType: block
+                __datagrid_toolbar_sorting:
+                    blockType: block
+            tree:
+                __root:
+                    __datagrid_toolbar:
+                        __datagrid_toolbar_sorting: ~
+                        __datagrid_toolbar_actions_container:
+                            __datagrid_toolbar_mass_actions: ~
+                            __datagrid_toolbar_extra_actions: ~
+                        __datagrid_toolbar_tools_container:
+                            __datagrid_toolbar_actions: ~
+                            __datagrid_toolbar_page_size: ~
+                        __datagrid_toolbar_pagination: ~
