@@ -52,7 +52,13 @@ class Message extends \Zend\Mail\Storage\Message
         $params['strict'] = isset($params['strict']) ? $params['strict'] : false;
 
         if (isset($params['raw'])) {
-            Mime\Decode::splitMessage($params['raw'], $this->headers, $this->content, Mime\Mime::LINEEND, $params['strict']);
+            Mime\Decode::splitMessage(
+                $params['raw'],
+                $this->headers,
+                $this->content,
+                \Zend\Mime\Mime::LINEEND,
+                $params['strict']
+            );
         } elseif (isset($params['headers'])) {
             if (is_array($params['headers'])) {
                 $this->headers = new Headers();

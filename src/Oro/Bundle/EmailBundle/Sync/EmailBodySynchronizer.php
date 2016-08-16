@@ -69,11 +69,9 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             // try to get active origin and any first folder from it
             $isEmailUserFound = null;
             foreach ($email->getEmailUsers() as $emailUser) {
-                if (
-                    ($origin = $emailUser->getOrigin()) &&
+                if (($origin = $emailUser->getOrigin()) &&
                     $origin->isActive() &&
-                    $origin->getFolders()->count()
-                ) {
+                    $origin->getFolders()->count()) {
                     foreach ($origin->getFolders() as $folder) {
                         $loader    = $this->getBodyLoader($origin);
                         $bodyLoaded = false;
@@ -108,16 +106,23 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                                 ),
                                 ['exception' => $e]
                             );
-                        }
-                        catch (LoadEmailBodyException $loadEx) {
+                        } catch (LoadEmailBodyException $loadEx) {
                             $this->logger->notice(
-                                sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
+                                sprintf(
+                                    'Load email body failed. Email id: %d. Error: %s',
+                                    $email->getId(),
+                                    $loadEx->getMessage()
+                                ),
                                 ['exception' => $loadEx]
                             );
                             throw $loadEx;
                         } catch (\Exception $ex) {
                             $this->logger->notice(
-                                sprintf('Load email body failed. Email id: %d. Error: %s.', $email->getId(), $ex->getMessage()),
+                                sprintf(
+                                    'Load email body failed. Email id: %d. Error: %s.',
+                                    $email->getId(),
+                                    $ex->getMessage()
+                                ),
                                 ['exception' => $ex]
                             );
                         }
