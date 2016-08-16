@@ -9,6 +9,9 @@ config:
         'tinymce/plugins/bdesk_photo/plugin.min.js':
             deps:
                 - 'tinymce/tinymce.min'
+        'tinymce/plugins/paste/plugin.min.js':
+            deps:
+                - 'tinymce/tinymce.min'
         'tinymce/plugins/code/plugin.min':
             deps:
                 - 'tinymce/tinymce.min'
