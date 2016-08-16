@@ -29,8 +29,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $parser->parse($tokenStream);
 
-        $this->assertContains('test1', $query->getSelect());
-        $this->assertContains('test2', $query->getSelect());
+        $this->assertContains('text.test1', $query->getSelect());
+        $this->assertContains('text.test2', $query->getSelect());
     }
 
     private function generateTokens($elements)
