@@ -83,22 +83,22 @@ class Item
     /**
      * @ORM\OneToMany(targetEntity="IndexText", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $textFields;
+    protected $textFields;
 
     /**
      * @ORM\OneToMany(targetEntity="IndexInteger", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $integerFields;
+    protected $integerFields;
 
     /**
      * @ORM\OneToMany(targetEntity="IndexDecimal", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $decimalFields;
+    protected $decimalFields;
 
     /**
      * @ORM\OneToMany(targetEntity="IndexDatetime", mappedBy="item", cascade={"all"}, orphanRemoval=true)
      */
-    private $datetimeFields;
+    protected $datetimeFields;
 
     /**
      * Constructor
@@ -202,7 +202,9 @@ class Item
      */
     public function addIntegerField(IndexInteger $integerFields)
     {
-        $this->integerFields[] = $integerFields;
+        if (!$this->integerFields->contains($integerFields)) {
+            $this->integerFields[] = $integerFields;
+        }
 
         return $this;
     }
@@ -211,10 +213,13 @@ class Item
      * Remove integerFields
      *
      * @param IndexInteger $integerFields
+     * @return Item
      */
     public function removeIntegerField(IndexInteger $integerFields)
     {
         $this->integerFields->removeElement($integerFields);
+
+        return $this;
     }
 
     /**
@@ -236,7 +241,9 @@ class Item
      */
     public function addDecimalField(IndexDecimal $decimalFields)
     {
-        $this->decimalFields[] = $decimalFields;
+        if (!$this->decimalFields->contains($decimalFields)) {
+            $this->decimalFields[] = $decimalFields;
+        }
 
         return $this;
     }
@@ -245,10 +252,13 @@ class Item
      * Remove decimalFields
      *
      * @param IndexDecimal $decimalFields
+     * @return Item
      */
     public function removeDecimalField(IndexDecimal $decimalFields)
     {
         $this->decimalFields->removeElement($decimalFields);
+
+        return $this;
     }
 
     /**
@@ -270,7 +280,9 @@ class Item
      */
     public function addDatetimeField(IndexDatetime $datetimeFields)
     {
-        $this->datetimeFields[] = $datetimeFields;
+        if (!$this->datetimeFields->contains($datetimeFields)) {
+            $this->datetimeFields[] = $datetimeFields;
+        }
 
         return $this;
     }
@@ -308,7 +320,9 @@ class Item
      */
     public function addTextField(IndexText $textFields)
     {
-        $this->textFields[] = $textFields;
+        if (!$this->textFields->contains($textFields)) {
+            $this->textFields[] = $textFields;
+        }
 
         return $this;
     }
@@ -571,7 +585,7 @@ class Item
      * @param string $fieldName
      * @param mixed  $fieldData
      */
-    private function setFieldData($record, $fieldName, $fieldData)
+    protected function setFieldData($record, $fieldName, $fieldData)
     {
         $record->setField($fieldName)
             ->setValue($fieldData)

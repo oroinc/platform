@@ -19,27 +19,27 @@ class IndexInteger
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="integerFields")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      */
-    private $item;
+    protected $item;
 
     /**
      * @var string
      *
      * @ORM\Column(name="field", type="string", length=250, nullable=false)
      */
-    private $field;
+    protected $field;
 
     /**
      * @var integer
      *
      * @ORM\Column(name="value", type="integer", nullable=false)
      */
-    private $value;
+    protected $value;
 
     /**
      * Get id
