@@ -16,6 +16,8 @@ class Message extends \Zend\Mail\Storage\Message
 {
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function __construct(array $params)
     {

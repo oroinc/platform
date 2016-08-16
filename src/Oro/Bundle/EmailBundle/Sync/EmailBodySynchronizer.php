@@ -61,6 +61,8 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      * @param Email $email
      *
      * @throws LoadEmailBodyFailedException
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function syncOneEmailBody(Email $email)
     {
