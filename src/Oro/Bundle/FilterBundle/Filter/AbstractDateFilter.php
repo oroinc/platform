@@ -20,6 +20,7 @@ abstract class AbstractDateFilter extends AbstractFilter
      */
     protected $joinOperators = [
         DateRangeFilterType::TYPE_NOT_BETWEEN => DateRangeFilterType::TYPE_BETWEEN,
+        DateRangeFilterType::TYPE_NOT_EQUAL   => DateRangeFilterType::TYPE_EQUAL,
     ];
 
     public function __construct(
@@ -53,6 +54,12 @@ abstract class AbstractDateFilter extends AbstractFilter
         }
         if (null !== $dateEndValue) {
             $ds->setParameter($endDateParameterName, $dateEndValue);
+        }
+        if ($data['type'] === DateRangeFilterType::TYPE_NOT_EQUAL &&
+            $comparisonType === DateRangeFilterType::TYPE_EQUAL
+        ) {
+            list($startDateParameterName, $endDateParameterName) = [$endDateParameterName, $startDateParameterName];
+            list($dateStartValue, $dateEndValue) = [$dateEndValue, $dateStartValue];
         }
 
         return $this->buildDependingOnType(
