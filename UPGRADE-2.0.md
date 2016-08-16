@@ -50,3 +50,8 @@ UPGRADE FROM 1.10 to 2.0
 - Added class `Oro\Component\Layout\DataProviderDecorator`.
 - Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
 - Method `Oro\Component\Layout\ContextDataCollection::getIdentifier()` was removed.
+- Added interface `Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface`
+- Added class `Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider` that implements `Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface`
+- Added interface `Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface`
+- Added class `Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor` that implements `Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface`
+- Added method `Oro\Component\Layout\Extension\Theme\ThemeExtension::addVisitor` for adding visitors that implements `Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface`

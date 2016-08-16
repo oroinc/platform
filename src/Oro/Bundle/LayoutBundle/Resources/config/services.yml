@@ -21,7 +21,6 @@ services:
         calls:
             - [addExtension, ['@oro_layout.extension']]
             - [addExtension, ['@oro_layout.theme_extension']]
-            - [addExtension, ['@oro_layout.import_extension']]
             - [setDefaultRenderer, [%oro_layout.templating.default%]]
 
     oro_layout.layout_manager:
