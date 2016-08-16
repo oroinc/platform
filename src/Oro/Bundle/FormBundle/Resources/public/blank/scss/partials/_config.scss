@@ -1,0 +1,9 @@
+$base-ui-element-offset: 12px 10px !default;
+
+$base-ui-element-font-size: $base-font-size !default;
+$base-ui-element-line-height: 1 !default;
+
+$base-ui-element-border: 1px solid get-color('additional', 'light') !default;
+$base-ui-element-border-radius: 2px !default;
+$base-ui-element-bg-color: get-color('additional', 'base') !default;
+$base-ui-element-color: get-color('additional', 'darker') !default;

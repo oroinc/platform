@@ -72,24 +72,32 @@
         }) %}
 
         {% if attr.placeholder is defined %}
-            {% set attr = attr|merge({
-                placeholder: attr.placeholder|block_text(translation_domain)
+            {% set attr = layout_attr_defaults(attr, {
+                'placeholder': attr.placeholder|block_text(translation_domain)
             }) %}
         {% endif %}
-
-        <label class="checkbox">
-            <input{{ block('block_attributes') }}/>
-            <span class="checkbox__icon icon"></span>
+        <label for="{{ id }}"
+               class="checkbox"
+        >
+            <input id="{{ id }}"
+                   type="checkbox"
+                   class="checkbox__input"
+                   {{ block('widget_attributes') }}
+                   {% if value is defined %} value="{{ value }}" {% endif %}
+                   {% if checked is defined %} checked="checked" {% endif %}
+            >
+            <span class="checkbox__icon"></span>
             <span class="checkbox__text">{{ label|block_text(translation_domain) }} </span>
         </label>
+
     {% else %}
         {% set attr = layout_attr_defaults(attr, {
             '~class': ' input'
         }) %}
 
         {% if attr.placeholder is defined %}
-            {% set attr = attr|merge({
-                placeholder: attr.placeholder|block_text(translation_domain)
+            {% set attr = layout_attr_defaults(attr, {
+                'placeholder': attr.placeholder|block_text(translation_domain)
             }) %}
         {% endif %}
 

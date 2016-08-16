@@ -1,0 +1,25 @@
+@import './config';
+
+.select {
+    @include base-ui-element($use-base-style, $select-inner-offset);
+
+    background: $select-bg;
+
+    @if ($use-select-appearance) {
+        @include appearance();
+    }
+
+    @include element-state('hover') {
+        text-decoration: none;
+
+        border-color: $select-border-color-hover-state;
+    }
+
+    @include element-state('focus') {
+        border-color: $select-border-color-focus-state;
+    }
+
+    @include element-state('error') {
+        border-color: $select-border-color-error-state;
+    }
+}

@@ -1,24 +1,20 @@
 @import '_config.scss';
 
 .input {
-    display: block;
-    margin: 0;
-    padding: 10px 14px 12px 14px;
 
-    vertical-align: middle;
+    @include base-ui-element($use-base-style, $input-inner-offset);
 
+    @include element-state('hover') {
+        text-decoration: none;
 
-    color: red;
-    border-radius: 4px;
-    border: 1px solid #b7b7b7;
-
-    appearance: none;
-
-    &:hover {
-        border-color: #626365;
+        border-color: $input-border-color-hover-state;
     }
 
-    &:focus {
-        outline: none;
+    @include element-state('focus') {
+        border-color: $input-border-color-focus-state;
+    }
+
+    @include element-state('error') {
+        border-color: $input-border-color-error-state;
     }
 }

@@ -1,0 +1,14 @@
+$use-base-style: true !default;
+$use-select-appearance: true !default;
+
+// Default
+$select-inner-offset: 7px 24px 7px 9px !default;
+$select-bg: url('../images/icons/arrow-down--gray.png') no-repeat right 8px center transparent !default;
+
+$select-border-color-hover-state: get-color('additional', 'dark') !default;
+
+// Focus
+$select-border-color-focus-state: $input-border-color-hover-state !default;
+
+// Error
+$select-border-color-error-state: get-color('ui', 'error-dark') !default;

@@ -1,25 +1,25 @@
 @import '_config.scss';
 
 .button {
-    display: inline-block;
-    padding: $button-inner-offset;
+    @include base-ui-element($use-base-style);
 
-    font-size: $button-font-size;
-    line-height: $button-line-height;
-
-    background-color: $button-bg-color;
-
-    border: $button-border;
-    border-radius: $button-border-radius;
-    color: $button-color;
+    text-decoration: none;
 
     touch-action: manipulation;
     cursor: pointer;
     user-select: none;
-    white-space: nowrap;
-    vertical-align: middle;
 
-    &:hover {
-        background-color: $button-bg-color-hover;
+    @include element-state('hover') {
+        text-decoration: none;
+
+        border-color: $button-border-color-hover-state;
+    }
+
+    @include element-state('focus') {
+        border-color: $button-border-color-focus-state;
+    }
+
+    @include element-state('error') {
+        border-color: $button-border-color-error-state;
     }
 }

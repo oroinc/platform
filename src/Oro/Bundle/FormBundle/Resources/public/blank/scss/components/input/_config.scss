@@ -1,7 +1,13 @@
-//// Typography
-//$input-font-family: $lato-font-family !default;
-//$input-font-size: $page-font-size !default;
-//$input-line-height: $page-line-height !default;
-//
-//// Colors
-//$input-color: $lightgrey-color !default;
+$use-base-style: true !default;
+
+// Default
+$input-inner-offset: 7px 9px;
+
+// Hover
+$input-border-color-hover-state: get-color('additional', 'dark') !default;
+
+// Focus
+$input-border-color-focus-state: $input-border-color-hover-state !default;
+
+// Error
+$input-border-color-error-state: get-color('ui', 'error-dark') !default;

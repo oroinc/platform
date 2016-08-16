@@ -4,40 +4,39 @@
     position: relative;
 
     display: inline-block;
-    margin: 0;
 
     &__input {
         position: absolute;
         z-index: -1;
-
         margin: 0;
 
-        opacity: 0;
-
+        &:hover,
         &:focus {
             ~ .checkbox__icon {
-                &::before {
-                    outline-offset: -2px;
-                }
+                border: $checkbox-icon-border-hover-state;
             }
         }
 
         &:checked {
             ~ .checkbox__icon {
-                &::before {
-                }
+                border: $checkbox-icon-border-focus-state;
+                background-color: $checkbox-icon-bg-color-focus-state;
             }
         }
     }
 
     &__icon {
+        display: inline-block;
+
+        height: $checkbox-icon-size;
+        width: $checkbox-icon-size;
+
+        border: $checkbox-icon-border;
+        background-color: $checkbox-icon-bg-color;
+
         cursor: pointer;
 
-        &::before {
-            display: inline-block;
-
-            font-family: 'Icon';
-        }
+        vertical-align: middle;
     }
 
     &__text {

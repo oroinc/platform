@@ -1,6 +1,9 @@
 @import 'oroui/blank/scss/_global-settings';
+
 @import 'partials/mixins';
 
 @import 'components/input/input';
-@import 'components/checkbox/checkbox';
 @import 'components/button/button';
+@import 'components/select/select';
+@import 'components/checkbox/checkbox';
+@import 'components/label/label';

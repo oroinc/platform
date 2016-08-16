@@ -1,7 +1,11 @@
-//// Colors
-//$checkbox-color: $lightgrey-color !default;
-//$checkbox-color-checked: $lightblue-color !default;
-//
-//// Others
-//$checkbox-icon-box: '\e835' !default;
-//$checkbox-icon-checkbox: '\e834' !default;
+// Default
+$checkbox-icon-size: 8px !default;
+$checkbox-icon-border: 1px solid get-color('additional', 'dark') !default;
+$checkbox-icon-bg-color: get-color('additional', 'ultra') !default;
+
+// Checked
+$checkbox-icon-bg-color-focus-state: get-color('ui', 'focus') !default;
+$checkbox-icon-border-focus-state: 1px solid get-color('ui', 'focus') !default;
+
+// Hover
+$checkbox-icon-border-hover-state: 1px solid get-color('ui', 'focus') !default;
