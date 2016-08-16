@@ -385,6 +385,13 @@ services:
         tags:
             - {name: oro_entity.custom_grid_field_validator, entity_name: Oro_Bundle_UserBundle_Entity_User }
 
+    oro_user.validator.user_authentication_fields:
+        class: Oro\Bundle\UserBundle\Validator\UserAuthenticationFieldsValidator
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.user_authentication_fields }
+
     # Dashboard
     oro_user.dashboard.owner_helper:
         class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper
