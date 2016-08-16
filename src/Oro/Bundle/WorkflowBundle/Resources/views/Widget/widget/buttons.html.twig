@@ -1,7 +1,0 @@
-{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
-
-<div class="widget-content">
-    {% for workflowName, workflow in workflowsData %}
-        {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entity_id} %}
-    {% endfor %}
-</div>
