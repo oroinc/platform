@@ -25,7 +25,7 @@ class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
     public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
     {
         $ds = $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
-        $this->manyToManyfilter->apply($ds, []);
+        $this->manyToManyfilter->apply($ds, ['type' => FilterUtility::TYPE_EMPTY]);
     }
 
     public function testApplyEmptyType()
@@ -59,6 +59,9 @@ class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
+        $qb->expects($this->any())
+            ->method('getDqlPart')
+            ->will($this->returnValue([]));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
             ->disableOriginalConstructor()
@@ -116,6 +119,9 @@ class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
+        $qb->expects($this->any())
+            ->method('getDqlPart')
+            ->will($this->returnValue([]));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
             ->disableOriginalConstructor()
