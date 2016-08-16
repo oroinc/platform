@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
-use Oro\Component\Config\CumulativeResourceManager;
-
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle;
+
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -241,7 +241,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $searchExtension->load($config, $this->container);
     }
 
-    public function testLoadAllDefinedEngineConfigurations()
+    public function testLoadAllDefinedEngineConfigurationsForElasticEngine()
     {
         $firstBundle = new FirstESEngineBundle();
         $secondBundle = new SecondESEngineBundle();
@@ -261,7 +261,85 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $searchExtension = new OroSearchExtension(array(), $this->container);
         $searchExtension->load($config, $this->container);
-        
-        $this->assertCount(4, $this->container->getResources());
+
+        $expectedResourceFiles = [
+            $this->getSearchBundleResource('services.yml'),
+            $this->getResourcePath('FirstESEngineBundle', 'elastic_search.yml'),
+            $this->getResourcePath('SecondESEngineBundle', 'elastic_search.yml')
+        ];
+
+        $this->assertResourceFilesMatch($expectedResourceFiles);
+
+        $this->assertServiceHasClass(
+            'test_es_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'
+        );
+
+        $this->assertServiceHasClass(
+            'test_es_second_bundle_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'
+        );
+
+        $this->assertServiceHasClass(
+            'test_es_first_bundle_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle'
+        );
+
+        $this->assertFalse($this->container->has('test_orm_service'));
+    }
+
+    /**
+     * @param array $expectedResourceFiles
+     */
+    public function assertResourceFilesMatch(array $expectedResourceFiles)
+    {
+        $resources = $this->container->getResources();
+        $resourceFiles = [];
+
+        foreach ($resources as $resource) {
+            if ($resource instanceof FileResource) {
+                $resourceFiles[] = (string) $resource;
+            }
+        }
+
+        $this->assertEquals($resourceFiles, $expectedResourceFiles);
+    }
+
+    /**
+     * @param string $serviceName
+     * @param string $className
+     */
+    public function assertServiceHasClass($serviceName, $className)
+    {
+        $this->assertTrue($this->container->has($serviceName));
+
+        $serviceDefinition = $this->container->getDefinition($serviceName);
+        $this->assertEquals($className, $serviceDefinition->getClass());
+    }
+
+    /**
+     * @param string $bundleName
+     * @param string $resourceName
+     * @return string
+     */
+    protected function getResourcePath($bundleName, $resourceName)
+    {
+        $directory = dirname(__DIR__);
+        $ds = DIRECTORY_SEPARATOR;
+
+        return $directory.$ds.'Fixture'.$ds.'Bundle'.$ds.$bundleName.$ds.'Resources'.$ds.'config'.$ds.'oro'.$ds
+            .'search_engine'.$ds.$resourceName;
+    }
+
+    /**
+     * @param string $resourceFile
+     * @return string
+     */
+    protected function getSearchBundleResource($resourceFile)
+    {
+        $ds = DIRECTORY_SEPARATOR;
+        $directory = realpath(dirname(__DIR__).$ds.'..'.$ds.'..');
+
+        return $directory.$ds.'Resources'.$ds.'config'.$ds.$resourceFile;
     }
 }
