@@ -235,4 +235,33 @@ class Message extends \Zend\Mail\Storage\Message
 
         return null;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function _cacheContent()
+    {
+        // caching content if we can't fetch parts
+        if ($this->content === null && $this->mail) {
+            $this->content = $this->mail->getRawContent($this->messageNum);
+        }
+
+        if (!$this->isMultipart()) {
+            return;
+        }
+
+        // split content in parts
+        $boundary = $this->getHeaderField('content-type', 'boundary');
+        if (!$boundary) {
+            throw new RuntimeException('no boundary found in content type to split message');
+        }
+        $parts = Decode::splitMessageStruct($this->content, $boundary);
+        if ($parts === null) {
+            return;
+        }
+        $counter = 1;
+        foreach ($parts as $part) {
+            $this->parts[$counter++] = new static(array('headers' => $part['header'], 'content' => $part['body']));
+        }
+    }
 }
