@@ -11,6 +11,8 @@ definitions:
                 - '@false'
         actions_configuration:
             - '@assign_value': [$entity.field, 'value']
+        pre_conditions:
+            '@condition1': ~
 
     another_definition:
         label: 'Another definition'

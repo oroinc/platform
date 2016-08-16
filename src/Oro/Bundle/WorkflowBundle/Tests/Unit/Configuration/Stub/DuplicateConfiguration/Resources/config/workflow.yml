@@ -28,4 +28,6 @@ workflows:
                 conditions:
                     '@true': ~
                 actions:
-                    - '@custom_post_action': ~
+                    - '@custom_action': ~
+                post_actions:
+                    - '@custom_action2': ~

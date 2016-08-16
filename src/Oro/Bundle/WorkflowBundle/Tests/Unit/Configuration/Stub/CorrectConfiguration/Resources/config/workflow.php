@@ -109,10 +109,15 @@ return array(
                 ),
                 'actions' => array(
                     array(
-                        '@custom_post_action' => null
-
+                        '@custom_action' => null
                     )
-                )
+                ),
+                'pre_conditions' => [
+                    ['@condition1' => null]
+                ],
+                'post_actions' => [
+                    ['@custom_action2' => null]
+                ],
             )
         ),
         'entity_restrictions' => array()
@@ -159,7 +164,9 @@ return array(
                 'preactions' => array(),
                 'preconditions' => array(),
                 'conditions' => array(),
-                'actions' => array()
+                'actions' => array(),
+                'pre_conditions' => [],
+                'post_actions' => [],
             )
         ),
         'is_system' => false,

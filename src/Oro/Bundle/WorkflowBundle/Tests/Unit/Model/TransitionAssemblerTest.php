@@ -58,7 +58,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         'with_condition' => [
             'conditions' => ['@true' => null]
         ],
-        'with_post_actions' => [
+        'with_actions' => [
             'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]
         ],
         'full_definition' => [
@@ -407,13 +407,13 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_preactions'],
             ],
-            'with_post_actions' => [
+            'with_actions' => [
                 'configuration' => [
-                    'transition_definition' => 'with_post_actions',
+                    'transition_definition' => 'with_actions',
                     'label' => 'label',
                     'step_to' => 'step',
                 ],
-                'transitionDefinition' => self::$transitionDefinitions['with_post_actions'],
+                'transitionDefinition' => self::$transitionDefinitions['with_actions'],
             ],
             'full_definition' => [
                 'configuration' => [

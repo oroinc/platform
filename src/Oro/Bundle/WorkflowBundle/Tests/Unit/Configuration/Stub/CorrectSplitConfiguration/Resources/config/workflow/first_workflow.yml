@@ -64,4 +64,8 @@ workflows:
                                     message: "Not equals"
                         message: "Fail upper level"
                 actions:
-                    - '@custom_post_action': ~
+                    - '@custom_action': ~
+                pre_conditions:
+                    - '@condition1': ~
+                post_actions:
+                    - '@custom_action2': ~

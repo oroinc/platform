@@ -102,8 +102,7 @@ return array(
                 ),
                 'actions' => array(
                     array(
-                        '@custom_post_action' => null
-
+                        '@custom_action' => null
                     )
                 )
             )

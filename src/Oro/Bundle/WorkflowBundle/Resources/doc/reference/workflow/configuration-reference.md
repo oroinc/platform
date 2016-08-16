@@ -427,6 +427,12 @@ Transition definition configuration has next options.
     Configuration of Post Actions that must be performed after transit to next step will be performed.
 * **form_init**
     Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
+* **pre_conditions**
+    Deprecated, use `preconditions` instead.
+* **init_actions**
+    Deprecated, use `form_init` instead.
+* **post_actions**
+    Deprecated, use `actions` instead.
 
 Example
 -------

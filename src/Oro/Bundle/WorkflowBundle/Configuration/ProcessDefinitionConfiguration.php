@@ -64,6 +64,11 @@ class ProcessDefinitionConfiguration implements ConfigurationInterface
                     ->prototype('variable')
                     ->end()
                 ->end()
+                // deprecated, use `preconditions` instead
+                ->arrayNode('pre_conditions')
+                    ->prototype('variable')
+                    ->end()
+                ->end()
                 ->arrayNode('actions_configuration')
                     ->prototype('variable')
                     ->end()
