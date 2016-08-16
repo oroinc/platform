@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle;
-
-use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -291,7 +291,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expectedResourceFiles
      */
-    public function assertResourceFilesMatch(array $expectedResourceFiles)
+    private function assertResourceFilesMatch(array $expectedResourceFiles)
     {
         $resources = $this->container->getResources();
         $resourceFiles = [];
@@ -309,7 +309,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
      * @param string $serviceName
      * @param string $className
      */
-    public function assertServiceHasClass($serviceName, $className)
+    private function assertServiceHasClass($serviceName, $className)
     {
         $this->assertTrue($this->container->has($serviceName));
 
@@ -322,7 +322,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
      * @param string $resourceName
      * @return string
      */
-    protected function getResourcePath($bundleName, $resourceName)
+    private function getResourcePath($bundleName, $resourceName)
     {
         $directory = dirname(__DIR__);
         $ds = DIRECTORY_SEPARATOR;
@@ -335,7 +335,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
      * @param string $resourceFile
      * @return string
      */
-    protected function getSearchBundleResource($resourceFile)
+    private function getSearchBundleResource($resourceFile)
     {
         $ds = DIRECTORY_SEPARATOR;
         $directory = realpath(dirname(__DIR__).$ds.'..'.$ds.'..');
