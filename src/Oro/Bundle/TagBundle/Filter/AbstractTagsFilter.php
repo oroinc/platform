@@ -16,25 +16,26 @@ abstract class AbstractTagsFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected $joinOperators = [
+        DictionaryFilterType::TYPE_NOT_IN => DictionaryFilterType::TYPE_IN,
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $this->checkDataSourceAdapter($ds);
         /** @var OrmFilterDatasourceAdapter $ds */
 
-        $data = $this->parseData($data);
-        if ($data !== false) {
-            $className = $this->getEntityClassName();
-            $entityClassParam = 'tags_filter_entity_class_' . $this->clearEntityClassName($className);
-            $filterExpr = $this->buildFilterExpr($ds, $data, $entityClassParam);
-            if (false !== $filterExpr) {
-                $this->applyFilterToClause($ds, $filterExpr);
-                $ds->setParameter($entityClassParam, $className);
-
-                return true;
-            }
+        $className = $this->getEntityClassName();
+        $entityClassParam = 'tags_filter_entity_class_' . $this->clearEntityClassName($className);
+        $filterExpr = $this->buildFilterExpr($ds, $data, $entityClassParam, $comparisonType);
+        if (false !== $filterExpr) {
+            $ds->setParameter($entityClassParam, $className);
         }
 
-        return false;
+        return $filterExpr;
     }
 
     /**
@@ -42,12 +43,12 @@ abstract class AbstractTagsFilter extends AbstractFilter
      *
      * @param OrmFilterDatasourceAdapter $ds
      * @param array                      $data
-     *
      * @param string                     $entityClassParam
+     * @param string                     $comparisonType
      *
      * @return bool|Func
      */
-    protected function buildFilterExpr(OrmFilterDatasourceAdapter $ds, array $data, $entityClassParam)
+    protected function buildFilterExpr(OrmFilterDatasourceAdapter $ds, array $data, $entityClassParam, $comparisonType)
     {
         $expr = false;
 
@@ -65,7 +66,7 @@ abstract class AbstractTagsFilter extends AbstractFilter
             ->andWhere($qb->expr()->in($tagAlias . '.id', $data['value']))
             ->getDQL();
 
-        switch ($data['type']) {
+        switch ($comparisonType) {
             case DictionaryFilterType::TYPE_IN:
                 $expr = $ds->expr()->in($entityIdAlias, $subQueryDQL);
                 break;
