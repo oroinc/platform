@@ -50,7 +50,6 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'exclude_definitions'   => array(),
                     'actions_configuration' => array(),
                     'preconditions' => array(),
-                    'pre_conditions' => [],
                 ),
             ),
             'maximum data' => array(
@@ -73,8 +72,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'order' => 10,
                     'exclude_definitions'   => array(),
                     'actions_configuration' => array('key' => 'value'),
-                    'preconditions' => array('test'),
-                    'pre_conditions' => ['test2'],
+                    'preconditions' => ['test', 'test2'],
                 ),
             ),
         );

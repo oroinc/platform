@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-class ProcessDefinitionConfiguration implements ConfigurationInterface
+class ProcessDefinitionConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
     /**
      * @param array $configs
@@ -64,15 +64,18 @@ class ProcessDefinitionConfiguration implements ConfigurationInterface
                     ->prototype('variable')
                     ->end()
                 ->end()
-                // deprecated, use `preconditions` instead
-                ->arrayNode('pre_conditions')
-                    ->prototype('variable')
-                    ->end()
-                ->end()
+                ->arrayNode('pre_conditions')->end() // deprecated, use `preconditions` instead
                 ->arrayNode('actions_configuration')
                     ->prototype('variable')
                     ->end()
                 ->end()
+            ->end()
+            ->beforeNormalization()
+                ->always(function ($config) {
+                    return $this->mergeConfigs([
+                        'preconditions' => 'pre_conditions',
+                    ], $config);
+                })
             ->end();
 
         return $nodeDefinition;

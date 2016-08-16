@@ -86,11 +86,12 @@ return array(
             'first_transition_definition' => array(
                 'preactions' => array(
                     array(
-                        '@custom_pre_action' => null
+                        '@custom_action' => null,
                     )
                 ),
                 'preconditions' => array(
-                    '@true' => null
+                    '@true' => null,
+                    '@condition1' => null
                 ),
                 'conditions' => array(
                     '@and' => array(
@@ -108,16 +109,9 @@ return array(
                     )
                 ),
                 'actions' => array(
-                    array(
-                        '@custom_action' => null
-                    )
+                    ['@custom_action' => null],
+                    ['@custom_action2' => null],
                 ),
-                'pre_conditions' => [
-                    ['@condition1' => null]
-                ],
-                'post_actions' => [
-                    ['@custom_action2' => null]
-                ],
             )
         ),
         'entity_restrictions' => array()
@@ -165,8 +159,6 @@ return array(
                 'preconditions' => array(),
                 'conditions' => array(),
                 'actions' => array(),
-                'pre_conditions' => [],
-                'post_actions' => [],
             )
         ),
         'is_system' => false,

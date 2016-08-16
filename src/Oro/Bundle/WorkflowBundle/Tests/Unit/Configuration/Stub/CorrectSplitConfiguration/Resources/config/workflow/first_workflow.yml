@@ -50,7 +50,7 @@ workflows:
         transition_definitions:
             first_transition_definition:
                 preactions:
-                    - '@custom_pre_action': ~
+                    - '@custom_action': ~
                 preconditions:
                     '@true': ~
                 conditions:
@@ -66,6 +66,6 @@ workflows:
                 actions:
                     - '@custom_action': ~
                 pre_conditions:
-                    - '@condition1': ~
+                    '@condition1': ~
                 post_actions:
                     - '@custom_action2': ~

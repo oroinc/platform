@@ -79,7 +79,7 @@ return array(
             'first_transition_definition' => array(
                 'preactions' => array(
                     array(
-                        '@custom_pre_action' => null
+                        '@custom_action' => null
                     )
                 ),
                 'preconditions' => array(

@@ -90,15 +90,9 @@ class TransitionAssembler extends BaseAbstractAssembler
             }
             $definitions[$name] = [
                 'preactions' => $this->getOption($options, 'preactions', []),
-                'preconditions' => array_merge(
-                    $this->getOption($options, 'preconditions', []),
-                    $this->getOption($options, 'pre_conditions', []) // deprecated
-                ),
+                'preconditions' => $this->getOption($options, 'preconditions', []),
                 'conditions' => $this->getOption($options, 'conditions', []),
-                'actions' => array_merge(
-                    $this->getOption($options, 'actions', []),
-                    $this->getOption($options, 'post_actions', []) // deprecated
-                ),
+                'actions' => $this->getOption($options, 'actions', []),
             ];
         }
 
