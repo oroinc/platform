@@ -13,6 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
@@ -58,50 +59,80 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      * Syncs email body for one email
      *
      * @param Email $email
+     *
+     * @throws LoadEmailBodyFailedException
      */
     public function syncOneEmailBody(Email $email)
     {
         if ($this->isBodyNotLoaded($email)) {
-            // body loader can load email from any folder
-            // todo: refactor to use correct emailuser and origin
-            // to use active origin and get correct folder from this origin
-            $emailUser = $email->getEmailUsers()->first();
-            $folder    = $emailUser->getFolders()->first();
-            $origin    = $emailUser->getOrigin();
-            if (!$origin) {
-                throw new LoadEmailBodyFailedException($email);
-            }
-
-            $loader    = $this->getBodyLoader($origin);
-            $bodyLoaded = false;
-            try {
-                $em        = $this->getManager();
-                $emailBody = $loader->loadEmailBody($folder, $email, $em);
-                $em->refresh($email);
-                // double check
-                if ($this->isBodyNotLoaded($email)) {
-                    $email->setEmailBody($emailBody);
-                    $email->setBodySynced(true);
-                    $bodyLoaded = true;
-                    $em->persist($email);
-                    $em->flush($email);
+            // body loader can load email body from any folder of any origin
+            // try to get active origin and any first folder from it
+            $isEmailUserFound = null;
+            foreach ($email->getEmailUsers() as $emailUser) {
+                if (
+                    ($origin = $emailUser->getOrigin()) &&
+                    $origin->isActive() &&
+                    $origin->getFolders()->count()
+                ) {
+                    foreach ($origin->getFolders() as $folder) {
+                        $loader    = $this->getBodyLoader($origin);
+                        $bodyLoaded = false;
+                        try {
+                            $em        = $this->getManager();
+                            $emailBody = $loader->loadEmailBody($folder, $email, $em);
+                            $em->refresh($email);
+                            // double check
+                            if ($this->isBodyNotLoaded($email)) {
+                                $email->setEmailBody($emailBody);
+                                $email->setBodySynced(true);
+                                $bodyLoaded = true;
+                                $em->persist($email);
+                                $em->flush($email);
+                            }
+                            $isEmailUserFound = true;
+                        } catch (EmailBodyNotFoundException $e) {
+                            $this->logger->notice(
+                                sprintf(
+                                    'Attempt to load email body failed. Email id: %d. Error: %s',
+                                    $email->getId(),
+                                    $e->getMessage()
+                                ),
+                                ['exception' => $e]
+                            );
+                        } catch (\Doctrine\ORM\NoResultException $e) {
+                            $this->logger->notice(
+                                sprintf(
+                                    'Attempt to load email body failed. Email id: %d. Error: %s',
+                                    $email->getId(),
+                                    $e->getMessage()
+                                ),
+                                ['exception' => $e]
+                            );
+                        }
+                        catch (LoadEmailBodyException $loadEx) {
+                            $this->logger->notice(
+                                sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
+                                ['exception' => $loadEx]
+                            );
+                            throw $loadEx;
+                        } catch (\Exception $ex) {
+                            $this->logger->notice(
+                                sprintf('Load email body failed. Email id: %d. Error: %s.', $email->getId(), $ex->getMessage()),
+                                ['exception' => $ex]
+                            );
+                        }
+                        if ($bodyLoaded) {
+                            $event = new EmailBodyAdded($email);
+                            $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+                        }
+                        if ($isEmailUserFound) {
+                            break;
+                        }
+                    }
                 }
-            } catch (LoadEmailBodyException $loadEx) {
-                $this->logger->notice(
-                    sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
-                    ['exception' => $loadEx]
-                );
-                throw $loadEx;
-            } catch (\Exception $ex) {
-                $this->logger->warning(
-                    sprintf('Load email body failed. Email id: %d. Error: %s.', $email->getId(), $ex->getMessage()),
-                    ['exception' => $ex]
-                );
-                throw new LoadEmailBodyFailedException($email, $ex);
             }
-            if ($bodyLoaded) {
-                $event = new EmailBodyAdded($email);
-                $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+            if (!$isEmailUserFound || !$email->getEmailUsers()->count()) {
+                throw new LoadEmailBodyFailedException($email);
             }
         }
     }
