@@ -212,13 +212,12 @@ class WidgetController extends Controller
 
         $isStepsDisplayOrdered = $workflow->getDefinition()->isStepsDisplayOrdered();
 
-        $steps = [];
         if ($isStepsDisplayOrdered) {
             $steps = $workflow->getStepManager()->getOrderedSteps()->toArray();
         } elseif ($currentStep) {
             $steps = [$workflow->getStepManager()->getStep($currentStep->getName())];
         } else {
-            $steps = [$workflow->getStepManager()->getStartStep()];
+            $steps = $this->getNextSteps($workflow);
         }
 
         $helper = new WorkflowStepHelper($workflow);
@@ -248,6 +247,34 @@ class WidgetController extends Controller
             ],
             'transitionsData' => $transitionData
         ];
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @return array|Step[]
+     */
+    protected function getNextSteps(Workflow $workflow)
+    {
+        $startTransitions = $workflow->getTransitionManager()->getStartTransitions();
+        $defaultStartTransition = $workflow->getTransitionManager()->getDefaultStartTransition();
+
+        if (count($startTransitions) > 1 && $defaultStartTransition) {
+            $startTransitions = array_filter(
+                $startTransitions->toArray(),
+                function (Transition $transition) use ($defaultStartTransition) {
+                    return $transition->getName() !== $defaultStartTransition->getName();
+                }
+            );
+        } else {
+            $startTransitions = $startTransitions->toArray();
+        }
+
+        return array_map(
+            function (Transition $transition) use ($startTransitions) {
+                return $transition->getStepTo();
+            },
+            $startTransitions
+        );
     }
 
     /**
