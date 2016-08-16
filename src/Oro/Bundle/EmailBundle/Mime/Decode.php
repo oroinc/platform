@@ -7,17 +7,18 @@
  */
 namespace Oro\Bundle\EmailBundle\Mime;
 
-use \Zend\Mime;
+use \Zend\Mime\Decode as BaseDecode;
+use \Zend\Mime\Mime;
 use \Zend\Stdlib\ErrorHandler;
 
 use Oro\Bundle\EmailBundle\Mail\Headers;
 
-class Decode extends Mime\Decode
+class Decode extends BaseDecode
 {
     /**
      * {@inheritdoc}
      */
-    public static function splitMessage($message, &$headers, &$body, $EOL = Mime\Mime::LINEEND, $strict = false)
+    public static function splitMessage($message, &$headers, &$body, $EOL = Mime::LINEEND, $strict = false)
     {
         if ($message instanceof Headers) {
             $message = $message->toString();

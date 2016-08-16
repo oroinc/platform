@@ -6,11 +6,13 @@ use \Zend\Mail\Header\ContentType;
 use \Zend\Mail\Header\HeaderInterface;
 use \Zend\Mail\Storage\Part;
 use \Zend\Stdlib\ErrorHandler;
+use \Zend\Mime\Mime as BaseMime;
 use \Zend\Mail\Storage\AbstractStorage;
-use \Zend\Mail\Storage\Exception;
+use \Zend\Mail\Storage\Exception\InvalidArgumentException;
+use \Zend\Mail\Storage\Exception\RuntimeException;
 
 use Oro\Bundle\EmailBundle\Mail\Headers;
-use Oro\Bundle\EmailBundle\Mime;
+use Oro\Bundle\EmailBundle\Mime\Decode;
 
 class Message extends \Zend\Mail\Storage\Message
 {
@@ -27,7 +29,7 @@ class Message extends \Zend\Mail\Storage\Message
                 $params['raw'] = file_get_contents($params['file']);
                 $error = ErrorHandler::stop();
                 if ($params['raw'] === false) {
-                    throw new Exception\RuntimeException('could not open file', 0, $error);
+                    throw new RuntimeException('could not open file', 0, $error);
                 }
             } else {
                 $params['raw'] = stream_get_contents($params['file']);
@@ -41,10 +43,10 @@ class Message extends \Zend\Mail\Storage\Message
 
         if (isset($params['handler'])) {
             if (!$params['handler'] instanceof AbstractStorage) {
-                throw new Exception\InvalidArgumentException('handler is not a valid mail handler');
+                throw new InvalidArgumentException('handler is not a valid mail handler');
             }
             if (!isset($params['id'])) {
-                throw new Exception\InvalidArgumentException('need a message id with a handler');
+                throw new InvalidArgumentException('need a message id with a handler');
             }
 
             $this->mail       = $params['handler'];
@@ -54,11 +56,11 @@ class Message extends \Zend\Mail\Storage\Message
         $params['strict'] = isset($params['strict']) ? $params['strict'] : false;
 
         if (isset($params['raw'])) {
-            Mime\Decode::splitMessage(
+            Decode::splitMessage(
                 $params['raw'],
                 $this->headers,
                 $this->content,
-                \Zend\Mime\Mime::LINEEND,
+                BaseMime::LINEEND,
                 $params['strict']
             );
         } elseif (isset($params['headers'])) {
@@ -67,7 +69,7 @@ class Message extends \Zend\Mail\Storage\Message
                 $this->headers->addHeaders($params['headers']);
             } else {
                 if (empty($params['noToplines'])) {
-                    Mime\Decode::splitMessage($params['headers'], $this->headers, $this->topLines);
+                    Decode::splitMessage($params['headers'], $this->headers, $this->topLines);
                 } else {
                     $this->headers = Headers::fromString($params['headers']);
                 }

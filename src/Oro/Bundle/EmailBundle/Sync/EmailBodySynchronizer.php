@@ -69,7 +69,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         if ($this->isBodyNotLoaded($email)) {
             // body loader can load email body from any folder of any origin
             // try to get active origin and any first folder from it
-            $isEmailUserFound = null;
+            $isEmailUserFound = false;
             foreach ($email->getEmailUsers() as $emailUser) {
                 if (($origin = $emailUser->getOrigin()) &&
                     $origin->isActive() &&
@@ -133,7 +133,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                             $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
                         }
                         if ($isEmailUserFound) {
-                            break;
+                            break 2;
                         }
                     }
                 }
