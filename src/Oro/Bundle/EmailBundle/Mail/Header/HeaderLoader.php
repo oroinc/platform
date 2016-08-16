@@ -7,9 +7,9 @@
  */
 namespace Oro\Bundle\EmailBundle\Mail\Header;
 
-use Zend\Mail\Header;
+use \Zend\Mail\Header\HeaderLoader as BaseHeaderLoader;
 
-class HeaderLoader extends Header\HeaderLoader
+class HeaderLoader extends BaseHeaderLoader
 {
     /**
      * @var array Pre-aliased Header plugins

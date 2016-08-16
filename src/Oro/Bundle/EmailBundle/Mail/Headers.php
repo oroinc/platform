@@ -7,9 +7,11 @@
  */
 namespace Oro\Bundle\EmailBundle\Mail;
 
-use Zend\Mail;
+use \Zend\Mail\Exception\RuntimeException;
+use \Zend\Mail\Headers as BaseHeaders;
+use \Zend\Mail\Header\HeaderInterface;
 
-class Headers extends Mail\Headers
+class Headers extends BaseHeaders
 {
     /**
      * Populates headers from string representation
@@ -20,7 +22,7 @@ class Headers extends Mail\Headers
      *
      * @param  string $string
      * @param  string $EOL EOL string; defaults to {@link EOL}
-     * @throws Mail\Exception\RuntimeException
+     * @throws RuntimeException
      * @return Headers
      */
     public static function fromString($string, $EOL = self::EOL)
@@ -45,7 +47,7 @@ class Headers extends Mail\Headers
                 break;
             } else {
                 // Line does not match header format!
-                throw new Mail\Exception\RuntimeException(sprintf(
+                throw new RuntimeException(sprintf(
                     'Line "%s"does not match header format!',
                     $line
                 ));
@@ -60,7 +62,7 @@ class Headers extends Mail\Headers
     /**
      * {@inheritdoc}
      */
-    public function addHeader(Mail\Header\HeaderInterface $header)
+    public function addHeader(HeaderInterface $header)
     {
         $key = $this->normalizeFieldName($header->getFieldName());
         // do not duplicate contenttype index

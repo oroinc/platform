@@ -7,14 +7,15 @@
  */
 namespace Oro\Bundle\EmailBundle\Mail\Header;
 
-use Zend\Mail;
+use \Zend\Mail\Header\ContentType as BaseContentType;
+use \Zend\Mail\Header\Exception\InvalidArgumentException;
 
 use Oro\Bundle\EmailBundle\Mail\Headers;
 
-class ContentType extends Mail\Header\ContentType
+class ContentType extends BaseContentType
 {
     /**
-     * @var Mail\Headers
+     * @var Headers
      */
     protected static $headers;
 
@@ -28,7 +29,7 @@ class ContentType extends Mail\Header\ContentType
 
         // check to ensure proper header type for this factory
         if (self::getHeaders()->normalizeFieldName($name) !== 'contenttype') {
-            throw new Mail\Header\Exception\InvalidArgumentException('Invalid header line for Content-Type string');
+            throw new InvalidArgumentException('Invalid header line for Content-Type string');
         }
 
         $value  = str_replace(Headers::FOLDING, " ", $value);
