@@ -193,7 +193,9 @@ services:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
 
     oro_imap.async.processor.sync_email:
+        scope: prototype
         class: 'Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor'
+        arguments:
             - '@oro_imap.email_synchronizer'
             - '@logger'
         tags:

@@ -15,6 +15,6 @@ class SyncEmailMessageProcessorTest extends WebTestCase
     {
         $service = $this->getContainer()->get('oro_imap.async.processor.sync_email');
 
-        $this->assertEquals(SyncEmailMessageProcessor::class, $service);
+        $this->assertInstanceOf(SyncEmailMessageProcessor::class, $service);
     }
 }
