@@ -151,6 +151,33 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
 
     }
 
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage "data" and "context" should not be used as value keys.
+     */
+    public function testProcessExpressionsWithDataKey()
+    {
+        $context = new LayoutContext();
+        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $values['data'] = 'test';
+
+        $this->processor->processExpressions($values, $context, $data, true, null);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage "data" and "context" should not be used as value keys.
+     */
+    public function testProcessExpressionsWithContextKey()
+    {
+        $context = new LayoutContext();
+        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $values['context'] = 'test';
+
+        $this->processor->processExpressions($values, $context, $data, true, null);
+    }
+
     public function testProcessExpressionsDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet()
     {
         $context = new LayoutContext();

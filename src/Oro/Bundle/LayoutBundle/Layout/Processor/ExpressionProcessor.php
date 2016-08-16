@@ -29,6 +29,7 @@ class ExpressionProcessor
     /** @var  array */
     protected $values = [];
 
+    /** @var  array */
     protected $processingValues = [];
 
     /** @var  array */
@@ -63,6 +64,9 @@ class ExpressionProcessor
         if (!$evaluate && $encoding === null) {
             return;
         }
+        if (array_key_exists('data', $values) || array_key_exists('context', $values)) {
+            throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
+        }
         $this->values = $values;
         $this->processedValues = [];
         foreach ($values as $key => &$value) {
@@ -74,6 +78,7 @@ class ExpressionProcessor
                 $this->processedValues[$key] = $value;
             }
         }
+        unset($value);
         $values = $this->processedValues;
     }
 
@@ -109,6 +114,7 @@ class ExpressionProcessor
             foreach ($value as &$item) {
                 $this->processValue($item, $context, $data, $evaluate, $encoding);
             }
+            unset($item);
         } elseif ($value instanceof OptionValueBag) {
             foreach ($value->all() as $action) {
                 $args = $action->getArguments();
@@ -128,8 +134,8 @@ class ExpressionProcessor
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
      * @param string                $encoding
-     *
      * @return mixed|string
+     * @throws CircularReferenceException
      */
     protected function processExpression(
         ParsedExpression $expr,
@@ -140,10 +146,10 @@ class ExpressionProcessor
     ) {
         $deps = $this->getNotProcessedDependencies($expr->getNodes());
         foreach ($deps as $key => $dep) {
-            if (in_array($key, $this->processingValues)) {
+            if (in_array($key, $this->processingValues, true)) {
                 $path = implode(' > ', array_merge($this->processingValues, [$key]));
                 throw new CircularReferenceException(
-                    sprintf('Circular reference "%s" on expression "%s".', $path, (string) $expr)
+                    sprintf('Circular reference "%s" on expression "%s".', $path, (string)$expr)
                 );
             }
             $this->processingValues[] = $key;
@@ -184,7 +190,7 @@ class ExpressionProcessor
     }
 
     /**
-     * @param Node $expression
+     * @param Node $node
      * @return array
      */
     protected function getNotProcessedDependencies(Node $node)
