@@ -204,8 +204,8 @@ class ExpressionProcessor
                 $deps[$name] = $this->values[$name];
             }
         }
-        foreach ($node->nodes as $node) {
-            $deps = array_merge($deps, $this->getNotProcessedDependencies($node));
+        foreach ($node->nodes as $childNode) {
+            $deps = array_merge($deps, $this->getNotProcessedDependencies($childNode));
         }
 
         return $deps;
