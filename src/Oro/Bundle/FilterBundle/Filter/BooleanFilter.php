@@ -34,23 +34,13 @@ class BooleanFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        $data = $this->parseData($data);
-        if (!$data) {
-            return false;
-        }
-
-        $this->applyFilterToClause(
+        return $this->buildComparisonExpr(
             $ds,
-            $this->buildComparisonExpr(
-                $ds,
-                $data['value'],
-                $this->get(FilterUtility::DATA_NAME_KEY)
-            )
+            $data['value'],
+            $fieldName
         );
-
-        return true;
     }
 
     /**

@@ -69,8 +69,20 @@ class Element extends NodeElement
     public function findLabel($locator)
     {
         $labelSelector = sprintf("label:contains('%s')", $locator);
+        $label = $this->find('css', $labelSelector);
 
-        return $this->find('css', $labelSelector);
+        if (null !== $label) {
+            return $label;
+        }
+
+        /** @var NodeElement $label */
+        foreach ($this->findAll('css', 'label') as $label) {
+            if (preg_match(sprintf('/%s/i', $locator), $label->getText())) {
+                return $label;
+            }
+        }
+
+        return null;
     }
 
     /**

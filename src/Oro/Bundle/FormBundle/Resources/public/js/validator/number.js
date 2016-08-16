@@ -1,8 +1,12 @@
-define(['underscore', 'orotranslation/js/translator'
-    ], function(_, __) {
+define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var localeSettings = require('orolocale/js/locale-settings');
+
     var defaultParam = {
+        notNumberMessage: 'oro.form.number.nan',
         exactMessage: 'oro.form.number.exect',
         maxMessage: 'oro.form.number.max',
         minMessage: 'oro.form.number.min'
@@ -33,6 +37,12 @@ define(['underscore', 'orotranslation/js/translator'
         }
         return result;
     }
+    function toNumber(value) {
+        var numberFormats = localeSettings.getNumberFormats('decimal');
+        value = String(value).split(numberFormats.grouping_separator_symbol).join('');
+        value = value.replace(numberFormats.decimal_separator_symbol, '.');
+        return Number(value);
+    }
 
     /**
      * @export oroform/js/validator/number
@@ -40,40 +50,43 @@ define(['underscore', 'orotranslation/js/translator'
     return [
         'Number',
         function(value, element, param) {
-            var result = between(Number(value), param.min, param.max);
-            return result === true;
+            value = toNumber(value);
+            return !isNaN(value) && between(value, param.min, param.max) === true;
         },
         function(param, element, value, placeholders) {
-            var result;
             var message;
             var number;
             param = _.extend({}, defaultParam, param);
             value = _.isUndefined(value) ? this.elementValue(element) : value;
-            result = between(Number(value), param.min, param.max);
-            switch (result) {
-                case 0:
-                    message = param.exactMessage;
-                    number = param.min;
-                    break;
-                case 1:
-                    message = param.maxMessage;
-                    number = param.max;
-                    break;
-                case -1:
-                    message = param.minMessage;
-                    number = param.min;
-                    break;
-                default:
-                    return '';
+            value = toNumber(value);
+            if (isNaN(value)) {
+                return __(param.notNumberMessage);
+            } else {
+                switch (between(value, param.min, param.max)) {
+                    case 0:
+                        message = param.exactMessage;
+                        number = param.min;
+                        break;
+                    case 1:
+                        message = param.maxMessage;
+                        number = param.max;
+                        break;
+                    case -1:
+                        message = param.minMessage;
+                        number = param.min;
+                        break;
+                    default:
+                        return '';
+                }
+                if (_.isUndefined(placeholders)) {
+                    placeholders = {};
+                }
+                placeholders.limit = number;
+                if (_.isUndefined(placeholders.value)) {
+                    placeholders.value = value;
+                }
+                return __(message, placeholders, number);
             }
-            if (_.isUndefined(placeholders)) {
-                placeholders = {};
-            }
-            placeholders.limit = number;
-            if (_.isUndefined(placeholders.value)) {
-                placeholders.value = value;
-            }
-            return __(message, placeholders, number);
         }
     ];
 });
