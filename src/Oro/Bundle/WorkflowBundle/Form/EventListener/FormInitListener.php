@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 use Oro\Component\Action\Action\ActionInterface;
 
-class InitActionsListener implements EventSubscriberInterface
+class FormInitListener implements EventSubscriberInterface
 {
     /**
      * @var WorkflowItem

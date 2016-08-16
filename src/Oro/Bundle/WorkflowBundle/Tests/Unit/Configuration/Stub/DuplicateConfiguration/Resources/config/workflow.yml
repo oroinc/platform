@@ -27,5 +27,5 @@ workflows:
             first_transition_definition:
                 conditions:
                     '@true': ~
-                post_actions:
+                actions:
                     - '@custom_post_action': ~

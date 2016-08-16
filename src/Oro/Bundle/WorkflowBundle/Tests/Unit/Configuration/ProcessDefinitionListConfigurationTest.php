@@ -51,7 +51,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'order' => 10,
                         'exclude_definitions'   => array('minimum_definition'),
                         'actions_configuration' => array('key' => 'value'),
-                        'pre_conditions' => array('test' => array())
+                        'preconditions' => array('test' => array())
                     ),
                 ),
                 'expected' => array(
@@ -62,7 +62,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'order' => 0,
                         'exclude_definitions'   => array(),
                         'actions_configuration' => array(),
-                        'pre_conditions' => array()
+                        'preconditions' => array()
                     ),
                     'maximum_definition' => array(
                         'label' => 'My Label',
@@ -71,7 +71,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'order' => 10,
                         'exclude_definitions'   => array('minimum_definition'),
                         'actions_configuration' => array('key' => 'value'),
-                        'pre_conditions' => array('test' => array())
+                        'preconditions' => array('test' => array())
                     )
                 ),
             )

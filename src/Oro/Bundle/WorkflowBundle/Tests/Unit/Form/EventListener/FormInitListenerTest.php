@@ -4,18 +4,18 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 
-class InitActionsListenerTest extends \PHPUnit_Framework_TestCase
+class FormInitListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var InitActionsListener
+     * @var FormInitListener
      */
     protected $listener;
 
     protected function setUp()
     {
-        $this->listener = new InitActionsListener();
+        $this->listener = new FormInitListener();
     }
 
     public function testGetSubscribedEvents()

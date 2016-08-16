@@ -51,7 +51,7 @@ workflows:
             first_transition_definition:
                 preactions:
                     - '@custom_pre_action': ~
-                pre_conditions:
+                preconditions:
                     '@true': ~
                 conditions:
                     '@and':
@@ -63,5 +63,5 @@ workflows:
                                     parameters: [1, 1]
                                     message: "Not equals"
                         message: "Fail upper level"
-                post_actions:
+                actions:
                     - '@custom_post_action': ~

@@ -90,9 +90,15 @@ class TransitionAssembler extends BaseAbstractAssembler
             }
             $definitions[$name] = [
                 'preactions' => $this->getOption($options, 'preactions', []),
-                'pre_conditions' => $this->getOption($options, 'pre_conditions', array()),
-                'conditions' => $this->getOption($options, 'conditions', array()),
-                'post_actions' => $this->getOption($options, 'post_actions', array())
+                'preconditions' => array_merge(
+                    $this->getOption($options, 'preconditions', []),
+                    $this->getOption($options, 'pre_conditions', []) // deprecated
+                ),
+                'conditions' => $this->getOption($options, 'conditions', []),
+                'actions' => array_merge(
+                    $this->getOption($options, 'actions', []),
+                    $this->getOption($options, 'post_actions', []) // deprecated
+                ),
             ];
         }
 
@@ -138,9 +144,9 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setPreAction($preAction);
         }
 
-        $definition['pre_conditions'] = $this->addAclPreConditions($options, $definition);
-        if (!empty($definition['pre_conditions'])) {
-            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['pre_conditions']);
+        $definition['preconditions'] = $this->addAclPreConditions($options, $definition);
+        if (!empty($definition['preconditions'])) {
+            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['preconditions']);
             $transition->setPreCondition($condition);
         }
 
@@ -149,9 +155,9 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setCondition($condition);
         }
 
-        if (!empty($definition['post_actions'])) {
-            $postAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['post_actions']);
-            $transition->setPostAction($postAction);
+        if (!empty($definition['actions'])) {
+            $action = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['actions']);
+            $transition->setAction($action);
         }
 
         if (!empty($options['schedule'])) {
@@ -182,19 +188,19 @@ class TransitionAssembler extends BaseAbstractAssembler
             }
             $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
 
-            if (empty($definition['pre_conditions'])) {
-                $definition['pre_conditions'] = $aclPreCondition;
+            if (empty($definition['preconditions'])) {
+                $definition['preconditions'] = $aclPreCondition;
             } else {
-                $definition['pre_conditions'] = array(
+                $definition['preconditions'] = array(
                     '@and' => array(
                         $aclPreCondition,
-                        $definition['pre_conditions']
+                        $definition['preconditions']
                     )
                 );
             }
         }
 
-        return !empty($definition['pre_conditions']) ? $definition['pre_conditions'] : array();
+        return !empty($definition['preconditions']) ? $definition['preconditions'] : array();
     }
 
     /**

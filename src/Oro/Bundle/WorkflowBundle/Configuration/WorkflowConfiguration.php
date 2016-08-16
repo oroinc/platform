@@ -304,6 +304,11 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('preconditions')
+                        ->prototype('variable')
+                        ->end()
+                    ->end()
+                     // deprecated, use `preconditions` instead
                     ->arrayNode('pre_conditions')
                         ->prototype('variable')
                         ->end()
@@ -312,6 +317,11 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('actions')
+                        ->prototype('variable')
+                        ->end()
+                    ->end()
+                    // deprecated, use `actions` instead
                     ->arrayNode('post_actions')
                         ->prototype('variable')
                         ->end()

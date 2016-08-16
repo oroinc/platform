@@ -60,7 +60,7 @@ class ProcessDefinitionConfiguration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
-                ->arrayNode('pre_conditions')
+                ->arrayNode('preconditions')
                     ->prototype('variable')
                     ->end()
                 ->end()
