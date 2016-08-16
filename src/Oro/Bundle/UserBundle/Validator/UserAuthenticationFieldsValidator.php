@@ -32,7 +32,6 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
     }
 
     /**
-     * @param string                             $value
      * @param User                               $entity
      * @param UserAuthenticationFieldsConstraint $constraint
      *
