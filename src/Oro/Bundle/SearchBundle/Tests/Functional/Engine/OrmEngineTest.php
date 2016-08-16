@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
@@ -30,6 +31,8 @@ class OrmEngineTest extends WebTestCase
         if ($this->getContainer()->getParameter('oro_search.engine') != 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
+
+        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
     }
 
     public function testSearchIndexRealTime()
@@ -79,10 +82,6 @@ class OrmEngineTest extends WebTestCase
         $this->assertEmpty($searchItem);
     }
 
-    /**
-     * Important note: this test relies on OroB2BCMSBundle's fixtures
-     * imported within the installation process by default.
-     */
     public function testSelectingAdditionalColumnsFromIndex()
     {
         $managerRegistry = $this->getContainer()->get('doctrine');
@@ -95,28 +94,54 @@ class OrmEngineTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $searchMappingProvider = new SearchMappingProvider(
-            $eventDispatcher
-        );
+        $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Provider\SearchMappingProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mapper->expects($this->any())->method('getMappingConfig')
+            ->will($this->returnValue([
+                'Oro\Bundle\TestFrameworkBundle\Entity\Item' => [
+                    'fields' => [
+                        [
+                            'name'          => 'stringValue',
+                            'target_type'   => 'string',
+                            'target_fields' => array('stringValue', 'all_data')
+                        ],
+                        [
+                            'name'          => 'integerValue',
+                            'target_type'   => 'integer',
+                            'target_fields' => array('integerValue', 'all_data')
+                        ]
+                    ]
+                ]
+            ]));
 
         $objectMapper = new ObjectMapper(
             $eventDispatcher,
             []
         );
 
-        $objectMapper->setMappingProvider($searchMappingProvider);
+        $objectMapper->setMappingProvider($mapper);
+
+        /**
+         * @var EntityTitleResolverInterface $entityTitleResolver
+         */
+        $entityTitleResolver = $this->getMock(
+            'Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface'
+        );
 
         $ormEngine = new Orm(
             $managerRegistry,
             $eventDispatcher,
             $doctrineHelper,
-            $objectMapper
+            $objectMapper,
+            $entityTitleResolver
         );
 
         $query = new Query();
 
-        $query->addSelect('currentSlug', Query::TYPE_TEXT);
-        $query->from('orob2b_cms_page');
+        $query->addSelect('stringValue', Query::TYPE_TEXT);
+        $query->from('oro_test_item');
 
         $result = $ormEngine->search($query);
 
@@ -130,7 +155,7 @@ class OrmEngineTest extends WebTestCase
         foreach ($elements as $item) {
             $selectedData = $item->getSelectedData();
             $this->assertNotEmpty($selectedData);
-            $this->assertArrayHasKey('currentSlug', $selectedData);
+            $this->assertArrayHasKey('stringValue', $selectedData);
         }
     }
 
