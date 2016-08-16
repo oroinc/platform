@@ -1,7 +1,8 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 <div class="widget-content widget-content-bordered">
-    <div class="workflow-collapse" {% if workflows|length > 1 %}
+    <div {% if workflows|length > 1 %}
+        class="workflow-collapse"
         data-page-component-module="oroui/js/app/components/jquery-widget-component"
         data-page-component-options="{{ {
             widgetModule: 'oroui/js/widget/collapse-widget',
