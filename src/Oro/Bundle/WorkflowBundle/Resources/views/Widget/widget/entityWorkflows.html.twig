@@ -1,21 +1,23 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 <div class="widget-content widget-content-bordered">
-    <div {% if workflows|length > 1 %}
-        class="workflow-collapse"
+    <div class="workflow-collapse" {% if workflows|length > 1 %}
         data-page-component-module="oroui/js/app/components/jquery-widget-component"
         data-page-component-options="{{ {
             widgetModule: 'oroui/js/widget/collapse-widget',
             storageKey: 'entityWorkflow' ~ entityId
-        }|json_encode() }}">
-        <span class="workflow-collapse-button" data-collapse-trigger></span{% endif %}>
+        }|json_encode() }}"
+    {% endif %}>
+        {% if workflows|length > 1 %}
+        <span class="workflow-collapse-button" data-collapse-trigger></span>
+        {% endif %}
         {% for workflow in workflows %}
             {% if loop.index == 2 %}
             <div class="workflow-collapse-container" data-collapse-container>
             {% endif %}
                 <table class="workflow-entity">
                     <tr>
-                        <td class="workflow-label"><div class="workflow-label-text">{{ workflow.label|trans }}</div></td>
+                        <td class="workflow-label"><div class="workflow-label-text">{{ workflow.label }}</div></td>
                         <td class="workflow-content-container">
                             <table class="workflow-content">
                                 <tr>
@@ -28,15 +30,15 @@
                                                 {% set possibleStepsCount = step.possibleStepsCount %}
                                                 {% if isOrdered %}
                                                     <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
-                                                        <div class="workflow-steps-item-arrow-container" title="{{ step.label|trans }}">
+                                                        <div class="workflow-steps-item-arrow-container" title="{{ step.label }}">
                                                             <span class="workflow-step-arrow-left"></span>
                                                             <span class="workflow-step-arrow-right"></span>
-                                                            <span class="workflow-step-name">{{ step.label|trans }}</span>
+                                                            <span class="workflow-step-name">{{ step.label }}</span>
                                                         </div>
                                                     </li>
                                                 {% else %}
                                                     <li class="workflow-steps-item workflow-unordered-steps">
-                                                        <span class="workflow-unordered-step-name">{{ step.label|trans }}</span>
+                                                        <span class="workflow-unordered-step-name">{{ step.label }}</span>
                                                     </li>
                                                 {% endif %}
                                             {% endfor %}
@@ -52,7 +54,7 @@
                         </td>
                     </tr>
                 </table>
-            {% if loop.last %}
+            {% if loop.index > 1 and loop.last %}
             </div>
             {% endif %}
         {% endfor %}
