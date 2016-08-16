@@ -170,6 +170,7 @@ services:
         class: %oro_search.event_listener.orm.fulltext_index_listener.class%
         arguments:
             - %database_driver%
+            - 'oro_search_index_text'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
