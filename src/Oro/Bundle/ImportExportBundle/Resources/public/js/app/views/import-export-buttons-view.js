@@ -113,7 +113,7 @@ define(function(require) {
                 widget.render();
             } else {
                 var exportStartedMessage = exportHandler.startExportNotificationMessage();
-                $.getJSON(this.href, function(data) {
+                $.getJSON(e.currentTarget.href, function(data) {
                     exportStartedMessage.close();
                     exportHandler.handleExportResponse(data);
                 });

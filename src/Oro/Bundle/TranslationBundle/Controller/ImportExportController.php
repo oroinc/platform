@@ -14,7 +14,7 @@ use Oro\Bundle\TranslationBundle\Form\Type\TranslationImportType;
 class ImportExportController extends BaseController
 {
     /**
-     * @Route("/import", name="oro_translation_import_form")
+     * @Route("/translation-import", name="oro_translation_import_form")
      * @AclAncestor("oro_importexport_import")
      * @Template
      *
