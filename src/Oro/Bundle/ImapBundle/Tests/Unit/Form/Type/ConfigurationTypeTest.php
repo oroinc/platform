@@ -210,9 +210,9 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $rootFolder->setFullName('Root');
         $entity->addFolder($rootFolder);
         if (is_array($folders)) {
-            foreach ($folders as $folder) {
+            foreach ($folders as $folderName) {
                 $folder = new EmailFolder();
-                $folder->setFullName($folder);
+                $folder->setFullName($folderName);
                 $folder->setParentFolder($rootFolder);
                 $rootFolder->addSubFolder($folder);
                 $entity->addFolder($folder);
