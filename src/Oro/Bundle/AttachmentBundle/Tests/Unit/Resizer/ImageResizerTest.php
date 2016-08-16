@@ -3,18 +3,15 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Resizer;
 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
-use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Liip\ImagineBundle\Model\Binary;
 
 use Prophecy\Argument;
 
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
-
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Resizer\ImageResizer;
-
+use Oro\Bundle\AttachmentBundle\Tools\ImageFactory;
 
 class ImageResizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,27 +38,27 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     protected $cacheManager;
 
     /**
-     * @var ExtensionGuesserInterface
+     * @var FileManager
      */
-    protected $extensionGuesser;
+    protected $fileManager;
 
     /**
-     * @var FilterManager
+     * @var ImageFactory
      */
-    protected $filterManager;
+    protected $imageFactory;
 
     public function setUp()
     {
         $this->attachmentManager = $this->prophesize(AttachmentManager::class);
         $this->cacheManager = $this->prophesize(CacheManager::class);
-        $this->filterManager= $this->prophesize(FilterManager::class);
-        $this->extensionGuesser = $this->prophesize(ExtensionGuesserInterface::class);
+        $this->imageFactory = $this->prophesize(ImageFactory::class);
+        $this->fileManager = $this->prophesize(FileManager::class);
 
         $this->resizer = new ImageResizer(
             $this->attachmentManager->reveal(),
             $this->cacheManager->reveal(),
-            $this->filterManager->reveal(),
-            $this->extensionGuesser->reveal(),
+            $this->fileManager->reveal(),
+            $this->imageFactory->reveal(),
             self::CACHE_RESOLVER_NAME
         );
     }
@@ -103,11 +100,9 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
         $image = new File();
         $image->setMimeType(self::MIME_TYPE);
 
-        $this->filterManager
-            ->applyFilter(Argument::type(Binary::class), self::FILTER_NAME)
-            ->willReturn($filteredBinary);
+        $this->fileManager->getContent($image)->willReturn(self::CONTENT);
 
-        $this->extensionGuesser->guess(self::MIME_TYPE)->willReturn(self::FORMAT);
+        $this->imageFactory->createImage(self::CONTENT, self::FILTER_NAME)->willReturn($filteredBinary);
 
         $this->attachmentManager->getContent($image)->willReturn(self::CONTENT);
         $this->attachmentManager->getFilteredImageUrl($image, self::FILTER_NAME)->willReturn(self::PATH);
