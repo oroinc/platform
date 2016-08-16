@@ -63,7 +63,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'order' => 0,
                         'exclude_definitions'   => array(),
                         'actions_configuration' => array(),
-                        'preconditions' => array(),
+                        'preconditions' => array()
                     ),
                     'maximum_definition' => array(
                         'label' => 'My Label',

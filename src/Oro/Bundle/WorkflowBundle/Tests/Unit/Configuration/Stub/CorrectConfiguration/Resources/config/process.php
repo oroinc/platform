@@ -25,7 +25,7 @@ return array(
             'enabled'               => true,
             'order'                 => 0,
             'exclude_definitions'   => array(),
-            'preconditions'         => array(),
+            'preconditions' => array()
         ),
     ),
     ProcessConfigurationProvider::NODE_TRIGGERS => array(

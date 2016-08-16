@@ -86,13 +86,13 @@ return array(
             'first_transition_definition' => array(
                 'preactions' => array(
                     array(
-                        '@custom_action' => null,
+                        '@custom_action' => null
                     )
                 ),
-                'preconditions' => array(
+                'preconditions' => [
                     '@true' => null,
-                    '@condition1' => null
-                ),
+                    '@condition1' => null,
+                ],
                 'conditions' => array(
                     '@and' => array(
                         '@true' => null,
@@ -108,10 +108,10 @@ return array(
                         'message' => 'Fail upper level'
                     )
                 ),
-                'actions' => array(
-                    ['@custom_action' => null],
+                'actions' => [
                     ['@custom_action2' => null],
-                ),
+                    ['@custom_action' => null],
+                ],
             )
         ),
         'entity_restrictions' => array()
@@ -158,7 +158,7 @@ return array(
                 'preactions' => array(),
                 'preconditions' => array(),
                 'conditions' => array(),
-                'actions' => array(),
+                'actions' => array()
             )
         ),
         'is_system' => false,

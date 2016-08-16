@@ -49,7 +49,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'order' => 0,
                     'exclude_definitions'   => array(),
                     'actions_configuration' => array(),
-                    'preconditions' => array(),
+                    'preconditions' => array()
                 ),
             ),
             'maximum data' => array(
