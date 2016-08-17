@@ -348,7 +348,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             \LogicException::class,
-            'The message\'s body must be an array of scalars. Got: stdClass'
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
         $producer->send($queue, ['foo' => new \stdClass]);
     }
@@ -365,7 +365,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             \LogicException::class,
-            'The message\'s body must be an array of scalars. Got: stdClass'
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
         $producer->send($queue, ['foo' => ['bar' => new \stdClass]]);
     }
@@ -452,7 +452,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             \LogicException::class,
-            'The message\'s body must be an array of scalars. Got: stdClass'
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
         $producer->createMessage(['foo' => new \stdClass()]);
     }
@@ -468,7 +468,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             \LogicException::class,
-            'The message\'s body must be an array of scalars. Got: stdClass'
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
         $producer->createMessage(['foo' => ['bar' => new \stdClass()]]);
     }

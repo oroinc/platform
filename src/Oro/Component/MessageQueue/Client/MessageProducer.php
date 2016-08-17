@@ -69,9 +69,9 @@ class MessageProducer implements MessageProducerInterface
 
             // only array of scalars is allowed.
             array_walk_recursive($body, function ($value) {
-                if (false == (is_scalar($value) || is_null($value))) {
+                if (!is_scalar($value) && !is_null($value)) {
                     throw new \LogicException(sprintf(
-                        'The message\'s body must be an array of scalars. Got: %s',
+                        'The message\'s body must be an array of scalars. Found not scalar in the array: %s',
                         is_object($value) ? get_class($value) : gettype($value)
                     ));
                 }
