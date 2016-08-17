@@ -1,0 +1,48 @@
+<div class="widget-content import-widget-content">
+    <div class="alert alert-info import-notice">
+        <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
+        {{ 'Zip files only'|trans }}
+    </div>
+    <div class="form-container">
+        <form method="post"
+              data-nohash="true"
+              id="{{ form.vars.id }}"
+              name="{{ form.vars.name }}"
+              action="{{ path('oro_translation_import_form', {entity: entityName, importJob: importJob, importValidateJob: importValidateJob, options: options}) }}"
+              class="form-horizontal"
+              {{ form_enctype(form) }}>
+
+            <fieldset class="form">
+                <div class="import-file">
+                    {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
+                </div>
+                <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
+                    {{ form_row(form.processorAlias, {'label': 'oro.importexport.import.strategy'}) }}
+                </div>
+                {{ form_rest(form) }}
+            </fieldset>
+
+            <div class="widget-actions">
+                <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                <button class="btn btn-primary" type="submit">{{ 'Submit'|trans }}</button>
+            </div>
+        </form>
+        {{ oro_form_js_validation(form) }}
+    </div>
+
+    <script type="text/javascript">
+        require(['oroui/js/widget-manager', 'oroui/js/messenger'],
+        function(WidgetManager, Messanger) {
+            WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                widget.getAction('form_submit', 'adopted', function(action) {
+                    action.on('click', function() {
+                        Messanger.notificationFlashMessage(
+                            'info',
+                            {{ 'Import validation started, please wait...'|trans|json_encode|raw }}
+                        );
+                    });
+                });
+            });
+        });
+    </script>
+</div>

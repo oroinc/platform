@@ -31,6 +31,16 @@ datagrid:
             updatedAt:
                 label: oro.ui.updated_at
                 frontend_type: datetime
+            import:
+                label: oro.importexport.import.label
+                type: twig
+                frontend_type: html
+                template: OroTranslationBundle:Language:Datagrid/import.html.twig
+            export:
+                label: oro.importexport.export.label
+                type: twig
+                frontend_type: html
+                template: OroTranslationBundle:Language:Datagrid/export.html.twig
         sorters:
             columns:
                 enabled:
