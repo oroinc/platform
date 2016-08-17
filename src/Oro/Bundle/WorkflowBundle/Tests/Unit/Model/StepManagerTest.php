@@ -3,17 +3,22 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 
+use Oro\Component\Testing\Unit\EntityTrait;
+
 class StepManagerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     public function testGetOrderedSteps()
     {
-        $defaultStartStep = $this->getStepMock(StepManager::DEFAULT_START_STEP_NAME, -1);
-        $stepOne = $this->getStepMock('step1', 1);
-        $stepTwo = $this->getStepMock('step2', 2);
-        $stepThree = $this->getStepMock('step3', 3);
+        $defaultStartStep = $this->getStep(StepManager::DEFAULT_START_STEP_NAME, -1);
+        $stepOne = $this->getStep('step1', 1);
+        $stepTwo = $this->getStep('step2', 2);
+        $stepThree = $this->getStep('step3', 3);
 
         $stepManager = new StepManager(new ArrayCollection([$stepTwo, $stepOne, $stepThree, $defaultStartStep]));
 
@@ -40,8 +45,8 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetSteps()
     {
-        $stepOne = $this->getStepMock('step1');
-        $stepTwo = $this->getStepMock('step2');
+        $stepOne = $this->getStep('step1');
+        $stepTwo = $this->getStep('step2');
 
         $stepManager = new StepManager();
         $stepManager->setSteps([$stepOne, $stepTwo]);
@@ -60,8 +65,8 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStep()
     {
-        $step1 = $this->getStepMock('step1');
-        $step2 = $this->getStepMock('step2');
+        $step1 = $this->getStep('step1');
+        $step2 = $this->getStep('step2');
 
         $steps = new ArrayCollection([$step1, $step2]);
         $stepManager = new StepManager($steps);
@@ -73,18 +78,11 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param null|int $order
-     * @return Step|\PHPUnit_Framework_MockObject_MockObject
+     * @return Step
      */
-    protected function getStepMock($name, $order = null)
+    protected function getStep($name, $order = null)
     {
-        $step = $this->getMockBuilder(Step::class)->disableOriginalConstructor()->getMock();
-        $step->expects($this->any())->method('getName')->willReturn($name);
-
-        if ($order) {
-            $step->expects($this->any())->method('getOrder')->willReturn($order);
-        }
-
-        return $step;
+        return $this->getEntity(Step::class, ['name' => $name, 'order' => $order]);
     }
 
     public function testStartStep()
@@ -127,7 +125,7 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
         $stepManager = new StepManager();
         $this->assertNull($stepManager->getDefaultStartStep());
 
-        $step = $this->getStepMock(StepManager::DEFAULT_START_STEP_NAME);
+        $step = $this->getStep(StepManager::DEFAULT_START_STEP_NAME);
 
         $stepManager->setSteps([$step]);
         $this->assertEquals($step, $stepManager->getDefaultStartStep());
