@@ -180,10 +180,10 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertEquals(
             'SELECT o.id FROM Stub:TestEntity o'
             . ' WHERE o IN('
-            . 'SELECT filter_test'
-            . ' FROM Stub:TestEntity filter_test'
-            . ' INNER JOIN filter_test.values filter_test_rel'
-            . ' WHERE filter_test_rel IN(:param1))',
+            . 'SELECT filter_param1'
+            . ' FROM Stub:TestEntity filter_param1'
+            . ' INNER JOIN filter_param1.values filter_param1_rel'
+            . ' WHERE filter_param1_rel IN(:param1))',
             $result
         );
         $this->assertEquals($values, $qb->getParameter('param1')->getValue());
@@ -226,10 +226,10 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertEquals(
             'SELECT o.id FROM Stub:TestEntity o'
             . ' WHERE o NOT IN('
-            . 'SELECT filter_test'
-            . ' FROM Stub:TestEntity filter_test'
-            . ' INNER JOIN filter_test.values filter_test_rel'
-            . ' WHERE filter_test_rel IN(:param1))',
+            . 'SELECT filter_param1'
+            . ' FROM Stub:TestEntity filter_param1'
+            . ' INNER JOIN filter_param1.values filter_param1_rel'
+            . ' WHERE filter_param1_rel IN(:param1))',
             $result
         );
         $this->assertEquals(

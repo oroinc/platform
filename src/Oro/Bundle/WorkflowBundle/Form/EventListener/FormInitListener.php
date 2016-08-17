@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 use Oro\Component\Action\Action\ActionInterface;
 
-class InitActionsListener implements EventSubscriberInterface
+class FormInitListener implements EventSubscriberInterface
 {
     /**
      * @var WorkflowItem
@@ -27,10 +27,8 @@ class InitActionsListener implements EventSubscriberInterface
      * @param WorkflowItem $workflowItem
      * @param ActionInterface $initAction
      */
-    public function initialize(
-        WorkflowItem $workflowItem,
-        ActionInterface $initAction
-    ) {
+    public function initialize(WorkflowItem $workflowItem, ActionInterface $initAction)
+    {
         $this->workflowItem = $workflowItem;
         $this->initAction = $initAction;
     }
