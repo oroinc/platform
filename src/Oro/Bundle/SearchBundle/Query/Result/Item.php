@@ -216,12 +216,18 @@ class Item
      */
     public function toArray()
     {
-        return [
+        $result = [
             'entity_name'   => $this->entityName,
             'record_id'     => $this->recordId,
             'record_string' => $this->recordTitle,
             'record_url'    => $this->recordUrl,
-            'selected_data'  => $this->selectedData
+
         ];
+
+        if (!empty($this->selectedData)) {
+            $result['selected_data'] = $this->selectedData;
+        }
+
+        return $result;
     }
 }

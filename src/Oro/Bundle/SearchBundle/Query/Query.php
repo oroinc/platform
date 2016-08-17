@@ -185,6 +185,13 @@ class Query
      */
     public function addSelect($fieldName, $fieldType = self::TYPE_TEXT)
     {
+        list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
+
+        if (!empty($explodedType) && !empty($explodedName)) {
+            $fieldType = $explodedType;
+            $fieldName = $explodedName;
+        }
+
         $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);
 
         if (!is_string($field)) {
