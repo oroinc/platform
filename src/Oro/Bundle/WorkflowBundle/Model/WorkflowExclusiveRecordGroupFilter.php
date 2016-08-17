@@ -39,18 +39,18 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
             return $workflows;
         }
 
-        $busyGroups = $this->getBusyGroups($workflows, $runningWorkflowNames);
+        $busyGroups = [];
 
         return $workflows->filter(
-            function (Workflow $workflow) use (&$busyGroups) {
+            function (Workflow $workflow) use (&$busyGroups, &$runningWorkflowNames) {
                 $workflowRecordGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
                 foreach ($workflowRecordGroups as $workflowRecordGroup) {
-                    if (!array_key_exists($workflowRecordGroup, $busyGroups)) {
-                        continue;
+                    if (in_array($workflowRecordGroup, $busyGroups, true)) {
+                        return false;
                     }
 
-                    if ($busyGroups[$workflowRecordGroup] !== $workflow->getName()) {
-                        return false;
+                    if (in_array($workflow->getName(), $runningWorkflowNames, true)) {
+                        $busyGroups[] = $workflowRecordGroup;
                     }
                 }
 
@@ -76,30 +76,6 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
             },
             $repository->findAllByEntityMetadata($entityClass, $identifier)
         );
-    }
-
-
-    /**
-     * @param ArrayCollection $workflows
-     * @param array $runningWorkflowNames
-     * @return array
-     */
-    private function getBusyGroups(ArrayCollection $workflows, array $runningWorkflowNames)
-    {
-        $runningExclusiveGroups = [];
-        //reversing as they were fetched by priority, so last should override group as more prioritised
-        foreach (array_reverse($runningWorkflowNames) as $runningWorkflowName) {
-            if ($workflows->containsKey($runningWorkflowName)) {
-                $groups = (array)$workflows[$runningWorkflowName]->getDefinition()->getExclusiveRecordGroups();
-                if (count($groups)) {
-                    foreach ($groups as $group) {
-                        $runningExclusiveGroups[$group] = $runningWorkflowName;
-                    }
-                }
-            }
-        }
-
-        return $runningExclusiveGroups;
     }
 
     /**
