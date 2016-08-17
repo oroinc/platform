@@ -172,8 +172,8 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
     }
 
     /**
-     * Find user with Primary Email as Username parameter
-     * Exclude current user from result if id parameter set
+     * Find users with Primary Email as Username parameter
+     * Exclude current user from result if id parameter is set
      *
      * Example:
      *    Current User:
@@ -188,7 +188,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
      *
      * @return array
      */
-    public function findUserWithEmailAsUsername($username, $id = null)
+    public function findUsersWithEmailAsUsername($username, $id = null)
     {
         $qb = $this->createQueryBuilder('u');
         $qb

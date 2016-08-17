@@ -145,7 +145,7 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
         $existingUser = [];
 
         $this->repository->expects($this->once())
-            ->method('findUserWithEmailAsUsername')
+            ->method('findUsersWithEmailAsUsername')
             ->with('username@example.com', 1)
             ->will($this->returnValue($existingUser));
 
@@ -171,7 +171,7 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
         $existingUser = ['id' => 2, 'username' => 'username', 'email' => 'username@example.com'];
 
         $this->repository->expects($this->once())
-            ->method('findUserWithEmailAsUsername')
+            ->method('findUsersWithEmailAsUsername')
             ->with('username@example.com', 1)
             ->will($this->returnValue($existingUser));
 

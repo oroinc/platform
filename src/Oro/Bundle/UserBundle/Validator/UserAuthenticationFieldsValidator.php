@@ -62,19 +62,19 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
     /**
      * @param User $entity
      *
-     * @return array|null
+     * @return bool
      */
     protected function isSameUserExists(User $entity)
     {
         /** @var UserRepository $repository */
         $repository = $this->registry->getManagerForClass(User::class)->getRepository(User::class);
 
-        $result = $repository->findUserWithEmailAsUsername($entity->getUsername(), $entity->getId());
+        $result = $repository->findUsersWithEmailAsUsername($entity->getUsername(), $entity->getId());
 
         if (count($result) > 0) {
-            return $result;
+            return true;
         }
 
-        return null;
+        return false;
     }
 }
