@@ -9,6 +9,8 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
 
 class Email extends EmailHeader
 {
+    const EMAIL_EMPTY_BODY_CONTENT = "\n";
+
     /**
      * @var Message
      */
@@ -78,8 +80,12 @@ class Email extends EmailHeader
             if ($contentType && strtolower($contentType->getType()) === 'text/html') {
                 $this->body->setContent($body->getContent(Body::FORMAT_HTML)->getDecodedContent());
                 $this->body->setBodyIsText(false);
-            } else {
+            } elseif ($contentType && strtolower($contentType->getType()) === 'text/plain') {
                 $this->body->setContent($body->getContent(Body::FORMAT_TEXT)->getDecodedContent());
+                $this->body->setBodyIsText(true);
+            } else {
+                //if body has wrong type, set body as empty and then try to save it as attachment
+                $this->body->setContent(self::EMAIL_EMPTY_BODY_CONTENT);
                 $this->body->setBodyIsText(true);
             }
         }
@@ -97,7 +103,13 @@ class Email extends EmailHeader
         if ($this->attachments === null) {
             $this->attachments = array();
 
-            foreach ($this->message->getAttachments() as $a) {
+            if ($this->getBody()->getContent() === self::EMAIL_EMPTY_BODY_CONTENT) {
+                $attachments = [$this->message->getMessageAsAttachment()];
+            } else {
+                $attachments = $this->message->getAttachments();
+            }
+
+            foreach ($attachments as $a) {
                 $fileSize = $a->getFileSize();
                 $content  = $a->getContent();
                 $filename = $a->getFileName()->getValue();
