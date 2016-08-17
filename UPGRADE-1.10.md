@@ -134,6 +134,8 @@ always returning 204 (No Content), now it returns HTTP 200 (OK) if the response 
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.9. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.9. Will be removed after 1.11.
 - `Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener` is no longer requires `Oro\Bundle\SearchBundle\Engine\FulltextIndexManager` as an first argument
+- The constructor of the `Oro\Bundle\SearchBundle\Engine\AbstractEngine` class was changed. Before: `__construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher, DoctrineHelper $doctrineHelper, ObjectMapper $mapper)`. After: `__construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher, DoctrineHelper $doctrineHelper, ObjectMapper $mapper, EntityTitleResolverInterface $entityTitleResolver)`.
+- The constructor of the `Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener` class was changed. Before: `__construct(Router $router, ObjectMapper $mapper, EntityManager $em)`. After: `__construct(Router $router, ObjectMapper $mapper, EntityManager $em, EntityTitleResolverInterface $entityTitleResolver)`.
 
 ####FormBundle
 - 'Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension' was renamed to 'Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension'
@@ -181,6 +183,7 @@ Now controller's action is not responsible to configure redirect data at all.
 ```
 Redirect data is now configured directly in the button rendered in Twig template using macroses: saveAndCloseButton, saveAndStayButton, saveAndNewButton and saveActionButton.
 See other related information in section `OroUIBundle` of this document.
+- Constructor for `Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType` changed. New arguments: `EntityManager $entityManager`, `SearchRegistry $searchRegistry`.
 
 ####TranslationBundle
 - Added translation strategies to dynamically handle translation fallbacks
@@ -297,6 +300,7 @@ Now:
 - Signature of `Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider::__construct` method was changed. Before: `__construct(DoctrineHelper $doctrineHelper, EntityNameResolver $entityNameResolver, AbstractCalendarEventNormalizer $calendarEventNormalizer)`. After: `__construct(DoctrineHelper $doctrineHelper, EntityNameResolver $entityNameResolver, AbstractCalendarEventNormalizer $calendarEventNormalizer, Recurrence $recurrenceModel)`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - Route name for `Oro\Bundle\CalendarBundle\ControllerAjaxCalendarEventController::changeStatus` has been changed, according to status changes, form `oro_calendar_event_tentatively_accepted` to `oro_calendar_event_tentative`
 - Url for `Oro\Bundle\CalendarBundle\ControllerAjaxCalendarEventController::changeStatus` has been changed from "/accept/{id}" to "/accepted/{id}" and from "/tentatively/{id}" to "/tentative/{id}"
+- The constructor of the `Oro\Bundle\CalendarBundle\Form\DataTransformer\AttendeesToViewTransformer` class was changed. Before: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, ObjectMapper $mapper, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, AttendeeRelationManager $attendeeRelationManager)`. After: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, AttendeeRelationManager $attendeeRelationManager, EntityTitleResolverInterface $entityTitleResolver)`.
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
@@ -315,12 +319,6 @@ Corresponding block type classes was removed.
 - Layout theme additional configuration such as assets, images or requirejs from now placed in `layout/{theme_name}/config` folder [Config definition](./src/Oro/Bundle/LayoutBundle/Resources/doc/config_definition.md).
 - Changed current expression language in layouts to symfony expression language, for details please check out documentation at
  [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
-- Interface `Oro\Component\Layout\DataProviderInterface` was removed.
-- Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
-- Methods `Oro\Component\Layout\DataAccessorInterface::getIdentifier()` and `Oro\Component\Layout\DataAccessorInterface::get()`  was removed.
-- Added class `Oro\Component\Layout\DataProviderDecorator`.
-- Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
-- Method `Oro\Component\Layout\ContextDataCollection::getIdentifier()` was removed.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
@@ -362,4 +360,9 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 - Added `Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface` interface. 
 - Class `Oro\Bundle\RequireJSBundle\Provider\Config` marked as deprecated. Use `Oro\Bundle\RequireJSBundle\Provider\ConfigProvider` instead.
 - Added `Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider` class. 
-- Added `Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager` class for building all configs provided by config providers via `oro:requirejs:build`. 
+- Added `Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager` class for building all configs provided by config providers via `oro:requirejs:build`.
+
+####ActivityBundle
+- The constructor of the `Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager` class was changed. Before: `__construct(ObjectManager $om, ActivityManager $activityManager, TokenStorageInterface $securityTokenStorage, ConfigManager $configManager, RouterInterface $router, EntityAliasResolver $entityAliasResolver, ObjectMapper $objectMapper, TranslatorInterface $translator, DoctrineHelper $doctrineHelper)`. After: `__construct(ObjectManager $om, ActivityManager $activityManager, TokenStorageInterface $securityTokenStorage, ConfigManager $configManager, RouterInterface $router, EntityAliasResolver $entityAliasResolver, EntityTitleResolverInterface $entityTitleResolver, DoctrineHelper $doctrineHelper)`.
+- The constructor of the `Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer` class was changed. Before: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, ObjectMapper $mapper, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher)`. After: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, EntityTitleResolverInterface $entityTitleResolver)`.
+- The constructor of the `Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType` class was changed. Before: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, ObjectMapper $mapper, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher)`. After: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, EntityTitleResolverInterface $entityTitleResolver)`.

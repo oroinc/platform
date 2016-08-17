@@ -76,11 +76,12 @@ class BaseType extends AbstractType
         }
         $blockPrefixes[]   = $uniqueBlockPrefix;
 
-        $view->vars['id']                  = $id;
-        $view->vars['block_type']          = $name;
-        $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
-        $view->vars['block_prefixes']      = $blockPrefixes;
-        $view->vars['cache_key']           = sprintf('_%s_%s', $id, $name);
+        $view->vars['id']                   = $id;
+        $view->vars['block_type']           = $name;
+        $view->vars['block_type_widget_id'] = $name . '_widget';
+        $view->vars['unique_block_prefix']  = $uniqueBlockPrefix;
+        $view->vars['block_prefixes']       = $blockPrefixes;
+        $view->vars['cache_key']            = sprintf('_%s_%s', $id, $name);
     }
 
     /**
