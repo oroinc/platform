@@ -1,6 +1,0 @@
-oro_api:
-    entities:
-        Oro\Bundle\DashboardBundle\Entity\ActiveDashboard: ~
-        Oro\Bundle\DashboardBundle\Entity\Dashboard: ~
-        Oro\Bundle\DashboardBundle\Entity\Widget: ~
-        Oro\Bundle\DashboardBundle\Entity\WidgetState: ~

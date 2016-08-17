@@ -33,64 +33,47 @@ class ChoiceFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        $data = $this->parseData($data);
-        if (!$data) {
-            return false;
-        }
-
         $isNullValueSelected = $this->checkNullValue($data);
         if ($isNullValueSelected) {
             if (empty($data['value'])) {
-                // apply only null value filter
-                $this->applyFilterToClause(
+                return $this->buildNullValueExpr(
                     $ds,
-                    $this->buildNullValueExpr(
-                        $ds,
-                        $data['type'],
-                        $this->get(FilterUtility::DATA_NAME_KEY)
-                    )
+                    $comparisonType,
+                    $fieldName
                 );
             } else {
-                // apply both comparison and null value filters
                 $parameterName = $ds->generateParameterName($this->getName());
-                $this->applyFilterToClause(
+                $ds->setParameter($parameterName, $data['value']);
+
+                return $this->buildCombinedExpr(
                     $ds,
-                    $this->buildCombinedExpr(
+                    $comparisonType,
+                    $this->buildComparisonExpr(
                         $ds,
-                        $data['type'],
-                        $this->buildComparisonExpr(
-                            $ds,
-                            $data['type'],
-                            $this->get(FilterUtility::DATA_NAME_KEY),
-                            $parameterName
-                        ),
-                        $this->buildNullValueExpr(
-                            $ds,
-                            $data['type'],
-                            $this->get(FilterUtility::DATA_NAME_KEY)
-                        )
+                        $comparisonType,
+                        $fieldName,
+                        $parameterName
+                    ),
+                    $this->buildNullValueExpr(
+                        $ds,
+                        $comparisonType,
+                        $fieldName
                     )
                 );
-                $ds->setParameter($parameterName, $data['value']);
             }
         } else {
-            // apply only comparison filter
             $parameterName = $ds->generateParameterName($this->getName());
-            $this->applyFilterToClause(
-                $ds,
-                $this->buildComparisonExpr(
-                    $ds,
-                    $data['type'],
-                    $this->get(FilterUtility::DATA_NAME_KEY),
-                    $parameterName
-                )
-            );
             $ds->setParameter($parameterName, $data['value']);
-        }
 
-        return true;
+            return $this->buildComparisonExpr(
+                $ds,
+                $comparisonType,
+                $fieldName,
+                $parameterName
+            );
+        }
     }
 
     /**

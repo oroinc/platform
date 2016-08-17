@@ -21,7 +21,7 @@ class EmailAddress extends BaseEmailAddress
     /**
      * @param EmailOwnerInterface|null $owner
      *
-     * @return $this;
+     * @return $this
      */
     public function setOwner(EmailOwnerInterface $owner = null)
     {
