@@ -238,6 +238,8 @@ class Message extends \Zend\Mail\Storage\Message
 
     /**
      * {@inheritdoc}
+     *
+     * @codingStandardsIgnoreStart
      */
     protected function _cacheContent()
     {
@@ -264,4 +266,5 @@ class Message extends \Zend\Mail\Storage\Message
             $this->parts[$counter++] = new static(array('headers' => $part['header'], 'content' => $part['body']));
         }
     }
+    // @codingStandardsIgnoreEnd
 }
