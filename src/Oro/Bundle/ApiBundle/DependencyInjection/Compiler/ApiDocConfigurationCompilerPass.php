@@ -19,7 +19,11 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
     const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro_api.routing_options_resolver';
     const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
     const REQUEST_TYPE_PROVIDER_TAG                 = 'oro_api.request_type_provider';
-    
+    const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
+    const EXPECTED_API_DOC_HTML_FORMATTER_CLASS     = 'Nelmio\ApiDocBundle\Formatter\HtmlFormatter';
+    const NEW_API_DOC_HTML_FORMATTER_CLASS          = 'Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter';
+    const FILE_LOCATOR_SERVICE                      = 'file_locator';
+
     /**
      * {@inheritdoc}
      */
@@ -42,6 +46,17 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
             'setRouteOptionsResolver',
             [new Reference(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)]
         );
+        // HTML formatter
+        if ($container->hasDefinition(self::API_DOC_HTML_FORMATTER_SERVICE)) {
+            $apiDocHtmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
+            if (self::EXPECTED_API_DOC_HTML_FORMATTER_CLASS === $apiDocHtmlFormatterDef->getClass()) {
+                $apiDocHtmlFormatterDef->setClass(self::NEW_API_DOC_HTML_FORMATTER_CLASS);
+                $apiDocHtmlFormatterDef->addMethodCall(
+                    'setFileLocator',
+                    [new Reference(self::FILE_LOCATOR_SERVICE)]
+                );
+            }
+        }
 
         $this->registerRoutingOptionsResolvers($container);
         $this->registerRequestTypeProviders($container);
