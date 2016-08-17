@@ -121,11 +121,37 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * User username = User email, Username in email format
      */
-    public function testUsernameValidUsernameInEmailFormat()
+    public function testUsernameValidUsernameAsEmail()
     {
         $user = $this->getUser(1);
         $user->setUsername('username@example.com');
         $user->setEmail('username@example.com');
+
+        $this->context->expects($this->never())
+            ->method('buildViolation');
+
+        $this->validator->validate($user, $this->constraint);
+    }
+
+    /**
+     * User with email as current user Username not exist, Username in email format
+     */
+    public function testUsernameValidUsernameInEmailFormat()
+    {
+        $user = $this->getUser(1);
+        $user->setUsername('username@example.com');
+        $user->setEmail('test@example.com');
+
+        $existingUser = [];
+
+        $this->repository->expects($this->once())
+            ->method('findUserWithEmailAsUsername')
+            ->with('username@example.com', 1)
+            ->will($this->returnValue($existingUser));
+
+        $this->om->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($this->repository);
 
         $this->context->expects($this->never())
             ->method('buildViolation');
@@ -144,41 +170,11 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
 
         $existingUser = ['id' => 2, 'username' => 'username', 'email' => 'username@example.com'];
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
-        $query->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnValue($existingUser));
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['andWhere', 'setParameter', 'getQuery'])
-            ->getMock();
-        $queryBuilder->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($query));
-        $queryBuilder->expects($this->at(0))
-            ->method('andWhere')
-            ->with('u.email = :email')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(1))
-            ->method('setParameter')
-            ->with('email', 'username@example.com')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(2))
-            ->method('andWhere')
-            ->with('u.id <> :id')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(3))
-            ->method('setParameter')
-            ->with('id', 1)
-            ->will($this->returnSelf());
-
         $this->repository->expects($this->once())
-            ->method('createQueryBuilder')
-            ->with('u')
-            ->will($this->returnValue($queryBuilder));
+            ->method('findUserWithEmailAsUsername')
+            ->with('username@example.com', 1)
+            ->will($this->returnValue($existingUser));
+
         $this->om->expects($this->any())
             ->method('getRepository')
             ->willReturn($this->repository);
