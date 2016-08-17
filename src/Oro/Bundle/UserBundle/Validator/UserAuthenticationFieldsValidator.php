@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Validator;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
 
 class UserAuthenticationFieldsValidator extends ConstraintValidator
@@ -18,16 +16,16 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
     const ALIAS          = 'oro_user.validator.user_authentication_fields';
 
     /**
-     * @var ManagerRegistry
+     * @var UserManager
      */
-    protected $registry;
+    protected $userManager;
 
     /**
-     * @param ManagerRegistry $registry
+     * @param UserManager $userManager
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(UserManager $userManager)
     {
-        $this->registry = $registry;
+        $this->userManager = $userManager;
     }
 
     /**
@@ -60,18 +58,29 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
     }
 
     /**
+     * Find existing user with Primary Email as current User's Username
+     *
+     * Example:
+     *    Current User:
+     *        Username = username@example.com
+     *        Email    = jack@example.com
+     *    Existing User:
+     *        Username = username
+     *        Email    = username@example.com
+     *
      * @param User $entity
      *
      * @return bool
      */
     protected function isSameUserExists(User $entity)
     {
-        /** @var UserRepository $repository */
-        $repository = $this->registry->getManagerForClass(User::class)->getRepository(User::class);
-
-        $result = $repository->findExistingUserByEmail($entity->getUsername(), $entity->getId());
+        /** @var User $result */
+        $result = $this->userManager->findUserByEmail($entity->getUsername());
 
         if ($result) {
+            if ($entity->getId() && $result->getId() === $entity->getId()) {
+                return false;
+            }
             return true;
         }
 
