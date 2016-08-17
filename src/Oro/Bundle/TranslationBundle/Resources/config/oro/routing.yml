@@ -14,6 +14,10 @@ oro_translation_language:
     type:         annotation
     prefix:       /language
 
+oro_translation_import_export:
+    resource:     "@OroTranslationBundle/Controller/ImportExportController.php"
+    type:         annotation
+
 oro_translation_bundle_api:
     resource:     "@OroTranslationBundle/Resources/config/oro/routing_api.yml"
     type:         rest
