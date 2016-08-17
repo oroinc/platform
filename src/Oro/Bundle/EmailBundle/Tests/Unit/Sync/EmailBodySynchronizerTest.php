@@ -144,9 +144,9 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('loadEmailBody')
             ->will($this->throwException($exception));
 
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('persist');
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('flush');
 
         $this->logger->expects($this->once())
@@ -190,9 +190,9 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('loadEmailBody')
             ->will($this->throwException($exception));
 
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('persist');
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('flush');
 
         $this->logger->expects($this->once())
