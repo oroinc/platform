@@ -10,25 +10,26 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetOrderedSteps()
     {
-        $stepOne = new Step();
-        $stepOne->setName('step1');
-        $stepOne->setOrder(1);
+        $defaultStartStep = $this->getStepMock(StepManager::DEFAULT_START_STEP_NAME, -1);
+        $stepOne = $this->getStepMock('step1', 1);
+        $stepTwo = $this->getStepMock('step2', 2);
+        $stepThree = $this->getStepMock('step3', 3);
 
-        $stepTwo = new Step();
-        $stepTwo->setName('step2');
-        $stepTwo->setOrder(2);
+        $stepManager = new StepManager(new ArrayCollection([$stepTwo, $stepOne, $stepThree, $defaultStartStep]));
 
-        $stepThree = new Step();
-        $stepThree->setName('step3');
-        $stepThree->setOrder(3);
-        $steps = new ArrayCollection([$stepTwo, $stepOne, $stepThree]);
-
-        $stepManager = new StepManager($steps);
         $ordered = $stepManager->getOrderedSteps();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $ordered);
-        $this->assertSame($stepOne, $ordered->get(0), 'Steps are not in correct order');
-        $this->assertSame($stepTwo, $ordered->get(1), 'Steps are not in correct order');
-        $this->assertSame($stepThree, $ordered->get(2), 'Steps are not in correct order');
+
+        $this->assertInstanceOf(ArrayCollection::class, $ordered);
+        $this->assertCount(4, $ordered);
+        $this->assertSame($defaultStartStep, $ordered->get(0), 'Steps are not in correct order');
+        $this->assertSame($stepOne, $ordered->get(1), 'Steps are not in correct order');
+        $this->assertSame($stepTwo, $ordered->get(2), 'Steps are not in correct order');
+        $this->assertSame($stepThree, $ordered->get(3), 'Steps are not in correct order');
+
+        $ordered = $stepManager->getOrderedSteps(true);
+
+        $this->assertCount(3, $ordered);
+        $this->assertFalse($ordered->contains($defaultStartStep));
     }
 
     public function testGetStepsEmpty()
@@ -69,14 +70,19 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($step2, $stepManager->getStep('step2'));
     }
 
-    protected function getStepMock($name)
+    /**
+     * @param string $name
+     * @param null|int $order
+     * @return Step|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getStepMock($name, $order = null)
     {
-        $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $step->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
+        $step = $this->getMockBuilder(Step::class)->disableOriginalConstructor()->getMock();
+        $step->expects($this->any())->method('getName')->willReturn($name);
+
+        if ($order) {
+            $step->expects($this->any())->method('getOrder')->willReturn($order);
+        }
 
         return $step;
     }
@@ -114,5 +120,16 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
         $steps = $stepManager->getRelatedTransitionSteps('transitionA');
 
         $this->assertEquals([$step1, $step2], $steps->getValues());
+    }
+
+    public function testGetDefaultStartTransition()
+    {
+        $stepManager = new StepManager();
+        $this->assertNull($stepManager->getDefaultStartStep());
+
+        $step = $this->getStepMock(StepManager::DEFAULT_START_STEP_NAME);
+
+        $stepManager->setSteps([$step]);
+        $this->assertEquals($step, $stepManager->getDefaultStartStep());
     }
 }

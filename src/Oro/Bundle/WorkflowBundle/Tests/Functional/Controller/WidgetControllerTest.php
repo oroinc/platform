@@ -65,6 +65,8 @@ class WidgetControllerTest extends WebTestCase
         $this->assertContains('transition-test_flow-start_transition', $crawler->html());
         $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
         $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
+        $this->assertContains('Open', $crawler->html());
+        $this->assertContains('(Start)', $crawler->html());
     }
 
     public function testStartTransitionFormAction()
@@ -135,6 +137,25 @@ class WidgetControllerTest extends WebTestCase
             $workflowItemNew->getCurrentStep()->getName()
         );
         $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
+    }
+
+    public function testButtonsAction()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_workflow_widget_buttons', [
+                '_widgetContainer' => 'dialog',
+                'entityClass' => self::ENTITY_CLASS,
+                'entityId' => $this->entity->getId(),
+            ]),
+            [],
+            [],
+            $this->generateBasicAuthHeader()
+        );
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
+        $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
     }
 
     /**
