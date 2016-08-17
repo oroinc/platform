@@ -35,5 +35,9 @@ oro.translation:
             installed: 'Language has been installed'
             updated: 'Language has been updated'
 
+        error:
+            install: 'Language not installed'
+            update: 'Language not updated'
+
     menu:
         languages.label: Languages

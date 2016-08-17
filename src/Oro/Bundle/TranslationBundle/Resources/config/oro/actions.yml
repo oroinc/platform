@@ -142,7 +142,7 @@ operations:
             icon: icon-download
         preactions:
             - '@assign_value': [$.successMessage, 'oro.translation.language.message.installed']
-            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.updated']
+            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.install']
             - '@call_service_method':
                 service: oro_translation.helper.language
                 method: isAvailableInstallTranslates
@@ -165,7 +165,7 @@ operations:
                 method_parameters: [$.data]
                 attribute: $.isAvailableUpdate
             - '@assign_value': [$.successMessage, 'oro.translation.language.message.updated']
-            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.updated']
+            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.update']
         preconditions:
             '@equal': [$.isAvailableUpdate, true]
 
