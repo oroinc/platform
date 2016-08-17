@@ -16,7 +16,6 @@ define(function(require) {
         onCreate: function(e) {
             SelectCreateInlineTypeAsyncView.__super__.onCreate.apply(this, arguments);
             this.dialogWidget.once('beforeContentLoad', _.bind(function() {
-                this.keepDialogWidget = true;
                 this.dialogWidget.hide();
                 this.$el.addClass('loading');
             }, this));

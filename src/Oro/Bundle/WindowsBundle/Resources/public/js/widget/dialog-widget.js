@@ -39,6 +39,7 @@ define(function(require) {
         defaultPos: 'center center',
         openedWindows: 0,
         contentTop: null,
+        keepAliveOnClose: false,
         /**
          * Flag if the widget is embedded to the page
          * (dialog has own life cycle)
@@ -128,6 +129,9 @@ define(function(require) {
         closeHandler: function(onClose) {
             if (_.isFunction(onClose)) {
                 onClose();
+            }
+            if (!this.keepAliveOnClose) {
+                this.dispose();
             }
         },
 
@@ -322,7 +326,10 @@ define(function(require) {
         },
 
         hide: function() {
+            var keepAliveOnClose = this.keepAliveOnClose;
+            this.keepAliveOnClose = true;
             this.widget.dialog('close');
+            this.keepAliveOnClose = keepAliveOnClose;
         },
 
         _renderHandler: function() {

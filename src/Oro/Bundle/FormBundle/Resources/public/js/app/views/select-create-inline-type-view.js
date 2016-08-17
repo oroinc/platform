@@ -16,7 +16,6 @@ define(function(require) {
         entityLabel: '',
         existingEntityGridId: null,
         dialogWidget: null,
-        keepDialogWidget: false,
         events: {
             'click .entity-select-btn': 'onSelect',
             'click .entity-create-btn': 'onCreate'
@@ -54,19 +53,13 @@ define(function(require) {
             this.dialogWidget.render();
         },
         onDialogClose: function() {
-            if (!this.keepDialogWidget) {
-                this.$(this.inputSelector).off('.' + this.dialogWidget._wid);
-                this.dialogWidget.dispose();
-                this.dialogWidget = null;
-            }
+            this.$(this.inputSelector).off('.' + this.dialogWidget._wid);
         },
         onGridRowSelect: function(data) {
             var eventNamespace = this.dialogWidget._wid;
             var loadingStarted = false;
-            this.keepDialogWidget = true;
             var $input = this.$(this.inputSelector);
             var onSelect = _.bind(function() {
-                this.keepDialogWidget = false;
                 this.dialogWidget.remove();
                 this.$(this.inputSelector).inputWidget('focus');
             }, this);
@@ -102,7 +95,6 @@ define(function(require) {
             this.dialogWidget.once('formSave', _.bind(function(id) {
                 var $input = this.$(this.inputSelector);
                 $input.inputWidget('val', id, true);
-                this.keepDialogWidget = false;
                 this.dialogWidget.remove();
                 this.dialogWidget = null;
                 $input.inputWidget('focus');
