@@ -238,10 +238,63 @@ class Message extends \Zend\Mail\Storage\Message
 
     /**
      * {@inheritdoc}
-     *
-     * @codingStandardsIgnoreStart
      */
-    protected function _cacheContent()
+    public function getPart($num)
+    {
+        if (isset($this->parts[$num])) {
+            return $this->parts[$num];
+        }
+
+        if (!$this->mail && $this->content === null) {
+            throw new RuntimeException('part not found');
+        }
+
+        if ($this->mail && $this->mail->hasFetchPart) {
+            // TODO: fetch part
+            // return
+        }
+
+        $this->cacheContent();
+
+        if (!isset($this->parts[$num])) {
+            throw new RuntimeException('part not found');
+        }
+
+        return $this->parts[$num];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function countParts()
+    {
+        if ($this->countParts) {
+            return $this->countParts;
+        }
+
+        $this->countParts = count($this->parts);
+        if ($this->countParts) {
+            return $this->countParts;
+        }
+
+        if ($this->mail && $this->mail->hasFetchPart) {
+            // TODO: fetch part
+            // return
+        }
+
+        $this->cacheContent();
+
+        $this->countParts = count($this->parts);
+        return $this->countParts;
+    }
+
+    /**
+     * Cache content and split in parts if multipart
+     *
+     * @throws RuntimeException
+     * @return null
+     */
+    protected function cacheContent()
     {
         // caching content if we can't fetch parts
         if ($this->content === null && $this->mail) {
@@ -266,5 +319,4 @@ class Message extends \Zend\Mail\Storage\Message
             $this->parts[$counter++] = new static(array('headers' => $part['header'], 'content' => $part['body']));
         }
     }
-    // @codingStandardsIgnoreEnd
 }

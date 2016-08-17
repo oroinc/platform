@@ -45,6 +45,9 @@ class EmailCacheManager
     public function ensureEmailBodyCached(Email $email)
     {
         if ($email->getEmailBody() === null) {
+            // Additional load attempt, which is performed only on UI email expanding.
+            // Console command oro:cron:email-body-sync marks email as synced even body was not loaded.
+            $email->setBodySynced(false);
             $this->emailBodySynchronizer->syncOneEmailBody($email);
         }
 

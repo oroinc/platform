@@ -67,29 +67,22 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     public function syncOneEmailBody(Email $email)
     {
         if ($this->isBodyNotLoaded($email)) {
-            // body loader can load email body from any folder of any origin
-            // try to get active origin and any first folder from it
-            $isEmailUserFound = false;
+            // Body loader can load email body from any folder of any emailUser.
+            // Even if email body was not loaded, email will be marked as synced to prevent sync degradation in time.
+            $em = $this->getManager();
+            $bodyLoaded = false;
             foreach ($email->getEmailUsers() as $emailUser) {
-                if (($origin = $emailUser->getOrigin()) &&
-                    $origin->isActive() &&
-                    $origin->getFolders()->count()) {
-                    foreach ($origin->getFolders() as $folder) {
+                if (($origin = $emailUser->getOrigin()) && $origin->isActive()) {
+                    foreach ($emailUser->getFolders() as $folder) {
                         $loader    = $this->getBodyLoader($origin);
-                        $bodyLoaded = false;
                         try {
-                            $em        = $this->getManager();
                             $emailBody = $loader->loadEmailBody($folder, $email, $em);
                             $em->refresh($email);
                             // double check
                             if ($this->isBodyNotLoaded($email)) {
                                 $email->setEmailBody($emailBody);
-                                $email->setBodySynced(true);
                                 $bodyLoaded = true;
-                                $em->persist($email);
-                                $em->flush($email);
                             }
-                            $isEmailUserFound = true;
                         } catch (EmailBodyNotFoundException $e) {
                             $this->logger->notice(
                                 sprintf(
@@ -131,14 +124,15 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                         if ($bodyLoaded) {
                             $event = new EmailBodyAdded($email);
                             $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
-                        }
-                        if ($isEmailUserFound) {
                             break 2;
                         }
                     }
                 }
             }
-            if (!$isEmailUserFound || !$email->getEmailUsers()->count()) {
+            $email->setBodySynced(true);
+            $em->persist($email);
+            $em->flush($email);
+            if (!$bodyLoaded) {
                 throw new LoadEmailBodyFailedException($email);
             }
         }
