@@ -188,7 +188,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
      * @param string $email
      * @param int|null $id
      *
-     * @return mixed
+     * @return User|null
      */
     public function findExistingUserByEmail($email, $id = null)
     {
