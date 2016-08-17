@@ -69,9 +69,9 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
         /** @var UserRepository $repository */
         $repository = $this->registry->getManagerForClass(User::class)->getRepository(User::class);
 
-        $result = $repository->findUsersWithEmailAsUsername($entity->getUsername(), $entity->getId());
+        $result = $repository->findExistingUserByEmail($entity->getUsername(), $entity->getId());
 
-        if (count($result) > 0) {
+        if ($result) {
             return true;
         }
 

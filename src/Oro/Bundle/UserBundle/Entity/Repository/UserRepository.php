@@ -172,9 +172,11 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
     }
 
     /**
-     * Find users with Primary Email as Username parameter
+     * Find user with Primary Email as email parameter
      * Exclude current user from result if id parameter is set
      *
+     * Use this method to find existing User by Username of another User when Username in email format
+     * Pass Username value as email parameter value in this case
      * Example:
      *    Current User:
      *        Username = username@example.com
@@ -183,17 +185,17 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
      *        Username = username
      *        Email    = username@example.com
      *
-     * @param string $username
+     * @param string $email
      * @param int|null $id
      *
-     * @return array
+     * @return mixed
      */
-    public function findUsersWithEmailAsUsername($username, $id = null)
+    public function findExistingUserByEmail($email, $id = null)
     {
         $qb = $this->createQueryBuilder('u');
         $qb
             ->andWhere('u.email = :email')
-            ->setParameter('email', $username);
+            ->setParameter('email', $email);
 
         if ($id) {
             $qb
@@ -203,7 +205,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
 
         $result = $qb
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
 
         return $result;
     }
