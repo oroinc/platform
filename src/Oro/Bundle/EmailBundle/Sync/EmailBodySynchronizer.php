@@ -59,29 +59,32 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      * Syncs email body for one email
      *
      * @param Email $email
+     * @param bool $forceSync
      *
      * @throws LoadEmailBodyFailedException
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function syncOneEmailBody(Email $email)
+    public function syncOneEmailBody(Email $email, $forceSync = false)
     {
-        if ($this->isBodyNotLoaded($email)) {
+        if ($this->isBodyNotLoaded($email, $forceSync)) {
             // Body loader can load email body from any folder of any emailUser.
             // Even if email body was not loaded, email will be marked as synced to prevent sync degradation in time.
             $em = $this->getManager();
             $bodyLoaded = false;
+            $emailBodyChanged = false;
             foreach ($email->getEmailUsers() as $emailUser) {
                 if (($origin = $emailUser->getOrigin()) && $origin->isActive()) {
                     foreach ($emailUser->getFolders() as $folder) {
                         $loader    = $this->getBodyLoader($origin);
                         try {
                             $emailBody = $loader->loadEmailBody($folder, $email, $em);
+                            $bodyLoaded = true;
                             $em->refresh($email);
                             // double check
-                            if ($this->isBodyNotLoaded($email)) {
+                            if ($this->isBodyNotLoaded($email, $forceSync)) {
                                 $email->setEmailBody($emailBody);
-                                $bodyLoaded = true;
+                                $emailBodyChanged = true;
                             }
                         } catch (EmailBodyNotFoundException $e) {
                             $this->logger->notice(
@@ -121,7 +124,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                                 ['exception' => $ex]
                             );
                         }
-                        if ($bodyLoaded) {
+                        if ($emailBodyChanged) {
                             $event = new EmailBodyAdded($email);
                             $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
                             break 2;
@@ -220,11 +223,12 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
     /**
      * @param Email $email
+     * @param bool $forceSync
      *
      * @return bool
      */
-    protected function isBodyNotLoaded(Email $email)
+    protected function isBodyNotLoaded(Email $email, $forceSync)
     {
-        return $email->isBodySynced() !== true && $email->getEmailBody() === null;
+        return ($email->isBodySynced() !== true || $forceSync === true) && $email->getEmailBody() === null;
     }
 }
