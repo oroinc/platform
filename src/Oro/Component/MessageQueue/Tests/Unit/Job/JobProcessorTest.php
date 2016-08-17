@@ -104,6 +104,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     public function testCreateChildJobShouldFindAndReturnAlreadyCreatedJob()
     {
         $job = new Job();
+        $job->setId(123);
 
         $storage = $this->createJobStorage();
         $storage
@@ -118,6 +119,12 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('findChildJobByName')
             ->with('job-name', $this->identicalTo($job))
+            ->will($this->returnValue($job))
+        ;
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(123)
             ->will($this->returnValue($job))
         ;
 
@@ -149,6 +156,12 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('findChildJobByName')
             ->with('job-name', $this->identicalTo($job))
             ->will($this->returnValue(null))
+        ;
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
         ;
 
         $producer = $this->createMessageProducerMock();
@@ -185,12 +198,20 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStartChildJobShouldThrowIfJobHasNotNewStatus()
     {
-        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
-
         $job = new Job();
         $job->setId(12345);
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_CANCELLED);
+
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
+        ;
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
 
         $this->setExpectedException(
             \LogicException::class,
@@ -202,11 +223,22 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStartJobShouldUpdateJobWithRunningStatusAndStartAtTime()
     {
+        $job = new Job();
+        $job->setId(12345);
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_NEW);
+
         $storage = $this->createJobStorage();
         $storage
             ->expects($this->once())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
+        ;
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
         ;
 
         $producer = $this->createMessageProducerMock();
@@ -214,10 +246,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
         ;
-
-        $job = new Job();
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_NEW);
 
         $processor = new JobProcessor($storage, $producer);
         $processor->startChildJob($job);
@@ -240,12 +268,20 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccessChildJobShouldThrowIfJobHasNotRunningStatus()
     {
-        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
-
         $job = new Job();
         $job->setId(12345);
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_CANCELLED);
+
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
+        ;
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
 
         $this->setExpectedException(
             \LogicException::class,
@@ -257,11 +293,22 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccessJobShouldUpdateJobWithSuccessStatusAndStopAtTime()
     {
+        $job = new Job();
+        $job->setId(12345);
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_RUNNING);
+
         $storage = $this->createJobStorage();
         $storage
             ->expects($this->once())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
+        ;
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
         ;
 
         $producer = $this->createMessageProducerMock();
@@ -269,10 +316,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
         ;
-
-        $job = new Job();
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_RUNNING);
 
         $processor = new JobProcessor($storage, $producer);
         $processor->successChildJob($job);
@@ -295,12 +338,20 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testFailChildJobShouldThrowIfJobHasNotRunningStatus()
     {
-        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
-
         $job = new Job();
         $job->setId(12345);
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_CANCELLED);
+
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
+        ;
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
 
         $this->setExpectedException(
             \LogicException::class,
@@ -312,11 +363,22 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testFailJobShouldUpdateJobWithFailStatusAndStopAtTime()
     {
+        $job = new Job();
+        $job->setId(12345);
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_RUNNING);
+
         $storage = $this->createJobStorage();
         $storage
             ->expects($this->once())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
+        ;
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
         ;
 
         $producer = $this->createMessageProducerMock();
@@ -324,10 +386,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
         ;
-
-        $job = new Job();
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_RUNNING);
 
         $processor = new JobProcessor($storage, $producer);
         $processor->failChildJob($job);
@@ -350,12 +408,20 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCancelChildJobShouldThrowIfJobHasNotNewOrRunningStatus()
     {
-        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
-
         $job = new Job();
         $job->setId(12345);
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_CANCELLED);
+
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
+        ;
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
 
         $this->setExpectedException(
             \LogicException::class,
@@ -367,11 +433,22 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCancelJobShouldUpdateJobWithCancelStatusAndStoppedAtTimeAndStartedAtTime()
     {
+        $job = new Job();
+        $job->setId(12345);
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_NEW);
+
         $storage = $this->createJobStorage();
         $storage
             ->expects($this->once())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
+        ;
+        $storage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job))
         ;
 
         $producer = $this->createMessageProducerMock();
@@ -379,10 +456,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
         ;
-
-        $job = new Job();
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_NEW);
 
         $processor = new JobProcessor($storage, $producer);
         $processor->cancelChildJob($job);
