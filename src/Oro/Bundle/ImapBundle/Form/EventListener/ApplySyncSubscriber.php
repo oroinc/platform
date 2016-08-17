@@ -33,7 +33,7 @@ class ApplySyncSubscriber implements EventSubscriberInterface
         $data = $event->getData();
         $form = $event->getForm();
 
-        if ($data && array_key_exists('folders', $data)) {
+        if ($data && array_key_exists('folders', $data) && is_array($data['folders'])) {
             /** @var UserEmailOrigin $origin */
             $origin = $form->getData();
 
@@ -62,11 +62,13 @@ class ApplySyncSubscriber implements EventSubscriberInterface
             });
 
             $matched = reset($f);
-            $syncEnabled = array_key_exists('syncEnabled', $matched);
-            $folder->setSyncEnabled($syncEnabled);
+            if ($matched) {
+                $syncEnabled = array_key_exists('syncEnabled', $matched);
+                $folder->setSyncEnabled($syncEnabled);
 
-            if (array_key_exists('subFolders', $matched) && $folder->hasSubFolders()) {
-                $this->applySyncEnabled($folder->getSubFolders(), $matched['subFolders']);
+                if (array_key_exists('subFolders', $matched) && $folder->hasSubFolders()) {
+                    $this->applySyncEnabled($folder->getSubFolders(), $matched['subFolders']);
+                }
             }
         }
     }
