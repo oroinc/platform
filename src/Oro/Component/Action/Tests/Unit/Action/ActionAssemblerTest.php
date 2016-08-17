@@ -159,7 +159,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                     array(
                         'instance' => array(
                             '_type' => 'tree',
-                            'post_actions' => array(
+                            'actions' => array(
                                 array(
                                     'instance' => array(
                                         '_type' => 'assign_value',
@@ -174,7 +174,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                     array(
                         'instance' => array(
                             '_type' => 'tree',
-                            'post_actions' => array(
+                            'actions' => array(
                                 array(
                                     'instance' => array(
                                         '_type' => 'assign_value',
@@ -209,7 +209,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                     array(
                         'instance' => array(
                             '_type' => 'tree',
-                            'post_actions' => array(
+                            'actions' => array(
                                 array(
                                     'instance' => array(
                                         '_type' => 'assign_value',
@@ -244,7 +244,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         if ($action instanceof TreeExecutor) {
             $actionData = array(
                 '_type'        => TreeExecutor::ALIAS,
-                'post_actions' => $this->getActions($action),
+                'actions'      => $this->getActions($action),
             );
         } elseif ($action instanceof ArrayAction) {
             $actionData = $action->toArray();
