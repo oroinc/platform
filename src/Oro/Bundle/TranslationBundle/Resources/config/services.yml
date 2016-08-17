@@ -206,6 +206,9 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Helper\LanguageHelper'
         arguments:
             - '@oro_translation.statistic_provider'
+            - '@oro_translation.packages_provider'
+            - '@oro_translation.oro_translation_adapter'
+            - '@oro_translation.service_provider'
 
     oro_translation.acl.voter.language:
         class: 'Oro\Bundle\TranslationBundle\Acl\Voter\LanguageVoter'

@@ -193,9 +193,12 @@ EOF
             DIRECTORY_SEPARATOR
         );
 
-        $result = $this
-            ->getTranslationService($input, $output)
-            ->download($languagePackPath, [$projectName], $locale);
+        $translationService = $this->getTranslationService($input, $output);
+
+        $result = $translationService->download($languagePackPath, [$projectName], $locale);
+        if ($result) {
+            $result = $translationService->loadTranslatesFromFile($languagePackPath, $locale);
+        }
 
         $output->writeln(sprintf("Download %s", $result ? 'successful' : 'failed'));
     }

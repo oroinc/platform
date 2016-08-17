@@ -3,6 +3,9 @@
 namespace Oro\Bundle\TranslationBundle\Helper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
+use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
+use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
 class LanguageHelper
@@ -10,12 +13,32 @@ class LanguageHelper
     /** @var TranslationStatisticProvider */
     protected $translationStatisticProvider;
 
+    /** @var PackagesProvider */
+    protected $packagesProvider;
+
+    /** @var OroTranslationAdapter */
+    protected $translationAdapter;
+
+    /** @var TranslationServiceProvider */
+    protected $translationServiceProvider;
+
     /**
      * @param TranslationStatisticProvider $translationStatisticProvider
+     * @param PackagesProvider $packagesProvider
+     * @param OroTranslationAdapter $translationAdapter
+     * @param TranslationServiceProvider $translationServiceProvider
+     * @internal param TranslationServiceProvider $translationServiceProvider
      */
-    public function __construct(TranslationStatisticProvider $translationStatisticProvider)
-    {
+    public function __construct(
+        TranslationStatisticProvider $translationStatisticProvider,
+        PackagesProvider $packagesProvider,
+        OroTranslationAdapter $translationAdapter,
+        TranslationServiceProvider $translationServiceProvider
+    ) {
         $this->translationStatisticProvider = $translationStatisticProvider;
+        $this->packagesProvider = $packagesProvider;
+        $this->translationAdapter = $translationAdapter;
+        $this->translationServiceProvider = $translationServiceProvider;
     }
 
     /**
@@ -66,6 +89,39 @@ class LanguageHelper
         $stats['en'] = ['translationStatus' => 100];
 
         return isset($stats[$language->getCode()]) ? (int)$stats[$language->getCode()]['translationStatus'] : null;
+    }
+
+    /**
+     * @param string $code
+     * @return array
+     */
+    public function getLanguageStatistic($code)
+    {
+        $stats = $this->getStatistic();
+
+        $languageStat = isset($stats[$code]) ? $stats[$code] : null;
+
+        if ($languageStat) {
+            $languageStat['lastBuildDate'] = $this->getDateTimeFromString($languageStat['lastBuildDate']);
+        }
+
+        return $languageStat;
+    }
+
+    /**
+     * @param string $code
+     * @return null|string
+     */
+    public function downloadLanguageFile($code)
+    {
+        $projects = $this->packagesProvider->getInstalledPackages();
+        $this->translationServiceProvider->setAdapter($this->translationAdapter);
+
+        $pathToSave = $this->translationServiceProvider->getTmpDir('download_' . $code);
+
+        $isDownloaded = $this->translationServiceProvider->download($pathToSave, $projects, $code);
+
+        return $isDownloaded ? $pathToSave : null;
     }
 
     /**
