@@ -155,7 +155,7 @@ class TranslationServiceProvider
     public function loadTranslatesFromFile($pathToSave, $locale = null)
     {
         $pathToSave .= self::FILE_NAME_SUFFIX;
-        $targetDir  = dirname($pathToSave);
+        $targetDir = dirname($pathToSave);
 
         $isExtracted  = $this->unzip(
             $pathToSave,

@@ -4,6 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
+use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
+use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
+use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
 /**
@@ -12,35 +15,64 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var TranslationStatisticProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $provider;
+    protected $statisticProvider;
+
+    /** @var PackagesProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $packagesProvider;
+
+    /** @var OroTranslationAdapter|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationAdapter;
+
+    /** @var TranslationServiceProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationServiceProvider;
 
     /** @var LanguageHelper */
     protected $helper;
 
     protected function setUp()
     {
-        $this->provider = $this->getMockBuilder(TranslationStatisticProvider::class)
+        $this->statisticProvider = $this->getMockBuilder(TranslationStatisticProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->packagesProvider = $this->getMockBuilder(PackagesProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->translationAdapter = $this->getMockBuilder(OroTranslationAdapter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->translationServiceProvider = $this->getMockBuilder(TranslationServiceProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new LanguageHelper($this->provider);
+        $this->helper = new LanguageHelper(
+            $this->statisticProvider,
+            $this->packagesProvider,
+            $this->translationAdapter,
+            $this->translationServiceProvider
+        );
     }
 
     protected function tearDown()
     {
-        unset($this->helper, $this->provider);
+        unset(
+            $this->helper,
+            $this->statisticProvider,
+            $this->packagesProvider,
+            $this->translationAdapter,
+            $this->translationServiceProvider
+        );
     }
 
     public function testIsAvailableInstallTranslatesAndNoCode()
     {
-        $this->provider->expects($this->never())->method('get');
+        $this->statisticProvider->expects($this->never())->method('get');
 
         $this->assertFalse($this->helper->isAvailableInstallTranslates(new Language()));
     }
 
     public function testIsAvailableInstallTranslatesAndInstalledBuildDate()
     {
-        $this->provider->expects($this->never())->method('get');
+        $this->statisticProvider->expects($this->never())->method('get');
 
         $language = (new Language())->setInstalledBuildDate(new \DateTime());
 
@@ -49,7 +81,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsAvailableInstallTranslatesAndUnknownCode()
     {
-        $this->provider->expects($this->once())->method('get')->willReturn([]);
+        $this->statisticProvider->expects($this->once())->method('get')->willReturn([]);
 
         $language = (new Language())->setCode('unknown');
 
@@ -58,7 +90,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsAvailableInstallTranslates()
     {
-        $this->provider->expects($this->once())
+        $this->statisticProvider->expects($this->once())
             ->method('get')
             ->willReturn([
                 ['code' => 'en']
@@ -71,14 +103,14 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsAvailableUpdateTranslatesAndNoCode()
     {
-        $this->provider->expects($this->never())->method('get');
+        $this->statisticProvider->expects($this->never())->method('get');
 
         $this->assertFalse($this->helper->isAvailableUpdateTranslates(new Language()));
     }
 
     public function testIsAvailableUpdateTranslatesAndNoInstalledBuildDate()
     {
-        $this->provider->expects($this->never())->method('get');
+        $this->statisticProvider->expects($this->never())->method('get');
 
         $language = (new Language())->setCode('en');
 
@@ -87,7 +119,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsAvailableUpdateTranslatesAndUnknownCode()
     {
-        $this->provider->expects($this->once())->method('get')->willReturn([]);
+        $this->statisticProvider->expects($this->once())->method('get')->willReturn([]);
 
         $language = (new Language())->setCode('unknown')->setInstalledBuildDate(new \DateTime());
 
@@ -98,7 +130,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
     {
         $date = new \DateTime();
 
-        $this->provider->expects($this->once())
+        $this->statisticProvider->expects($this->once())
             ->method('get')
             ->willReturn([
                 [
@@ -116,7 +148,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
     {
         $date = new \DateTime();
 
-        $this->provider->expects($this->once())
+        $this->statisticProvider->expects($this->once())
             ->method('get')
             ->willReturn([
                 [
@@ -134,7 +166,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTranslationStatusAndUnknownCode()
     {
-        $this->provider->expects($this->once())
+        $this->statisticProvider->expects($this->once())
             ->method('get')
             ->willReturn([]);
 
@@ -144,7 +176,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetTranslationStatusAndEnCode()
     {
         // TODO: should be removed in https://magecore.atlassian.net/browse/BAP-10608
-        $this->provider->expects($this->once())
+        $this->statisticProvider->expects($this->once())
             ->method('get')
             ->willReturn([]);
 
@@ -155,7 +187,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTranslationStatus()
     {
-        $this->provider->expects($this->once())
+        $this->statisticProvider->expects($this->once())
             ->method('get')
             ->willReturn([
                 ['code' => 'en_US', 'translationStatus' => 50],
@@ -164,5 +196,37 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
         $language = (new Language())->setCode('en_US');
 
         $this->assertEquals(50, $this->helper->getTranslationStatus($language));
+    }
+
+    public function testGetLanguageStatistic()
+    {
+        $statistic = ['code' => 'en_US', 'translationStatus' => 50, 'lastBuildDate' => date('Y-m-dTH:i:sO')];
+        $this->statisticProvider->expects($this->once())
+            ->method('get')
+            ->willReturn([
+                $statistic,
+            ]);
+        $expectedStatistic = $statistic;
+        $expectedStatistic['lastBuildDate'] = new \DateTime($expectedStatistic['lastBuildDate']);
+        $this->assertEquals($expectedStatistic, $this->helper->getLanguageStatistic('en_US'));
+    }
+
+    public function testDownloadLanguageFile()
+    {
+        $statistic = ['code' => 'en_US', 'translationStatus' => 50, 'lastBuildDate' => date('Y-m-dTH:i:sO')];
+        $this->packagesProvider->expects($this->once())
+            ->method('getInstalledPackages')
+            ->willReturn(['Oro']);
+        $this->translationServiceProvider->expects($this->once())
+            ->method('setAdapter');
+        $this->translationServiceProvider->expects($this->once())
+            ->method('getTmpDir')
+            ->with('download_en_US')
+            ->willReturn('test_path');
+        $this->translationServiceProvider->expects($this->once())
+            ->method('download')
+            ->with('test_path', ['Oro'], 'en_US')
+            ->willReturn(true);
+        $this->assertEquals('test_path', $this->helper->downloadLanguageFile('en_US'));
     }
 }

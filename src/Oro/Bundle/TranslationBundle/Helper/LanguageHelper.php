@@ -27,7 +27,6 @@ class LanguageHelper
      * @param PackagesProvider $packagesProvider
      * @param OroTranslationAdapter $translationAdapter
      * @param TranslationServiceProvider $translationServiceProvider
-     * @internal param TranslationServiceProvider $translationServiceProvider
      */
     public function __construct(
         TranslationStatisticProvider $translationStatisticProvider,

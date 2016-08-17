@@ -145,7 +145,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $service->update([$dir]);
     }
 
-    public function testDownload()
+    public function testDownloadAndLoad()
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
@@ -180,6 +180,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->with(['en']);
 
         $service->download($path, ['Oro'], 'en');
+        $service->loadTranslatesFromFile($path, 'en');
     }
 
     /**
@@ -210,6 +211,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException($ex));
 
         $service->download($path, ['Oro'], 'en');
+        $service->loadTranslatesFromFile($path, 'en');
     }
 
     public function testCleanUp()
