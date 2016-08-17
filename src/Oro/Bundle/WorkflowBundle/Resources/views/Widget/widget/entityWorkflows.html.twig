@@ -18,36 +18,40 @@
             {% endif %}
                 <table class="workflow-entity">
                     <tr>
-                        <td class="workflow-label"><div class="workflow-label-text">{{ workflow.label }}</div></td>
+                        <td class="workflow-label"><div class="workflow-label-text" title="{{ workflow.label }}">{{ workflow.label }}</div></td>
                         <td class="workflow-content-container">
                             <table class="workflow-content">
                                 <tr>
                                     <td class="workflow-steps">
                                         {% set isOrdered = workflow.stepsData.is_ordered %}
                                         {% set steps = workflow.stepsData.steps %}
-                                        <ul class="workflow-steps-list {% if not workflow.isStarted %}workflow-not-started{% endif %}">
-                                            {% for step in steps %}
-                                                {% set active = step.active %}
-                                                {% set possibleStepsCount = step.possibleStepsCount %}
-                                                {% if isOrdered %}
-                                                    <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
-                                                        <div class="workflow-steps-item-arrow-container" title="{{ step.label }}">
-                                                            <span class="workflow-step-arrow-left"></span>
-                                                            <span class="workflow-step-arrow-right"></span>
-                                                            <span class="workflow-step-name">{{ step.label }}</span>
-                                                        </div>
-                                                    </li>
-                                                {% else %}
-                                                    <li class="workflow-steps-item workflow-unordered-steps">
-                                                        <span class="workflow-unordered-step-name">{{ step.label }}</span>
-                                                    </li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ul>
+                                        <div class="workflow-scroller">
+                                            <ul class="workflow-steps-list {% if not workflow.isStarted %}workflow-not-started{% endif %}">
+                                                {% for step in steps %}
+                                                    {% set active = step.active %}
+                                                    {% set possibleStepsCount = step.possibleStepsCount %}
+                                                    {% if isOrdered %}
+                                                        <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
+                                                            <div class="workflow-steps-item-arrow-container" title="{{ step.label }}">
+                                                                <span class="workflow-step-arrow-left"></span>
+                                                                <span class="workflow-step-arrow-right"></span>
+                                                                <span class="workflow-step-name">{{ step.label }}</span>
+                                                            </div>
+                                                        </li>
+                                                    {% else %}
+                                                        <li class="workflow-steps-item workflow-unordered-steps">
+                                                            <span class="workflow-unordered-step-name">{{ step.label }}</span>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
                                     </td>
                                     {% if workflow.transitionsData|length != 0 %}
                                         <td class="workflow-controls">
-                                            {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
+                                            <div class="workflow-buttons-scroller">
+                                                {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId} %}
+                                            </div>
                                         </td>
                                     {% endif %}
                                 </tr>
