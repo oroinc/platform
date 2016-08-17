@@ -38,8 +38,8 @@ Keywords
 Include field values, taken from the search index, as an additional
  "selected_data" section in the search result items.
  You can select one or more fields to be attached to search results.
- The name of the field should consist the type prefix, otherwise the engine
- will try to recognize the type automatically.
+ The name of the field should consist the type prefix, otherwise the default
+ ``text`` type will be used.
 ```
 select text.field_name
 select (text.first_field_name, text.second_field_name)
