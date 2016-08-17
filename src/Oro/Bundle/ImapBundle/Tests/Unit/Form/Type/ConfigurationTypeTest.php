@@ -225,7 +225,6 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedFoldersCount, $entity->getFolders()->count());
     }
 
-
     /**
      * @return array
      */
