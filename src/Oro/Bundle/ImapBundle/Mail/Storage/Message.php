@@ -14,6 +14,9 @@ use \Zend\Mail\Storage\Exception\RuntimeException;
 use Oro\Bundle\EmailBundle\Mail\Headers;
 use Oro\Bundle\EmailBundle\Mime\Decode;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Message extends \Zend\Mail\Storage\Message
 {
     /**
