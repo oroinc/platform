@@ -101,10 +101,16 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidOptionsDataProvider
+     * @param array $options
+     * @param array $attributes
+     * @param string $owner
+     * @param string $ownerName
+     * @param string $expectedException
+     * @param string $expectedExceptionMessage
      */
     public function testAssembleRequiredOptionException(
-        $options,
-        $attributes,
+        array $options,
+        array $attributes,
         $owner,
         $ownerName,
         $expectedException,
@@ -114,6 +120,9 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assembler->assemble($options, $attributes, $owner, $ownerName);
     }
 
+    /**
+     * @return array
+     */
     public function invalidOptionsDataProvider()
     {
         return array(

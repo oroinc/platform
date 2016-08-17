@@ -6,6 +6,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
@@ -74,14 +75,20 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     /**
      * @dataProvider submitDataProvider
+     * @param array $submitData
+     * @param WorkflowData $formData
+     * @param array $formOptions
+     * @param array $childrenOptions
+     * @param array $guessedData
+     * @param WorkflowData|null $sourceWorkflowData
      */
     public function testSubmit(
-        $submitData,
-        $formData,
+        array $submitData,
+        WorkflowData $formData,
         array $formOptions,
         array $childrenOptions,
-        array $guessedData = array(),
-        $sourceWorkflowData = null
+        array $guessedData = [],
+        WorkflowData $sourceWorkflowData = null
     ) {
         // Check default values listener is subscribed or not subscribed
         if (!empty($formOptions['attribute_default_values'])) {

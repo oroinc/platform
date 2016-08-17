@@ -27,10 +27,8 @@ class FormInitListener implements EventSubscriberInterface
      * @param WorkflowItem $workflowItem
      * @param ActionInterface $initAction
      */
-    public function initialize(
-        WorkflowItem $workflowItem,
-        ActionInterface $initAction
-    ) {
+    public function initialize(WorkflowItem $workflowItem, ActionInterface $initAction)
+    {
         $this->workflowItem = $workflowItem;
         $this->initAction = $initAction;
     }

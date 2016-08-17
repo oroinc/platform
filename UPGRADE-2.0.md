@@ -70,6 +70,9 @@ UPGRADE FROM 1.10 to 2.0
 * Added new method `hasActiveWorkflowsByEntityClass`, that indicates if an entity class has one or more linked workflows
 * Removed method `getActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `getActiveWorkflowsByEntityClass`
 * Removed method `hasActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `hasActiveWorkflowsByEntityClass`
+* Class `Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener` renamed to `Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener`.
+* Service 'oro_workflow.form.event_listener.init_actions' renamed to `oro_workflow.form.event_listener.form_init`.
+* Fourth constructor argument of class `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType` changed from `InitActionsListener $initActionsListener` to `FormInitListener $formInitListener`.
 * Added `preconditions` to process definition for use instead of `pre_conditions`
 * Added `preconditions` to transition definition for use instead of `pre_conditions`
 * Added `form_init` to transition definition for use instead of `init_actions`

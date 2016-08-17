@@ -268,7 +268,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                                 ], $config);
                             })
                         ->end()
-
                     ->end()
                     ->scalarNode('page_template')
                         ->defaultNull()
