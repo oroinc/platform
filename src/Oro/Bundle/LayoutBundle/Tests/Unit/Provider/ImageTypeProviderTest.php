@@ -37,19 +37,27 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         $theme2ListingDimensions = [self::DIMENSION_ORIGINAL, self::DIMENSION_CUSTOM];
 
         $this->themeManager->getAllThemes()->willReturn([
-            $this->prepareTheme('theme1', [
-                'main' => ['Main', 1, $theme1MainDimensions],
-                'listing' => ['Listing', 3, $theme1ListingDimensions],
-            ], [
-                self::DIMENSION_ORIGINAL => [null, null],
-                self::DIMENSION_LARGE => [400, 400],
-                self::DIMENSION_SMALL => [50, 50],
-            ]),
-            $this->prepareTheme('theme2', [
-                'listing' => ['Listing', 5, $theme2ListingDimensions],
-            ], [
-                self::DIMENSION_CUSTOM => [88, 88],
-            ]),
+            $this->prepareTheme(
+                'theme1',
+                [
+                    'main' => ['Main', 1, $theme1MainDimensions],
+                    'listing' => ['Listing', 3, $theme1ListingDimensions],
+                ],
+                [
+                    self::DIMENSION_ORIGINAL => [null, null],
+                    self::DIMENSION_LARGE => [400, 400],
+                    self::DIMENSION_SMALL => [50, 50],
+                ]
+            ),
+            $this->prepareTheme(
+                'theme2',
+                [
+                    'listing' => ['Listing', 5, $theme2ListingDimensions],
+                ],
+                [
+                    self::DIMENSION_CUSTOM => [88, 88],
+                ]
+            ),
             $this->prepareTheme('theme3', [], [])
         ]);
 
@@ -102,7 +110,7 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
 
         foreach ($dimensions as $name => $dimension) {
             list($width, $height) = $dimension;
-            $data['images']['dimensions'][$name] = ['width' => $width, 'height' => $height];
+            $config['images']['dimensions'][$name] = ['width' => $width, 'height' => $height];
         }
 
         $theme = new Theme($name);

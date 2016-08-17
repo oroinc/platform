@@ -4,6 +4,8 @@ namespace LayoutBundle\Tests\Unit\Provider;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Prophecy\Prophecy\ObjectProphecy;
 
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
@@ -18,29 +20,45 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
     const PRODUCT_SMALL = 'product_small';
     const LARGE_SIZE = 378;
     const SMALL_SIZE = 56;
+
     /**
      * @var ImageFilterProvider
      */
     protected $imageFilterProvider;
 
     /**
-     * @var ImageTypeProvider|ObjectProphecy
+     * @var ImageTypeProvider
      */
     protected $imageTypeProvider;
 
     /**
-     * @var FilterConfiguration|ObjectProphecy
+     * @var FilterConfiguration
      */
     protected $filterConfig;
 
+    /**
+     * @var FilterConfiguration
+     */
+    protected $configManager;
+
+    /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
     public function __construct()
     {
-        $this->imageTypeProvider = $this->prophesize('Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider');
-        $this->filterConfig = $this->prophesize('Liip\ImagineBundle\Imagine\Filter\FilterConfiguration');
+        $this->imageTypeProvider = $this->prophesize(ImageTypeProvider::class);
+        $this->filterConfig = $this->prophesize(FilterConfiguration::class);
+        $this->configManager = $this->prophesize(ConfigManager::class);
+        $this->filterConfig = $this->prophesize(FilterConfiguration::class);
+        $this->doctrineHelper = $this->prophesize(DoctrineHelper::class);
 
         $this->imageFilterProvider = new ImageFilterProvider(
             $this->imageTypeProvider->reveal(),
-            $this->filterConfig->reveal()
+            $this->filterConfig->reveal(),
+            $this->configManager->reveal(),
+            $this->doctrineHelper->reveal()
         );
     }
 
@@ -95,12 +113,10 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
                 $filterData,
                 [
                     'filters' => [
-                        'upscale' => [
-                            'min' => [$width, $height]
-                        ],
                         'thumbnail' => [
                             'size' => [$width, $height],
-                            'mode' => ImageFilterProvider::RESIZE_MODE
+                            'mode' => ImageFilterProvider::RESIZE_MODE,
+                            'allow_upscale' => true
                         ],
                         'background' => [
                             'size' => [$width, $height],
