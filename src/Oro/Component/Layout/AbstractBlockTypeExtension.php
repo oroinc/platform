@@ -3,27 +3,28 @@
 namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 
 abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
     }
 
@@ -37,7 +38,7 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data)
+    public function normalizeOptions(Options &$options, ContextInterface $context, DataAccessorInterface $data)
     {
 
     }

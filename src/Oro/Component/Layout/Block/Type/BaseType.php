@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Block\Type;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Block\Type\Options;
 
 class BaseType extends AbstractType
 {
@@ -29,7 +30,7 @@ class BaseType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         // merge the passed variables with the existing ones
         if (!empty($options['vars'])) {
@@ -87,7 +88,7 @@ class BaseType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
         if (isset($view->vars['attr']['id']) && !isset($view->vars['label_attr']['for'])) {
             $view->vars['label_attr']['for'] = $view->vars['attr']['id'];
@@ -114,11 +115,11 @@ class BaseType extends AbstractType
 
     /**
      * @param BlockView $view
-     * @param array     $options
+     * @param Options   $options
      *
      * @return string
      */
-    protected function getTranslationDomain(BlockView $view, array $options)
+    protected function getTranslationDomain(BlockView $view, Options $options)
     {
         $translationDomain = isset($options['translation_domain'])
             ? $options['translation_domain']

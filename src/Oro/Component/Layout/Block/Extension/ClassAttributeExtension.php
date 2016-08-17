@@ -8,6 +8,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\StringOptionValueBuilder;
+use Oro\Component\Layout\Block\Type\Options;
 
 /**
  * This extension normalizes 'class' attribute and allows to use [append/subtract/replace]Option methods
@@ -18,7 +19,7 @@ class ClassAttributeExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
         $this->normalizeClassAttribute($view, 'attr');
         $this->normalizeClassAttribute($view, 'label_attr');

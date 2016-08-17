@@ -4,6 +4,8 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\Form\FormView;
 
+use Oro\Component\Layout\Block\Type\Options;
+
 /**
  * @method BlockView getParent()
  * @property BlockView[] children
@@ -24,5 +26,6 @@ class BlockView extends FormView
     {
         parent::__construct($parent);
         unset($this->vars['value']);
+        $this->vars = new Options($this->vars);
     }
 }

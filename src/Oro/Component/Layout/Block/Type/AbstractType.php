@@ -7,27 +7,28 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 
 abstract class AbstractType implements BlockTypeInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
     }
 

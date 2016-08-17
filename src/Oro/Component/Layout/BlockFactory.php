@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\Options;
 
 class BlockFactory implements BlockFactoryInterface
 {
@@ -212,6 +213,7 @@ class BlockFactory implements BlockFactoryInterface
 
         // resolve options
         $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
+        $resolvedOptions = new Options($resolvedOptions);
 
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);

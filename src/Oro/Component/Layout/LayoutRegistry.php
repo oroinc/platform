@@ -4,6 +4,7 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 
 class LayoutRegistry implements LayoutRegistryInterface
 {
@@ -125,7 +126,7 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function normalizeOptions(
         $name,
-        array &$options,
+        Options &$options,
         ContextInterface $context,
         DataAccessorInterface $data
     ) {
@@ -140,7 +141,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function buildBlock($name, BlockBuilderInterface $builder, array $options)
+    public function buildBlock($name, BlockBuilderInterface $builder, Options $options)
     {
         $extensions = isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
@@ -154,7 +155,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function buildView($name, BlockView $view, BlockInterface $block, array $options)
+    public function buildView($name, BlockView $view, BlockInterface $block, Options $options)
     {
         $extensions = isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
@@ -168,7 +169,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function finishView($name, BlockView $view, BlockInterface $block, array $options)
+    public function finishView($name, BlockView $view, BlockInterface $block, Options $options)
     {
         $extensions = isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]

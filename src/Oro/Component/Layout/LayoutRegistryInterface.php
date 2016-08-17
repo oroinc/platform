@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 
 /**
  * The central registry of the Layout component.
@@ -66,9 +67,9 @@ interface LayoutRegistryInterface
      *
      * @param string                $name    The block type name
      * @param BlockBuilderInterface $builder The block builder
-     * @param array                 $options The options
+     * @param Options               $options The options
      */
-    public function buildBlock($name, BlockBuilderInterface $builder, array $options);
+    public function buildBlock($name, BlockBuilderInterface $builder, Options $options);
 
     /**
      * Builds the block view.
@@ -81,9 +82,9 @@ interface LayoutRegistryInterface
      * @param string         $name    The block type name
      * @param BlockView      $view    The block view object
      * @param BlockInterface $block   The block configuration
-     * @param array          $options The options
+     * @param Options        $options The options
      */
-    public function buildView($name, BlockView $view, BlockInterface $block, array $options);
+    public function buildView($name, BlockView $view, BlockInterface $block, Options $options);
 
     /**
      * Finishes the block view.
@@ -96,9 +97,9 @@ interface LayoutRegistryInterface
      * @param string         $name    The block type name
      * @param BlockView      $view    The block view object
      * @param BlockInterface $block   The block configuration
-     * @param array          $options The options
+     * @param Options        $options The options
      */
-    public function finishView($name, BlockView $view, BlockInterface $block, array $options);
+    public function finishView($name, BlockView $view, BlockInterface $block, Options $options);
 
     /**
      * Executes layout updates for the given layout item.
@@ -122,13 +123,13 @@ interface LayoutRegistryInterface
      * Update block options after they way resolved.
      *
      * @param  string $name
-     * @param array $options
+     * @param Options $options
      * @param ContextInterface $context
      * @param DataAccessorInterface $data
      */
     public function normalizeOptions(
         $name,
-        array &$options,
+        Options &$options,
         ContextInterface $context,
         DataAccessorInterface $data
     );
