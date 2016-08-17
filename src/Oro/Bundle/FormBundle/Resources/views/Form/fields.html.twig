@@ -554,10 +554,12 @@
     {% if _block is not empty %}
         {{ _block|raw }}
     {% else %}
+        {% if form.vars.configs.async_dialogs|default(false) is sameas(true) %}
+            {% set asyncNameSegment = 'async-' %}
+        {% endif %}
         <script type="text/javascript">
-            require(['jquery', 'oroform/js/select-create-inline-type-handler'],
-            function ($, handler) {
-                $(function() {
+            require(['jquery', 'oroform/js/app/components/select-create-inline-type-{{ asyncNameSegment|default('') }}component', 'ready!dom'],
+                function ($, SelectCreateInlineTypeComponent) {
                     {% set urlParts = {
                         grid: {
                             route: form.vars.grid_widget_route|default('oro_datagrid_widget'),
@@ -579,16 +581,16 @@
                         }) %}
                     {% endif %}
 
-                    handler(
-                        $('#{{ id }}-el'),
-                        $('#{{ id }}'),
-                        {{ label|trans|json_encode|raw }},
-                        {{ urlParts|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
-                        {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
-                        {{ form.vars.create_enabled|default(false)|json_encode|raw }}
-                    );
-                });
-            });
+                    var selectCreateInlineTypeComponent = new SelectCreateInlineTypeComponent({
+                        _sourceElement: $('#{{ id }}-el'),
+                        inputSelector: '#{{ id }}',
+                        entityLabel: {{ label|trans|json_encode|raw }},
+                        urlParts: {{ urlParts|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
+                        existingEntityGridId: {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
+                        createEnabled: {{ form.vars.create_enabled|default(false)|json_encode|raw }}
+                    });
+                }
+            );
         </script>
     {% endif %}
 {% endblock %}

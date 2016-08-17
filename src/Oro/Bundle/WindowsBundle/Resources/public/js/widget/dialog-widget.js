@@ -129,7 +129,6 @@ define(function(require) {
             if (_.isFunction(onClose)) {
                 onClose();
             }
-            this.dispose();
         },
 
         /**
@@ -246,6 +245,7 @@ define(function(require) {
                 // Close handler will invoke dispose method,
                 // where remove method will be called again
                 this.widget.dialog('close');
+                _.defer(_.bind(this.dispose, this));
             } else {
                 DialogWidget.__super__.remove.call(this);
             }
@@ -302,6 +302,9 @@ define(function(require) {
                 this.widget.html(this.$el).dialog(dialogOptions);
                 this.getLayoutElement().attr('data-layout', 'separate');
             } else {
+                if (this.widget.dialog('instance') !== void 0 && !this.widget.dialog('isOpen')) {
+                    this.widget.dialog('open');
+                }
                 this.widget.html(this.$el);
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
@@ -316,6 +319,10 @@ define(function(require) {
                 this._fixDialogMinHeight(false);
                 this.widget.trigger('resize');
             }, this));
+        },
+
+        hide: function() {
+            this.widget.dialog('close');
         },
 
         _renderHandler: function() {
