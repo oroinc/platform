@@ -49,7 +49,7 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
             && $entity->getUsername() !== $entity->getEmail()
         ) {
             /** @var User $user */
-            $user = $this->findExistingUser($entity);
+            $user = $this->isSameUserExists($entity);
             if ($user) {
                 /** @var ExecutionContextInterface $context */
                 $context = $this->context;
@@ -63,28 +63,15 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
     /**
      * @param User $entity
      *
-     * @return User|null
+     * @return array|null
      */
-    protected function findExistingUser($entity)
+    protected function isSameUserExists(User $entity)
     {
         $class = ClassUtils::getClass($entity);
         /** @var UserRepository $repository */
         $repository = $this->registry->getManagerForClass($class)->getRepository($class);
 
-        $qb = $repository->createQueryBuilder('u');
-        $qb
-            ->andWhere('u.email = :email')
-            ->setParameter('email', $entity->getUsername());
-
-        if ($entity->getId()) {
-            $qb
-                ->andWhere('u.id <> :id')
-                ->setParameter('id', $entity->getId());
-        }
-
-        $result = $qb
-            ->getQuery()
-            ->getResult();
+        $result = $repository->findUserWithEmailAsUsername($entity->getUsername(), $entity->getId());
 
         if (count($result) > 0) {
             return $result;
