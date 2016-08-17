@@ -2,35 +2,21 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Validator\UserAuthenticationFieldsValidator;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
 
 class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var \PHPUnit_Framework_MockObject_MockObject|UserManager
      */
-    protected $registry;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager
-     */
-    protected $om;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
-     */
-    protected $metadata;
+    protected $userManager;
 
     /**
      * @var UserAuthenticationFieldsConstraint
@@ -48,30 +34,13 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
     protected $violation;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|UserRepository
-     */
-    protected $repository;
-
-    /**
      * @var UserAuthenticationFieldsValidator
      */
     protected $validator;
 
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->getMock();
-
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->om));
-
-        $this->repository = $this
-            ->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
+        $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -83,7 +52,7 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContextInterface')
             ->getMock();
 
-        $this->validator = new UserAuthenticationFieldsValidator($this->registry);
+        $this->validator = new UserAuthenticationFieldsValidator($this->userManager);
         $this->validator->initialize($this->context);
     }
 
@@ -142,16 +111,12 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
         $user->setUsername('username@example.com');
         $user->setEmail('test@example.com');
 
-        $existingUser = [];
+        $existingUser = null;
 
-        $this->repository->expects($this->once())
-            ->method('findUsersWithEmailAsUsername')
-            ->with('username@example.com', 1)
+        $this->userManager->expects($this->once())
+            ->method('findUserByEmail')
+            ->with('username@example.com')
             ->will($this->returnValue($existingUser));
-
-        $this->om->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->repository);
 
         $this->context->expects($this->never())
             ->method('buildViolation');
@@ -168,16 +133,14 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
         $user->setUsername('username@example.com');
         $user->setEmail('test@example.com');
 
-        $existingUser = ['id' => 2, 'username' => 'username', 'email' => 'username@example.com'];
+        $existingUser = $this->getUser(2);
+        $existingUser->setUsername('username');
+        $existingUser->setEmail('username@example.com');
 
-        $this->repository->expects($this->once())
-            ->method('findUsersWithEmailAsUsername')
-            ->with('username@example.com', 1)
+        $this->userManager->expects($this->once())
+            ->method('findUserByEmail')
+            ->with('username@example.com')
             ->will($this->returnValue($existingUser));
-
-        $this->om->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->repository);
 
         $this->context->expects($this->once())
             ->method('buildViolation')
