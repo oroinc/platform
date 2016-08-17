@@ -432,14 +432,20 @@ Transition definition configuration has next options.
 
 * **preactions**
     Configuration of Pre Actions that must be performed before Pre Conditions check.
-* **pre_conditions**
+* **preconditions**
     Configuration of Pre Conditions that must satisfy to allow displaying transition.
 * **conditions**
     Configuration of Conditions that must satisfy to allow transition.
-* **post_actions**
+* **actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
+* **form_init**
+    Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
+* **pre_conditions**
+    Deprecated, use `preconditions` instead.
 * **init_actions**
-    Configuration of Init Actions that may be performed on workflow item before conditions and post actions.
+    Deprecated, use `form_init` instead.
+* **post_actions**
+    Deprecated, use `actions` instead.
 
 Example
 -------
@@ -457,9 +463,9 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, true]
-                init_actions:
+                form_init:
                     - @increment_value: [$call_attempt]
             not_answered_definition: # Callee did not answer
                 # Set timeout value
@@ -471,7 +477,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, false]
             end_conversation_definition:
                 conditions:
@@ -482,7 +488,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -589,7 +595,7 @@ workflows:
         transition_definitions:
             # some transition definition
             qualify_call:
-                pre_conditions:
+                preconditions:
                     @equal: [$status, "in_progress"]
                 conditions:
                     # empty($call_timeout) || (($call_timeout >= 60 && $call_timeout < 100) || ($call_timeout > 0 && $call_timeout <= 30))
@@ -638,9 +644,9 @@ workflows:
             # some transition definition
                 preactions:
                     - @some_action: ~
-                init_actions:
+                form_init:
                     - @assign_value: [$call_attempt, 1]
-                post_actions:
+                actions:
                     - @create_entity: # create an entity PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -733,7 +739,7 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, true]
             not_answered_definition: # Callee did not answer
@@ -743,7 +749,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, false]
             end_conversation_definition:
@@ -755,7 +761,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         parameters:
                             class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation

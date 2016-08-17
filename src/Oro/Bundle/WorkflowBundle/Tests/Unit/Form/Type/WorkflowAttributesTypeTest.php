@@ -3,8 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
@@ -16,7 +18,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $initActionListener;
+    protected $formInitListener;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -43,6 +45,11 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
      */
     protected $dispatcher;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $authorizationChecker;
+
     protected function setUp()
     {
         parent::setUp();
@@ -50,30 +57,38 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->workflowRegistry = $this->createWorkflowRegistryMock();
         $this->attributeGuesser = $this->createAttributeGuesserMock();
         $this->defaultValuesListener = $this->createDefaultValuesListenerMock();
-        $this->initActionListener = $this->createInitActionsListenerMock();
+        $this->formInitListener = $this->createFormInitListenerMock();
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
         $this->dispatcher = $this->createDispatcherMock();
+        $this->authorizationChecker = $this->createAuthorizationCheckerMock();
 
         $this->type = $this->createWorkflowAttributesType(
             $this->workflowRegistry,
             $this->attributeGuesser,
             $this->defaultValuesListener,
-            $this->initActionListener,
+            $this->formInitListener,
             $this->requiredAttributesListener,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->authorizationChecker
         );
     }
 
     /**
      * @dataProvider submitDataProvider
+     * @param array $submitData
+     * @param WorkflowData $formData
+     * @param array $formOptions
+     * @param array $childrenOptions
+     * @param array $guessedData
+     * @param WorkflowData|null $sourceWorkflowData
      */
     public function testSubmit(
-        $submitData,
-        $formData,
+        array $submitData,
+        WorkflowData $formData,
         array $formOptions,
         array $childrenOptions,
-        array $guessedData = array(),
-        $sourceWorkflowData = null
+        array $guessedData = [],
+        WorkflowData $sourceWorkflowData = null
     ) {
         // Check default values listener is subscribed or not subscribed
         if (!empty($formOptions['attribute_default_values'])) {
@@ -88,15 +103,15 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         }
 
         // Check init action listener is subscribed or not subscribed
-        if (!empty($formOptions['init_actions'])) {
-            $this->initActionListener->expects($this->once())
+        if (!empty($formOptions['form_init'])) {
+            $this->formInitListener->expects($this->once())
                 ->method('initialize')
                 ->with(
                     $formOptions['workflow_item'],
-                    $formOptions['init_actions']
+                    $formOptions['form_init']
                 );
         } else {
-            $this->initActionListener->expects($this->never())->method($this->anything());
+            $this->formInitListener->expects($this->never())->method($this->anything());
         }
 
         // Check required attributes listener is subscribed or not subscribed
@@ -189,7 +204,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                         ),
                     ),
                     'attribute_default_values' => array('first' => 'Test'),
-                    'init_actions' => $this->getMock('Oro\Component\Action\Action\ActionInterface')
+                    'form_init' => $this->getMock('Oro\Component\Action\Action\ActionInterface')
                 ),
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),
@@ -363,6 +378,42 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 )
             ),
         );
+    }
+
+    public function testNotEditableAttributes()
+    {
+        $entity = new \stdClass();
+        $formData = $this->createWorkflowData(array('entity' => $entity));
+        $workflow = $this->createWorkflow(
+            'test_workflow_with_attributes',
+            array(
+                'first' => $this->createAttribute('first', 'string', 'First'),
+                'second' => $this->createAttribute('second', 'string', 'Second'),
+            )
+        );
+        $workflow->getDefinition()->setEntityAttributeName('entity');
+        $formOptions = array(
+            'workflow' => $workflow,
+            'workflow_item' => $this->createWorkflowItem($workflow),
+            'attribute_fields' => array(
+                'first'  => array('form_type' => 'text'),
+                'second' => array('form_type' => 'text')
+            )
+        );
+
+        $this->authorizationChecker->expects($this->at(0))
+            ->method('isGranted')
+            ->with('EDIT', new FieldVote($entity, 'first'))
+            ->willReturn(true);
+        $this->authorizationChecker->expects($this->at(1))
+            ->method('isGranted')
+            ->with('EDIT', new FieldVote($entity, 'second'))
+            ->willReturn(false);
+
+        $form = $this->factory->create($this->type, $formData, $formOptions);
+
+        $this->assertTrue($form->has('first'));
+        $this->assertFalse($form->has('second'));
     }
 
     public function testNormalizers()

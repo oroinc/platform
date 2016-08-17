@@ -218,43 +218,93 @@ class LoadMetadata implements ProcessorInterface
                 continue;
             }
             if (!$field->isMetaProperty()) {
-                $isField = $entityMetadata->hasField($fieldName);
-                $isAssociation = !$isField && $entityMetadata->hasAssociation($fieldName);
-                if (!$isField && !$isAssociation) {
+                $dataType = $field->getDataType();
+                if ($dataType
+                    && !$entityMetadata->hasField($fieldName)
+                    && !$entityMetadata->hasAssociation($fieldName)
+                ) {
                     $targetClass = $field->getTargetClass();
-                    $dataType = $this->assertDataType($field->getDataType(), $entityClass, $fieldName);
                     if ($targetClass) {
-                        $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
-                        $associationMetadata->setTargetClassName($targetClass);
-                        $associationMetadata->setIsNullable(true);
-                        if (0 !== strpos($dataType, 'association:')) {
-                            $associationMetadata->setDataType($dataType);
-                            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
-                            $associationMetadata->addAcceptableTargetClassName($targetClass);
-                        } else {
-                            list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
-                            $targets = $this->getExtendedAssociationTargets(
-                                $entityClass,
-                                $associationType,
-                                $associationKind
-                            );
-                            $this->setAssociationDataType($associationMetadata, $field);
-                            $associationMetadata->setAssociationType($associationType);
-                            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
-                            $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
-                        }
+                        $this->addAssociationMetadata($entityMetadata, $entityClass, $fieldName, $field);
                     } else {
-                        $fieldMetadata = $entityMetadata->addField(new FieldMetadata($fieldName));
-                        $fieldMetadata->setDataType($dataType);
-                        $fieldMetadata->setIsNullable(true);
+                        $this->addFieldMetadata($entityMetadata, $entityClass, $fieldName, $field);
                     }
                 }
             } elseif (!$entityMetadata->hasMetaProperty($fieldName)) {
-                $metaPropertyMetadata = $entityMetadata->addMetaProperty(new MetaPropertyMetadata($fieldName));
-                $metaPropertyMetadata->setDataType(
-                    $this->assertDataType($field->getDataType(), $entityClass, $fieldName)
-                );
+                $this->addMetaPropertyMetadata($entityMetadata, $entityClass, $fieldName, $field);
             }
+        }
+    }
+
+    /**
+     * @param EntityMetadata              $entityMetadata
+     * @param string                      $entityClass
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function addMetaPropertyMetadata(
+        EntityMetadata $entityMetadata,
+        $entityClass,
+        $fieldName,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $metaPropertyMetadata = $entityMetadata->addMetaProperty(new MetaPropertyMetadata($fieldName));
+        $metaPropertyMetadata->setDataType(
+            $this->assertDataType($field->getDataType(), $entityClass, $fieldName)
+        );
+    }
+
+    /**
+     * @param EntityMetadata              $entityMetadata
+     * @param string                      $entityClass
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function addFieldMetadata(
+        EntityMetadata $entityMetadata,
+        $entityClass,
+        $fieldName,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $fieldMetadata = $entityMetadata->addField(new FieldMetadata($fieldName));
+        $fieldMetadata->setDataType(
+            $this->assertDataType($field->getDataType(), $entityClass, $fieldName)
+        );
+        $fieldMetadata->setIsNullable(true);
+    }
+
+    /**
+     * @param EntityMetadata              $entityMetadata
+     * @param string                      $entityClass
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function addAssociationMetadata(
+        EntityMetadata $entityMetadata,
+        $entityClass,
+        $fieldName,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $targetClass = $field->getTargetClass();
+        $dataType = $this->assertDataType($field->getDataType(), $entityClass, $fieldName);
+        $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
+        $associationMetadata->setTargetClassName($targetClass);
+        $associationMetadata->setIsNullable(true);
+        if (0 !== strpos($dataType, 'association:')) {
+            $associationMetadata->setDataType($dataType);
+            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
+            $associationMetadata->addAcceptableTargetClassName($targetClass);
+        } else {
+            list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
+            $targets = $this->getExtendedAssociationTargets(
+                $entityClass,
+                $associationType,
+                $associationKind
+            );
+            $this->setAssociationDataType($associationMetadata, $field);
+            $associationMetadata->setAssociationType($associationType);
+            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
+            $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
         }
     }
 

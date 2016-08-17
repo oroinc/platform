@@ -68,8 +68,8 @@ workflows:
         transition_definitions:
             first_transition_definition:
                 preactions:
-                    - '@custom_pre_action': ~
-                pre_conditions:
+                    - '@custom_action': ~
+                preconditions:
                     '@true': ~
                 conditions:
                     '@and':
@@ -81,8 +81,12 @@ workflows:
                                     parameters: [1, 1]
                                     message: "Not equals"
                         message: "Fail upper level"
+                actions:
+                    - '@custom_action2': ~
+                pre_conditions:
+                    '@condition1': ~
                 post_actions:
-                    - '@custom_post_action': ~
+                    - '@custom_action': ~
     second_workflow:
         label: 'Second Workflow'
         entity: Second\Entity
