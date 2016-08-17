@@ -8,7 +8,6 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageType;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 
 class LanguageTypeTest extends FormIntegrationTestCase
 {
