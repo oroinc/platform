@@ -29,7 +29,7 @@ class ImportExportController extends Controller
      *
      * @Route("/import", name="oro_importexport_import_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:importForm.html.twig")
      *
      * @param Request $request
      *
@@ -85,7 +85,7 @@ class ImportExportController extends Controller
      *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:importValidate.html.twig")
      *
      * @param Request $request
      * @param string $processorAlias
@@ -164,7 +164,7 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/config", name="oro_importexport_export_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:configurableExport.html.twig")
      *
      * @param Request $request
      *
@@ -204,7 +204,7 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/template/config", name="oro_importexport_export_template_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:configurableTemplateExport.html.twig")
      *
      * @param Request $request
      * @return array|Response
