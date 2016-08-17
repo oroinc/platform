@@ -11,6 +11,8 @@ use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -178,6 +180,79 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 false
             )
         );
+    }
+
+    /**
+     * @param string     $foldersForm
+     * @param array      $folders
+     * @param array|bool $expectedFoldersCount
+     *
+     * @dataProvider setFolderDataProvider
+     */
+    public function testBindValidFolderData($foldersForm, $folders, $expectedFoldersCount)
+    {
+        $formData = [
+            'imapHost'       => 'someHost',
+            'imapPort'       => '123',
+            'smtpHost'       => '',
+            'smtpPort'       => '',
+            'imapEncryption' => 'ssl',
+            'smtpEncryption' => 'ssl',
+            'user'           => 'someUser',
+            'password'       => '',
+            'folders'        => $foldersForm
+        ];
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $form = $this->factory->create($type);
+
+        $entity = new TestUserEmailOrigin(1);
+        $rootFolder = new EmailFolder();
+        $rootFolder->setFullName('Root');
+        $entity->addFolder($rootFolder);
+        if (is_array($folders)) {
+            foreach ($folders as $folderName) {
+                $folder = new EmailFolder();
+                $folder->setFullName($folderName);
+                $folder->setParentFolder($rootFolder);
+                $rootFolder->addSubFolder($folder);
+                $entity->addFolder($folder);
+            }
+        }
+
+        $form->setData($entity);
+        $form->submit($formData);
+        $entity = $form->getData();
+        $this->assertEquals($expectedFoldersCount, $entity->getFolders()->count());
+    }
+
+    /**
+     * @return array
+     */
+    public function setFolderDataProvider()
+    {
+        return [
+            'one folder' => [
+                '[{"fullName":"Test1","name":"Test1","type":"other","subFolders":[]}]',
+                ['Test1'],
+                2
+            ],
+            'two folders' => [
+                '[{"fullName":"Test3","name":"Test3","type":"other","subFolders":[]},'
+                    . '{"fullName":"Test2","name":"Test2","type":"other","subFolders":[]}]',
+                ['Test3', 'Test2'],
+                3
+            ],
+            'no folders' => [
+                [],
+                [],
+                1
+            ],
+            'no folders data' => [
+                null,
+                null,
+                1
+            ],
+        ];
     }
 
     /**

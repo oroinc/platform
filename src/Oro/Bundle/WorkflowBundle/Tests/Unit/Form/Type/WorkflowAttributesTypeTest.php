@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 
@@ -43,6 +44,11 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
      */
     protected $dispatcher;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $authorizationChecker;
+
     protected function setUp()
     {
         parent::setUp();
@@ -53,6 +59,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->initActionListener = $this->createInitActionsListenerMock();
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
         $this->dispatcher = $this->createDispatcherMock();
+        $this->authorizationChecker = $this->createAuthorizationCheckerMock();
 
         $this->type = $this->createWorkflowAttributesType(
             $this->workflowRegistry,
@@ -60,7 +67,8 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->defaultValuesListener,
             $this->initActionListener,
             $this->requiredAttributesListener,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->authorizationChecker
         );
     }
 
@@ -363,6 +371,42 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 )
             ),
         );
+    }
+
+    public function testNotEditableAttributes()
+    {
+        $entity = new \stdClass();
+        $formData = $this->createWorkflowData(array('entity' => $entity));
+        $workflow = $this->createWorkflow(
+            'test_workflow_with_attributes',
+            array(
+                'first' => $this->createAttribute('first', 'string', 'First'),
+                'second' => $this->createAttribute('second', 'string', 'Second'),
+            )
+        );
+        $workflow->getDefinition()->setEntityAttributeName('entity');
+        $formOptions = array(
+            'workflow' => $workflow,
+            'workflow_item' => $this->createWorkflowItem($workflow),
+            'attribute_fields' => array(
+                'first'  => array('form_type' => 'text'),
+                'second' => array('form_type' => 'text')
+            )
+        );
+
+        $this->authorizationChecker->expects($this->at(0))
+            ->method('isGranted')
+            ->with('EDIT', new FieldVote($entity, 'first'))
+            ->willReturn(true);
+        $this->authorizationChecker->expects($this->at(1))
+            ->method('isGranted')
+            ->with('EDIT', new FieldVote($entity, 'second'))
+            ->willReturn(false);
+
+        $form = $this->factory->create($this->type, $formData, $formOptions);
+
+        $this->assertTrue($form->has('first'));
+        $this->assertFalse($form->has('second'));
     }
 
     public function testNormalizers()

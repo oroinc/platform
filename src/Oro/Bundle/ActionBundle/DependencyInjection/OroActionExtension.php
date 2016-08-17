@@ -16,6 +16,7 @@ class OroActionExtension extends Extension
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('assemblers.yml');
+        $loader->load('block_types.yml');
         $loader->load('cache.yml');
         $loader->load('conditions.yml');
         $loader->load('configuration.yml');

@@ -49,15 +49,16 @@ class BaseTypeTest extends BaseBlockTypeTestCase
         $this->assertBlockView(
             [
                 'vars' => [
-                    'id'                  => 'test:block--1',
-                    'block_type'          => 'block',
-                    'unique_block_prefix' => '_test_block_1',
-                    'block_prefixes'      => [
+                    'id'                   => 'test:block--1',
+                    'block_type'           => 'block',
+                    'block_type_widget_id' => 'block_widget',
+                    'unique_block_prefix'  => '_test_block_1',
+                    'block_prefixes'       => [
                         'block',
                         '_test_block_1'
                     ],
-                    'cache_key'           => '_test:block--1_block',
-                    'translation_domain'  => 'messages'
+                    'cache_key'            => '_test:block--1_block',
+                    'translation_domain'   => 'messages'
                 ]
             ],
             $view,
@@ -85,20 +86,21 @@ class BaseTypeTest extends BaseBlockTypeTestCase
         $this->assertBlockView(
             [
                 'vars' => [
-                    'id'                  => 'block_id',
-                    'block_type'          => 'block',
-                    'unique_block_prefix' => '_block_id',
-                    'block_prefixes'      => [
+                    'id'                   => 'block_id',
+                    'block_type'           => 'block',
+                    'block_type_widget_id' => 'block_widget',
+                    'unique_block_prefix'  => '_block_id',
+                    'block_prefixes'       => [
                         'block',
                         'additional_prefix',
                         '_block_id'
                     ],
-                    'cache_key'           => '_block_id_block',
-                    'translation_domain'  => 'test_translation_domain',
-                    'attr'                => ['test_attr' => 'test_attr_val'],
-                    'label'               => 'Test Label',
-                    'label_attr'          => ['test_label_attr' => 'test_label_attr_val'],
-                    'test_var'            => 'test_var_val'
+                    'cache_key'            => '_block_id_block',
+                    'translation_domain'   => 'test_translation_domain',
+                    'attr'                 => ['test_attr' => 'test_attr_val'],
+                    'label'                => 'Test Label',
+                    'label_attr'           => ['test_label_attr' => 'test_label_attr_val'],
+                    'test_var'             => 'test_var_val'
                 ]
             ],
             $view,
