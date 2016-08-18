@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
 
@@ -61,7 +63,7 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->gridConfigurationHelper->expects($this->once())->method('getEntity')->will($this->returnValue('entity'));
         $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByEntityClass')->with('entity')
-            ->will($this->returnValue([]));
+            ->will($this->returnValue(new ArrayCollection()));
 
         $this->assertTrue($this->manager->boardViewEnabled($config));
     }

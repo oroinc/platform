@@ -8,6 +8,7 @@ Table of Contents
  - [How it works?](#how-it-works)
  - [Workflow Fields](#workflow-fields)
  - [Activation State](#activation-state)
+ - [Mutually Exclusive Workflows](#mutually-exclusive-workflows)
  - [Configuration](#configuration)
  - [Console commands](#console-commands)
 
@@ -154,7 +155,7 @@ This level provides a possibility to have several active workflows at one time w
 So, when **no** workflows were performed for an entity in same exclusive record group, there would be the possibility to launch starting transitions from any of them. But, when one of that workflows was started - you may not perform any actions from another workflow (and start it as well). That is a ramification of a business process that can be reached by the `exclusive_record_group` node in workflows configuration.
 
 ###Priority Case
-Let's say, you have two exclusive workflows at the level of a single record and both of them has automated start transitions (e.g. automatically performs start transition when a new instance its related entity is created).
+Let's say, you have two exclusive workflows at the level of a single record and both of them has automated start transitions (e.g. automatically performs start transition when a new instance of their common related entity is created).
 In that case, you may configure `priority` flag in workflow configurations so when a new record of the related entity created workflows would be processed by that priority flag and the second one from same exclusive record group will not perform its start transition if there already present another workflow record from the same exclusive group.
 For example `checkout` and `alternative_checkout` workflows. In a case when we need to process `alternative_checkout` workflow before `checkout`, we can determine its priority level higher than another.
 Then, when new `Checkout` entity will be persisted, a system would perform `alternative_checkout` workflow start transition first.

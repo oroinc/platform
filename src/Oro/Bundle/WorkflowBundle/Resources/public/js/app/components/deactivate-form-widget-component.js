@@ -67,16 +67,16 @@ define(function(require) {
         onClick: function(e) {
             var self = this;
 
-            $.ajax({
-                url: routing.generate('oro_api_workflow_activate', {workflowDefinition: this.options.workflow}),
-                type: 'GET',
+            var $form = this.options._sourceElement.find(this.options.selectors.form);
+            $form.trigger('submit', {
                 success: function() {
-                    var $form = self.options._sourceElement.find(self.options.selectors.form);
-
-                    $form.trigger('submit');
-                },
-                error: function(xhr, textStatus, error) {
-                    Error.handle({}, xhr, {enforce: true});
+                    $.ajax({
+                        url: routing.generate('oro_api_workflow_activate', {workflowDefinition: self.options.workflow}),
+                        type: 'GET',
+                        error: function(xhr, textStatus, error) {
+                            Error.handle({}, xhr, {enforce: true});
+                        }
+                    });
                 }
             });
         }

@@ -122,7 +122,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByEntityClass')
             ->with($options['workflow_entity_class'])
-            ->willReturn([$workflow]);
+            ->willReturn(new ArrayCollection([$workflow]));
 
         $this->assertQueryBuilderCalled();
 
@@ -169,7 +169,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByEntityClass')
             ->with('\stdClass')
-            ->willReturn([new \stdClass(), new \stdClass()]);
+            ->willReturn(new ArrayCollection([new \stdClass(), new \stdClass()]));
 
         $this->type->finishView(
             $view,

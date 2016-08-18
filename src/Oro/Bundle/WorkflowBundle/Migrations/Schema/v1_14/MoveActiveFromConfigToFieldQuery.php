@@ -2,94 +2,99 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
+use Doctrine\DBAL\Types\Type;
+
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getDescription()
     {
-        return 'Moves from entities config "active_workflow" to corresponded workflow "active" field.';
+        $logger = new ArrayLogger();
+        $this->migrateConfigs($logger, true);
+
+        return array_merge(
+            ['Moves from entities config "active_workflow" to corresponded workflow "active" field.'],
+            $logger->getMessages()
+        );
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @throws \Exception
+     * {@inheritdoc}
      */
     public function execute(LoggerInterface $logger)
     {
-        $this->connection->beginTransaction();
-        try {
-            //inactivate all
-            $inactivateAllQuery = 'UPDATE oro_workflow_definition SET active=:is_active WHERE name IS NOT NULL';
-            $params = ['is_active' => false];
-            $types = ['is_active' => 'boolean'];
-            $this->logQuery($logger, $inactivateAllQuery, $params, $types);
-            $this->connection->executeUpdate($inactivateAllQuery, $params, $types);
+        $this->migrateConfigs($logger);
+    }
 
-            $activateQuery = 'UPDATE oro_workflow_definition SET active=:is_active WHERE name = :workflow_name';
-            $activationStatement = $this->connection->prepare($activateQuery);
-            $activationStatement->bindValue(':is_active', true, 'boolean');
-            $updateParamsTypes = ['workflow_name' => 'string', 'is_active' => 'boolean'];
+    /**
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     */
+    protected function migrateConfigs(LoggerInterface $logger, $dryRun = false)
+    {
+        $queries = [];
 
-            foreach ($this->unshiftActiveWorkflows($logger) as $workflow) {
-                $this->logQuery(
-                    $logger,
-                    $activateQuery,
-                    ['workflow_name' => $workflow, 'is_active' => true],
-                    $updateParamsTypes
-                );
-                $activationStatement->bindValue(':workflow_name', $workflow, 'string');
-                $activationStatement->execute();
+        // prepare update queries
+        $rows = $this->getRows($logger);
+        foreach ($rows as $row) {
+            $data = $this->connection->convertToPHPValue($row['data'], 'array');
+
+            if ($this->isWorkflowAwareData($data)) {
+                $workflowName = $data['workflow']['active_workflow'];
+                if (!empty($workflowName)) {
+                    $queries[] = [
+                        'UPDATE oro_workflow_definition SET active = :is_active WHERE name = :workflow_name',
+                        ['is_active' => true, 'workflow_name' => $workflowName],
+                        ['is_active' => Type::BOOLEAN, 'workflow_name' => Type::STRING]
+                    ];
+                }
+
+                unset($data['workflow']['active_workflow']);
+                $queries[] = [
+                    'UPDATE oro_entity_config SET data = :data WHERE id = :id',
+                    ['data' => $data, 'id' => $row['id']],
+                    ['data' => Type::TARRAY, 'id' => Type::INTEGER]
+                ];
             }
+        }
 
-            $this->connection->commit();
-        } catch (\Exception $e) {
-            $this->connection->rollBack();
-            throw $e;
+        // execute update queries
+        foreach ($queries as $val) {
+            $this->logQuery($logger, $val[0], $val[1], $val[2]);
+            if (!$dryRun) {
+                $this->connection->executeUpdate($val[0], $val[1], $val[2]);
+            }
         }
     }
 
     /**
      * @param LoggerInterface $logger
-     * @return \Generator
+     * @return array
      */
-    private function unshiftActiveWorkflows(LoggerInterface $logger)
+    private function getRows(LoggerInterface $logger)
     {
-        $fetchQuery = 'SELECT id, data FROM oro_entity_config config';
+        $query  = 'SELECT id, data FROM oro_entity_config';
 
-        $params = $types = $processedWorkflows = [];
+        $this->logQuery($logger, $query);
 
-        $this->logQuery($logger, $fetchQuery, $params, $types);
+        return $this->connection->fetchAll($query);
+    }
 
-        $fetchStatement = $this->connection->executeQuery($fetchQuery, $params, $types);
-
-        $updateQuery = 'UPDATE oro_entity_config SET data=:data WHERE id=:id';
-        $updateStatement = $this->connection->prepare($updateQuery);
-
-        while (($row = $fetchStatement->fetch()) !== null) {
-            $data = $this->connection->convertToPHPValue($row['data'], 'array');
-            if (array_key_exists('workflow', $data) && array_key_exists('active_workflow', $data['workflow'])) {
-                if (!in_array($data['workflow']['active_workflow'], $processedWorkflows, true)) {
-                    $processedWorkflows[] = $data['workflow']['active_workflow'];
-                    yield $data['workflow']['active_workflow'];
-                }
-
-                unset($data['workflow']['active_workflow']);
-                $updateStatement->bindValue(':data', $data, 'array');
-                $updateStatement->bindValue(':id', $row['id'], 'integer');
-                $this->logQuery(
-                    $logger,
-                    $updateQuery,
-                    ['data' => $data, 'id' => $row['id']],
-                    ['data' => 'array', 'id' => 'integer']
-                );
-                $updateStatement->execute();
-            }
-        }
+    /**
+     * @param mixed $data
+     * @return bool
+     */
+    private function isWorkflowAwareData($data)
+    {
+        return is_array($data) &&
+            array_key_exists('workflow', $data) &&
+            array_key_exists('active_workflow', $data['workflow']);
     }
 }

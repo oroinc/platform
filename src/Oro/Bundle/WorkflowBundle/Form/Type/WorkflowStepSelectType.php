@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
@@ -132,9 +133,8 @@ class WorkflowStepSelectType extends AbstractType
             $workflowName = $options['workflow_name'];
             $workflows = [$this->workflowRegistry->getWorkflow($workflowName)];
         } elseif (isset($options['workflow_entity_class'])) {
-            $workflows = array_values(
-                $this->workflowRegistry->getActiveWorkflowsByEntityClass($options['workflow_entity_class'])
-            );
+            $workflows = $this->workflowRegistry->getActiveWorkflowsByEntityClass($options['workflow_entity_class'])
+                ->getValues();
         } else {
             throw new \InvalidArgumentException('Either "workflow_name" or "workflow_entity_class" must be set');
         }

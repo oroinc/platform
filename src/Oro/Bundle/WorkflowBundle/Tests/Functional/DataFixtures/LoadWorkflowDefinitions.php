@@ -42,7 +42,7 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
         $listConfiguration = $this->container->get('oro_workflow.configuration.config.workflow_list');
         $configurationBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition');
 
-        $workflowConfiguration = Yaml::parse(file_get_contents(__DIR__ . '/config/workflows.yml')) ? : [];
+        $workflowConfiguration = $this->getWorkflowConfiguration();
         $workflowConfiguration = $listConfiguration->processConfiguration($workflowConfiguration);
         $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
@@ -62,5 +62,13 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
         if ($hasDefinitions) {
             $manager->flush();
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWorkflowConfiguration()
+    {
+        return Yaml::parse(file_get_contents(__DIR__ . '/config/workflows.yml')) ? : [];
     }
 }

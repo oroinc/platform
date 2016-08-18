@@ -134,7 +134,7 @@ Single workflow configuration has next properties:
 * **entity_restrictions**
     Contains configuration for Workflow Restrictions
 * **defaults** - node for default workflow configuration values that can be changed in UI later. 
-    * **active** - determine if workflow should be active right after first load of configuration
+    * **active** - determine if workflow should be active right after first load of configuration.
 
 
 
@@ -301,7 +301,7 @@ workflows:
                     owner:
                         update: false
                         delete: false
-             start_conversation:
+            start_conversation:
                 label: 'Call Phone Conversation'
                 allowed_transitions:
                     - end_conversation

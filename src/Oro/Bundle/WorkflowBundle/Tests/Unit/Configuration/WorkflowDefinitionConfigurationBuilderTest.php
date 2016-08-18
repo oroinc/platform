@@ -57,6 +57,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
      * @param array $expectedData
      * @param array $expectedAcls
      * @dataProvider buildFromConfigurationDataProvider
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function testBuildFromConfiguration(array $inputData, array $expectedData, array $expectedAcls = array())
     {

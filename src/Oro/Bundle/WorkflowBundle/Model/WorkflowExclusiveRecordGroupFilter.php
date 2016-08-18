@@ -33,30 +33,60 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
      */
     public function filter(ArrayCollection $workflows, WorkflowRecordContext $context)
     {
-        $runningWorkflowNames = $this->getRunningWorkflowNames($context->getEntity());
+        $lockedGroup = $this->retrieveLockedGroups($workflows, $context);
 
-        if (count($runningWorkflowNames) === 0) {
+        if (count($lockedGroup) === 0) {
             return $workflows;
         }
 
-        $busyGroups = [];
-
         return $workflows->filter(
-            function (Workflow $workflow) use (&$busyGroups, &$runningWorkflowNames) {
-                $workflowRecordGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
-                foreach ($workflowRecordGroups as $workflowRecordGroup) {
-                    if (in_array($workflowRecordGroup, $busyGroups, true)) {
-                        return false;
-                    }
-
-                    if (in_array($workflow->getName(), $runningWorkflowNames, true)) {
-                        $busyGroups[] = $workflowRecordGroup;
+            function (Workflow $workflow) use (&$lockedGroup) {
+                $definition = $workflow->getDefinition();
+                if ($definition->hasExclusiveRecordGroups()) {
+                    $name = $workflow->getName();
+                    foreach ($definition->getExclusiveRecordGroups() as $recordGroup) {
+                        if (array_key_exists($recordGroup, $lockedGroup) && $lockedGroup[$recordGroup] !== $name) {
+                            return false;
+                        }
                     }
                 }
 
                 return true;
             }
         );
+    }
+
+    /**
+     * @param ArrayCollection $workflows
+     * @param WorkflowRecordContext $context
+     * @return array
+     */
+    private function retrieveLockedGroups(ArrayCollection $workflows, WorkflowRecordContext $context)
+    {
+        $runningWorkflowNames = $this->getRunningWorkflowNames($context->getEntity());
+
+        $lockedGroups = [];
+
+        if (count($runningWorkflowNames) === 0) {
+            //no locks as no workflows in progress
+            return $lockedGroups;
+        }
+
+        //as workflows comes in order of its priorities then highest one must replace/override lower one
+        $workflows = array_reverse($workflows->toArray());
+
+        /**@var Workflow[] $workflows */
+        foreach ($workflows as $workflow) {
+            $definition = $workflow->getDefinition();
+            $workflowName = $definition->getName();
+            if ($definition->hasExclusiveRecordGroups() && in_array($workflowName, $runningWorkflowNames, true)) {
+                foreach ($definition->getExclusiveRecordGroups() as $recordGroup) {
+                    $lockedGroups[$recordGroup] = $workflowName;
+                }
+            }
+        }
+
+        return $lockedGroups;
     }
 
     /**

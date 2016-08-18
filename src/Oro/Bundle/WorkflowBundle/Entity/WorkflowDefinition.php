@@ -39,8 +39,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowDefinition implements DomainObjectInterface
 {
@@ -92,14 +96,14 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var bool
      *
-     * @ORM\Column(name="active", type="boolean")
+     * @ORM\Column(name="active", type="boolean", options={"default"=false})
      */
     protected $active = false;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="priority", type="integer")
+     * @ORM\Column(name="priority", type="integer", options={"default"=0})
      */
     protected $priority = 0;
 
@@ -108,7 +112,7 @@ class WorkflowDefinition implements DomainObjectInterface
      *
      * @ORM\Column(name="configuration", type="array")
      */
-    protected $configuration = array();
+    protected $configuration = [];
 
     /**
      * @var WorkflowStep[]|Collection
@@ -387,7 +391,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function setSteps($steps)
     {
-        $newStepNames = array();
+        $newStepNames = [];
         foreach ($steps as $step) {
             $newStepNames[] = $step->getName();
         }
@@ -477,7 +481,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function setEntityAcls($entityAcl)
     {
-        $newAttributeSteps = array();
+        $newAttributeSteps = [];
         foreach ($entityAcl as $acl) {
             $newAttributeSteps[] = $acl->getAttributeStepKey();
         }
@@ -775,6 +779,14 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @return bool
+     */
+    public function hasExclusiveActiveGroups()
+    {
+        return !empty($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]);
+    }
+
+    /**
      * @return array
      */
     public function getExclusiveActiveGroups()
@@ -782,6 +794,14 @@ class WorkflowDefinition implements DomainObjectInterface
         return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE])
             ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]
             : [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasExclusiveRecordGroups()
+    {
+        return !empty($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]);
     }
 
     /**

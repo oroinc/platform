@@ -22,6 +22,9 @@ class WorkflowRegistry
     /** @var Workflow[] */
     protected $workflowByName = [];
 
+    /** @var array */
+    protected $workflowByEntityClass = [];
+
     /**
      * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
@@ -98,18 +101,22 @@ class WorkflowRegistry
     {
         $class = ClassUtils::getRealClass($entityClass);
 
-        $criteria = [
-            'relatedEntity' => $class,
-            'active' => true
-        ];
+        if (!array_key_exists($class, $this->workflowByEntityClass)) {
+            $criteria = [
+                'relatedEntity' => $class,
+                'active' => true
+            ];
 
-        $workflows = new ArrayCollection();
-        foreach ($this->getEntityRepository()->findBy($criteria, ['priority' => 'DESC']) as $definition) {
-            /** @var WorkflowDefinition $definition */
-            $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
+            $workflows = new ArrayCollection();
+            foreach ($this->getEntityRepository()->findBy($criteria, ['priority' => 'DESC']) as $definition) {
+                /** @var WorkflowDefinition $definition */
+                $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
+            }
+
+            $this->workflowByEntityClass[$class] = $workflows;
         }
 
-        return $workflows;
+        return $this->workflowByEntityClass[$class];
     }
 
     /**

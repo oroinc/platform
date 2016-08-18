@@ -226,13 +226,13 @@ class RestrictionManager
             foreach ($classRestrictions as $classRestriction) {
                 $workflowName = $classRestriction['workflowName'];
                 if (!isset($this->workflows[$entityClass][$workflowName])) {
-                    $workflows = $this->workflowRegistry->getActiveWorkflowsByEntityClass(
+                    $activeWorkflows = $this->workflowRegistry->getActiveWorkflowsByEntityClass(
                         $classRestriction['relatedEntity']
                     );
 
                     $this->workflows[$entityClass][$workflowName] = ['is_active' => false];
 
-                    foreach ($workflows as $workflow) {
+                    foreach ($activeWorkflows as $workflow) {
                         $this->workflows[$entityClass][$workflow->getName()] = ['is_active' => true];
                     }
                 }

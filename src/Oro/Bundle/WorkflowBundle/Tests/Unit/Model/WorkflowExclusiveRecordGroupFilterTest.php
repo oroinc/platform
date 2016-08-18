@@ -73,7 +73,8 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
             'same group' => $this->sameGroupCase(),
             'items with same group are covered by priority' => $this->itemsWithSameGroupsCase(),
             'no group' => $this->noGroupCase(),
-            'mixed' => $this->mixedCase()
+            'mixed' => $this->mixedCase(),
+            'unordered records' => $this->unorderedRecordsCase()
         ];
     }
 
@@ -88,9 +89,9 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem1 = $this->getWorkflowItem('workflow1', ['group1']);
 
         return [
-            new ArrayCollection(['workflow1' => $workflow1]),
-            [$workflowItem1],
-            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
+            'expected' => new ArrayCollection(['workflow1' => $workflow1]),
+            'records' => [$workflowItem1],
+            'active workflows' => new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
         ];
     }
 
@@ -105,9 +106,9 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem1 = $this->getWorkflowItem('workflow1', ['group1']);
 
         return [
-            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2]),
-            [$workflowItem1],
-            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
+            'expected' => new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2]),
+            'records' => [$workflowItem1],
+            'active workflwos' => new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
         ];
     }
 
@@ -123,9 +124,9 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem2 = $this->getWorkflowItem('workflow2', []);
 
         return [
-            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2]),
-            [$workflowItem1, $workflowItem2],
-            new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
+            'expected' => new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2]),
+            'records' => [$workflowItem1, $workflowItem2],
+            'active workflows' => new ArrayCollection(['workflow1' => $workflow1, 'workflow2' => $workflow2])
         ];
     }
 
@@ -143,9 +144,28 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem2 = $this->getWorkflowItem('w2', ['g2']);
 
         return [
-            new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2, 'w3' => $workflow3]),
-            [$workflowItem1, $workflowItem2],
-            new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2, 'w3' => $workflow3, 'w4' => $workflow4])
+            'expected' => new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2, 'w3' => $workflow3]),
+            'records' => [$workflowItem1, $workflowItem2],
+            'active workflows' => new ArrayCollection(
+                ['w1' => $workflow1, 'w2' => $workflow2, 'w3' => $workflow3, 'w4' => $workflow4]
+            )
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function unorderedRecordsCase()
+    {
+        $workflow1 = $this->getWorkflow('w1', ['g1']);
+        $workflow2 = $this->getWorkflow('w2', ['g1']);
+
+        $workflowItem2 = $this->getWorkflowItem('w2', ['g1']);
+
+        return [
+            'expected' => new ArrayCollection(['w2' => $workflow2]),
+            'records' => [$workflowItem2],
+            'active workflows' => new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2])
         ];
     }
 
@@ -161,9 +181,9 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
         $workflowItem2 = $this->getWorkflowItem('w2', ['g1', 'g3']);
 
         return [
-            new ArrayCollection(['w1'=> $workflow1]),
-            [$workflowItem1, $workflowItem2],
-            new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2])
+            'expected' => new ArrayCollection(['w1' => $workflow1]),
+            'records' => [$workflowItem1, $workflowItem2],
+            'active workflows' => new ArrayCollection(['w1' => $workflow1, 'w2' => $workflow2])
         ];
     }
 

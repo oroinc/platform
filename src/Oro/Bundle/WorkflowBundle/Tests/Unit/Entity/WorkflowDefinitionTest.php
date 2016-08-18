@@ -49,7 +49,7 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->workflowDefinition->getStartStep());
         $startStep = new WorkflowStep();
         $startStep->setName('start_step');
-        $this->workflowDefinition->setSteps(array($startStep));
+        $this->workflowDefinition->setSteps([$startStep]);
         $this->workflowDefinition->setStartStep($startStep);
         $this->assertEquals($startStep, $this->workflowDefinition->getStartStep());
         $this->workflowDefinition->setStartStep(null);
@@ -70,24 +70,62 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(42, $this->workflowDefinition->getPriority());
     }
 
-    public function testGroups()
+    /**
+     * @param array $groups
+     * @dataProvider groupsData
+     */
+    public function testGroups(array $groups)
     {
         $this->assertEquals([], $this->workflowDefinition->getExclusiveActiveGroups());
+        $this->assertFalse($this->workflowDefinition->hasExclusiveActiveGroups());
         $this->assertEquals([], $this->workflowDefinition->getExclusiveRecordGroups());
-        $groups = [
-            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['active1', 'active2'],
-            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => ['record1', 'record2'],
-        ];
+        $this->assertFalse($this->workflowDefinition->hasExclusiveRecordGroups());
+
         $this->workflowDefinition->setGroups($groups);
 
         $this->assertEquals(
-            $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE],
+            array_key_exists(10, $groups)? $groups[10] : [],
             $this->workflowDefinition->getExclusiveActiveGroups()
         );
+
         $this->assertEquals(
-            $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD],
+            !empty($groups[10]),
+            $this->workflowDefinition->hasExclusiveActiveGroups()
+        );
+
+        $this->assertEquals(
+            array_key_exists(20, $groups)? $groups[20] : [],
             $this->workflowDefinition->getExclusiveRecordGroups()
         );
+
+        $this->assertEquals(
+            !empty($groups[20]),
+            $this->workflowDefinition->hasExclusiveRecordGroups()
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function groupsData()
+    {
+        return [
+            [
+                [
+                    WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['active1', 'active2'],
+                    WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => ['record1', 'record2'],
+                ]
+            ],
+            [
+                [
+                    WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => [],
+                    WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => [],
+                ]
+            ],
+            [
+                []
+            ]
+        ];
     }
 
     /**
@@ -107,7 +145,7 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testConfiguration()
     {
         $this->assertEmpty($this->workflowDefinition->getConfiguration());
-        $value = array('some', 'configuration', 'array');
+        $value = ['some', 'configuration', 'array'];
         $this->workflowDefinition->setConfiguration($value);
         $this->assertEquals($value, $this->workflowDefinition->getConfiguration());
     }
@@ -116,15 +154,15 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $startStep = new WorkflowStep();
         $startStep->setName('start');
-        $expectedData = array(
+        $expectedData = [
             'name' => 'test_name',
             'label' => 'test_label',
-            'steps' => new ArrayCollection(array($startStep)),
+            'steps' => new ArrayCollection([$startStep]),
             'start_step' => $startStep,
-            'configuration' => array('test', 'configuration'),
+            'configuration' => ['test', 'configuration'],
             'active_groups' => ['active1', 'active2'],
             'record_groups' => ['record1', 'record2'],
-        );
+        ];
 
         $this->assertNotEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
 
@@ -166,7 +204,7 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->workflowDefinition->hasStepByName('step3'));
 
         $this->assertCount(2, $this->workflowDefinition->getSteps());
-        $this->workflowDefinition->setSteps(new ArrayCollection(array($stepOne)));
+        $this->workflowDefinition->setSteps(new ArrayCollection([$stepOne]));
         $actualSteps = $this->workflowDefinition->getSteps();
         $this->assertCount(1, $actualSteps);
         $this->assertEquals($stepOne, $actualSteps[0]);
@@ -178,7 +216,7 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $firstStep->setName('first_step');
         $secondStep = new WorkflowStep();
         $secondStep->setName('second_step');
-        $this->workflowDefinition->setSteps(array($firstStep, $secondStep));
+        $this->workflowDefinition->setSteps([$firstStep, $secondStep]);
 
         $firstEntityAcl = new WorkflowEntityAcl();
         $firstEntityAcl->setStep($firstStep)->setAttribute('first_attribute');
@@ -189,24 +227,24 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
 
         // adding
-        $this->workflowDefinition->setEntityAcls(array($firstEntityAcl));
+        $this->workflowDefinition->setEntityAcls([$firstEntityAcl]);
         $this->assertCount(1, $this->workflowDefinition->getEntityAcls());
         $this->assertEquals($firstEntityAcl, $this->workflowDefinition->getEntityAcls()->first());
 
         // merging
-        $this->workflowDefinition->setEntityAcls(array($firstEntityAcl, $secondEntityAcl));
+        $this->workflowDefinition->setEntityAcls([$firstEntityAcl, $secondEntityAcl]);
         $this->assertCount(2, $this->workflowDefinition->getEntityAcls());
         $entityAcls = array_values($this->workflowDefinition->getEntityAcls()->toArray());
         $this->assertEquals($firstEntityAcl, $entityAcls[0]);
         $this->assertEquals($secondEntityAcl, $entityAcls[1]);
 
         // removing
-        $this->workflowDefinition->setEntityAcls(array($secondEntityAcl));
+        $this->workflowDefinition->setEntityAcls([$secondEntityAcl]);
         $this->assertCount(1, $this->workflowDefinition->getEntityAcls());
         $this->assertEquals($secondEntityAcl, $this->workflowDefinition->getEntityAcls()->first());
 
         // resetting
-        $this->workflowDefinition->setEntityAcls(array());
+        $this->workflowDefinition->setEntityAcls([]);
         $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
     }
 
@@ -254,7 +292,7 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getDefinitionAsArray(WorkflowDefinition $definition)
     {
-        return array(
+        return [
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
             'steps' => $definition->getSteps(),
@@ -262,6 +300,6 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
             'configuration' => $definition->getConfiguration(),
             'active_groups' => $definition->getExclusiveActiveGroups(),
             'record_groups' => $definition->getExclusiveRecordGroups(),
-        );
+        ];
     }
 }

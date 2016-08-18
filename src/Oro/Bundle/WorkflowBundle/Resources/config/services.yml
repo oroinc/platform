@@ -76,7 +76,7 @@ services:
             - '@doctrine'
 
     oro_workflow.manager:
-        class: %oro_workflow.manager.class%
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
         arguments:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
@@ -88,7 +88,7 @@ services:
     oro_workflow.applicability_filter.exclusive_record_group:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
 
     oro_workflow.abstract.workflow_aware_manager:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager
