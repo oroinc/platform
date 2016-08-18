@@ -271,7 +271,7 @@
         ]
 #}
 {% macro pinnedDropdownButton(parameters) %}
-    {% if isDesktopVersion() %}
+    {% if isDesktopVersion() or parameters.mobileEnabled|default(false) %}
         {% set options = parameters.options|default({}) %}
         {% set options = options|merge({
             widgetModule: options.widgetModule|default('oroui/js/content-processor/pinned-dropdown-button'),
