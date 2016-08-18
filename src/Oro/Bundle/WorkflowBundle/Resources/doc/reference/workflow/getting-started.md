@@ -157,8 +157,8 @@ So, when **no** workflows were performed for an entity in same exclusive record 
 ###Priority Case
 Let's say, you have two exclusive workflows at the level of a single record and both of them has automated start transitions (e.g. automatically performs start transition when a new instance of their common related entity is created).
 In that case, you may configure `priority` flag in workflow configurations so when a new record of the related entity created workflows would be processed by that priority flag and the second one from same exclusive record group will not perform its start transition if there already present another workflow record from the same exclusive group.
-For example `checkout` and `alternative_checkout` workflows. In a case when we need to process `alternative_checkout` workflow before `checkout`, we can determine its priority level higher than another.
-Then, when new `Checkout` entity will be persisted, a system would perform `alternative_checkout` workflow start transition first.
+For example `first_workflow` and `second_workflow` workflows. In a case when we need to process `second_workflow` workflow before `first_workflow`, we can determine its priority level higher than another.
+Then, when new `SomeEntity` entity will be persisted, a system would perform `second_workflow` workflow start transition first.
 Additionally, if start transition of dominant workflow has unmet its conditions to start, then the second workflow would have a chance to start its flow as well.
 
 Configuration

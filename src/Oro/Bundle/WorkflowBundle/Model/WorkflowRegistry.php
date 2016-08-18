@@ -29,10 +29,8 @@ class WorkflowRegistry
      * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
      */
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        WorkflowAssembler $workflowAssembler
-    ) {
+    public function __construct(ManagerRegistry $managerRegistry, WorkflowAssembler $workflowAssembler)
+    {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
     }

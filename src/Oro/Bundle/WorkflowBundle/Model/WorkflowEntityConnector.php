@@ -52,9 +52,11 @@ class WorkflowEntityConnector
         $cacheKey = self::WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX . $entityClass;
 
         if (false === $this->cache->contains($cacheKey)) {
-            $this->cache->save($cacheKey, $weather = $this->isSupportedIdentifierType($entityClass));
+            $data = $this->isSupportedIdentifierType($entityClass);
+
+            $this->cache->save($cacheKey, $data);
             //to reduce amounts of calls in cache->fetch returns immediately
-            return $weather;
+            return $data;
         }
 
         return $this->cache->fetch($cacheKey);
