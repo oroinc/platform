@@ -38,16 +38,16 @@ class ExpressionProcessor
     /**
      * @param array                 $values
      * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
      * @param bool                  $evaluate
      * @param string                $encoding
+     * @param DataAccessorInterface $data
      */
     public function processExpressions(
         array &$values,
         ContextInterface $context,
-        DataAccessorInterface $data,
         $evaluate,
-        $encoding
+        $encoding,
+        DataAccessorInterface $data = null
     ) {
         if (!$evaluate && $encoding === null) {
             return;
@@ -62,9 +62,9 @@ class ExpressionProcessor
                             $value = $this->processExpression(
                                 $this->expressionLanguage->parse(substr($value, 1), ['context', 'data']),
                                 $context,
-                                $data,
                                 $evaluate,
-                                $encoding
+                                $encoding,
+                                $data
                             );
                             break;
                         case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
@@ -74,17 +74,17 @@ class ExpressionProcessor
                     }
                 }
             } elseif (is_array($value)) {
-                $this->processExpressions($value, $context, $data, $evaluate, $encoding);
+                $this->processExpressions($value, $context, $evaluate, $encoding, $data);
             } elseif ($value instanceof OptionValueBag) {
                 foreach ($value->all() as $action) {
                     $args = $action->getArguments();
-                    $this->processExpressions($args, $context, $data, $evaluate, $encoding);
+                    $this->processExpressions($args, $context, $evaluate, $encoding, $data);
                     foreach ($args as $index => $arg) {
                         $action->setArgument($index, $arg);
                     }
                 }
             } elseif ($value instanceof ParsedExpression) {
-                $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
+                $value = $this->processExpression($value, $context, $evaluate, $encoding, $data);
             }
         }
     }
@@ -92,19 +92,24 @@ class ExpressionProcessor
     /**
      * @param ParsedExpression      $expr
      * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
      * @param bool                  $evaluate
      * @param string                $encoding
+     * @param DataAccessorInterface $data
      *
-     * @return mixed|string
+     * @return mixed|string|ParsedExpression
      */
     protected function processExpression(
         ParsedExpression $expr,
         ContextInterface $context,
-        DataAccessorInterface $data,
         $evaluate,
-        $encoding
+        $encoding,
+        DataAccessorInterface $data = null
     ) {
+        $node = $expr->getNodes();
+        if ($data === null && $this->nodeWorkWithData($node)) {
+            return $expr;
+        }
+
         return $evaluate
             ? $this->expressionLanguage->evaluate($expr, ['context' => $context, 'data' => $data])
             : $this->encoderRegistry->getEncoder($encoding)->encodeExpr($expr);
@@ -134,5 +139,13 @@ class ExpressionProcessor
 
         // regular string
         return self::STRING_IS_REGULAR;
+    }
+
+    /**
+     * @param $node
+     */
+    protected function nodeWorkWithData($node)
+    {
+        //TO DO realisation
     }
 }
