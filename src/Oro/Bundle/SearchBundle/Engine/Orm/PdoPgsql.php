@@ -40,7 +40,7 @@ class PdoPgsql extends BaseDriver
      *
      * @return string
      */
-    public static function getPlainSql($tableName)
+    public static function getPlainSql($tableName = 'oro_search_index_text')
     {
         return "CREATE INDEX value ON $tableName USING gin(to_tsvector('english', 'value'))";
     }
