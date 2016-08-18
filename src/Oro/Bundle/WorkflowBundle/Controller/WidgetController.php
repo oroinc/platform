@@ -208,17 +208,28 @@ class WidgetController extends Controller
     protected function getWorkflowData($entity, Workflow $workflow, WorkflowManager $workflowManager)
     {
         $workflowItem = $workflowManager->getWorkflowItem($entity, $workflow->getName());
-        $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
+
+        $transitionData = $workflowItem
+            ? $this->getAvailableTransitionsDataByWorkflowItem($workflowItem)
+            : $this->getAvailableStartTransitionsData($workflow, $entity);
 
         $isStepsDisplayOrdered = $workflow->getDefinition()->isStepsDisplayOrdered();
+        $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
 
-        $steps = [];
         if ($isStepsDisplayOrdered) {
-            $steps = $workflow->getStepManager()->getOrderedSteps()->toArray();
+            $steps = $workflow->getStepManager()->getOrderedSteps(true)->toArray();
         } elseif ($currentStep) {
             $steps = [$workflow->getStepManager()->getStep($currentStep->getName())];
         } else {
-            $steps = [$workflow->getStepManager()->getStartStep()];
+            $steps = array_map(
+                function (array $data) {
+                    /** @var Transition $transition */
+                    $transition = $data['transition'];
+
+                    return $transition->getStepTo();
+                },
+                $transitionData
+            );
         }
 
         $helper = new WorkflowStepHelper($workflow);
@@ -234,10 +245,6 @@ class WidgetController extends Controller
             $steps
         );
 
-        $transitionData = $workflowItem
-            ? $this->getAvailableTransitionsDataByWorkflowItem($workflowItem)
-            : $this->getAvailableStartTransitionsData($workflow, $entity);
-
         return [
             'name' => $workflow->getName(),
             'label' => $workflow->getLabel(),
@@ -245,6 +252,7 @@ class WidgetController extends Controller
             'stepsData' => [
                 'is_ordered' => $isStepsDisplayOrdered,
                 'steps' => $steps
+
             ],
             'transitionsData' => $transitionData
         ];
@@ -270,6 +278,45 @@ class WidgetController extends Controller
                 ]
             )
         );
+    }
+
+    /**
+     * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons")
+     * @Template
+     * @AclAncestor("oro_workflow")
+     *
+     * @param string $entityClass
+     * @param int $entityId
+     * @return array
+     */
+    public function buttonsAction($entityClass, $entityId)
+    {
+        $workflowsData = [];
+
+        /** @var WorkflowManager $workflowManager */
+        $workflowManager = $this->get('oro_workflow.manager');
+        $entity = $this->getEntityReference($entityClass, $entityId);
+
+        $workflows = $workflowManager->getApplicableWorkflows($entity);
+        foreach ($workflows as $workflow) {
+            $workflowsData[$workflow->getName()] = [
+                'label' => $workflow->getLabel(),
+                'resetAllowed' => false,
+                'transitionsData' => $this->getAvailableStartTransitionsData($workflow, $entity),
+            ];
+        }
+
+        $workflowItems = $workflowManager->getWorkflowItemsByEntity($entity);
+        foreach ($workflowItems as $workflowItem) {
+            $name = $workflowItem->getWorkflowName();
+
+            $workflowsData[$name]['transitionsData'] = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+        }
+
+        return [
+            'entity_id' => $entityId,
+            'workflowsData' => $workflowsData,
+        ];
     }
 
     /**
