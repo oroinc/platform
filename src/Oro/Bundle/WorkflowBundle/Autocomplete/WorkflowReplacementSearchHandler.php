@@ -64,9 +64,14 @@ class WorkflowReplacementSearchHandler extends SearchHandler
                 ->setParameter('id', $this->getWorkflowNamesForExclusion($workflowName));
         }
 
-        return array_filter($queryBuilder->getQuery()->getResult(), function (WorkflowDefinition $definition) {
-            return $definition->isActive();
-        });
+        $workflows = $queryBuilder->getQuery()->getResult();
+
+        return array_filter(
+            $workflows,
+            function (WorkflowDefinition $definition) {
+                return $definition->isActive();
+            }
+        );
     }
 
     /**
@@ -88,8 +93,6 @@ class WorkflowReplacementSearchHandler extends SearchHandler
      */
     protected function getWorkflowNamesForExclusion($workflowName)
     {
-        $workflows = [$workflowName];
-
         $workflow = $this->workflowRegistry->getWorkflow($workflowName);
         if ($workflow) {
             $activeWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
@@ -104,6 +107,8 @@ class WorkflowReplacementSearchHandler extends SearchHandler
             );
         }
 
-        return $workflows;
+        $workflows[] = $workflowName;
+
+        return array_unique($workflows);
     }
 }

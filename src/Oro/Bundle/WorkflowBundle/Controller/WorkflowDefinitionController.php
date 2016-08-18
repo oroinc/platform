@@ -153,16 +153,16 @@ class WorkflowDefinitionController extends Controller
     }
 
     /**
-     * Deactivate WorkflowDefinition form
+     * Activate WorkflowDefinition form
      *
-     * @Route("/deactivate-form/{name}", name="oro_workflow_definition_activate_from_widget")
+     * @Route("/activate-form/{name}", name="oro_workflow_definition_activate_from_widget")
      * @AclAncestor("oro_workflow_definition_update")
-     * @Template("OroWorkflowBundle:WorkflowDefinition:widget/deactivateForm.html.twig")
+     * @Template("OroWorkflowBundle:WorkflowDefinition:widget/activateForm.html.twig")
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      */
-    public function deactivateFormAction(WorkflowDefinition $workflowDefinition)
+    public function activateFormAction(WorkflowDefinition $workflowDefinition)
     {
         $form = $this->createForm(
             WorkflowReplacementSelectType::NAME,
@@ -178,6 +178,8 @@ class WorkflowDefinitionController extends Controller
 
         if ($form->isValid()) {
             $workflowManager = $this->get('oro_workflow.manager');
+            $workflowManager->activateWorkflow($workflowDefinition->getName());
+
             $workflowNames = array_merge(
                 $form->getData(),
                 array_map(

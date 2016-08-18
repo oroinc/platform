@@ -99,7 +99,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertContainGroups($crawler->html());
     }
 
-    public function testDeactivateFormAction()
+    public function testActivateFormAction()
     {
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_GROUPS1);
 

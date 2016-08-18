@@ -1,9 +1,10 @@
 <div class="widget-content"
-     data-page-component-module="oroworkflow/js/app/components/deactivate-form-widget-component"
+     data-page-component-module="oroworkflow/js/app/components/activate-form-widget-component"
      data-page-component-options="{{ {
          '_wid': app.request.get('_wid'),
          'workflow': workflow,
-         'deactivated': savedId is defined and deactivated is defined ? deactivated|join(', ') : null,
+         'success': savedId is defined,
+         'deactivated': deactivated is defined ? deactivated|join(', ') : null,
          'selectors': {
              'form': '#' ~ form.vars.id
          },
@@ -16,7 +17,7 @@
         </div>
     {% endif %}
 
-    <div class="alert alert-warning">
+    <div class="alert workflow-deactivation-message">
         <div class="message">
             {% if workflowsToDeactivation %}
                 <p>
