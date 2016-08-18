@@ -49,10 +49,19 @@ class JobStorageTest extends WebTestCase
 
     public function testCouldCreateJobWithoutLock()
     {
+        $rootJob = new Job();
+        $rootJob->setOwnerId('owner-id');
+        $rootJob->setName('name');
+        $rootJob->setStatus(Job::STATUS_NEW);
+        $rootJob->setCreatedAt(new \DateTime());
+
+        $this->getJobStorage()->saveJob($rootJob);
+
         $job = new Job();
         $job->setName('name');
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
+        $job->setRootJob($rootJob);
 
         $this->getJobStorage()->saveJob($job);
         $this->getEntityManager()->clear();
@@ -65,10 +74,19 @@ class JobStorageTest extends WebTestCase
 
     public function testCouldUpdateJobWithoutLock()
     {
+        $rootJob = new Job();
+        $rootJob->setOwnerId('owner-id');
+        $rootJob->setName('name');
+        $rootJob->setStatus(Job::STATUS_NEW);
+        $rootJob->setCreatedAt(new \DateTime());
+
+        $this->getJobStorage()->saveJob($rootJob);
+
         $job = new Job();
         $job->setName('name');
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
+        $job->setRootJob($rootJob);
 
         $this->getJobStorage()->saveJob($job);
 
@@ -87,6 +105,7 @@ class JobStorageTest extends WebTestCase
     public function testCouldUpdateJobWithLock()
     {
         $job = new Job();
+        $job->setOwnerId('owner-id');
         $job->setName('name');
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
@@ -109,6 +128,7 @@ class JobStorageTest extends WebTestCase
     public function testShouldThrowIfDuplicateJob()
     {
         $job1 = new Job();
+        $job1->setOwnerId('owner-id1');
         $job1->setName('name');
         $job1->setUnique(true);
         $job1->setStatus(Job::STATUS_NEW);
@@ -117,6 +137,7 @@ class JobStorageTest extends WebTestCase
         $this->getJobStorage()->saveJob($job1);
 
         $job2 = new Job();
+        $job2->setOwnerId('owner-id2');
         $job2->setName('name');
         $job2->setUnique(true);
         $job2->setStatus(Job::STATUS_NEW);

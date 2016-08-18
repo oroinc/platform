@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -21,22 +22,30 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     protected $calculateRootJobStatusCase;
 
     /**
+     * @var MessageProducerInterface
+     */
+    protected $producer;
+
+    /**
      * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * @param JobStorage                 $jobStorage
+     * @param JobStorage $jobStorage
      * @param CalculateRootJobStatusCase $calculateRootJobStatusCase
-     * @param LoggerInterface            $logger
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface $logger
      */
     public function __construct(
         JobStorage $jobStorage,
         CalculateRootJobStatusCase $calculateRootJobStatusCase,
+        MessageProducerInterface $producer,
         LoggerInterface $logger
     ) {
         $this->jobStorage = $jobStorage;
         $this->calculateRootJobStatusCase = $calculateRootJobStatusCase;
+        $this->producer = $producer;
         $this->logger = $logger;
     }
 
@@ -60,7 +69,13 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
             return self::REJECT;
         }
 
-        $this->calculateRootJobStatusCase->calculate($job);
+        $isRootJobStopped = $this->calculateRootJobStatusCase->calculate($job);
+
+        if ($isRootJobStopped) {
+            $this->producer->send(Topics::ROOT_JOB_STOPPED, [
+                'jobId' => $job->getRootJob()->getId(),
+            ]);
+        }
 
         return self::ACK;
     }

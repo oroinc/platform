@@ -67,7 +67,7 @@ class JobProcessor
         } catch (DuplicateJobException $e) {
         }
 
-        return $this->jobStorage->findRootJobByOwnerId($ownerId);
+        return $this->jobStorage->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
     }
 
     /**

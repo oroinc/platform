@@ -20,6 +20,8 @@ class CalculateRootJobStatusCase
 
     /**
      * @param Job $job
+     *
+     * @return bool true if root job was stopped
      */
     public function calculate(Job $job)
     {
@@ -30,7 +32,8 @@ class CalculateRootJobStatusCase
             return;
         }
 
-        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) use ($stopStatuses) {
+        $rootStopped = false;
+        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) use ($stopStatuses, &$rootStopped) {
             if (in_array($rootJob->getStatus(), $stopStatuses)) {
                 return;
             }
@@ -45,11 +48,14 @@ class CalculateRootJobStatusCase
             $rootJob->setStatus($status);
 
             if (in_array($status, $stopStatuses)) {
+                $rootStopped = true;
                 if (! $rootJob->getStoppedAt()) {
                     $rootJob->setStoppedAt(new \DateTime());
                 }
             }
         });
+
+        return $rootStopped;
     }
 
     /**
