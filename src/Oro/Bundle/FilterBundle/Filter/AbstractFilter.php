@@ -106,6 +106,7 @@ abstract class AbstractFilter implements FilterInterface
 
             $subQb = clone $qb;
             $subQb
+                ->resetDqlPart('orderBy')
                 ->select($idFieldExpr)
                 ->andWhere($comparisonExpr);
             $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
