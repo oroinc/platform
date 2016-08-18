@@ -95,21 +95,8 @@ abstract class AbstractFilter implements FilterInterface
         if ($relatedJoin) {
             $qb = $ds->getQueryBuilder();
 
-            $fieldsExprs = [];
-            $groupByFields = $this->getSelectFieldFromGroupBy($qb->getDqlPart('groupBy'));
-            if ($groupByFields) {
-                $fieldsExprs = $groupByFields;
-            } else {
-                $entities = $qb->getRootEntities();
-                $idField = $qb
-                    ->getEntityManager()
-                    ->getClassMetadata(reset($entities))
-                    ->getSingleIdentifierFieldName();
-
-                $rootAliases = $qb->getRootAliases();
-                $fieldsExprs[] = sprintf('%s.%s', reset($rootAliases), $idField);
-            }
-
+            $fieldsExprs = $this->createConditionFieldExprs($qb);
+            $subExprs = [];
             foreach ($fieldsExprs as $fieldExpr) {
                 $subQb = clone $qb;
                 $subQb
@@ -118,11 +105,9 @@ abstract class AbstractFilter implements FilterInterface
                     ->andWhere($comparisonExpr);
                 $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
 
-                $this->applyFilterToClause(
-                    $ds,
-                    $joinOperator ? $qb->expr()->notIn($fieldExpr, $dql) : $qb->expr()->in($fieldExpr, $dql)
-                );
+                $subExprs[] = $joinOperator ? $qb->expr()->notIn($fieldExpr, $dql) : $qb->expr()->in($fieldExpr, $dql);
             }
+            $this->applyFilterToClause($ds, call_user_func_array([$qb->expr(), 'andX'], $subExprs));
         } else {
             $this->applyFilterToClause($ds, $comparisonExpr);
         }
@@ -404,6 +389,29 @@ abstract class AbstractFilter implements FilterInterface
         list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
 
         return QueryUtils::findJoinByAlias($ds->getQueryBuilder(), $alias);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     *
+     * @return array
+     */
+    protected function createConditionFieldExprs(QueryBuilder $qb)
+    {
+        $groupByFields = $this->getSelectFieldFromGroupBy($qb->getDqlPart('groupBy'));
+        if ($groupByFields) {
+            return $groupByFields;
+        }
+
+        $entities = $qb->getRootEntities();
+        $idField = $qb
+            ->getEntityManager()
+            ->getClassMetadata(reset($entities))
+            ->getSingleIdentifierFieldName();
+
+        $rootAliases = $qb->getRootAliases();
+
+        return [sprintf('%s.%s', reset($rootAliases), $idField)];
     }
 
     /**
