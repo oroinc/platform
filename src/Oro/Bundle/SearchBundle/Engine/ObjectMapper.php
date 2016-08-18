@@ -13,6 +13,8 @@ use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 
 class ObjectMapper extends AbstractMapper
 {
+    const EMPTY_SELECTED_VALUE = '';
+
     /**
      * @param EventDispatcherInterface $dispatcher
      * @param                          $mappingConfig
@@ -158,10 +160,9 @@ class ObjectMapper extends AbstractMapper
      *
      * @param Query $query
      * @param array $item
-     * @param mixed $defaultValueIfNull
      * @return array|null
      */
-    public function mapSelectedData(Query $query, $item, $defaultValueIfNull = '')
+    public function mapSelectedData(Query $query, $item)
     {
         $selects = $query->getSelect();
 
@@ -174,7 +175,7 @@ class ObjectMapper extends AbstractMapper
         foreach ($selects as $select) {
             list ($type, $name) = Criteria::explodeFieldTypeName($select);
 
-            $result[$name] = $defaultValueIfNull;
+            $result[$name] = self::EMPTY_SELECTED_VALUE;
 
             if (isset($item[$name])) {
                 $value = $item[$name];
