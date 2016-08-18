@@ -14,3 +14,6 @@ CollectionField:
 
 FieldSet:
   class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
+GroupChoiceField:
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\GroupChoiceField
