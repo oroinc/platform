@@ -15,6 +15,7 @@ use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
+use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 
 /**
  * The LayoutListener class handles the @Layout annotation.
@@ -42,21 +43,29 @@ class LayoutListener
     protected $layoutDataCollector;
 
     /**
+     * @var UserAgentProvider
+     */
+    protected $userAgentProvider;
+
+    /**
      * @param LayoutHelper $layoutHelper
      * @param LayoutManager $layoutManager
      * @param LayoutContextHolder $layoutContextHolder
      * @param LayoutDataCollector $layoutDataCollector
+     * @param UserAgentProvider $userAgentProvider
      */
     public function __construct(
         LayoutHelper $layoutHelper,
         LayoutManager $layoutManager,
         LayoutContextHolder $layoutContextHolder,
-        LayoutDataCollector $layoutDataCollector
+        LayoutDataCollector $layoutDataCollector,
+        UserAgentProvider $userAgentProvider
     ) {
         $this->layoutHelper = $layoutHelper;
         $this->layoutManager = $layoutManager;
         $this->layoutContextHolder = $layoutContextHolder;
         $this->layoutDataCollector = $layoutDataCollector;
+        $this->userAgentProvider = $userAgentProvider;
     }
 
     /**
@@ -70,6 +79,8 @@ class LayoutListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
+        $request->headers->remove('user-agent');
+        $request->headers->set('isMobile', $this->userAgentProvider->getUserAgent()->isMobile());
 
         $layoutAnnotation = $this->layoutHelper->getLayoutAnnotation($request);
         if (!$layoutAnnotation) {

@@ -18,6 +18,7 @@ use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
+use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -39,6 +40,9 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutContextHolder|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutContextHolder;
 
+    /** @var UserAgentProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $userAgentProvider;
+
     protected function setUp()
     {
         $this->layoutManager = $this->getMockBuilder('Oro\Component\Layout\LayoutManager')
@@ -56,11 +60,24 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->userAgentProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgentProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->userAgentProvider->expects($this->any())
+            ->method('getUserAgent')
+            ->willReturn($userAgent);
+
         $this->listener = new LayoutListener(
             $this->layoutHelper,
             $this->layoutManager,
             $this->layoutContextHolder,
-            $this->layoutDataCollector
+            $this->layoutDataCollector,
+            $this->userAgentProvider
         );
     }
 
