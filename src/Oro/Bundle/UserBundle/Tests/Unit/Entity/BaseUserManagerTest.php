@@ -171,10 +171,18 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindUserByEmail()
     {
+        $crit = ['username' => self::TEST_EMAIL];
+
+        $this->repository
+            ->expects($this->at(0))
+            ->method('findOneBy')
+            ->with($this->equalTo($crit))
+            ->will($this->returnValue([]));
+
         $crit = ['email' => self::TEST_EMAIL];
 
         $this->repository
-            ->expects($this->once())
+            ->expects($this->at(1))
             ->method('findOneBy')
             ->with($this->equalTo($crit))
             ->will($this->returnValue([]));

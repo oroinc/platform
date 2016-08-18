@@ -17,7 +17,6 @@ class Recipient
      * @param string $email
      * @param string $name
      * @param RecipientEntity|null $entity
-     * @param string|null $organization
      */
     public function __construct($email, $name, RecipientEntity $entity = null)
     {
@@ -48,10 +47,31 @@ class Recipient
     public function getName()
     {
         if ($this->entity && false !== $start = strrpos($this->entity->getLabel(), '(')) {
-            return sprintf('%s %s', $this->name, substr($this->entity->getLabel(), $start));
+            $label = substr($this->entity->getLabel(), $start);
+            $name = $this->getFormattedName($this->name);
+
+            return sprintf('%s %s', $name, $label);
         }
 
         return $this->name;
+    }
+
+    /**
+     * Email should be in brackets < > for identification and extracting 'pure' email from label with additional text
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    public function getFormattedName($name)
+    {
+        $addrPos = strrpos($name, '<');
+        $atPos = strrpos($name, '@');
+        if ($addrPos === false && $atPos) {
+            return sprintf('<%s>', $name);
+        }
+
+        return $name;
     }
 
     /**
@@ -76,7 +96,9 @@ class Recipient
             return $this->getName();
         }
 
-        return sprintf('%s %s', $this->name, $this->entity->getAdditionalInfo());
+        $name = $this->getFormattedName($this->name);
+
+        return sprintf('%s %s', $name, $this->entity->getAdditionalInfo());
     }
 
     /**
