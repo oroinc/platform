@@ -2,6 +2,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Dbal\Extension;
 
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
@@ -47,7 +48,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
             'redelivered' => false,
             'queue' => 'queue',
             'priority' => 1,
-        ]);
+        ], ['redelivered' => Type::BOOLEAN]);
         $id = (int) $dbal->lastInsertId('message_queue_id_seq');
 
         //guard
