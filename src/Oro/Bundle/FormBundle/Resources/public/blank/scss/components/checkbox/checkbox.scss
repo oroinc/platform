@@ -10,6 +10,8 @@
         z-index: -1;
         margin: 0;
 
+        opacity: 0;
+
         &:hover,
         &:focus {
             ~ .checkbox__icon {
