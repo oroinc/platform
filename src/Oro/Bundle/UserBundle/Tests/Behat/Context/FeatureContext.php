@@ -12,14 +12,26 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     use ElementFactoryDictionary;
 
     /**
-     * @Then /^(?:|I )click on "(?P<comment>[^"]+)" attachment thumbnail$/
+     * @Then /^(?:|I )click on "(?P<text>[^"]+)" attachment thumbnail$/
      */
-    public function commentAttachmentShouldProperlyWork($comment)
+    public function commentAttachmentShouldProperlyWork($text)
     {
         /** @var CommentItem $commentItem */
-        $commentItem = $this->elementFactory->findElementContains('CommentItem', $comment);
-        self::assertTrue($commentItem->isValid(), sprintf('Comment with "%s" text not found', $comment));
+        $commentItem = $this->elementFactory->findElementContains('CommentItem', $text);
+        self::assertTrue($commentItem->isValid(), sprintf('Comment with "%s" text not found', $text));
 
         $commentItem->clickOnAttachmentThumbnail();
+    }
+
+    /**
+     * @Then /^download link for "(?P<text>[^"]+)" attachment should work$/
+     */
+    public function downloadLinkForAttachmentShouldWork($text)
+    {
+        /** @var CommentItem $commentItem */
+        $commentItem = $this->elementFactory->findElementContains('CommentItem', $text);
+        self::assertTrue($commentItem->isValid(), sprintf('Comment with "%s" text not found', $text));
+
+        $commentItem->checkDownloadLink();
     }
 }

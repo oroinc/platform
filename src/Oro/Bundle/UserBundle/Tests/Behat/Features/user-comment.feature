@@ -27,6 +27,5 @@ Feature: User user comment
     Then I should see "Amazing cat"
     When I click on "cat.jpg" attachment thumbnail
     Then I should see large image
-    And should not see "Download(9.40 KB)"
-    When follow "cat.jpg"
-    Then I should see "Download(9.40 KB)"
+    And I close large image preview
+    And download link for "cat.jpg" attachment should work
