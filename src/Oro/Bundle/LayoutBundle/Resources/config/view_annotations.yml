@@ -6,7 +6,6 @@ services:
             - '@oro_layout.layout_manager'
             - '@oro_layout.layout_context_holder'
             - '@oro_layout.profiler.layout_data_collector'
-            - '@oro_ui.user_agent_provider'
         tags:
             # process the '@Layout' annotation before the '@Template' annotation
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView, priority: 10 }

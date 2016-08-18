@@ -27,9 +27,9 @@ class UserAgentContextConfigurator implements ContextConfiguratorInterface
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()
-            ->setRequired(['user_agent'])
-            ->setAllowedTypes(['user_agent' => ['Oro\Bundle\UIBundle\Provider\UserAgentInterface']]);
+            ->setRequired(['is_mobile'])
+            ->setAllowedTypes(['is_mobile' => ['boolean']]);
 
-        $context->set('user_agent', $this->userAgentProvider->getUserAgent());
+        $context->set('is_mobile', $this->userAgentProvider->getUserAgent()->isMobile());
     }
 }
