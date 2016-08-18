@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\DBAL\Driver\PDOException;
 
 use FOS\RestBundle\Util\Codes;
 
