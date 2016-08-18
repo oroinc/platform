@@ -22,13 +22,17 @@ define(function(require) {
         },
         initialize: function(options) {
             SelectCreateInlineTypeView.__super__.initialize.apply(this, arguments);
-            _.extend(this,
-                _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector'));
+            _.extend(this, _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector'));
         },
 
         buildRouteParams: function(routeType) {
             var routeParams = this.urlParts[routeType].parameters;
             return _.extend({}, routeParams, this.$(this.inputSelector).data('select2_query_additional_params'));
+        },
+
+        setEnableState: function(enabled) {
+            this.$('button').prop('disabled', !enabled);
+            this.$(this.inputSelector).select2('readonly', !enabled);
         },
 
         onSelect: function(e) {
