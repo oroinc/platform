@@ -20,5 +20,5 @@ response:
                 recordUrl: http://localhost/search/
                 selectedData:
                     item:
-                        key: 'stringValue'
-                        value: 'item1@mail.com'
+                        key: stringValue
+                        value: item1@mail.com

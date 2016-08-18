@@ -158,9 +158,10 @@ class ObjectMapper extends AbstractMapper
      *
      * @param Query $query
      * @param array $item
+     * @param mixed $defaultValueIfNull
      * @return array|null
      */
-    public function mapSelectedData(Query $query, $item)
+    public function mapSelectedData(Query $query, $item, $defaultValueIfNull = '')
     {
         $selects = $query->getSelect();
 
@@ -172,6 +173,8 @@ class ObjectMapper extends AbstractMapper
 
         foreach ($selects as $select) {
             list ($type, $name) = Criteria::explodeFieldTypeName($select);
+
+            $result[$name] = $defaultValueIfNull;
 
             if (isset($item[$name])) {
                 $value = $item[$name];

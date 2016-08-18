@@ -17,4 +17,17 @@ class SelectedValue extends AbstractKeyValue
      * @Soap\ComplexType("string")
      */
     protected $value;
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function __construct($key, $value)
+    {
+        if ($value == null) {
+            $value = '';
+        }
+
+        parent::__construct($key, $value);
+    }
 }

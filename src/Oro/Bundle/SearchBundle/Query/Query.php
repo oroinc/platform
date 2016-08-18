@@ -180,20 +180,22 @@ class Query
 
     /**
      * @param string $fieldName
-     * @param string $fieldType
+     * @param string $enforcedFieldType
      * @return $this
      */
-    public function addSelect($fieldName, $fieldType = null)
+    public function addSelect($fieldName, $enforcedFieldType = null)
     {
-        if ($fieldType == null) {
-            list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
+        $fieldType = self::TYPE_TEXT;
 
-            if (!empty($explodedType) && !empty($explodedName)) {
-                $fieldType = $explodedType;
-                $fieldName = $explodedName;
-            } else {
-                $fieldType = self::TYPE_TEXT;
-            }
+        list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
+
+        if (!empty($explodedType) && !empty($explodedName)) {
+            $fieldType = $explodedType;
+            $fieldName = $explodedName;
+        }
+
+        if ($enforcedFieldType !== null) {
+            $fieldType = $enforcedFieldType;
         }
 
         $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);

@@ -225,7 +225,7 @@ class Item
             'record_url'    => $this->recordUrl,
         ];
 
-        if (!empty($this->selectedData)) {
+        if (count($this->selectedData) > 0) {
             $result['selected_data'] = $this->selectedData;
         }
 
