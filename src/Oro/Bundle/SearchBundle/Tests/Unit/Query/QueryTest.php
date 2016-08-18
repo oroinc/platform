@@ -143,11 +143,20 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Query();
         $query->addSelect('name', Query::TYPE_TEXT);
-        $query->addSelect('status', Query::TYPE_INTEGER);
-        $query->addSelect('date', Query::TYPE_DATETIME);
-        // this is not a bug, just testing dupe handling
-        $query->addSelect('name', Query::TYPE_TEXT);
-        $this->assertCount(3, $query->getSelect());
-        $this->assertEquals(['text.name', 'integer.status', 'datetime.date'], $query->getSelect());
+        $query->addSelect('name', Query::TYPE_TEXT); // testing handing doubles
+        $query->addSelect('datetime.date', Query::TYPE_DECIMAL); // enforced type
+        $query->addSelect('integer.number'); // type guessing by prefix
+        $query->addSelect('sku'); // default type should be `text`
+
+        $this->assertCount(4, $query->getSelect());
+        $this->assertEquals(
+            [
+                'text.name',
+                'decimal.date',
+                'integer.number',
+                'text.sku'
+            ],
+            $query->getSelect()
+        );
     }
 }
