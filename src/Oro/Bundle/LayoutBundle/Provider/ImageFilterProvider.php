@@ -11,8 +11,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
-use OroB2B\Bundle\ProductBundle\DependencyInjection\Configuration;
-
 /**
  * Load dimensions from theme config to LiipImagine filters
  */
@@ -124,9 +122,9 @@ class ImageFilterProvider
     private function getWatermarkFilterSettings()
     {
         $config = [];
-        $fileConfigKey = Configuration::ROOT_NODE . '.' . Configuration::PRODUCT_IMAGE_WATERMARK_FILE;
-        $sizeConfigKey = Configuration::ROOT_NODE . '.' . Configuration::PRODUCT_IMAGE_WATERMARK_SIZE;
-        $positionConfigKey = Configuration::ROOT_NODE . '.' . Configuration::PRODUCT_IMAGE_WATERMARK_POSITION;
+        $fileConfigKey = 'orob2b_product.product_image_watermark_file';
+        $sizeConfigKey = 'orob2b_product.product_image_watermark_size';
+        $positionConfigKey = 'orob2b_product.product_image_watermark_position';
 
         $imageId = $this->configManager->get($fileConfigKey);
         $size = $this->configManager->get($sizeConfigKey);

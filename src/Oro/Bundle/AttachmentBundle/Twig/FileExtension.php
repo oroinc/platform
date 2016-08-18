@@ -167,8 +167,8 @@ class FileExtension extends \Twig_Extension
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
                     'iconClass'  => $this->manager->getAttachmentIconClass($attachment),
-                    'url'        => '', //$this->manager
-                        //->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'url'        => $this->manager
+                        ->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
                     'fileName'   => $attachment->getOriginalFilename(),
                     'additional' => $additional
                 ]
