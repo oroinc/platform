@@ -52,6 +52,7 @@ response:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordUrl: http://localhost/search/
+                selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordUrl: http://localhost/search/
