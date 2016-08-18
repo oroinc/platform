@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
-class WorkflowConfiguration implements ConfigurationInterface
+class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
     const NODE_STEPS = 'steps';
     const NODE_ATTRIBUTES = 'attributes';
@@ -261,6 +261,13 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->arrayNode('form_options')
                         ->prototype('variable')
                         ->end()
+                        ->beforeNormalization()
+                            ->always(function ($config) {
+                                return $this->mergeConfigs([
+                                    'form_init' => 'init_actions',
+                                ], $config);
+                            })
+                        ->end()
                     ->end()
                     ->scalarNode('page_template')
                         ->defaultNull()
@@ -304,18 +311,28 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('pre_conditions')
+                    ->arrayNode('preconditions')
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('pre_conditions')->end() // deprecated, use `preconditions` instead
                     ->arrayNode('conditions')
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('post_actions')
+                    ->arrayNode('actions')
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('post_actions')->end() // deprecated, use `actions` instead
+                ->end()
+                ->beforeNormalization()
+                    ->always(function ($config) {
+                        return $this->mergeConfigs([
+                            'preconditions' => 'pre_conditions',
+                            'actions' => 'post_actions',
+                        ], $config);
+                    })
                 ->end()
             ->end();
 

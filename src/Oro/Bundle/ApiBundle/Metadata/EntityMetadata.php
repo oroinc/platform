@@ -531,4 +531,30 @@ class EntityMetadata implements ToArrayInterface
             $this->attributes->remove($attributeName);
         }
     }
+
+    /**
+     * Checks whether the metadata contains only identifier fields(s).
+     *
+     * @return bool
+     */
+    public function hasIdentifierFieldsOnly()
+    {
+        $idFields = $this->getIdentifierFieldNames();
+        if (empty($idFields)) {
+            return false;
+        }
+
+        $fields = $this->getFields();
+        if (empty($fields)) {
+            return false;
+        }
+
+        if (count($this->getAssociations()) > 0) {
+            return false;
+        }
+
+        return
+            count($fields) === count($idFields)
+            && count(array_diff_key($fields, array_flip($idFields))) === 0;
+    }
 }

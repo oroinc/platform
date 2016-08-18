@@ -16,7 +16,7 @@ return array(
             'actions_configuration' => array(
                 array('@assign_value' => array('$entity.field', 'value'))
             ),
-            'pre_conditions' => array()
+            'preconditions' => array()
         ),
         'another_definition' => array(
             'label'                 => 'Another definition',
@@ -25,7 +25,7 @@ return array(
             'enabled'               => true,
             'order'                 => 0,
             'exclude_definitions'   => array(),
-            'pre_conditions' => array()
+            'preconditions' => array()
         )
     ),
     ProcessConfigurationProvider::NODE_TRIGGERS => array(
