@@ -158,22 +158,23 @@ class Query
      *
      * @param mixed  $field
      *
-     * @param string $fieldType
+     * @param string $enforcedFieldType
      *
      * @return Query
      */
-    public function select($field, $fieldType = null)
+    public function select($field, $enforcedFieldType = null)
     {
         $this->select = [];
 
         if (is_array($field)) {
             foreach ($field as $_field) {
-                $this->addSelect($_field, $fieldType);
+                $this->addSelect($_field, $enforcedFieldType);
             }
+            
             return $this;
         }
 
-        $this->addSelect($field, $fieldType);
+        $this->addSelect($field, $enforcedFieldType);
 
         return $this;
     }
