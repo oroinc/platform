@@ -55,9 +55,9 @@ class Error
      *
      * @return Error
      */
-    public static function createValidationError($title, $detail = null)
+    public static function createValidationError($title, $detail = null, $statusCode = Response::HTTP_BAD_REQUEST)
     {
-        return self::create($title, $detail)->setStatusCode(Response::HTTP_BAD_REQUEST);
+        return self::create($title, $detail)->setStatusCode($statusCode);
     }
 
     /**
