@@ -158,38 +158,45 @@ class Query
      *
      * @param mixed  $field
      *
-     * @param string $fieldType
+     * @param string $enforcedFieldType
      *
      * @return Query
      */
-    public function select($field, $fieldType = self::TYPE_TEXT)
+    public function select($field, $enforcedFieldType = null)
     {
         $this->select = [];
 
         if (is_array($field)) {
             foreach ($field as $_field) {
-                $this->addSelect($_field, $fieldType);
+                $this->addSelect($_field, $enforcedFieldType);
             }
+
             return $this;
         }
 
-        $this->addSelect($field, $fieldType);
+        $this->addSelect($field, $enforcedFieldType);
 
         return $this;
     }
 
     /**
      * @param string $fieldName
-     * @param string $fieldType
+     * @param string $enforcedFieldType
      * @return $this
      */
-    public function addSelect($fieldName, $fieldType = self::TYPE_TEXT)
+    public function addSelect($fieldName, $enforcedFieldType = null)
     {
+        $fieldType = self::TYPE_TEXT;
+
         list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
 
         if (!empty($explodedType) && !empty($explodedName)) {
             $fieldType = $explodedType;
             $fieldName = $explodedName;
+        }
+
+        if ($enforcedFieldType !== null) {
+            $fieldType = $enforcedFieldType;
         }
 
         $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);

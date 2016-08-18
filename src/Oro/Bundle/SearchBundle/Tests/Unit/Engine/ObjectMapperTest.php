@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
@@ -341,7 +341,11 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
         $query->expects($this->once())
             ->method('getSelect')
-            ->willReturn(['text.sku', 'text.defaultName']);
+            ->willReturn([
+                'text.sku',
+                'text.defaultName',
+                'notExistingField'
+            ]);
 
         $item = [
             'item' => [
@@ -354,6 +358,13 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->mapper->mapSelectedData($query, $item);
 
-        $this->assertEquals(['sku'=>'2GH80', 'defaultName'=>'Example Headlamp'], $result);
+        $this->assertEquals(
+            [
+                'sku' => '2GH80',
+                'defaultName' => 'Example Headlamp',
+                'notExistingField' => ObjectMapper::EMPTY_SELECTED_VALUE
+            ],
+            $result
+        );
     }
 }
