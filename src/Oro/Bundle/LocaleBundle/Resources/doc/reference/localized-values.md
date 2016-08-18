@@ -20,7 +20,7 @@ localization.titles|localized_value
 Format values in layout configs
 ===============================
 
-Use `localized_value` ExpressionFunction
+Use `locale` Layout data provider and `getLocalizedValue()`.
 
 ```yml
 # .../Resources/views/layouts/.../myconfig.yml
@@ -30,7 +30,7 @@ layout:
             ...
             options:
                 ...
-                content: '=localized_value(data["localization"].getTitles())'
+                content: '=data["locale"].getLocalizedValue(data["localization"].getTitles())'
 ```
 
 Format values in datagrids

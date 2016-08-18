@@ -190,8 +190,20 @@ services:
             - '@oro_entity_config.config_manager'
             - '@router'
             - '@oro_entity.entity_alias_resolver'
-            - '@oro_search.mapper'
-            - '@translator'
+            - '@oro_activity.resolver.entity_title'
             - '@oro_entity.doctrine_helper'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
+
+    oro_activity.resolver.entity_title.entity_name:
+        public: false
+        class: Oro\Bundle\SearchBundle\Resolver\EntityNameEntityTitleResolver
+        arguments:
+            - '@oro_search.resolver.entity_title'
+            - '@oro_entity.entity_name_resolver'
+
+    oro_activity.resolver.entity_title:
+        class: Oro\Bundle\SearchBundle\Resolver\DefaultEntityTitleResolver
+        arguments:
+            - '@oro_activity.resolver.entity_title.entity_name'
+            - '@translator'

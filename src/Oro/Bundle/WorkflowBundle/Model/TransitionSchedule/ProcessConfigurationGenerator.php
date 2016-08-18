@@ -83,7 +83,7 @@ class ProcessConfigurationGenerator
                         ]
                     ]
                 ],
-                'pre_conditions' => []
+                'preconditions' => []
             ]
         ];
 
@@ -117,7 +117,7 @@ class ProcessConfigurationGenerator
     protected function createProcessName($workflowName, $transitionName)
     {
         $object = new ScheduledTransitionProcessName($workflowName, $transitionName);
-        
+
         return $object->getName();
     }
 }

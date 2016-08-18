@@ -429,4 +429,52 @@ class QueryUtils
 
         return (bool) preg_match($pattern, $dql . ' ');
     }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param Expr\Join $join
+     *
+     * @return string
+     */
+    public static function getJoinClass(QueryBuilder $qb, Expr\Join $join)
+    {
+        if (class_exists($join->getJoin())) {
+            return $join->getJoin();
+        }
+
+        $fromParts = $qb->getDqlPart('from');
+        $aliasToClassMap = [];
+        foreach ($fromParts as $from) {
+            $aliasToClassMap[$from->getAlias()] = $from->getFrom();
+        }
+
+        list($parentAlias, $field) = explode('.', $join->getJoin());
+        $parentClass = isset($aliasToClassMap[$parentAlias])
+            ? $aliasToClassMap[$parentAlias]
+            : static::getJoinClass($qb, static::findJoinByAlias($qb, $parentAlias));
+
+        return $qb->getEntityManager()
+            ->getClassMetadata($parentClass)
+            ->getAssociationTargetClass($field);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $alias
+     *
+     * @return Expr\Join
+     */
+    public static function findJoinByAlias(QueryBuilder $qb, $alias)
+    {
+        $joinParts = $qb->getDQLPart('join');
+        foreach ($joinParts as $joins) {
+            foreach ($joins as $join) {
+                if ($join->getAlias() === $alias) {
+                    return $join;
+                }
+            }
+        }
+
+        return null;
+    }
 }
