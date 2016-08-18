@@ -170,7 +170,7 @@ class Query
             foreach ($field as $_field) {
                 $this->addSelect($_field, $enforcedFieldType);
             }
-            
+
             return $this;
         }
 

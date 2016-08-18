@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
