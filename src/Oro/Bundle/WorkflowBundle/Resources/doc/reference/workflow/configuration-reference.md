@@ -412,16 +412,27 @@ workflows:
 Transition Definition Configuration
 ===================================
 
-Transition Definition is used by Transition to check Conditions and to perform Init Action and Post Actions.
+Transition Definition is used by Transition to check Pre Conditions and Conditions, to perform Init Action and Post
+Actions.
 
 Transition definition configuration has next options.
 
+* **preactions**
+    Configuration of Pre Actions that must be performed before Pre Conditions check.
+* **preconditions**
+    Configuration of Pre Conditions that must satisfy to allow displaying transition.
 * **conditions**
-    Configuration of Conditions that must satisfy to allow transition
-* **post_actions**
+    Configuration of Conditions that must satisfy to allow transition.
+* **actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
+* **form_init**
+    Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
+* **pre_conditions**
+    Deprecated, use `preconditions` instead.
 * **init_actions**
-    Configuration of Init Actions that may be performed on workflow item before conditions and post actions.
+    Deprecated, use `form_init` instead.
+* **post_actions**
+    Deprecated, use `actions` instead.
 
 Example
 -------
@@ -432,22 +443,28 @@ workflows:
         # ...
         transition_definitions:
             connected_definition: # Try to make call connected
+                # Set timeout value
+                preactions:
+                    - @assign_value: [$call_timeout, 120]
                 # Check that timeout is set
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, true]
-                init_actions:
+                form_init:
                     - @increment_value: [$call_attempt]
             not_answered_definition: # Callee did not answer
+                # Set timeout value
+                preactions:
+                    - @assign_value: [$call_timeout, 30]
                 # Make sure that caller waited at least 60 seconds
                 conditions: # call_timeout not empty and >= 60
                     @and:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, false]
             end_conversation_definition:
                 conditions:
@@ -458,7 +475,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -565,7 +582,7 @@ workflows:
         transition_definitions:
             # some transition definition
             qualify_call:
-                pre_conditions:
+                preconditions:
                     @equal: [$status, "in_progress"]
                 conditions:
                     # empty($call_timeout) || (($call_timeout >= 60 && $call_timeout < 100) || ($call_timeout > 0 && $call_timeout <= 30))
@@ -584,10 +601,12 @@ workflows:
                                     - @greater: [$call_timeout, 0]
 ```
 
-Post Actions and Init Action
-============================
+Pre Actions, Post Actions and Init Action
+=========================================
 
-Post Actions and Init Action configuration complements Transition Definition configuration.
+Pre Action, Post Actions and Init Action configuration complements Transition Definition configuration.
+
+Pre Actions will be performed BEFORE the Pre Conditions will be qualified.
 
 Post Actions will be performed during transition AFTER conditions will be qualified and current Step of Workflow Item
 will be changed to the corresponding one (step_to option) in the Transition.
@@ -610,9 +629,11 @@ workflows:
         # ...
         transition_definitions:
             # some transition definition
-                init_actions:
+                preactions:
+                    - @some_action: ~
+                form_init:
                     - @assign_value: [$call_attempt, 1]
-                post_actions:
+                actions:
                     - @create_entity: # create an entity PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -706,7 +727,7 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, true]
             not_answered_definition: # Callee did not answer
@@ -716,7 +737,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, false]
             end_conversation_definition:
@@ -728,7 +749,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         parameters:
                             class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation

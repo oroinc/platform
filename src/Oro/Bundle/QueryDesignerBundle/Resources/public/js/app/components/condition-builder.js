@@ -4,7 +4,7 @@ define(function(require) {
     var $ = require('oroquerydesigner/js/condition-builder');
     var _ = require('underscore');
     var defaults = {
-        eriaListSelector: '',
+        criteriaListSelector: '',
         entityChoiceSelector: '',
         onFieldsUpdate: {
             toggleCriteria: []

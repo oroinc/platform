@@ -10,16 +10,22 @@ class FieldSecurityMetadata implements \Serializable
     /** @var string */
     protected $label;
 
+    /** @var string[] */
+    protected $permissions;
+
     /**
      * @param string $fieldName
      * @param string $label
+     * @param array  $permissions
      */
     public function __construct(
         $fieldName = '',
-        $label = ''
+        $label = '',
+        $permissions = []
     ) {
         $this->fieldName = $fieldName;
         $this->label = $label;
+        $this->permissions = $permissions;
     }
 
     /**
@@ -43,6 +49,16 @@ class FieldSecurityMetadata implements \Serializable
     }
 
     /**
+     * Returns available field permissions
+     *
+     * @return string[]
+     */
+    public function getPermissions()
+    {
+        return $this->permissions;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -50,7 +66,8 @@ class FieldSecurityMetadata implements \Serializable
         return serialize(
             [
                 $this->fieldName,
-                $this->label
+                $this->label,
+                $this->permissions
             ]
         );
     }
@@ -62,7 +79,8 @@ class FieldSecurityMetadata implements \Serializable
     {
         list(
             $this->fieldName,
-            $this->label
+            $this->label,
+            $this->permissions
             ) = unserialize($serialized);
     }
 
@@ -79,6 +97,7 @@ class FieldSecurityMetadata implements \Serializable
         $result = new FieldSecurityMetadata();
         $result->fieldName = $data['fieldName'];
         $result->label = $data['label'];
+        $result->permissions = $data['permissions'];
 
         return $result;
     }

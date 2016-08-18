@@ -40,8 +40,9 @@ class EmailSynchronizationManager
      * Performs a synchronization of emails for the given email origins.
      *
      * @param EmailOrigin[] $origins
+     * @param bool          $scheduleJob
      */
-    public function syncOrigins($origins)
+    public function syncOrigins($origins, $scheduleJob = false)
     {
         /** @var AbstractEmailSynchronizer[] $synchronizers */
         $synchronizers = [];
@@ -50,13 +51,28 @@ class EmailSynchronizationManager
         }
 
         foreach ($synchronizers as $synchronizer) {
-            $supportedOriginIds = [];
-            foreach ($origins as $origin) {
-                if ($synchronizer->supports($origin)) {
-                    $supportedOriginIds[] = $origin->getId();
-                }
+            $this->performSync($origins, $synchronizer, $scheduleJob);
+        }
+    }
+
+    /**
+     * @param EmailOrigin[]             $origins
+     * @param AbstractEmailSynchronizer $synchronizer
+     * @param bool                      $scheduleJob
+     */
+    protected function performSync($origins, $synchronizer, $scheduleJob)
+    {
+        $supportedOriginIds = [];
+        foreach ($origins as $origin) {
+            if ($synchronizer->supports($origin)) {
+                $supportedOriginIds[] = $origin->getId();
             }
-            if (!empty($supportedOriginIds)) {
+        }
+        if ($scheduleJob && $synchronizer->supportScheduleJob()) {
+            // create job if not exists yet
+            $synchronizer->scheduleSyncOriginsJob($supportedOriginIds);
+        } else {
+            if (0 !== count($supportedOriginIds)) {
                 $synchronizer->syncOrigins($supportedOriginIds);
             }
         }

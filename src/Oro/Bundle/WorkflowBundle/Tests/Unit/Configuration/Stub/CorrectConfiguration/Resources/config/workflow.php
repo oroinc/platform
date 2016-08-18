@@ -84,9 +84,15 @@ return array(
         ),
         'transition_definitions' => array(
             'first_transition_definition' => array(
-                'pre_conditions' => array(
-                    '@true' => null
+                'preactions' => array(
+                    array(
+                        '@custom_action' => null
+                    )
                 ),
+                'preconditions' => [
+                    '@true' => null,
+                    '@condition1' => null,
+                ],
                 'conditions' => array(
                     '@and' => array(
                         '@true' => null,
@@ -102,12 +108,10 @@ return array(
                         'message' => 'Fail upper level'
                     )
                 ),
-                'post_actions' => array(
-                    array(
-                        '@custom_post_action' => null
-
-                    )
-                )
+                'actions' => [
+                    ['@custom_action2' => null],
+                    ['@custom_action' => null],
+                ],
             )
         ),
         'entity_restrictions' => array()
@@ -151,9 +155,10 @@ return array(
         ),
         'transition_definitions' => array(
             'second_transition_definition' => array(
-                'pre_conditions' => array(),
+                'preactions' => array(),
+                'preconditions' => array(),
                 'conditions' => array(),
-                'post_actions' => array()
+                'actions' => array()
             )
         ),
         'is_system' => false,

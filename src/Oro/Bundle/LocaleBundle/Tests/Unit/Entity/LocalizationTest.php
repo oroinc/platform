@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
