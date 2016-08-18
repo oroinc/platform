@@ -49,6 +49,8 @@ define(function(require) {
         /** @property */
         enabled: true,
 
+        appearances: null,
+
         /** @property */
         permissions: {
             CREATE: false,
@@ -90,7 +92,7 @@ define(function(require) {
                 throw new TypeError('"viewsCollection" is required');
             }
 
-            _.extend(this, _.pick(options, ['viewsCollection', 'title']));
+            _.extend(this, _.pick(options, ['viewsCollection', 'title', 'appearances']));
 
             this.template = _.template($('#template-datagrid-grid-view').html());
             this.titleTemplate = _.template($('#template-datagrid-grid-view-label').html());
@@ -231,7 +233,6 @@ define(function(require) {
          */
         onSaveAs: function(e) {
             var modal = new ViewNameModal();
-            var currentModel = this._getCurrentViewModel();
             var self = this;
             modal.on('ok', function(e) {
                 var model = self._createViewModel({
@@ -250,8 +251,9 @@ define(function(require) {
                 model.save(null, {
                     wait: true,
                     success: function(model) {
+                        var icon = self._getAppearanceIcon(model.get('appearanceType'));
                         model.set('name', model.get('id'));
-                        model.set('icon', currentModel.get('icon'));
+                        model.set('icon', icon);
                         model.unset('id');
                         self.viewsCollection.add(model);
                         self.changeView(model.get('name'));
@@ -274,6 +276,9 @@ define(function(require) {
 
             modal.open();
             $('#gridViewName').focus();
+        },
+        _getAppearanceIcon: function(appearanceType) {
+            return this.appearances ? _.result(_.findWhere(this.appearances, {type: appearanceType}), 'icon') : '';
         },
 
         /**

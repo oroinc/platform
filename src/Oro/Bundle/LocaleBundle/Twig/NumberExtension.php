@@ -321,7 +321,8 @@ class NumberExtension extends \Twig_Extension
      *          <symbol> => <value>,
      *          ...
      *      ),
-     *     'locale' => <locale>
+     *     'locale' => <locale>,
+     *     'default' => <value>
      * )
      *
      * @param float $value
@@ -334,8 +335,9 @@ class NumberExtension extends \Twig_Extension
         $textAttributes = (array)$this->getOption($options, 'textAttributes', array());
         $symbols = (array)$this->getOption($options, 'symbols', array());
         $locale = $this->getOption($options, 'locale');
+        $default = $this->getOption($options, 'default', false);
 
-        return $this->formatter->formatDuration($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->formatter->formatDuration($value, $attributes, $textAttributes, $symbols, $locale, $default);
     }
 
     /**

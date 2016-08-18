@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
@@ -25,7 +25,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /** @var QueryBuilder */
     protected $qb;
 
-    /** @var RestrictionBuilder */
+    /** @var RestrictionBuilderInterface */
     protected $restrictionBuilder;
 
     /**
@@ -34,13 +34,13 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
-     * @param RestrictionBuilder            $restrictionBuilder
+     * @param RestrictionBuilderInterface   $restrictionBuilder
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         ManagerRegistry $doctrine,
-        RestrictionBuilder $restrictionBuilder
+        RestrictionBuilderInterface $restrictionBuilder
     ) {
         $this->restrictionBuilder = $restrictionBuilder;
         parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
@@ -100,7 +100,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         $isDistinct = false
     ) {
         if ($isDistinct) {
-            $columnExpr = 'DISTINCT ' . $columnExpr;
+            $columnExpr = 'DISTINCT ' . (string)$columnExpr;
         }
 
         if ($functionExpr !== null) {

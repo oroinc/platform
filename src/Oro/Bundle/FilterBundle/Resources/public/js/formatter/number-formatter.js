@@ -1,6 +1,9 @@
-define(['underscore', './abstract-formatter'
-    ], function(_, AbstractFormatter) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var AbstractFormatter = require('./abstract-formatter');
+    var localeSettings = require('orolocale/js/locale-settings');
 
     /**
      * A floating point number formatter. Doesn't understand notation at the moment.
@@ -21,6 +24,10 @@ define(['underscore', './abstract-formatter'
         if (this.decimals < 0 || this.decimals > 20) {
             throw new RangeError('decimals must be between 0 and 20');
         }
+
+        var numberFormats = localeSettings.getNumberFormats('decimal');
+        this.decimalSeparator = numberFormats.decimal_separator_symbol;
+        this.orderSeparator = numberFormats.grouping_separator_symbol;
     };
 
     NumberFormatter.prototype = new AbstractFormatter();

@@ -79,7 +79,7 @@ services:
             - '@oro_layout.theme_manager'
 
     oro_layout.data_provider.theme:
-        class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider
+        class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider
         arguments:
             - '@oro_layout.theme_manager'
         tags:
