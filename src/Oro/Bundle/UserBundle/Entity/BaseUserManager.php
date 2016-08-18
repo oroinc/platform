@@ -159,11 +159,15 @@ class BaseUserManager implements UserProviderInterface
      */
     public function findUserByUsernameOrEmail($usernameOrEmail)
     {
-        if (filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL)) {
-            return $this->findUserByEmail($usernameOrEmail);
+        $user = $this->findUserByUsername($usernameOrEmail);
+
+        if (!$user) {
+            if (filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL)) {
+                $user = $this->findUserByEmail($usernameOrEmail);
+            }
         }
 
-        return $this->findUserByUsername($usernameOrEmail);
+        return $user;
     }
 
     /**

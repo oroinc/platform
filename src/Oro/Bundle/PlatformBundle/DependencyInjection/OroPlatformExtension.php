@@ -42,6 +42,13 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $resources = array_reverse($configLoader->load());
         foreach ($resources as $resource) {
             foreach ($resource->data as $name => $config) {
+                if ($name === 'services') {
+                    $loader = new Loader\YamlFileLoader($container, new FileLocator(rtrim($resource->path, 'app.yml')));
+                    $loader->load('app.yml');
+
+                    continue;
+                }
+
                 if (empty($extensions[$name])) {
                     continue;
                 }

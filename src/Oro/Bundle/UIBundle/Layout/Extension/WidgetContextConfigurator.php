@@ -47,7 +47,6 @@ class WidgetContextConfigurator implements ContextConfiguratorInterface
 
         $context->data()->setDefault(
             'widget_id',
-            '$request._wid',
             function () use ($request) {
                 if (!$request) {
                     throw new \BadMethodCallException('The request expected.');

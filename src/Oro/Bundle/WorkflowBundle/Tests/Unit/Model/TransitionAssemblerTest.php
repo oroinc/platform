@@ -41,7 +41,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected static $actions = [
         'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]],
-        'post_actions' => ['@assign_value' => ['parameters' => ['$attribute', 'post_action_value']]]
+        'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]
     ];
 
     /**
@@ -53,21 +53,21 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]
         ],
         'with_pre_condition' => [
-            'pre_conditions' => ['@true' => null]
+            'preconditions' => ['@true' => null]
         ],
         'with_condition' => [
             'conditions' => ['@true' => null]
         ],
-        'with_post_actions' => [
-            'post_actions' => ['@assign_value' => ['parameters' => ['$attribute', 'post_action_value']]]
+        'with_actions' => [
+            'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]
         ],
         'full_definition' => [
             'page_template' => 'Test:Page:template',
             'dialog_template' => 'Test:Dialog:template',
             'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]],
-            'pre_conditions' => ['@true' => null],
+            'preconditions' => ['@true' => null],
             'conditions' => ['@true' => null],
-            'post_actions' => ['@assign_value' => ['parameters' => ['$attribute', 'post_action_value']]],
+            'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]],
         ]
     ];
 
@@ -225,15 +225,15 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        if (isset($transitionDefinition['pre_conditions']) && $defaultAclPrecondition) {
+        if (isset($transitionDefinition['preconditions']) && $defaultAclPrecondition) {
             $preConditions = [
                 '@and' => [
                     $defaultAclPrecondition,
-                    $transitionDefinition['pre_conditions']
+                    $transitionDefinition['preconditions']
                 ]
             ];
-        } elseif (isset($transitionDefinition['pre_conditions'])) {
-            $preConditions = $transitionDefinition['pre_conditions'];
+        } elseif (isset($transitionDefinition['preconditions'])) {
+            $preConditions = $transitionDefinition['preconditions'];
         }
 
         $count = 0;
@@ -265,7 +265,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                         $expectedPreAction = $action;
                     }
 
-                    if ($config === self::$actions['post_actions']) {
+                    if ($config === self::$actions['actions']) {
                         $expectedPostAction = $action;
                     }
 
@@ -349,7 +349,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
         $this->assertSame($expectedPreAction, $actualTransition->getPreAction(), 'Incorrect preaction');
-        $this->assertSame($expectedPostAction, $actualTransition->getPostAction(), 'Incorrect post_action');
+        $this->assertSame($expectedPostAction, $actualTransition->getAction(), 'Incorrect action');
     }
 
     /**
@@ -407,13 +407,13 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_preactions'],
             ],
-            'with_post_actions' => [
+            'with_actions' => [
                 'configuration' => [
-                    'transition_definition' => 'with_post_actions',
+                    'transition_definition' => 'with_actions',
                     'label' => 'label',
                     'step_to' => 'step',
                 ],
-                'transitionDefinition' => self::$transitionDefinitions['with_post_actions'],
+                'transitionDefinition' => self::$transitionDefinitions['with_actions'],
             ],
             'full_definition' => [
                 'configuration' => [

@@ -69,6 +69,14 @@ class Message extends \Zend\Mail\Storage\Message
     }
 
     /**
+     * @return null|Attachment
+     */
+    public function getMessageAsAttachment()
+    {
+        return $this->getPartAttachment($this);
+    }
+
+    /**
      * Gets the Content-Type for the given part
      *
      * @param Part $part The message part

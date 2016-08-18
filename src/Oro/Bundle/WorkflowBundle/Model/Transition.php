@@ -50,7 +50,7 @@ class Transition
     /**
      * @var ActionInterface|null
      */
-    protected $postAction;
+    protected $action;
 
     /**
      * @var bool
@@ -224,25 +224,21 @@ class Transition
     }
 
     /**
-     * Set post action.
-     *
-     * @param ActionInterface $postAction
+     * @param ActionInterface $action
      * @return Transition
      */
-    public function setPostAction(ActionInterface $postAction = null)
+    public function setAction(ActionInterface $action = null)
     {
-        $this->postAction = $postAction;
+        $this->action = $action;
         return $this;
     }
 
     /**
-     * Get post action.
-     *
      * @return ActionInterface|null
      */
-    public function getPostAction()
+    public function getAction()
     {
-        return $this->postAction;
+        return $this->action;
     }
 
     /**
@@ -344,8 +340,8 @@ class Transition
             $stepTo = $this->getStepTo();
             $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
 
-            if ($this->postAction) {
-                $this->postAction->execute($workflowItem);
+            if ($this->action) {
+                $this->action->execute($workflowItem);
             }
         } else {
             throw new ForbiddenTransitionException(
