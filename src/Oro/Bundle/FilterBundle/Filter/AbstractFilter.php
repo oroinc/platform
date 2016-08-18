@@ -95,26 +95,34 @@ abstract class AbstractFilter implements FilterInterface
         if ($relatedJoin) {
             $qb = $ds->getQueryBuilder();
 
-            $entities = $qb->getRootEntities();
-            $idField = $qb
-                ->getEntityManager()
-                ->getClassMetadata(reset($entities))
-                ->getSingleIdentifierFieldName();
+            $fieldsExprs = [];
+            $groupByFields = $this->getSelectFieldFromGroupBy($qb->getDqlPart('groupBy'));
+            if ($groupByFields) {
+                $fieldsExprs = $groupByFields;
+            } else {
+                $entities = $qb->getRootEntities();
+                $idField = $qb
+                    ->getEntityManager()
+                    ->getClassMetadata(reset($entities))
+                    ->getSingleIdentifierFieldName();
 
-            $rootAliases = $qb->getRootAliases();
-            $idFieldExpr = sprintf('%s.%s', reset($rootAliases), $idField);
+                $rootAliases = $qb->getRootAliases();
+                $fieldsExprs[] = sprintf('%s.%s', reset($rootAliases), $idField);
+            }
 
-            $subQb = clone $qb;
-            $subQb
-                ->resetDqlPart('orderBy')
-                ->select($idFieldExpr)
-                ->andWhere($comparisonExpr);
-            $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
+            foreach ($fieldsExprs as $fieldExpr) {
+                $subQb = clone $qb;
+                $subQb
+                    ->resetDqlPart('orderBy')
+                    ->select($fieldExpr)
+                    ->andWhere($comparisonExpr);
+                $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
 
-            $this->applyFilterToClause(
-                $ds,
-                $joinOperator ? $qb->expr()->notIn($idFieldExpr, $dql) : $qb->expr()->in($idFieldExpr, $dql)
-            );
+                $this->applyFilterToClause(
+                    $ds,
+                    $joinOperator ? $qb->expr()->notIn($fieldExpr, $dql) : $qb->expr()->in($fieldExpr, $dql)
+                );
+            }
         } else {
             $this->applyFilterToClause($ds, $comparisonExpr);
         }
@@ -396,5 +404,42 @@ abstract class AbstractFilter implements FilterInterface
         list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
 
         return QueryUtils::findJoinByAlias($ds->getQueryBuilder(), $alias);
+    }
+
+    /**
+     * @param Expr\GroupBy[] $groupBy
+     *
+     * @return array
+     */
+    protected function getSelectFieldFromGroupBy(array $groupBy)
+    {
+        $expressions = [];
+        foreach ($groupBy as $groupByPart) {
+            foreach ($groupByPart->getParts() as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        }
+
+        return $expressions;
+    }
+
+    /**
+     * @param string $groupByPart
+     *
+     * @return array
+     */
+    protected function getSelectFieldFromGroupByPart($groupByPart)
+    {
+        $expressions = [];
+        if (strpos($groupByPart, ',') !== false) {
+            $groupByParts = explode(',', $groupByPart);
+            foreach ($groupByParts as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        } else {
+            $expressions[] = trim($groupByPart);
+        }
+
+        return $expressions;
     }
 }
