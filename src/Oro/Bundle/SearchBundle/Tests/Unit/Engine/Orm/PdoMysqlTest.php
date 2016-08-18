@@ -7,8 +7,9 @@ class PdoMysqlTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetPlainSql()
     {
-        $recordString = PdoMysql::getPlainSql();
+        $recordString = PdoMysql::getPlainSql('oro_search_index_text');
         $this->assertTrue(strpos($recordString, 'FULLTEXT') > 0);
+        $this->assertContains('oro_search_index_text', $recordString);
     }
 
     public function testInitRepo()

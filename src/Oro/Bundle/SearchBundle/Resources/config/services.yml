@@ -146,7 +146,8 @@ services:
         class: %oro_search.fulltext_index_manager.class%
         arguments:
             - '@doctrine.dbal.default_connection'
-            - %oro_search.drivers%
+            - '%oro_search.drivers%'
+            - 'oro_search_index_text'
 
     oro_search.event_listener.update_schema_listener:
         class: %oro_search.event_listener.update_schema_listener.class%
@@ -201,3 +202,10 @@ services:
             - '@oro_search.provider.search_mapping'
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_website_search.fulltext_index_manager:
+        class: '%oro_search.fulltext_index_manager.class%'
+        arguments:
+            - '@doctrine.dbal.default_connection'
+            - '%oro_search.drivers%'
+            - 'oro_website_search_text'

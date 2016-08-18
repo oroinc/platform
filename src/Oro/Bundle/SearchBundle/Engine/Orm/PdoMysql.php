@@ -42,11 +42,13 @@ class PdoMysql extends BaseDriver
     /**
      * Sql plain query to create fulltext index for mySql.
      *
+     * @param string $tableName
+     *
      * @return string
      */
-    public static function getPlainSql()
+    public static function getPlainSql($tableName)
     {
-        return "ALTER TABLE `oro_search_index_text` ADD FULLTEXT `value` ( `value`)";
+        return "ALTER TABLE `$tableName` ADD FULLTEXT `value` ( `value`)";
     }
 
     /**

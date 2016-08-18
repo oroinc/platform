@@ -20,13 +20,20 @@ class FulltextIndexManager
     protected $configClasses;
 
     /**
+     * @var string
+     */
+    protected $tableName;
+
+    /**
      * @param Connection $connection
      * @param array      $configClasses
+     * @param string     $tableName
      */
-    public function __construct(Connection $connection, array $configClasses)
+    public function __construct(Connection $connection, array $configClasses, $tableName)
     {
         $this->connection    = $connection;
         $this->configClasses = $configClasses;
+        $this->tableName     = $tableName;
     }
 
     /**
@@ -59,6 +66,6 @@ class FulltextIndexManager
         /** @var PdoMysql $className */
         $className = $this->configClasses[$driver];
 
-        return $className::getPlainSql();
+        return $className::getPlainSql($this->tableName);
     }
 }
