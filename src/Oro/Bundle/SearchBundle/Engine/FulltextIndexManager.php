@@ -29,7 +29,7 @@ class FulltextIndexManager
      * @param array      $configClasses
      * @param string     $tableName
      */
-    public function __construct(Connection $connection, array $configClasses, $tableName)
+    public function __construct(Connection $connection, array $configClasses, $tableName = 'oro_search_index_text')
     {
         $this->connection    = $connection;
         $this->configClasses = $configClasses;
