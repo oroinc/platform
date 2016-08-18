@@ -185,9 +185,9 @@ class Query
      */
     public function addSelect($fieldName, $fieldType = null)
     {
-        list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
-
         if ($fieldType == null) {
+            list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
+
             if (!empty($explodedType) && !empty($explodedName)) {
                 $fieldType = $explodedType;
                 $fieldName = $explodedName;
