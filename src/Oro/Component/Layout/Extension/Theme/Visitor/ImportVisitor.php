@@ -55,8 +55,10 @@ class ImportVisitor implements VisitorInterface
     /**
      * {@inheritdoc}
      */
-    public function walkUpdates(array $updates, ContextInterface $context)
+    public function walkUpdates(array &$updates, ContextInterface $context)
     {
+        $this->updates = &$updates;
+
         foreach ($updates as $group) {
             foreach ($group as $update) {
                 if ($update instanceof ImportsAwareLayoutUpdateInterface) {
@@ -64,8 +66,6 @@ class ImportVisitor implements VisitorInterface
                 }
             }
         }
-
-        return $this->updates;
     }
 
     /**

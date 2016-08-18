@@ -9,8 +9,6 @@ interface VisitorInterface
     /**
      * @param array $updates
      * @param ContextInterface $context
-     *
-     * @return array
      */
-    public function walkUpdates(array $updates, ContextInterface $context);
+    public function walkUpdates(array &$updates, ContextInterface $context);
 }

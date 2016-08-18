@@ -58,7 +58,8 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
 
         $updates = ['root' => [$this->getMock(LayoutUpdateInterface::class)]];
 
-        $this->assertEquals([], $this->visitor->walkUpdates($updates, $context));
+        $this->visitor->walkUpdates($updates, $context);
+        $this->assertEquals($updates, $updates);
     }
 
     public function testWalkUpdatesWithImports()
@@ -124,9 +125,11 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
 
         $updates = ['root' => [$update]];
 
-        $expectedResult = ['root' => [$importUpdate]];
+        $expectedResult = $updates;
+        $expectedResult['root'][] = $importUpdate;
 
-        $this->assertEquals($expectedResult, $this->visitor->walkUpdates($updates, $context));
+        $this->visitor->walkUpdates($updates, $context);
+        $this->assertEquals($expectedResult, $updates);
     }
 
     public function testWalkUpdatesWithImportsContainedMultipleUpdates()
@@ -189,9 +192,11 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
 
         $updates = ['root' => [$update]];
 
-        $expectedResult = ['root' => [$importUpdate]];
+        $expectedResult = $updates;
+        $expectedResult['root'][] = $importUpdate;
 
-        $this->assertEquals($expectedResult, $this->visitor->walkUpdates($updates, $context));
+        $this->visitor->walkUpdates($updates, $context);
+        $this->assertEquals($expectedResult, $updates);
     }
 
     /**

@@ -16,7 +16,7 @@ class ThemeResourceProvider implements ResourceProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function findApplicableResources(array $paths)
     {
@@ -48,7 +48,7 @@ class ThemeResourceProvider implements ResourceProviderInterface
      *
      * @return array|null
      */
-    private function readValue(&$array, $property)
+    private function readValue($array, $property)
     {
         if (is_array($array) && isset($array[$property])) {
             return $array[$property];

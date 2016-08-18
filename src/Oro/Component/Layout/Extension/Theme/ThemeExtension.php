@@ -74,15 +74,16 @@ class ThemeExtension extends AbstractExtension
         }
 
         foreach ($this->visitors as $visitor) {
-            $updates = $visitor->walkUpdates($this->updates, $context);
-            $this->updates = array_merge_recursive($this->updates, $updates);
+            $visitor->walkUpdates($this->updates, $context);
         }
 
         return $this->updates;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $file
+     *
+     * @return array
      */
     protected function loadLayoutUpdate($file)
     {
