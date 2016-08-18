@@ -162,7 +162,7 @@ class Query
      *
      * @return Query
      */
-    public function select($field, $fieldType = self::TYPE_TEXT)
+    public function select($field, $fieldType = null)
     {
         $this->select = [];
 
@@ -183,13 +183,17 @@ class Query
      * @param string $fieldType
      * @return $this
      */
-    public function addSelect($fieldName, $fieldType = self::TYPE_TEXT)
+    public function addSelect($fieldName, $fieldType = null)
     {
         list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
 
-        if (!empty($explodedType) && !empty($explodedName)) {
-            $fieldType = $explodedType;
-            $fieldName = $explodedName;
+        if ($fieldType == null) {
+            if (!empty($explodedType) && !empty($explodedName)) {
+                $fieldType = $explodedType;
+                $fieldName = $explodedName;
+            } else {
+                $fieldType = self::TYPE_TEXT;
+            }
         }
 
         $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);

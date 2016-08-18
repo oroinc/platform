@@ -19,6 +19,11 @@ response:
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item1@mail.com
                 recordUrl: http://localhost/search/
-                selected_data:
-                    stringValue: item1@mail.com
-                    integerValue: 1000
+                selectedData:
+                    item:
+                        -
+                            key: 'stringValue'
+                            value: 'item1@mail.com'
+                        -
+                            key: 'integerValue'
+                            value: '1000'

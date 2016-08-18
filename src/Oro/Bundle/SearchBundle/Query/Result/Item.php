@@ -49,7 +49,8 @@ class Item
     protected $em;
 
     /**
-     * @var array
+     * @Soap\ComplexType("Oro\Bundle\SearchBundle\Soap\Type\SelectedValue[]")
+     * @var string[]
      */
     protected $selectedData = [];
 
@@ -208,6 +209,7 @@ class Item
     public function setSelectedData($selectedData)
     {
         $this->selectedData = $selectedData;
+
         return $this;
     }
 
@@ -221,7 +223,6 @@ class Item
             'record_id'     => $this->recordId,
             'record_string' => $this->recordTitle,
             'record_url'    => $this->recordUrl,
-
         ];
 
         if (!empty($this->selectedData)) {
