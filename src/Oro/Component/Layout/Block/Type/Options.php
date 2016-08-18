@@ -10,7 +10,7 @@ class Options implements \ArrayAccess
     private $options;
 
     /**
-     * {@inheritdoc}
+     * @param $options
      */
     public function __construct($options)
     {
@@ -18,11 +18,16 @@ class Options implements \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * @param $optionName
+     * @param boolean $shouldBeEvaluated
+     *
+     * @return mixed
+     *
+     * @throws \OutOfBoundsException
      */
     public function get($optionName, $shouldBeEvaluated = true)
     {
-        if ($this->hasArgument($optionName)) {
+        if (isset($this->options[$optionName])) {
             $option = $this->options[$optionName];
             if ($shouldBeEvaluated && $option instanceof Expression) {
                 throw new \InvalidArgumentException(
@@ -32,7 +37,7 @@ class Options implements \ArrayAccess
             return $option;
         }
 
-        throw new \InvalidArgumentException(sprintf('Argument "%s" not found.', $optionName));
+        throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $optionName));
     }
 
     /**
@@ -68,8 +73,10 @@ class Options implements \ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        if ($this->hasArgument($offset)) {
+        if (isset($this->options[$offset])) {
             unset($this->options[$offset]);
+        } else {
+            throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $offset));
         }
     }
 
@@ -80,15 +87,5 @@ class Options implements \ArrayAccess
     public function getAll()
     {
         return $this->options;
-    }
-
-    /**
-     * @param string $offset
-     *
-     * @return bool
-     */
-    public function hasArgument($offset)
-    {
-        return array_key_exists($offset, $this->options);
     }
 }

@@ -212,8 +212,7 @@ class BlockFactory implements BlockFactoryInterface
         $types     = $this->typeHelper->getTypes($blockType);
 
         // resolve options
-        $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
-        $resolvedOptions = new Options($resolvedOptions);
+        $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
 
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);

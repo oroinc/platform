@@ -20,7 +20,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('test', $this->options->get('value'));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException('OutOfBoundsException');
         $this->assertFalse($this->options->get('nameNotExist'));
     }
 
@@ -45,12 +45,6 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->options->offsetExists('value'));
         $this->assertFalse($this->options->offsetExists('attr'));
-    }
-
-    public function testHasArgument()
-    {
-        $this->assertTrue($this->options->hasArgument('value'));
-        $this->assertFalse($this->options->hasArgument('nameNotExist'));
     }
 
     public function testGetAll()
