@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -13,14 +14,23 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Validator\Constraints\ConstraintWithStatusCodeInterface;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Collects errors occurred during the the form submit and adds them into the Context.
  */
 class CollectFormErrors implements ProcessorInterface
 {
+    /** @var ConstraintTextExtractorInterface */
+    protected $constraintTextExtractor;
+
+    /**
+     * @param ConstraintTextExtractorInterface $constraintTextExtractor
+     */
+    public function __construct(ConstraintTextExtractorInterface $constraintTextExtractor)
+    {
+        $this->constraintTextExtractor = $constraintTextExtractor;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -176,7 +186,7 @@ class CollectFormErrors implements ProcessorInterface
                 return Constraint::EXTRA_FIELDS;
             }
 
-            return ValueNormalizerUtil::humanizeClassName(get_class($cause->getConstraint()), 'Constraint');
+            return $this->constraintTextExtractor->getConstraintType($cause->getConstraint());
         }
 
         // undefined constraint type
@@ -193,9 +203,7 @@ class CollectFormErrors implements ProcessorInterface
         $cause = $formError->getCause();
         if ($cause instanceof ConstraintViolation) {
             $constraint = $cause->getConstraint();
-            if ($constraint instanceof ConstraintWithStatusCodeInterface) {
-                return $constraint->getStatusCode();
-            }
+            return $this->constraintTextExtractor->getConstraintStatusCode($constraint);
         }
 
         return null;
