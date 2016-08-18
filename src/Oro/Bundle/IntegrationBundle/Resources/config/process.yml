@@ -1,0 +1,37 @@
+definitions:
+    schedule_integration:
+        label:   'Shedule integration'
+        enabled: true
+        entity:  Oro\Bundle\IntegrationBundle\Entity\Channel
+        order:   10
+        preconditions:
+            '@equal': [$enabled, true]
+        actions_configuration:
+            - '@assign_constant_value':
+                attribute: $.commandName
+                value: Oro\Bundle\IntegrationBundle\Command\SyncCommand::COMMAND_NAME
+            - '@tree':
+                actions:
+                    - '@format_string':
+                        attribute: $.channelArguments
+                        string: '--integration-id=%integration_id%'
+                        arguments:
+                            integration_id: $id
+                    - '@create_entity':
+                        class: JMS\JobQueueBundle\Entity\Job
+                        attribute: $.syncJob
+                        arguments:
+                            - $.commandName
+                            - [$.channelArguments]
+
+triggers:
+    schedule_integration:
+        -
+            event:    update
+            priority: 50
+            queued:   true
+            field:    enabled
+        -
+            event:    create
+            priority: 50
+            queued:   true
