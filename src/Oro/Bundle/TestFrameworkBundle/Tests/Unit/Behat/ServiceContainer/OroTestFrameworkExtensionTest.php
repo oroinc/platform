@@ -32,6 +32,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $config = [
             'shared_contexts' => $this->sharedContexts,
+            'application_suites' => [],
             'elements_namespace_suffix' => '\Tests\Behat\Page\Element',
         ];
 
@@ -50,13 +51,16 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
+        $applicableSuites = ['OroUserBundle'];
 
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, [
             'shared_contexts' => $sharedContexts,
+            'application_suites' => $applicableSuites,
         ]);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
+        $this->assertEquals($applicableSuites, $containerBuilder->getParameter('oro_test.application_suites'));
     }
 
     public function testGetConfigKey()

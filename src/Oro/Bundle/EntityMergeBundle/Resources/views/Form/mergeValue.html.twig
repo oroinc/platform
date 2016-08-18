@@ -1,3 +1,4 @@
+{% import _self as macros %}
 {#
     Available variables:
 
@@ -10,13 +11,17 @@
     <span class="empty">-- {{ 'oro.entity_merge.form.empty'|trans }} --</span>
 {% endset %}
 
+{% set escapeStrategy = metadata.has('autoescape') ? metadata.get('autoescape') : true %}
+
 {% if convertedValue|length %}
     {% if isListValue %}
     {% set hasVisibleValues = false %}
     <ul>
         {% for value in convertedValue if value|length %}
             {% set hasVisibleValues = true %}
-            <li> {{ value }} </li>
+            <li>
+                {{ macros.escape(value, escapeStrategy) }}
+            </li>
         {% endfor %}
 
         {% if not hasVisibleValues %}
@@ -24,8 +29,16 @@
         {% endif %}
     </ul>
     {% else %}
-        {{ convertedValue }}
+        {{ macros.escape(convertedValue, escapeStrategy) }}
     {% endif %}
 {% else %}
     {{ empty_cell }}
 {% endif %}
+
+{% macro escape(value, escapeStrategy = true) %}
+    {% if escapeStrategy %}
+        {{ value|e(escapeStrategy)|raw }}
+    {% else %}
+        {{ value|raw }}
+    {% endif %}
+{% endmacro %}

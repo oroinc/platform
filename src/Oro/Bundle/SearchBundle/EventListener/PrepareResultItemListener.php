@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class PrepareResultItemListener
 {
@@ -32,12 +33,18 @@ class PrepareResultItemListener
      * @param Router $router
      * @param ObjectMapper $mapper
      * @param EntityManager $em
+     * @param EntityTitleResolverInterface $entityTitleResolver
      */
-    public function __construct(Router $router, ObjectMapper $mapper, EntityManager $em)
-    {
+    public function __construct(
+        Router $router,
+        ObjectMapper $mapper,
+        EntityManager $em,
+        EntityTitleResolverInterface $entityTitleResolver
+    ) {
         $this->router = $router;
         $this->mapper = $mapper;
-        $this->em     = $em;
+        $this->em = $em;
+        $this->entityTitleResolver = $entityTitleResolver;
     }
 
     /**
@@ -127,16 +134,7 @@ class PrepareResultItemListener
             $entity = $this->em->getRepository($name)->find($item->getRecordId());
         }
 
-        if ($fields = $this->mapper->getEntityMapParameter($name, 'title_fields')) {
-            $title = array();
-            foreach ($fields as $field) {
-                $title[] = $this->mapper->getFieldValue($entity, $field);
-            }
-        } else {
-            $title = array((string) $entity);
-        }
-
-        return implode(' ', $title);
+        return $this->entityTitleResolver->resolve($entity);
     }
 
     /**
