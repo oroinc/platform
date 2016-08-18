@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\HttpFoundation\File\File as HttpFile;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Validator\Constraints\Image;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigFileDataTransformer implements DataTransformerInterface
 {
@@ -72,16 +71,24 @@ class ConfigFileDataTransformer implements DataTransformerInterface
 
             return null;
         }
-        if (
-            $file->getFile() &&
-            $file->getFile()->isFile() &&
-            0 === count($this->validator->validate($file->getFile(), $this->fileConstraints))
-        ) {
+
+        $httpFile = $file->getFile();
+
+        if ($httpFile && $httpFile->isFile() && $this->isValidHttpFile($httpFile)) {
             $file->preUpdate();
             $em->persist($file);
             $em->flush($file);
         }
 
         return $file->getId();
+    }
+
+    /**
+     * @param HttpFile $httpFile
+     * @return bool
+     */
+    protected function isValidHttpFile($httpFile)
+    {
+        return !count($this->validator->validate($httpFile, $this->fileConstraints));
     }
 }

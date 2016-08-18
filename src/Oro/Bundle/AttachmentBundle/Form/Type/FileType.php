@@ -48,7 +48,7 @@ class FileType extends AbstractType
         );
 
         if ($options['addEventSubscriber']) {
-           $builder->addEventSubscriber($this->eventSubscriber);
+            $builder->addEventSubscriber($this->eventSubscriber);
         }
     }
 
