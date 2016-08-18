@@ -178,8 +178,6 @@ class WorkflowDefinitionController extends Controller
 
         if ($form->isValid()) {
             $workflowManager = $this->get('oro_workflow.manager');
-            $workflowManager->activateWorkflow($workflowDefinition->getName());
-
             $workflowNames = array_merge(
                 $form->getData(),
                 array_map(
@@ -203,6 +201,8 @@ class WorkflowDefinitionController extends Controller
             }
             
             $response['deactivated'] = $deactivated;
+
+            $workflowManager->activateWorkflow($workflowDefinition->getName());
         }
 
         return $response;
