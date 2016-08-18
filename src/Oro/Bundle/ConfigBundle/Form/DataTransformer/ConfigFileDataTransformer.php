@@ -26,6 +26,10 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      */
     private $validator;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param ValidatorInterface $validator
+     */
     public function __construct(DoctrineHelper $doctrineHelper, ValidatorInterface $validator)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -54,16 +58,16 @@ class ConfigFileDataTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param File $file
+     * @param File|null $file
      * @return int|null
      */
     public function reverseTransform($file)
     {
-        $em = $this->doctrineHelper->getEntityManagerForClass(File::class);
-
         if (null === $file) {
             return null;
         }
+
+        $em = $this->doctrineHelper->getEntityManagerForClass(File::class);
 
         if ($file->isEmptyFile()) {
             $em->remove($file);

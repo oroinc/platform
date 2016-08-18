@@ -1,6 +1,6 @@
 <?php
 
-namespace ConfigBundle\Tests\Unit\Utils;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;

@@ -1,6 +1,6 @@
 <?php
 
-namespace ConfigBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 

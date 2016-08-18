@@ -1,5 +1,6 @@
 <?php
-namespace ConfigBundle\Tests\Provider;
+
+namespace Oro\Bundle\ConfigBundle\Tests\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
