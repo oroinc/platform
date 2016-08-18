@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Element;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
+use Oro\Bundle\CommentBundle\Tests\Behat\Element\CommentItem;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
@@ -75,18 +76,11 @@ class ActivityListItem extends Element
      */
     public function editComment($comment, TableNode $table)
     {
-        $commentItem = $this->findContains('li.comment-item', $comment);
+        /** @var CommentItem $commentItem */
+        $commentItem = $this->elementFactory->findElementContains('CommentItem', $comment);
         self::assertNotNull($commentItem, sprintf('Comment with "%s" text not found', $comment));
 
-        $actions = $commentItem->find('css', 'div.comment-actions a.dropdown-toggle');
-        self::assertNotNull($actions, sprintf('Comment "%s" actions dropdown not found', $comment));
-
-        // BAP-11448. PhantomJs not handle mouseOver on this element
-//        $actions->mouseOver();
-        $this->getDriver()->executeJsOnXpath($actions->getXpath(), '{{ELEMENT}}.click()');
-
-        $commentItem->clickLink('Update Comment');
-        $this->getDriver()->waitForAjax();
+        $commentItem->clickActionLink('Update Comment');
 
         /** @var Form $form */
         $form = $this->elementFactory->createElement('Comment');
@@ -99,18 +93,11 @@ class ActivityListItem extends Element
      */
     public function deleteComment($comment)
     {
-        $commentItem = $this->findContains('li.comment-item', $comment);
+        /** @var CommentItem $commentItem */
+        $commentItem = $this->elementFactory->findElementContains('CommentItem', $comment);
         self::assertNotNull($commentItem, sprintf('Comment with "%s" text not found', $comment));
 
-        $actions = $commentItem->find('css', 'div.comment-actions a.dropdown-toggle');
-        self::assertNotNull($actions, sprintf('Comment "%s" actions dropdown not found', $comment));
-
-        // BAP-11448. PhantomJs not handle mouseOver on this element
-//        $actions->mouseOver();
-        $this->getDriver()->executeJsOnXpath($actions->getXpath(), '{{ELEMENT}}.click()');
-
-        $commentItem->clickLink('Delete Comment');
-        $this->getDriver()->waitForAjax();
+        $commentItem->clickActionLink('Delete Comment');
 
         $this->getPage()->clickLink('Yes, Delete');
         $this->getDriver()->waitForAjax();

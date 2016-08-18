@@ -13,10 +13,10 @@ class ActivityList extends Element
      */
     public function getActivityListItem($content)
     {
-        $item = $this->find('css', "div.list-item:contains('$content')");
-        self::assertNotNull($item, sprintf('Item with "%s" content not found in activity list', $content));
+        $item = $this->elementFactory->findElementContains('ActivityListItem', $content);
+        self::assertTrue($item->isValid(), sprintf('Item with "%s" content not found in activity list', $content));
 
-        return $this->elementFactory->wrapElement('ActivityListItem', $item);
+        return $item;
     }
 
     /**

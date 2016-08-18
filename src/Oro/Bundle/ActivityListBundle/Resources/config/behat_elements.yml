@@ -4,3 +4,4 @@ ActivityList:
 
 ActivityListItem:
   class: Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityListItem
+  selector: 'div.list-item'
