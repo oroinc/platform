@@ -67,10 +67,12 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
     public function testGetExtendedType()
     {
+        $expectedResult = method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
+            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
+            : 'form';
+
         $this->assertEquals(
-            method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-                ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
-                : 'form',
+            $expectedResult,
             $this->extension->getExtendedType()
         );
     }
