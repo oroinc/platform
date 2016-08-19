@@ -25,13 +25,15 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $inputData = [
             'feature1' => [
-                'toggle' => 'oro_feature.test.feature_enabled'
+                'toggle' => 'oro_feature.test.feature_enabled',
+                'label' => 'Feature 1 Label'
             ],
         ];
 
         $expected = [
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
+                'label' => 'Feature 1 Label',
                 'strategy' => 'unanimous',
                 'dependency' => [],
                 'route' => [],
@@ -51,6 +53,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
         $inputData = [
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
+                'label' => 'Feature 1 Label',
                 'strategy' => 'some_strategy',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
@@ -65,6 +68,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
         $expected = [
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
+                'label' => 'Feature 1 Label',
                 'strategy' => 'some_strategy',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
@@ -97,6 +101,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function processInvalidConfigurationProvider()
     {
@@ -107,16 +112,36 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'Invalid type for path "features.feature1". Expected array, but got string'
             ],
-            'incorrect array' => [
+            'incorrect toggle' => [
                 'input' => [
                     'feature1' => []
                 ],
                 'message' => 'The child node "toggle" at path "features.feature1" must be configured'
             ],
+            'incorrect label' => [
+                'input' => [
+                    'feature1' => [
+                        'toggle' => 'oro_feature.test.feature_enabled',
+                    ]
+                ],
+                'message' => 'The child node "label" at path "features.feature1" must be configured'
+            ],
+            'incorrect description' => [
+                'input' => [
+                    'feature1' => [
+                        'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
+                        'description' => ['array']
+                    ]
+                ],
+                'message' => 'Invalid type for path "features.feature1.description". ' .
+                    'Expected scalar, but got array'
+            ],
             'incorrect strategy' => [
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'strategy' => ['array']
                     ]
                 ],
@@ -127,6 +152,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'dependency' => 'not_array'
                     ]
                 ],
@@ -137,6 +163,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'route' => 'not_array'
                     ]
                 ],
@@ -147,6 +174,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'workflow' => 'not_array'
                     ]
                 ],
@@ -157,6 +185,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'operation' => 'not_array'
                     ]
                 ],
@@ -167,6 +196,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'process' => ''
                     ]
                 ],
@@ -177,6 +207,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'configuration' => 42
                     ]
                 ],
@@ -187,6 +218,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
+                        'label' => 'Feature 1 Label',
                         'api' => 'not_array'
                     ]
                 ],
