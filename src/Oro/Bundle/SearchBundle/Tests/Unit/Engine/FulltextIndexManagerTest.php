@@ -38,7 +38,7 @@ class FulltextIndexManagerTest extends \PHPUnit_Framework_TestCase
             DatabaseDriverInterface::DRIVER_MYSQL => 'Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql'
         ];
 
-        $this->indexManager = new FulltextIndexManager($this->connection, $config);
+        $this->indexManager = new FulltextIndexManager($this->connection, $config, 'oro_search_index_text');
     }
 
     public function testCreateIndexes()
@@ -46,7 +46,7 @@ class FulltextIndexManagerTest extends \PHPUnit_Framework_TestCase
         $this->connection
             ->expects($this->once())
             ->method('query')
-            ->with(PdoMysql::getPlainSql());
+            ->with(PdoMysql::getPlainSql('oro_search_index_text'));
 
         $this->indexManager->createIndexes();
     }

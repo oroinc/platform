@@ -5,7 +5,6 @@ namespace Oro\Component\Layout\Extension;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
-use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\LayoutItemInterface;
@@ -62,13 +61,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * The data providers provided by this extension
      *
-     * @var DataProviderInterface[]
-     *
-     * Example:
-     *  [
-     *      'data_provider_1' => DataProviderInterface,
-     *      'data_provider_2' => DataProviderInterface
-     *  ]
+     * @var object[]
      */
     private $dataProviders;
 
@@ -269,7 +262,7 @@ abstract class AbstractExtension implements ExtensionInterface
      *      'dataProvider2' => dataProvider2
      *  ]
      *
-     * @return DataProviderInterface[]
+     * @return object[]
      */
     protected function loadDataProviders()
     {
@@ -385,22 +378,12 @@ abstract class AbstractExtension implements ExtensionInterface
 
     /**
      * Initializes data providers.
-     *
-     * @throws Exception\UnexpectedTypeException if any registered data provider is not
-     *                                           an instance of DataProviderInterface
      */
     private function initDataProviders()
     {
         $this->dataProviders = [];
 
         foreach ($this->loadDataProviders() as $name => $dataProvider) {
-            if (!$dataProvider instanceof DataProviderInterface) {
-                throw new Exception\UnexpectedTypeException(
-                    $dataProvider,
-                    'Oro\Component\Layout\DataProviderInterface'
-                );
-            }
-
             $this->dataProviders[$name] = $dataProvider;
         }
     }

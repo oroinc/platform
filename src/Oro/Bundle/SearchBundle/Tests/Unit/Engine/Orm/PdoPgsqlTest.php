@@ -7,8 +7,9 @@ class PdoPgsqlTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetPlainSql()
     {
-        $recordString = PdoPgsql::getPlainSql();
+        $recordString = PdoPgsql::getPlainSql('oro_search_index_text');
         $this->assertTrue(strpos($recordString, 'to_tsvector') > 0);
+        $this->assertContains('oro_search_index_text', $recordString);
     }
 
     public function testInitRepo()

@@ -63,7 +63,7 @@ abstract class RolePrivilegeAbstractProvider
      * @param AbstractRole $role
      * @param string $type
      *
-     * @return array
+     * @return array|AclPrivilege[]
      */
     protected function preparePrivileges(AbstractRole $role, $type)
     {
