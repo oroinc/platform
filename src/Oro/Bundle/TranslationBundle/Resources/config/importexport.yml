@@ -28,8 +28,8 @@ services:
         public: false
         arguments:
             - '@oro_importexport.context_registry'
-            - '@doctrine'
-            - '@translator.default'
+            - '@oro_entity.doctrine_helper'
+            - '@translator'
 
     # Writer
     oro_translation.importexport.writer.translations:

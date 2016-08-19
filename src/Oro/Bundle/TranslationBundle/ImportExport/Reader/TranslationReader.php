@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\TranslationBundle\ImportExport\Reader;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\Translation\DataCollectorTranslator;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationReader extends AbstractReader
 {
-    /** @var ManagerRegistry */
-    protected $registry;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var Translator */
     protected $translator;
@@ -27,17 +27,17 @@ class TranslationReader extends AbstractReader
 
     /**
      * @param ContextRegistry $contextRegistry
-     * @param ManagerRegistry $registry
-     * @param Translator $translator
+     * @param DoctrineHelper $doctrineHelper
+     * @param DataCollectorTranslator $translator
      */
     public function __construct(
         ContextRegistry $contextRegistry,
-        ManagerRegistry $registry,
-        Translator $translator
+        DoctrineHelper $doctrineHelper,
+        DataCollectorTranslator $translator
     ) {
         parent::__construct($contextRegistry);
 
-        $this->registry = $registry;
+        $this->doctrineHelper = $doctrineHelper;
         $this->translator = $translator;
     }
 
@@ -66,21 +66,25 @@ class TranslationReader extends AbstractReader
     protected function getLanguageMessages($languageId)
     {
         if (!isset($this->messages[$languageId])) {
-            $language = $this->getLanguage($languageId);
-            $locale = $language->getCode();
+            $locale = $this->getLanguage($languageId)->getCode();
 
             $defaultMessages = $this->getMessages(Translation::DEFAULT_LOCALE);
             $originalMessages = $this->getMessages($locale, true);
 
-            $defaults = ['locale' => $locale, 'original_value' => ''];
+            $messages = array_merge($defaultMessages, $originalMessages);
 
-            $messages = [];
-            foreach ($defaultMessages as $key => $value) {
-                $messages[$key] = array_merge(
-                    $value,
-                    isset($originalMessages[$key]) ? $originalMessages[$key] : $defaults
+            ksort($messages, SORT_STRING | SORT_FLAG_CASE);
+
+            array_walk($messages, function(array &$message, $key) use ($locale, $originalMessages, $defaultMessages) {
+                $message = array_merge(
+                    $message,
+                    [
+                        'locale' => $locale,
+                        'original_value' => isset($originalMessages[$key]) ? $originalMessages[$key]['value'] : '',
+                        'default_value' => isset($defaultMessages[$key]) ? $defaultMessages[$key]['value'] : '',
+                    ]
                 );
-            }
+            });
 
             $this->messages[$languageId] = array_values($messages);
         }
@@ -105,14 +109,11 @@ class TranslationReader extends AbstractReader
                     'domain' => $domain,
                     'key' => $key,
                     'value' => $value,
-                    'original_value' => $value,
                 ];
 
                 $messages[sprintf('%s.%s', $domain, $key)] = $message;
             }
         }
-
-        ksort($messages, SORT_STRING | SORT_FLAG_CASE);
 
         return $messages;
     }
@@ -123,12 +124,6 @@ class TranslationReader extends AbstractReader
      */
     protected function getLanguage($id)
     {
-        if (!isset($this->languages[$id])) {
-            $languages[$id] = $this->registry->getManagerForClass(Language::class)
-                ->getRepository(Language::class)
-                ->find($id);
-        }
-
-        return $languages[$id];
+        return $this->doctrineHelper->getEntityReference(Language::class, $id);
     }
 }
