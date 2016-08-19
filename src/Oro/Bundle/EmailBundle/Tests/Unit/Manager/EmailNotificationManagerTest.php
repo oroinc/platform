@@ -2,7 +2,12 @@
 
 namespace Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Email;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
@@ -120,50 +125,66 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $count);
     }
 
+    /**
+     * @param EmailOwnerInterface $user
+     *
+     * @return array
+     */
     protected function getEmails($user)
     {
-        $email = [
-            'seen' => 0,
-            0 => $this->getMockEmail([
-                'getId' => 1,
-                'getSubject' => 'subject',
-                'getFromName' => 'fromName',
+        $firstEmail = $this->prepareEmailUser(
+            [
+                'getId'          => 1,
+                'getSubject'     => 'subject',
+                'getFromName'    => 'fromName',
                 'getBodyContent' => 'bodyContent',
-            ], $user)
-        ];
+            ],
+            $user,
+            false
+        );
 
-        $email1 = [
-            'seen'=>1,
-            0 => $this->getMockEmail([
-                'getId' => 2,
-                'getSubject' => 'subject_1',
+        $secondEmail = $this->prepareEmailUser(
+            [
+                'getId'          => 2,
+                'getSubject'     => 'subject_1',
                 'getBodyContent' => 'bodyContent_1',
-                'getFromName' => 'fromName_1',
+                'getFromName'    => 'fromName_1',
 
-            ], $user)
-        ];
+            ],
+            $user,
+            true
+        );
 
-        return [$email, $email1];
+        return [$firstEmail, $secondEmail];
     }
 
-    protected function getMockEmail($values, $user)
+    /**
+     * @param array $values
+     * @param EmailOwnerInterface $user
+     * @param bool $seen
+     *
+     * @return EmailUser
+     */
+    protected function prepareEmailUser($values, $user, $seen)
     {
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')->disableOriginalConstructor()
-            ->getMock();
-        $email->expects($this->exactly(1))->method('getId')->willReturn($values['getId']);
-        $email->expects($this->once())->method('getSubject')->willReturn($values['getSubject']);
-        $email->expects($this->once())->method('getFromName')->willReturn($values['getFromName']);
-        $emailAddress = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailAddress')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailAddress->expects($this->any())->method('getOwner')->willReturn($user);
-        $email->expects($this->any())->method('getFromEmailAddress')->willReturn($emailAddress);
+        $emailBody = new EmailBody();
+        $emailBody->setBodyContent($values['getBodyContent']);
 
-        $emailBody = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')->disableOriginalConstructor()
-            ->getMock();
-        $emailBody->expects($this->once())->method('getBodyContent')->willReturn($values['getBodyContent']);
-        $email->expects($this->once())->method('getEmailBody')->willReturn($emailBody);
+        $email = new Email();
+        $email->setId($values['getId']);
+        $email->setSubject($values['getSubject']);
+        $email->setFromName($values['getFromName']);
 
-        return $email;
+        $emailAddress = new EmailAddress();
+        $emailAddress->setOwner($user);
+
+        $email->setFromEmailAddress($emailAddress);
+        $email->setEmailBody($emailBody);
+
+        $emailUser = new EmailUser();
+        $emailUser->setEmail($email);
+        $emailUser->setSeen($seen);
+
+        return $emailUser;
     }
 }

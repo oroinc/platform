@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
-use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 
@@ -23,6 +23,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 use Oro\Component\Action\Model\ContextAccessor;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTestCase
 {
@@ -126,9 +127,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         WorkflowRegistry $workflowRegistry = null,
         AttributeGuesser $attributeGuesser = null,
         DefaultValuesListener $defaultValuesListener = null,
-        InitActionsListener $initActionListener = null,
+        FormInitListener $formInitListener = null,
         RequiredAttributesListener $requiredAttributesListener = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
+        AuthorizationCheckerInterface $authorizationChecker = null
     ) {
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createWorkflowRegistryMock();
@@ -139,8 +141,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         if (!$defaultValuesListener) {
             $defaultValuesListener = $this->createDefaultValuesListenerMock();
         }
-        if (!$initActionListener) {
-            $initActionListener = $this->createInitActionsListenerMock();
+        if (!$formInitListener) {
+            $formInitListener = $this->createFormInitListenerMock();
         }
         if (!$requiredAttributesListener) {
             $requiredAttributesListener = $this->createRequiredAttributesListenerMock();
@@ -148,15 +150,19 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         if (!$dispatcher) {
             $dispatcher = $this->createDispatcherMock();
         }
+        if (!$authorizationChecker) {
+            $authorizationChecker = $this->createAuthorizationCheckerMock();
+        }
 
         return new WorkflowAttributesType(
             $workflowRegistry,
             $attributeGuesser,
             $defaultValuesListener,
-            $initActionListener,
+            $formInitListener,
             $requiredAttributesListener,
             new ContextAccessor(),
-            $dispatcher
+            $dispatcher,
+            $authorizationChecker
         );
     }
 
@@ -191,9 +197,9 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             ->getMock();
     }
 
-    protected function createInitActionsListenerMock()
+    protected function createFormInitListenerMock()
     {
-        return$this->getMockBuilder('Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener')
+        return$this->getMockBuilder(FormInitListener::class)
             ->disableOriginalConstructor()
             ->setMethods(array('initialize', 'executeInitAction'))
             ->getMock();
@@ -212,5 +218,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         return $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
+    }
+
+    protected function createAuthorizationCheckerMock()
+    {
+        return $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
     }
 }
