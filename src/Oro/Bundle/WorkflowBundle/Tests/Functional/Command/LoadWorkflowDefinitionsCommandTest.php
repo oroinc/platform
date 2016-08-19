@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
-use Symfony\Component\Console\Tester\CommandTester;
-
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
