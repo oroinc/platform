@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
 class ImapEmailRemoveManager implements LoggerAwareInterface
 {
@@ -106,23 +107,27 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
         $imapFolders = $repo->getEmptyOutdatedFoldersByOrigin($origin);
         $folders     = new ArrayCollection();
 
+        /** @var ImapEmailFolder $imapFolder */
         foreach ($imapFolders as $imapFolder) {
-            $this->logger->info(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
+            $emailFolder = $imapFolder->getFolder();
+            if ($emailFolder->getSubFolders()->count() === 0) {
+                $this->logger->info(sprintf('Remove "%s" folder.', $emailFolder->getFullName()));
 
-            if (!$folders->contains($imapFolder->getFolder())) {
-                $folders->add($imapFolder->getFolder());
+                if (!$folders->contains($emailFolder)) {
+                    $folders->add($emailFolder);
+                }
+
+                $this->em->remove($imapFolder);
             }
-
-            $this->em->remove($imapFolder);
         }
 
         foreach ($folders as $folder) {
             $this->em->remove($folder);
         }
 
-        if (count($imapFolders) > 0) {
+        if (count($folders) > 0) {
             $this->em->flush();
-            $this->logger->info(sprintf('Removed %d folder(s).', count($imapFolders)));
+            $this->logger->info(sprintf('Removed %d folder(s).', count($folders)));
         }
     }
 
