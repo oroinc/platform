@@ -657,6 +657,7 @@ define(function(require) {
         },
 
         changeAppearance: function(key, options) {
+            this.$el.attr('data-appearance-type', key);
             this.trigger('changeAppearance', key, options);
         },
 
@@ -920,6 +921,7 @@ define(function(require) {
 
             this.rendered = true;
 
+            this.$el.attr('data-appearance-type', _.result(this.metadata.state, 'appearanceType') || null);
             return this;
         },
 

@@ -166,7 +166,7 @@ define([
             this.subviews.itemsCounter.$el.hide();
 
             if (this.subviews.sortingDropdown) {
-                this.$(this.selector.sortingDropdown).hide().append(this.subviews.sortingDropdown.render().$el);
+                this.$(this.selector.sortingDropdown).append(this.subviews.sortingDropdown.render().$el);
             }
 
             if (this.subviews.extraActionsPanel.haveActions()) {
