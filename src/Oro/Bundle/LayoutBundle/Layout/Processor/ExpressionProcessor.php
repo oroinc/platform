@@ -51,9 +51,9 @@ class ExpressionProcessor
     /**
      * @param Options               $values
      * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
      * @param bool                  $evaluate
      * @param string                $encoding
-     * @param DataAccessorInterface $data
      */
     public function processExpressions(
         Options $values,
@@ -86,9 +86,9 @@ class ExpressionProcessor
     /**
      * @param                       $value
      * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
      * @param                       $evaluate
      * @param                       $encoding
-     * @param DataAccessorInterface $data
      */
     protected function processValue(
         &$value,
@@ -125,16 +125,16 @@ class ExpressionProcessor
                 }
             }
         } elseif ($value instanceof ParsedExpression) {
-                $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
+            $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
         }
     }
 
     /**
      * @param ParsedExpression      $expr
      * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
      * @param bool                  $evaluate
      * @param string                $encoding
-     * @param DataAccessorInterface $data
      * @return mixed|string|ParsedExpression
      * @throws CircularReferenceException
      */

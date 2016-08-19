@@ -53,7 +53,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      * @param array $options
      * @return array
      */
-    protected function resolveValueBags(array $options)
+    protected function resolveValueBags(array &$options)
     {
         foreach ($options as $key => $value) {
             if (is_array($value)) {
