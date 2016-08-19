@@ -5,9 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\UIBundle\Route\Router;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -103,5 +100,30 @@ class ControllersRoleTest extends WebTestCase
         $result = reset($result['data']);
 
         $this->assertEquals(1, $result['id']);
+    }
+
+    /**
+     * @depends testUpdate
+     */
+    public function testView()
+    {
+        $response = $this->client->requestGrid(
+            'roles-grid',
+            ['roles-grid[_filter][label][value]' => 'testRoleUpdated']
+        );
+
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
+        /** @var Crawler $crawler */
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_role_view', ['id' => $result['id']])
+        );
+
+        self::assertContains('testRoleUpdated', $crawler->filter('.responsive-section')->first()->html());
+        self::assertContains('Clone', $crawler->filter('.navigation .title-buttons-container a')->eq(0)->html());
+        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->eq(1)->html());
+        self::assertContains('Delete', $crawler->filter('.navigation .title-buttons-container a')->eq(2)->html());
     }
 }

@@ -147,6 +147,10 @@ define(function(require) {
          * Destroys picker widget
          */
         destroyPickerWidget: function() {
+            if (!this.$frontDateField.data('datepicker')) {
+                // field was removed from DOM and there are no data to retrieve the instance
+                return;
+            }
             this.$frontDateField.datepicker('destroy');
         },
 

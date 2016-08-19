@@ -2,23 +2,24 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
 {
@@ -37,25 +38,21 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /** @var ObjectMapper */
-    protected $mapper;
-
-    /** @var TranslatorInterface */
-    protected $translator;
+    /** @var EntityTitleResolverInterface */
+    protected $entityTitleResolver;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param ObjectManager         $om
-     * @param ActivityManager       $activityManager
-     * @param TokenStorageInterface $securityTokenStorage
-     * @param ConfigManager         $configManager
-     * @param RouterInterface       $router
-     * @param EntityAliasResolver   $entityAliasResolver
-     * @param ObjectMapper          $objectMapper
-     * @param TranslatorInterface   $translator
-     * @param DoctrineHelper        $doctrineHelper
+     * @param ObjectManager                 $om
+     * @param ActivityManager               $activityManager
+     * @param TokenStorageInterface         $securityTokenStorage
+     * @param ConfigManager                 $configManager
+     * @param RouterInterface               $router
+     * @param EntityAliasResolver           $entityAliasResolver
+     * @param EntityTitleResolverInterface  $entityTitleResolver
+     * @param DoctrineHelper                $doctrineHelper
      */
     public function __construct(
         ObjectManager $om,
@@ -64,8 +61,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         ConfigManager $configManager,
         RouterInterface $router,
         EntityAliasResolver $entityAliasResolver,
-        ObjectMapper $objectMapper,
-        TranslatorInterface $translator,
+        EntityTitleResolverInterface $entityTitleResolver,
         DoctrineHelper $doctrineHelper
     ) {
         parent::__construct(null, $om);
@@ -75,8 +71,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $this->configManager        = $configManager;
         $this->router               = $router;
         $this->entityAliasResolver  = $entityAliasResolver;
-        $this->mapper               = $objectMapper;
-        $this->translator           = $translator;
+        $this->entityTitleResolver  = $entityTitleResolver;
         $this->doctrineHelper       = $doctrineHelper;
     }
 
@@ -114,7 +109,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $config        = $entityProvider->getConfig($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
-            $item = $this->prepareItemTitle($item, $targetClass, $target, $targetId);
+            $item['title'] = $this->entityTitleResolver->resolve($target);
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
             $item['entityId']           = $id;
@@ -178,34 +173,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $event = new PrepareContextTitleEvent($item, $targetClass);
             $this->eventDispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
             $item = $event->getItem();
-        }
-
-        return $item;
-    }
-
-    /**
-     * @param $item
-     * @param $targetClass
-     * @param $target
-     * @param $targetId
-     *
-     * @return mixed
-     */
-    protected function prepareItemTitle($item, $targetClass, $target, $targetId)
-    {
-        if (!array_key_exists('title', $item) || !$item['title']) {
-            $item['title'] = [];
-            if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
-                foreach ($fields as $field) {
-                    $item['title'][] = $this->mapper->getFieldValue($target, $field);
-                }
-            }
-            $text          = array_filter($item['title']);
-            $item['title'] = $text
-                ? implode(' ', $text)
-                : $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
-
-            return $item;
         }
 
         return $item;

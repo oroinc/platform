@@ -1119,7 +1119,7 @@
         fieldName - Field name wich value should be rendered
         entityLabelIfNotGranted - Entity label that should be rendered in case if user have no access to see field value
 #}
-{%- macro renderEntiViewLabel(entity, fieldName, entityLabelIfNotGranted = null) -%}
+{%- macro renderEntityViewLabel(entity, fieldName, entityLabelIfNotGranted = null) -%}
     {% if entity is not null and resource_granted('VIEW', entity, fieldName) %}
         {{ attribute(entity, fieldName) }}
     {% else %}

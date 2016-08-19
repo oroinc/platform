@@ -18,30 +18,19 @@ class NumberRangeFilter extends NumberFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         if (!$this->isApplicable($data)) {
-            return parent::apply($ds, $data);
+            return parent::buildExpr($ds, $comparisonType, $fieldName, $data);
         }
 
-        if (false === ($data = $this->parseData($data))) {
-            return false;
-        }
-
-        $type = $data['type'];
-
-        $this->applyFilterToClause(
+        return $this->buildRangeComparisonExpr(
             $ds,
-            $this->buildRangeComparisonExpr(
-                $ds,
-                $type,
-                $this->get(FilterUtility::DATA_NAME_KEY),
-                $data['value'],
-                $data['value_end']
-            )
+            $comparisonType,
+            $fieldName,
+            $data['value'],
+            $data['value_end']
         );
-
-        return true;
     }
 
     /**
