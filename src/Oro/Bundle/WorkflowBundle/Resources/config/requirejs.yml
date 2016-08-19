@@ -22,7 +22,7 @@ config:
         'oro/datagrid/action/workflow-deactivate-action':           'bundles/oroworkflow/js/datagrid/action/workflow-deactivate-action.js'
         'oro/select2-workflow-replacement-component':               'bundles/oroworkflow/js/app/components/select2-workflow-replacement-component.js'
 
-        'oroworkflow/js/app/components/deactivate-form-widget-component': 'bundles/oroworkflow/js/app/components/deactivate-form-widget-component.js'
+        'oroworkflow/js/app/components/activate-form-widget-component': 'bundles/oroworkflow/js/app/components/activate-form-widget-component.js'
         'oroworkflow/js/app/views/workflow-activate-btn-view': 'bundles/oroworkflow/js/app/views/workflow-activate-btn-view.js'
         'oroworkflow/js/app/views/workflow-deactivate-btn-view': 'bundles/oroworkflow/js/app/views/workflow-deactivate-btn-view.js'
     appmodules:

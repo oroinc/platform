@@ -3,12 +3,15 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Processor;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
+use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
 
+use Oro\Bundle\LayoutBundle\Exception\CircularReferenceException;
 use Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry;
 
 class ExpressionProcessor
@@ -23,8 +26,17 @@ class ExpressionProcessor
     /** @var ExpressionEncoderRegistry */
     protected $encoderRegistry;
 
+    /** @var  array */
+    protected $values = [];
+
+    /** @var  array */
+    protected $processingValues = [];
+
+    /** @var  array */
+    protected $processedValues = [];
+
     /**
-     * @param ExpressionLanguage              $expressionLanguage
+     * @param ExpressionLanguage        $expressionLanguage
      * @param ExpressionEncoderRegistry $encoderRegistry
      */
     public function __construct(
@@ -52,40 +64,67 @@ class ExpressionProcessor
         if (!$evaluate && $encoding === null) {
             return;
         }
+        if (array_key_exists('data', $values) || array_key_exists('context', $values)) {
+            throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
+        }
+        $this->values = $values;
+        $this->processedValues = [];
         foreach ($values as $key => &$value) {
-            if (is_string($value)) {
-                if (!empty($value)) {
-                    switch ($this->checkStringValue($value)) {
-                        case self::STRING_IS_REGULAR:
-                            break;
-                        case self::STRING_IS_EXPRESSION:
-                            $value = $this->processExpression(
-                                $this->expressionLanguage->parse(substr($value, 1), ['context', 'data']),
-                                $context,
-                                $evaluate,
-                                $encoding,
-                                $data
-                            );
-                            break;
-                        case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
-                            // the backslash (\) at the begin of the array key should be removed
-                            $value = substr($value, 1);
-                            break;
-                    }
-                }
-            } elseif (is_array($value)) {
-                $this->processExpressions($value, $context, $evaluate, $encoding, $data);
-            } elseif ($value instanceof OptionValueBag) {
-                foreach ($value->all() as $action) {
-                    $args = $action->getArguments();
-                    $this->processExpressions($args, $context, $evaluate, $encoding, $data);
-                    foreach ($args as $index => $arg) {
-                        $action->setArgument($index, $arg);
-                    }
-                }
-            } elseif ($value instanceof ParsedExpression) {
-                $value = $this->processExpression($value, $context, $evaluate, $encoding, $data);
+            if (array_key_exists($key, $this->processedValues)) {
+                $value = $this->processedValues[$key];
+            } else {
+                $this->processingValues[] = $key;
+                $this->processValue($value, $context, $evaluate, $encoding, $data);
+                $this->processedValues[$key] = $value;
             }
+        }
+        unset($value);
+        $values = $this->processedValues;
+    }
+
+    /**
+     * @param                       $value
+     * @param ContextInterface      $context
+     * @param                       $evaluate
+     * @param                       $encoding
+     * @param DataAccessorInterface $data
+     */
+    protected function processValue(
+        &$value,
+        ContextInterface $context,
+        $evaluate,
+        $encoding,
+        DataAccessorInterface $data = null
+    ) {
+        if (is_string($value) && !empty($value)) {
+            switch ($this->checkStringValue($value)) {
+                case self::STRING_IS_REGULAR:
+                    break;
+                case self::STRING_IS_EXPRESSION:
+                    $expr = $this->parseExpression($value);
+                    $value = $this->processExpression($expr, $context, $evaluate, $encoding, $data);
+                    break;
+                case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
+                    // the backslash (\) at the begin of the array key should be removed
+                    $value = substr($value, 1);
+                    break;
+            }
+
+        } elseif (is_array($value)) {
+            foreach ($value as &$item) {
+                $this->processValue($item, $context, $evaluate, $encoding, $data);
+            }
+            unset($item);
+        } elseif ($value instanceof OptionValueBag) {
+            foreach ($value->all() as $action) {
+                $args = $action->getArguments();
+                foreach ($args as $index => $arg) {
+                    $this->processValue($arg, $context, $evaluate, $encoding, $data);
+                    $action->setArgument($index, $arg);
+                }
+            }
+        } elseif ($value instanceof ParsedExpression) {
+                $value = $this->processExpression($value, $context, $evaluate, $encoding, $data);
         }
     }
 
@@ -95,8 +134,8 @@ class ExpressionProcessor
      * @param bool                  $evaluate
      * @param string                $encoding
      * @param DataAccessorInterface $data
-     *
      * @return mixed|string|ParsedExpression
+     * @throws CircularReferenceException
      */
     protected function processExpression(
         ParsedExpression $expr,
@@ -106,12 +145,27 @@ class ExpressionProcessor
         DataAccessorInterface $data = null
     ) {
         $node = $expr->getNodes();
+        $deps = $this->getNotProcessedDependencies($node);
+
         if ($data === null && $this->nodeWorkWithData($node)) {
             return $expr;
         }
 
+        foreach ($deps as $key => $dep) {
+            if (in_array($key, $this->processingValues, true)) {
+                $path = implode(' > ', array_merge($this->processingValues, [$key]));
+                throw new CircularReferenceException(
+                    sprintf('Circular reference "%s" on expression "%s".', $path, (string)$expr)
+                );
+            }
+            $this->processingValues[] = $key;
+            $this->processValue($dep, $context, $evaluate, $encoding, $data);
+            $this->processedValues[$key] = $dep;
+        }
+        $values = array_merge(['context' => $context, 'data' => $data,], $this->values, $this->processedValues);
+
         return $evaluate
-            ? $this->expressionLanguage->evaluate($expr, ['context' => $context, 'data' => $data])
+            ? $this->expressionLanguage->evaluate($expr, $values)
             : $this->encoderRegistry->getEncoder($encoding)->encodeExpr($expr);
     }
 
@@ -142,10 +196,35 @@ class ExpressionProcessor
     }
 
     /**
-     * @param $node
+     * @param Node $node
+     * @return array
      */
-    protected function nodeWorkWithData($node)
+    protected function getNotProcessedDependencies(Node $node)
     {
-        //TO DO realisation
+        $deps = [];
+        if ($node instanceof NameNode) {
+            $name = $node->attributes['name'];
+            if (array_key_exists($name, $this->values) &&
+                !array_key_exists($name, $this->processedValues)
+            ) {
+                $deps[$name] = $this->values[$name];
+            }
+        }
+        foreach ($node->nodes as $childNode) {
+            $deps = array_merge($deps, $this->getNotProcessedDependencies($childNode));
+        }
+
+        return $deps;
+    }
+
+    /**
+     * @param $value
+     * @return ParsedExpression
+     */
+    protected function parseExpression($value)
+    {
+        $names = array_merge(['context', 'data'], array_keys($this->values));
+
+        return $this->expressionLanguage->parse(substr($value, 1), $names);
     }
 }
