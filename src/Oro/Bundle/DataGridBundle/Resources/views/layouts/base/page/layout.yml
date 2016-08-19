@@ -2,8 +2,3 @@ layout:
     actions:
         - '@setBlockTheme':
             themes: 'OroDataGridBundle:layouts:base/page/layout.html.twig'
-
-    imports:
-        -
-            id: datagrid_toolbar
-            root: scripts_before

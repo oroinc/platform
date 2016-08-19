@@ -1,0 +1,9 @@
+layout:
+    actions:
+        - '@addTree':
+            items:
+                __datagrid:
+                    blockType: datagrid
+            tree:
+                __root:
+                    __datagrid: ~
