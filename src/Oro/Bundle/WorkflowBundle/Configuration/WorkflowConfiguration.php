@@ -18,6 +18,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
+    const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
+    const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -74,11 +76,24 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->booleanNode('steps_display_ordered')
                 ->defaultFalse()
             ->end()
+            ->arrayNode('defaults')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('active')
+                        ->defaultFalse()
+                    ->end()
+                ->end()
+            ->end()
+            ->integerNode('priority')
+                ->defaultValue(0)
+            ->end()
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
             ->append($this->getTransitionDefinitionsNode())
-            ->append($this->getEntityRestrictionsNode());
+            ->append($this->getEntityRestrictionsNode())
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_ACTIVE_GROUPS))
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_RECORD_GROUPS));
 
         return $nodeBuilder;
     }
@@ -370,6 +385,26 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->end()
                     ->end()
                 ->end()
+            ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getGroupsNode($nodeName)
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root($nodeName);
+        $rootNode
+            ->beforeNormalization()
+                ->always()
+                ->then(function ($v) {
+                    return array_map('strtolower', $v);
+                })
+            ->end()
+            ->prototype('scalar')
             ->end();
 
         return $rootNode;
