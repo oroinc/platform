@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
+use Symfony\Component\Config\Definition\Processor;
 
 class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +19,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessEmptyConfiguration()
     {
-        $this->assertEquals([], $this->configuration->processConfiguration([]));
+        $this->assertEquals([], $this->processConfiguration([]));
     }
 
     public function testProcessMinValidConfiguration()
@@ -45,7 +46,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->configuration->processConfiguration($inputData));
+        $this->assertEquals($expected, $this->processConfiguration($inputData));
     }
 
     public function testProcessFullValidConfiguration()
@@ -80,7 +81,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->configuration->processConfiguration($inputData));
+        $this->assertEquals($expected, $this->processConfiguration($inputData));
     }
 
     /**
@@ -96,7 +97,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             $expectedExceptionMessage
         );
 
-        $this->configuration->processConfiguration($inputData);
+        $this->processConfiguration($inputData);
     }
 
     /**
@@ -226,5 +227,16 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                     'Expected array, but got string'
             ],
         ];
+    }
+
+    /**
+     * @param array $inputData
+     * @return array
+     */
+    protected function processConfiguration(array $inputData)
+    {
+        $processor = new Processor();
+
+        return $processor->processConfiguration($this->configuration, [$inputData]);
     }
 }

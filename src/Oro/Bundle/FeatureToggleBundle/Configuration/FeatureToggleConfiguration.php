@@ -2,31 +2,20 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Oro\Bundle\ActionBundle\Configuration\ConfigurationDefinitionInterface;
-
-use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class FeatureToggleConfiguration implements ConfigurationDefinitionInterface
+class FeatureToggleConfiguration implements ConfigurationInterface
 {
-    /**
-     * @param array $configs
-     * @return array
-     */
-    public function processConfiguration(array $configs)
-    {
-        $processor = new Processor();
+    const ROOT = 'features';
 
-        return $processor->processConfiguration($this, [$configs]);
-    }
-    
     /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root('features');
+        $root = $builder->root(self::ROOT);
 
         $children = $root->useAttributeAsKey('name')->prototype('array')->children();
 

@@ -1,1 +1,29 @@
 services:
+    oro_featuretoggle.cache.provider.features:
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_featuretoggle_features' ] ]
+
+    oro_featuretoggle.configuration.provider:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
+        arguments:
+            - []
+            - '%kernel.bundles%'
+            - '@oro_featuretoggle.cache.provider.features'
+
+    oro_featuretoggle.cache.clearer:
+        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheClearer'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_featuretoggle.cache.warmer:
+        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheWarmer'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+        tags:
+            - { name: kernel.cache_warmer }
