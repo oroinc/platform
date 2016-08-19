@@ -77,17 +77,17 @@
             }) %}
         {% endif %}
         <label for="{{ id }}"
-               class="checkbox"
+               class="custom-checkbox"
         >
             <input id="{{ id }}"
-                   type="checkbox"
-                   class="checkbox__input"
+                   type="custom-checkbox"
+                   class="custom-checkbox__input"
                    {{ block('widget_attributes') }}
                    {% if value is defined %} value="{{ value }}" {% endif %}
                    {% if checked is defined %} checked="checked" {% endif %}
             >
-            <span class="checkbox__icon"></span>
-            <span class="checkbox__text">{{ label|block_text(translation_domain) }} </span>
+            <span class="custom-checkbox__icon"></span>
+            <span class="custom-checkbox__text">{{ label|block_text(translation_domain) }} </span>
         </label>
 
     {% else %}
