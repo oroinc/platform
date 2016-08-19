@@ -92,10 +92,14 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
 
                 return self::REJECT;
             }
+        }
 
-            $priority = isset($dependentJob['priority']) ? $dependentJob['priority'] : MessagePriority::NORMAL;
-
-            $this->producer->send($dependentJob['topic'], $dependentJob['message'], $priority);
+        foreach ($dependentJobs as $dependentJob) {
+            if (isset($dependentJob['priority'])) {
+                $this->producer->send($dependentJob['topic'], $dependentJob['message'], $dependentJob['priority']);
+            } else {
+                $this->producer->send($dependentJob['topic'], $dependentJob['message']);
+            }
         }
 
         return self::ACK;
