@@ -72,8 +72,6 @@ class TranslationReader extends AbstractReader
             $defaultMessages = $this->getMessages(Translation::DEFAULT_LOCALE);
             $originalMessages = $this->getMessages($locale, true);
 
-            error_log('defaultMessages: ' . json_encode([count($defaultMessages), count($originalMessages)]));
-
             $defaults = ['locale' => $locale, 'original_value' => ''];
 
             $messages = [];
