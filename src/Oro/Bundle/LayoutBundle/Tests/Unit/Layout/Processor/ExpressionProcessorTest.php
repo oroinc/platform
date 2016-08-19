@@ -9,6 +9,7 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
+use Oro\Component\Layout\Block\Type\Options;
 
 use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor;
@@ -72,8 +73,9 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['attr']['class'] = $classAttr;
         $values['label_attr']['enabled'] = '=true';
         $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
+        $values = new Options($values);
 
-        $this->processor->processExpressions($values, $context, $data, true, null);
+        $this->processor->processExpressions($values, $context, true, null, $data);
 
         $this->assertSame(
             true,
@@ -146,8 +148,9 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['first'] = '=second';
         $values['second'] = '=third';
         $values['third'] = '=true == first';
+        $values = new Options($values);
 
-        $this->processor->processExpressions($values, $context, $data, true, null);
+        $this->processor->processExpressions($values, $context, true, null, $data);
 
     }
 
@@ -161,8 +164,9 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $context = new LayoutContext();
         $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $values['data'] = 'test';
+        $values = new Options($values);
 
-        $this->processor->processExpressions($values, $context, $data, true, null);
+        $this->processor->processExpressions($values, $context, true, null, $data);
     }
 
     /**
@@ -174,6 +178,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $context = new LayoutContext();
         $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $values['context'] = 'test';
+        $values = new Options($values);
 
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
@@ -193,10 +198,10 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['scalar'] = 123;
         $values['attr']['enabled'] = '=true';
         $values['label_attr']['enabled'] = '=true';
-
+        $values = new Options($values);
         $initialVars = $values;
 
-        $this->processor->processExpressions($values, $context, $data, false, null);
+        $this->processor->processExpressions($values, $context, false, null, $data);
 
         $this->assertSame($initialVars, $values);
     }
@@ -218,11 +223,11 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['attr']['enabled'] = '=true';
         $values['attr']['class'] = $classAttr;
         $values['label_attr']['enabled'] = '=true';
+        $values = new Options($values);
 
-        $this->processor->processExpressions($values, $context, $data, false, 'json');
 
+        $this->processor->processExpressions($values, $context, false, 'json', $data);
         $trueExprJson = __DIR__.'/data/true_expression.json';
-
         $this->assertJsonStringEqualsJsonFile(
             $trueExprJson,
             $values['expr_object'],

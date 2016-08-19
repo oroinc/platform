@@ -10,6 +10,7 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
+use Oro\Component\Layout\Block\Type\Options;
 
 use Oro\Bundle\LayoutBundle\Exception\CircularReferenceException;
 use Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry;
@@ -48,14 +49,14 @@ class ExpressionProcessor
     }
 
     /**
-     * @param array                 $values
+     * @param Options               $values
      * @param ContextInterface      $context
      * @param bool                  $evaluate
      * @param string                $encoding
      * @param DataAccessorInterface $data
      */
     public function processExpressions(
-        array &$values,
+        Options &$values,
         ContextInterface $context,
         $evaluate,
         $encoding,
@@ -64,7 +65,7 @@ class ExpressionProcessor
         if (!$evaluate && $encoding === null) {
             return;
         }
-        if (array_key_exists('data', $values) || array_key_exists('context', $values)) {
+        if (property_exists($values, 'data') || property_exists($values, 'context')) {
             throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
         }
         $this->values = $values;
@@ -226,5 +227,25 @@ class ExpressionProcessor
         $names = array_merge(['context', 'data'], array_keys($this->values));
 
         return $this->expressionLanguage->parse(substr($value, 1), $names);
+    }
+
+    /**
+     * @param Node $node
+     *
+     * @return boolean
+     */
+    protected function nodeWorkWithData(Node $node)
+    {
+        $hasData = false;
+        if ($node instanceof NameNode) {
+            if ($node->attributes['name'] === 'data') {
+                return true;
+            }
+        }
+        foreach ($node->nodes as $childNode) {
+            $hasData = $this->nodeWorkWithData($childNode) || $hasData;
+        }
+
+        return $hasData;
     }
 }
