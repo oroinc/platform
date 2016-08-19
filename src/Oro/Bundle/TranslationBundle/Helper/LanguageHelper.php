@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Helper;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
@@ -22,22 +24,28 @@ class LanguageHelper
     /** @var TranslationServiceProvider */
     protected $translationServiceProvider;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param TranslationStatisticProvider $translationStatisticProvider
      * @param PackagesProvider $packagesProvider
      * @param OroTranslationAdapter $translationAdapter
      * @param TranslationServiceProvider $translationServiceProvider
+     * @param ConfigManager $configManager
      */
     public function __construct(
         TranslationStatisticProvider $translationStatisticProvider,
         PackagesProvider $packagesProvider,
         OroTranslationAdapter $translationAdapter,
-        TranslationServiceProvider $translationServiceProvider
+        TranslationServiceProvider $translationServiceProvider,
+        ConfigManager $configManager
     ) {
         $this->translationStatisticProvider = $translationStatisticProvider;
         $this->packagesProvider = $packagesProvider;
         $this->translationAdapter = $translationAdapter;
         $this->translationServiceProvider = $translationServiceProvider;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -155,5 +163,17 @@ class LanguageHelper
         date_default_timezone_set($defaultTimezone);
 
         return $result;
+    }
+
+    /**
+     * @param Language $language
+     *
+     * @return bool
+     */
+    public function isDefaultLanguage(Language $language)
+    {
+        $defaultLanguage = $this->configManager->get(Configuration::getConfigKeyByName(Configuration::LANGUAGE));
+
+        return $defaultLanguage === $language->getCode();
     }
 }
