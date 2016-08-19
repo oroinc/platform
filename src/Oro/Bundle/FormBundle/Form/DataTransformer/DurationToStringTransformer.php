@@ -24,6 +24,11 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DurationToStringTransformer implements DataTransformerInterface
 {
+    const DURATION_JIRA_REGEX = '/^' .
+                                '(?:(?:(\d+(?:\.\d{0,2})?)?)h(?:[\s]*|$))?' .
+                                '(?:(?:(\d+(?:\.\d{0,2})?)?)m(?:[\s]*|$))?' .
+                                '(?:(?:(\d+(?:\.\d{0,2})?)?)s)?' .
+                                '$/i';
     /**
      * {@inheritdoc}
      */
@@ -80,13 +85,7 @@ class DurationToStringTransformer implements DataTransformerInterface
         $time = trim((string)$time);
 
         // matches JIRA style string
-        $regex = '/^' .
-                 '(?:(?:(\d+(?:\.\d{0,2})?)?)h(?:[\s]*|$))?' .
-                 '(?:(?:(\d+(?:\.\d{0,2})?)?)m(?:[\s]*|$))?' .
-                 '(?:(?:(\d+(?:\.\d{0,2})?)?)s)?' .
-                 '$/i';
-
-        if (preg_match_all($regex, $time, $matches)) {
+        if (preg_match_all(self::DURATION_JIRA_REGEX, $time, $matches)) {
             return [
                 'h' => $matches[1][0],
                 'm' => $matches[2][0],
