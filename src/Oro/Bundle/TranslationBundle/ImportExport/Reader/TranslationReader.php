@@ -19,9 +19,6 @@ class TranslationReader extends AbstractReader
     /** @var Translator */
     protected $translator;
 
-    /** @var Language[] */
-    protected $languages;
-
     /** @var array */
     protected $messages;
 
@@ -75,7 +72,7 @@ class TranslationReader extends AbstractReader
 
             ksort($messages, SORT_STRING | SORT_FLAG_CASE);
 
-            array_walk($messages, function(array &$message, $key) use ($locale, $originalMessages, $defaultMessages) {
+            array_walk($messages, function (array &$message, $key) use ($locale, $originalMessages, $defaultMessages) {
                 $message = array_merge(
                     $message,
                     [
