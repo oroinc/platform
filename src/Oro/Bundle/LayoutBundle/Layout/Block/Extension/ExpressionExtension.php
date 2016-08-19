@@ -32,7 +32,7 @@ class ExpressionExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function normalizeOptions(Options &$options, ContextInterface $context, DataAccessorInterface $data)
+    public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
         $this->processor->processExpressions($options, $context, true, null, null);
     }
