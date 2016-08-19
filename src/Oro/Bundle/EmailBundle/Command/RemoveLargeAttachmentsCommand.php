@@ -26,9 +26,6 @@ class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
 
     const LIMIT = 100;
 
-    /** @var bool */
-    protected $base64DecodingSupported;
-
     /**
      * {@inheritdoc}
      */
@@ -90,7 +87,7 @@ class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
      */
     protected function createRemoveAttachmentCallback($size)
     {
-        if ($size === null || $this->isBase64DecodingSupported()) {
+        if ($size === null) {
             return function (EmailAttachment $attachment) {
                 $attachment->getEmailBody()->removeAttachment($attachment);
             };
@@ -126,18 +123,14 @@ class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
             ->join('a.attachmentContent', 'eac');
 
         if ($size !== null) {
-            $base64Length = $this->isBase64DecodingSupported()
-                ? 'BASE64_LENGTH(eac.content)'
-                /**
-                 * Base64-encoded data takes about 33% more space than the original data.
-                 * @see http://php.net/manual/en/function.base64-encode.php
-                 */
-                : 'LENGTH(eac.content) * 0.67';
-
+            /**
+             * Base64-encoded data takes about 33% more space than the original data.
+             * @see http://php.net/manual/en/function.base64-encode.php
+             */
             $qb
-                ->andWhere(<<<DQL
+                ->andWhere(<<<'DQL'
 CASE WHEN eac.contentTransferEncoding = 'base64' THEN
-    $base64Length
+    LENGTH(eac.content) * 0.67
 ELSE
     LENGTH(eac.content)
 END >= :size
@@ -159,29 +152,6 @@ DQL
         return $sizeInMb !== null
             ? (int) ($sizeInMb * 1024 * 1024)
             : (int) ($this->getConfigManager()->get('oro_email.attachment_sync_max_size') * 1024 * 1024);
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function isBase64DecodingSupported()
-    {
-        if ($this->base64DecodingSupported === null) {
-            $connection = $this->getEntityManager()->getConnection();
-            if (!$connection->getDatabasePlatform() instanceof MySqlPlatform) {
-                return true;
-            }
-
-            $version = $connection
-                ->executeQuery('SELECT VERSION()')
-                ->fetchColumn();
-
-            list($major, $minor) = explode('.', $version);
-
-            $this->base64DecodingSupported = $major > 5 || ($major === 5 && $minor >= 6);
-        }
-
-        return $this->base64DecodingSupported;
     }
 
     /**
