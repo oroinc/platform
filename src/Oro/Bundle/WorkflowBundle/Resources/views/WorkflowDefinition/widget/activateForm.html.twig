@@ -1,25 +1,39 @@
 <div class="widget-content"
-     data-page-component-module="oroworkflow/js/app/components/deactivate-form-widget-component"
+     data-page-component-module="oroworkflow/js/app/components/activate-form-widget-component"
      data-page-component-options="{{ {
          '_wid': app.request.get('_wid'),
          'workflow': workflow,
-         'deactivated': savedId is defined and deactivated is defined ? deactivated|join(', ') : null,
+         'success': savedId is defined,
+         'deactivated': deactivated is defined ? deactivated|join(', ') : null,
          'selectors': {
              'form': '#' ~ form.vars.id
          },
          'buttonName': 'activate'
      }|json_encode }}">
-    <div class="alert alert-warning">
-        <div class="message">
-            {{ 'oro.workflow.workflowdefinition.form.replace_message'|trans }}
-        </div>
-    </div>
 
     {% if form.vars.errors|length > 0 %}
         <div class="alert alert-error">
             {{ form_errors(form) }}
         </div>
     {% endif %}
+
+    <div class="alert workflow-deactivation-message">
+        <div class="message">
+            {% if workflowsToDeactivation %}
+                <p>
+                    {{ 'oro.workflow.workflowdefinition.form.workflow_to_deactivation_message'|trans }}
+                    <ul>
+                        {% for workflowToDeactivation in workflowsToDeactivation %}
+                            <li>
+                                <a href="{{ path('oro_workflow_definition_view', {name: workflowToDeactivation.name}) }}">{{ workflowToDeactivation.label }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </p>
+            {% endif %}
+            <p>{{ 'oro.workflow.workflowdefinition.form.replace_message'|trans }}</p>
+        </div>
+    </div>
 
     <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ app.request.uri }}" {{ form_enctype(form) }}
           method="{{ form.vars.method }}" data-collect="true" class="form-dialog">
