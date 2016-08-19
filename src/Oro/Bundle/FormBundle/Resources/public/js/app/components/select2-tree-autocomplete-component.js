@@ -15,7 +15,7 @@ define(function(require) {
             var propName = config.renderedPropertyName || 'name';
             config.result_template = config.result_template || this.makeItemTemplate(propName, true);
             config.selection_template = config.selection_template || this.makeItemTemplate(propName, false);
-            config.className = 'select2-tree-autocomplete';
+            config.containerCssClass = 'select2-tree-autocomplete';
             config.onAfterInit = function(select2Instance) {
                 var oldPositionDropdown = select2Instance.positionDropdown;
                 select2Instance.positionDropdown = function() {
@@ -32,7 +32,7 @@ define(function(require) {
             var template = require('tpl!oroform/templates/select2-tree-autocomplete-result.html');
 
             var mixData = {
-                newKey: 'oro.form.new',
+                newKey: 'oro.form.add_new',
                 getLabel: function(item, highlight) {
                     var label = _.escape(item[propName]);
                     if (forSelection) {

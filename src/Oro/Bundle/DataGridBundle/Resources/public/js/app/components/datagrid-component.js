@@ -266,7 +266,7 @@ define(function(require) {
 
         selectAppearanceById: function(id) {
             var appearanceOptions = _.find(this.metadata.options.appearances, function(item) {
-                return item.id === id;
+                return item.id === id || (id === '' && item.id === void 0 /* non specified on default view */);
             });
             if (!appearanceOptions) {
                 var error = new Error('Could not find appearance `' + id + '`');
