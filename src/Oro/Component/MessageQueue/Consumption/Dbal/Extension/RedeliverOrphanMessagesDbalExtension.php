@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption\Dbal\Extension;
 
+use Doctrine\DBAL\Types\Type;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
@@ -49,11 +50,22 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $dbal = $connection->getDBALConnection();
 
         $sql = sprintf(
-            'UPDATE %s SET consumer_id=NULL, delivered_at=NULL, redelivered=1 WHERE delivered_at <= ?',
+            'UPDATE %s SET consumer_id=NULL, delivered_at=NULL, redelivered=:isRedelivered '.
+            'WHERE delivered_at <= :deliveredAt',
             $connection->getTableName()
         );
 
-        $affectedRows = $dbal->executeUpdate($sql, [time() - $this->orphanTime]);
+        $affectedRows = $dbal->executeUpdate(
+            $sql,
+            [
+                'isRedelivered' => true,
+                'deliveredAt' => time() - $this->orphanTime,
+            ],
+            [
+                'isRedelivered' => Type::BOOLEAN,
+                'deliveredAt' => Type::INTEGER,
+            ]
+        );
 
         if ($affectedRows) {
             $context->getLogger()->alert(sprintf(

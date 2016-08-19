@@ -3,7 +3,7 @@
 {% endif %}
 {% if entity is defined and entity
     and entity_class is defined
-    and has_workflows(entity_class)
+    and has_workflows(entity)
     and has_workflow_items(entity)
     and resource_granted('oro_workflow')
 %}

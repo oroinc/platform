@@ -8,15 +8,9 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 
-class UpdateEntityConfigsQuery extends ParametrizedMigrationQuery
+class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
 {
-    const CONFIG_KEY = 'workflow';
-
-    const OLD_CONFIG_KEY = 'active_workflow';
-    const NEW_CONFIG_KEY = WorkflowSystemConfigManager::CONFIG_KEY;
-
     /**
      * {@inheritdoc}
      */
@@ -25,7 +19,10 @@ class UpdateEntityConfigsQuery extends ParametrizedMigrationQuery
         $logger = new ArrayLogger();
         $this->migrateConfigs($logger, true);
 
-        return $logger->getMessages();
+        return array_merge(
+            ['Moves from entities config "active_workflow" to corresponded workflow "active" field.'],
+            $logger->getMessages()
+        );
     }
 
     /**
@@ -38,7 +35,7 @@ class UpdateEntityConfigsQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param bool            $dryRun
+     * @param bool $dryRun
      */
     protected function migrateConfigs(LoggerInterface $logger, $dryRun = false)
     {
@@ -49,12 +46,17 @@ class UpdateEntityConfigsQuery extends ParametrizedMigrationQuery
         foreach ($rows as $row) {
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
 
-            if (array_key_exists(self::CONFIG_KEY, $data) &&
-                array_key_exists(self::OLD_CONFIG_KEY, $data[self::CONFIG_KEY])
-            ) {
-                $data[self::CONFIG_KEY][self::NEW_CONFIG_KEY] = (array)$data[self::CONFIG_KEY][self::OLD_CONFIG_KEY];
-                unset($data[self::CONFIG_KEY][self::OLD_CONFIG_KEY]);
+            if ($this->isWorkflowAwareData($data)) {
+                $workflowName = $data['workflow']['active_workflow'];
+                if (!empty($workflowName)) {
+                    $queries[] = [
+                        'UPDATE oro_workflow_definition SET active = :is_active WHERE name = :workflow_name',
+                        ['is_active' => true, 'workflow_name' => $workflowName],
+                        ['is_active' => Type::BOOLEAN, 'workflow_name' => Type::STRING]
+                    ];
+                }
 
+                unset($data['workflow']['active_workflow']);
                 $queries[] = [
                     'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                     ['data' => $data, 'id' => $row['id']],
@@ -76,14 +78,23 @@ class UpdateEntityConfigsQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @return array
      */
-    protected function getRows(LoggerInterface $logger)
+    private function getRows(LoggerInterface $logger)
     {
         $query  = 'SELECT id, data FROM oro_entity_config';
-        $params = [];
-        $types  = [];
 
-        $this->logQuery($logger, $query, $params, $types);
+        $this->logQuery($logger, $query);
 
-        return $this->connection->fetchAll($query, $params, $types);
+        return $this->connection->fetchAll($query);
+    }
+
+    /**
+     * @param mixed $data
+     * @return bool
+     */
+    private function isWorkflowAwareData($data)
+    {
+        return is_array($data) &&
+            array_key_exists('workflow', $data) &&
+            array_key_exists('active_workflow', $data['workflow']);
     }
 }

@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
 class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowManager;
+    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowRegistry;
 
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -26,22 +27,22 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager')
+        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new WorkflowVirtualRelationProvider($this->workflowManager, $this->doctrineHelper);
+        $this->provider = new WorkflowVirtualRelationProvider($this->workflowRegistry, $this->doctrineHelper);
     }
 
     // testIsVirtualRelation
     public function testIsVirtualRelationAndUnknownRelationFieldName()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
-        $this->workflowManager->expects($this->never())->method('getActiveWorkflowNamesByEntity');
+        $this->workflowRegistry->expects($this->never())->method('getActiveWorkflowsByEntityClass');
 
         $this->assertFalse($this->provider->isVirtualRelation('stdClass', 'unknown_relation'));
     }
@@ -127,7 +128,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetVirtualRelationQueryAndUnknownRelationFieldName()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
-        $this->workflowManager->expects($this->never())->method('getActiveWorkflowNamesByEntity');
+        $this->workflowRegistry->expects($this->never())->method('getActiveWorkflowsByEntityClass');
 
         $this->assertEquals([], $this->provider->getVirtualRelationQuery('stdClass', 'unknown_field'));
     }
@@ -180,17 +181,12 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertWorkflowManagerCalled($result, $class = null)
     {
-        $data = [];
-        if ($result) {
-            $data = ['test_workflow'];
-        }
-
-        $moker = $this->workflowManager->expects($this->once())
-            ->method('getActiveWorkflowNamesByEntity')
-            ->willReturn($data);
+        $mocker = $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByEntityClass')
+            ->willReturn(new ArrayCollection($result ? ['non Empty'] : []));
 
         if ($class) {
-            $moker->with($class);
+            $mocker->with($class);
         }
     }
 }
