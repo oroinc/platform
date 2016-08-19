@@ -47,7 +47,7 @@ operations:
                 attribute: $.isDefaultLanguage
         preconditions:
             '@and':
-                - '@equal': [$.isDefaultLanguage, true]
+                - '@equal': [$.isDefaultLanguage, false]
                 - '@equal': [$enabled, true]
         actions:
             - '@run_action_group':
