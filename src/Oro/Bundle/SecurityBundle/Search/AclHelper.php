@@ -51,7 +51,7 @@ class AclHelper
         $allowedAliases   = [];
         $ownerExpressions = [];
         $expr             = $query->getCriteria()->expr();
-        if (count($querySearchAliases) !== 0) {
+        if (false !== $querySearchAliases && count($querySearchAliases) !== 0) {
             foreach ($querySearchAliases as $entityAlias) {
                 $className = $this->mappingProvider->getEntityClass($entityAlias);
                 if ($className) {

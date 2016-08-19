@@ -18,6 +18,14 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     protected $result;
 
     /**
+     * Performing an internal query() to the engine, without
+     * data postprocessing etc.
+     *
+     * @return mixed
+     */
+    abstract protected function query();
+
+    /**
      * Getting the results from the query() and caching them.
      *
      * @return mixed|Result

@@ -6,24 +6,25 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Factory\QueryFactory;
+use Oro\Bundle\SearchBundle\Factory\QueryFactoryInterface;
 
 class SearchDatasource implements DatasourceInterface
 {
     const TYPE = 'search';
 
-    /** @var Indexer */
-    protected $indexer;
+    /** @var QueryFactoryInterface */
+    protected $queryFactory;
 
-    /** @var IndexerQuery */
+    /** @var SearchQueryInterface */
     protected $query;
 
     /**
-     * @param Indexer $indexer
+     * @param QueryFactoryInterface $factory
      */
-    public function __construct(Indexer $indexer)
+    public function __construct(QueryFactoryInterface $factory)
     {
-        $this->indexer = $indexer;
+        $this->queryFactory = $factory;
     }
 
     /**
@@ -31,10 +32,8 @@ class SearchDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
-        $this->query = new IndexerQuery(
-            $this->indexer,
-            $this->indexer->select()
-        );
+        $this->query = $this->queryFactory->create($grid, $config);
+
         $grid->setDatasource(clone $this);
     }
 
@@ -53,10 +52,20 @@ class SearchDatasource implements DatasourceInterface
     }
 
     /**
-     * @return IndexerQuery
+     * @return SearchQueryInterface
      */
     public function getQuery()
     {
         return $this->query;
+    }
+
+    /**
+     * The SearchQuery is a builder itself.
+     *
+     * @return SearchQueryInterface
+     */
+    public function getQueryBuilder()
+    {
+        return $this->getQuery();
     }
 }
