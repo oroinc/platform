@@ -3,13 +3,14 @@ namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
-class DependentJobMessageProcessor implements MessageProcessorInterface
+class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var JobStorage
@@ -75,26 +76,36 @@ class DependentJobMessageProcessor implements MessageProcessorInterface
 
         $jobData = $job->getData();
 
-        if (! isset($jobData['dependentJob'])) {
+        if (! isset($jobData['dependentJobs'])) {
             return self::ACK;
         }
 
-        $dependentJob = $jobData['dependentJob'];
+        $dependentJobs = $jobData['dependentJobs'];
 
-        if (! isset($dependentJob['topic']) || ! isset($dependentJob['message'])) {
-            $this->logger->critical(sprintf(
-                '[DependentJobMessageProcessor] Got invalid dependent job data. job: "%s", dependentJob: "%s"',
-                $job->getId(),
-                JSON::encode($dependentJob)
-            ));
+        foreach ($dependentJobs as $dependentJob) {
+            if (! isset($dependentJob['topic']) || ! isset($dependentJob['message'])) {
+                $this->logger->critical(sprintf(
+                    '[DependentJobMessageProcessor] Got invalid dependent job data. job: "%s", dependentJob: "%s"',
+                    $job->getId(),
+                    JSON::encode($dependentJob)
+                ));
 
-            return self::REJECT;
+                return self::REJECT;
+            }
+
+            $priority = isset($dependentJob['priority']) ? $dependentJob['priority'] : MessagePriority::NORMAL;
+
+            $this->producer->send($dependentJob['topic'], $dependentJob['message'], $priority);
         }
 
-        $priority = isset($dependentJob['priority']) ? $dependentJob['priority'] : MessagePriority::NORMAL;
-
-        $this->producer->send($dependentJob['topic'], $dependentJob['message'], $priority);
-
         return self::ACK;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedTopics()
+    {
+        return [Topics::ROOT_JOB_STOPPED];
     }
 }

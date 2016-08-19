@@ -36,9 +36,24 @@ services:
         arguments:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.job.calculate_root_job_status_case'
+            - '@oro_message_queue.client.message_producer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.job.dependent_job_processor:
+        class: 'Oro\Component\MessageQueue\Job\DependentJobMessageProcessor'
+        arguments:
+            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.job.dependent_job_service:
+        class: 'Oro\Component\MessageQueue\Job\DependentJobService'
+        arguments:
+            - '@oro_message_queue.job.storage'
 
     oro_message_queue.job.grid.root_job_action_configuration:
         class: 'Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration'

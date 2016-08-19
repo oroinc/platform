@@ -91,6 +91,13 @@ class Job extends BaseJob
      */
     protected $stoppedAt;
 
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="data", type="json_array", nullable=true)
+     */
+    protected $data;
+
     public function __construct()
     {
         parent::__construct();
