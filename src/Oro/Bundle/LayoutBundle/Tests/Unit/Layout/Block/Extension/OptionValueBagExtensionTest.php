@@ -30,13 +30,11 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $actual
      * @param array $expected
-     * @param bool $isApplied
      * @dataProvider optionsDataProvider
      */
-    public function testNormalizeOptions(array $actual, array $expected, $isApplied = true)
+    public function testNormalizeOptions(array $actual, array $expected)
     {
         $context = new LayoutContext();
-        $context['expressions_evaluate_deferred'] = !$isApplied;
 
         /** @var DataAccessorInterface $dataAccessor */
         $dataAccessor = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
@@ -48,13 +46,11 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $actual
      * @param array $expected
-     * @param bool $isApplied
      * @dataProvider optionsDataProvider
      */
-    public function testFinishView(array $actual, array $expected, $isApplied = true)
+    public function testFinishView(array $actual, array $expected)
     {
         $context = new LayoutContext();
-        $context['expressions_evaluate_deferred'] = $isApplied;
 
         $view = new BlockView();
         $view->vars = $actual;
@@ -81,8 +77,7 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'resolve_value_bags' => true,
-                ],
-                'isApplied' => false,
+                ]
             ],
             'empty bag' => [
                 'actual' => [

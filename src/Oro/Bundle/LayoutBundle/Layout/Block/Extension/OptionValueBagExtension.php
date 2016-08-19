@@ -14,6 +14,7 @@ use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\OptionValueBuilderInterface;
 use Oro\Component\Layout\StringOptionValueBuilder;
+use Oro\Component\Layout\Block\Type\Options;
 
 /**
  * Automatically converts OptionValueBag to an appropriate data representation
@@ -31,9 +32,9 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data)
+    public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-        if ($options['resolve_value_bags'] && false === $context->getOr('expressions_evaluate_deferred')) {
+        if ($options['resolve_value_bags']) {
             $this->resolveValueBags($options);
         }
     }
@@ -41,9 +42,9 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if ($options['resolve_value_bags'] && true === $block->getContext()->getOr('expressions_evaluate_deferred')) {
+        if ($options['resolve_value_bags']) {
             $this->resolveValueBags($view->vars);
         }
     }
@@ -52,7 +53,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      * @param array $options
      * @return array
      */
-    protected function resolveValueBags(array &$options)
+    protected function resolveValueBags(array $options)
     {
         foreach ($options as $key => $value) {
             if (is_array($value)) {
@@ -67,10 +68,10 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
 
     /**
      * @param OptionValueBag $valueBag
-     * @param array $options
+     * @param Options $options
      * @return OptionValueBuilderInterface
      */
-    protected function getOptionsBuilder(OptionValueBag $valueBag, array $options)
+    protected function getOptionsBuilder(OptionValueBag $valueBag, Options $options)
     {
         $isArray = false;
 

@@ -75,7 +75,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
         $values = new Options($values);
 
-        $this->processor->processExpressions($values, $context, true, null, $data);
+        $this->processor->processExpressions($values, $context, $data, true, null);
 
         $this->assertSame(
             true,
@@ -166,7 +166,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['data'] = 'test';
         $values = new Options($values);
 
-        $this->processor->processExpressions($values, $context, true, null, $data);
+        $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
     /**
@@ -201,7 +201,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values = new Options($values);
         $initialVars = $values;
 
-        $this->processor->processExpressions($values, $context, false, null, $data);
+        $this->processor->processExpressions($values, $context, $data, false, null);
 
         $this->assertSame($initialVars, $values);
     }
@@ -209,7 +209,6 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessExpressionsEncodesAllExpressions()
     {
         $context = new LayoutContext();
-        $context->set('expressions_evaluate_deferred', true);
         $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $trueExpr = new ParsedExpression('true', new ConstantNode(true));
 
@@ -226,7 +225,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values = new Options($values);
 
 
-        $this->processor->processExpressions($values, $context, false, 'json', $data);
+        $this->processor->processExpressions($values, $context, $data, false, 'json');
         $trueExprJson = __DIR__.'/data/true_expression.json';
         $this->assertJsonStringEqualsJsonFile(
             $trueExprJson,

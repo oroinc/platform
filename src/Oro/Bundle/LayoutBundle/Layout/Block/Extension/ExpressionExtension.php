@@ -34,7 +34,7 @@ class ExpressionExtension extends AbstractBlockTypeExtension
      */
     public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-        $this->processor->processExpressions($options, $context, true, null, null);
+        $this->processor->processExpressions($options, $context, null, true, null);
     }
 
     /**
@@ -48,7 +48,7 @@ class ExpressionExtension extends AbstractBlockTypeExtension
         $evaluate = $context->getOr('expressions_evaluate');
         $encoding = $context->getOr('expressions_encoding');
 
-        $this->processor->processExpressions($view->vars, $context, $evaluate, $encoding, $data);
+        $this->processor->processExpressions($view->vars, $context, $data, $evaluate, $encoding);
     }
 
     /**

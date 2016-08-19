@@ -58,9 +58,9 @@ class ExpressionProcessor
     public function processExpressions(
         Options $values,
         ContextInterface $context,
-        $evaluate,
-        $encoding,
-        DataAccessorInterface $data = null
+        DataAccessorInterface $data = null,
+        $evaluate = true,
+        $encoding = null
     ) {
         if (!$evaluate && $encoding === null) {
             return;
@@ -75,7 +75,7 @@ class ExpressionProcessor
                 $value = $this->processedValues[$key];
             } else {
                 $this->processingValues[] = $key;
-                $this->processValue($value, $context, $evaluate, $encoding, $data);
+                $this->processValue($value, $context, $data, $evaluate, $encoding);
                 $this->processedValues[$key] = $value;
             }
         }
@@ -93,9 +93,9 @@ class ExpressionProcessor
     protected function processValue(
         &$value,
         ContextInterface $context,
-        $evaluate,
-        $encoding,
-        DataAccessorInterface $data = null
+        DataAccessorInterface $data = null,
+        $evaluate = true,
+        $encoding = null
     ) {
         if (is_string($value) && !empty($value)) {
             switch ($this->checkStringValue($value)) {
@@ -103,7 +103,7 @@ class ExpressionProcessor
                     break;
                 case self::STRING_IS_EXPRESSION:
                     $expr = $this->parseExpression($value);
-                    $value = $this->processExpression($expr, $context, $evaluate, $encoding, $data);
+                    $value = $this->processExpression($expr, $context, $data, $evaluate, $encoding);
                     break;
                 case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
                     // the backslash (\) at the begin of the array key should be removed
@@ -113,19 +113,19 @@ class ExpressionProcessor
 
         } elseif (is_array($value)) {
             foreach ($value as &$item) {
-                $this->processValue($item, $context, $evaluate, $encoding, $data);
+                $this->processValue($item, $context, $data, $evaluate, $encoding);
             }
             unset($item);
         } elseif ($value instanceof OptionValueBag) {
             foreach ($value->all() as $action) {
                 $args = $action->getArguments();
                 foreach ($args as $index => $arg) {
-                    $this->processValue($arg, $context, $evaluate, $encoding, $data);
+                    $this->processValue($arg, $context, $data, $evaluate, $encoding);
                     $action->setArgument($index, $arg);
                 }
             }
         } elseif ($value instanceof ParsedExpression) {
-                $value = $this->processExpression($value, $context, $evaluate, $encoding, $data);
+                $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
         }
     }
 
@@ -141,9 +141,9 @@ class ExpressionProcessor
     protected function processExpression(
         ParsedExpression $expr,
         ContextInterface $context,
-        $evaluate,
-        $encoding,
-        DataAccessorInterface $data = null
+        DataAccessorInterface $data = null,
+        $evaluate = true,
+        $encoding = null
     ) {
         $node = $expr->getNodes();
         $deps = $this->getNotProcessedDependencies($node);
@@ -160,7 +160,7 @@ class ExpressionProcessor
                 );
             }
             $this->processingValues[] = $key;
-            $this->processValue($dep, $context, $evaluate, $encoding, $data);
+            $this->processValue($dep, $context, $data, $evaluate, $encoding);
             $this->processedValues[$key] = $dep;
         }
         $values = array_merge(['context' => $context, 'data' => $data,], $this->values, $this->processedValues);
