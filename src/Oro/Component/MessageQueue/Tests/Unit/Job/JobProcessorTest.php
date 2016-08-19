@@ -80,8 +80,8 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         ;
         $storage
             ->expects($this->once())
-            ->method('findRootJobByOwnerId')
-            ->with('owner-id')
+            ->method('findRootJobByOwnerIdAndJobName')
+            ->with('owner-id', 'job-name')
             ->will($this->returnValue($job))
         ;
 

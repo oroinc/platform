@@ -64,10 +64,16 @@ class Job
      */
     protected $stoppedAt;
 
+    /**
+     * @var array
+     */
+    protected $data;
+
     public function __construct()
     {
         $this->interrupted = false;
         $this->unique = false;
+        $this->data = [];
     }
 
     /**
@@ -274,5 +280,21 @@ class Job
     public function setChildJobs(array $childJobs)
     {
         $this->childJobs = $childJobs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData(array $data)
+    {
+        $this->data = $data;
     }
 }

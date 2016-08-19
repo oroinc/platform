@@ -56,18 +56,20 @@ class JobStorage
 
     /**
      * @param string $ownerId
+     * @param string $jobName
      *
      * @return Job
      */
-    public function findRootJobByOwnerId($ownerId)
+    public function findRootJobByOwnerIdAndJobName($ownerId, $jobName)
     {
         $qb = $this->repository->createQueryBuilder('job');
 
         return $qb
-            ->addSelect('rootJob')
-            ->leftJoin('job.rootJob', 'rootJob')
-            ->where('job.ownerId = :ownerId')
-            ->setParameter('ownerId', $ownerId)
+            ->where('job.ownerId = :ownerId AND job.name = :jobName')
+            ->setParameters([
+                'ownerId' => $ownerId,
+                'jobName' => $jobName,
+            ])
             ->getQuery()->getOneOrNullResult()
         ;
     }
