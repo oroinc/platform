@@ -3,8 +3,7 @@
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
-{% set entityConfiguration = oro_entity_config(entity.relatedEntity, 'workflow') %}
-{% set isActive = entityConfiguration.active_workflows is defined and entity.name in entityConfiguration.active_workflows %}
+{% set isActive = entity.isActive %}
 
 {% set pageComponent = {
         module: 'oroworkflow/js/app/components/workflow-viewer-component',

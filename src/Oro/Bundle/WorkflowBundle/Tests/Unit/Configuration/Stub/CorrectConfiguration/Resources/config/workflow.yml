@@ -6,6 +6,13 @@ workflows:
         start_step: first_step
         entity_attribute: my_entity
         steps_display_ordered: true
+        priority: 1
+        defaults:
+            active: true
+        exclusive_active_groups:
+            - 'active_group1'
+        exclusive_record_groups:
+            - 'record_group1'
         steps:
             first_step:
                 label: 'First Step'
