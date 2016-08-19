@@ -2,7 +2,7 @@ connector:
     name: oro_importexport
     jobs:
         language_translations_export_to_zip:
-            title: "Export Language Translations to ZIP"
+            title: "Export Language Translations to CSV"
             type: export
             steps:
                 export:
@@ -11,34 +11,19 @@ connector:
                     services:
                         reader:    oro_translation.importexport.reader.translations
                         processor: oro_importexport.processor.export_delegate
-                        writer:    oro_translation.importexport.writer.translations_yml
-                    parameters: ~
-                pack_zip_file:
-                    title:     export
-                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
-                    services:
-                        reader:    oro_translation.importexport.reader.translations_yml
-                        processor: oro_importexport.processor.export_delegate
-                        writer:    oro_translation.importexport.writer.translations_zip
-                    parameters: ~
+                        writer:    oro_importexport.writer.csv
+                    parameters:
+                        batch_size: 500
 
         language_translations_import_from_zip:
-            title: "Import Language Translations from ZIP"
+            title: "Import Language Translations from CSV"
             type: import
             steps:
-                unpack_zip_file:
-                    title:     import
-                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
-                    services:
-                        reader:    oro_translation.importexport.reader.translations_zip
-                        processor: oro_importexport.processor.import_delegate
-                        writer:    oro_translation.importexport.writer.translations_yml
-                    parameters: ~
                 import:
                     title:     import
                     class:     Oro\Bundle\BatchBundle\Step\ItemStep
                     services:
-                        reader:    oro_translation.importexport.reader.translations_yml
+                        reader:    oro_importexport.reader.csv
                         processor: oro_importexport.processor.import_delegate
                         writer:    oro_translation.importexport.writer.translations
                     parameters: ~
