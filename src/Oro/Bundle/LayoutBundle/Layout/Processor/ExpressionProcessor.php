@@ -56,7 +56,7 @@ class ExpressionProcessor
      * @param DataAccessorInterface $data
      */
     public function processExpressions(
-        Options &$values,
+        Options $values,
         ContextInterface $context,
         $evaluate,
         $encoding,
