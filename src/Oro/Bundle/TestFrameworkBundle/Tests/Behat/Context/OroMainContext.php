@@ -112,6 +112,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then page has :header header
+     */
+    public function pageHasHeader($header)
+    {
+        $this->assertSession()->elementTextContains('css', 'div#container h1', $header);
+    }
+
+    /**
      * Close form error message
      *
      * @Then /^(?:|I )close error message$/
