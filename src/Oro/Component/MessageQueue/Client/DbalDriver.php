@@ -4,7 +4,6 @@ namespace Oro\Component\MessageQueue\Client;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 
 class DbalDriver implements DriverInterface
@@ -31,45 +30,37 @@ class DbalDriver implements DriverInterface
 
     /**
      * {@inheritdoc}
-     */
-    public function createProducer()
-    {
-        return new MessageProducer($this->session->createProducer(), $this);
-    }
-
-    /**
-     * {@inheritdoc}
      *
-     * @return DbalMessage
+     * @param DbalDestination $queue
      */
-    public function createMessage()
+    public function send(QueueInterface $queue, Message $message)
     {
-        return $this->session->createMessage();
-    }
+        $headers = $message->getHeaders();
+        $properties = $message->getProperties();
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param DbalMessage $message
-     */
-    public function setMessagePriority(MessageInterface $message, $priority)
-    {
-        $map = [
-            MessagePriority::VERY_LOW => 0,
-            MessagePriority::LOW => 1,
-            MessagePriority::NORMAL => 2,
-            MessagePriority::HIGH => 3,
-            MessagePriority::VERY_HIGH => 4,
-        ];
+        $headers['content_type'] = $message->getContentType();
 
-        if (false == array_key_exists($priority, $map)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Given priority could not be converted to transport\'s one. Got: %s',
-                $priority
-            ));
+        $transportMessage = $this->session->createMessage();
+        $transportMessage->setBody($message->getBody());
+        $transportMessage->setHeaders($headers);
+        $transportMessage->setProperties($properties);
+
+        $transportMessage->setMessageId($message->getMessageId());
+        $transportMessage->setTimestamp($message->getTimestamp());
+
+        if ($message->getDelaySec()) {
+            $transportMessage->setDelay($message->getDelaySec());
         }
 
-        $message->setPriority($map[$priority]);
+        if ($message->getPriority()) {
+            $this->setMessagePriority($transportMessage, $message->getPriority());
+        }
+
+        if ($message->getExpireSec()) {
+            throw new \InvalidArgumentException('Expire is not supported by the transport');
+        }
+
+        $this->session->createProducer()->send($queue, $transportMessage);
     }
 
     /**
@@ -88,26 +79,33 @@ class DbalDriver implements DriverInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param DbalMessage $message
-     */
-    public function delayMessage(QueueInterface $queue, MessageInterface $message, $delaySec)
-    {
-        $delayMessage = $this->session->createMessage(
-            $message->getBody(),
-            $message->getProperties(),
-            $message->getHeaders()
-        );
-        $delayMessage->setDelay($delaySec);
-
-        $this->session->createProducer()->send($queue, $delayMessage);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * @param DbalMessage $message
+     * @param string $priority
+     */
+    private function setMessagePriority(DbalMessage $message, $priority)
+    {
+        $map = [
+            MessagePriority::VERY_LOW => 0,
+            MessagePriority::LOW => 1,
+            MessagePriority::NORMAL => 2,
+            MessagePriority::HIGH => 3,
+            MessagePriority::VERY_HIGH => 4,
+        ];
+
+        if (false == array_key_exists($priority, $map)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Given priority could not be converted to transport\'s one. Got: %s',
+                $priority
+            ));
+        }
+
+        $message->setPriority($map[$priority]);
     }
 }

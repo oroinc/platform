@@ -1,69 +1,64 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Util\JSON;
 
 class MessageProducer implements MessageProducerInterface
 {
-    /**
-     * @var TransportMessageProducer
-     */
-    protected $transportProducer;
-
     /**
      * @var DriverInterface
      */
     protected $driver;
 
     /**
-     * @param TransportMessageProducer $transportProducer
-     * @param DriverInterface                  $driver
+     * @param DriverInterface $driver
      */
-    public function __construct(TransportMessageProducer $transportProducer, DriverInterface $driver)
+    public function __construct(DriverInterface $driver)
     {
-        $this->transportProducer = $transportProducer;
         $this->driver = $driver;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function send($topic, $message, $priority = MessagePriority::NORMAL)
+    public function send($topic, $message)
     {
         $config = $this->driver->getConfig();
 
-        if (false == $message instanceof MessageInterface) {
-            $message = $this->createMessage($message);
+        if (false == $message instanceof Message) {
+            $body = $message;
+            $message = new Message();
+            $message->setBody($body);
         }
 
-        $this->driver->setMessagePriority($message, $priority);
+        $this->prepareBody($message);
 
-        $properties = $message->getProperties();
-        $properties[Config::PARAMETER_TOPIC_NAME] = $topic;
-        $properties[Config::PARAMETER_PROCESSOR_NAME] = $config->getRouterMessageProcessorName();
-        $properties[Config::PARAMETER_QUEUE_NAME] = $config->getRouterQueueName();
-        $message->setProperties($properties);
-        
+        $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topic);
+        $message->setProperty(Config::PARAMETER_PROCESSOR_NAME, $config->getRouterMessageProcessorName());
+        $message->setProperty(Config::PARAMETER_QUEUE_NAME, $config->getRouterQueueName());
+
+        $message->setMessageId($message->getMessageId() ?: uniqid('oro', true));
+        $message->setTimestamp($message->getTimestamp() ?: time());
+        $message->setPriority($message->getPriority() ?: MessagePriority::NORMAL);
+
         $queue = $this->driver->createQueue($config->getRouterQueueName());
 
-        $this->transportProducer->send($queue, $message);
+        $this->driver->send($queue, $message);
     }
 
     /**
-     * {@inheritdoc}
+     * @param Message $message
      */
-    public function createMessage($body)
+    private function prepareBody(Message $message)
     {
-        $message = $this->driver->createMessage();
-        $headers = $message->getHeaders();
+        $body = $message->getBody();
+        $contentType = $message->getContentType();
 
         if (is_scalar($body) || is_null($body)) {
-            $headers['content_type'] = empty($headers['content_type']) ? 'text/plain' : $headers['content_type'];
+            $contentType = $contentType ?: 'text/plain';
             $body = (string) $body;
         } elseif (is_array($body)) {
-            if (isset($headers['content_type']) && $headers['content_type'] !== 'application/json') {
+            if ($contentType && $contentType !== 'application/json') {
                 throw new \LogicException(sprintf('Content type "application/json" only allowed when body is array'));
             }
 
@@ -77,7 +72,7 @@ class MessageProducer implements MessageProducerInterface
                 }
             });
 
-            $headers['content_type'] = 'application/json';
+            $contentType = 'application/json';
             $body = JSON::encode($body);
         } else {
             throw new \InvalidArgumentException(sprintf(
@@ -86,12 +81,7 @@ class MessageProducer implements MessageProducerInterface
             ));
         }
 
-        $message->setHeaders($headers);
+        $message->setContentType($contentType);
         $message->setBody($body);
-
-        $message->setMessageId(uniqid('oro', true));
-        $message->setTimestamp(time());
-
-        return $message;
     }
 }

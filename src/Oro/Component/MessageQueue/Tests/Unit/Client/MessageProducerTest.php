@@ -380,7 +380,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             $this->createDriverStub($expectedMessage, null, null)
         );
 
-        $actualMessage = $producer->createMessage(null);
+        $actualMessage = $producer->prepareBody(null);
 
         self::assertSame($expectedMessage, $actualMessage);
         self::assertNotEmpty($actualMessage->getMessageId());
@@ -398,7 +398,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             $this->createDriverStub($expectedMessage, null, null)
         );
 
-        $actualMessage = $producer->createMessage('aString');
+        $actualMessage = $producer->prepareBody('aString');
 
         self::assertSame($expectedMessage, $actualMessage);
         self::assertNotEmpty($actualMessage->getMessageId());
@@ -416,7 +416,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             $this->createDriverStub($expectedMessage, null, null)
         );
 
-        $actualMessage = $producer->createMessage(['foo' => 'fooVal']);
+        $actualMessage = $producer->prepareBody(['foo' => 'fooVal']);
 
         self::assertSame($expectedMessage, $actualMessage);
         self::assertNotEmpty($actualMessage->getMessageId());
@@ -438,7 +438,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             \LogicException::class,
             'The message\'s body must be either null, scalar or array. Got: stdClass'
         );
-        $producer->createMessage(new \stdClass());
+        $producer->prepareBody(new \stdClass());
     }
 
     public function testShouldThrowExceptionIfBodyIsArrayWithObjectsInsideOnCreateMessage()
@@ -454,7 +454,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             \LogicException::class,
             'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
-        $producer->createMessage(['foo' => new \stdClass()]);
+        $producer->prepareBody(['foo' => new \stdClass()]);
     }
 
     public function testShouldThrowExceptionIfBodyIsArrayWithObjectsInSubArraysInsideOnCreateMessage()
@@ -470,7 +470,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             \LogicException::class,
             'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
-        $producer->createMessage(['foo' => ['bar' => new \stdClass()]]);
+        $producer->prepareBody(['foo' => ['bar' => new \stdClass()]]);
     }
 
     /**
