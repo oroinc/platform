@@ -209,13 +209,15 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
+     * @Given /^(?:|I )login as administrator$/
      */
-    public function loginAsUserWithPassword($login, $password)
+    public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
     {
         $this->visit('user/login');
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
+
     }
 
     /**
@@ -242,7 +244,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
+     * @Then /^(?:|I )should see large image$/
+     */
+    public function iShouldSeeLargeImage()
+    {
+        $largeImage = $this->getSession()->getPage()->find('css', '.lg-image');
+        self::assertNotNull($largeImage, 'Large image not visible');
+    }
+
+    /**
+     * @Then /^(?:|I )close large image preview$/
+     */
+    public function closeLargeImagePreview()
+    {
+        $page = $this->getSession()->getPage();
+        $page->find('css', '.lg-image')->mouseOver();
+        $page->find('css', 'span.lg-close')->click();
+    }
+
+     /**
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      */
     public function pressButton($button)
     {
