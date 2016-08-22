@@ -92,7 +92,7 @@ class OroMainContext extends MinkContext implements
     {
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
-        $page = $this->getSession()->getPage();
+        $page = $this->getPage();
 
         $page->clickLink('Update schema');
         $driver->waitForAjax();
@@ -203,6 +203,7 @@ class OroMainContext extends MinkContext implements
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
+        $this->getSession()->getDriver()->waitForAjax();
         $form = $fieldSet->getLastSet();
         $form->fill($table);
     }
