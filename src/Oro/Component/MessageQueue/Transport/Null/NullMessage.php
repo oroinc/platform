@@ -169,23 +169,4 @@ class NullMessage implements MessageInterface
 
         $this->setHeaders($headers);
     }
-
-    /**
-     * @param string|null $replyTo
-     */
-    public function setReplyTo($replyTo)
-    {
-        $headers = $this->getHeaders();
-        $headers['reply_to'] = $replyTo;
-
-        $this->setHeaders($headers);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getReplyTo()
-    {
-        return $this->getHeader('reply_to');
-    }
 }
