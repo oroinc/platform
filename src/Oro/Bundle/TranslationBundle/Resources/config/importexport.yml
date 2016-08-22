@@ -51,8 +51,8 @@ services:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter'
         public: false
 
+    # Normalizer
     oro_translation.importexport.normalizer.translation:
-        class: Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer'
         tags:
             - { name: oro_importexport.normalizer }
-
