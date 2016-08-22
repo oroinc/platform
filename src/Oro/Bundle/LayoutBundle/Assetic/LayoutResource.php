@@ -15,12 +15,17 @@ class LayoutResource implements ResourceInterface
     /** @var ThemeManager */
     protected $themeManager;
 
+    /** @var string */
+    protected $outputDir;
+
     /**
      * @param ThemeManager $themeManager
+     * @param string $outputDir
      */
-    public function __construct(ThemeManager $themeManager)
+    public function __construct(ThemeManager $themeManager, $outputDir)
     {
         $this->themeManager = $themeManager;
+        $this->outputDir = $outputDir;
     }
 
     /**
@@ -65,6 +70,7 @@ class LayoutResource implements ResourceInterface
                 continue;
             }
             $name = self::RESOURCE_ALIAS . '_' . $theme->getName(). '_' . $assetKey;
+            $asset = $this->prepareAssets($asset);
             $formulae[$name] = [
                 $asset['inputs'],
                 $asset['filters'],
@@ -92,5 +98,62 @@ class LayoutResource implements ResourceInterface
         }
 
         return $assets;
+    }
+
+    /**
+     * @param array $asset
+     * @return array
+     */
+    protected function prepareAssets($asset)
+    {
+        $inputs = $asset['inputs'];
+        $inputsByExtension = [];
+        foreach ($inputs as $input) {
+            $inputsByExtension[pathinfo($input)['extension']][] = $input;
+        }
+
+        $inputs = [];
+        foreach ($inputsByExtension as $extension => $extensionInputs) {
+            if ($extension === 'css' || count($extensionInputs) === 1) {
+                $inputs = array_merge($inputs, $extensionInputs);
+            } else {
+                $inputs[] = $this->joinInputs($asset['output'], $extension, $extensionInputs);
+            }
+        }
+
+        $asset['inputs'] = $inputs;
+        return $asset;
+    }
+
+    /**
+     * @param array $output
+     * @param string $extension
+     * @param array $inputs
+     * @return string
+     */
+    protected function joinInputs($output, $extension, $inputs)
+    {
+        $configInputs = [];
+        $restInputs = [];
+        foreach ($inputs as $input) {
+            if (strpos($input, '/configs/') !== false) {
+                $configInputs[] = $input;
+            } else {
+                $restInputs[] = $input;
+            }
+        }
+        $inputs = array_merge($configInputs, $restInputs);
+
+        $inputsContent = '';
+        foreach ($inputs as $input) {
+            $inputsContent .= '@import "../'.$input.'"'.";\n";
+        }
+
+        $file = realpath($this->outputDir) . '/' . $output . '.'. $extension;
+        if (false === @file_put_contents($file, $inputsContent)) {
+            throw new \RuntimeException('Unable to write file ' . $file);
+        }
+
+        return $file;
     }
 }
