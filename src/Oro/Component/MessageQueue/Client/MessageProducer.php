@@ -3,6 +3,9 @@ namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 class MessageProducer implements MessageProducerInterface
 {
     /**
