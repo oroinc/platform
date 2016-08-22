@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Intl\Util\IntlTestHelper;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageType;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 
 class LanguageTypeTest extends FormIntegrationTestCase
 {
@@ -57,20 +57,12 @@ class LanguageTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider buildFormProvider
      *
-     * @param array  $configData
-     * @param string $defaultLang
-     * @param array  $choicesKeysExpected
+     * @param array $configData
+     * @param array $choicesKeysExpected
      */
-    public function testBuildForm(array $configData, $defaultLang, array $choicesKeysExpected)
+    public function testBuildForm(array $configData, array $choicesKeysExpected)
     {
-        IntlTestHelper::requireIntl($this);
-
-        \Locale::setDefault($defaultLang);
-
-        $this->cmMock->expects($this->once())
-            ->method('get')
-            ->with(LanguageType::CONFIG_KEY, true)
-            ->willReturn($defaultLang);
+        \Locale::setDefault('en');
 
         $this->languageProvider->expects($this->once())
             ->method('getEnabledLanguages')
@@ -88,14 +80,71 @@ class LanguageTypeTest extends FormIntegrationTestCase
     {
         return [
             'only default language available' => [
-                [],
-                'en',
+                ['en'],
                 ['English']
             ],
             'enabled languages are appeared' => [
-                ['uk'],
-                'en',
+                ['en', 'uk'],
                 ['English', 'Ukrainian']
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider buildViewProvider
+     *
+     * @param array $configData
+     * @param $defaultLang
+     * @param $useParentScopeValue
+     */
+    public function testBuildView(array $configData, $defaultLang, $useParentScopeValue)
+    {
+        $this->cmMock->expects($this->once())
+            ->method('get')
+            ->with(LanguageType::CONFIG_KEY, true)
+            ->willReturn($defaultLang);
+
+        $this->languageProvider->expects($this->once())
+            ->method('getEnabledLanguages')
+            ->willReturn($configData);
+
+        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $mockFormView */
+        $mockFormView = $this->getMockBuilder('Symfony\Component\Form\FormView')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $mockParentForm */
+        $mockParentForm = $this->getMock('Symfony\Component\Form\FormInterface');
+        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $mockFormInterface */
+        $mockFormInterface = $this->getMock('Symfony\Component\Form\FormInterface');
+
+        if (!$useParentScopeValue) {
+            $mockParentForm->expects($this->once())->method('has')->with('use_parent_scope_value')->willReturn(true);
+            $mockParentForm->expects($this->once())->method('remove')->with('use_parent_scope_value');
+            $mockParentForm->expects($this->once())
+                ->method('add')
+                ->with('use_parent_scope_value', 'hidden', ['data' => 0]);
+            $mockFormInterface->expects($this->any())->method('getParent')->willReturn($mockParentForm);
+        }
+
+        $this->formType->buildView($mockFormView, $mockFormInterface, []);
+    }
+
+    /**
+     * @return array
+     */
+    public function buildViewProvider()
+    {
+        return [
+            'default language enabled' => [
+                ['en'],
+                'en',
+                true,
+            ],
+            'default language disabled' => [
+                ['en', 'uk'],
+                'ru',
+                false
             ]
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -47,9 +49,7 @@ class LanguageType extends AbstractType
      */
     protected function getLanguageChoices()
     {
-        // ensure that default value is always in choice list
-        $defaultValue = $this->cm->get(self::CONFIG_KEY, true);
-        $availableLanguages = array_merge($this->languageProvider->getEnabledLanguages(), [$defaultValue]);
+        $availableLanguages = $this->languageProvider->getEnabledLanguages();
 
         $allLanguages = Intl::getLocaleBundle()->getLocaleNames('en');
 
@@ -78,5 +78,23 @@ class LanguageType extends AbstractType
     public function getBlockPrefix()
     {
         return 'oro_language';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        parent::buildView($view, $form, $options);
+
+        $defaultValue = $this->cm->get(self::CONFIG_KEY, true);
+        $availableLanguages = $this->languageProvider->getEnabledLanguages();
+
+        if (!in_array($defaultValue, $availableLanguages, true)) {
+            if ($form->getParent()->has('use_parent_scope_value')) {
+                $form->getParent()->remove('use_parent_scope_value');
+                $form->getParent()->add('use_parent_scope_value', 'hidden', ['data' => 0]);
+            }
+        }
     }
 }
