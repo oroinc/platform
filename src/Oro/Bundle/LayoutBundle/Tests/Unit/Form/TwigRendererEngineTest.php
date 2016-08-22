@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
-use Symfony\Bridge\Twig\Form\TwigRendererEngine as BaseEngine;
+use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 
 use Symfony\Component\Form\FormView;
 
@@ -38,7 +38,7 @@ class TwigRendererEngineTest extends \PHPUnit_Framework_TestCase
             ->method('getTemplateName')
             ->will($this->returnValue('theme'));
 
-        $class = new \ReflectionClass(BaseEngine::class);
+        $class = new \ReflectionClass(BaseTwigRendererEngine::class);
         $property = $class->getProperty('template');
         $property->setAccessible(true);
         $property->setValue($this->twigRendererEngine, $template);

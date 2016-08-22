@@ -96,7 +96,7 @@ class OroLayoutExtension extends Extension
         foreach ($updateLoaderDef->getMethodCalls() as $methodCall) {
             if ($methodCall[0] === 'addDriver') {
                 if ($methodCall[1][0] == 'php') {
-                    $methodCall[1][0] = '/^(?!.*html\.php$).*\.php$/';
+                    $updateFileNamePatterns[] = '/^(?!.*html\.php$).*\.php$/';
                 } else {
                     $updateFileNamePatterns[] = '/\.' . $methodCall[1][0] . '$/';
                 }

@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
-use Symfony\Bridge\Twig\Form\TwigRendererEngineInterface;
-
+use Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface;
 use Oro\Bundle\LayoutBundle\Twig\TwigRenderer;
 
 class TwigRendererTest extends \PHPUnit_Framework_TestCase
@@ -14,7 +13,7 @@ class TwigRendererTest extends \PHPUnit_Framework_TestCase
         $environment = $this->getMock('Twig_Environment');
 
         /** @var TwigRendererEngineInterface|\PHPUnit_Framework_MockObject_MockObject $engine */
-        $engine = $this->getMock('Symfony\Bridge\Twig\Form\TwigRendererEngineInterface');
+        $engine = $this->getMock('Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface');
         $engine->expects($this->once())
             ->method('setEnvironment')
             ->with($environment);

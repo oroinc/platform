@@ -313,6 +313,24 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCompileParentBlockWidget()
+    {
+        $arguments = new \Twig_Node(
+            [
+                new \Twig_Node_Expression_Name('block', 0),
+            ]
+        );
+
+        $node = new SearchAndRenderBlockNode('parent_block_widget', $arguments, 0);
+
+        $compiler = new \Twig_Compiler(new \Twig_Environment());
+
+        $this->assertEquals(
+            self::RENDER_CALL . '($context[\'block\'], \'widget\', $context, true)',
+            trim($compiler->compile($node)->getSource())
+        );
+    }
+
     protected function getVariableGetter($name)
     {
         if (PHP_VERSION_ID >= 50400) {

@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Templating\Helper;
 
-use Symfony\Component\Form\FormRendererInterface;
+use Oro\Component\Layout\Form\FormRendererInterface;
 
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
@@ -25,7 +25,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->renderer   = $this->getMock('Symfony\Component\Form\FormRendererInterface');
+        $this->renderer   = $this->getMock('Oro\Component\Layout\Form\FormRendererInterface');
         $this->textHelper = $this->getMockBuilder('Oro\Component\Layout\Templating\TextHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -73,6 +73,18 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($view), 'widget', $variables);
 
         $this->helper->widget($view, $variables);
+    }
+
+    public function testParentBlockWidgetRendering()
+    {
+        $view      = new BlockView();
+        $variables = ['foo' => 'bar'];
+
+        $this->renderer->expects($this->once())
+            ->method('searchAndRenderBlock')
+            ->with($this->identicalTo($view), 'widget', $variables, true);
+
+        $this->helper->parentBlockWidget($view, $variables);
     }
 
     public function testRowRendering()
