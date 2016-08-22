@@ -5,6 +5,11 @@ services:
         public: false
         parent: oro_importexport.strategy.configurable_add_or_replace
 
+    oro_translation.importexport.strategy.translation.reset:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy'
+        public: false
+        parent: oro_importexport.strategy.configurable_add_or_replace
+
     # Import processor
     oro_translation.importexport.processor.import.translation:
         public: false
@@ -14,6 +19,15 @@ services:
         tags:
             - { name: oro_importexport.processor, type: import, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
             - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
+
+    oro_translation.importexport.processor.import.translation_reset:
+        public: false
+        parent: oro_importexport.processor.import_abstract
+        calls:
+             - [setStrategy, ['@oro_translation.importexport.strategy.translation.reset']]
+        tags:
+            - { name: oro_importexport.processor, type: import, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.reset }
+            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.reset }
 
     # Export processor
     oro_translation.importexport.processor.export.translation:
@@ -49,3 +63,8 @@ services:
     oro_translation.importexport.writer.translations_zip:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationZipWriter'
         public: false
+
+    oro_translation.importexport.normalizer.translation:
+        class: Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer
+        tags:
+            - { name: oro_importexport.normalizer }

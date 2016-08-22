@@ -26,19 +26,11 @@ connector:
             title: "Import Language Translations from ZIP"
             type: import
             steps:
-                unpack_zip_file:
-                    title:     import
-                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
-                    services:
-                        reader:    oro_translation.importexport.reader.translations_zip
-                        processor: oro_importexport.processor.import_delegate
-                        writer:    oro_translation.importexport.writer.translations_yml
-                    parameters: ~
                 import:
                     title:     import
                     class:     Oro\Bundle\BatchBundle\Step\ItemStep
                     services:
-                        reader:    oro_translation.importexport.reader.translations_yml
+                        reader:    oro_importexport.reader.csv
                         processor: oro_importexport.processor.import_delegate
                         writer:    oro_translation.importexport.writer.translations
                     parameters: ~
