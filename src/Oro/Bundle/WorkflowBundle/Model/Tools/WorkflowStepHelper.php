@@ -28,9 +28,10 @@ class WorkflowStepHelper
     /**
      * @param Step $step
      * @param bool $withTree
+     * @param bool $onlyNames
      * @return array|Step[]
      */
-    public function getStepsAfter(Step $step, $withTree = false)
+    public function getStepsAfter(Step $step, $withTree = false, $onlyNames = false)
     {
         $allowedTransitionStepsTo = array_map(
             function ($allowedTransition) {
@@ -45,16 +46,22 @@ class WorkflowStepHelper
             array_intersect($allowedTransitionStepsTo, $this->getStepsWithMoreOrder($step))
         );
 
-        $steps = array_map(
-            function ($stepName) {
-                return $this->getStepManager()->getStep($stepName);
-            },
-            $steps
-        );
+        if (!$onlyNames) {
+            $steps = array_map(
+                function ($stepName) {
+                    return $this->getStepManager()->getStep($stepName);
+                },
+                $steps
+            );
+        }
 
         if ($withTree) {
             foreach ($steps as $nextStep) {
-                $steps = array_merge($steps, $this->getStepsAfter($nextStep, true));
+                if ($onlyNames) {
+                    $nextStep = $this->getStepManager()->getStep($nextStep);
+                }
+
+                $steps = array_merge($steps, $this->getStepsAfter($nextStep, true, $onlyNames));
             }
         }
 
@@ -64,9 +71,10 @@ class WorkflowStepHelper
     /**
      * @param WorkflowItem $workflowItem
      * @param array $startStepNames
+     * @param bool $onlyNames
      * @return array|Step[]
      */
-    public function getStepsBefore(WorkflowItem $workflowItem, array $startStepNames)
+    public function getStepsBefore(WorkflowItem $workflowItem, array $startStepNames, $onlyNames = false)
     {
         $records = array_reverse($workflowItem->getTransitionRecords()->toArray());
         $path = [];
@@ -82,8 +90,8 @@ class WorkflowStepHelper
         $stepManager = $this->getStepManager();
 
         return array_map(
-            function (WorkflowStep $step) use ($stepManager) {
-                return $stepManager->getStep($step->getName());
+            function (WorkflowStep $step) use ($stepManager, $onlyNames) {
+                return $onlyNames ? $step->getName() : $stepManager->getStep($step->getName());
             },
             array_reverse($path)
         );

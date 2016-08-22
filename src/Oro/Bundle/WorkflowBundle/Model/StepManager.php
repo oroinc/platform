@@ -78,9 +78,10 @@ class StepManager
      * Get steps sorted by order.
      *
      * @param bool $withoutDefaultStartStep
+     * @param bool $onlyNames
      * @return Collection|Step[]
      */
-    public function getOrderedSteps($withoutDefaultStartStep = false)
+    public function getOrderedSteps($withoutDefaultStartStep = false, $onlyNames = false)
     {
         $steps = $this->steps;
 
@@ -100,6 +101,15 @@ class StepManager
                 return ($stepOne->getOrder() >= $stepTwo->getOrder()) ? 1 : -1;
             }
         );
+
+        if ($onlyNames) {
+            $steps = array_map(
+                function (Step $step) {
+                    return $step->getName();
+                },
+                $steps
+            );
+        }
 
         return new ArrayCollection($steps);
     }

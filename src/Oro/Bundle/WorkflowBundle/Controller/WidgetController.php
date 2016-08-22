@@ -217,8 +217,11 @@ class WidgetController extends Controller
         $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
 
         $helper = new WorkflowStepHelper($workflow);
+        $stepManager = $workflow->getStepManager();
 
         if ($isStepsDisplayOrdered) {
+            $steps = $stepManager->getOrderedSteps(true, true)->toArray();
+
             if ($workflowItem) {
                 $startStepNames = array_map(
                     function (array $data) {
@@ -230,15 +233,22 @@ class WidgetController extends Controller
                     $this->getAvailableStartTransitionsData($workflow, $entity)
                 );
 
-                $steps = array_merge(
-                    $helper->getStepsBefore($workflowItem, $startStepNames),
-                    $helper->getStepsAfter($workflow->getStepManager()->getStep($currentStep->getName()), true)
+                $way = array_merge(
+                    $helper->getStepsBefore($workflowItem, $startStepNames, true),
+                    $helper->getStepsAfter($stepManager->getStep($currentStep->getName()), true, true)
                 );
-            } else {
-                $steps = $workflow->getStepManager()->getOrderedSteps(true)->toArray();
+
+                $steps = array_intersect($steps, $way);
             }
+
+            $steps = array_map(
+                function ($stepName) use ($stepManager) {
+                    return $stepManager->getStep($stepName);
+                },
+                $steps
+            );
         } elseif ($currentStep) {
-            $steps = [$workflow->getStepManager()->getStep($currentStep->getName())];
+            $steps = [$stepManager->getStep($currentStep->getName())];
         } else {
             $steps = array_map(
                 function (array $data) {
