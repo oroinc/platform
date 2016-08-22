@@ -72,12 +72,12 @@ class WidgetController extends Controller
      * )
      * @AclAncestor("oro_workflow")
      *
-     * @param Request $request
      * @param string $transitionName
      * @param string $workflowName
+     * @param Request $request
      * @return Response
      */
-    public function startTransitionFormAction(Request $request, $transitionName, $workflowName)
+    public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
         $entityId = $request->get('entityId', 0);
 
@@ -157,12 +157,12 @@ class WidgetController extends Controller
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @AclAncestor("oro_workflow")
      *
-     * @param Request $request
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
+     * @param Request $request
      * @return Response
      */
-    public function transitionFormAction(Request $request, $transitionName, WorkflowItem $workflowItem)
+    public function transitionFormAction($transitionName, WorkflowItem $workflowItem, Request $request)
     {
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
@@ -376,10 +376,8 @@ class WidgetController extends Controller
     protected function getAvailableStartTransitionsData(Workflow $workflow, $entity)
     {
         $transitionsData = [];
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
 
-        $transitions = $workflowManager->getStartTransitions($workflow);
+        $transitions = $workflow->getTransitionManager()->getStartTransitions();
         /** @var Transition $transition */
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {
@@ -412,15 +410,11 @@ class WidgetController extends Controller
      */
     protected function getStartTransitionData(Workflow $workflow, Transition $transition, $entity)
     {
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
-
         $errors = new ArrayCollection();
-        $isAllowed = $workflowManager
-            ->isStartTransitionAvailable($workflow, $transition, $entity, [], $errors);
+        $isAllowed = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
         if ($isAllowed || !$transition->isUnavailableHidden()) {
             return [
-                'workflow' => $workflowManager->getWorkflow($workflow),
+                'workflow' => $workflow,
                 'transition' => $transition,
                 'isAllowed' => $isAllowed,
                 'errors' => $errors

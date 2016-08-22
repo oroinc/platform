@@ -21,7 +21,7 @@ use Oro\Component\DoctrineUtils\ORM\LikeQueryHelperTrait;
 /**
  * Provide logic for workflow scheduled transitions processes synchronization
  */
-class WorkflowDefinitionChangesListener implements EventSubscriberInterface
+class WorkflowScheduledTransitionsListener implements EventSubscriberInterface
 {
     use LikeQueryHelperTrait;
 
@@ -34,9 +34,6 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var string */
-    protected $processDefinitionClassName;
-
     /** @var array */
     private $generatedConfigurations = [];
 
@@ -44,18 +41,15 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
      * @param ProcessConfigurationGenerator $generator
      * @param ProcessConfigurator $processConfigurator
      * @param ManagerRegistry $registry
-     * @param string $processDefinitionClassName
      */
     public function __construct(
         ProcessConfigurationGenerator $generator,
         ProcessConfigurator $processConfigurator,
-        ManagerRegistry $registry,
-        $processDefinitionClassName
+        ManagerRegistry $registry
     ) {
         $this->generator = $generator;
         $this->processConfigurator = $processConfigurator;
         $this->registry = $registry;
-        $this->processDefinitionClassName = $processDefinitionClassName;
     }
 
     /**
@@ -65,8 +59,10 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     {
         $definition = $event->getDefinition();
 
-        $this->generatedConfigurations[$definition->getName()] = $this->generator
-            ->generateForScheduledTransition($definition);
+        if ($definition->isActive()) {
+            $this->generatedConfigurations[$definition->getName()] = $this->generator
+                ->generateForScheduledTransition($definition);
+        }
     }
 
     /**
@@ -96,7 +92,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
                 $this->generatedConfigurations[$workflowName],
                 $workflowDefinition
             );
-            unset($this->generatedConfigurations);
+            unset($this->generatedConfigurations[$workflowName]);
         }
     }
 
@@ -205,7 +201,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
      */
     protected function getProcessDefinitionRepository()
     {
-        return $this->registry->getManagerForClass($this->processDefinitionClassName)
-            ->getRepository($this->processDefinitionClassName);
+        return $this->registry->getManagerForClass(ProcessDefinition::class)
+            ->getRepository(ProcessDefinition::class);
     }
 }
