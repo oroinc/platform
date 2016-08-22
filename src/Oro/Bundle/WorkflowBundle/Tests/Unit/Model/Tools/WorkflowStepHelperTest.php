@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Tools;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Tools\WorkflowStepHelper;
@@ -23,12 +28,13 @@ class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
      *
      * @param Step $step
      * @param array $expected
+     * @param bool $withTree
      */
-    public function testGetStepsAfter(Step $step, array $expected)
+    public function testGetStepsAfter(Step $step, array $expected, $withTree = false)
     {
         $helper = new WorkflowStepHelper($this->getWorkflowMock());
 
-        $this->assertEquals($expected, $helper->getStepsAfter($step));
+        $this->assertEquals($expected, $helper->getStepsAfter($step, $withTree));
     }
 
     /**
@@ -63,8 +69,33 @@ class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
             [
                 'step' => $this->getStepByNumber(5),
                 'expected' => []
+            ],
+            [
+                'step' => $this->getStepByNumber(1),
+                'expected' => [
+                    $this->getStepByNumber(2),
+                    $this->getStepByNumber(4),
+                    $this->getStepByNumber(5)
+                ],
+                'withTree' => true
             ]
         ];
+    }
+
+    public function testGetStepsBefore()
+    {
+        $workflowItem = $this->getWorkflowItem(['step6', 'step1', 'step2', 'step3', 'step1', 'step5', 'step4']);
+        $startSteps = ['step6', 'step1'];
+
+        $helper = new WorkflowStepHelper($this->getWorkflowMock());
+        $this->assertEquals(
+            [
+                $this->getStepByNumber(1),
+                $this->getStepByNumber(5),
+                $this->getStepByNumber(4)
+            ],
+            $helper->getStepsBefore($workflowItem, $startSteps)
+        );
     }
 
     /**
@@ -151,5 +182,30 @@ class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
         }
 
         return self::$steps[$number];
+    }
+
+    /**
+     * @param array $records
+     * @return WorkflowItem
+     */
+    protected function getWorkflowItem(array $records = [])
+    {
+        $recordObjects = [];
+        foreach ($records as $stepTo) {
+            $recordObjects[] = $this->getWorkflowTransitionRecord($stepTo);
+        }
+
+        return $this->getEntity(WorkflowItem::class, ['transitionRecords' => new ArrayCollection($recordObjects)]);
+    }
+
+    /**
+     * @param string $stepTo
+     * @return WorkflowTransitionRecord
+     */
+    protected function getWorkflowTransitionRecord($stepTo)
+    {
+        $step = $this->getEntity(WorkflowStep::class, ['name' => $stepTo]);
+
+        return $this->getEntity(WorkflowTransitionRecord::class, ['stepTo' => $step]);
     }
 }

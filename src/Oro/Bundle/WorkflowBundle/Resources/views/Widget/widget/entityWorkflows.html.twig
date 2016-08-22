@@ -23,14 +23,36 @@
                             <table class="workflow-content">
                                 <tr>
                                     <td class="workflow-steps">
-                                        {% set isOrdered = workflow.stepsData.is_ordered %}
+                                        {% set isOrdered = workflow.stepsData.isOrdered %}
                                         {% set steps = workflow.stepsData.steps %}
+
+                                        {% if not workflow.isStarted and workflow.transitionsData|length > 1 %}
+                                            {% set steps = [{active: false, label: '...', possibleStepsCount: 0}] %}
+                                        {% endif %}
+
                                         <div class="workflow-scroller">
                                             <ul class="workflow-steps-list {% if not workflow.isStarted %}workflow-not-started{% endif %}">
-                                                {% for step in steps %}
-                                                    {% set active = step.active %}
-                                                    {% set possibleStepsCount = step.possibleStepsCount %}
+                                                {% set activeRendered = not workflow.isStarted %}
+                                                {% set manyVariantsFound = false %}
+                                                {% set manyVariantsRendered = false %}
+
+                                                {% for step in steps if not manyVariantsRendered %}
                                                     {% if isOrdered %}
+                                                        {% set active = step.active %}
+
+                                                        {% if activeRendered and manyVariantsFound %}
+                                                            {% set manyVariantsRendered = true %}
+                                                            {% set step = step|merge({label: '...'}) %}
+                                                        {% endif %}
+
+                                                        {% if active and not activeRendered %}
+                                                            {% set activeRendered = true %}
+                                                        {% endif %}
+
+                                                        {% if step.possibleStepsCount > 1 and activeRendered %}
+                                                            {% set manyVariantsFound = true %}
+                                                        {% endif %}
+
                                                         <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
                                                             <div class="workflow-steps-item-arrow-container" title="{{ step.label }}">
                                                                 <span class="workflow-step-arrow-left"></span>
