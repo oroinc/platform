@@ -216,8 +216,27 @@ class WidgetController extends Controller
         $isStepsDisplayOrdered = $workflow->getDefinition()->isStepsDisplayOrdered();
         $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
 
+        $helper = new WorkflowStepHelper($workflow);
+
         if ($isStepsDisplayOrdered) {
-            $steps = $workflow->getStepManager()->getOrderedSteps(true)->toArray();
+            if ($workflowItem) {
+                $startStepNames = array_map(
+                    function (array $data) {
+                        /** @var Transition $transition */
+                        $transition = $data['transition'];
+
+                        return $transition->getStepTo()->getName();
+                    },
+                    $this->getAvailableStartTransitionsData($workflow, $entity)
+                );
+
+                $steps = array_merge(
+                    $helper->getStepsBefore($workflowItem, $startStepNames),
+                    $helper->getStepsAfter($workflow->getStepManager()->getStep($currentStep->getName()), true)
+                );
+            } else {
+                $steps = $workflow->getStepManager()->getOrderedSteps(true)->toArray();
+            }
         } elseif ($currentStep) {
             $steps = [$workflow->getStepManager()->getStep($currentStep->getName())];
         } else {
@@ -231,8 +250,6 @@ class WidgetController extends Controller
                 $transitionData
             );
         }
-
-        $helper = new WorkflowStepHelper($workflow);
 
         $steps = array_map(
             function (Step $step) use ($currentStep, $helper) {
@@ -250,9 +267,8 @@ class WidgetController extends Controller
             'label' => $workflow->getLabel(),
             'isStarted' => $workflowItem !== null,
             'stepsData' => [
-                'is_ordered' => $isStepsDisplayOrdered,
+                'isOrdered' => $isStepsDisplayOrdered,
                 'steps' => $steps
-
             ],
             'transitionsData' => $transitionData
         ];
