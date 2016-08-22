@@ -38,17 +38,12 @@ services:
 
     # Reader
     oro_translation.importexport.reader.translations:
-        parent: oro_importexport.reader.entity
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader'
         public: false
-
-    oro_translation.importexport.reader.translations_yml:
-        class: 'Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationYmlReader'
-        public: false
-
-    oro_translation.importexport.reader.translations_zip:
-        class: 'Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationZipReader'
-        public: false
+        arguments:
+            - '@oro_importexport.context_registry'
+            - '@oro_entity.doctrine_helper'
+            - '@translator'
 
     # Writer
     oro_translation.importexport.writer.translations:
@@ -56,15 +51,8 @@ services:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter'
         public: false
 
-    oro_translation.importexport.writer.translations_yml:
-        class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationYmlWriter'
-        public: false
-
-    oro_translation.importexport.writer.translations_zip:
-        class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationZipWriter'
-        public: false
-
     oro_translation.importexport.normalizer.translation:
         class: Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer
         tags:
             - { name: oro_importexport.normalizer }
+

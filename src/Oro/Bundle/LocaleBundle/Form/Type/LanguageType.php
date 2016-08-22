@@ -37,6 +37,7 @@ class LanguageType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices'     => array_flip($this->getLanguageChoices()),
+                'choices_as_values' => true,
                 'empty_value' => 'Please select...',
             ]
         );

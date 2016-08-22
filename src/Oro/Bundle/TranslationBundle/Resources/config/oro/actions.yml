@@ -196,7 +196,7 @@ action_groups:
             - '@call_service_method':
                 service: oro_translation.service_provider
                 method: loadTranslatesFromFile
-                method_parameters: [$.fileDir, $.language_code]
+                method_parameters: [$.fileDir, $.code]
                 attribute: $.installed
 
     oro_translation_language_update_build_date:

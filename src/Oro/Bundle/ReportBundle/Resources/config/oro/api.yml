@@ -1,4 +1,0 @@
-oro_api:
-    entities:
-        Oro\Bundle\ReportBundle\Entity\Report: ~
-        Oro\Bundle\ReportBundle\Entity\ReportType: ~

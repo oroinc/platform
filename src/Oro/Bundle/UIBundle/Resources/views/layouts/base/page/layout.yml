@@ -20,13 +20,13 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        visible: '=data["theme"].getIcon()!=null'
-                        href: '=data["asset"].getUrl(data["theme"].getIcon())'
+                        visible: '=data["theme"].getIcon(context["theme"])!=null'
+                        href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
                         rel: shortcut icon
                 styles:
                     blockType: style
                     options:
-                        src: '=data["asset"].getUrl(data["theme"].getConfig()["assets"]["styles"]["output"])'
+                        src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
                 body:
                     blockType: body
                 scripts_before:

@@ -31,9 +31,10 @@ define(function(require) {
                     return item;
                 });
                 if (options.readonly) {
-                    group.items = _.filter(group.items, function(item) {
+                    group.items = _.map(group.items, function(item) {
                         item.editable = !options.readonly;
-                        return item.access_level !== accessLevels.NONE;
+                        item.noAccess = item.access_level === accessLevels.NONE;
+                        return item;
                     });
                 }
                 var itemsCollection = new BaseCollection(group.items, {
