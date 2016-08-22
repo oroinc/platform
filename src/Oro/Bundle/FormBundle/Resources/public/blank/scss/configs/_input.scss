@@ -1,7 +1,7 @@
 $use-base-style: true !default;
 
 // Default
-$input-inner-offset: 7px 9px;
+$input-inner-offset: 7px 9px !default;
 
 // Hover
 $input-border-color-hover-state: get-color('additional', 'dark') !default;

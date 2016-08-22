@@ -2,4 +2,3 @@ styles:
     inputs:
         - 'bundles/oroform/default/scss/styles.scss'
     filters: ['cssrewrite', 'cssmin']
-    output: 'css/layout/default/styles.css'
