@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FeatureToggleBundle;
 
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\ConfigurationPass;
+use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggleVotersPass;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,5 +27,6 @@ class OroFeatureToggleBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new ConfigurationPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new FeatureToggleVotersPass());
     }
 }

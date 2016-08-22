@@ -18,6 +18,41 @@ class ConfigurationManager
     }
 
     /**
+     * @param string $resourceType
+     * @param string $resource
+     * @return array
+     */
+    public function getResourceFeatures($resourceType, $resource)
+    {
+        $configuration = $this->configurationProvider->getConfiguration();
+
+        $features = [];
+        foreach ($configuration as $featureName => $config) {
+            if (array_key_exists($resourceType, $config) && in_array($resource, $config[$resourceType])) {
+                $features[] = $featureName;
+            }
+        }
+
+        return $features;
+    }
+
+    /**
+     * @param string $featureName
+     * @return array
+     */
+    public function getDependOnFeatures($featureName)
+    {
+        $dependOnFeatures = $this->get($featureName, 'dependency');
+
+        $features = [];
+        foreach ($dependOnFeatures as $dependOnFeature) {
+            $features[] = $this->getDependOnFeatures($dependOnFeature);
+        }
+    
+        return $features;
+    }
+
+    /**
      * @param string $feature
      * @param string $node
      * @param null|mixed $default
