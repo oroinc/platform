@@ -18,11 +18,11 @@ class ConfigurationManager
     }
 
     /**
-     * @param string $resourceType
      * @param string $resource
+     * @param string $resourceType
      * @return array
      */
-    public function getResourceFeatures($resourceType, $resource)
+    public function getResourceFeatures($resource, $resourceType)
     {
         $configuration = $this->configurationProvider->getConfiguration();
 

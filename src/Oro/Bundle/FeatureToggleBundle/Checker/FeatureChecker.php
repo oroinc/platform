@@ -108,10 +108,19 @@ class FeatureChecker
      * @param string $resource
      * @param string $resourceType
      * @param null $scopeIdentifier
+     * @return bool
      */
     public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
     {
-        
+        $features = $this->configManager->getResourceFeatures($resourceType, $resource);
+
+        foreach ($features as $feature) {
+            if (!$this->check($feature, $scopeIdentifier)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
