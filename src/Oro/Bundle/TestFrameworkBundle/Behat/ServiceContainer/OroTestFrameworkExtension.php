@@ -79,6 +79,9 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
                 ->end()
+                ->scalarNode('reference_initializer_class')
+                    ->defaultValue('Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer')
+                ->end()
             ->end();
     }
 
@@ -93,6 +96,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
+        $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
     }
 
     public function processDbDumpers(ContainerBuilder $container)
