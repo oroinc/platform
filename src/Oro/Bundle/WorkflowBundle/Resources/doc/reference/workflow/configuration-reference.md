@@ -128,8 +128,15 @@ Single workflow configuration has next properties:
     Contains configuration for Transitions
 * **transition_definitions**
     Contains configuration for Transition Definitions
+* **priority** - integer value of current workflow dominance level in part of automatically performed tasks (ordering, exclusiveness). It is recommended to use high degree integer values to give a scope for 3rd party integrators.
+* **exclusive_active_groups** - list of group names for which current workflow should be active exclusively
+* **exclusive_record_groups** - list of group names for which current workflow can not be performed together with other workflows with one of specified groups. E.g., no concurrent transitions are possible among workflows in same exclusive_record_group. 
 * **entity_restrictions**
     Contains configuration for Workflow Restrictions
+* **defaults** - node for default workflow configuration values that can be changed in UI later. 
+    * **active** - determine if workflow should be active right after first load of configuration.
+
+
 
 Example
 -------
@@ -137,11 +144,17 @@ Example
 workflows:                                                    # Root elements
     b2b_flow_sales:                                           # A unique name of workflow
         label: B2B Sales Flow                                 # This will be shown in UI
+        defaults:
+            active: true                                      # Active by default (when config is loaded)
         entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
         steps_display_ordered: true                           # Show all steps in step widget
+        priority: 100                                         # Priority level
+        exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
+        exclusive_record_groups:
+            - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps
@@ -288,7 +301,7 @@ workflows:
                     owner:
                         update: false
                         delete: false
-             start_conversation:
+            start_conversation:
                 label: 'Call Phone Conversation'
                 allowed_transitions:
                     - end_conversation
@@ -667,7 +680,6 @@ workflows:
     phone_call:
         label: 'Demo Call Workflow'
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-        enabled: true
         start_step: start_call
         steps:
             start_call:

@@ -4,13 +4,10 @@ define(function(require) {
     'use strict';
 
     var DeactivateFormWidgetComponent;
-    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var Error = require('oroui/js/error');
     var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
     var widgetManager = require('oroui/js/widget-manager');
 
     DeactivateFormWidgetComponent = BaseComponent.extend({
@@ -19,7 +16,8 @@ define(function(require) {
          */
         options: {
             _wid: '',
-            deactivated: '',
+            success: false,
+            deactivated: null,
             workflow: '',
             selectors: {
                 form: null
@@ -38,7 +36,7 @@ define(function(require) {
             widgetManager.getWidgetInstance(
                 this.options._wid,
                 function(widget) {
-                    if (_.isNull(self.options.deactivated)) {
+                    if (!self.options.success) {
                         widget.getAction(self.options.buttonName, 'adopted', function(action) {
                             action.on('click', _.bind(self.onClick, self));
                         });
@@ -61,24 +59,8 @@ define(function(require) {
             );
         },
 
-        /**
-         * @param {jQuery.Event} e
-         */
-        onClick: function(e) {
-            var self = this;
-
-            $.ajax({
-                url: routing.generate('oro_api_workflow_activate', {workflowDefinition: this.options.workflow}),
-                type: 'GET',
-                success: function() {
-                    var $form = self.options._sourceElement.find(self.options.selectors.form);
-
-                    $form.trigger('submit');
-                },
-                error: function(xhr, textStatus, error) {
-                    Error.handle({}, xhr, {enforce: true});
-                }
-            });
+        onClick: function() {
+            this.options._sourceElement.find(this.options.selectors.form).trigger('submit');
         }
     });
 

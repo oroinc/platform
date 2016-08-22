@@ -59,11 +59,12 @@ class StartTransitionHandler
         }
 
         $responseCode = null;
-
+        $workflowItem = null;
         try {
             $dataArray = [];
+            $workflowName = $workflow->getName();
             if ($data) {
-                $this->serializer->setWorkflowName($workflow->getName());
+                $this->serializer->setWorkflowName($workflowName);
                 /* @var $data WorkflowData */
                 $data = $this->serializer->deserialize(
                     $data,
@@ -73,7 +74,7 @@ class StartTransitionHandler
                 $dataArray = $data->getValues();
             }
 
-            $workflowItem = $this->workflowManager->startWorkflow($workflow, $entity, $transition, $dataArray);
+            $workflowItem = $this->workflowManager->startWorkflow($workflowName, $entity, $transition, $dataArray);
         } catch (HttpException $e) {
             $responseCode = $e->getStatusCode();
         } catch (WorkflowNotFoundException $e) {
