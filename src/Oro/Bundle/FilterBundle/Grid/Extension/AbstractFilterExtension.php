@@ -2,23 +2,17 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
-use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
-use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractFilterExtension extends AbstractExtension
