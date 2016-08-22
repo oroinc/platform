@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
+use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
@@ -21,7 +22,9 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function shouldSeeRecordInActivityList($content)
     {
-        $this->getActivityListItem($content);
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $activityList->getActivityListItem($content);
     }
 
     /**
@@ -33,7 +36,9 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
     public function shouldNotSeeRecordInActivityList($content)
     {
         try {
-            $this->getActivityListItem($content);
+            /** @var ActivityList $activityList */
+            $activityList = $this->createElement('ActivityList');
+            $activityList->getActivityListItem($content);
         } catch (\Exception $e) {
             return;
         }
@@ -42,11 +47,43 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
     }
 
     /**
+     * @When /^(?:|I )add activity comment with:$/
+     */
+    public function iAddActivityCommentWith(TableNode $table)
+    {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $activityList->getCollapsedItem()->addComment($table);
+    }
+
+    /**
+     * @When /^(?:|I )edit "(?P<comment>[^"]+)" activity comment with:$/
+     */
+    public function iEditActivityCommentWith($comment, TableNode $table)
+    {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $activityList->getCollapsedItem()->editComment($comment, $table);
+    }
+
+    /**
+     * @When /^(?:|I )delete "(?P<comment>[^"]+)" activity comment$/
+     */
+    public function iDeleteActivityCommentWith($comment)
+    {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $activityList->getCollapsedItem()->deleteComment($comment);
+    }
+
+    /**
      * @Then there is no records in activity list
      */
     public function thereIsNoRecordsInActivityList()
     {
-        $items = $this->getActivityListItems();
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $items = $activityList->getItems();
 
         self::assertCount(
             0,
@@ -62,9 +99,12 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function thereIsNumberRecordsInActivityList($number)
     {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+
         self::assertCount(
             $this->getCount($number),
-            $this->getActivityListItems(),
+            $activityList->getItems(),
             sprintf('Expect that Activity list has %s items', $number)
         );
     }
@@ -74,7 +114,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function goToNewerOrOlderActivities($linkLocator)
     {
-        $link = $this->createElement('Activity List')->findLink(ucfirst($linkLocator));
+        $link = $this->createElement('ActivityList')->findLink(ucfirst($linkLocator));
 
         if (!$link) {
             self::fail(sprintf('Can\'t find "%s" button', $linkLocator));
@@ -93,9 +133,10 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function iCollapseActivityListItem($content)
     {
-        $item = $this->getActivityListItem($content);
-        $item->find('css', 'a.accordion-toggle')->click();
-        $this->getSession()->getDriver()->waitForAjax();
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $item = $activityList->getActivityListItem($content);
+        $item->collapse();
     }
 
     /**
@@ -107,21 +148,13 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function iClickActionOnContentInActivityList($action, $content)
     {
-        $item = $this->getActivityListItem($content);
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $item = $activityList->getActivityListItem($content);
+        $link = $item->getActionLink($action);
 
-        $item->find('css', 'div.actions a.dropdown-toggle')->mouseOver();
-        $links = $item->findAll('css', 'li.launcher-item a');
-
-        /** @var NodeElement $link */
-        foreach ($links as $link) {
-            if (preg_match(sprintf('/%s/i', $action), $link->getText())) {
-                $link->click();
-
-                return;
-            }
-        }
-
-        self::fail(sprintf('"%s" activity item was found, but "%s" action not', $content, $action));
+        self::assertNotNull($link, sprintf('"%s" activity item was found, but "%s" action not', $content, $action));
+        $link->click();
     }
 
     /**
@@ -132,7 +165,9 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function iShouldSeeInEmailBody($content)
     {
-        $collapsedItem = $this->getCollapsedItem();
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $collapsedItem = $activityList->getCollapsedItem();
         $emailBody = $collapsedItem->find('css', 'div.email-body')->getHtml();
 
         self::assertNotFalse(
@@ -146,7 +181,9 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function emailShouldHaveThreadIcon($content)
     {
-        $item = $this->getActivityListItem($content);
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $item = $activityList->getActivityListItem($content);
         $icon = $item->find('css', 'div.icon i');
 
         self::assertTrue(
@@ -163,7 +200,9 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function emailShouldHaveTwoEmails($content, $emailsCount)
     {
-        $item = $this->getActivityListItem($content);
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $item = $activityList->getActivityListItem($content);
         $threadEmails = $item->findAll('css', 'div.thread-view div.email-info');
 
         self::assertCount(
@@ -180,17 +219,10 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function iShouldSeeNameInContexts($text)
     {
-        $collapsedItem = $this->getCollapsedItem();
-        $contexts = $collapsedItem->findAll('css', 'div.activity-context-activity-list div.context-item a');
-
-        /** @var NodeElement $context */
-        foreach ($contexts as $context) {
-            if (false !== stripos($context->getText(), $text)) {
-                return;
-            }
-        }
-
-        self::fail(sprintf('Context with "%s" name not found', $text));
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $collapsedItem = $activityList->getCollapsedItem();
+        $collapsedItem->hasContext($text);
     }
 
     /**
@@ -200,9 +232,13 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function iShouldSeeTextInCollapsedActivityItem($text)
     {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $collapsedItem = $activityList->getCollapsedItem();
+
         self::assertNotFalse(
-            stripos($this->getCollapsedItem()->getText(), $text),
-            sprintf('Can\'t find "%s" image name in collapsed activity item', $text)
+            stripos($collapsedItem->getText(), $text),
+            sprintf('Can\'t find "%s" in collapsed activity item', $text)
         );
     }
 
@@ -239,53 +275,10 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function deleteAllContextsFromActionItem()
     {
-        $collapsedItem = $this->getCollapsedItem();
-        $contexts = $collapsedItem->findAll('css', 'div.activity-context-activity-list div.context-item');
-
-        /** @var NodeElement $context */
-        foreach ($contexts as $context) {
-            $context->find('css', 'i.icon-remove')->click();
-        }
-    }
-
-    /**
-     * @return NodeElement Collapsed activity element
-     */
-    protected function getCollapsedItem()
-    {
-        $items = $this->createElement('Activity List')->findAll('css', 'div.accordion-body');
-        $collapsedItem = array_filter($items, function (NodeElement $element) {
-            return $element->hasClass('in');
-        });
-
-        self::assertNotCount(0, $collapsedItem, 'Not found collapsed items in activity list');
-
-        return array_shift($collapsedItem);
-    }
-
-    /**
-     * @param string $content
-     * @return NodeElement Activity element
-     */
-    protected function getActivityListItem($content)
-    {
-        foreach ($this->getActivityListItems() as $item) {
-            if (false !== strpos($item->getText(), $content)) {
-                return $item;
-            }
-        }
-
-        self::fail(sprintf('Item with "%s" content not found in activity list', $content));
-    }
-
-    /**
-     * @return NodeElement[]
-     */
-    protected function getActivityListItems()
-    {
-        $activityList = $this->createElement('Activity List');
-
-        return $activityList->findAll('css', 'div.list-item');
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('ActivityList');
+        $collapsedItem = $activityList->getCollapsedItem();
+        $collapsedItem->deleteAllContexts();
     }
 
     /**
