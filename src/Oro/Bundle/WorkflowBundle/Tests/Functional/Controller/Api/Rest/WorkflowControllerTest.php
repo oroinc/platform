@@ -19,9 +19,6 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
  */
 class WorkflowControllerTest extends WebTestCase
 {
-    const CONFIG_PROVIDER_NAME = 'workflow';
-    const CONFIG_KEY = 'active_workflows';
-
     /** @var string */
     protected $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
 
@@ -45,16 +42,15 @@ class WorkflowControllerTest extends WebTestCase
         $workflowOneName = $workflowOne->getName();
         $workflowTwoName = $workflowTwo->getName();
 
-        $workflowManager->activateWorkflow($workflowOne);
-        $this->assertActiveWorkflow($this->entityClass, $workflowOneName);
-
-        $workflowManager->activateWorkflow($workflowTwo);
-        $this->assertActiveWorkflow($this->entityClass, $workflowTwoName);
-
-        $activeWorkflowsCount = count($this->getWorkflowManager()->getApplicableWorkflows($this->entityClass));
-        $this->assertGreaterThanOrEqual(2, $activeWorkflowsCount);
+        $workflowManager->activateWorkflow($workflowOne->getName());
+        $workflowManager->activateWorkflow($workflowTwo->getName());
 
         $entity = $this->createNewEntity();
+
+        $this->assertActiveWorkflow($entity, $workflowOneName);
+        $this->assertActiveWorkflow($entity, $workflowTwoName);
+
+        $this->assertCount(2, $this->getWorkflowManager()->getApplicableWorkflows($entity));
 
         $workflowManager->startWorkflow($workflowOneName, $entity, LoadWorkflowDefinitions::START_TRANSITION);
         $this->assertEntityWorkflowItem($entity, $workflowOneName);
@@ -78,9 +74,11 @@ class WorkflowControllerTest extends WebTestCase
     public function testDeactivateAndActivateActions()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
-        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $testEntity = $this->createNewEntity();
+
+        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
+
         $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $repositoryProcess = $this->getRepository('OroWorkflowBundle:ProcessDefinition');
@@ -97,7 +95,7 @@ class WorkflowControllerTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertActivationResult($result);
-        $this->assertInactiveWorkflow($this->entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
+        $this->assertInactiveWorkflow($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $processes = $repositoryProcess->findAll();
         $this->assertCount(count($processesBefore) - 1, $processes);
@@ -118,7 +116,7 @@ class WorkflowControllerTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertActivationResult($result);
-        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
+        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $this->assertEmpty($this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP));
     }
@@ -167,24 +165,24 @@ class WorkflowControllerTest extends WebTestCase
     }
 
     /**
-     * @param string
+     * @param object $entity
      * @param string|null $workflowName
      */
-    protected function assertActiveWorkflow($entityClass, $workflowName)
+    protected function assertActiveWorkflow($entity, $workflowName)
     {
-        $activeWorkflowNames = $this->getActiveWorkflowNames($entityClass);
+        $activeWorkflowNames = $this->getActiveWorkflowNames($entity);
 
         $this->assertNotEmpty($activeWorkflowNames);
         $this->assertContains($workflowName, $activeWorkflowNames);
     }
 
     /**
-     * @param string
+     * @param object $entity
      * @param string|null $workflowName
      */
-    protected function assertInactiveWorkflow($entityClass, $workflowName)
+    protected function assertInactiveWorkflow($entity, $workflowName)
     {
-        $this->assertNotContains($workflowName, $this->getActiveWorkflowNames($entityClass));
+        $this->assertNotContains($workflowName, $this->getActiveWorkflowNames($entity));
     }
 
     /**
@@ -210,9 +208,11 @@ class WorkflowControllerTest extends WebTestCase
     public function testGetValidWorkflowItem()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
-        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $testEntity = $this->createNewEntity();
+
+        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
+
         $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
@@ -235,10 +235,10 @@ class WorkflowControllerTest extends WebTestCase
 
     public function testStartWorkflow()
     {
-        $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::NO_START_STEP);
-        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::NO_START_STEP);
-
         $testEntity = $this->createNewEntity();
+
+        $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::NO_START_STEP);
+        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::NO_START_STEP);
 
         $this->client->request(
             'GET',
@@ -267,9 +267,10 @@ class WorkflowControllerTest extends WebTestCase
     public function testTransitAction()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
-        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::MULTISTEP);
 
         $testEntity = $this->createNewEntity();
+
+        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::MULTISTEP);
 
         $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::MULTISTEP);
 
@@ -326,12 +327,12 @@ class WorkflowControllerTest extends WebTestCase
     }
 
     /**
-     * @param string $entityClass
+     * @param object $entity
      * @return array
      */
-    protected function getActiveWorkflowNames($entityClass)
+    protected function getActiveWorkflowNames($entity)
     {
-        $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entityClass);
+        $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entity);
 
         return array_map(
             function (Workflow $workflow) {

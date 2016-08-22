@@ -14,11 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
-/**
- * Load customers
- *
- * Execute with "php app/console doctrine:fixtures:load"
- */
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
     const COUNT = 9;
@@ -60,34 +55,9 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function loadItems($manager)
     {
-        for ($ind = 1; $ind <= self::COUNT; $ind++) {
-            //create item
-            /** @var $item Item */
-            $item = new Item();
-            //string value
-            $item->stringValue  = 'item' . $ind . '@mail.com';
-            $item->integerValue = $ind * 1000;
-            //decimal
-            $item->decimalValue = $ind / 10.0;
-            //float
-            $item->floatValue = $ind / 10.0 + 10;
-            //boolean
-            $item->booleanValue = rand(0, 1) == true;
-            //blob
-            $item->blobValue = "blob-{$ind}";
-            //array
-            $item->arrayValue = [$ind];
-            //datetime
-            $date = new \DateTime('2014-12-01', new \DateTimeZone('UTC'));
-            $date->add(new \DateInterval("P{$ind}Y"));
-            $item->datetimeValue = $date;
-            //guid
-            $item->guidValue = UUIDGenerator::v4();
-            //object
-            $item->objectValue = new \stdClass();
-            //phone
-            $item->phone = sprintf($ind % 2 ? '123-456-%s00' : '%s00987654', $ind);
+        $items = $this->generateItems();
 
+        foreach ($items as $item) {
             $manager->persist($item);
         }
 
@@ -117,5 +87,46 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
         if (!$isLoaded) {
             throw new \LogicException('Search items are not loaded');
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function generateItems()
+    {
+        $items = [];
+
+        for ($ind = 1; $ind <= self::COUNT; $ind++) {
+            //create item
+            /** @var $item Item */
+            $item = new Item();
+            //string value
+            $item->stringValue = 'item' . $ind . '@mail.com';
+            $item->integerValue = $ind * 1000;
+            //decimal
+            $item->decimalValue = $ind / 10.0;
+            //float
+            $item->floatValue = $ind / 10.0 + 10;
+            //boolean
+            $item->booleanValue = rand(0, 1) == true;
+            //blob
+            $item->blobValue = "blob-{$ind}";
+            //array
+            $item->arrayValue = [$ind];
+            //datetime
+            $date = new \DateTime('2014-12-01', new \DateTimeZone('UTC'));
+            $date->add(new \DateInterval("P{$ind}Y"));
+            $item->datetimeValue = $date;
+            //guid
+            $item->guidValue = UUIDGenerator::v4();
+            //object
+            $item->objectValue = new \stdClass();
+            //phone
+            $item->phone = sprintf($ind % 2 ? '123-456-%s00' : '%s00987654', $ind);
+
+            $items[] = $item;
+        }
+
+        return $items;
     }
 }

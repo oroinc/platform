@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -57,8 +58,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function propertiesDataProvider()
     {
         return array(
-            'name' => array('name', 'test'),
-            'label' => array('label', 'test'),
             'definition' => array('definition', $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'))
         );
     }
@@ -379,10 +378,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('transit')
             ->with($workflowItem);
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -427,8 +422,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         $transition = $this->getTransitionMock('transition', false, $stepTwo);
 
-        $workflow = $this->createWorkflow('test');
+        $workflow = $this->createWorkflow();
         $workflow->setDefinition($workflowDefinition);
+        $workflowDefinition->expects($this->once())->method('getName')->willReturn('test');
         $workflow->getTransitionManager()->setTransitions(array($transition));
         $workflow->getStepManager()->setSteps(array($stepOne));
         $workflow->transit($workflowItem, 'transition');
@@ -470,6 +466,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('getStepByName')
             ->with($workflowStep->getName())
             ->will($this->returnValue($workflowStep));
+        $workflowDefinition->expects($this->any())->method('getName')->willReturn('test_wf_name');
 
         $entity = new EntityWithWorkflow();
         $entityAttribute = new Attribute();
@@ -477,7 +474,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         $this->assertDoctrineHelperCalled($entity, 'test_wf_name');
 
-        $workflow = $this->createWorkflow('test_wf_name');
+        $workflow = $this->createWorkflow();
         $workflow->setDefinition($workflowDefinition);
         $workflow->getTransitionManager()->setTransitions(array($transition));
         $workflow->getAttributeManager()->setAttributes(array($entityAttribute));
@@ -819,7 +816,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             $attributeManager,
             $transitionManager
         );
-        $workflow->setName($workflowName);
+
+        $definition = new WorkflowDefinition();
+        $definition->setName($workflowName);
+        $workflow->setDefinition($definition);
 
         return $workflow;
     }

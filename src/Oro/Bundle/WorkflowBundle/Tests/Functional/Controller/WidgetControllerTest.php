@@ -41,6 +41,8 @@ class WidgetControllerTest extends WebTestCase
         $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions']);
         $this->entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass(self::ENTITY_CLASS);
         $this->workflowManager = $this->client->getContainer()->get('oro_workflow.manager');
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
         $this->entity = $this->createNewEntity();
     }
 

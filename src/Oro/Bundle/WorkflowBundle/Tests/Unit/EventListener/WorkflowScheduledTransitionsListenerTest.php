@@ -12,16 +12,14 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
-use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionChangesListener;
+use Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowScheduledTransitionsListenerTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
-
-    const PROCESS_DEFINITION_CLASS_NAME = 'stdClass';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessConfigurationGenerator */
     protected $generator;
@@ -35,7 +33,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessDefinitionRepository */
     protected $processDefinitionRepository;
 
-    /** @var WorkflowDefinitionChangesListener */
+    /** @var WorkflowScheduledTransitionsListener */
     protected $listener;
 
     protected function setUp()
@@ -59,20 +57,19 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $manager->expects($this->any())
             ->method('getRepository')
-            ->with(self::PROCESS_DEFINITION_CLASS_NAME)
+            ->with(ProcessDefinition::class)
             ->willReturn($this->processDefinitionRepository);
 
         $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
-            ->with(self::PROCESS_DEFINITION_CLASS_NAME)
+            ->with(ProcessDefinition::class)
             ->willReturn($manager);
 
-        $this->listener = new WorkflowDefinitionChangesListener(
+        $this->listener = new WorkflowScheduledTransitionsListener(
             $this->generator,
             $this->processConfigurator,
-            $this->registry,
-            self::PROCESS_DEFINITION_CLASS_NAME
+            $this->registry
         );
     }
 
@@ -83,7 +80,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateProcessConfigurations()
     {
-        $workflowDefinition = (new WorkflowDefinition())->setName('workflow');
+        $workflowDefinition = (new WorkflowDefinition())->setName('workflow')->setActive(true);
 
         $this->generator->expects($this->once())
             ->method('generateForScheduledTransition')
@@ -97,6 +94,15 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
             $this->listener,
             'Generated configuration should be stored for later events.'
         );
+    }
+
+    public function testPreventGenerateProcessConfigurationForNonActiveWorkflows()
+    {
+        $workflowDefinition = (new WorkflowDefinition())->setName('workflow')->setActive(false);
+
+        $this->generator->expects($this->never())->method('generateForScheduledTransition');
+
+        $this->listener->generateProcessConfigurations($this->createEvent($workflowDefinition));
     }
 
     public function testWorkflowAfterCreate()
@@ -178,7 +184,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
                 WorkflowEvents::WORKFLOW_ACTIVATED => 'workflowActivated',
                 WorkflowEvents::WORKFLOW_DEACTIVATED => 'workflowDeactivated'
             ],
-            WorkflowDefinitionChangesListener::getSubscribedEvents()
+            WorkflowScheduledTransitionsListener::getSubscribedEvents()
         );
     }
 
@@ -202,7 +208,9 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setGeneratedConfigurations(array $generatedConfigurations)
     {
-        $reflection = new \ReflectionClass('Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionChangesListener');
+        $reflection = new \ReflectionClass(
+            'Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener'
+        );
         $property = $reflection->getProperty('generatedConfigurations');
         $property->setAccessible(true);
         $property->setValue($this->listener, $generatedConfigurations);
