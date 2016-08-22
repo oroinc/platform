@@ -530,16 +530,13 @@ class Query
      */
     public function getStringQuery()
     {
-        $fromString = $whereString = '';
+        $fromString = '';
 
         if ($this->getFrom()) {
             $fromString .= 'from ' . implode(', ', $this->getFrom());
         }
 
-        if (null !== $whereExpr = $this->criteria->getWhereExpression()) {
-            $visitor     = new QueryStringExpressionVisitor();
-            $whereString = ' where ' . $whereExpr->visit($visitor);
-        }
+        $whereString = $this->getWhereString();
 
         $orderByString = '';
         if ($this->getOrderBy()) {
@@ -575,6 +572,22 @@ class Query
                . $orderByString
                . $limitString
                . $offsetString;
+    }
+
+    /**
+     * Returns the WHERE string part for getStringQuery.
+     *
+     * @return string
+     */
+    private function getWhereString()
+    {
+        $whereString = '';
+        if (null !== $whereExpr = $this->criteria->getWhereExpression()) {
+            $visitor     = new QueryStringExpressionVisitor();
+            $whereString = ' where ' . $whereExpr->visit($visitor);
+        }
+
+        return $whereString;
     }
 
     /**
