@@ -81,6 +81,42 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
         ], $transportMessage->getProperties());
     }
 
+    public function testShouldReturnConfigInstance()
+    {
+        $config = new Config('', '', '', '', '');
+
+        $driver = new NullDriver($this->createSessionStub(), $config);
+        $result = $driver->getConfig();
+
+        self::assertSame($config, $result);
+    }
+
+    public function testAllowCreateTransportMessage()
+    {
+        $config = new Config('', '', '', '', '');
+
+        $message = new NullMessage();
+
+        $session = $this->createSessionMock();
+        $session
+            ->expects(self::once())
+            ->method('createMessage')
+            ->willReturn($message)
+        ;
+
+        $driver = new NullDriver($session, $config);
+
+        self::assertSame($message, $driver->createTransportMessage());
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
+     */
+    private function createSessionMock()
+    {
+        return $this->getMock(NullSession::class, [], [], '', false);
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
      */

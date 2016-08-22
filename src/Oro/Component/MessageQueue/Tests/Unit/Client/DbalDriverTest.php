@@ -139,6 +139,24 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
         self::assertSame($config, $result);
     }
 
+    public function testAllowCreateTransportMessage()
+    {
+        $config = new Config('', '', '', '', '');
+
+        $message = new DbalMessage();
+
+        $session = $this->createSessionMock();
+        $session
+            ->expects(self::once())
+            ->method('createMessage')
+            ->willReturn($message)
+        ;
+
+        $driver = new DbalDriver($session, $config);
+
+        self::assertSame($message, $driver->createTransportMessage());
+    }
+
     public function testShouldCreateAndDeclareQueue()
     {
         $queue = new DbalDestination('name');

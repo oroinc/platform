@@ -61,8 +61,8 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
 
         $context->setStatus(MessageProcessorInterface::REJECT);
         $context->getLogger()->debug(
-            '[DelayRedeliveredMessageExtension]'.
-            'Reject redelivered message. Set reject status to context.'
+            '[DelayRedeliveredMessageExtension] '.
+            'Reject redelivered original message by setting reject status to context.'
         );
     }
 }

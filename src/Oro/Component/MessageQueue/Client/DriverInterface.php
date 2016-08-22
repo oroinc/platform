@@ -1,10 +1,16 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 
 interface DriverInterface
 {
+    /**
+     * @return MessageInterface
+     */
+    public function createTransportMessage();
+
     /**
      * @param QueueInterface $queue
      * @param Message $message

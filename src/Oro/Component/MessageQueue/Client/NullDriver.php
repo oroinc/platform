@@ -2,6 +2,7 @@
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
+use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
@@ -26,6 +27,16 @@ class NullDriver implements DriverInterface
     {
         $this->session = $session;
         $this->config = $config;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return NullMessage
+     */
+    public function createTransportMessage()
+    {
+        return $this->session->createMessage();
     }
 
     /**
@@ -59,7 +70,7 @@ class NullDriver implements DriverInterface
         $headers['delay'] = $message->getDelaySec();
         $headers['priority'] = $message->getPriority();
 
-        $transportMessage = $this->session->createMessage();
+        $transportMessage = $this->createTransportMessage();
         $transportMessage->setBody($message->getBody());
         $transportMessage->setProperties($message->getProperties());
         $transportMessage->setMessageId($message->getMessageId());

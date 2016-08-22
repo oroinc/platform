@@ -40,7 +40,7 @@ class DbalDriver implements DriverInterface
 
         $headers['content_type'] = $message->getContentType();
 
-        $transportMessage = $this->session->createMessage();
+        $transportMessage = $this->createTransportMessage();
         $transportMessage->setBody($message->getBody());
         $transportMessage->setHeaders($headers);
         $transportMessage->setProperties($properties);
@@ -61,6 +61,16 @@ class DbalDriver implements DriverInterface
         }
 
         $this->session->createProducer()->send($queue, $transportMessage);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return DbalMessage
+     */
+    public function createTransportMessage()
+    {
+        return $this->session->createMessage();
     }
 
     /**
