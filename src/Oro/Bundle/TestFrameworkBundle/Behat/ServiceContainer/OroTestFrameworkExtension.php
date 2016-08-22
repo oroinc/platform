@@ -99,12 +99,18 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     public function processDbDumpers(ContainerBuilder $container)
     {
         $dbDumper = $this->getDbDumper($container);
         $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     /**
      * @param ContainerBuilder $container
      * @throws OutOfBoundsException When
@@ -239,7 +245,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             $elementConfiguration = array_merge($elementConfiguration, Yaml::parse(file_get_contents($mappingPath)));
         }
 
-        $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
+        $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
     }
 
     /**

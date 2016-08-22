@@ -75,6 +75,7 @@ services:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory'
         arguments:
             - '@mink'
+            - '@mink.selectors_handler'
             - ~
 
     oro_behat_element_factory_initializer:
