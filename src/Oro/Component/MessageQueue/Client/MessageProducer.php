@@ -39,7 +39,7 @@ class MessageProducer implements MessageProducerInterface
         $message->setProperty(Config::PARAMETER_PROCESSOR_NAME, $config->getRouterMessageProcessorName());
         $message->setProperty(Config::PARAMETER_QUEUE_NAME, $config->getRouterQueueName());
 
-        $message->setMessageId($message->getMessageId() ?: uniqid('oro', true));
+        $message->setMessageId($message->getMessageId() ?: uniqid('oro.', true));
         $message->setTimestamp($message->getTimestamp() ?: time());
         $message->setPriority($message->getPriority() ?: MessagePriority::NORMAL);
 
