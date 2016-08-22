@@ -49,6 +49,6 @@ class DependentJobContext
      */
     public function getDependentJobs()
     {
-        return $this->getDependentJobs();
+        return $this->dependentJobs;
     }
 }

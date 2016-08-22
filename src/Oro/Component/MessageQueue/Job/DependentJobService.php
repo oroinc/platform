@@ -16,10 +16,26 @@ class DependentJobService
         $this->jobStorage = $jobStorage;
     }
 
+    /**
+     * @param Job $job
+     *
+     * @return DependentJobContext
+     */
+    public function createDependentJobContext(Job $job)
+    {
+        return new DependentJobContext($job);
+    }
+
+    /**
+     * @param DependentJobContext $context
+     */
     public function saveDependentJob(DependentJobContext $context)
     {
         if (! $context->getJob()->isRoot()) {
-            throw new \LogicException('Only root job allowed');
+            throw new \LogicException(sprintf(
+                'Only root jobs allowed but got child. jobId: "%s"',
+                $context->getJob()->getId()
+            ));
         }
 
         $this->jobStorage->saveJob($context->getJob(), function (Job $job) use ($context) {

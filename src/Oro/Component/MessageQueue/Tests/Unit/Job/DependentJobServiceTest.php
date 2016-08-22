@@ -1,93 +1,42 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
 class DependentJobServiceTest extends \PHPUnit_Framework_TestCase
 {
-    public function testShouldThrowIfRootJobIsNotSet()
+    public function testCouldBeConstructedWithRequiredArguments()
     {
-        $dependentJob = new DependentJobService();
-
-        $this->setExpectedException(\LogicException::class, 'Root job is not set');
-
-        $dependentJob->addDependentJob('', '');
-    }
-
-    public function testShouldAddDependentJobs()
-    {
-        $job = new Job();
-
-        $dependentJob = new DependentJobService(null, $job);
-
-        $dependentJob->addDependentJob('topic1', 'message1', 'priority1');
-        $dependentJob->addDependentJob('topic2', 'message2');
-
-        $expectedData = [
-            'dependentJobs' => [
-                [
-                    'topic' => 'topic1',
-                    'message' => 'message1',
-                    'priority' => 'priority1',
-                ],
-                [
-                    'topic' => 'topic2',
-                    'message' => 'message2',
-                ],
-            ]
-        ];
-
-        $this->assertEquals($expectedData, $job->getData());
-    }
-
-    public function testShouldThrowIfRootJobIsSet()
-    {
-        $dependentJob = new DependentJobService(null, new Job());
-
-        $this->setExpectedException(\LogicException::class, 'Is not allowed to call method if rootJob is set');
-
-        $dependentJob->setDependentJob(new Job(), function () {
-
-        });
-    }
-
-    public function testShouldThrowIfJobStorageIsNotSet()
-    {
-        $dependentJob = new DependentJobService(null, null);
-
-        $this->setExpectedException(\LogicException::class, 'Job storage is not set');
-
-        $dependentJob->setDependentJob(new Job(), function () {
-
-        });
+        new DependentJobService($this->createJobStorageMock());
     }
 
     public function testShouldThrowIfJobIsNotRootJob()
     {
-        $dependentJob = new DependentJobService($this->createJobStorageMock(), null);
-
-        $this->setExpectedException(\LogicException::class, 'Only root jobs allowed but got child. id:"1234"');
-
         $job = new Job();
-        $job->setId(1234);
+        $job->setId(12345);
         $job->setRootJob(new Job());
 
-        $dependentJob->setDependentJob($job, function () {
+        $context = new DependentJobContext($job);
 
-        });
+        $service = new DependentJobService($this->createJobStorageMock());
+
+        $this->setExpectedException(\LogicException::class, 'Only root jobs allowed but got child. jobId: "12345"');
+
+        $service->saveDependentJob($context);
     }
 
-    public function testShouldCallClosureAndSaveJob()
+    public function testShouldSaveDependentJobs()
     {
         $job = new Job();
+        $job->setId(12345);
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
             ->method('saveJob')
-            ->with($job, $this->isInstanceOf(\Closure::class))
             ->will($this->returnCallback(function (Job $job, $callback) {
                 $callback($job);
 
@@ -95,50 +44,26 @@ class DependentJobServiceTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $dependentJob = new DependentJobService($jobStorage, null);
+        $context = new DependentJobContext($job);
+        $context->addDependentJob('job-topic', 'job-message', 'job-priority');
 
-        $childDependentJob = null;
-        $dependentJob->setDependentJob($job, function (DependentJobService $dependentJob) use (&$childDependentJob) {
-            $childDependentJob = $dependentJob;
-        });
+        $service = new DependentJobService($storage);
 
-        $this->assertInstanceOf(DependentJobService::class, $childDependentJob);
-        $this->assertNotSame($childDependentJob, $dependentJob);
-    }
+        $service->saveDependentJob($context);
 
-    public function testShouldClearDependentJobsBeforeCallback()
-    {
-        $job = new Job();
-        $job->setData([
-            'another-key' => 'another-value',
-            'dependentJobs' => ['key' => 'value'],
-        ]);
-
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
-            ->expects($this->once())
-            ->method('saveJob')
-            ->with($job, $this->isInstanceOf(\Closure::class))
-            ->will($this->returnCallback(function (Job $job, $callback) {
-                $callback($job);
-
-                return true;
-            }))
-        ;
-
-        $dependentJob = new DependentJobService($jobStorage, null);
-
-        $dependentJob->setDependentJob($job, function () {
-
-        });
-
-        $expectedData = [
-            'another-key' => 'another-value',
-            'dependentJobs' => [],
+        $expectedDependentJobs = [
+            'dependentJobs' => [
+                [
+                    'topic' => 'job-topic',
+                    'message' => 'job-message',
+                    'priority' => 'job-priority',
+                ]
+            ]
         ];
 
-        $this->assertEquals($expectedData, $job->getData());
+        $this->assertEquals($expectedDependentJobs, $job->getData());
     }
+
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
