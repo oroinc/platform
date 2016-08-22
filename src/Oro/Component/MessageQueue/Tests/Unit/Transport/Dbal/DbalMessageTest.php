@@ -186,4 +186,19 @@ class DbalMessageTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame(123, $message->getTimestamp());
     }
+
+    public function testShouldReturnNullAsDefaultReplyTo()
+    {
+        $message = new DbalMessage();
+
+        self::assertSame(null, $message->getReplyTo());
+    }
+
+    public function testShouldAllowGetPreviouslySetReplyTo()
+    {
+        $message = new DbalMessage();
+        $message->setReplyTo('theQueueName');
+
+        self::assertSame('theQueueName', $message->getReplyTo());
+    }
 }
