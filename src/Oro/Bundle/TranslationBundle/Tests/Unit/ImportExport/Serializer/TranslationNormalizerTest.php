@@ -4,22 +4,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\ImportExport\Serializer;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var TranslationNormalizer */
     protected $normalizer;
 
-    /** @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $fieldHelper;
-
     protected function setUp()
     {
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->normalizer = new TranslationNormalizer();
     }
 
