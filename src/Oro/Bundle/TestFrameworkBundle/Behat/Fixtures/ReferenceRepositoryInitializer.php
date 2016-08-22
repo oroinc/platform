@@ -13,9 +13,11 @@ use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use OroB2B\Bundle\AccountBundle\Entity\AccountUserAddress;
 use OroB2B\Bundle\AccountBundle\Entity\AccountUserRole;
+use OroB2B\Bundle\PricingBundle\Entity\CombinedPriceList;
+use OroB2B\Bundle\PricingBundle\Entity\PriceListCurrency;
+use OroB2B\Bundle\PricingBundle\Entity\PriceList;
 use OroB2B\Bundle\ProductBundle\Entity\ProductUnit;
-
-
+use OroB2B\Bundle\WebsiteBundle\Entity\Website;
 
 class ReferenceRepositoryInitializer
 {
@@ -87,6 +89,32 @@ class ReferenceRepositoryInitializer
         /** @var AddressType $shippingType*/
         $shippingType = $repository->findOneBy(['name' => 'shipping']);
         $this->referenceRepository->set('shippingType', $shippingType);
+
+
+        /** @var PriceListCurrencyRepository $repository */
+        $repository = $this->em->getRepository('OroB2BPricingBundle:PriceListCurrency');
+        /** @var PriceListCurrency EUR*/
+        $eur = $repository->findOneBy(['currency' => 'EUR']);
+        $this->referenceRepository->set('eur', $eur);
+
+        /** @var PriceListRepository $repository */
+        $repository = $this->em->getRepository('OroB2BPricingBundle:PriceList');
+        /** @var PriceList $pricelist1*/
+        $pricelist1 = $repository->findOneBy(['id' => '1']);
+        $this->referenceRepository->set('pricelist1', $pricelist1);
+
+        /** @var WebsiteRepository $repository */
+        $repository = $this->em->getRepository('OroB2BWebsiteBundle:Website');
+        /** @var Website $website1*/
+        $website1 = $repository->findOneBy(['id' => '1']);
+        $this->referenceRepository->set('website1', $website1);
+
+        /** @var CombinedPriceListRepository $repository */
+        $repository = $this->em->getRepository('OroB2BPricingBundle:CombinedPriceList');
+        /** @var CombinedPriceList $combinedPriceList*/
+        $combinedPriceList = $repository->findOneBy(['id' => '1']);
+        $this->referenceRepository->set('combinedPriceList', $combinedPriceList);
+
 
 //        /** @var AccountUserAddressRepository $repository */
 //        $repository = $this->em->getRepository('OroB2BAccountBundle:AccountUserAddress');
