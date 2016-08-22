@@ -14,22 +14,22 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     /**
      * @var JobStorage
      */
-    protected $jobStorage;
+    private $jobStorage;
 
     /**
      * @var CalculateRootJobStatusCase
      */
-    protected $calculateRootJobStatusCase;
+    private $calculateRootJobStatusCase;
 
     /**
      * @var MessageProducerInterface
      */
-    protected $producer;
+    private $producer;
 
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @param JobStorage $jobStorage
