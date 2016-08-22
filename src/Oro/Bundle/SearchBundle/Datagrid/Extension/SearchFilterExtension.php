@@ -1,13 +1,16 @@
 <?php
 
-namespace Oro\Bundle\FilterBundle\Grid\Extension;
+namespace Oro\Bundle\SearchBundle\Datagrid\Extension;
+
+use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
+use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
+use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
-class OrmFilterExtension extends AbstractFilterExtension
+class SearchFilterExtension extends AbstractFilterExtension
 {
     /**
      * {@inheritDoc}
@@ -20,7 +23,7 @@ class OrmFilterExtension extends AbstractFilterExtension
             return false;
         }
 
-        return $config->getDatasourceType() == OrmDatasource::TYPE;
+        return $config->getDatasourceType() == SearchDatasource::TYPE;
     }
 
     /**
@@ -28,28 +31,39 @@ class OrmFilterExtension extends AbstractFilterExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
+        $datasourceAdapter = null;
+
+        if ($datasource instanceof SearchDatasource) {
+            $datasourceAdapter = new SearchFilterDatasourceAdapter($datasource->getQuery());
+        }
+
+        if ($datasourceAdapter === null) {
+            throw new \InvalidArgumentException('Datasource should be an instance of SearchDatasource.');
+        }
+
         $filters = $this->getFiltersToApply($config);
         $values  = $this->getValuesToApply($config);
-        /** @var OrmDatasource $datasource */
-        $datasourceAdapter = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
 
         foreach ($filters as $filter) {
             $value = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
 
             if ($value !== false) {
                 $form = $filter->getForm();
+
                 if (!$form->isSubmitted()) {
                     $form->submit($value);
                 }
 
                 if ($form->isValid()) {
                     $data = $form->getData();
+
                     if (isset($value['value']['start'])) {
                         $data['value']['start_original'] = $value['value']['start'];
                     }
                     if (isset($value['value']['end'])) {
                         $data['value']['end_original'] = $value['value']['end'];
                     }
+
                     $filter->apply($datasourceAdapter, $data);
                 }
             }
