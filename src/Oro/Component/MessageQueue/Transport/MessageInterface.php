@@ -153,14 +153,4 @@ interface MessageInterface
      * @return void
      */
     public function setTimestamp($timestamp);
-
-    /**
-     * @param string|null $replyTo
-     */
-    public function setReplyTo($replyTo);
-
-    /**
-     * @return string|null
-     */
-    public function getReplyTo();
 }
