@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
-use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -43,9 +43,9 @@ class WorkflowAttributesType extends AbstractType
     protected $defaultValuesListener;
 
     /**
-     * @var InitActionsListener
+     * @var FormInitListener
      */
-    protected $initActionsListener;
+    protected $formInitListener;
 
     /**
      * @var RequiredAttributesListener
@@ -71,7 +71,7 @@ class WorkflowAttributesType extends AbstractType
      * @param WorkflowRegistry $workflowRegistry
      * @param AttributeGuesser $attributeGuesser ,
      * @param DefaultValuesListener $defaultValuesListener
-     * @param InitActionsListener $initActionsListener
+     * @param FormInitListener $formInitListener
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
      * @param EventDispatcherInterface $dispatcher
@@ -81,7 +81,7 @@ class WorkflowAttributesType extends AbstractType
         WorkflowRegistry $workflowRegistry,
         AttributeGuesser $attributeGuesser,
         DefaultValuesListener $defaultValuesListener,
-        InitActionsListener $initActionsListener,
+        FormInitListener $formInitListener,
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor,
         EventDispatcherInterface $dispatcher,
@@ -90,7 +90,7 @@ class WorkflowAttributesType extends AbstractType
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
         $this->defaultValuesListener = $defaultValuesListener;
-        $this->initActionsListener = $initActionsListener;
+        $this->formInitListener = $formInitListener;
         $this->requiredAttributesListener = $requiredAttributesListener;
         $this->contextAccessor = $contextAccessor;
         $this->dispatcher = $dispatcher;
@@ -122,12 +122,12 @@ class WorkflowAttributesType extends AbstractType
             $builder->addEventSubscriber($this->defaultValuesListener);
         }
 
-        if (!empty($options['init_actions'])) {
-            $this->initActionsListener->initialize(
+        if (!empty($options['form_init'])) {
+            $this->formInitListener->initialize(
                 $options['workflow_item'],
-                $options['init_actions']
+                $options['form_init']
             );
-            $builder->addEventSubscriber($this->initActionsListener);
+            $builder->addEventSubscriber($this->formInitListener);
         }
 
         if (!empty($options['attribute_fields'])) {
@@ -309,7 +309,7 @@ class WorkflowAttributesType extends AbstractType
             array(
                 'attribute_fields',
                 'attribute_default_values',
-                'init_actions',
+                'form_init',
                 'workflow'
             )
         );
@@ -329,7 +329,7 @@ class WorkflowAttributesType extends AbstractType
                 'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
                 'attribute_fields' => 'array',
                 'attribute_default_values' => 'array',
-                'init_actions' => 'Oro\Component\Action\Action\ActionInterface',
+                'form_init' => 'Oro\Component\Action\Action\ActionInterface',
             )
         );
     }
