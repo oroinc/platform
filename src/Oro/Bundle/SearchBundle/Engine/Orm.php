@@ -206,6 +206,7 @@ class Orm extends AbstractEngine
         }
         if ($searchResults) {
             foreach ($searchResults as $item) {
+                $originalItem = $item;
                 if (is_array($item)) {
                     $item = $item['item'];
                 }
@@ -225,8 +226,8 @@ class Orm extends AbstractEngine
                     $item['recordId'],
                     $item['title'],
                     null,
-                    $this->mapper->getEntityConfig($item['entity']),
-                    $this->mapper->mapSelectedData($query, $item)
+                    $this->mapper->mapSelectedData($query, $originalItem),
+                    $this->mapper->getEntityConfig($item['entity'])
                 );
             }
         }
