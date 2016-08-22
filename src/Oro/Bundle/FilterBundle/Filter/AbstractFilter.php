@@ -95,25 +95,19 @@ abstract class AbstractFilter implements FilterInterface
         if ($relatedJoin) {
             $qb = $ds->getQueryBuilder();
 
-            $entities = $qb->getRootEntities();
-            $idField = $qb
-                ->getEntityManager()
-                ->getClassMetadata(reset($entities))
-                ->getSingleIdentifierFieldName();
+            $fieldsExprs = $this->createConditionFieldExprs($qb);
+            $subExprs = [];
+            foreach ($fieldsExprs as $fieldExpr) {
+                $subQb = clone $qb;
+                $subQb
+                    ->resetDqlPart('orderBy')
+                    ->select($fieldExpr)
+                    ->andWhere($comparisonExpr);
+                $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
 
-            $rootAliases = $qb->getRootAliases();
-            $idFieldExpr = sprintf('%s.%s', reset($rootAliases), $idField);
-
-            $subQb = clone $qb;
-            $subQb
-                ->select($idFieldExpr)
-                ->andWhere($comparisonExpr);
-            $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
-
-            $this->applyFilterToClause(
-                $ds,
-                $joinOperator ? $qb->expr()->notIn($idFieldExpr, $dql) : $qb->expr()->in($idFieldExpr, $dql)
-            );
+                $subExprs[] = $joinOperator ? $qb->expr()->notIn($fieldExpr, $dql) : $qb->expr()->in($fieldExpr, $dql);
+            }
+            $this->applyFilterToClause($ds, call_user_func_array([$qb->expr(), 'andX'], $subExprs));
         } else {
             $this->applyFilterToClause($ds, $comparisonExpr);
         }
@@ -395,5 +389,65 @@ abstract class AbstractFilter implements FilterInterface
         list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
 
         return QueryUtils::findJoinByAlias($ds->getQueryBuilder(), $alias);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     *
+     * @return array
+     */
+    protected function createConditionFieldExprs(QueryBuilder $qb)
+    {
+        $groupByFields = $this->getSelectFieldFromGroupBy($qb->getDqlPart('groupBy'));
+        if ($groupByFields) {
+            return $groupByFields;
+        }
+
+        $entities = $qb->getRootEntities();
+        $idField = $qb
+            ->getEntityManager()
+            ->getClassMetadata(reset($entities))
+            ->getSingleIdentifierFieldName();
+
+        $rootAliases = $qb->getRootAliases();
+
+        return [sprintf('%s.%s', reset($rootAliases), $idField)];
+    }
+
+    /**
+     * @param Expr\GroupBy[] $groupBy
+     *
+     * @return array
+     */
+    protected function getSelectFieldFromGroupBy(array $groupBy)
+    {
+        $expressions = [];
+        foreach ($groupBy as $groupByPart) {
+            foreach ($groupByPart->getParts() as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        }
+
+        return $expressions;
+    }
+
+    /**
+     * @param string $groupByPart
+     *
+     * @return array
+     */
+    protected function getSelectFieldFromGroupByPart($groupByPart)
+    {
+        $expressions = [];
+        if (strpos($groupByPart, ',') !== false) {
+            $groupByParts = explode(',', $groupByPart);
+            foreach ($groupByParts as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        } else {
+            $expressions[] = trim($groupByPart);
+        }
+
+        return $expressions;
     }
 }
