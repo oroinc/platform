@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension\Pager;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension;
 
-use Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery;
+use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Result;
 
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase

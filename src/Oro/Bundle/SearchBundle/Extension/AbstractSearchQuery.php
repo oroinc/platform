@@ -1,21 +1,12 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Extension\Pager;
+namespace Oro\Bundle\SearchBundle\Extension;
 
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 
-/**
- * @method Query setOrderBy() setOrderBy($fieldName, $direction = "ASC", $type = Query::TYPE_TEXT)
- */
-class IndexerQuery
+abstract class AbstractSearchQuery implements SearchQueryInterface
 {
-    /**
-     * @var Indexer
-     */
-    protected $indexer;
-
     /**
      * @var Query
      */
@@ -27,30 +18,14 @@ class IndexerQuery
     protected $result;
 
     /**
-     * @param Indexer $indexer
-     * @param Query   $query
+     * Getting the results from the query() and caching them.
+     *
+     * @return mixed|Result
      */
-    public function __construct(Indexer $indexer, Query $query)
-    {
-        $this->indexer = $indexer;
-        $this->query   = $query;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __call($name, $args)
-    {
-        return call_user_func_array(array($this->query, $name), $args);
-    }
-
-    /**
-     * @return Result
-     */
-    protected function getResult()
+    public function getResult()
     {
         if (!$this->result) {
-            $this->result = $this->indexer->query($this->query);
+            $this->result = $this->query();
         }
 
         return $this->result;
@@ -59,11 +34,26 @@ class IndexerQuery
     /**
      * {@inheritdoc}
      */
-    public function execute(array $params = array(), $hydrationMode = null)
+    public function execute()
     {
         return $this->getResult()->getElements();
     }
 
+    /**
+     * @return Query
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
+     * @param Query $query
+     */
+    public function setQuery($query)
+    {
+        $this->query = $query;
+    }
     /**
      * {@inheritdoc}
      */
@@ -105,7 +95,7 @@ class IndexerQuery
     }
 
     /**
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getSortBy()
     {
@@ -113,10 +103,18 @@ class IndexerQuery
     }
 
     /**
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getSortOrder()
     {
         return $this->query->getOrderDirection();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
+    {
+        return $this->query->setOrderBy($fieldName, $direction, $type);
     }
 }
