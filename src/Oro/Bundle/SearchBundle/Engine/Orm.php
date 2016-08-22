@@ -198,8 +198,6 @@ class Orm extends AbstractEngine
     {
         $results       = [];
 
-        $query->setMappingConfig($this->mapper->getMappingConfig());
-
         $searchResults = $this->getIndexRepository()->search($query);
         if (($query->getCriteria()->getMaxResults() > 0 || $query->getCriteria()->getFirstResult() > 0)) {
             $recordsCount = $this->getIndexRepository()->getRecordsCount($query);
@@ -208,8 +206,6 @@ class Orm extends AbstractEngine
         }
         if ($searchResults) {
             foreach ($searchResults as $item) {
-                $selectedData = $this->mapper->mapSelectedData($query, $item);
-
                 if (is_array($item)) {
                     $item = $item['item'];
                 }
@@ -230,7 +226,7 @@ class Orm extends AbstractEngine
                     $item['title'],
                     null,
                     $this->mapper->getEntityConfig($item['entity']),
-                    $selectedData
+                    $this->mapper->mapSelectedData($query, $item)
                 );
             }
         }

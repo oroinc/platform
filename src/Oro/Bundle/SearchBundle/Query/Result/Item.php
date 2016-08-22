@@ -60,8 +60,8 @@ class Item
      * @param string|null   $recordId
      * @param string|null   $recordTitle
      * @param string|null   $recordUrl
-     * @param array         $entityConfig
      * @param array         $selectedData
+     * @param array         $entityConfig
      */
     public function __construct(
         ObjectManager $em,
@@ -69,8 +69,8 @@ class Item
         $recordId = null,
         $recordTitle = null,
         $recordUrl = null,
-        $entityConfig = [],
-        $selectedData = []
+        $selectedData = [],
+        $entityConfig = []
     ) {
         $this->em           = $em;
         $this->entityName   = $entityName;
@@ -206,7 +206,7 @@ class Item
      * @param array $selectedData
      * @return $this
      */
-    public function setSelectedData($selectedData)
+    public function setSelectedData(array $selectedData)
     {
         $this->selectedData = $selectedData;
 

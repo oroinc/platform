@@ -159,4 +159,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $query->getSelect()
         );
     }
+
+    public function testStringQueryWithSelect()
+    {
+        $query = new Query();
+        $this->assertEquals('', $query->getStringQuery());
+        $query->from('*');
+        $this->assertEquals('from *', $query->getStringQuery());
+        $query->select('language');
+        $this->assertEquals('select text.language from *', $query->getStringQuery());
+        $query->addSelect('organization', 'integer');
+        $this->assertEquals('select (text.language, integer.organization) from *', $query->getStringQuery());
+    }
 }

@@ -6,9 +6,9 @@ To perform search queries, you need to use the query builder =>
 
 Example:
 ```
-$query = $this->getSearchManager()
+$query = (new Query())
         ->select('sku')
-        ->from('Oro/Bundle/SearchBundle/Entity:Product')
+        ->from('oro_search_product')
         ->andWhere('all_data', '=', 'Functions', 'text')
         ->orWhere('price', '>', 85, 'decimal');
 ```
@@ -17,7 +17,7 @@ Syntax of Query builder is close to Doctrine 2.
 * **select()** - accepts a string or array of strings, that represent field names in the search index. 
 The values of those fields will be returned in the *selected_data* key of the response items.
 **NOTE**: If you don't want to overwrite this setting, use the *addSelect()* method instead.
-* **from()** - takes array or string of entities to search from. If argument was `*`,
+* **from()** - takes array or string of entity aliases to search from. If argument was `*`,
 then search will be performed for all entities.
 
 * **andWhere()**, **orWhere()** - functions set AND WHERE and OR WHERE functions in search request.

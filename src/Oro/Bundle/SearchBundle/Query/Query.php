@@ -530,13 +530,16 @@ class Query
      */
     public function getStringQuery()
     {
-        $fromString = '';
+        $fromString = $whereString = '';
+
         if ($this->getFrom()) {
             $fromString .= 'from ' . implode(', ', $this->getFrom());
         }
 
-        $visitor     = new QueryStringExpressionVisitor();
-        $whereString = ' where ' . $this->criteria->getWhereExpression()->visit($visitor);
+        if (null !== $whereExpr = $this->criteria->getWhereExpression()) {
+            $visitor     = new QueryStringExpressionVisitor();
+            $whereString = ' where ' . $whereExpr->visit($visitor);
+        }
 
         $orderByString = '';
         if ($this->getOrderBy()) {
@@ -563,7 +566,7 @@ class Query
 
         $selectString = '';
         if (!empty($selectColumnsString)) {
-            $selectString = trim('select (' . $selectColumnsString . ')') . ' ';
+            $selectString = trim('select ' . $selectColumnsString) . ' ';
         }
 
         return $selectString

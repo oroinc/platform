@@ -393,7 +393,7 @@ abstract class BaseDriver
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
 
-            $uniqIndex = uniqid();
+            $uniqIndex = $this->getUniqueId();
             $joinField = $this->getJoinField($type);
             $joinAlias = $this->getJoinAlias($type, $uniqIndex);
 

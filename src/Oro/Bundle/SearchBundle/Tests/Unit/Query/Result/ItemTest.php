@@ -48,6 +48,7 @@ class ItemTest extends \PHPUnit_Framework_TestCase
             1,
             'test title',
             'http://example.com',
+            [],
             [
                 'alias'  => 'test_product',
                 'label'  => 'test product',

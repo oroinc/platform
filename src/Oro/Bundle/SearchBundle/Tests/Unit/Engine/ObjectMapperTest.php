@@ -362,7 +362,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             [
                 'sku' => '2GH80',
                 'defaultName' => 'Example Headlamp',
-                'notExistingField' => ObjectMapper::EMPTY_SELECTED_VALUE
+                'notExistingField' => ''
             ],
             $result
         );

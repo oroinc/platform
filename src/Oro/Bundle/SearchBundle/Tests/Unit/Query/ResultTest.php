@@ -42,6 +42,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             1,
             'test title',
             'http://example.com',
+            [],
             array(
                  'alias' => 'test_product',
                  'label' => 'test product',
@@ -59,6 +60,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             2,
             'test title 2',
             'http://example.com',
+            [],
             array(
                  'alias' => 'test_product',
                  'label' => 'test product',
@@ -76,6 +78,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             3,
             'test title 3',
             'http://example.com',
+            [],
             array(
                  'alias' => 'test_product',
                  'label' => 'test product',
