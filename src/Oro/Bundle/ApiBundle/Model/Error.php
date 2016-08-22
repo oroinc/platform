@@ -52,6 +52,7 @@ class Error
      * @param string|Label      $title  A short, human-readable summary of the problem that should not change
      *                                  from occurrence to occurrence of the problem.
      * @param string|Label|null $detail A human-readable explanation specific to this occurrence of the problem
+     * @param integer|null       $statusCode A status code should be returned for the error. Default value - 400
      *
      * @return Error
      */

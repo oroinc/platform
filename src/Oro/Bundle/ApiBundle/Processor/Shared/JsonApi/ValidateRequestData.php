@@ -291,6 +291,7 @@ abstract class ValidateRequestData implements ProcessorInterface
     /**
      * @param string $pointer
      * @param string $message
+     * @param integer|null $statusCode
      */
     protected function addError($pointer, $message, $statusCode = Response::HTTP_BAD_REQUEST)
     {
