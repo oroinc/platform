@@ -10,7 +10,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,8 +26,8 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var Query|\PHPUnit_Framework_MockObject_MockObject */
     protected $query;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowManager;
+    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowRegistry;
 
     /** @var WorkflowReplacementSearchHandler */
     protected $searchHandler;
@@ -48,7 +49,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -58,7 +59,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->searchHandler = new WorkflowReplacementSearchHandler(self::TEST_ENTITY_CLASS, ['label']);
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistryMock());
-        $this->searchHandler->setWorkflowManager($this->workflowManager);
+        $this->searchHandler->setWorkflowRegistry($this->workflowRegistry);
     }
 
     public function testSearchWithoutDelimiter()
@@ -79,10 +80,8 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->once())->method('setMaxResults')->with(11)
             ->willReturn($this->queryBuilder);
 
-        $this->workflowManager->expects($this->any())->method('isActiveWorkflow')->willReturn(true);
-
         $this->query->expects($this->once())->method('getResult')->willReturn([
-            $this->getDefinition('item1', 'label1'),
+            $this->getDefinition('item1', 'label1', true),
         ]);
 
         $this->assertSame(
@@ -111,10 +110,8 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->with('search', '%item2%')
             ->willReturn($this->queryBuilder);
 
-        $this->workflowManager->expects($this->any())->method('isActiveWorkflow')->willReturn(true);
-
         $this->query->expects($this->once())->method('getResult')->willReturn([
-            $this->getDefinition('item2', 'label2'),
+            $this->getDefinition('item2', 'label2', true),
         ]);
 
         $this->assertSame(
@@ -140,13 +137,58 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())->method('setParameter')
-            ->with('id', 'entity1')
+            ->with('id', ['entity1'])
             ->willReturn($this->queryBuilder);
 
-        $this->workflowManager->expects($this->any())->method('isActiveWorkflow')->willReturn(true);
+        $this->workflowRegistry->expects($this->once())
+            ->method('getWorkflow')
+            ->with('entity1')
+            ->willReturn(null);
 
         $this->query->expects($this->once())->method('getResult')->willReturn([
-            $this->getDefinition('item3', 'label3'),
+            $this->getDefinition('item3', 'label3', true),
+        ]);
+
+        $this->assertSame(
+            [
+                'results' => [
+                    ['name' => 'item3', 'label' => 'label3'],
+                ],
+                'more' => false
+            ],
+            $this->searchHandler->search(';entity1', 2, 10)
+        );
+    }
+
+    public function testSearchWithEntityAndWorkflowsWithSameGroup()
+    {
+        $this->queryBuilder->expects($this->once())->method('setFirstResult')->with(10)
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())->method('setMaxResults')->with(11)
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())->method('andWhere')
+            ->with((new Query\Expr())->notIn('w.name', ':id'))
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())->method('setParameter')
+            ->with('id', ['entity1', 'entity2', 'entity3'])
+            ->willReturn($this->queryBuilder);
+
+        $workflow = $this->getWorkflowMock('entity1');
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getWorkflow')
+            ->with('entity1')
+            ->willReturn($workflow);
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByActiveGroups')
+            ->with(['entity1_group'])
+            ->willReturn([$workflow, $this->getWorkflowMock('entity2'), $this->getWorkflowMock('entity3')]);
+
+        $this->query->expects($this->once())->method('getResult')->willReturn([
+            $this->getDefinition('item3', 'label3', true),
         ]);
 
         $this->assertSame(
@@ -167,15 +209,9 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->once())->method('setMaxResults')->with(11)
             ->willReturn($this->queryBuilder);
 
-        $this->workflowManager->expects($this->any())
-            ->method('isActiveWorkflow')
-            ->willReturnCallback(function (WorkflowDefinition $definition) {
-                return $definition->getName() !== 'item4';
-            });
-
         $this->query->expects($this->once())->method('getResult')->willReturn([
-            $this->getDefinition('item4', 'label4'),
-            $this->getDefinition('item5', 'label5'),
+            $this->getDefinition('item4', 'label4', false),
+            $this->getDefinition('item5', 'label5', true),
         ]);
 
         $this->assertSame(
@@ -192,14 +228,16 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param string $label
+     * @param bool $active
      * @return WorkflowDefinition
      */
-    protected function getDefinition($name, $label)
+    protected function getDefinition($name, $label, $active)
     {
         $definition = new WorkflowDefinition();
         $definition
             ->setName($name)
-            ->setLabel($label);
+            ->setLabel($label)
+            ->setActive($active);
 
         return $definition;
     }
@@ -248,5 +286,22 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($metadata);
 
         return $metadataFactory;
+    }
+
+    /**
+     * @param string $name
+     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getWorkflowMock($name)
+    {
+        $definition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->any())->method('getName')->willReturn($name);
+        $definition->expects($this->any())->method('getExclusiveActiveGroups')->willReturn([$name . '_group']);
+
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        $workflow->expects($this->any())->method('getName')->willReturn($name);
+        $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
+
+        return $workflow;
     }
 }
