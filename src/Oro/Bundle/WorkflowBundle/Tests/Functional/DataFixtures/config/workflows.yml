@@ -54,7 +54,7 @@ workflows:
                   label: '(Final)'
                   order: 1
                   is_final: true
-                  allowed_transitions: ['ssecond_point_transition']
+                  allowed_transitions: ['second_point_transition']
         transition_definitions:
             starting_point_transition_definition: ~
             second_point_transition_definition: ~

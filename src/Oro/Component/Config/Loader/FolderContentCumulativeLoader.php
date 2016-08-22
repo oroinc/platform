@@ -61,28 +61,31 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     protected $plainResultStructure;
 
     /** @var string[] */
-    protected $fileExtensions;
+    protected $fileNamePatterns;
 
     /** @var PropertyAccess */
     protected $propertyAccessor;
+
+    /** @var string */
+    protected $resource;
 
     /**
      * @param string   $relativeFolderPath
      * @param int      $maxNestingLevel      Pass -1 to unlimit, if you want to find files in exact path given pass 1
      * @param bool     $plainResultStructure Indicates whether result should be returned as flat array
      *                                       or should be nested tree depends on file position in directory hierarchy
-     * @param string[] $fileExtensions       The extensions of files to be scanned
+     * @param string[] $fileNamePatterns     The regular expressions that are used to filter files to be scanned
      */
     public function __construct(
         $relativeFolderPath,
         $maxNestingLevel = -1,
         $plainResultStructure = true,
-        array $fileExtensions = []
+        array $fileNamePatterns = []
     ) {
         $this->relativeFolderPath   = $relativeFolderPath;
         $this->maxNestingLevel      = $maxNestingLevel === -1 ? $maxNestingLevel : --$maxNestingLevel;
         $this->plainResultStructure = $plainResultStructure;
-        $this->fileExtensions       = $fileExtensions;
+        $this->fileNamePatterns     = $fileNamePatterns;
         $this->resource             = 'Folder contents: ' . $relativeFolderPath;
     }
 
@@ -96,7 +99,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
                 $this->relativeFolderPath,
                 $this->maxNestingLevel,
                 $this->plainResultStructure,
-                $this->fileExtensions
+                $this->fileNamePatterns
             ]
         );
     }
@@ -110,7 +113,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
             $this->relativeFolderPath,
             $this->maxNestingLevel,
             $this->plainResultStructure,
-            $this->fileExtensions
+            $this->fileNamePatterns
             ) = unserialize($serialized);
     }
 
@@ -323,13 +326,29 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         $iterator = new \CallbackFilterIterator(
             $recursiveIterator,
             function (\SplFileInfo $file) {
-                return empty($this->fileExtensions)
+                return empty($this->fileNamePatterns)
                     ? true
-                    : in_array($file->getExtension(), $this->fileExtensions, true);
+                    : $this->isFileIncluded($file->getBasename());
             }
         );
 
         return $iterator;
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return bool
+     */
+    protected function isFileIncluded($fileName)
+    {
+        foreach ($this->fileNamePatterns as $fileNamePattern) {
+            if (preg_match($fileNamePattern, $fileName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
