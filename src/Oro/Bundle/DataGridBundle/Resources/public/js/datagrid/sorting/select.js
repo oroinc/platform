@@ -53,13 +53,17 @@ define(function(require) {
                 }
             }));
 
-            this._updateDisplayValue();
+            this._updateDisplayDirection();
 
             return this;
         },
 
         _updateDisplayValue: function() {
             this.$('select').select2('val', this.currentColumn ? this.currentColumn.get('name') : null);
+            this._updateDisplayDirection();
+        },
+
+        _updateDisplayDirection: function() {
             this.$('[data-name=order-toggle]')
                 .toggleClass('icon-sort-by-attributes', this.currentDirection === 'ascending')
                 .toggleClass('icon-sort-by-attributes-alt', this.currentDirection === 'descending');
@@ -75,8 +79,19 @@ define(function(require) {
             this.onChangeSorting();
         },
 
-        onChangeSorting: function() {
-            this.collection.trigger('backgrid:sort', this.$('select').val(), this.currentDirection);
+        onChangeSorting: function(e) {
+            var value = this.$('select').val();
+            var column = value ? this._getColumnByValue(value) : false;
+            if (column) {
+                if (!this.currentDirection) {
+                    this.currentDirection = 'ascending';
+                    this._updateDisplayDirection();
+                }
+                this.collection.trigger('backgrid:sort', column, this.currentDirection);
+            } else {
+                this.currentDirection = null;
+                this._updateDisplayDirection();
+            }
         }
     });
 

@@ -6,7 +6,7 @@ define([
     './visible-items-counter',
     './page-size',
     './actions-panel',
-    './sorting/select'
+    './sorting/dropdown'
 ], function(_, Backbone, __, PaginationInput, VisibleItemsCounter, PageSize, ActionsPanel, SortingDropdown) {
     'use strict';
 

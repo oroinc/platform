@@ -1,14 +1,14 @@
+<div class="sorting-label"><%=_.__('oro.datagrid.toolbar_sorting.label') %>:</div>
 <select>
     <% if (currentDirection === null) { %>
-        <option value="not-selected" selected="selected">
-            <%= _.__('oro.datagrid.sorters.not_selected') %>
-        </option>
+    <option value="not-selected" selected="selected">
+        <%= _.__('oro.datagrid.sorters.not_selected') %>
+    </option>
     <% } %>
     <% _.each(columns, function (column) { %>
-        <% _.each(['ascending', 'descending'], function (direction) { %>
-            <option value="<%= getColumnValue(column, direction) %>" <% if (column === currentColumn && direction === currentDirection) { %>selected="selected"<% } %>>
-                <% if (_.isUndefined(column.get('label'))) { %><%= column %><% } else { %><%= column.get('label')%><% } %>&nbsp(<%= _.__('oro.datagrid.sorters.' + column.get('sortingType')+ '.' + direction) %>)
-            </option>
-        <% }); %>
+    <option value="<%= column.name %>">
+        <% if (_.isUndefined(column.label)) { %><%= column %><% } else { %><%= column.label %><% } %>
+    </option>
     <% }); %>
 </select>
+<a data-name="order-toggle" class="icon-sort-by-attributes<% if (currentDirection === 'ascending') { %>-alt<% } %>"></a>
