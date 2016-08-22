@@ -34,11 +34,6 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    protected function testGetFormType()
-    {
-        $this->assertEquals(TextFilterType::NAME, $this->filter->getFormType());
-    }
-
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
         $ds = $this->getMock(FilterDatasourceAdapterInterface::class);
