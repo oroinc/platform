@@ -35,7 +35,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'strategy' => 'unanimous',
                 'dependency' => [],
                 'route' => [],
                 'workflow' => [],
@@ -55,7 +54,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'strategy' => 'some_strategy',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
                 'workflow' => ['feature_workflow_one', 'feature_workflow_two'],
@@ -70,7 +68,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'strategy' => 'some_strategy',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
                 'workflow' => ['feature_workflow_one', 'feature_workflow_two'],
@@ -136,17 +133,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "features.feature1.description". ' .
-                    'Expected scalar, but got array'
-            ],
-            'incorrect strategy' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'strategy' => ['array']
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.strategy". ' .
                     'Expected scalar, but got array'
             ],
             'incorrect dependency' => [
