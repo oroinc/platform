@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Oro\Component\MessageQueue\Job\CalculateRootJobStatusCase;
+use Oro\Component\MessageQueue\Job\CalculateRootJobStatusService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
-class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
+class CalculateRootJobStatusServiceTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new CalculateRootJobStatusCase($this->createJobStorageMock());
+        new CalculateRootJobStatusService($this->createJobStorageMock());
     }
 
     public function stopStatusProvider()
@@ -38,7 +38,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             ->method('saveJob')
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($notRootJob);
     }
 
@@ -62,7 +62,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($childJob);
 
         $this->assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
@@ -92,7 +92,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($childJob);
 
         $this->assertEquals($stopStatus, $rootJob->getStatus());
@@ -120,7 +120,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusService($em);
         $case->calculate($childJob);
 
         $this->assertEquals(new \DateTime('2012-12-12 12:12:12'), $rootJob->getStoppedAt());
@@ -146,7 +146,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
 
         $this->setExpectedException(
             \LogicException::class,
@@ -179,7 +179,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_NEW, $rootJob->getStatus());
@@ -212,7 +212,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
@@ -245,7 +245,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
@@ -278,7 +278,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_CANCELLED, $rootJob->getStatus());
@@ -311,7 +311,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_FAILED, $rootJob->getStatus());
@@ -344,7 +344,7 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $case = new CalculateRootJobStatusCase($storage);
+        $case = new CalculateRootJobStatusService($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_SUCCESS, $rootJob->getStatus());

@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Job;
 
 use Doctrine\Common\Collections\Collection;
 
-class CalculateRootJobStatusCase
+class CalculateRootJobStatusService
 {
     /**
      * @var JobStorage

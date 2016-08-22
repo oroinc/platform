@@ -197,7 +197,7 @@ class Job
      *
      * @param Job $rootJob
      */
-    public function setRootJob($rootJob)
+    public function setRootJob(Job $rootJob)
     {
         $this->rootJob = $rootJob;
     }
@@ -277,7 +277,7 @@ class Job
      *
      * @param Job[] $childJobs
      */
-    public function setChildJobs(array $childJobs)
+    public function setChildJobs($childJobs)
     {
         $this->childJobs = $childJobs;
     }

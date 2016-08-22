@@ -158,7 +158,11 @@ class JobStorage
                             ]);
                         }
                     } catch (UniqueConstraintViolationException $e) {
-                        throw new DuplicateJobException();
+                        throw new DuplicateJobException(sprintf(
+                            'Duplicate job. ownerId:"%s", name:"%s"',
+                            $job->getOwnerId(),
+                            $job->getName()
+                        ));
                     }
 
                     $this->em->persist($job);

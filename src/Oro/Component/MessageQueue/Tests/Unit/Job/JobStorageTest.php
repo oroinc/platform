@@ -121,6 +121,8 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     public function testShouldCatchUniqueConstraintViolationExceptionAndThrowDuplicateJobException()
     {
         $job = new Job();
+        $job->setOwnerId('owner-id');
+        $job->setName('job-name');
         $job->setUnique(true);
 
         $connection = $this->createConnectionMock();
@@ -153,7 +155,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
         $storage = new JobStorage($em, $repository, 'unique_table');
 
-        $this->setExpectedException(DuplicateJobException::class);
+        $this->setExpectedException(DuplicateJobException::class, 'Duplicate job. ownerId:"owner-id", name:"job-name"');
 
         $storage->saveJob($job);
     }

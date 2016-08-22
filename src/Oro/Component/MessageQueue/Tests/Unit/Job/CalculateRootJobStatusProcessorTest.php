@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\CalculateRootJobStatusCase;
+use Oro\Component\MessageQueue\Job\CalculateRootJobStatusService;
 use Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
@@ -84,7 +84,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setBody(json_encode(['id' => 12345]));
+        $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new CalculateRootJobStatusProcessor($storage, $case, $producer, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -124,7 +124,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setBody(json_encode(['id' => 12345]));
+        $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new CalculateRootJobStatusProcessor($storage, $case, $producer, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -165,7 +165,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setBody(json_encode(['id' => 12345]));
+        $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new CalculateRootJobStatusProcessor($storage, $case, $producer, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -198,11 +198,11 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|CalculateRootJobStatusCase
+     * @return \PHPUnit_Framework_MockObject_MockObject|CalculateRootJobStatusService
      */
     private function createCalculateRootJobStatusCaseMock()
     {
-        return $this->getMock(CalculateRootJobStatusCase::class, [], [], '', false);
+        return $this->getMock(CalculateRootJobStatusService::class, [], [], '', false);
     }
 
     /**
