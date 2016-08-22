@@ -23,8 +23,6 @@ class MessageProducer implements MessageProducerInterface
      */
     public function send($topic, $message)
     {
-        $config = $this->driver->getConfig();
-
         if (false == $message instanceof Message) {
             $body = $message;
             $message = new Message();
@@ -33,6 +31,7 @@ class MessageProducer implements MessageProducerInterface
 
         $this->prepareBody($message);
 
+        $config = $this->driver->getConfig();
         $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topic);
         $message->setProperty(Config::PARAMETER_PROCESSOR_NAME, $config->getRouterMessageProcessorName());
         $message->setProperty(Config::PARAMETER_QUEUE_NAME, $config->getRouterQueueName());
