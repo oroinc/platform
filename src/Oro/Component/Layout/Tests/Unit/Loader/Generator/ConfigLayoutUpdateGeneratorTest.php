@@ -115,7 +115,6 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 /**
  * Filename: testfilename.yml
  */
-
 class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
 {
     public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)

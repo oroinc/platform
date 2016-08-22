@@ -13,7 +13,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     const NAMESPACE_PLACEHOLDER = '__';
     const NAMESPACE_SUFFIX = '_';
 
-    const ADDITIONAL_BLOCK_PREFIX_OPTION = 'additional_block_prefix';
+    const ADDITIONAL_BLOCK_PREFIX_OPTION = 'additional_block_prefixes';
     const ADDITIONAL_BLOCK_PREFIX_PATTERN = '__%s%s';
 
     /**
@@ -241,7 +241,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     protected function replaceRoot(&$id)
     {
         if (null !== $id && $id === self::ROOT_PLACEHOLDER) {
-            $rootId = $this->import->getRoot();
+            $rootId = $this->getRoot($this->import);
             if ($rootId === null) {
                 throw new LogicException('Import root is not defined.');
             }
@@ -249,6 +249,23 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @param LayoutUpdateImport $import
+     *
+     * @return string
+     */
+    protected function getRoot(LayoutUpdateImport $import)
+    {
+        $rootId = $import->getRoot();
+        if ($rootId === self::ROOT_PLACEHOLDER && $import->getParent()) {
+            $rootId = $this->getRoot($import->getParent());
+        }
+        if ($this->hasNamespacePlaceholder($rootId) && $import->getParent()) {
+            $rootId = $this->getReplacement($rootId, $import->getParent()->getNamespace());
+        }
+        return $rootId;
     }
 
     /**
@@ -269,7 +286,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     protected function replaceNamespace(&$id)
     {
         if ($this->hasNamespacePlaceholder($id)) {
-            $namespace = $this->import->getNamespace();
+            $namespace = $this->getNamespace($this->import);
             $replacement = $namespace.self::NAMESPACE_SUFFIX;
             if (!$namespace) {
                 $replacement = '';
@@ -282,6 +299,36 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     }
 
     /**
+     * @param $id
+     * @param $namespace
+     *
+     * @return mixed
+     */
+    protected function getReplacement($id, $namespace)
+    {
+        $replacement = $namespace.self::NAMESPACE_SUFFIX;
+        if (!$namespace) {
+            $replacement = '';
+        }
+        return substr_replace($id, $replacement, 0, strlen(self::NAMESPACE_PLACEHOLDER));
+    }
+
+    /**
+     * @param LayoutUpdateImport $import
+     *
+     * @return string
+     */
+    protected function getNamespace(LayoutUpdateImport $import)
+    {
+        $namespace = $import->getNamespace();
+        if ($import->getParent()) {
+            $namespace = $namespace ? self::NAMESPACE_SUFFIX . $namespace : '';
+            $namespace = $this->getNamespace($import->getParent()) . $namespace;
+        }
+        return $namespace;
+    }
+
+    /**
      * @param string $id
      * @param array $options
      *
@@ -290,13 +337,25 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     protected function addAdditionalBlockPrefixOption($id, array &$options)
     {
         if ($this->hasNamespacePlaceholder($id)) {
-            $options[self::ADDITIONAL_BLOCK_PREFIX_OPTION] = sprintf(
-                self::ADDITIONAL_BLOCK_PREFIX_PATTERN,
-                $this->import->getId(),
-                $id
-            );
+            $options[self::ADDITIONAL_BLOCK_PREFIX_OPTION] = $this->getAdditionalBlockPrefixes($id, $this->import);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $id
+     * @param LayoutUpdateImport $import
+     * @param array $prefixes
+     *
+     * @return array
+     */
+    protected function getAdditionalBlockPrefixes($id, LayoutUpdateImport $import, $prefixes = [])
+    {
+        $prefixes[] = sprintf(self::ADDITIONAL_BLOCK_PREFIX_PATTERN, $import->getId(), $id);
+        if ($import->getParent()) {
+            $prefixes = $this->getAdditionalBlockPrefixes($id, $import->getParent(), $prefixes);
+        }
+        return $prefixes;
     }
 }
