@@ -179,7 +179,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataProvider()
     {
-        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+        $dataProvider = $this->getMock(\stdClass::class);
 
         $this->container->expects($this->once())
             ->method('get')

@@ -209,13 +209,15 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
+     * @Given /^(?:|I )login as administrator$/
      */
-    public function loginAsUserWithPassword($login, $password)
+    public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
     {
         $this->visit('user/login');
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
+
     }
 
     /**
@@ -242,7 +244,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
+     * @Then /^(?:|I )should see large image$/
+     */
+    public function iShouldSeeLargeImage()
+    {
+        $largeImage = $this->getSession()->getPage()->find('css', '.lg-image');
+        self::assertNotNull($largeImage, 'Large image not visible');
+    }
+
+    /**
+     * @Then /^(?:|I )close large image preview$/
+     */
+    public function closeLargeImagePreview()
+    {
+        $page = $this->getSession()->getPage();
+        $page->find('css', '.lg-image')->mouseOver();
+        $page->find('css', 'span.lg-close')->click();
+    }
+
+     /**
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      */
     public function pressButton($button)
     {
@@ -364,7 +385,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Assert text by label in page
+     * Assert text by label in page. Accept regexp as parameter to label
+     * Example: Then I should see call with:
+     *            | Subject             | Proposed Charlie to star in new film |
+     *            | Additional comments | Charlie was in a good mood           |
+     *            | Call date & time    | Aug 24, 2017,? 11:00 AM              |
+     *            | Phone number        | (310) 475-0859                       |
+     *            | Direction           | Outgoing                             |
+     *            | Duration            | 5:30                                 |
      *
      * @Then /^(?:|I )should see (?P<entity>[\w\s]+) with:$/
      */
@@ -381,7 +409,7 @@ class OroMainContext extends MinkContext implements
             foreach ($labels as $label) {
                 $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-                if (false !== stripos($text, $row[1])) {
+                if (false !== preg_match(sprintf('/%s/i', $row[1]), $text)) {
                     continue 2;
                 }
             }

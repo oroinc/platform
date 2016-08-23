@@ -84,7 +84,7 @@ define(function(require) {
                             }
                             mediator.execute('refreshPage');
                         } else if (!_.isEmpty(self.options.gridname)) {
-                            mediator.trigger('datagrid:doReset:' + self.options.gridname);
+                            mediator.trigger('datagrid:doRefresh:' + self.options.gridname);
                         }
                     }
                 });

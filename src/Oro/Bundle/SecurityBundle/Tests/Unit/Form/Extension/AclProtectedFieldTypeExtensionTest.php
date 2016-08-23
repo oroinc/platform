@@ -216,6 +216,9 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $form->add('street');
         $form->add('country');
 
+        // add error that should be cleaned
+        $form->get('country')->addError(new FormError('test error'));
+
         $data = [
             'country' => 'some country',
             'city' => 'some city',
