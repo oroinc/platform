@@ -47,6 +47,11 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
+        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
+        if (preg_match('/^(?:|I )should see ".+"/', $scope->getStep()->getText())) {
+            return;
+        }
+
         $this->getSession()->getDriver()->waitForAjax();
     }
 
@@ -78,11 +83,57 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^(?:|I should )see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
     public function iShouldSeeFlashMessage($title)
     {
-        $this->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
+        $this->spin(function (MinkContext $context) use ($title) {
+            $context->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
+
+            return true;
+        });
+    }
+
+    public function assertPageContainsText($text)
+    {
+        $this->spin(function (MinkContext $context) use ($text) {
+            $context->assertSession()->pageTextContains($this->fixStepArgument($text));
+
+            return true;
+        });
+    }
+
+    /**
+     * Assert form error message
+     * Example: Then I should see "At least one of the fields First name, Last name must be defined." error message
+     *
+     * @Then /^(?:|I should )see "(?P<title>[^"]+)" error message$/
+     */
+    public function iShouldSeeErrorMessage($title)
+    {
+        $this->spin(function (MinkContext $context) use ($title) {
+            $context->assertSession()->elementTextContains('css', '.alert-error', $title);
+
+            return true;
+        });
+    }
+
+    public function spin($lambda)
+    {
+        $time = 60;
+
+        while ($time > 0) {
+            try {
+                if ($lambda($this)) {
+                    return true;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            usleep(250000);
+            $time -= 0.25;
+        }
     }
 
     /**
@@ -98,17 +149,6 @@ class OroMainContext extends MinkContext implements
         $driver->waitForAjax();
         $page->clickLink('Yes, Proceed');
         $driver->waitForAjax(120000);
-    }
-
-    /**
-     * Assert form error message
-     * Example: Then I should see "At least one of the fields First name, Last name must be defined." error message
-     *
-     * @Then /^(?:|I should )see "(?P<title>[^"]+)" error message$/
-     */
-    public function iShouldSeeErrorMessage($title)
-    {
-        $this->assertSession()->elementTextContains('css', '.alert-error', $title);
     }
 
     /**
