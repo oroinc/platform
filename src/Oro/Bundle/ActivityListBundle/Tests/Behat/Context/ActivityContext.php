@@ -22,6 +22,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function shouldSeeRecordInActivityList($content)
     {
+        $this->getSession()->getDriver()->waitForAjax();
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('ActivityList');
         $activityList->getActivityListItem($content);

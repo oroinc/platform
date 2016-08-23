@@ -49,7 +49,6 @@ class OroMainContext extends MinkContext implements
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
         if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
-            var_dump('spin method');
             return;
         }
 
