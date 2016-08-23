@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
-use Oro\Bundle\SearchBundle\Factory\QueryFactoryInterface;
+use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
 
 class SearchDatasource implements DatasourceInterface
 {

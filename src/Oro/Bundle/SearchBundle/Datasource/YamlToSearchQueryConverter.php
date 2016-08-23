@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\QueryConfiguration;
 
-class YamlSearchConverter
+class YamlToSearchQueryConverter
 {
     /**
      * @param SearchQueryInterface $query

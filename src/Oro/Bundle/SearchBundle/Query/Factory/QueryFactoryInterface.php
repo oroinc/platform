@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Factory;
+namespace Oro\Bundle\SearchBundle\Query\Factory;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 

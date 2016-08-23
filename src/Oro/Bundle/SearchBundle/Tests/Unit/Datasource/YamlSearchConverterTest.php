@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource;
 
-use Oro\Bundle\SearchBundle\Datasource\YamlSearchConverter;
+use Oro\Bundle\SearchBundle\Datasource\YamlToSearchQueryConverter;
 use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 
 class YamlSearchConverterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var SearchQueryInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var SearchQueryInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $query;
 
     public function setUp()
@@ -42,7 +40,7 @@ class YamlSearchConverterTest extends \PHPUnit_Framework_TestCase
             ->method('addSelect')
             ->with('text.name');
 
-        $testable = new YamlSearchConverter();
+        $testable = new YamlToSearchQueryConverter();
         $testable->process($this->query, $config);
     }
 }
