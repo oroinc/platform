@@ -6,14 +6,14 @@ use Doctrine\Common\Collections\Expr\Comparison;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\SearchBundle\Extension\AbstractSearchQuery;
+use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 {
     /**
-     * @var AbstractSearchQuery
+     * @var SearchQueryInterface
      */
     private $query;
 
@@ -22,7 +22,10 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     private $expressionBuilder;
 
-    public function __construct(AbstractSearchQuery $query)
+    /**
+     * @param SearchQueryInterface $query
+     */
+    public function __construct(SearchQueryInterface $query)
     {
         $this->query = $query;
     }
@@ -77,6 +80,9 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         return null;
     }
 
+    /**
+     * @return ExpressionBuilder
+     */
     public function expr()
     {
         if ($this->expressionBuilder === null) {
@@ -116,7 +122,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * @return AbstractSearchQuery
+     * @return SearchQueryInterface
      */
     public function getQuery()
     {
