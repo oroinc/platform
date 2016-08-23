@@ -4,18 +4,18 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator;
+use Oro\Bundle\UIBundle\Layout\Extension\IsMobileContextConfigurator;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Bundle\UIBundle\Provider\UserAgent;
 
 use Oro\Component\Layout\ContextInterface;
 
-class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var UserAgentContextConfigurator
+     * @var IsMobileContextConfigurator
      */
-    protected $userAgentContextConfigurator;
+    protected $isMobileContextConfigurator;
 
     /**
      * @var UserAgentProvider|\PHPUnit_Framework_MockObject_MockObject
@@ -35,7 +35,7 @@ class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')
             ->disableOriginalConstructor()->getMock();
 
-        $this->userAgentContextConfigurator = new UserAgentContextConfigurator($this->userAgentProvider);
+        $this->isMobileContextConfigurator = new IsMobileContextConfigurator($this->userAgentProvider);
     }
 
     public function testConfigureContext()
@@ -72,6 +72,6 @@ class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
             ->method('set')
             ->with('is_mobile', $isMobile);
 
-        $this->userAgentContextConfigurator->configureContext($context);
+        $this->isMobileContextConfigurator->configureContext($context);
     }
 }

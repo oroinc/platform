@@ -6,7 +6,7 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 
-class UserAgentContextConfigurator implements ContextConfiguratorInterface
+class IsMobileContextConfigurator implements ContextConfiguratorInterface
 {
     /**
      * @var UserAgentProvider
