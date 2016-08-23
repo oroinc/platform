@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Extension;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
-use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 
