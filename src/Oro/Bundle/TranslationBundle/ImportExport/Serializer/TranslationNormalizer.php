@@ -14,11 +14,8 @@ class TranslationNormalizer implements DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        if (!is_array($data) || !isset($data['key'], $data['locale'])) {
+        if (!is_array($data) || !isset($data['domain'], $data['key'], $data['value'])) {
             throw new UnexpectedValueException('Incorrect record format');
-        }
-        if ($data['locale'] !== $context['language_code']) {
-            throw new UnexpectedValueException('Locale should be ' . $context['language_code']);
         }
         $translation = new Translation();
         $translation->setLocale($context['language_code']);

@@ -46,22 +46,6 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Locale should be test_locale_other
-     */
-    public function testDenormalizeWrongLocale()
-    {
-        $data = [
-            'locale' => 'test_locale',
-            'domain' => 'test_domain',
-            'key' => 'test_key',
-            'value' => 'test_value',
-        ];
-        $context = ['language_code' => 'test_locale_other'];
-        $this->normalizer->denormalize($data, Translation::class, null, $context);
-    }
-
-    /**
      * @param string $type
      * @param string $languageCode
      * @param bool $expected

@@ -6,7 +6,7 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrate
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
-class TranslationResetStrategy extends ConfigurableAddOrReplaceStrategy
+class TranslationResetStrategy extends TranslationImportStrategy
 {
     /**
      * @var array
