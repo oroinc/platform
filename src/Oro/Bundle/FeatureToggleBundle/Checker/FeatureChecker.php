@@ -94,7 +94,7 @@ class FeatureChecker
         }
 
         // If one of depend on feature is disabled mark feature as disabled
-        $dependOnFeatures = $this->configManager->getDependOnFeatures($feature);
+        $dependOnFeatures = $this->configManager->getFeatureDependencies($feature);
         foreach ($dependOnFeatures as $feature) {
             if (!$this->check($feature, $scopeIdentifier)) {
                 return false;
@@ -112,7 +112,7 @@ class FeatureChecker
      */
     public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
     {
-        $features = $this->configManager->getResourceFeatures($resourceType, $resource);
+        $features = $this->configManager->getFeaturesByResource($resourceType, $resource);
 
         foreach ($features as $feature) {
             if (!$this->check($feature, $scopeIdentifier)) {
