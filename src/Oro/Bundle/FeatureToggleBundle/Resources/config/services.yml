@@ -13,6 +13,11 @@ services:
             - '@oro_featuretoggle.configuration'
             - '@oro_featuretoggle.cache.provider.features'
 
+    oro_featuretoggle.configuration.manager:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+
     oro_featuretoggle.cache.clearer:
         class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheClearer'
         public: false
@@ -36,5 +41,5 @@ services:
         class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
         public: false
         arguments:
-            - '@oro_featuretoggle.configuration.provider'
+            - '@oro_featuretoggle.configuration.manager'
             - []

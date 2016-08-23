@@ -94,13 +94,19 @@ class FeatureChecker
      */
     public function isFeatureEnabled($feature, $scopeIdentifier = null)
     {
-        if (!empty($this->featuresStates) && isset($this->featuresStates[$feature])) {
-            return $$this->featuresStates[$feature];
+        if (!$this->checkFeatureState($feature, $scopeIdentifier)) {
+            return false;
         }
 
-        $this->featuresStates[$feature] = $this->checkFeatureState($feature, $scopeIdentifier);
+        // If one of depend on feature is disabled mark feature as disabled
+        $dependOnFeatures = $this->configManager->getFeatureDependencies($feature);
+        foreach ($dependOnFeatures as $dependOnFeature) {
+            if (!$this->checkFeatureState($dependOnFeature, $scopeIdentifier)) {
+                return false;
+            }
+        }
 
-        return $this->featuresStates[$feature];
+        return true;
     }
 
     /**
@@ -114,7 +120,7 @@ class FeatureChecker
         $features = $this->configManager->getFeaturesByResource($resourceType, $resource);
 
         foreach ($features as $feature) {
-            if (!$this->check($feature, $scopeIdentifier)) {
+            if (!$this->checkFeatureState($feature, $scopeIdentifier)) {
                 return false;
             }
         }
@@ -129,19 +135,13 @@ class FeatureChecker
      */
     protected function checkFeatureState($feature, $scopeIdentifier = null)
     {
-        if (!$this->check($feature, $scopeIdentifier)) {
-            return false;
+        if (!empty($this->featuresStates) && isset($this->featuresStates[$feature])) {
+            return $$this->featuresStates[$feature];
         }
 
-        // If one of depend on feature is disabled mark feature as disabled
-        $dependOnFeatures = $this->configManager->getFeatureDependencies($feature);
-        foreach ($dependOnFeatures as $dependOnFeature) {
-            if (!$this->check($dependOnFeature, $scopeIdentifier)) {
-                return false;
-            }
-        }
+        $this->featuresStates[$feature] = $this->check($feature, $scopeIdentifier);
 
-        return true;
+        return $this->featuresStates[$feature];
     }
 
     /**
