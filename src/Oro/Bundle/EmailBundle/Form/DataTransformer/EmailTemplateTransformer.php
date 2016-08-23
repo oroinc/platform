@@ -4,28 +4,13 @@ namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
-
 class EmailTemplateTransformer implements DataTransformerInterface
 {
-    /** @var SanitizeHTMLTransformer */
-    protected $transformer;
-
-    /**
-     * @param SanitizeHTMLTransformer $transformer
-     */
-    public function __construct(SanitizeHTMLTransformer $transformer)
-    {
-        $this->transformer = $transformer;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function transform($value)
     {
-        $value = $this->transformer->transform($value);
-
         return $this->decodeTemplateVariables($value);
     }
 
@@ -34,8 +19,6 @@ class EmailTemplateTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        $value = $this->transformer->reverseTransform($value);
-
         return $this->decodeTemplateVariables($value);
     }
 
