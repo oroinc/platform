@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Datasource;
 
+use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -15,9 +16,16 @@ class SearchFilterDatasourceAdapterTest extends WebTestCase
 {
     public function testUsingStringFilter()
     {
-        $query = $this->getMock(Query::class);
+        $innerQuery = $this->getMock(Query::class);
 
-        $query->expects($this->once())
+        $query = $this->getMockBuilder(IndexerQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getQuery'])
+            ->getMock();
+
+        $query->method('getQuery')->willReturn($innerQuery);
+
+        $innerQuery->expects($this->once())
             ->method('andWhere')
             ->with(
                 'foo',

@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension;
+use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
 use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -99,7 +100,14 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $gridConfig = DatagridConfiguration::create($gridConfig);
 
-        $query = $this->getMock(Query::class);
+        $innerQuery = $this->getMock(Query::class);
+
+        $query = $this->getMockBuilder(IndexerQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getQuery'])
+            ->getMock();
+
+        $query->method('getQuery')->willReturn($innerQuery);
 
         $dataSource = $this
             ->getMockBuilder(SearchDatasource::class)
