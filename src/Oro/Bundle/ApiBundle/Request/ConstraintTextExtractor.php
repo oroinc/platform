@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator;
+
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\ApiBundle\Validator\Constraints\ConstraintWithStatusCodeInterface;
 
 class ConstraintTextExtractor implements ConstraintTextExtractorInterface
 {
@@ -13,6 +15,10 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
      */
     public function getConstraintStatusCode(Validator\Constraint $constraint)
     {
+        if ($constraint instanceof ConstraintWithStatusCodeInterface) {
+            return $constraint->getStatusCode();
+        }
+
         return Response::HTTP_BAD_REQUEST;
     }
 

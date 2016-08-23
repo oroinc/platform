@@ -37,8 +37,7 @@ class ValidateRequestData extends BaseProcessor
                     'The \'%1$s\' property of the primary data object'
                     . ' should match \'%1$s\' parameter of the query sting',
                     JsonApiDoc::ID
-                ),
-                Response::HTTP_CONFLICT
+                )
             );
 
             return false;

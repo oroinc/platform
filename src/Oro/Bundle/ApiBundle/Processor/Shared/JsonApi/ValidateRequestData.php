@@ -109,8 +109,7 @@ abstract class ValidateRequestData implements ProcessorInterface
                 sprintf(
                     'The \'%s\' property of the primary data object should match the requested resource',
                     JsonApiDoc::TYPE
-                ),
-                Response::HTTP_CONFLICT
+                )
             );
 
             return false;
