@@ -36,3 +36,9 @@ services:
         parent: oro_integration.writer.persistent_batch_writer
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter'
         public: false
+
+    # Export Handler
+    oro_translation.importexport.handler.export:
+        class: 'Oro\Bundle\TranslationBundle\Handler\TranslationExportHandler'
+        parent: oro_importexport.handler.export
+        lazy: true

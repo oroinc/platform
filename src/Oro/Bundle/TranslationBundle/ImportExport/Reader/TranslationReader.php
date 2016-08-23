@@ -16,7 +16,7 @@ class TranslationReader extends AbstractReader
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var Translator */
+    /** @var DataCollectorTranslator */
     protected $translator;
 
     /** @var array */
@@ -48,7 +48,7 @@ class TranslationReader extends AbstractReader
         $messages = $this->getLanguageMessages($this->getContext()->getOption('language_id'));
 
         if (!isset($messages[$offset])) {
-            return;
+            return null;
         }
 
         $this->getStepExecution()->incrementReadCount();
@@ -76,9 +76,7 @@ class TranslationReader extends AbstractReader
                 $message = array_merge(
                     $message,
                     [
-                        'locale' => $locale,
                         'original_value' => isset($originalMessages[$key]) ? $originalMessages[$key]['value'] : '',
-                        'default_value' => isset($defaultMessages[$key]) ? $defaultMessages[$key]['value'] : '',
                     ]
                 );
             });
@@ -102,7 +100,6 @@ class TranslationReader extends AbstractReader
         foreach ($catalogue->getDomains() as $domain) {
             foreach ($catalogue->all($domain) as $key => $value) {
                 $message = [
-                    'locale' => $locale,
                     'domain' => $domain,
                     'key' => $key,
                     'value' => $value,

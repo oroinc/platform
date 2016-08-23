@@ -102,36 +102,30 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
                 'offset' => 0,
                 'locale' => 'locale1',
                 'expected' => [
-                    'locale' => 'locale1',
                     'domain' => 'domain1',
                     'key' => 'key1',
                     'value' => 'domain1-locale1-message1',
                     'original_value' => 'domain1-locale1-message1',
-                    'default_value' => 'domain1-default-message1',
                 ],
             ],
             'offset1' => [
                 'offset' => 1,
                 'locale' => 'locale1',
                 'expected' => [
-                    'locale' => 'locale1',
                     'domain' => 'domain1',
                     'key' => 'key2',
                     'value' => 'domain1-default-message2',
                     'original_value' => '',
-                    'default_value' => 'domain1-default-message2',
                 ],
             ],
             'offset2' => [
                 'offset' => 2,
                 'locale' => 'locale1',
                 'expected' => [
-                    'locale' => 'locale1',
                     'domain' => 'domain2',
                     'key' => 'key1',
                     'value' => 'domain2-locale1-message1',
                     'original_value' => 'domain2-locale1-message1',
-                    'default_value' => '',
                 ],
             ],
             'offset3' => [
