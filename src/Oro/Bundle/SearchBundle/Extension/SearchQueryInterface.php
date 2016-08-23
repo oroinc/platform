@@ -89,7 +89,7 @@ interface SearchQueryInterface
     /**
      * Returning the wrapped Query object.
      *
-     * @return SearchQueryInterface
+     * @return Query
      */
     public function getQuery();
 
