@@ -4,6 +4,7 @@ UPGRADE FROM 1.10 to 2.0
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
+- Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` 
