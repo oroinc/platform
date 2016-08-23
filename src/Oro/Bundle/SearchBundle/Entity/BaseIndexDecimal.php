@@ -5,12 +5,9 @@ namespace Oro\Bundle\SearchBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Decimal entity for search index
- *
- * @ORM\Table(name="oro_search_index_decimal")
- * @ORM\Entity
+ * @ORM\MappedSuperclass
  */
-class IndexDecimal
+class BaseIndexDecimal implements BaseItemFieldInterface
 {
     /**
      * @var integer
@@ -52,12 +49,9 @@ class IndexDecimal
     }
 
     /**
-     * Set item
-     *
-     * @param  Item         $item
-     * @return IndexDecimal
+     * {@inheritdoc}
      */
-    public function setItem(Item $item = null)
+    public function setItem(BaseItem $item = null)
     {
         $this->item = $item;
 
@@ -65,9 +59,7 @@ class IndexDecimal
     }
 
     /**
-     * Get item
-     *
-     * @return Item
+     * {@inheritdoc}
      */
     public function getItem()
     {
@@ -75,10 +67,7 @@ class IndexDecimal
     }
 
     /**
-     * Set field name
-     *
-     * @param  string       $field
-     * @return IndexDecimal
+     * {@inheritdoc}
      */
     public function setField($field)
     {
@@ -88,9 +77,7 @@ class IndexDecimal
     }
 
     /**
-     * Get field name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -98,10 +85,7 @@ class IndexDecimal
     }
 
     /**
-     * Set field value
-     *
-     * @param  float        $value
-     * @return IndexDecimal
+     * {@inheritdoc}
      */
     public function setValue($value)
     {
@@ -111,9 +95,7 @@ class IndexDecimal
     }
 
     /**
-     * Get field value
-     *
-     * @return float
+     * {@inheritdoc}
      */
     public function getValue()
     {

@@ -9,6 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SearchBundle\Entity\BaseItem;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -25,11 +26,24 @@ abstract class BaseDriver
     protected $em;
 
     /**
+     * @var array
+     */
+    protected $associationMappings;
+
+    /**
      * @param \Doctrine\ORM\EntityManager         $em
      * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @throws \InvalidArgumentException
      */
     public function initRepo(EntityManager $em, ClassMetadata $class)
     {
+        if (!is_a($class->name, BaseItem::class, true)) {
+            throw new \InvalidArgumentException(
+                'ClassMetadata doesn\'t represent Oro\Bundle\SearchBundle\Entity\Item class or its descendant'
+            );
+        }
+
+        $this->associationMappings = $class->associationMappings;
         $this->entityName = $class->name;
         $this->em         = $em;
     }
@@ -185,11 +199,11 @@ abstract class BaseDriver
      */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:Item');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDecimal');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexText');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexInteger');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDatetime');
+        $this->truncateTable($dbPlatform, $connection, $this->entityName);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['textFields']['targetEntity']);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['integerFields']['targetEntity']);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['decimalFields']['targetEntity']);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['datetimeFields']['targetEntity']);
     }
 
     /**

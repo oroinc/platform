@@ -5,17 +5,10 @@ namespace Oro\Bundle\SearchBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Text entity for search index
- *
- * @ORM\Table(name="oro_search_index_text")
- * @ORM\Entity
+ * @ORM\MappedSuperclass
  */
-class IndexText
+class BaseIndexText implements BaseItemFieldInterface
 {
-    const HYPHEN_SUBSTITUTION = ' ';
-
-    const TABLE_NAME = 'oro_search_index_text';
-
     /**
      * @var integer
      *
@@ -56,10 +49,7 @@ class IndexText
     }
 
     /**
-     * Set field name
-     *
-     * @param  string    $field
-     * @return IndexText
+     * {@inheritdoc}
      */
     public function setField($field)
     {
@@ -69,9 +59,7 @@ class IndexText
     }
 
     /**
-     * Get field name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -79,10 +67,7 @@ class IndexText
     }
 
     /**
-     * Set field value
-     *
-     * @param  string    $value
-     * @return IndexText
+     * {@inheritdoc}
      */
     public function setValue($value)
     {
@@ -92,9 +77,7 @@ class IndexText
     }
 
     /**
-     * Get field value
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getValue()
     {
@@ -102,12 +85,9 @@ class IndexText
     }
 
     /**
-     * Set item
-     *
-     * @param  Item      $item
-     * @return IndexText
+     * {@inheritdoc}
      */
-    public function setItem(Item $item = null)
+    public function setItem(BaseItem $item = null)
     {
         $this->item = $item;
 
@@ -115,9 +95,7 @@ class IndexText
     }
 
     /**
-     * Get item
-     *
-     * @return Item
+     * {@inheritdoc}
      */
     public function getItem()
     {

@@ -5,12 +5,9 @@ namespace Oro\Bundle\SearchBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Date time entity for search index
- *
- * @ORM\Table(name="oro_search_index_datetime")
- * @ORM\Entity
+ * @ORM\MappedSuperclass
  */
-class IndexDatetime
+class BaseIndexDatetime implements BaseItemFieldInterface
 {
     /**
      * @var integer
@@ -52,12 +49,9 @@ class IndexDatetime
     }
 
     /**
-     * Set item
-     *
-     * @param  Item          $item
-     * @return IndexDatetime
+     * {@inheritdoc}
      */
-    public function setItem(Item $item = null)
+    public function setItem(BaseItem $item = null)
     {
         $this->item = $item;
 
@@ -65,9 +59,7 @@ class IndexDatetime
     }
 
     /**
-     * Get item
-     *
-     * @return Item
+     * {@inheritdoc}
      */
     public function getItem()
     {
@@ -75,10 +67,7 @@ class IndexDatetime
     }
 
     /**
-     * Set field name
-     *
-     * @param  string        $field
-     * @return IndexDatetime
+     * {@inheritdoc}
      */
     public function setField($field)
     {
@@ -88,9 +77,7 @@ class IndexDatetime
     }
 
     /**
-     * Get field name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -98,22 +85,21 @@ class IndexDatetime
     }
 
     /**
-     * Set field value
-     *
-     * @param  \DateTime     $value
-     * @return IndexDatetime
+     * {@inheritdoc}
      */
-    public function setValue(\DateTime $value)
+    public function setValue($value)
     {
+        if (!$value instanceof \DateTime) {
+            throw new \InvalidArgumentException('Value has to be of \DateTime class');
+        }
+
         $this->value = $value;
 
         return $this;
     }
 
     /**
-     * Get field value
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
     public function getValue()
     {

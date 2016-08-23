@@ -5,12 +5,9 @@ namespace Oro\Bundle\SearchBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Integer entity for search index
- *
- * @ORM\Table(name="oro_search_index_integer")
- * @ORM\Entity
+ * @ORM\MappedSuperclass
  */
-class IndexInteger
+class BaseIndexInteger implements BaseItemFieldInterface
 {
     /**
      * @var integer
@@ -52,10 +49,7 @@ class IndexInteger
     }
 
     /**
-     * Set field name
-     *
-     * @param  string       $field
-     * @return IndexInteger
+     * {@inheritdoc}
      */
     public function setField($field)
     {
@@ -65,9 +59,7 @@ class IndexInteger
     }
 
     /**
-     * Get field name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -75,10 +67,7 @@ class IndexInteger
     }
 
     /**
-     * Set field value
-     *
-     * @param  integer      $value
-     * @return IndexInteger
+     * {@inheritdoc}
      */
     public function setValue($value)
     {
@@ -88,9 +77,7 @@ class IndexInteger
     }
 
     /**
-     * Get field value
-     *
-     * @return integer
+     * {@inheritdoc}
      */
     public function getValue()
     {
@@ -98,12 +85,9 @@ class IndexInteger
     }
 
     /**
-     * Set item
-     *
-     * @param  Item         $index
-     * @return IndexInteger
+     * {@inheritdoc}
      */
-    public function setItem(Item $index = null)
+    public function setItem(BaseItem $index = null)
     {
         $this->item = $index;
 
@@ -111,9 +95,7 @@ class IndexInteger
     }
 
     /**
-     * Get item
-     *
-     * @return Item
+     * {@inheritdoc}
      */
     public function getItem()
     {

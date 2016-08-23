@@ -4,24 +4,14 @@ namespace Oro\Bundle\SearchBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 /**
- * Search index items that correspond to specific entity record
- *
- * @ORM\Table(
- *  name="oro_search_item",
- *  uniqueConstraints={@ORM\UniqueConstraint(name="IDX_ENTITY", columns={"entity", "record_id"})},
- *  indexes={@ORM\Index(name="IDX_ALIAS", columns={"alias"}), @ORM\Index(name="IDX_ENTITIES", columns={"entity"})}
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository")
- * @ORM\HasLifecycleCallbacks
+ * @ORM\MappedSuperClass
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class Item
+abstract class BaseItem
 {
     /**
      * @var integer $id
@@ -81,37 +71,6 @@ class Item
     protected $updatedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="IndexText", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $textFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexInteger", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $integerFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexDecimal", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $decimalFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexDatetime", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $datetimeFields;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->textFields = new ArrayCollection();
-        $this->integerFields = new ArrayCollection();
-        $this->decimalFields = new ArrayCollection();
-        $this->datetimeFields = new ArrayCollection();
-    }
-
-    /**
      * Get id
      *
      * @return integer
@@ -126,7 +85,7 @@ class Item
      *
      * @param  string $entity
      *
-     * @return Item
+     * @return $this
      */
     public function setEntity($entity)
     {
@@ -150,7 +109,7 @@ class Item
      *
      * @param  integer $recordId
      *
-     * @return Item
+     * @return $this
      */
     public function setRecordId($recordId)
     {
@@ -174,7 +133,7 @@ class Item
      *
      * @param  boolean $changed
      *
-     * @return Item
+     * @return $this
      */
     public function setChanged($changed)
     {
@@ -194,161 +153,99 @@ class Item
     }
 
     /**
-     * Add integerFields
-     *
-     * @param  IndexInteger $integerFields
-     *
-     * @return Item
+     * @param BaseIndexInteger $integerField
+     * @return BaseItem
      */
-    public function addIntegerField(IndexInteger $integerFields)
+    public function addIntegerField(BaseIndexInteger $integerField)
     {
-        if (!$this->integerFields->contains($integerFields)) {
-            $this->integerFields[] = $integerFields;
+        if (!$this->getIntegerFields()->contains($integerField)) {
+            $this->getIntegerFields()->add($integerField);
         }
 
         return $this;
     }
 
     /**
-     * Remove integerFields
-     *
-     * @param IndexInteger $integerFields
-     * @return Item
+     * @param BaseIndexInteger $integerField
+     * @return BaseItem
      */
-    public function removeIntegerField(IndexInteger $integerFields)
+    public function removeIntegerField(BaseIndexInteger $integerField)
     {
-        $this->integerFields->removeElement($integerFields);
+        $this->getIntegerFields()->removeElement($integerField);
 
         return $this;
     }
 
     /**
-     * Get integerFields
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @param BaseIndexDecimal $decimalField
+     * @return BaseItem
      */
-    public function getIntegerFields()
+    public function addDecimalField(BaseIndexDecimal $decimalField)
     {
-        return $this->integerFields;
-    }
-
-    /**
-     * Add decimalFields
-     *
-     * @param  IndexDecimal $decimalFields
-     *
-     * @return Item
-     */
-    public function addDecimalField(IndexDecimal $decimalFields)
-    {
-        if (!$this->decimalFields->contains($decimalFields)) {
-            $this->decimalFields[] = $decimalFields;
+        if (!$this->getDecimalFields()->contains($decimalField)) {
+            $this->getDecimalFields()->add($decimalField);
         }
 
         return $this;
     }
 
     /**
-     * Remove decimalFields
-     *
-     * @param IndexDecimal $decimalFields
-     * @return Item
+     * @param BaseIndexDecimal $decimalField
+     * @return BaseItem
      */
-    public function removeDecimalField(IndexDecimal $decimalFields)
+    public function removeDecimalField(BaseIndexDecimal $decimalField)
     {
-        $this->decimalFields->removeElement($decimalFields);
+        $this->getDecimalFields()->removeElement($decimalField);
 
         return $this;
     }
 
     /**
-     * Get decimalFields
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @param BaseIndexDatetime $datetimeField
+     * @return BaseItem
      */
-    public function getDecimalFields()
+    public function addDatetimeField(BaseIndexDatetime $datetimeField)
     {
-        return $this->decimalFields;
-    }
-
-    /**
-     * Add datetimeFields
-     *
-     * @param  IndexDatetime $datetimeFields
-     *
-     * @return Item
-     */
-    public function addDatetimeField(IndexDatetime $datetimeFields)
-    {
-        if (!$this->datetimeFields->contains($datetimeFields)) {
-            $this->datetimeFields[] = $datetimeFields;
+        if (!$this->getDatetimeFields()->contains($datetimeField)) {
+            $this->getDatetimeFields()->add($datetimeField);
         }
 
         return $this;
     }
 
     /**
-     * Remove datetimeFields
-     *
-     * @param  IndexDatetime $datetimeFields
-     *
-     * @return Item
+     * @param BaseIndexDatetime $datetimeField
+     * @return BaseItem
      */
-    public function removeDatetimeField(IndexDatetime $datetimeFields)
+    public function removeDatetimeField(BaseIndexDatetime $datetimeField)
     {
-        $this->datetimeFields->removeElement($datetimeFields);
+        $this->getDatetimeFields()->removeElement($datetimeField);
 
         return $this;
     }
 
     /**
-     * Get datetimeFields
-     *
-     * @return \Doctrine\Common\Collections\ArrayCollection
+     * @param BaseIndexText $textField
+     * @return BaseItem
      */
-    public function getDatetimeFields()
+    public function addTextField(BaseIndexText $textField)
     {
-        return $this->datetimeFields;
-    }
-
-    /**
-     * Add text fields
-     *
-     * @param  IndexText $textFields
-     *
-     * @return Item
-     */
-    public function addTextField(IndexText $textFields)
-    {
-        if (!$this->textFields->contains($textFields)) {
-            $this->textFields[] = $textFields;
+        if (!$this->getTextFields()->contains($textField)) {
+            $this->getTextFields()->add($textField);
         }
 
         return $this;
     }
 
     /**
-     * Remove text fields
-     *
-     * @param  IndexText $textFields
-     *
-     * @return Item
+     * @param BaseIndexText $textField
+     * @return BaseItem
      */
-    public function removeTextField(IndexText $textFields)
+    public function removeTextField(BaseIndexText $textField)
     {
-        $this->textFields->removeElement($textFields);
+        $this->getTextFields()->removeElement($textField);
 
         return $this;
-    }
-
-    /**
-     * Get text fields
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getTextFields()
-    {
-        return $this->textFields;
     }
 
     /**
@@ -371,11 +268,8 @@ class Item
     }
 
     /**
-     * Set createdAt
-     *
-     * @param  \DateTime $createdAt
-     *
-     * @return Item
+     * @param \DateTime $createdAt
+     * @return $this
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
@@ -385,8 +279,6 @@ class Item
     }
 
     /**
-     * Get createdAt
-     *
      * @return \DateTime
      */
     public function getCreatedAt()
@@ -395,11 +287,8 @@ class Item
     }
 
     /**
-     * Set updatedAt
-     *
      * @param \DateTime $updatedAt
-     *
-     * @return Item
+     * @return $this
      */
     public function setUpdatedAt(\DateTime $updatedAt)
     {
@@ -409,8 +298,6 @@ class Item
     }
 
     /**
-     * Get updatedAt
-     *
      * @return \DateTime
      */
     public function getUpdatedAt()
@@ -419,28 +306,8 @@ class Item
     }
 
     /**
-     * Save index item data
-     *
-     * @param array $objectData
-     *
-     * @return Item
-     */
-    public function saveItemData($objectData)
-    {
-        $this->saveData($objectData, $this->textFields, new IndexText(), SearchQuery::TYPE_TEXT);
-        $this->saveData($objectData, $this->integerFields, new IndexInteger(), SearchQuery::TYPE_INTEGER);
-        $this->saveData($objectData, $this->datetimeFields, new IndexDatetime(), SearchQuery::TYPE_DATETIME);
-        $this->saveData($objectData, $this->decimalFields, new IndexDecimal(), SearchQuery::TYPE_DECIMAL);
-
-        return $this;
-    }
-
-    /**
-     * Set alias
-     *
-     * @param  string $alias
-     *
-     * @return Item
+     * @param string $alias
+     * @return BaseItem
      */
     public function setAlias($alias)
     {
@@ -450,8 +317,6 @@ class Item
     }
 
     /**
-     * Get alias
-     *
      * @return string
      */
     public function getAlias()
@@ -460,11 +325,8 @@ class Item
     }
 
     /**
-     * Set title
-     *
-     * @param  string $title
-     *
-     * @return Item
+     * @param string $title
+     * @return BaseItem
      */
     public function setTitle($title)
     {
@@ -474,8 +336,6 @@ class Item
     }
 
     /**
-     * Get title
-     *
      * @return string
      */
     public function getTitle()
@@ -489,8 +349,7 @@ class Item
     public function getRecordText()
     {
         $recordText = '';
-        /** @var IndexText $textField */
-        foreach ($this->textFields as $textField) {
+        foreach ($this->getTextFields() as $textField) {
             if ($textField->getField() == Indexer::TEXT_ALL_DATA_FIELD) {
                 $recordText = $textField->getValue();
             }
@@ -500,12 +359,12 @@ class Item
     }
 
     /**
-     * @param array  $objectData
+     * @param array $objectData
      * @param Collection $fields
-     * @param object $newRecord
+     * @param BaseItemFieldInterface $newRecord
      * @param string $type
      */
-    protected function saveData($objectData, Collection $fields, $newRecord, $type)
+    protected function saveData($objectData, Collection $fields, BaseItemFieldInterface $newRecord, $type)
     {
         if (isset($objectData[$type]) && count($objectData[$type])) {
             $itemData = $objectData[$type];
@@ -525,8 +384,8 @@ class Item
                 }
             }
             //delete fields
-            if (count($updatedTextFields) < count($this->textFields)) {
-                foreach ($this->textFields as $index => $collectionElement) {
+            if (count($updatedTextFields) < count($this->getTextFields())) {
+                foreach ($this->getTextFields() as $index => $collectionElement) {
                     if (!array_key_exists($index, $updatedTextFields)) {
                         $fields->removeElement($collectionElement);
                     }
@@ -545,13 +404,15 @@ class Item
      * @param string $fieldName
      * @param mixed $fieldData
      * @param Collection $fields
-     * @param object $newRecord
+     * @param BaseItemFieldInterface $newRecord
      */
-    protected function addFieldData($fieldName, $fieldData, Collection $fields, $newRecord)
+    protected function addFieldData($fieldName, $fieldData, Collection $fields, BaseItemFieldInterface $newRecord)
     {
         if (!is_array($fieldData)) {
             $fieldData = [$fieldData];
         }
+
+        /** @var array $fieldData */
         foreach ($fieldData as $data) {
             $record = clone $newRecord;
             $this->setFieldData($record, $fieldName, $data);
@@ -565,9 +426,9 @@ class Item
      */
     protected function deleteArrayFields(Collection $fields, $fieldName)
     {
+        /** @var Collection $fieldsToDelete */
         $fieldsToDelete = $fields->filter(
             function ($valueEntity) use ($fieldName) {
-                /** @var IndexInteger|IndexText|IndexDatetime|IndexDecimal $valueEntity */
                 return $valueEntity->getField() === $fieldName;
             }
         );
@@ -581,14 +442,45 @@ class Item
     /**
      * Set record parameters
      *
-     * @param object $record
+     * @param BaseItemFieldInterface $record
      * @param string $fieldName
-     * @param mixed  $fieldData
+     * @param mixed $fieldData
+     * @throws \InvalidArgumentException
      */
-    protected function setFieldData($record, $fieldName, $fieldData)
+    protected function setFieldData(BaseItemFieldInterface $record, $fieldName, $fieldData)
     {
         $record->setField($fieldName)
             ->setValue($fieldData)
             ->setItem($this);
     }
+
+    /**
+     * @return \Doctrine\Common\Collections\Collection|BaseIndexInteger[]
+     */
+    abstract public function getIntegerFields();
+
+    /**
+     * @return \Doctrine\Common\Collections\Collection|BaseIndexDecimal[]
+     */
+    abstract public function getDecimalFields();
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection|BaseIndexDatetime[]
+     */
+    abstract public function getDatetimeFields();
+
+    /**
+     * Get text fields
+     *
+     * @return \Doctrine\Common\Collections\Collection|BaseIndexText[]
+     */
+    abstract public function getTextFields();
+
+    /**
+     * Save index item data
+     *
+     * @param array $objectData
+     * @return BaseItem
+     */
+    abstract public function saveItemData($objectData);
 }
