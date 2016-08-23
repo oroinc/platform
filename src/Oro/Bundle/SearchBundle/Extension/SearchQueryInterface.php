@@ -85,4 +85,30 @@ interface SearchQueryInterface
      * @return Query
      */
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT);
+
+    /**
+     * Returning the wrapped Query object.
+     *
+     * @return SearchQueryInterface
+     */
+    public function getQuery();
+
+    /**
+     * Adding a field to be selected from the Search Index database
+     * system.
+     *
+     * @param      $fieldName
+     * @param null $enforcedFieldType
+     * @return mixed
+     */
+    public function addSelect($fieldName, $enforcedFieldType = null);
+
+    /**
+     * Insert entities array to query from
+     *
+     * @param array|string $entities
+     *
+     * @return SearchQueryInterfacei
+     */
+    public function from($entities);
 }

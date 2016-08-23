@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Extension;
+namespace Oro\Bundle\SearchBundle\Datasource;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SearchBundle\Factory\QueryFactory;
+use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Factory\QueryFactoryInterface;
 
 class SearchDatasource implements DatasourceInterface

@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
-use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
 
 class SearchPagerExtension extends OrmPagerExtension
 {
