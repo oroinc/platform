@@ -113,6 +113,7 @@ class Configuration implements ConfigurationInterface
             [
                 'locale' => ['value' => '%locale%'],
                 self::LANGUAGE => ['value' => null],
+                'languages' => ['value' => [self::DEFAULT_LANGUAGE], 'type' => 'array'],
                 'country' => ['value' => null],
                 'currency' => ['value' => null],
                 'timezone' => ['value' => date_default_timezone_get()],

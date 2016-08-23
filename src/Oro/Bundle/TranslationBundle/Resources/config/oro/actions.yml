@@ -47,6 +47,7 @@ operations:
                 attribute: $.isDefaultLanguage
         preconditions:
             '@and':
+                - '@not_equal': [$code, 'en']
                 - '@equal': [$.isDefaultLanguage, false]
                 - '@equal': [$enabled, true]
         actions:

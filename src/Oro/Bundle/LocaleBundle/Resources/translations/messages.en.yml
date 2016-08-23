@@ -90,6 +90,7 @@ oro.locale:
             country.label: 'Primary Location'
             format_address_by_address_country.label: 'Format address per country'
             language.label: 'Default Language'
+            languages.label: 'Supported languages'
             timezone.label: 'Timezone'
             currency.label: 'Currency'
             quarter_start.label: 'First Quarter Starts on'
@@ -111,6 +112,7 @@ oro.locale:
             default: N/A
     form:
         tooltip:
+            languages: "Select the languages that can be used for translation of the email templates."
             locale: "Locale selection affects formatting of numbers, addresses, names, and dates."
             location: " If Format address per country option is disabled, or there is no country-specific formatting, the addresses will be formatted according to the rules of primary location."
             format_address_by_address_country: "When this option is selected, addresses will be formatted according to the rules of their countries. Otherwise, the primary location formatting will be applied."
