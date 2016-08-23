@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ApplicationsHelper
 {
-    const BACKEND = 'backend';
+    const DEFAULT_APPLICATION = 'default';
 
     /**
      * @var TokenStorageInterface
@@ -45,7 +45,7 @@ class ApplicationsHelper
     {
         $token = $this->tokenStorage->getToken();
 
-        return $token && $token->getUser() instanceof User ? self::BACKEND : null;
+        return $token && $token->getUser() instanceof User ? self::DEFAULT_APPLICATION : null;
     }
 
     /**
