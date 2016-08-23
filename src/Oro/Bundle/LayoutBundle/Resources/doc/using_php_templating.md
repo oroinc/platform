@@ -1,14 +1,14 @@
-Using PHP Templating instead of Twig
-====================================
 
-This article describes how to use php templates in layouts.
-You can find some useful information on using php templates in Symfony's documentation: [How to Use PHP instead of Twig for Templates](http://symfony.com/doc/current/templating/PHP.html).
-For further reading see Form component's documentation: [How to Customize Form Rendering](http://symfony.com/doc/current/form/form_customization.html).
+# Using PHP Templating instead of Twig
 
-Configuring LayoutBundle
-------------------------
+This article describes using php templates in layouts.
+In the official Symfony documentation you can find the following useful information: 
+* [How to Use PHP instead of Twig for Templates](http://symfony.com/doc/current/templating/PHP.html).
+* [How to Customize Form Rendering](http://symfony.com/doc/current/form/form_customization.html).
 
-In current implementation you can't use multiple templating engines at once. So you should disable Twig templating and set php templating as default in your `config.yml`:
+## Configuring LayoutBundle
+
+Only one template engine can be used for the entire <ORO deployment>. If you decide to use php templates, disable the Twig and set php as default template engine in the `config.yml`:
 
 ```Yaml
 oro_layout:
@@ -18,10 +18,10 @@ oro_layout:
             enabled: false
 ```
 
-Defining Layouts
-----------------
+## Defining Layouts with php templates
 
-Let's create default layout update file in for our theme's folder:
+To modify the default layout, update the default.yml file located in the theme's folder. 
+For example, the file below defines the standard page structure (head, metadata, and body) and two custom blocks in the body (content and greeting):
 
 ```Yaml
 #MyBundle/Resources/views/layouts/first_theme/default.yml
@@ -56,24 +56,30 @@ layout:
                             greeting: ~
 ```
 
-Here we have skeleton for our pages (html, head, ...). Imortant thing is that we specified theme for our blocks (`MyBundle:layouts/first_theme/php`), this is how php templating knows where to search for templates.
+To help php search for the necessary template, we specified location of the theme's php folder:
 
-Overriding Templates
---------------------
+```Yaml
+    actions:
+        - @setBlockTheme:
+            themes: 'MyBundle:layouts/first_theme/php'
+```
 
-Now we can override any of our block templates. For example let's define template for `greeting` block:
+
+## Overriding Templates
+
+You can override contents of any block template. For example, a `greeting` block that displays 'Hello!' <how is it linked to the filename? _..._widget.html.php?>:
 
 ```php
 #MyBundle/Resources/views/layouts/first_theme/php/_greeting_widget.html.php
 <p>Hello!</p>
 ```
 
-This is template pretty simple, it just displays text "Hello!". So let's create more complex template to override template for `content` block:
+This simple template displays "Hello!" text. So let's create more complex template to override template for `content` block:
 
 ```php
 #MyBundle/Resources/views/layouts/first_theme/php/_content_widget.html.php
 <div <?php echo $view['layout']->block($block, 'block_attributes') ?>>
-    <h1>Greeting</h1>
+    <h1>Welcome back</h1>
     <?php echo $view['layout']->widget($block); ?>
 </div>
 ```
@@ -88,7 +94,7 @@ Html output will be the following:
     </head>
     <body>
         <div class="content">
-            <h1>Greeting</h1>
+            <h1>Welcome back</h1>
             <p>Hello!</p>
         </div>
     </body>
