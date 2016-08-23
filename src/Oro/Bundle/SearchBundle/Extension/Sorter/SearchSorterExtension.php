@@ -60,9 +60,14 @@ class SearchSorterExtension extends AbstractExtension
             $sortKey = $sorter['data_name'];
 
             if (isset($sorter['apply_callback']) && is_callable($sorter['apply_callback'])) {
+                // use callback if specified
                 $sorter['apply_callback']($datasource, $sortKey, $direction);
+            } elseif (array_key_exists(PropertyInterface::TYPE_KEY, $sorter)) {
+                // pass type if specified
+                $datasource->getQuery()->setOrderBy($sortKey, $direction, $sorter[PropertyInterface::TYPE_KEY]);
             } else {
-                 $datasource->getQuery()->setOrderBy($sortKey, $direction);
+                // otherwise use default type
+                $datasource->getQuery()->setOrderBy($sortKey, $direction);
             }
         }
     }
