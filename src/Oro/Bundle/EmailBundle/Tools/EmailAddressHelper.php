@@ -17,6 +17,9 @@ class EmailAddressHelper
      *    email address: "John Smith" <john@example.com>; 'pure' email address john@example.com
      *    email address: John Smith <john@example.com>; 'pure' email address john@example.com
      *    email address: <john@example.com>; 'pure' email address john@example.com
+     *    email address: "John Smith" <john@example.com> (Contact); 'pure' email address john@example.com
+     *    email address: John Smith <john@example.com> (Contact); 'pure' email address john@example.com
+     *    email address: <john@example.com> (Contact); 'pure' email address john@example.com
      *    email address: john@example.com; 'pure' email address john@example.com
      *
      * @param string $fullEmailAddress

@@ -56,8 +56,8 @@ define(function(require) {
             }
             if (!accessLevels.length) {
                 accessLevels.fetch({
-                    success: function (collection) {
-                        _.each(collection.models, function (model) {
+                    success: function(collection) {
+                        _.each(collection.models, function(model) {
                             if (isNaN(model.get('access_level'))) {
                                 collection.remove(model);
                             }
