@@ -1,5 +1,9 @@
 styles:
     inputs:
-        - 'bundles/oroform/blank/scss/configs/_input.scss'
+        - 'bundles/oroform/blank/scss/configs/settings.scss'
+        - 'bundles/oroform/blank/scss/configs/button-config.scss'
+        - 'bundles/oroform/blank/scss/configs/custom-checkbox-config.scss'
+        - 'bundles/oroform/blank/scss/configs/input-config.scss'
+        - 'bundles/oroform/blank/scss/configs/select-config.scss'
         - 'bundles/oroform/blank/scss/styles.scss'
     filters: ['cssrewrite', 'cssmin']

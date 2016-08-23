@@ -1,5 +1,3 @@
-@import './_config';
-
 @mixin placeholder {
     ::-webkit-input-placeholder {@content}
     :-moz-placeholder           {@content}

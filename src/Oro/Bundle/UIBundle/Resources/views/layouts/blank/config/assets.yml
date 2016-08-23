@@ -1,5 +1,11 @@
 styles:
     inputs:
+        - 'bundles/oroui/blank/scss/configs/global-settings.scss'
+        - 'bundles/oroui/blank/scss/configs/base-config.scss'
+        - 'bundles/oroui/blank/scss/configs/grid-config.scss'
+        - 'bundles/oroui/blank/scss/configs/link-config.scss'
+        - 'bundles/oroui/blank/scss/configs/nitifications-config.scss'
+        - 'bundles/oroui/blank/scss/configs/page-titlec-config.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
     filters: ['cssrewrite', 'cssmin']
     output: 'css/layout/blank/styles.css'

@@ -1,6 +1,4 @@
-@import './_config';
-
-@if ($use-base-styles) {
+@if ($use-basic-styles) {
     html {
         font-family: sans-serif;
         -webkit-text-size-adjust: 100%;
