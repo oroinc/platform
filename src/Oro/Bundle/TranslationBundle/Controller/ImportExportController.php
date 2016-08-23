@@ -42,22 +42,12 @@ class ImportExportController extends BaseController
      */
     protected function getExportHandler()
     {
-        return $this->get('oro_translation.importexport.handler.export')->setLanguage($this->getLanguage());
-    }
-
-    /**
-     * @return Language
-     */
-    protected function getLanguage()
-    {
         $options = $this->getOptionsFromRequest();
-        if (isset($options['language_id']) && ($options['language_id'] > 0)) {
-            return $this->get('oro_entity.doctrine_helper')->getEntityReference(
-                Language::class,
-                $options['language_id']
-            );
+        $handler = $this->get('oro_translation.importexport.handler.export');
+        if (isset($options['language_code'])) {
+            $handler->setLanguageCode($options['language_code']);
         }
 
-        return null;
+        return $handler;
     }
 }

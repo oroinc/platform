@@ -45,7 +45,7 @@ class TranslationReader extends AbstractReader
     {
         $offset = $this->getStepExecution()->getReadCount();
 
-        $messages = $this->getLanguageMessages($this->getContext()->getOption('language_id'));
+        $messages = $this->getLanguageMessages($this->getContext()->getOption('language_code'));
 
         if (!isset($messages[$offset])) {
             return null;
@@ -57,13 +57,12 @@ class TranslationReader extends AbstractReader
     }
 
     /**
-     * @param int $languageId
+     * @param int $locale
      * @return array
      */
-    protected function getLanguageMessages($languageId)
+    protected function getLanguageMessages($locale)
     {
-        if (!isset($this->messages[$languageId])) {
-            $locale = $this->getLanguage($languageId)->getCode();
+        if (!isset($this->messages[$locale])) {
 
             $defaultMessages = $this->getMessages(Translation::DEFAULT_LOCALE);
             $originalMessages = $this->getMessages($locale, true);
@@ -81,10 +80,10 @@ class TranslationReader extends AbstractReader
                 );
             });
 
-            $this->messages[$languageId] = array_values($messages);
+            $this->messages[$locale] = array_values($messages);
         }
 
-        return $this->messages[$languageId];
+        return $this->messages[$locale];
     }
 
     /**
@@ -110,14 +109,5 @@ class TranslationReader extends AbstractReader
         }
 
         return $messages;
-    }
-
-    /**
-     * @param int $id
-     * @return Language
-     */
-    protected function getLanguage($id)
-    {
-        return $this->doctrineHelper->getEntityReference(Language::class, $id);
     }
 }
