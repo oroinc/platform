@@ -34,7 +34,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      */
     public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-        if ($options['resolve_value_bags']) {
+        if ($options->offsetGet('resolve_value_bags') && !$this->checkExpression($options)) {
             $this->resolveValueBags($options);
         }
     }
@@ -44,9 +44,27 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      */
     public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if ($options['resolve_value_bags']) {
+        $exprEvaluate = $block->getContext()->getOr('expressions_evaluate');
+        if ($options->offsetGet('resolve_value_bags') && $exprEvaluate) {
             $this->resolveValueBags($view->vars);
+        } elseif (!$exprEvaluate) {
+            throw new \InvalidArgumentException('expression should be evaluate');
         }
+    }
+
+    /**
+     * @param $options
+     * @return bool
+     */
+    protected function checkExpression($options)
+    {
+        $check = false;
+        foreach ($options as $value) {
+            if (is_string($value) && strpos($value, '=data') !== false) {
+                return true;
+            }
+        }
+        return $check;
     }
 
     /**
