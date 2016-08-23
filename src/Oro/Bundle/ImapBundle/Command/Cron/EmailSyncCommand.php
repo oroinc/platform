@@ -89,6 +89,12 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'The identifier of email origin to be synchronized.'
+            )
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE | InputOption::VALUE_OPTIONAL,
+                'Forces operation to be executed.'
             );
     }
 
@@ -109,7 +115,8 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 (int)$input->getOption('max-concurrent-tasks'),
                 (int)$input->getOption('min-exec-interval'),
                 (int)$input->getOption('max-exec-time'),
-                (int)$input->getOption('max-tasks')
+                (int)$input->getOption('max-tasks'),
+                (bool)$input->getOption('force')
             );
         }
     }
