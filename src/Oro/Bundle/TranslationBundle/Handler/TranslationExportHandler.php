@@ -8,6 +8,9 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 
 class TranslationExportHandler extends ExportHandler
 {
+    /**
+     * @var Language
+     */
     protected $language;
 
     /**
