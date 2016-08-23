@@ -31,6 +31,9 @@ parameters:
     oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
     oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
 
+    # search sorter
+    oro_search.extension.search_sorter.class: Oro\Bundle\SearchBundle\Extension\Sorter\SearchSorterExtension
+
     oro_search.drivers:
         pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
         pdo_pgsql: Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql
@@ -218,3 +221,8 @@ services:
         class: Oro\Bundle\SearchBundle\Resolver\EntityToStringTitleResolver
         arguments:
             - '@oro_search.resolver.entity_title.title_fields'
+
+    oro_search.extension.search_sorter:
+        class: %oro_search.extension.search_sorter.class%
+        tags:
+            - { name: oro_datagrid.extension }
