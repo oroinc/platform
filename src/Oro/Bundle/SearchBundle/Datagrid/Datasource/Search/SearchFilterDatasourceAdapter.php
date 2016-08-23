@@ -5,13 +5,15 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Datasource\Search;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\SearchBundle\Extension\AbstractSearchQuery;
+use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 {
     /**
-     * @var Query
+     * @var AbstractSearchQuery
      */
     private $query;
 
@@ -20,14 +22,17 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     private $expressionBuilder;
 
-    public function __construct(Query $query)
+    public function __construct(AbstractSearchQuery $query)
     {
         $this->query = $query;
     }
 
+    /**
+     * @throws \RuntimeException
+     */
     public function getDatabasePlatform()
     {
-        return null;
+        throw new \RuntimeException(self::class.' has no implementation of `getDatabasePlatform`.');
     }
 
     /**
@@ -41,7 +46,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
         if ($restriction instanceof Comparison) {
-            $this->query->where(
+            $this->query->getQuery()->where(
                 $condition == FilterUtility::CONDITION_OR ? Query::KEYWORD_OR : Query::KEYWORD_AND,
                 $restriction->getField(),
                 $restriction->getOperator(),
@@ -111,7 +116,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * @return Query
+     * @return AbstractSearchQuery
      */
     public function getQuery()
     {

@@ -57,13 +57,6 @@ class SearchFilterExtension extends AbstractFilterExtension
                 if ($form->isValid()) {
                     $data = $form->getData();
 
-                    if (isset($value['value']['start'])) {
-                        $data['value']['start_original'] = $value['value']['start'];
-                    }
-                    if (isset($value['value']['end'])) {
-                        $data['value']['end_original'] = $value['value']['end'];
-                    }
-
                     $filter->apply($datasourceAdapter, $data);
                 }
             }

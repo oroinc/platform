@@ -12,11 +12,19 @@ use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchStringFilter extends AbstractFilter
 {
+    /**
+     * @return string
+     */
     protected function getFormType()
     {
         return TextFilterType::NAME;
     }
 
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param mixed $data
+     * @return bool|void
+     */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
@@ -24,16 +32,16 @@ class SearchStringFilter extends AbstractFilter
         if ($ds instanceof SearchFilterDatasourceAdapter) {
             switch ($data['type']) {
                 case TextFilterType::TYPE_EQUAL:
-                    $ds->getQuery()->andWhere($fieldName, Query::OPERATOR_EQUALS, $data['value']);
+                    $ds->getQuery()->getQuery()->andWhere($fieldName, Query::OPERATOR_EQUALS, $data['value']);
                     return;
                 case TextFilterType::TYPE_NOT_EQUAL:
-                    $ds->getQuery()->andWhere($fieldName, Query::OPERATOR_EQUALS, $data['value']);
+                    $ds->getQuery()->getQuery()->andWhere($fieldName, Query::OPERATOR_EQUALS, $data['value']);
                     return;
                 case TextFilterType::TYPE_CONTAINS:
-                    $ds->getQuery()->andWhere($fieldName, Query::OPERATOR_CONTAINS, $data['value']);
+                    $ds->getQuery()->getQuery()->andWhere($fieldName, Query::OPERATOR_CONTAINS, $data['value']);
                     return;
                 case TextFilterType::TYPE_NOT_CONTAINS:
-                    $ds->getQuery()->andWhere($fieldName, Query::OPERATOR_NOT_CONTAINS, $data['value']);
+                    $ds->getQuery()->getQuery()->andWhere($fieldName, Query::OPERATOR_NOT_CONTAINS, $data['value']);
                     return;
             }
         }
