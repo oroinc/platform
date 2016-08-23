@@ -21,14 +21,15 @@ class OroDurationType extends AbstractType
 {
     const NAME = 'oro_duration';
 
-    const VALIDATION_REGEX_JIRA = '/^' .
-                                  '(?:(?:(\d+(?:\.\d{0,2})?)?)h(?:[\s]*|$))?' .
-                                  '(?:(?:(\d+(?:\.\d{0,2})?)?)m(?:[\s]*|$))?' .
-                                  '(?:(?:(\d+(?:\.\d{0,2})?)?)s?)?' .
-                                  '$/i';
-    const VALIDATION_REGEX_COLUMN = '/^' .
-                                    '((\d{1,3}:)?\d{1,3}:)?\d{1,3}' .
-                                    '$/i';
+    const VALIDATION_REGEX_JIRA   = '/^
+                                    (?:(?:(\d+(?:\.\d{0,2})?)?)h
+                                    (?:[\s]*|$))?(?:(?:(\d+(?:\.\d{0,2})?)?)m
+                                    (?:[\s]*|$))?(?:(?:(\d+(?:\.\d{0,2})?)?)s?)?
+                                    $/ix';
+
+    const VALIDATION_REGEX_COLUMN = '/^
+                                    ((\d{1,3}:)?\d{1,3}:)?\d{1,3}
+                                    $/ix';
 
     /**
      * {@inheritdoc}

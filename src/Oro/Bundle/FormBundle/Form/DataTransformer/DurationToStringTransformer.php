@@ -24,11 +24,11 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DurationToStringTransformer implements DataTransformerInterface
 {
-    const DURATION_JIRA_REGEX = '/^' .
-                                '(?:(?:(\d+(?:\.\d{0,2})?)?)h(?:[\s]*|$))?' .
-                                '(?:(?:(\d+(?:\.\d{0,2})?)?)m(?:[\s]*|$))?' .
-                                '(?:(?:(\d+(?:\.\d{0,2})?)?)s)?' .
-                                '$/i';
+    const DURATION_JIRA_REGEX = '/^
+                                (?:(?:(\d+(?:\.\d{0,2})?)?)h
+                                (?:[\s]*|$))?(?:(?:(\d+(?:\.\d{0,2})?)?)m
+                                (?:[\s]*|$))?(?:(?:(\d+(?:\.\d{0,2})?)?)s)?
+                                $/ix';
     /**
      * {@inheritdoc}
      */
