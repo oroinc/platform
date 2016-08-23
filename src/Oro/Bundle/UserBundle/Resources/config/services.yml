@@ -413,6 +413,8 @@ services:
             - '@oro_config.config_bag'
             - '@form.factory'
             - '@oro_security.security_facade'
+        calls:
+            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
             -  { name: oro_config.configuration_provider }
         lazy: true

@@ -10,6 +10,7 @@ use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 abstract class Provider implements ProviderInterface
 {
@@ -23,11 +24,24 @@ abstract class Provider implements ProviderInterface
     protected $processedSubTrees = array();
 
     /**
+     * @var FeatureChecker
+     */
+    protected $featureChecker;
+
+    /**
      * @param ConfigBag $configBag
      */
     public function __construct(ConfigBag $configBag)
     {
         $this->configBag = $configBag;
+    }
+
+    /**
+     * @param FeatureChecker $featureChecker
+     */
+    public function setFeatureChecker(FeatureChecker $featureChecker)
+    {
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -112,6 +126,10 @@ abstract class Provider implements ProviderInterface
     {
         $level++;
         foreach ($nodes as $name => $node) {
+            if (!$this->featureChecker->isResourceEnabled($name, 'configuration')) {
+                continue;
+            }
+
             if (is_array($node) && isset($node['children'])) {
                 $group = $this->configBag->getGroupsNode($name);
                 if ($group === false) {

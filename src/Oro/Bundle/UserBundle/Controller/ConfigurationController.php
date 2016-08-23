@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class ConfigurationController extends Controller
 {
@@ -70,19 +68,19 @@ class ConfigurationController extends Controller
     protected function config(User $entity, $activeGroup = null, $activeSubGroup = null)
     {
         $provider = $this->get('oro_user.provider.user_config_form_provider');
+        /** @var ConfigManager $manager */
+        $manager = $this->get('oro_config.user');
+        $prevScopeId = $manager->getScopeId();
+        //update scope id to match currently configured user
+        $manager->setScopeIdFromEntity($entity);
 
         list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
 
         $tree = $provider->getTree();
         $form = false;
-        $manager = $this->get('oro_config.user');
 
         if ($activeSubGroup !== null) {
             $form = $provider->getForm($activeSubGroup);
-
-            $prevScopeId = $manager->getScopeId();
-            //update scope id to match currently configured user
-            $manager->setScopeIdFromEntity($entity);
 
             if ($this->get('oro_config.form.handler.config')
                 ->setConfigManager($manager)
@@ -99,9 +97,9 @@ class ConfigurationController extends Controller
 
                 $sender->send($sender->getGenerator()->generate($taggableData));
             }
-            //revert previous scope id
-            $manager->setScopeId($prevScopeId);
         }
+        //revert previous scope id
+        $manager->setScopeId($prevScopeId);
 
         return [
             'entity'         => $entity,
