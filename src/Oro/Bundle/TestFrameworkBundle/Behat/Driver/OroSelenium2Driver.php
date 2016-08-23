@@ -269,7 +269,12 @@ JS;
             return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
         })();
 JS;
-        $this->wait($time, $jsAppActiveCheck);
+        $checkCount = 7;
+        do {
+            $this->wait($time, $jsAppActiveCheck);
+            $checkCount--;
+            usleep(100000);
+        } while ($checkCount > 0);
     }
 
     /**
