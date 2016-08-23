@@ -60,7 +60,6 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
             BeforeSuiteTested::BEFORE => ['injectSuite', 5],
             BeforeFeatureTested::BEFORE  => ['beforeFeature', 100],
             AfterFeatureTested::AFTER  => ['afterFeature', -100],
-            ScenarioTested::BEFORE => ['beforeScenario', 100]
         ];
     }
 
@@ -91,11 +90,6 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
         $this->clearDependencies();
         $this->restore();
         $this->shutdownKernel();
-    }
-
-    public function beforeScenario()
-    {
-        $this->refreshDependencies();
     }
 
     public function bootKernel()

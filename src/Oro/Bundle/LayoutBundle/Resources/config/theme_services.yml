@@ -72,10 +72,26 @@ services:
     oro_layout.theme_extension:
         class: %oro_layout.theme_extension.class%
         arguments:
-            - %oro_layout.theme_updates_resources%
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
             - '@oro_layout.loader.path_provider'
+            - '@oro_layout.theme_extension.resource_provider.theme'
+        calls:
+            - [addVisitor, ['@oro_layout.theme_extension.visitor.import']]
+
+    oro_layout.theme_extension.resource_provider.theme:
+        class: Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider
+        public: false
+        arguments:
+            - %oro_layout.theme_updates_resources%
+
+    oro_layout.theme_extension.visitor.import:
+        class: Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor
+        public: false
+        arguments:
+            - '@oro_layout.loader'
+            - '@oro_layout.dependency_initializer'
+            - '@oro_layout.theme_extension.resource_provider.theme'
             - '@oro_layout.theme_manager'
 
     oro_layout.data_provider.theme:
