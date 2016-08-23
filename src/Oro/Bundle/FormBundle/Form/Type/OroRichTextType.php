@@ -77,13 +77,12 @@ class OroRichTextType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $allowableTags = null;
-        if (!empty($options['wysiwyg_options']['valid_elements'])) {
-            $allowableTags = $options['wysiwyg_options']['valid_elements'];
+        if (null !== $options['wysiwyg_options']['valid_elements']) {
+            $builder->addModelTransformer(new SanitizeHTMLTransformer(
+                $options['wysiwyg_options']['valid_elements'],
+                $this->cacheDir
+            ));
         }
-
-        $transformer = new SanitizeHTMLTransformer($allowableTags, $this->cacheDir);
-        $builder->addModelTransformer($transformer);
     }
 
     /**

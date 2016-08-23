@@ -11,12 +11,17 @@ class EmailTemplateTransformer implements DataTransformerInterface
     /** @var SanitizeHTMLTransformer */
     protected $transformer;
 
+    /** @var bool Run sanitization transformer or not */
+    /** @deprecated since 1.10 */
+    private $sanitize;
+
     /**
      * @param SanitizeHTMLTransformer $transformer
      */
     public function __construct(SanitizeHTMLTransformer $transformer)
     {
         $this->transformer = $transformer;
+        $this->sanitize = true;
     }
 
     /**
@@ -24,7 +29,9 @@ class EmailTemplateTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        $value = $this->transformer->transform($value);
+        if ($this->sanitize) {
+            $value = $this->transformer->transform($value);
+        }
 
         return $this->decodeTemplateVariables($value);
     }
@@ -34,9 +41,21 @@ class EmailTemplateTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        $value = $this->transformer->reverseTransform($value);
+        if ($this->sanitize) {
+            $value = $this->transformer->reverseTransform($value);
+        }
 
         return $this->decodeTemplateVariables($value);
+    }
+
+    /**
+     * Toggle sanitization transformer
+     * @param bool $sanitize
+     * @deprecated since 1.10
+     */
+    public function setSanitize($sanitize)
+    {
+        $this->sanitize = (bool) $sanitize;
     }
 
     /**
