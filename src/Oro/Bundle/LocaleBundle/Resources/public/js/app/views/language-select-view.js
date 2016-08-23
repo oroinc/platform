@@ -46,6 +46,10 @@ define(function(require) {
 
             if (selected) {
                 select.val(selected);
+
+                if (selected !== select.val()) {
+                    select.val('');
+                }
             }
 
             select.change();
