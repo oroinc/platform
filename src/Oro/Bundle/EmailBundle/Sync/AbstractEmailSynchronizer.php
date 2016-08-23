@@ -106,14 +106,21 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
+     * @param bool $force               Skip UID or last sync date
+     *
      * @return int
      *
      * @throws \Exception
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1)
-    {
+    public function sync(
+        $maxConcurrentTasks,
+        $minExecIntervalInMin,
+        $maxExecTimeInMin = -1,
+        $maxTasks = 1,
+        $force = false
+    ) {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
         }
@@ -153,7 +160,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
             $processedOrigins[$origin->getId()] = true;
             try {
-                $this->doSyncOrigin($origin);
+                $this->doSyncOrigin($origin, $force);
             } catch (SyncFolderTimeoutException $ex) {
                 break;
             } catch (\Exception $ex) {
@@ -260,7 +267,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param EmailOrigin $origin
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin)
+    protected function doSyncOrigin(EmailOrigin $origin, $force)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -277,7 +284,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
-                $processor->process($origin, $syncStartTime);
+                $processor->process($origin, $syncStartTime, $force);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
                 $this->logger->info('Skip because it is already in process.');
