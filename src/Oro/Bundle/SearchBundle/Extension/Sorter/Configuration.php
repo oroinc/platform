@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Extension\Sorter;
 
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
