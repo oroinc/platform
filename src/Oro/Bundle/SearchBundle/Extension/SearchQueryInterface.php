@@ -108,7 +108,7 @@ interface SearchQueryInterface
      *
      * @param array|string $entities
      *
-     * @return SearchQueryInterfacei
+     * @return SearchQueryInterface
      */
     public function from($entities);
 }
