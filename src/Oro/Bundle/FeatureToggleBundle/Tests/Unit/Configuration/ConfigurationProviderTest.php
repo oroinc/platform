@@ -20,6 +20,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testWarmUpCache(array $configuration, array $bundles, array $mergedConfiguration)
     {
         $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -41,6 +42,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testClearCache()
     {
         $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             [],
@@ -67,6 +69,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -102,6 +105,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -132,6 +136,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $mergedConfiguration
     ) {
         $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -185,6 +190,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = true;
         $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
@@ -217,6 +223,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = true;
         $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,

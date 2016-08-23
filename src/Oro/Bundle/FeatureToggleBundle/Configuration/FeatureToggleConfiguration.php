@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -48,7 +47,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param ArrayNode $node
+     * @param NodeBuilder $node
      */
     protected function addFeatureConfiguration(NodeBuilder $node)
     {

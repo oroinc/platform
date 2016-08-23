@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ActionBundle\Configuration;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
-use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class FeatureConfigurationExtension implements ConfigurationExtensionInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function extendConfigurationTree(ArrayNode $node)
+    public function extendConfigurationTree(NodeBuilder $node)
     {
         $node
             ->arrayNode('operation')
