@@ -189,6 +189,11 @@ services:
         tags:
             - { name: oro_api.config_extension }
 
+    oro_api.config_extension.feature:
+        class: 'Oro\Bundle\ApiBundle\Config\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false

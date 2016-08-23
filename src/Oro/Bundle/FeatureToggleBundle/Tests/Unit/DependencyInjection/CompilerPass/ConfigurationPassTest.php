@@ -9,6 +9,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\ConfigurationPass;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,22 +33,14 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     'description' => 'Description 1',
                     'dependency' => ['feature2'],
                     'route' => ['f1_route1', 'f1_route2'],
-                    'workflow' => ['f1_workflow1', 'f1_workflow2'],
-                    'operation' => ['f1_operation1', 'f1_operation2'],
-                    'process' => ['f1_process1', 'f1_process2'],
                     'configuration' => ['config_section1', 'config_leaf1'],
-                    'api' => ['Entity1', 'Entity2'],
                 ]
             ],
             TestBundle2::class => [
                 'feature1' => [
                     'toggle' => 'changed_toggle',
                     'route' => ['f1_route3'],
-                    'workflow' => ['f1_workflow3'],
-                    'operation' => ['f1_operation3'],
-                    'process' => ['f1_process3'],
                     'configuration' => ['config_leaf2'],
-                    'api' => ['Entity3', 'Entity4'],
                 ],
                 'feature2' => [
                     'label' => 'Feature 2',
@@ -60,6 +53,10 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $container->expects($this->once())
+            ->method('findTaggedServiceIds')
+            ->with(ConfigurationPass::EXTENSION_TAG)
+            ->willReturn(['testConfigExtension' => []]);
 
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
@@ -85,14 +82,32 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->method('replaceArgument')
             ->with(0, $expectedConfiguration);
 
-        $container->expects($this->once())
+        $configDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configDefinition->expects($this->once())
+            ->method('addMethodCall')
+            ->with('addExtension', [new Reference('testConfigExtension')]);
+
+        $container->expects($this->exactly(2))
             ->method('hasDefinition')
-            ->with(ConfigurationPass::PROVIDER)
+            ->withConsecutive(
+                [ConfigurationPass::CONFIGURATION_SERVICE],
+                [ConfigurationPass::PROVIDER]
+            )
             ->willReturn(true);
-        $container->expects($this->once())
+        $container->expects($this->exactly(2))
             ->method('getDefinition')
-            ->with(ConfigurationPass::PROVIDER)
-            ->willReturn($providerDefinition);
+            ->withConsecutive(
+                [ConfigurationPass::CONFIGURATION_SERVICE],
+                [ConfigurationPass::PROVIDER]
+            )
+            ->willReturnMap(
+                [
+                    [ConfigurationPass::CONFIGURATION_SERVICE, $configDefinition],
+                    [ConfigurationPass::PROVIDER, $providerDefinition]
+                ]
+            );
         $container->expects($this->once())
             ->method('has')
             ->with(ConfigurationPass::CACHE)

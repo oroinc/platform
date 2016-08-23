@@ -32,7 +32,7 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
         $default = 'default';
 
         $this->configurationProvider->expects($this->once())
-            ->method('getConfiguration')
+            ->method('getFeaturesConfiguration')
             ->willReturn([]);
 
         $this->assertEquals($default, $this->configurationManager->get($feature, $node, $default));
@@ -46,9 +46,34 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
         $value = 'value';
 
         $this->configurationProvider->expects($this->once())
-            ->method('getConfiguration')
+            ->method('getFeaturesConfiguration')
             ->willReturn(['feature' => ['node' => $value]]);
 
         $this->assertEquals($value, $this->configurationManager->get($feature, $node, $default));
+    }
+
+    public function testGetFeaturesByResource()
+    {
+        $resourceType = 'testType';
+        $resource = 'testResource';
+        $features = ['feature1', 'feature2'];
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getResourcesConfiguration')
+            ->willReturn([$resourceType => [$resource =>$features ]]);
+
+        $this->assertEquals($features, $this->configurationManager->getFeaturesByResource($resourceType, $resource));
+    }
+
+    public function testGetFeatureDependencies()
+    {
+        $feature = 'feature3';
+        $dependsOn = ['feature1', 'feature2'];
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getDependenciesConfiguration')
+            ->willReturn([$feature => $dependsOn]);
+
+        $this->assertEquals($dependsOn, $this->configurationManager->getFeatureDependencies($feature));
     }
 }

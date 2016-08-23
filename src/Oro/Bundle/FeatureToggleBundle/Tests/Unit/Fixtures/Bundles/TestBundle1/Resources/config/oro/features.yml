@@ -8,18 +8,6 @@ features:
         route:
             - f1_route1
             - f1_route2
-        workflow:
-            - f1_workflow1
-            - f1_workflow2
-        operation:
-            - f1_operation1
-            - f1_operation2
-        process:
-            - f1_process1
-            - f1_process2
         configuration:
             - config_section1
             - config_leaf1
-        api:
-            - Entity1
-            - Entity2

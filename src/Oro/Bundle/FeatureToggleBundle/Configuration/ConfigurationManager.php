@@ -60,11 +60,42 @@ class ConfigurationManager
      */
     public function get($feature, $node, $default = null)
     {
-        $configuration = $this->configurationProvider->getConfiguration();
+        $configuration = $this->configurationProvider->getFeaturesConfiguration();
         if (array_key_exists($feature, $configuration) && array_key_exists($node, $configuration[$feature])) {
             return $configuration[$feature][$node];
         }
 
         return $default;
+    }
+
+    /**
+     * @param string $resourceType
+     * @param string $resource
+     * @return array
+     */
+    public function getFeaturesByResource($resourceType, $resource)
+    {
+        $configuration = $this->configurationProvider->getResourcesConfiguration();
+        if (array_key_exists($resourceType, $configuration)
+            && array_key_exists($resource, $configuration[$resourceType])
+        ) {
+            return $configuration[$resourceType][$resource];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param string $feature
+     * @return array
+     */
+    public function getFeatureDependencies($feature)
+    {
+        $configuration = $this->configurationProvider->getDependenciesConfiguration();
+        if (array_key_exists($feature, $configuration)) {
+            return $configuration[$feature];
+        }
+
+        return [];
     }
 }
