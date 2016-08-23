@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Mink;
+use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Testwork\Suite\Suite;
 
 class OroElementFactory implements SuiteAwareInterface
@@ -12,6 +13,11 @@ class OroElementFactory implements SuiteAwareInterface
      * @var Mink
      */
     private $mink = null;
+
+    /**
+     * @var SelectorsHandler
+     */
+    private $selectorsHandler;
 
     /**
      * @var array
@@ -24,13 +30,21 @@ class OroElementFactory implements SuiteAwareInterface
     private $suite;
 
     /**
-     * @param Mink  $mink
+     * @var SelectorManipulator
+     */
+    private $selectorManipulator;
+
+    /**
+     * @param Mink $mink
+     * @param SelectorsHandler $selectorsHandler
      * @param array $configuration
      */
-    public function __construct(Mink $mink, array $configuration)
+    public function __construct(Mink $mink, SelectorsHandler $selectorsHandler, array $configuration)
     {
         $this->mink = $mink;
         $this->configuration = $configuration;
+        $this->selectorsHandler = $selectorsHandler;
+        $this->selectorManipulator = new SelectorManipulator();
     }
 
     /**
@@ -44,7 +58,7 @@ class OroElementFactory implements SuiteAwareInterface
     }
 
     /**
-     * @param string $name
+     * @param string $name Element name
      *
      * @return Element
      */
@@ -67,9 +81,10 @@ class OroElementFactory implements SuiteAwareInterface
      * Create specific element by name and common NodeElement object
      * Specific element most commonly has more wide interface than NodeElement
      *
-     * @param string $name
+     * @param string $name Element name
      * @param NodeElement $element
-     * @return NodeElement
+     *
+     * @return Element
      */
     public function wrapElement($name, NodeElement $element)
     {
@@ -93,6 +108,44 @@ class OroElementFactory implements SuiteAwareInterface
     }
 
     /**
+     * @param string $name Element name
+     * @param string $text Text that contains in element node
+     *
+     * @return Element
+     */
+    public function findElementContains($name, $text)
+    {
+        if (!$this->hasElement($name)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not find element with "%s" name',
+                $name
+            ));
+        }
+
+        $elementClass = $this->configuration[$name]['class'];
+        $elementSelector = $this->selectorManipulator->addContainsSuffix(
+            $this->configuration[$name]['selector'],
+            $text
+        );
+
+        $element = new $elementClass($this->mink->getSession(), $this, $elementSelector);
+
+        $this
+            ->injectSuite($element)
+            ->injectOptions($element, $this->configuration[$name]);
+
+        return $element;
+    }
+
+    /**
+     * @return Element
+     */
+    public function getPage()
+    {
+        return new Element($this->mink->getSession(), $this, ['type' => 'xpath', 'locator' => '/html/body']);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setSuite(Suite $suite)
@@ -102,12 +155,31 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param NodeElement $element
+     *
+     * @return $this
      */
     protected function injectSuite(NodeElement $element)
     {
         if ($element instanceof SuiteAwareInterface) {
             $element->setSuite($this->suite);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param Element $element
+     * @param array $elementConfig
+     *
+     * @return $this
+     */
+    protected function injectOptions(Element $element, array $elementConfig)
+    {
+        if (array_key_exists('options', $elementConfig)) {
+            $element->setOptions($elementConfig['options']);
+        }
+
+        return $this;
     }
 
     /**
@@ -122,9 +194,7 @@ class OroElementFactory implements SuiteAwareInterface
         /** @var Element $element */
         $element = new $elementClass($this->mink->getSession(), $this, $elementConfig['selector']);
 
-        if (isset($elementConfig['options'])) {
-            $element->setOptions($elementConfig['options']);
-        }
+        $this->injectOptions($element, $elementConfig);
 
         return $element;
     }
