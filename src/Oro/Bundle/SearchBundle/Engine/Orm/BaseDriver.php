@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
@@ -111,6 +112,74 @@ abstract class BaseDriver
     }
 
     /**
+     * Add text search to qb
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param array                      $searchCondition
+     * @param boolean                    $setOrderBy
+     *
+     * @return string
+     */
+    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
+    {
+        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
+        $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
+
+        // TODO Need to clarify search requirements in scope of CRM-214
+        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
+            $searchString = $this->createContainsStringQuery($index, $useFieldName);
+        } else {
+            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
+        }
+
+        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
+
+        if ($useFieldName) {
+            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
+        }
+
+        if ($setOrderBy) {
+            $this->setTextOrderBy($qb, $index);
+        }
+
+        return '(' . $searchString . ' ) ';
+    }
+
+    /**
+     * @param string $fieldType
+     * @param int    $index
+     *
+     * @return string
+     */
+    public function getJoinAlias($fieldType, $index)
+    {
+        return sprintf('%sField%s', $fieldType, $index);
+    }
+
+    /**
+     * Returns an unique ID hash, used for SQL aliases
+     *
+     * @return string
+     */
+    public function getUniqueId()
+    {
+        return str_replace('.', '_', uniqid('', true));
+    }
+
+    /**
+     * Returning the DQL name of the search attribute entity
+     * for given type.
+     *
+     * @param string $type
+     * @return string
+     */
+    public function getJoinField($type)
+    {
+        return sprintf('search.%sFields', $type);
+    }
+
+    /**
      * @param AbstractPlatform $dbPlatform
      * @param Connection       $connection
      */
@@ -147,41 +216,6 @@ abstract class BaseDriver
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
         return $dbPlatform->getTruncateTableSql($tableName);
-    }
-
-    /**
-     * Add text search to qb
-     *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param array                      $searchCondition
-     * @param boolean                    $setOrderBy
-     *
-     * @return string
-     */
-    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
-    {
-        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
-        $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
-
-        // TODO Need to clarify search requirements in scope of CRM-214
-        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
-            $searchString = $this->createContainsStringQuery($index, $useFieldName);
-        } else {
-            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
-        }
-
-        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
-
-        if ($useFieldName) {
-            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-        }
-
-        if ($setOrderBy) {
-            $this->setTextOrderBy($qb, $index);
-        }
-
-        return '(' . $searchString . ' ) ';
     }
 
     /**
@@ -330,45 +364,60 @@ abstract class BaseDriver
         $qb = $this->createQueryBuilder('search')
             ->select('search as item');
 
-        $this->setFrom($query, $qb);
-
-        $criteria = $query->getCriteria();
-
-        $whereExpression = $criteria->getWhereExpression();
-        if ($whereExpression) {
-            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-            $qb->andWhere($visitor->dispatch($whereExpression));
-        }
+        $this->applySelectToQB($query, $qb);
+        $this->applyFromToQB($query, $qb);
+        $this->applyWhereToQB($query, $qb, $setOrderBy);
 
         if ($setOrderBy) {
-            $this->addOrderBy($query, $qb);
+            $this->applyOrderByToQB($query, $qb);
         }
 
         return $qb;
     }
 
     /**
-     * @param string $fieldType
-     * @param int    $index
+     * Parses and applies the SELECT's columns (if selected)
+     * from the casual query into the search index query.
      *
-     * @return string
+     * @param Query        $query
+     * @param QueryBuilder $qb
      */
-    public function getJoinAlias($fieldType, $index)
+    protected function applySelectToQB(Query $query, QueryBuilder $qb)
     {
-        return sprintf('%sField%s', $fieldType, $index);
+        $selects = $query->getSelect();
+
+        if (empty($selects)) {
+            return;
+        }
+
+        foreach ($selects as $select) {
+            list($type, $name) = Criteria::explodeFieldTypeName($select);
+
+            $uniqIndex = $this->getUniqueId();
+            $joinField = $this->getJoinField($type);
+            $joinAlias = $this->getJoinAlias($type, $uniqIndex);
+
+            $withClause = sprintf('%s.field = :param%s', $joinAlias, $uniqIndex);
+
+            $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
+                ->setParameter('param' . $uniqIndex, $name);
+
+            $qb->addSelect($joinAlias . '.value as ' . $name);
+        }
     }
 
     /**
-     * Set from parameters from search query
+     * Parses and applies the FROM part to the search engine's
+     * query.
      *
      * @param \Oro\Bundle\SearchBundle\Query\Query $query
      * @param \Doctrine\ORM\QueryBuilder           $qb
      */
-    protected function setFrom(Query $query, QueryBuilder $qb)
+    protected function applyFromToQB(Query $query, QueryBuilder $qb)
     {
         $useFrom = true;
         foreach ($query->getFrom() as $from) {
-            if ($from == '*') {
+            if ($from === '*') {
                 $useFrom = false;
             }
         }
@@ -378,12 +427,32 @@ abstract class BaseDriver
     }
 
     /**
-     * Set order by for search query
+     * Parses and applies the WHERE expressions from the DQL
+     * to the search engine's query.
+     *
+     * @param Query        $query
+     * @param QueryBuilder $qb
+     * @param string       $setOrderBy
+     */
+    protected function applyWhereToQB(Query $query, QueryBuilder $qb, $setOrderBy)
+    {
+        $criteria = $query->getCriteria();
+
+        $whereExpression = $criteria->getWhereExpression();
+        if ($whereExpression) {
+            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
+            $qb->andWhere($visitor->dispatch($whereExpression));
+        }
+    }
+
+    /**
+     * Applies the ORDER BY part from the Query to the
+     * search engine's query.
      *
      * @param \Oro\Bundle\SearchBundle\Query\Query $query
      * @param \Doctrine\ORM\QueryBuilder           $qb
      */
-    protected function addOrderBy(Query $query, QueryBuilder $qb)
+    protected function applyOrderByToQB(Query $query, QueryBuilder $qb)
     {
         $orderBy = $query->getCriteria()->getOrderings();
 
@@ -394,6 +463,7 @@ abstract class BaseDriver
             $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
                 ->orderBy('orderTable.value', $direction)
                 ->setParameter('orderField', $fieldName);
+            $qb->addSelect('orderTable.value');
         }
     }
 
