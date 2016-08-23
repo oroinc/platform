@@ -88,27 +88,27 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
 
         return [
             [
-                'applications' => ['backend'],
+                'applications' => ['default'],
                 'token' => $this->createToken($user),
                 'expectedResult' => true
             ],
             [
-                'applications' => ['frontend'],
+                'applications' => ['test'],
                 'token' => $this->createToken($user),
                 'expectedResult' => false
             ],
             [
-                'applications' => ['backend'],
+                'applications' => ['default'],
                 'token' => $this->createToken($otherUser),
                 'expectedResult' => false
             ],
             [
-                'applications' => ['frontend'],
+                'applications' => ['test'],
                 'token' => $this->createToken($otherUser),
                 'expectedResult' => false
             ],
             [
-                'applications' => ['backend'],
+                'applications' => ['default'],
                 'token' => null,
                 'expectedResult' => false
             ],
@@ -128,7 +128,7 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'supported user' => [
                 'token' => $this->createToken(new User()),
-                'expectedResult' => 'backend',
+                'expectedResult' => 'default',
             ],
             'not supported user' => [
                 'token' => $this->createToken('anon.'),
