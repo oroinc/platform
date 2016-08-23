@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\ImportExport\Strategy;
 
-use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
