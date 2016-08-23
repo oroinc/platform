@@ -181,12 +181,11 @@ services:
         tags:
             - { name: layout.data_provider, alias: asset }
 
-    oro_layout.provider.image_filter:
-        class: Oro\Bundle\LayoutBundle\Provider\ImageFilterProvider
+    oro_layout.loader.image_filter:
+        class: Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader
         arguments:
             - '@oro_layout.provider.image_type'
             - '@liip_imagine.filter.configuration'
-            - '@oro_config.global'
             - '@oro_entity.doctrine_helper'
 
 

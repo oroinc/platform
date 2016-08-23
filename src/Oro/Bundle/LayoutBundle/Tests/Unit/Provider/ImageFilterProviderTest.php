@@ -4,13 +4,10 @@ namespace LayoutBundle\Tests\Unit\Provider;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Prophecy\Prophecy\ObjectProphecy;
-
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
-use Oro\Bundle\LayoutBundle\Provider\ImageFilterProvider;
+use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 
 class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
@@ -22,9 +19,9 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
     const SMALL_SIZE = 56;
 
     /**
-     * @var ImageFilterProvider
+     * @var ImageFilterLoader
      */
-    protected $imageFilterProvider;
+    protected $imageFilterLoader;
 
     /**
      * @var ImageTypeProvider
@@ -37,11 +34,6 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
     protected $filterConfig;
 
     /**
-     * @var FilterConfiguration
-     */
-    protected $configManager;
-
-    /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
@@ -50,14 +42,11 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->imageTypeProvider = $this->prophesize(ImageTypeProvider::class);
         $this->filterConfig = $this->prophesize(FilterConfiguration::class);
-        $this->configManager = $this->prophesize(ConfigManager::class);
-        $this->filterConfig = $this->prophesize(FilterConfiguration::class);
         $this->doctrineHelper = $this->prophesize(DoctrineHelper::class);
 
-        $this->imageFilterProvider = new ImageFilterProvider(
+        $this->imageFilterLoader = new ImageFilterLoader(
             $this->imageTypeProvider->reveal(),
             $this->filterConfig->reveal(),
-            $this->configManager->reveal(),
             $this->doctrineHelper->reveal()
         );
     }
@@ -82,7 +71,7 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
             ->set(self::PRODUCT_SMALL, $this->prepareFilterData(self::SMALL_SIZE, self::SMALL_SIZE))
             ->shouldBeCalledTimes(1);
 
-        $this->imageFilterProvider->load();
+        $this->imageFilterLoader->load();
     }
 
     /**
@@ -102,7 +91,7 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
     private function prepareFilterData($width = null, $height = null)
     {
         $filterData = [
-            'quality' => ImageFilterProvider::IMAGE_QUALITY,
+            'quality' => ImageFilterLoader::IMAGE_QUALITY,
             'filters' => [
                 'strip' => []
             ]
@@ -115,12 +104,12 @@ class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
                     'filters' => [
                         'thumbnail' => [
                             'size' => [$width, $height],
-                            'mode' => ImageFilterProvider::RESIZE_MODE,
+                            'mode' => ImageFilterLoader::RESIZE_MODE,
                             'allow_upscale' => true
                         ],
                         'background' => [
                             'size' => [$width, $height],
-                            'color' => ImageFilterProvider::BACKGROUND_COLOR
+                            'color' => ImageFilterLoader::BACKGROUND_COLOR
                         ]
                     ]
                 ]

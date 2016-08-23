@@ -105,7 +105,7 @@ class FileController extends Controller
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
         $customResolver = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
-        $this->get('oro_layout.provider.image_filter')->load();
+        $this->get('oro_layout.loader.image_filter')->load();
         $image = $this->get('oro_attachment.image_factory')->createImage(
             $this->get('oro_attachment.file_manager')->getContent($file),
             $filter

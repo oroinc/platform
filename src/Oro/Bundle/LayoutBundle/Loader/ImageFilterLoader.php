@@ -1,20 +1,20 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Provider;
+namespace Oro\Bundle\LayoutBundle\Loader;
 
 use Imagine\Image\ImageInterface;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
+use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
+use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 
 /**
  * Load dimensions from theme config to LiipImagine filters
  */
-class ImageFilterProvider
+class ImageFilterLoader
 {
     const IMAGE_QUALITY = 95;
     const BACKGROUND_COLOR = '#fff';
@@ -26,27 +26,24 @@ class ImageFilterProvider
     /** @var FilterConfiguration */
     protected $filterConfiguration;
 
-    /** @var  ConfigManager */
-    protected $configManager;
-
     /** @var  DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var CustomImageFilterProviderInterface[]  */
+    protected $customFilterProviders = [];
 
     /**
      * @param ImageTypeProvider $imageTypeProvider
      * @param FilterConfiguration $filterConfiguration
-     * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ImageTypeProvider $imageTypeProvider,
         FilterConfiguration $filterConfiguration,
-        ConfigManager $configManager,
         DoctrineHelper $doctrineHelper
     ) {
         $this->imageTypeProvider = $imageTypeProvider;
         $this->filterConfiguration = $filterConfiguration;
-        $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -59,6 +56,14 @@ class ImageFilterProvider
                 $this->buildFilterFromDimension($dimension)
             );
         }
+    }
+
+    /**
+     * @param CustomImageFilterProviderInterface $provider
+     */
+    public function addCustomImageFilterProvider(CustomImageFilterProviderInterface $provider)
+    {
+        $this->customFilterProviders[] = $provider;
     }
 
     /**
@@ -92,7 +97,9 @@ class ImageFilterProvider
             ]
         ];
 
-        $filterSettings = array_merge_recursive($filterSettings, $this->getWatermarkFilterSettings());
+        foreach ($this->customFilterProviders as $provider) {
+            $filterSettings = array_merge_recursive($filterSettings, $provider->getFilterConfig());
+        }
 
         if ($withResize) {
             $filterSettings = array_merge_recursive(
@@ -114,38 +121,5 @@ class ImageFilterProvider
         }
 
         return $filterSettings;
-    }
-
-    /**
-     * @return array
-     */
-    private function getWatermarkFilterSettings()
-    {
-        $config = [];
-        $fileConfigKey = 'orob2b_product.product_image_watermark_file';
-        $sizeConfigKey = 'orob2b_product.product_image_watermark_size';
-        $positionConfigKey = 'orob2b_product.product_image_watermark_position';
-
-        $imageId = $this->configManager->get($fileConfigKey);
-        $size = $this->configManager->get($sizeConfigKey);
-        $position = $this->configManager->get($positionConfigKey);
-
-        if ($imageId) {
-            /** @var File $image */
-            $image = $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($imageId);
-            $filePath = 'attachment/' . $image->getFilename();
-
-            $config = [
-                'filters' => [
-                    'watermark' => [
-                        'image' => $filePath,
-                        'size' => round($size / 100, 2),
-                        'position' => $position
-                    ]
-                ]
-            ];
-        }
-
-        return $config;
     }
 }
