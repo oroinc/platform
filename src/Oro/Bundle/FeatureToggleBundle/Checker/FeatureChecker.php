@@ -60,7 +60,7 @@ class FeatureChecker
     public function __construct(
         ConfigurationManager $configManager,
         array $voters = [],
-        $strategy = self::STRATEGY_AFFIRMATIVE,
+        $strategy = self::STRATEGY_UNANIMOUS,
         $allowIfAllAbstainDecisions = false,
         $allowIfEqualGrantedDeniedDecisions = true
     ) {
@@ -75,8 +75,7 @@ class FeatureChecker
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
     }
-
-
+    
     /**
      * Configures the voters.
      *
