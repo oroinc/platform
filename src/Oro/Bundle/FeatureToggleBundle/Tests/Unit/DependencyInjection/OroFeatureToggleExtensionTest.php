@@ -18,14 +18,6 @@ class OroFeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $config = [
-            'oro_featuretoggle' => [
-                'strategy' => FeatureChecker::STRATEGY_CONSENSUS,
-                'allow_if_all_abstain' => true,
-                'allow_if_equal_granted_denied' =>false
-            ],
-        ];
-
         /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $featureChecker */
         $featureCheckerDefinition = $this->getMockBuilder(Definition::class)
             ->disableOriginalConstructor()
@@ -36,14 +28,15 @@ class OroFeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturnSelf();
         $featureCheckerDefinition->expects($this->at(0))
             ->method('addArgument')
-            ->with($config['oro_featuretoggle']['strategy']);
+            ->with(FeatureChecker::STRATEGY_UNANIMOUS);
         $featureCheckerDefinition->expects($this->at(1))
             ->method('addArgument')
-            ->with($config['oro_featuretoggle']['allow_if_all_abstain']);
+            ->with(false);
         $featureCheckerDefinition->expects($this->at(2))
             ->method('addArgument')
-            ->with($config['oro_featuretoggle']['allow_if_equal_granted_denied']);
+            ->with(true);
 
+        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -53,6 +46,6 @@ class OroFeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($featureCheckerDefinition);
 
         $extension = new OroFeatureToggleExtension();
-        $extension->load($config, $container);
+        $extension->load([], $container);
     }
 }

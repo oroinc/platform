@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
                         FeatureChecker::STRATEGY_CONSENSUS,
                         FeatureChecker::STRATEGY_UNANIMOUS
                     ])
-                    ->defaultValue(FeatureChecker::STRATEGY_AFFIRMATIVE)
+                    ->defaultValue(FeatureChecker::STRATEGY_UNANIMOUS)
                 ->end()
                 ->booleanNode('allow_if_all_abstain')
                     ->defaultFalse()

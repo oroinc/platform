@@ -39,6 +39,11 @@ class FeatureChecker
     /**
      * @var array
      */
+    protected $featuresStates = [];
+
+    /**
+     * @var array
+     */
     protected $supportedStrategies = [
         self::STRATEGY_AFFIRMATIVE,
         self::STRATEGY_CONSENSUS,
@@ -89,19 +94,13 @@ class FeatureChecker
      */
     public function isFeatureEnabled($feature, $scopeIdentifier = null)
     {
-        if (!$this->check($feature, $scopeIdentifier)) {
-            return false;
+        if (!empty($this->featuresStates) && isset($this->featuresStates[$feature])) {
+            return $$this->featuresStates[$feature];
         }
 
-        // If one of depend on feature is disabled mark feature as disabled
-        $dependOnFeatures = $this->configManager->getFeatureDependencies($feature);
-        foreach ($dependOnFeatures as $feature) {
-            if (!$this->check($feature, $scopeIdentifier)) {
-                return false;
-            }
-        }
+        $this->featuresStates[$feature] = $this->checkFeatureState($feature, $scopeIdentifier);
 
-        return true;
+        return $this->featuresStates[$feature];
     }
 
     /**
@@ -116,6 +115,28 @@ class FeatureChecker
 
         foreach ($features as $feature) {
             if (!$this->check($feature, $scopeIdentifier)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $feature
+     * @param null $scopeIdentifier
+     * @return bool
+     */
+    protected function checkFeatureState($feature, $scopeIdentifier = null)
+    {
+        if (!$this->check($feature, $scopeIdentifier)) {
+            return false;
+        }
+
+        // If one of depend on feature is disabled mark feature as disabled
+        $dependOnFeatures = $this->configManager->getFeatureDependencies($feature);
+        foreach ($dependOnFeatures as $dependOnFeature) {
+            if (!$this->check($dependOnFeature, $scopeIdentifier)) {
                 return false;
             }
         }
