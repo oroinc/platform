@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class OroFeatureToggleExtensionTest extends ExtensionTestCase
+class OroFeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * Test Get Alias
-     */
     public function testGetAlias()
     {
         $extension = new OroFeatureToggleExtension();
@@ -21,8 +19,8 @@ class OroFeatureToggleExtensionTest extends ExtensionTestCase
     public function testLoad()
     {
         $config = [
-            'feature_checker' => [
-                'strategy' => 'some_strategy',
+            'oro_featuretoggle' => [
+                'strategy' => FeatureChecker::STRATEGY_CONSENSUS,
                 'allow_if_all_abstain' => true,
                 'allow_if_equal_granted_denied' =>false
             ],
@@ -33,22 +31,28 @@ class OroFeatureToggleExtensionTest extends ExtensionTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $featureCheckerDefinition
+            ->method('addArgument')
+            ->willReturnSelf();
         $featureCheckerDefinition->expects($this->at(0))
             ->method('addArgument')
-            ->with($config['feature_checker']['strategy']);
+            ->with($config['oro_featuretoggle']['strategy']);
         $featureCheckerDefinition->expects($this->at(1))
             ->method('addArgument')
-            ->with($config['feature_checker']['allow_if_all_abstain']);
+            ->with($config['oro_featuretoggle']['allow_if_all_abstain']);
         $featureCheckerDefinition->expects($this->at(2))
             ->method('addArgument')
-            ->with($config['feature_checker']['allow_if_equal_granted_denied']);
+            ->with($config['oro_featuretoggle']['allow_if_equal_granted_denied']);
 
-        $container = $this->getContainerMock();
+        $container = $this->getMockBuilder(ContainerBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $container->expects($this->once())
             ->method('getDefinition')
             ->with('oro_featuretoggle.checker.feature_checker')
             ->willReturn($featureCheckerDefinition);
 
-        $this->loadExtension(new OroFeatureToggleExtension(), $config);
+        $extension = new OroFeatureToggleExtension();
+        $extension->load($config, $container);
     }
 }

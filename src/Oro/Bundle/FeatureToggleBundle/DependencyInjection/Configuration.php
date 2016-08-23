@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->enumNode('oro_featuretoggle_strategy')
+                ->enumNode('strategy')
                     ->values([
                         FeatureChecker::STRATEGY_AFFIRMATIVE,
                         FeatureChecker::STRATEGY_CONSENSUS,
@@ -26,10 +26,10 @@ class Configuration implements ConfigurationInterface
                     ])
                     ->defaultValue(FeatureChecker::STRATEGY_AFFIRMATIVE)
                 ->end()
-                ->booleanNode('oro_featuretoggle_allow_if_all_abstain')
+                ->booleanNode('allow_if_all_abstain')
                     ->defaultFalse()
                 ->end()
-                ->booleanNode('oro_featuretoggle_allow_if_equal_granted_denied')
+                ->booleanNode('allow_if_equal_granted_denied')
                     ->defaultTrue()
                 ->end()
             ->end();

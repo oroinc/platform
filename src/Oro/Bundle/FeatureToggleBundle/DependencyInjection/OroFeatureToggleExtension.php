@@ -25,9 +25,9 @@ class OroFeatureToggleExtension extends Extension
 
         $container
             ->getDefinition('oro_featuretoggle.checker.feature_checker')
-            ->addArgument($config['oro_featuretoggle_strategy'])
-            ->addArgument($config['oro_featuretoggle_allow_if_all_abstain'])
-            ->addArgument($config['oro_featuretoggle_allow_if_equal_granted_denied'])
+            ->addArgument($config['strategy'])
+            ->addArgument($config['allow_if_all_abstain'])
+            ->addArgument($config['allow_if_equal_granted_denied'])
         ;
     }
 
