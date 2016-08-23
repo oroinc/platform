@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Filter;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Filter\SearchStringFilter;
 use Oro\Bundle\SearchBundle\Query\Query;
-use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,6 +60,5 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
             ->with('foo', Query::OPERATOR_EQUALS, 'bar');
 
         $this->filter->apply($ds, ['type' => TextFilterType::TYPE_EQUAL, 'value' => 'bar']);
-
     }
 }
