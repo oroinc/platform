@@ -55,7 +55,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'description',
-                'textarea',
+                'oro_resizeable_rich_text',
                 ['required' => false, 'label' => 'oro.calendar.calendarevent.description.label']
             )
             ->will($this->returnSelf());
