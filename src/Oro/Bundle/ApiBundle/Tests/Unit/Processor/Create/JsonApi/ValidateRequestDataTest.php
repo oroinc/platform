@@ -97,7 +97,6 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['type' => 'test', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property of the primary data object should match the requested resource',
                 '/data/type',
-                409
             ],
             [
                 ['data' => ['type' => 'products']],
