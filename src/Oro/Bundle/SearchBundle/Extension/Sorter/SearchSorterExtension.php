@@ -10,7 +10,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
-use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
 
 class SearchSorterExtension extends AbstractExtension
 {
