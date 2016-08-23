@@ -6,7 +6,6 @@ use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationProvider
 {
@@ -27,6 +26,11 @@ class ConfigurationProvider
     protected $kernelBundles;
 
     /**
+     * @var FeatureToggleConfiguration
+     */
+    protected $configuration;
+
+    /**
      * @var CacheProvider
      */
     protected $cache;
@@ -34,15 +38,18 @@ class ConfigurationProvider
     /**
      * @param array $rawConfiguration
      * @param array $kernelBundles
+     * @param FeatureToggleConfiguration $configuration
      * @param CacheProvider $cache
      */
     public function __construct(
         array $rawConfiguration,
         array $kernelBundles,
+        FeatureToggleConfiguration $configuration,
         CacheProvider $cache
     ) {
         $this->rawConfiguration = $rawConfiguration;
         $this->kernelBundles = array_values($kernelBundles);
+        $this->configuration = $configuration;
         $this->cache = $cache;
     }
 
@@ -109,15 +116,10 @@ class ConfigurationProvider
      */
     protected function resolveConfiguration()
     {
-        $merger = new ConfigurationMerger($this->kernelBundles);
-        $configs = $merger->mergeConfiguration($this->rawConfiguration);
         $data = [];
-
+        $configs = $this->getMergedConfigs();
         if (count($configs) > 0) {
-            $processor = new Processor();
-            $configuration = new FeatureToggleConfiguration();
-
-            $data[self::FEATURES] = $processor->processConfiguration($configuration, [$configs]);
+            $data[self::FEATURES] = $this->configuration->processConfiguration($configs);
             $data[self::INTERNAL][self::DEPENDENCIES] = $this->resolveDependencies($data[self::FEATURES]);
             $data[self::INTERNAL][self::BY_RESOURCE] = $this->resolveResources($data[self::FEATURES]);
         }
@@ -193,5 +195,15 @@ class ConfigurationProvider
         }
 
         return $dependsOnFeatures;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getMergedConfigs()
+    {
+        $merger = new ConfigurationMerger($this->kernelBundles);
+
+        return $merger->mergeConfiguration($this->rawConfiguration);
     }
 }

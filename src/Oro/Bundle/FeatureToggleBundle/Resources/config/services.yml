@@ -10,6 +10,7 @@ services:
         arguments:
             - []
             - '%kernel.bundles%'
+            - '@oro_featuretoggle.configuration'
             - '@oro_featuretoggle.cache.provider.features'
 
     oro_featuretoggle.cache.clearer:
@@ -27,3 +28,6 @@ services:
             - '@oro_featuretoggle.configuration.provider'
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_featuretoggle.configuration:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'

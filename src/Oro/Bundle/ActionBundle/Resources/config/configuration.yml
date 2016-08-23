@@ -49,3 +49,8 @@ services:
         class: %oro_action.configuration_pass.replace_property_path.class%
         arguments:
             - "data"
+
+    oro_action.config_extension.feature:
+        class: 'Oro\Bundle\ActionBundle\Configuration\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }

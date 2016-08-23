@@ -37,11 +37,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Feature 1 Label',
                 'dependency' => [],
                 'route' => [],
-                'workflow' => [],
-                'operation' => [],
-                'process' => [],
-                'configuration' => [],
-                'api' => []
+                'configuration' => []
             ]
         ];
 
@@ -56,11 +52,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Feature 1 Label',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
-                'workflow' => ['feature_workflow_one', 'feature_workflow_two'],
-                'operation' => ['feature_operation'],
-                'process' => ['feature_process'],
-                'configuration' => ['oro_feature', 'oro_another'],
-                'api' => ['Oro\FeatureBundle\Entity\SomeEntity']
+                'configuration' => ['oro_feature', 'oro_another']
             ],
         ];
 
@@ -70,11 +62,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Feature 1 Label',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
-                'workflow' => ['feature_workflow_one', 'feature_workflow_two'],
-                'operation' => ['feature_operation'],
-                'process' => ['feature_process'],
-                'configuration' => ['oro_feature', 'oro_another'],
-                'api' => ['Oro\FeatureBundle\Entity\SomeEntity']
+                'configuration' => ['oro_feature', 'oro_another']
             ]
         ];
 
@@ -157,39 +145,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'Invalid type for path "features.feature1.route". ' .
                     'Expected array, but got string'
             ],
-            'incorrect workflow' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'workflow' => 'not_array'
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.workflow". ' .
-                    'Expected array, but got string'
-            ],
-            'incorrect operation' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'operation' => 'not_array'
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.operation". ' .
-                    'Expected array, but got string'
-            ],
-            'incorrect process' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'process' => ''
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.process". ' .
-                    'Expected array, but got string'
-            ],
             'incorrect configuration' => [
                 'input' => [
                     'feature1' => [
@@ -200,18 +155,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'Invalid type for path "features.feature1.configuration". ' .
                     'Expected array, but got integer'
-            ],
-            'incorrect api' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'api' => 'not_array'
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.api". ' .
-                    'Expected array, but got string'
-            ],
+            ]
         ];
     }
 

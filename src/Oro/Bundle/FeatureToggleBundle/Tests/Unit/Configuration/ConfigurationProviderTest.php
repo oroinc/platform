@@ -19,10 +19,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testWarmUpCache(array $configuration, array $bundles, array $mergedConfiguration)
     {
+        $config = new FeatureToggleConfiguration();
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
+            $config,
             $cache
         );
 
@@ -38,10 +40,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testClearCache()
     {
+        $config = new FeatureToggleConfiguration();
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             [],
             [],
+            $config,
             $cache
         );
 
@@ -62,10 +66,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $bundles,
         array $mergedConfiguration
     ) {
+        $config = new FeatureToggleConfiguration();
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
+            $config,
             $cache
         );
 
@@ -95,10 +101,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $bundles,
         array $mergedConfiguration
     ) {
+        $config = new FeatureToggleConfiguration();
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
+            $config,
             $cache
         );
 
@@ -123,10 +131,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         array $bundles,
         array $mergedConfiguration
     ) {
+        $config = new FeatureToggleConfiguration();
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
+            $config,
             $cache
         );
 
@@ -155,29 +165,31 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                 'feature1' => [
                     'label' => 'Feature 1',
                     'toggle' => 'toggle1',
-                    'dependency' => ['feature2']
+                    'dependency' => ['feature2'],
                 ],
                 'feature2' => [
                     'label' => 'Feature 2',
                     'toggle' => 'toggle2',
-                    'dependency' => ['feature3']
+                    'dependency' => ['feature3'],
                 ],
                 'feature3' => [
                     'label' => 'Feature 3',
                     'toggle' => 'toggle3',
-                    'dependency' => ['feature1']
-                ]
-            ]
+                    'dependency' => ['feature1'],
+                ],
+            ],
         ];
         $bundles = [TestBundle1::class];
 
         $this->setExpectedException(CircularReferenceException::class);
 
         $ignoreCache = true;
+        $config = new FeatureToggleConfiguration();
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
+            $config,
             $cache
         );
         $configurationProvider->getDependenciesConfiguration($ignoreCache);
@@ -190,31 +202,32 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                 'feature1' => [
                     'label' => 'Feature 1',
                     'toggle' => 'toggle1',
-                    'dependency' => ['feature2']
+                    'dependency' => ['feature2'],
                 ],
                 'feature2' => [
                     'label' => 'Feature 2',
                     'toggle' => 'toggle2',
-                    'dependency' => ['feature1']
-                ]
-            ]
+                    'dependency' => ['feature1'],
+                ],
+            ],
         ];
         $bundles = [TestBundle1::class];
 
         $this->setExpectedException(CircularReferenceException::class);
 
         $ignoreCache = true;
+        $config = new FeatureToggleConfiguration();
         $cache = $this->getMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
+            $config,
             $cache
         );
         $configurationProvider->getDependenciesConfiguration($ignoreCache);
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function configurationDataProvider()
@@ -229,31 +242,20 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'description' => 'Description 1',
                             'dependency' => ['feature2'],
                             'route' => ['f1_route1', 'f1_route2'],
-                            'workflow' => ['f1_workflow1', 'f1_workflow2'],
-                            'operation' => ['f1_operation1', 'f1_operation2'],
-                            'process' => ['f1_process1', 'f1_process2'],
-                            'configuration' => ['config_section1', 'config_leaf1'],
-                            'api' => ['Entity1', 'Entity2'],
+                            'configuration' => ['config_section1', 'config_leaf1']
                         ],
                     ],
                     TestBundle2::class => [
                         'feature1' => [
                             'toggle' => 'changed_toggle',
                             'route' => ['f1_route3'],
-                            'workflow' => ['f1_workflow3'],
-                            'operation' => ['f1_operation3'],
-                            'process' => ['f1_process3'],
-                            'configuration' => ['config_leaf2'],
-                            'api' => ['Entity3', 'Entity4'],
+                            'configuration' => ['config_leaf2']
                         ],
                         'feature2' => [
                             'label' => 'Feature 2',
                             'toggle' => 'toggle2',
                             'route' => ['f1_route3'],
-                            'workflow' => ['f1_workflow3'],
-                            'operation' => ['f1_operation3'],
-                            'process' => ['f1_process3'],
-                            'configuration' => ['config_leaf2'],
+                            'configuration' => ['config_leaf2']
                         ],
                         'feature3' => [
                             'label' => 'Feature 3',
@@ -271,33 +273,21 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'description' => 'Description 1',
                             'dependency' => ['feature2'],
                             'route' => ['f1_route1', 'f1_route2', 'f1_route3'],
-                            'workflow' => ['f1_workflow1', 'f1_workflow2', 'f1_workflow3'],
-                            'operation' => ['f1_operation1', 'f1_operation2', 'f1_operation3'],
-                            'process' => ['f1_process1', 'f1_process2', 'f1_process3'],
-                            'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
-                            'api' => ['Entity1', 'Entity2', 'Entity3', 'Entity4'],
+                            'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2']
                         ],
                         'feature2' => [
                             'label' => 'Feature 2',
                             'toggle' => 'toggle2',
                             'dependency' => [],
                             'route' => ['f1_route3'],
-                            'workflow' => ['f1_workflow3'],
-                            'operation' => ['f1_operation3'],
-                            'process' => ['f1_process3'],
-                            'configuration' => ['config_leaf2'],
-                            'api' => [],
+                            'configuration' => ['config_leaf2']
                         ],
                         'feature3' => [
                             'label' => 'Feature 3',
                             'toggle' => 'toggle3',
                             'dependency' => ['feature1'],
                             'route' => [],
-                            'workflow' => [],
-                            'operation' => [],
-                            'process' => [],
-                            'configuration' => [],
-                            'api' => [],
+                            'configuration' => []
                         ],
                     ],
                     ConfigurationProvider::INTERNAL => [
@@ -307,32 +297,11 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                                 'f1_route2' => ['feature1'],
                                 'f1_route3' => ['feature1', 'feature2'],
                             ],
-                            'workflow' => [
-                                'f1_workflow1' => ['feature1'],
-                                'f1_workflow2' => ['feature1'],
-                                'f1_workflow3' => ['feature1', 'feature2'],
-                            ],
-                            'operation' => [
-                                'f1_operation1' => ['feature1'],
-                                'f1_operation2' => ['feature1'],
-                                'f1_operation3' => ['feature1', 'feature2'],
-                            ],
-                            'process' => [
-                                'f1_process1' => ['feature1'],
-                                'f1_process2' => ['feature1'],
-                                'f1_process3' => ['feature1', 'feature2'],
-                            ],
                             'configuration' => [
                                 'config_section1' => ['feature1'],
                                 'config_leaf1' => ['feature1'],
                                 'config_leaf2' => ['feature1', 'feature2'],
-                            ],
-                            'api' => [
-                                'Entity1' => ['feature1'],
-                                'Entity2' => ['feature1'],
-                                'Entity3' => ['feature1'],
-                                'Entity4' => ['feature1'],
-                            ],
+                            ]
                         ],
                         ConfigurationProvider::DEPENDENCIES => [
                             'feature1' => ['feature2'],

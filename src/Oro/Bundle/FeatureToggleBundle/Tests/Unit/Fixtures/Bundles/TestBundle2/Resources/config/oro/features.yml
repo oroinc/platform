@@ -3,17 +3,8 @@ features:
         toggle: changed_toggle
         route:
             - f1_route3
-        workflow:
-            - f1_workflow3
-        operation:
-            - f1_operation3
-        process:
-            - f1_process3
         configuration:
             - config_leaf2
-        api:
-            - Entity3
-            - Entity4
 
     feature2:
         label: "Feature 2"

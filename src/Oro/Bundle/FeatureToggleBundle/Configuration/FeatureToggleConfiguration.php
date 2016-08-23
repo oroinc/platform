@@ -2,12 +2,28 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 
 class FeatureToggleConfiguration implements ConfigurationInterface
 {
     const ROOT = 'features';
+
+    /**
+     * @var array|ConfigurationExtensionInterface[]
+     */
+    protected $extensions = [];
+
+    /**
+     * @param ConfigurationExtensionInterface $extension
+     */
+    public function addExtension(ConfigurationExtensionInterface $extension)
+    {
+        $this->extensions[] = $extension;
+    }
 
     /**
      * {@inheritdoc}
@@ -21,7 +37,22 @@ class FeatureToggleConfiguration implements ConfigurationInterface
 
         $root->end();
 
-        $children
+        $this->addFeatureConfiguration($children);
+        foreach ($this->extensions as $extension) {
+            $extension->extendConfigurationTree($children);
+        }
+
+        $children->end();
+
+        return $builder;
+    }
+
+    /**
+     * @param ArrayNode $node
+     */
+    protected function addFeatureConfiguration(NodeBuilder $node)
+    {
+        $node
             ->scalarNode('toggle')
                 ->isRequired()
                 ->cannotBeEmpty()
@@ -40,28 +71,20 @@ class FeatureToggleConfiguration implements ConfigurationInterface
                 ->prototype('variable')
                 ->end()
             ->end()
-            ->arrayNode('workflow')
-                ->prototype('variable')
-                ->end()
-            ->end()
-            ->arrayNode('operation')
-                ->prototype('variable')
-                ->end()
-            ->end()
-            ->arrayNode('process')
-                ->prototype('variable')
-                ->end()
-            ->end()
             ->arrayNode('configuration')
                 ->prototype('variable')
                 ->end()
-            ->end()
-            ->arrayNode('api')
-                ->prototype('variable')
-                ->end()
-            ->end()
-        ->end();
+            ->end();
+    }
 
-        return $builder;
+    /**
+     * @param array $configs
+     * @return array
+     */
+    public function processConfiguration(array $configs)
+    {
+        $processor = new Processor();
+
+        return $processor->processConfiguration($this, [$configs]);
     }
 }

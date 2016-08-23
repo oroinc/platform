@@ -87,3 +87,9 @@ services:
 
     oro_workflow.configuration.builder.process_configuration:
         class: %oro_workflow.configuration.builder.process_configuration.class%
+
+    oro_workflow.config_extension.feature:
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }
+
