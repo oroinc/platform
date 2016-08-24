@@ -9,7 +9,7 @@ use Symfony\Component\Process\Process;
 abstract class AbstractDbDumper implements DumperInterface
 {
     /** The max runtime for a process in seconds */
-    const TIMEOUT = 30;
+    const TIMEOUT = 60;
 
     /** @var string */
     protected $dbHost;
