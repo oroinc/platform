@@ -88,7 +88,7 @@ class FeatureChecker
 
     /**
      * @param string $feature
-     * @param int|null $scopeIdentifier
+     * @param object|int|null $scopeIdentifier
      * @return bool
      */
     public function isFeatureEnabled($feature, $scopeIdentifier = null)
@@ -111,7 +111,7 @@ class FeatureChecker
     /**
      * @param string $resource
      * @param string $resourceType
-     * @param null $scopeIdentifier
+     * @param object|int|null $scopeIdentifier
      * @return bool
      */
     public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
@@ -129,7 +129,7 @@ class FeatureChecker
 
     /**
      * @param string $feature
-     * @param null $scopeIdentifier
+     * @param object|int|null $scopeIdentifier
      * @return bool
      */
     protected function checkFeatureState($feature, $scopeIdentifier = null)
@@ -145,7 +145,7 @@ class FeatureChecker
 
     /**
      * @param string $feature
-     * @param int|null $scopeIdentifier
+     * @param object|int|null $scopeIdentifier
      * @return bool
      */
     protected function check($feature, $scopeIdentifier = null)
@@ -167,7 +167,7 @@ class FeatureChecker
 
     /**
      * @param string $feature
-     * @param int|null $scopeIdentifier
+     * @param object|int|null $scopeIdentifier
      * @return bool
      */
     protected function checkAffirmativeStrategy($feature, $scopeIdentifier = null)
@@ -199,7 +199,7 @@ class FeatureChecker
 
     /**
      * @param string $feature
-     * @param int|null $scopeIdentifier
+     * @param object|int|null $scopeIdentifier
      * @return bool
      */
     protected function checkConsensusStrategy($feature, $scopeIdentifier = null)
@@ -239,7 +239,7 @@ class FeatureChecker
     
     /**
      * @param $feature
-     * @param int|null $scopeIdentifier
+     * @param object|int|null $scopeIdentifier
      * @return bool
      */
     protected function checkUnanimousStrategy($feature, $scopeIdentifier = null)

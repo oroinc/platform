@@ -26,13 +26,9 @@ class RequestListener
      */
     public function onRequest(GetResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $request = $event->getRequest();
         $route = $request->get('_route');
-        if (!$this->featureChecker->isResourceEnabled($route, 'route', 'website')) {
+        if (!$this->featureChecker->isResourceEnabled($route, 'route')) {
             $response = new Response('This feature is disabled', Response::HTTP_NOT_FOUND);
             $event->setResponse($response);
         }

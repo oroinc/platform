@@ -21,7 +21,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class);
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();
         $this->listener = new RequestListener($this->featureChecker);
     }
 
@@ -30,7 +30,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->featureChecker
             ->expects($this->once())
             ->method('isResourceEnabled')
-            ->with('oro_login', 'route', 'website')
+            ->with('oro_login', 'route')
             ->willReturn(false);
 
         $request = $this->getMock(Request::class);
@@ -48,7 +48,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->featureChecker
             ->expects($this->once())
             ->method('isResourceEnabled')
-            ->with('oro_login', 'route', 'website')
+            ->with('oro_login', 'route')
             ->willReturn(true);
 
         $request = $this->getMock(Request::class);
