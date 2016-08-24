@@ -81,7 +81,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                         return true;
                     }
 
-                    return in_array('backend', $operation->getDefinition()->getApplications(), true);
+                    return in_array('default', $operation->getDefinition()->getApplications(), true);
                 }
             );
 
@@ -330,7 +330,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ],
             'operation3' => [
                 'label' => 'Label3',
-                'applications' => ['frontend'],
+                'applications' => ['commerce'],
                 'groups' => ['group1'],
                 'entities' => [
                     'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
@@ -391,7 +391,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ],
             'operation12' => [
                 'label' => 'Label12',
-                'applications' => ['backend'],
+                'applications' => ['default'],
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
             ],
             'operation13' => [

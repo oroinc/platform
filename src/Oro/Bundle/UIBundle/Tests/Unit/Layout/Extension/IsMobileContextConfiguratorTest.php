@@ -4,28 +4,38 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator;
+use Oro\Bundle\UIBundle\Layout\Extension\IsMobileContextConfigurator;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
+use Oro\Bundle\UIBundle\Provider\UserAgent;
+
 use Oro\Component\Layout\ContextInterface;
 
-class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var UserAgentContextConfigurator
+     * @var IsMobileContextConfigurator
      */
-    protected $userAgentContextConfigurator;
+    protected $isMobileContextConfigurator;
 
     /**
      * @var UserAgentProvider|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $userAgentProvider;
 
+    /**
+     * @var UserAgent|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $userAgent;
+
     public function setUp()
     {
         $this->userAgentProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgentProvider')
             ->disableOriginalConstructor()->getMock();
 
-        $this->userAgentContextConfigurator = new UserAgentContextConfigurator($this->userAgentProvider);
+        $this->userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->isMobileContextConfigurator = new IsMobileContextConfigurator($this->userAgentProvider);
     }
 
     public function testConfigureContext()
@@ -34,12 +44,12 @@ class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $optionResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $optionResolver->expects($this->once())
             ->method('setRequired')
-            ->with(['user_agent'])
+            ->with(['is_mobile'])
             ->willReturn($optionResolver);
 
         $optionResolver->expects($this->once())
             ->method('setAllowedTypes')
-            ->with(['user_agent' => ['Oro\Bundle\UIBundle\Provider\UserAgentInterface']])
+            ->with(['is_mobile' => ['boolean']])
             ->willReturn($optionResolver);
 
         /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
@@ -48,16 +58,20 @@ class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
             ->method('getResolver')
             ->willReturn($optionResolver);
 
-        $userAgent = 'safari';
+        $isMobile = true;
+
+        $this->userAgent->expects($this->once())
+            ->method('isMobile')
+            ->willReturn($isMobile);
 
         $this->userAgentProvider->expects($this->once())
             ->method('getUserAgent')
-            ->willReturn($userAgent);
+            ->willReturn($this->userAgent);
 
         $context->expects($this->once())
             ->method('set')
-            ->with('user_agent', $userAgent);
+            ->with('is_mobile', $isMobile);
 
-        $this->userAgentContextConfigurator->configureContext($context);
+        $this->isMobileContextConfigurator->configureContext($context);
     }
 }
