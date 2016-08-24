@@ -2,37 +2,56 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Oro\Bundle\ActionBundle\Configuration\ConfigurationDefinitionInterface;
-
-use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 
-class FeatureToggleConfiguration implements ConfigurationDefinitionInterface
+class FeatureToggleConfiguration implements ConfigurationInterface
 {
-    /**
-     * @param array $configs
-     * @return array
-     */
-    public function processConfiguration(array $configs)
-    {
-        $processor = new Processor();
+    const ROOT = 'features';
 
-        return $processor->processConfiguration($this, [$configs]);
+    /**
+     * @var array|ConfigurationExtensionInterface[]
+     */
+    protected $extensions = [];
+
+    /**
+     * @param ConfigurationExtensionInterface $extension
+     */
+    public function addExtension(ConfigurationExtensionInterface $extension)
+    {
+        $this->extensions[] = $extension;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root('features');
+        $root = $builder->root(self::ROOT);
 
         $children = $root->useAttributeAsKey('name')->prototype('array')->children();
 
         $root->end();
 
-        $children
+        $this->addFeatureConfiguration($children);
+        foreach ($this->extensions as $extension) {
+            $extension->extendConfigurationTree($children);
+        }
+
+        $children->end();
+
+        return $builder;
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    protected function addFeatureConfiguration(NodeBuilder $node)
+    {
+        $node
             ->scalarNode('toggle')
                 ->isRequired()
                 ->cannotBeEmpty()
@@ -43,9 +62,6 @@ class FeatureToggleConfiguration implements ConfigurationDefinitionInterface
             ->end()
             ->scalarNode('description')
             ->end()
-            ->scalarNode('strategy')
-                ->defaultValue('unanimous')
-            ->end()
             ->arrayNode('dependency')
                 ->prototype('variable')
                 ->end()
@@ -54,28 +70,20 @@ class FeatureToggleConfiguration implements ConfigurationDefinitionInterface
                 ->prototype('variable')
                 ->end()
             ->end()
-            ->arrayNode('workflow')
-                ->prototype('variable')
-                ->end()
-            ->end()
-            ->arrayNode('operation')
-                ->prototype('variable')
-                ->end()
-            ->end()
-            ->arrayNode('process')
-                ->prototype('variable')
-                ->end()
-            ->end()
             ->arrayNode('configuration')
                 ->prototype('variable')
                 ->end()
-            ->end()
-            ->arrayNode('api')
-                ->prototype('variable')
-                ->end()
-            ->end()
-        ->end();
+            ->end();
+    }
 
-        return $builder;
+    /**
+     * @param array $configs
+     * @return array
+     */
+    public function processConfiguration(array $configs)
+    {
+        $processor = new Processor();
+
+        return $processor->processConfiguration($this, [$configs]);
     }
 }

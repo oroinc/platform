@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
+use Symfony\Component\Config\Definition\Processor;
 
 class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +19,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessEmptyConfiguration()
     {
-        $this->assertEquals([], $this->configuration->processConfiguration([]));
+        $this->assertEquals([], $this->processConfiguration([]));
     }
 
     public function testProcessMinValidConfiguration()
@@ -34,18 +35,13 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'strategy' => 'unanimous',
                 'dependency' => [],
                 'route' => [],
-                'workflow' => [],
-                'operation' => [],
-                'process' => [],
-                'configuration' => [],
-                'api' => []
+                'configuration' => []
             ]
         ];
 
-        $this->assertEquals($expected, $this->configuration->processConfiguration($inputData));
+        $this->assertEquals($expected, $this->processConfiguration($inputData));
     }
 
     public function testProcessFullValidConfiguration()
@@ -54,14 +50,9 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'strategy' => 'some_strategy',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
-                'workflow' => ['feature_workflow_one', 'feature_workflow_two'],
-                'operation' => ['feature_operation'],
-                'process' => ['feature_process'],
-                'configuration' => ['oro_feature', 'oro_another'],
-                'api' => ['Oro\FeatureBundle\Entity\SomeEntity']
+                'configuration' => ['oro_feature', 'oro_another']
             ],
         ];
 
@@ -69,18 +60,13 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'strategy' => 'some_strategy',
                 'dependency' => ['feature_one', 'feature_two'],
                 'route' => ['oro_feature_route'],
-                'workflow' => ['feature_workflow_one', 'feature_workflow_two'],
-                'operation' => ['feature_operation'],
-                'process' => ['feature_process'],
-                'configuration' => ['oro_feature', 'oro_another'],
-                'api' => ['Oro\FeatureBundle\Entity\SomeEntity']
+                'configuration' => ['oro_feature', 'oro_another']
             ]
         ];
 
-        $this->assertEquals($expected, $this->configuration->processConfiguration($inputData));
+        $this->assertEquals($expected, $this->processConfiguration($inputData));
     }
 
     /**
@@ -96,7 +82,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             $expectedExceptionMessage
         );
 
-        $this->configuration->processConfiguration($inputData);
+        $this->processConfiguration($inputData);
     }
 
     /**
@@ -137,17 +123,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'Invalid type for path "features.feature1.description". ' .
                     'Expected scalar, but got array'
             ],
-            'incorrect strategy' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'strategy' => ['array']
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.strategy". ' .
-                    'Expected scalar, but got array'
-            ],
             'incorrect dependency' => [
                 'input' => [
                     'feature1' => [
@@ -170,39 +145,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'Invalid type for path "features.feature1.route". ' .
                     'Expected array, but got string'
             ],
-            'incorrect workflow' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'workflow' => 'not_array'
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.workflow". ' .
-                    'Expected array, but got string'
-            ],
-            'incorrect operation' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'operation' => 'not_array'
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.operation". ' .
-                    'Expected array, but got string'
-            ],
-            'incorrect process' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'process' => ''
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.process". ' .
-                    'Expected array, but got string'
-            ],
             'incorrect configuration' => [
                 'input' => [
                     'feature1' => [
@@ -213,18 +155,18 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'Invalid type for path "features.feature1.configuration". ' .
                     'Expected array, but got integer'
-            ],
-            'incorrect api' => [
-                'input' => [
-                    'feature1' => [
-                        'toggle' => 'oro_feature.test.feature_enabled',
-                        'label' => 'Feature 1 Label',
-                        'api' => 'not_array'
-                    ]
-                ],
-                'message' => 'Invalid type for path "features.feature1.api". ' .
-                    'Expected array, but got string'
-            ],
+            ]
         ];
+    }
+
+    /**
+     * @param array $inputData
+     * @return array
+     */
+    protected function processConfiguration(array $inputData)
+    {
+        $processor = new Processor();
+
+        return $processor->processConfiguration($this->configuration, [$inputData]);
     }
 }

@@ -1,4 +1,49 @@
 services:
+    oro_featuretoggle.cache.provider.features:
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_featuretoggle_features' ] ]
+
+    oro_featuretoggle.configuration.provider:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
+        arguments:
+            - []
+            - '%kernel.bundles%'
+            - '@oro_featuretoggle.configuration'
+            - '@oro_featuretoggle.cache.provider.features'
+
+    oro_featuretoggle.configuration.manager:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+
+    oro_featuretoggle.cache.clearer:
+        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheClearer'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_featuretoggle.cache.warmer:
+        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheWarmer'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_featuretoggle.configuration:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
+
+    oro_featuretoggle.checker.feature_checker:
+        class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
+        public: false
+        arguments:
+            - '@oro_featuretoggle.configuration.manager'
+            - []
+
     oro_featuretoggle.event_listener.request:
         class: 'Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener'
         arguments:
