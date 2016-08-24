@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\SearchBundle\Datasource;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\SearchBundle\Event\SearchResultAfter;
+use Oro\Bundle\SearchBundle\Event\SearchResultBefore;
 use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
 
@@ -19,12 +23,19 @@ class SearchDatasource implements DatasourceInterface
     /** @var SearchQueryInterface */
     protected $query;
 
+    /** @var DatagridInterface */
+    protected $datagrid;
+
     /**
-     * @param QueryFactoryInterface $factory
+     * @param QueryFactoryInterface    $factory
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(QueryFactoryInterface $factory)
-    {
+    public function __construct(
+        QueryFactoryInterface $factory,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->queryFactory = $factory;
+        $this->dispatcher   = $eventDispatcher;
     }
 
     /**
@@ -32,6 +43,8 @@ class SearchDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
+        $this->datagrid = $grid;
+
         $this->query = $this->queryFactory->create($grid, $config);
 
         $grid->setDatasource(clone $this);
@@ -43,10 +56,17 @@ class SearchDatasource implements DatasourceInterface
     public function getResults()
     {
         $results = $this->query->execute();
-        $rows    = [];
+
+        $event = new SearchResultBefore($this->datagrid, $this->query);
+        $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
+
+        $rows = [];
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
         }
+
+        $event = new SearchResultAfter($this->datagrid, $rows, $this->query);
+        $this->dispatcher->dispatch(SearchResultAfter::NAME, $event);
 
         return $rows;
     }

@@ -52,7 +52,7 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $ds->method('getQuery')
+        $ds->method('getWrappedSearchQuery')
             ->will($this->returnValue($query));
 
         $query->expects($this->once())
