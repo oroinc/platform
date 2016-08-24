@@ -42,7 +42,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'empty' => [
                 'configs'  => [[]],
                 'expected' => [
-                    'strategy' => 'affirmative',
+                    'strategy' => 'unanimous',
                     'allow_if_all_abstain' => false,
                     'allow_if_equal_granted_denied' => true
                 ]

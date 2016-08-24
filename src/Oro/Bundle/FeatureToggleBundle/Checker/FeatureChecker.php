@@ -12,7 +12,7 @@ class FeatureChecker
     const STRATEGY_UNANIMOUS = 'unanimous';
 
     /**
-     * @var array
+     * @var VoterInterface[]
      */
     protected $voters;
 
@@ -60,11 +60,11 @@ class FeatureChecker
     public function __construct(
         ConfigurationManager $configManager,
         array $voters = [],
-        $strategy = self::STRATEGY_AFFIRMATIVE,
+        $strategy = self::STRATEGY_UNANIMOUS,
         $allowIfAllAbstainDecisions = false,
         $allowIfEqualGrantedDeniedDecisions = true
     ) {
-        if (!in_array($strategy, $this->supportedStrategies)) {
+        if (!in_array($strategy, $this->supportedStrategies, true)) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
 
@@ -75,8 +75,7 @@ class FeatureChecker
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
     }
-
-
+    
     /**
      * Configures the voters.
      *
@@ -98,7 +97,7 @@ class FeatureChecker
             return false;
         }
 
-        // If one of depend on feature is disabled mark feature as disabled
+        // If one of dependencies is disabled mark feature as disabled
         $dependOnFeatures = $this->configManager->getFeatureDependencies($feature);
         foreach ($dependOnFeatures as $dependOnFeature) {
             if (!$this->checkFeatureState($dependOnFeature, $scopeIdentifier)) {
@@ -136,7 +135,7 @@ class FeatureChecker
     protected function checkFeatureState($feature, $scopeIdentifier = null)
     {
         if (!empty($this->featuresStates) && isset($this->featuresStates[$feature])) {
-            return $$this->featuresStates[$feature];
+            return $this->featuresStates[$feature];
         }
 
         $this->featuresStates[$feature] = $this->check($feature, $scopeIdentifier);
