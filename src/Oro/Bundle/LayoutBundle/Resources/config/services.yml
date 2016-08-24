@@ -189,3 +189,9 @@ services:
             - '@oro_entity.doctrine_helper'
 
 
+    oro_layout.request.listener.imagine_filter_config:
+        class: Oro\Bundle\LayoutBundle\EventListener\ImagineFilterConfigListener
+        arguments:
+            - '@oro_layout.loader.image_filter'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
