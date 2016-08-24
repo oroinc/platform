@@ -34,7 +34,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EmailBundle\Command\RemoveLargeAttachmentsCommand;
+use Oro\Bundle\EmailBundle\Command\PurgeEmailAttachmentCommand;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
@@ -54,7 +54,7 @@ class EmailController extends Controller
      */
     public function removeLargerAttachmentsAction()
     {
-        $job = new Job(RemoveLargeAttachmentsCommand::NAME);
+        $job = new Job(PurgeEmailAttachmentCommand::NAME);
         $em = $this->getDoctrine()->getManagerForClass(Job::class);
         $em->persist($job);
         $em->flush();
