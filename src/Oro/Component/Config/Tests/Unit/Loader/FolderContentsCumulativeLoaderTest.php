@@ -25,16 +25,16 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
      * @param array      $expectedRegisteredResources
      * @param string     $path
      * @param int        $nestingLevel
-     * @param string[]   $fileExtensions
+     * @param string[]   $fileNamePatterns
      */
     public function testLoadInFlatMode(
         $expectedResult,
         $expectedRegisteredResources,
         $path,
         $nestingLevel = -1,
-        $fileExtensions = ['yml', 'xml']
+        $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
     ) {
-        $loader = new FolderContentCumulativeLoader($path, $nestingLevel, true, $fileExtensions);
+        $loader = new FolderContentCumulativeLoader($path, $nestingLevel, true, $fileNamePatterns);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);
@@ -138,16 +138,16 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
      * @param array      $expectedRegisteredResources
      * @param string     $path
      * @param int        $nestingLevel
-     * @param string[]   $fileExtensions
+     * @param string[]   $fileNamePatterns
      */
     public function testLoadInFlatModeWithAppRootDirectory(
         $expectedResult,
         $expectedRegisteredResources,
         $path,
         $nestingLevel = -1,
-        $fileExtensions = ['yml', 'xml']
+        $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
     ) {
-        $loader = new FolderContentCumulativeLoader($path, $nestingLevel, true, $fileExtensions);
+        $loader = new FolderContentCumulativeLoader($path, $nestingLevel, true, $fileNamePatterns);
 
         $bundle       = new TestBundle1();
         $bundleClass  = get_class($bundle);
@@ -252,7 +252,7 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadInHierarchicalModeWithAppRootDirectory()
     {
-        $loader = new FolderContentCumulativeLoader('Resources/folder_to_track/', -1, false, ['yml', 'xml']);
+        $loader = new FolderContentCumulativeLoader('Resources/folder_to_track/', -1, false, ['/\.yml$/', '/\.xml$/']);
 
         $bundle       = new TestBundle1();
         $bundleClass  = get_class($bundle);
@@ -291,7 +291,7 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadInHierarchicalMode()
     {
-        $loader = new FolderContentCumulativeLoader('Resources/folder_to_track/', -1, false, ['yml', 'xml']);
+        $loader = new FolderContentCumulativeLoader('Resources/folder_to_track/', -1, false, ['/\.yml$/', '/\.xml$/']);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);
