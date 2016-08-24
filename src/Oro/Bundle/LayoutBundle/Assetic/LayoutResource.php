@@ -4,6 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Assetic;
 
 use Assetic\Factory\Resource\ResourceInterface;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -15,16 +17,24 @@ class LayoutResource implements ResourceInterface
     /** @var ThemeManager */
     protected $themeManager;
 
+    /** @var Filesystem */
+    protected $filesystem;
+
     /** @var string */
     protected $outputDir;
 
     /**
      * @param ThemeManager $themeManager
+     * @param Filesystem $filesystem
      * @param string $outputDir
      */
-    public function __construct(ThemeManager $themeManager, $outputDir)
-    {
+    public function __construct(
+        ThemeManager $themeManager,
+        Filesystem $filesystem,
+        $outputDir
+    ) {
         $this->themeManager = $themeManager;
+        $this->filesystem = $filesystem;
         $this->outputDir = $outputDir;
     }
 
@@ -133,16 +143,19 @@ class LayoutResource implements ResourceInterface
      */
     protected function joinInputs($output, $extension, $inputs)
     {
-        $configInputs = [];
+        $settingsInputs = [];
+        $variablesInputs = [];
         $restInputs = [];
         foreach ($inputs as $input) {
-            if (strpos($input, '/configs/') !== false) {
-                $configInputs[] = $input;
+            if (strpos($input, '/settings/') !== false) {
+                $settingsInputs[] = $input;
+            } elseif (strpos($input, '/variables/') !== false) {
+                $variablesInputs[] = $input;
             } else {
                 $restInputs[] = $input;
             }
         }
-        $inputs = array_merge($configInputs, $restInputs);
+        $inputs = array_merge($settingsInputs, $variablesInputs, $restInputs);
 
         $inputsContent = '';
         foreach ($inputs as $input) {
@@ -150,6 +163,7 @@ class LayoutResource implements ResourceInterface
         }
 
         $file = realpath($this->outputDir) . '/' . $output . '.'. $extension;
+        $this->filesystem->mkdir(dirname($file), 0777);
         if (false === @file_put_contents($file, $inputsContent)) {
             throw new \RuntimeException('Unable to write file ' . $file);
         }
