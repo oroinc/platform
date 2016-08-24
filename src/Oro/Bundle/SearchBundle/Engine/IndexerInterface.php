@@ -7,12 +7,13 @@ interface IndexerInterface
     /**
      * Save one of several entities to search index
      *
-     * @param object|array $entity
-     * @param array        $context
+     * @param array $entities entities of the same type
+     * @param array $context
      *
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    public function save($entity, $context = []);
+    public function save($entities, array $context = []);
 
     /**
      * Delete one or several entities from search index
@@ -22,7 +23,7 @@ interface IndexerInterface
      *
      * @return bool
      */
-    public function delete($entity, $context = []);
+    public function delete(array $entity, array $context = []);
 
     /**
      * Returns classes required to reindex for one or several classes
