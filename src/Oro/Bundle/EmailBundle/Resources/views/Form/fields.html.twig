@@ -2,10 +2,10 @@
     {{ form_widget(form) }}
     {% if is_granted('oro_email_email_user_edit') %}
         <a class="btn pull-right"
-           href="{{ path('oro_email_remove_larger_attachments') }}"
+           href="{{ path('oro_email_purge_emails_attachments') }}"
            data-page-component-module="{{ 'oroui/js/app/components/hidden-redirect-component' }}"
            data-page-component-options="{{ {showLoading: true}|json_encode }}"
-           >Remove larger attachments</a>
+           >{{ 'oro.email.system_configuration.attachment_configuration.remove_larger_attachments.label'|trans }}</a>
     {% endif %}
 {% endblock %}
 

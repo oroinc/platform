@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Command;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -17,9 +16,9 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 
-class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
+class PurgeEmailAttachmentCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:email:remove-large-attachments';
+    const NAME = 'oro:email-attachment:purge';
 
     const OPTION_SIZE = 'size';
     const OPTION_ALL = 'all';
@@ -33,18 +32,18 @@ class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
     {
         $this
             ->setName(static::NAME)
-            ->setDescription('Removes large attachments')
+            ->setDescription('Purges emails attachments')
             ->addOption(
                 static::OPTION_SIZE,
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Overrides size in MB at which attachment is considered to be large. Defaults to system config.'
+                'Purges emails attachments larger that option size in MB. Default to system configuration value.'
             )
             ->addOption(
                 static::OPTION_ALL,
                 null,
                 InputOption::VALUE_NONE,
-                'Remove all attachments ignoring "size" option'
+                'Purges all emails attachments ignoring "size" option'
             );
     }
 
@@ -53,7 +52,7 @@ class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $size = $input->getOption(static::OPTION_ALL) ? null : $this->getSize($input->getOption(static::OPTION_SIZE));
+        $size = $this->getSize($input->getOption(static::OPTION_ALL), $input->getOption(static::OPTION_SIZE));
         $qb = $this->createEmailAttachmentQb($size);
 
         if (!$qb) {
@@ -80,14 +79,13 @@ class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param EmailAttachment $attachment
-     * @param int|null $size
+     * @param int $size
      *
      * @return callable
      */
     protected function createRemoveAttachmentCallback($size)
     {
-        if ($size === null) {
+        if ($size <= 0) {
             return function (EmailAttachment $attachment) {
                 $attachment->getEmailBody()->removeAttachment($attachment);
             };
@@ -108,21 +106,17 @@ class RemoveLargeAttachmentsCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param int|null $size
+     * @param int $size
      *
-     * @return QueryBuilder|null
+     * @return QueryBuilder
      */
     protected function createEmailAttachmentQb($size)
     {
-        if ($size === 0) {
-            return null;
-        }
-
         $qb = $this->getEmailAttachmentRepository()
             ->createQueryBuilder('a')
             ->join('a.attachmentContent', 'eac');
 
-        if ($size !== null) {
+        if ($size > 0) {
             /**
              * Base64-encoded data takes about 33% more space than the original data.
              * @see http://php.net/manual/en/function.base64-encode.php
@@ -143,11 +137,22 @@ DQL
     }
 
     /**
-     * @param int|null$sizeInMb
+     * @param bool     $all
+     * @param int|null $size
      *
      * @return int
      */
-    protected function getSize($sizeInMb = null)
+    private function getSize($all, $size)
+    {
+        return $all ? 0 : $this->getSizeInBytes($size);
+    }
+
+    /**
+     * @param int|null $sizeInMb
+     *
+     * @return int
+     */
+    protected function getSizeInBytes($sizeInMb = null)
     {
         return $sizeInMb !== null
             ? (int) ($sizeInMb * 1024 * 1024)

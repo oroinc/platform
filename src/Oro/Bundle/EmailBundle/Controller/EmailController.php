@@ -49,13 +49,13 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 class EmailController extends Controller
 {
     /**
-     * @Route("/remove-larger-attachments", name="oro_email_remove_larger_attachments")
-     * @AclAncestor("oro_email_email_user_edit")
+     * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
+     * @AclAncestor("oro_email_email_attachment_view")
      */
     public function removeLargerAttachmentsAction()
     {
         $job = new Job(RemoveLargeAttachmentsCommand::NAME);
-        $em = $this->getDoctrine()->getManagerForClass(get_class($job));
+        $em = $this->getDoctrine()->getManagerForClass(Job::class);
         $em->persist($job);
         $em->flush();
 
