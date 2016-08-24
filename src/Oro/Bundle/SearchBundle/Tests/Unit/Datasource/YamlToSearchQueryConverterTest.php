@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource;
 use Oro\Bundle\SearchBundle\Datasource\YamlToSearchQueryConverter;
 use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 
-class YamlSearchConverterTest extends \PHPUnit_Framework_TestCase
+class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var SearchQueryInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $query;
