@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('default')
                     ->prototype('enum')
-                        ->values([OrmSorterExtension::DIRECTION_DESC, OrmSorterExtension::DIRECTION_ASC])->end()
+                        ->values([AbstractSorterExtension::DIRECTION_DESC, AbstractSorterExtension::DIRECTION_ASC])->end()
                     ->end()
                     ->booleanNode('multiple_sorting')->end()
                     ->booleanNode('toolbar_sorting')->end()
