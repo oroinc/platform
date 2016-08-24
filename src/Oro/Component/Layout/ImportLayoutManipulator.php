@@ -259,7 +259,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     protected function getRootId(LayoutUpdateImport $import)
     {
         $rootId = $import->getRoot();
-        if($import->getParent()) {
+        if ($import->getParent()) {
             if ($rootId === self::ROOT_PLACEHOLDER) {
                 $rootId = $this->getRootId($import->getParent());
             } else {
@@ -289,7 +289,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     {
         if ($this->hasNamespacePlaceholder($id)) {
             $replacement = '';
-            if($namespace === null) {
+            if ($namespace === null) {
                 $namespace = $this->getNamespace($this->import);
             }
             if ($namespace) {
