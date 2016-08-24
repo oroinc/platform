@@ -364,7 +364,7 @@ JS;
         $this->executeJsOnElement($element, $script);
     }
 
-    private function waitFor($timeout, Callback $function)
+    private function waitFor($timeout, \Closure $function)
     {
         $start = microtime(true);
         $end = $start + $timeout / 1000.0;
