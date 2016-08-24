@@ -233,7 +233,7 @@ JS;
      * Wait PAGE load
      * @param int $time Time should be in milliseconds
      */
-    public function waitPageToLoad($time = 15000)
+    public function waitPageToLoad($time = 60000)
     {
         $this->wait(
             $time,
@@ -246,7 +246,7 @@ JS;
      * Wait AJAX request
      * @param int $time Time should be in milliseconds
      */
-    public function waitForAjax($time = 15000)
+    public function waitForAjax($time = 60000)
     {
         $this->waitPageToLoad($time);
 
