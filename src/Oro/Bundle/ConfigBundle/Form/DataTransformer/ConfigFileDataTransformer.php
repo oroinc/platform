@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\File\File as HttpFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ConfigFileDataTransformer implements DataTransformerInterface
@@ -27,13 +28,20 @@ class ConfigFileDataTransformer implements DataTransformerInterface
     private $validator;
 
     /**
+     * @var FileManager
+     */
+    private $fileManager;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param ValidatorInterface $validator
+     * @param FileManager $fileManager
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ValidatorInterface $validator)
+    public function __construct(DoctrineHelper $doctrineHelper, ValidatorInterface $validator, FileManager $fileManager)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->validator = $validator;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -70,6 +78,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
         $em = $this->doctrineHelper->getEntityManagerForClass(File::class);
 
         if ($file->isEmptyFile()) {
+            $this->fileManager->deleteFile($file->getFilename());
             $em->remove($file);
             $em->flush($file);
 

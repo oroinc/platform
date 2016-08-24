@@ -11,12 +11,14 @@ use Symfony\Component\HttpFoundation\File\File as HttpFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
 {
     const FILE_ID = 1;
+    const FILENAME = 'filename.jpg';
 
     /**
      * @var ConfigFileDataTransformer
@@ -34,6 +36,11 @@ class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
     protected $validator;
 
     /**
+     * @var FileManager
+     */
+    protected $fileManager;
+
+    /**
      * @var array
      */
     protected $constraints = ['constraints'];
@@ -42,8 +49,13 @@ class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper = $this->prophesize(DoctrineHelper::class);
         $this->validator = $this->prophesize(ValidatorInterface::class);
+        $this->fileManager = $this->prophesize(FileManager::class);
 
-        $this->transformer = new ConfigFileDataTransformer($this->doctrineHelper->reveal(), $this->validator->reveal());
+        $this->transformer = new ConfigFileDataTransformer(
+            $this->doctrineHelper->reveal(),
+            $this->validator->reveal(),
+            $this->fileManager->reveal()
+        );
         $this->transformer->setFileConstraints($this->constraints);
     }
 
@@ -73,10 +85,13 @@ class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $file = new File();
         $file->setEmptyFile(true);
+        $file->setFilename(self::FILENAME);
 
         $em = $this->prepareEntityManager();
         $em->remove($file)->shouldBeCalled();
         $em->flush($file)->shouldBeCalled();
+
+        $this->fileManager->deleteFile(self::FILENAME)->shouldBeCalled();
 
         $this->assertNull($this->transformer->reverseTransform($file));
     }

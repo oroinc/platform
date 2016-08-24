@@ -3,12 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Tools;
 
 use Liip\ImagineBundle\Binary\BinaryInterface;
-
-use Liip\ImagineBundle\Model\Binary;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
-
 use Liip\ImagineBundle\Binary\MimeTypeGuesserInterface;
+use Liip\ImagineBundle\Model\Binary;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
+
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
 class ImageFactory
 {
