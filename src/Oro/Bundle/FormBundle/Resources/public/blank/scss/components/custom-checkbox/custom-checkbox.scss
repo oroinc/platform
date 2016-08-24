@@ -1,5 +1,3 @@
-@import '_config.scss';
-
 .custom-checkbox {
     position: relative;
 
@@ -14,13 +12,13 @@
 
         &:hover,
         &:focus {
-            ~ .checkbox__icon {
+            ~ .custom-checkbox__icon {
                 border: $checkbox-icon-border-hover-state;
             }
         }
 
         &:checked {
-            ~ .checkbox__icon {
+            ~ .custom-checkbox__icon {
                 border: $checkbox-icon-border-focus-state;
                 background-color: $checkbox-icon-bg-color-focus-state;
             }
@@ -29,6 +27,7 @@
 
     &__icon {
         display: inline-block;
+        box-sizing: border-box;
 
         height: $checkbox-icon-size;
         width: $checkbox-icon-size;

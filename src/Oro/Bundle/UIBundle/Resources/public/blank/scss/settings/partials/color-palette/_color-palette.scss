@@ -1,6 +1,7 @@
 @import './colors';
 
-// Use for example: color: get-color('primary', 'base');
+// Returns the value in a map associated with a given key;
+// Use for example: color: get-color('primary', 'base') => color: #000;
 @function get-color($palette: 'primary', $key: 'main') {
     $current-palette: map-get($color-palette,  $palette);
 

@@ -2,7 +2,8 @@
     html {
         font-family: sans-serif;
         -webkit-text-size-adjust: 100%;
-        -ms-text-size-adjust: 100%
+        -ms-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
     html,
@@ -12,12 +13,12 @@
     }
 
     .body {
-        min-width: $breakpoint-mobile;
+        min-width: $body-min-width;
         margin: 0;
 
         font: #{$base-font-size}/#{$base-line-height} $base-font;
 
-        background-color: get-color('additional', 'ultra');
-        color: get-color('additional', 'darker');
+        background-color: $body-bg-color;
+        color: $body-color;
     }
 }

@@ -1,5 +1,3 @@
-@import './config';
-
 .select {
     @include base-ui-element($use-base-style, $select-inner-offset);
 

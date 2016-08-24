@@ -1,6 +1,6 @@
 styles:
     inputs:
-        - 'bundles/oroui/blank/scss/variables/global-settings.scss'
+        - 'bundles/oroui/blank/scss/settings/global-settings.scss'
         - 'bundles/oroui/blank/scss/variables/base-config.scss'
         - 'bundles/oroui/blank/scss/variables/grid-config.scss'
         - 'bundles/oroui/blank/scss/variables/link-config.scss'
