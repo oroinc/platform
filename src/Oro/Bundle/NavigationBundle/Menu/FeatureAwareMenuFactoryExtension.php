@@ -2,13 +2,52 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
-class FeatureAwareMenuFactoryExtension extends AbstractFeatureAwareMenuFactoryExtension
+use Knp\Menu\Factory;
+use Knp\Menu\ItemInterface;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+
+class FeatureAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
     /**
-     * @return int|null|object
+     * @var FeatureChecker
      */
-    protected function getScopeId()
+    protected $featureChecker;
+
+    /**
+     * @param FeatureChecker $featureChecker
+     */
+    public function __construct(FeatureChecker $featureChecker)
     {
-        return null;
+        $this->featureChecker = $featureChecker;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildOptions(array $options = [])
+    {
+        if (!$this->alreadyDenied($options) && !empty($options['route'])) {
+            $options['extras']['isAllowed'] = $this->featureChecker
+                ->isResourceEnabled($options['route'], 'route');
+        }
+
+        return $options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildItem(ItemInterface $item, array $options)
+    {
+    }
+
+    /**
+     * @param array $options
+     * @return bool
+     */
+    protected function alreadyDenied(array $options)
+    {
+        return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
+        ($options['extras']['isAllowed'] === false);
     }
 }

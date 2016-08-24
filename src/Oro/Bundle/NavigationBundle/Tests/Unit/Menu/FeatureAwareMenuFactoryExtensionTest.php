@@ -30,7 +30,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $this->featureChecker
             ->expects($this->once())
             ->method('isResourceEnabled')
-            ->with('route_name', 'route', null)
+            ->with('route_name', 'route')
             ->willReturn(false);
 
         $options = $this->extension->buildOptions(
