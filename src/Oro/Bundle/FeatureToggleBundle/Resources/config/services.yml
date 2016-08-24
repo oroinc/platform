@@ -43,3 +43,10 @@ services:
         arguments:
             - '@oro_featuretoggle.configuration.manager'
             - []
+
+    oro_featuretoggle.layout.data_provider.feature_provider:
+        class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: layout.data_provider, alias: feature }
