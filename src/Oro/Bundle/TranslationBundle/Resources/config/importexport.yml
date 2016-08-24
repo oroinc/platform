@@ -58,9 +58,3 @@ services:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer'
         tags:
             - { name: oro_importexport.normalizer }
-
-    # Export Handler
-    oro_translation.importexport.handler.export:
-        class: 'Oro\Bundle\TranslationBundle\Handler\TranslationExportHandler'
-        parent: oro_importexport.handler.export
-        lazy: true
