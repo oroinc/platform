@@ -9,8 +9,8 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension;
+use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
-use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase

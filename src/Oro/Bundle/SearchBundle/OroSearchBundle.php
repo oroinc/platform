@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle;
 
+use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\FilterTypesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -20,5 +21,7 @@ class OroSearchBundle extends Bundle
                 'Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass'
             );
         }
+
+        $container->addCompilerPass(new FilterTypesPass());
     }
 }

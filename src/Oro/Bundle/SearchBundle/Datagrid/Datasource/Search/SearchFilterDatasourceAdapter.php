@@ -128,4 +128,16 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     {
         return $this->query;
     }
+
+    /**
+     * @return Query
+     */
+    public function getWrappedSearchQuery()
+    {
+        if (!$this->query || !$this->query->getQuery()) {
+            throw new \RuntimeException('Query not initialized properly');
+        }
+
+        return $this->query->getQuery();
+    }
 }
