@@ -3,7 +3,14 @@ services:
     oro_translation.importexport.strategy.translation.add_or_replace:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy'
         public: false
-        parent: oro_importexport.strategy.configurable_add_or_replace
+        parent: 'oro_importexport.strategy.configurable_add_or_replace'
+        calls:
+            - [setMetadataCache, ['@oro_translation.database_translation.metadata.cache']]
+
+    oro_translation.importexport.strategy.translation.reset:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy'
+        public: false
+        parent: 'oro_translation.importexport.strategy.translation.add_or_replace'
 
     # Import processor
     oro_translation.importexport.processor.import.translation:
@@ -14,6 +21,15 @@ services:
         tags:
             - { name: oro_importexport.processor, type: import, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
             - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
+
+    oro_translation.importexport.processor.import.translation_reset:
+        public: false
+        parent: oro_importexport.processor.import_abstract
+        calls:
+             - [setStrategy, ['@oro_translation.importexport.strategy.translation.reset']]
+        tags:
+            - { name: oro_importexport.processor, type: import, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.reset }
+            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.reset }
 
     # Export processor
     oro_translation.importexport.processor.export.translation:
@@ -36,6 +52,12 @@ services:
         parent: oro_integration.writer.persistent_batch_writer
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter'
         public: false
+
+    # Normalizer
+    oro_translation.importexport.normalizer.translation:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer'
+        tags:
+            - { name: oro_importexport.normalizer }
 
     # Export Handler
     oro_translation.importexport.handler.export:

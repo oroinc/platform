@@ -201,4 +201,32 @@ class TranslationRepository extends EntityRepository
 
         return $result;
     }
+
+    /**
+     * @param string $locale
+     *
+     * @return int
+     */
+    public function getCountByLocale($locale)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('count(t.id)')
+            ->where('t.locale = :locale')
+            ->setParameter('locale', $locale);
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string $locale
+     */
+    public function deleteByLocale($locale)
+    {
+        $this->createQueryBuilder('t')
+            ->delete()
+            ->where('t.locale = :locale')
+            ->setParameter('locale', $locale)
+            ->getQuery()
+            ->execute();
+    }
 }

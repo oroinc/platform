@@ -41,3 +41,10 @@ oro.translation:
 
     menu:
         languages.label: Languages
+
+oro:
+    importexport:
+        import:
+            oro_translation_translation:
+                add_or_replace: Add and Replace
+                reset: Reset and Add
