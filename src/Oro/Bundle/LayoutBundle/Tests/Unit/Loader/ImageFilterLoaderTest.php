@@ -1,6 +1,6 @@
 <?php
 
-namespace LayoutBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Loader;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
@@ -10,7 +10,7 @@ use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 
-class ImageFilterProviderTest extends \PHPUnit_Framework_TestCase
+class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
 {
     const PRODUCT_ORIGINAL = 'product_original';
     const PRODUCT_LARGE = 'product_large';

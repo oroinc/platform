@@ -19,7 +19,7 @@ class ImageTypeProvider
     /**
      * @var ThemeImageType[]
      */
-    protected $imageTypes;
+    protected $imageTypes = [];
 
     /**
      * @var ThemeImageTypeDimension[]
