@@ -11,7 +11,7 @@ oro_system_configuration:
             options:
                 label: oro.form.system_configuration.fields.wysiwyg_enabled.label
                 tooltip: oro.form.system_configuration.fields.wysiwyg_enabled.tooltip
-                required: true
+                required: false
 
     tree:
         system_configuration:

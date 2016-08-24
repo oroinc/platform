@@ -29,6 +29,7 @@ oro_system_configuration:
             options:
                 label: oro.grid.system_configuration.fields.full_screen_layout_enabled.label
                 tooltip: oro.grid.system_configuration.fields.full_screen_layout_enabled.tooltip
+                required: false
     tree:
         system_configuration:
             platform:

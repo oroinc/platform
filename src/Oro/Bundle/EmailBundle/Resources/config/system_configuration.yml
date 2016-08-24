@@ -89,7 +89,7 @@ oro_system_configuration:
             priority: 100
             options:
                 label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
-                required: true
+                required: false
 
         oro_email.attachment_sync_enable:
             data_type: boolean
@@ -98,7 +98,7 @@ oro_system_configuration:
             options:
                 label: oro.email.system_configuration.attachment_sync.enable.label
                 tooltip: oro.email.form.tooltip.attachment_sync.enable
-                required: true
+                required: false
 
         oro_email.attachment_sync_max_size:
             data_type: number
@@ -133,7 +133,7 @@ oro_system_configuration:
             options:
                 label: oro.email.system_configuration.sanitize_html.label
                 tooltip: oro.email.system_configuration.sanitize_html.tooltip
-                required: true
+                required: false
 
     tree:
         system_configuration:
