@@ -8,19 +8,18 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache;
-use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -65,17 +64,17 @@ class ProcessCollectorListener implements OptionalListenerInterface
     /**
      * @var array
      */
-    protected $scheduledProcesses = array();
+    protected $scheduledProcesses = [];
 
     /**
      * @var ProcessJob[]
      */
-    protected $queuedJobs = array();
+    protected $queuedJobs = [];
 
     /**
      * @var array
      */
-    protected $removedEntityHashes = array();
+    protected $removedEntityHashes = [];
 
     /**
      * @var bool
@@ -88,12 +87,18 @@ class ProcessCollectorListener implements OptionalListenerInterface
     protected $enabled = true;
 
     /**
-     * @param ManagerRegistry           $registry
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ProcessHandler            $handler
-     * @param ProcessLogger             $logger
-     * @param ProcessTriggerCache       $triggerCache
-     * @param ProcessSchedulePolicy     $schedulePolicy
+     * @var MessageProducerInterface
+     */
+    private $messageProducer;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
+     * @param ProcessHandler $handler
+     * @param ProcessLogger $logger
+     * @param ProcessTriggerCache $triggerCache
+     * @param ProcessSchedulePolicy $schedulePolicy
+     * @param MessageProducerInterface $messageProducer
      */
     public function __construct(
         ManagerRegistry $registry,
@@ -101,7 +106,8 @@ class ProcessCollectorListener implements OptionalListenerInterface
         ProcessHandler $handler,
         ProcessLogger $logger,
         ProcessTriggerCache $triggerCache,
-        ProcessSchedulePolicy $schedulePolicy
+        ProcessSchedulePolicy $schedulePolicy,
+        MessageProducerInterface $messageProducer
     ) {
         $this->registry       = $registry;
         $this->doctrineHelper = $doctrineHelper;
@@ -109,6 +115,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
         $this->logger         = $logger;
         $this->triggerCache   = $triggerCache;
         $this->schedulePolicy = $schedulePolicy;
+        $this->messageProducer = $messageProducer;
     }
 
     /**
@@ -139,7 +146,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
             $triggers = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')
                 ->findAllWithDefinitions(true);
 
-            $this->triggers = array();
+            $this->triggers = [];
             foreach ($triggers as $trigger) {
                 $triggerEntityClass = $trigger->getDefinition()->getRelatedEntity();
                 $triggerEvent = $trigger->getEvent();
@@ -171,7 +178,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
             return $this->triggers[$entityClass][$event];
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -275,7 +282,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
         $this->triggers = null;
 
         if ($args->clearsAllEntities()) {
-            $this->scheduledProcesses = array();
+            $this->scheduledProcesses = [];
         } else {
             unset($this->scheduledProcesses[$args->getEntityClass()]);
         }
@@ -338,69 +345,37 @@ class ProcessCollectorListener implements OptionalListenerInterface
         // delete unused processes
         if ($this->removedEntityHashes) {
             $this->registry->getRepository('OroWorkflowBundle:ProcessJob')->deleteByHashes($this->removedEntityHashes);
-            $this->removedEntityHashes = array();
+            $this->removedEntityHashes = [];
         }
 
-        // create queued JMS jobs
-        $this->createJobs($entityManager);
+        $this->createJobs();
     }
 
-    /**
-     * Create JMS jobs for queued process jobs
-     *
-     * @param \Doctrine\ORM\EntityManager $entityManager
-     */
-    protected function createJobs($entityManager)
+    protected function createJobs()
     {
         if (empty($this->queuedJobs)) {
             return;
         }
 
-        $jmsJobList = [];
-
         foreach ($this->queuedJobs as $timeShift => $processJobBatch) {
             foreach ($processJobBatch as $priority => $processJobs) {
-                $args = array();
-
                 /** @var ProcessJob $processJob */
+
                 foreach ($processJobs as $processJob) {
-                    $args[] = '--id=' . $processJob->getId();
+                    $message = new Message();
+                    $message->setBody(['process_job_id' => $processJob->getId()]);
+
+                    if ($timeShift) {
+                        $message->setDelaySec($timeShift);
+                    }
+
+                    $this->messageProducer->send(Topics::EXECUTE_PROCESS_JOB, $message);
                     $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
                 }
-
-                $jmsJob = new Job(ExecuteProcessJobCommand::NAME, $args, false, Job::DEFAULT_QUEUE, $priority);
-
-                if ($timeShift) {
-                    $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($timeShift);
-                    $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
-                    $executeAfter->add($timeShiftInterval);
-                    $jmsJob->setExecuteAfter($executeAfter);
-                }
-
-                $entityManager->persist($jmsJob);
-                $jmsJobList[] = $jmsJob;
             }
         }
 
-        $this->queuedJobs = array();
-
-        $entityManager->flush();
-
-        $this->confirmJobs($entityManager, $jmsJobList);
-    }
-
-    /**
-     * @param \Doctrine\ORM\EntityManager $entityManager
-     * @param Job[] $jmsJobList
-     */
-    protected function confirmJobs($entityManager, $jmsJobList)
-    {
-        foreach ($jmsJobList as $jmsJob) {
-            $jmsJob->setState(Job::STATE_PENDING);
-            $entityManager->persist($jmsJob);
-        }
-
-        $entityManager->flush();
+        $this->queuedJobs = [];
     }
 
     /**
@@ -448,7 +423,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
             return;
         }
 
-        $this->scheduledProcesses[$entityClass][] = array('trigger' => $trigger, 'data' => $data);
+        $this->scheduledProcesses[$entityClass][] = ['trigger' => $trigger, 'data' => $data];
     }
 
     /**
