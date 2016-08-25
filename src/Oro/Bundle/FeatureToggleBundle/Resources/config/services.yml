@@ -86,3 +86,11 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onRequest }
+
+    oro_featuretoggle.provider.api_exclusion_provider:
+        class: Oro\Bundle\FeatureToggleBundle\Provider\ApiExclusionProvider
+        public: false
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
