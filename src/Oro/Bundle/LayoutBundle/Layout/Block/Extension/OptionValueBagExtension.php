@@ -36,8 +36,8 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      */
     public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-        if ($options['resolve_value_bags'] && !$this->hasExpression($options)) {
-            $this->resolveValueBags($options);
+        if ($options['resolve_value_bags']) {
+            $this->resolveValueBags($options, true);
         }
     }
 
@@ -49,33 +49,21 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
         $exprEvaluate = $block->getContext()->getOr('expressions_evaluate');
         if ($options['resolve_value_bags'] && $exprEvaluate) {
             $this->resolveValueBags($view->vars);
-        } elseif (!$exprEvaluate) {
-            throw new \InvalidArgumentException('expression should be evaluate');
         }
-    }
-
-    /**
-     * @param $options
-     * @return bool
-     */
-    protected function hasExpression($options)
-    {
-        $check = false;
-        foreach ($options as $value) {
-            if ($value instanceof Expression) {
-                return true;
-            }
-        }
-        return $check;
     }
 
     /**
      * @param array $options
+     * @param bool $hasExpression
+     *
      * @return array
      */
-    protected function resolveValueBags(array &$options)
+    protected function resolveValueBags(array &$options, $hasExpression = false)
     {
         foreach ($options as $key => $value) {
+            if ($hasExpression && $value instanceof Expression) {
+                continue;
+            }
             if (is_array($value)) {
                 $options[$key] = $this->resolveValueBags($value);
             } elseif ($value instanceof OptionValueBag) {
