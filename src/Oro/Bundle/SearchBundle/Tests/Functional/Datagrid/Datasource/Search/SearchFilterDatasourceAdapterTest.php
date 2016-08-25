@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Datasource;
 
-use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
