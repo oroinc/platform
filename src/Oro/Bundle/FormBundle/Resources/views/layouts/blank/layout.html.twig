@@ -1,0 +1,21 @@
+{% extends "OroLayoutBundle:Layout:div_layout.html.twig" %}
+
+{% block input_widget %}
+    {% if type == 'checkbox' %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' checkbox__input'
+        }) %}
+
+        <label for="{{ id }}" class="checkbox">
+            {{ parent() }}
+            <span class="checkbox__icon"></span>
+            <span class="checkbox__text">{{ label|block_text(translation_domain) }} </span>
+        </label>
+    {% else %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' input'
+        }) %}
+
+        {{ parent() }}
+    {% endif %}
+{% endblock %}

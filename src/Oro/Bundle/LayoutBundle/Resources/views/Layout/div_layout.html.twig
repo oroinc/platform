@@ -106,23 +106,7 @@
         }) %}
     {% endif %}
 
-    {%- if type == 'checkbox' -%}
-        {% set attr = layout_attr_defaults(attr, {
-            '~class': ' checkbox__input'
-        }) %}
-
-        <label for="{{ id }}" class="checkbox">
-            <input{{ block('block_attributes') }}/>
-            <span class="checkbox__icon"></span>
-            <span class="checkbox__text">{{ label|block_text(translation_domain) }} </span>
-        </label>
-    {% else %}
-        {% set attr = layout_attr_defaults(attr, {
-            '~class': ' input'
-        }) %}
-
-        <input{{ block('block_attributes') }}/>
-    {%- endif -%}
+    <input{{ block('block_attributes') }}/>
 {%- endblock %}
 
 {% block container_widget -%}
