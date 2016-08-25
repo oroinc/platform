@@ -12,7 +12,7 @@ Table of content
 
 ##Overview
 Datagrid is table oriented representation of some data from some datasource.
- It's configuration is declarative YAML based file, that should be placed in `Resources/config` folder of your bundle and named `datagrid.yml`.
+ It's configuration is declarative YAML based file, that should be placed in `Resources/config` folder of your bundle and named `datagrids.yml`.
   This file should contain root node `datagrid` and each grid configuration should be placed under it.
 
 ##Getting Started

@@ -9,7 +9,7 @@ class WorkflowConfigurationProvider extends AbstractConfigurationProvider
     /**
      * @var string
      */
-    protected $configFilePattern = 'workflow.yml';
+    protected $configFilePattern = 'workflows.yml';
 
     /**
      * @var WorkflowListConfiguration
@@ -25,6 +25,7 @@ class WorkflowConfigurationProvider extends AbstractConfigurationProvider
         parent::__construct($kernelBundles);
 
         $this->configuration = $configuration;
+        $this->configDirectory = '/Resources/config/oro/';
     }
 
     /**

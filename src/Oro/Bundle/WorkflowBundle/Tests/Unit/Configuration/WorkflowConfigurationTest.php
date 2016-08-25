@@ -27,7 +27,7 @@ class WorkflowConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     protected function getInputConfiguration()
     {
-        $fileName = __DIR__ . '/Stub/CorrectConfiguration/Resources/config/workflow.yml';
+        $fileName = __DIR__ . '/Stub/CorrectConfiguration/Resources/config/workflows.yml';
         $this->assertFileExists($fileName);
         $data = Yaml::parse(file_get_contents($fileName)) ? : [];
 

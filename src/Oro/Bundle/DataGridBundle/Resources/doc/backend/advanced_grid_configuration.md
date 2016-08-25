@@ -275,7 +275,7 @@ my_bundle.event_listener.my_grid_listener:
 ```
 - last step is implementing grid listener
 - as an example see:
-    - Oro/Bundle/UserBundle/Resources/config/datagrid.yml (owner-users-select-grid)
+    - Oro/Bundle/UserBundle/Resources/config/oro/datagrids.yml (owner-users-select-grid)
     - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php (service name: "oro_user.event_listener.owner_user_grid_listener")
 
 #### Problem:

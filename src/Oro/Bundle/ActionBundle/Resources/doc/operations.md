@@ -194,7 +194,7 @@ So that default operation `DELETE` will not be matched for your entity and will 
   Yes. There are two ways to do that. **The first**: you can disable operation by updating datagrid configuration in its
 section `action_configuration` you should define a key that corresponds to operation name with value `false`.
 
-`datagrid.yml`:
+`datagrids.yml`:
 
 ```
 datagrid:

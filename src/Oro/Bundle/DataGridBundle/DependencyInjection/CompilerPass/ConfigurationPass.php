@@ -44,7 +44,7 @@ class ConfigurationPass implements CompilerPassInterface
 
             $configLoader = new CumulativeConfigLoader(
                 'oro_datagrid',
-                new YamlCumulativeFileLoader('Resources/config/datagrid.yml')
+                new YamlCumulativeFileLoader('Resources/config/oro/datagrids.yml')
             );
             $resources    = $configLoader->load($container);
             foreach ($resources as $resource) {
