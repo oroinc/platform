@@ -67,14 +67,18 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
         /**
          * @returns {string}
          */
-        getDateTimeFormat: function(addNbsp) {
-            if (addNbsp) {
-                if (!this.frontendFormats.datetimeNBSP) {
-                    this.frontendFormats.datetimeNBSP = this.prepareNbspFormat(this.frontendFormats.datetime);
-                }
-                return this.frontendFormats.datetimeNBSP;
-            }
+        getDateTimeFormat: function() {
             return this.frontendFormats.datetime;
+        },
+
+        /**
+         * @returns {string}
+         */
+        getDateTimeFormatNBSP: function() {
+            if (!this.frontendFormats.datetimeNBSP) {
+                this.frontendFormats.datetimeNBSP = this.prepareNbspFormat(this.frontendFormats.datetime);
+            }
+            return this.frontendFormats.datetimeNBSP;
         },
 
         /**
@@ -295,9 +299,18 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @param {string} value
          * @returns {string}
          */
-        formatDateTime: function(value, addNbsp) {
+        formatDateTime: function(value) {
             return this.getMomentForBackendDateTime(value).tz(this.timezone)
-                .format(this.getDateTimeFormat(addNbsp));
+                .format(this.getDateTimeFormat());
+        },
+
+        /**
+         * @param {string} value
+         * @returns {string}
+         */
+        formatDateTimeNBSP: function(value) {
+            return this.getMomentForBackendDateTime(value).tz(this.timezone)
+                .format(this.getDateTimeFormatNBSP());
         },
 
         /**
