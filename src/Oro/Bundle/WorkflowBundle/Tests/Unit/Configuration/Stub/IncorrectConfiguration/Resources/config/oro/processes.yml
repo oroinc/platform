@@ -1,0 +1,6 @@
+processes:
+    definitions:
+        invalid_definition:
+            some: ~
+            incorrect: ~
+            configuration: ~

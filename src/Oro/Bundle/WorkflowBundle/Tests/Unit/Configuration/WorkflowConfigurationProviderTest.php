@@ -136,7 +136,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExpectedWokflowConfiguration($bundleName)
     {
-        $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/workflow.php';
+        $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/oro/workflows.php';
         $this->assertFileExists($fileName);
         return include $fileName;
     }

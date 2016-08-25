@@ -20,7 +20,7 @@ class ConfigurationPass implements CompilerPassInterface
     const EXTENSION_TAG_NAME = 'oro_datagrid.extension';
     const PROVIDER_TAG_NAME  = 'oro_datagrid.configuration.provider';
 
-    const ROOT_PARAMETER   = 'datagrid';
+    const ROOT_PARAMETER   = 'datagrids';
 
     /**
      * {@inheritDoc}
