@@ -58,3 +58,11 @@ services:
             - '@oro_featuretoggle.configuration.manager'
         tags:
             - { name: oro_featuretogle.voter }
+
+    oro_featuretoggle.provider.api_exclusion_provider:
+        class: Oro\Bundle\FeatureToggleBundle\Provider\ApiExclusionProvider
+        public: false
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
