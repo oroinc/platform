@@ -46,23 +46,6 @@ class ReferenceRepositoryInitializer
     }
 
     /**
-     * References must be refreshed after each kernel shutdown
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public function refresh()
-    {
-        $references = $this->referenceRepository->toArray();
-        $this->referenceRepository->clear();
-
-        foreach ($references as $key => $object) {
-            $class = get_class($object);
-            $newReference = $this->em->getReference($class, $object->getId());
-
-            $this->referenceRepository->set($key, $newReference);
-        }
-    }
-
-    /**
      * Remove all references from repository
      */
     public function clear()

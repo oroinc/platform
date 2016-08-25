@@ -16,20 +16,34 @@ REST API work with get request only.
 Result
 ====================
 
-Request return array with next data:
+Request returns an array with data:
 
  - **records_count** - the total number of results (without `offset` and `max_results`) parameters
  - **count** - count of records in current request
- - **data**- array with data. Data consists from next values:
+ - **data** - array with data. Data consists of values:
      - **entity_name** - class name of entity
      - **record_id** - id of record from this entity
      - **record_string** - the title of this record
+     - **record_url** - the given URL for this record
+     - **selected_data** - data from fields that have been explicitily selected in the select clause (optional)
 
  Query language
 ====================
 
 Keywords
 --------
+
+### select
+
+Include field values, taken from the search index, as an additional
+ "selected_data" section in the search result items.
+ You can select one or more fields to be attached to search results.
+ The name of the field should consist the type prefix, otherwise the default
+ ``text`` type will be used.
+```
+select text.field_name
+select (text.first_field_name, text.second_field_name)
+```
 
 ### from
 
@@ -153,6 +167,11 @@ Query examples
 * Search by demo products where name contains string `opportunity` and where price greater than `100`.
 ```
 from demo_product where name ~ opportunity and double price > 100
+```
+
+* Search and return entity data plus name and description of demo products.
+```
+select (name, description) from demo_product
 ```
 
 * Search by all entities where integer field count not equals `10`.
