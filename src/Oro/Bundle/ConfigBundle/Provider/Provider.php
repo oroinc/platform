@@ -10,6 +10,7 @@ use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 abstract class Provider implements ProviderInterface
 {
@@ -23,11 +24,24 @@ abstract class Provider implements ProviderInterface
     protected $processedSubTrees = array();
 
     /**
+     * @var FeatureChecker
+     */
+    protected $featureChecker;
+
+    /**
      * @param ConfigBag $configBag
      */
     public function __construct(ConfigBag $configBag)
     {
         $this->configBag = $configBag;
+    }
+
+    /**
+     * @param FeatureChecker $featureChecker
+     */
+    public function setFeatureChecker(FeatureChecker $featureChecker)
+    {
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -88,13 +102,39 @@ abstract class Provider implements ProviderInterface
                 throw new ItemNotFoundException(sprintf('Tree "%s" is not defined.', $treeName));
             }
 
-            $definition                             = $treeRoot;
-            $data                                   = $this->buildGroupNode($definition, $correctFieldsLevel);
-            $tree                                   = new GroupNodeDefinition($treeName, $definition, $data);
+            $definition = $treeRoot;
+            if ($this->featureChecker) {
+                $definition = $this->filterDisabledNodes($definition);
+            }
+            $data = $this->buildGroupNode($definition, $correctFieldsLevel);
+            $tree = new GroupNodeDefinition($treeName, $definition, $data);
             $this->processedTrees[$tree->getName()] = $tree;
         }
 
         return $this->processedTrees[$treeName];
+    }
+
+    /**
+     * @param array $definition
+     * @return array
+     */
+    protected function filterDisabledNodes(array $definition)
+    {
+        foreach ($definition as $key => &$definitionRow) {
+            if (is_string($definitionRow)
+                && !$this->featureChecker->isResourceEnabled($definitionRow, 'configuration')
+            ) {
+                unset($definition[$key]);
+            } elseif (is_array($definitionRow) && array_key_exists('children', $definitionRow)) {
+                if ($this->featureChecker->isResourceEnabled($key, 'configuration')) {
+                    $definitionRow['children'] = $this->filterDisabledNodes($definitionRow['children']);
+                } else {
+                    unset($definition[$key]);
+                }
+            }
+        }
+
+        return $definition;
     }
 
     /**

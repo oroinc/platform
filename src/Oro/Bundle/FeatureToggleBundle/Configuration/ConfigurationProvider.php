@@ -116,7 +116,13 @@ class ConfigurationProvider
      */
     protected function resolveConfiguration()
     {
-        $data = [];
+        $data = [
+            self::FEATURES => [],
+            self::INTERNAL => [
+                self::DEPENDENCIES => [],
+                self::BY_RESOURCE => []
+            ]
+        ];
         $configs = $this->getMergedConfigs();
         if (count($configs) > 0) {
             $data[self::FEATURES] = $this->configuration->processConfiguration($configs);
