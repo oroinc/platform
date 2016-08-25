@@ -57,9 +57,9 @@ class SearchSorterExtension extends AbstractSorterExtension
             return static::$typeMapping[$configType];
         } else {
             throw new InvalidConfigurationException(sprintf(
-                'Unknown data type %s, possible values: %s',
+                'Unknown data type \'%s\', possible values: \'%s\'',
                 $configType,
-                implode(', ', static::$typeMapping)
+                implode('\', \'', static::$typeMapping)
             ));
         }
     }

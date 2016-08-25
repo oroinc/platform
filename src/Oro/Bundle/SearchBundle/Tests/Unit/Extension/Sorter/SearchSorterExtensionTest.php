@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension\Sorter;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Extension\Sorter\SearchSorterExtension;
 
 class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
@@ -247,5 +249,91 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
                 'expectedMessage' => 'Could not found column(s) "unknown" for sorting',
             ],
         ];
+    }
+
+    /**
+     * @param $configDataType A valid configuration datatype (eg. string or integer)
+     *
+     * @dataProvider visitDatasourceWithValidTypeProvider
+     */
+    public function testVisitDatasourceWithValidType($configDataType)
+    {
+        $config = DatagridConfiguration::create([
+            'sorters' => [
+                'columns' => [
+                    'testColumn' => [
+                        'data_name' => 'testColumn',
+                        'type' => $configDataType,
+                    ]
+                ]
+            ]
+        ]);
+
+        $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
+            ->getMock()
+        ;
+
+        $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $mockDatasource
+            ->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($mockQuery)
+        ;
+
+        $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $this->sorter->setParameters($mockParameterBag);
+
+        $this->sorter->visitDatasource($config, $mockDatasource);
+    }
+
+    /**
+     * @return array
+     */
+    public function visitDatasourceWithValidTypeProvider()
+    {
+        return [
+            'string' => [
+                'configDataType' =>'string',
+            ],
+            'integer' => [
+                'configDataType' => 'integer',
+            ],
+        ];
+    }
+
+    /**
+     * @expectedException Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException
+     */
+    public function testVisitDatasourceWithInvalidType()
+    {
+        $config = DatagridConfiguration::create([
+            'sorters' => [
+                'columns' => [
+                    'testColumn' => [
+                        'data_name' => 'testColumn',
+                        'type' => 'this_will_not_be_a_valid_type',
+                    ]
+                ]
+            ]
+        ]);
+
+        $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $this->sorter->setParameters($mockParameterBag);
+
+        $this->sorter->visitDatasource($config, $mockDatasource);
     }
 }
