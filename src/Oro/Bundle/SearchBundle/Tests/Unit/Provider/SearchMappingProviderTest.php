@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 
+use Doctrine\Common\Cache\Cache;
+
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
@@ -10,7 +12,7 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
     {
         parent::setUp();
 
-        $this->cacheDriver = $this->getMock('Doctrine\Common\Cache\Cache');
+        $this->cacheDriver = $this->getMock(Cache::class);
 
         $this->provider = new SearchMappingProvider($this->eventDispatcher, $this->cacheDriver);
         $this->provider->setMappingConfig($this->testMapping);

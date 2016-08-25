@@ -130,7 +130,7 @@ abstract class AbstractSearchMappingProvider
     /**
      * Gets the FQCN of an entity by given search alias
      *
-     * @param $alias
+     * @param string $alias
      *
      * @return null|string
      */
@@ -162,7 +162,7 @@ abstract class AbstractSearchMappingProvider
     /**
      * Return true if given class supports
      *
-     * @param $className
+     * @param mixed $className
      *
      * @return bool
      */
@@ -176,7 +176,7 @@ abstract class AbstractSearchMappingProvider
     /**
      * Return true if fields mapping exists for the given class name
      *
-     * @param $className
+     * @param mixed $className
      *
      * @return bool
      */

@@ -8,6 +8,9 @@ use Doctrine\Common\Cache\Cache;
 
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AbstractSearchMappingProvider */
@@ -33,7 +36,7 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
 
     protected function setUp()
     {
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
