@@ -38,6 +38,7 @@ class SearchPagerExtension extends OrmPagerExtension
     {
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
+        /** @var $datasource SearchDatasource */
         $this->pager->setQuery($datasource->getQuery());
         $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
         $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
