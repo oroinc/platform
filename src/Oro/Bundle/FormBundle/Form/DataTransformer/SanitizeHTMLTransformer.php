@@ -13,6 +13,11 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     const MODE    = 0775;
 
     /**
+     * @var \HtmlPurifier|null
+     */
+    protected $htmlPurifier;
+
+    /**
      * @var string|null
      */
     protected $allowedElements;
@@ -55,18 +60,20 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
      */
     protected function sanitize($value)
     {
-        $config = \HTMLPurifier_Config::createDefault();
-        $this->fillAllowedElementsConfig($config);
-        $this->fillCacheConfig($config);
-        // add inline data support
-        $config->set(
-            'URI.AllowedSchemes',
-            ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true, 'tel' => true]
-        );
-        $config->set('Attr.AllowedFrameTargets', ['_blank']);
-        $purifier = new \HTMLPurifier($config);
+        if (!$this->htmlPurifier) {
+            $config = \HTMLPurifier_Config::createDefault();
+            $this->fillAllowedElementsConfig($config);
+            $this->fillCacheConfig($config);
+            // add inline data support
+            $config->set(
+                'URI.AllowedSchemes',
+                ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true, 'tel' => true]
+            );
+            $config->set('Attr.AllowedFrameTargets', ['_blank']);
+            $this->htmlPurifier = new \HTMLPurifier($config);
+        }
 
-        return $purifier->purify($value);
+        return $this->htmlPurifier->purify($value);
     }
 
     /**
