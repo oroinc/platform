@@ -365,12 +365,12 @@ define(function(require) {
             }
 
             var data = this.$(this.elementSelector).inputWidget('data');
-            _.each(value.value, function (id) {
+            _.each(value.value, function(id) {
                 if (this.selectedData[id]) {
                     return;
                 }
 
-                var item = _.find(data, function (item) {
+                var item = _.find(data, function(item) {
                     return item.id === id;
                 });
 
