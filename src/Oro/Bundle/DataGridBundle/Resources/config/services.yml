@@ -94,10 +94,16 @@ services:
     oro_datagrid.configuration.provider:
         class: %oro_datagrid.configuration.provider.class%
         arguments:
-            - []
             - '@oro_datagrid.provider.resolver'
+            - '@oro_datagrid.configuration_provider.cache'
         tags:
             - { name: oro_datagrid.configuration.provider, priority: -10 }
+
+    oro_datagrid.configuration_provider.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_datagrid_configuration' ] ]
 
     oro_datagrid.configuration.provider.chain:
         class: %oro_datagrid.configuration.provider.chain.class%
@@ -133,6 +139,20 @@ services:
         class: %oro_datagrid.event_listener.cell_selection.class%
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
+
+    oro_datagrid.event_listener.container_listener:
+      class: Oro\Bundle\DataGridBundle\EventListener\ContainerListener
+      arguments:
+          - '@oro_datagrid.configuration.provider'
+          - '@oro_datagrid.config.dumper'
+      tags:
+          - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_datagrid.config.dumper:
+            class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
+            public: false
+            lazy: true
+            arguments: [ %kernel.cache_dir%, %kernel.debug%, 'oro_datagrid' ]
 
     oro_datagrid.event_listener.mixin:
         class: Oro\Bundle\DataGridBundle\EventListener\MixinListener
@@ -289,3 +309,4 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.acl_helper'
+
