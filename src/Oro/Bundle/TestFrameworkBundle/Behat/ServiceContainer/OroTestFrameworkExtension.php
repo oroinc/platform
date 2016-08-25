@@ -7,8 +7,11 @@ use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
+use Behat\Testwork\Cli\ServiceContainer\CliExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
+use Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
@@ -63,9 +66,18 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $builder
             ->children()
+                ->arrayNode('application_suites')
+                    ->prototype('scalar')->end()
+                    ->info(
+                        "Suites that applicable for application.\n".
+                        'This suites will be run with --applicable-suites key in console'
+                    )
+                    ->defaultValue([])
+                ->end()
                 ->arrayNode('shared_contexts')
                     ->prototype('scalar')->end()
                     ->info('Contexts that added to all autoload bundles suites')
+                    ->defaultValue([])
                 ->end()
             ->end();
     }
@@ -80,6 +92,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
+        $container->setParameter('oro_test.application_suites', $config['application_suites']);
     }
 
     public function processDbDumpers(ContainerBuilder $container)

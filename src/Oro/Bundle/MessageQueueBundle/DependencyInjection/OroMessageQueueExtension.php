@@ -80,6 +80,11 @@ class OroMessageQueueExtension extends Extension
 
                 $container->setDefinition('oro_message_queue.client.message_producer', $traceableMessageProducer);
             }
+
+            $delayRedeliveredExtension = $container->getDefinition(
+                'oro_message_queue.client.delay_redelivered_message_extension'
+            );
+            $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
         }
     }
 }

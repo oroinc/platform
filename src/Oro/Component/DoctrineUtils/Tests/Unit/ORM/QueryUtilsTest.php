@@ -2,13 +2,38 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\PhpUtils\ArrayUtil;
 
-class QueryUtilsTest extends \PHPUnit_Framework_TestCase
+class QueryUtilsTest extends OrmTestCase
 {
+    /** @var EntityManager */
+    protected $em;
+
+    public function setUp()
+    {
+        $reader         = new AnnotationReader();
+        $metadataDriver = new AnnotationDriver(
+            $reader,
+            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        );
+
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $this->em->getConfiguration()->setEntityNamespaces(
+            [
+                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+            ]
+        );
+    }
+
     public function testCreateResultSetMapping()
     {
         $platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
@@ -290,6 +315,175 @@ class QueryUtilsTest extends \PHPUnit_Framework_TestCase
             $expectedCriteria,
             QueryUtils::normalizeCriteria(['field' => 'value'])
         );
+    }
+
+    public function testFixUnusedParameters()
+    {
+        $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
+                AND a.name != :param2 AND a.status = ?1';
+        $parameters = [
+            $this->getParameterMock(0),
+            $this->getParameterMock(1),
+            $this->getParameterMock('param1'),
+            $this->getParameterMock('param2'),
+            $this->getParameterMock('param3'),
+        ];
+        $expectedParameters = [
+            1 => '1_value',
+            'param1' => 'param1_value',
+            'param2' => 'param2_value',
+        ];
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->once())
+            ->method('getDql')
+            ->will($this->returnValue($dql));
+        $qb->expects($this->once())
+            ->method('getParameters')
+            ->will($this->returnValue($parameters));
+        $qb->expects($this->once())
+            ->method('setParameters')
+            ->with($expectedParameters);
+
+        QueryUtils::removeUnusedParameters($qb);
+    }
+
+    /**
+     * @dataProvider dqlParametersDataProvider
+     *
+     * @param string $dql
+     * @param string $parameter
+     * @param bool $expected
+     */
+    public function testDqlContainsParameter($dql, $parameter, $expected)
+    {
+        $this->assertEquals($expected, QueryUtils::dqlContainsParameter($dql, $parameter));
+    }
+
+    public function dqlParametersDataProvider()
+    {
+        $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
+            AND a.name != :param2 AND a.status = ?1';
+
+        return [
+            [$dql, 'param1', true],
+            [$dql, 'param5', false],
+            [$dql, 'param11', false],
+            [$dql, 0, false],
+            [$dql, 1, true],
+        ];
+    }
+
+    protected function getParameterMock($name)
+    {
+        $parameter = $this->getMockBuilder('\Doctrine\ORM\Query\Parameter')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $parameter->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+        $parameter->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue($name . '_value'));
+
+        return $parameter;
+    }
+
+    /**
+     * @dataProvider getJoinClassDataProvider
+     */
+    public function testGetJoinClass(callable $qbFactory, $joinPath, $expectedClass)
+    {
+        $qb = $qbFactory($this->em);
+
+        $this->assertEquals(
+            $expectedClass,
+            QueryUtils::getJoinClass($qb, ArrayUtil::getIn($qb->getDqlPart('join'), $joinPath))
+        );
+    }
+
+    public function getJoinClassDataProvider()
+    {
+        return [
+            'field:manyToOne' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.bestItem', 'i');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+            'field:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.groups', 'g');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+            ],
+            'field:manyToMany.field:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.groups', 'g')
+                        ->join('g.items', 'i');
+                },
+                ['p', 1],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+            'class:manyToOne' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+            'class:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+            ],
+            'class:manyToMany.class:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                },
+                ['p', 1],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+        ];
+    }
+
+    public function testFindJoinByAlias()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
+            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+
+        $this->assertNull(QueryUtils::findJoinByAlias($qb, 'p'));
+        $this->assertEquals('g', QueryUtils::findJoinByAlias($qb, 'g')->getAlias());
+        $this->assertEquals('i', QueryUtils::findJoinByAlias($qb, 'i')->getAlias());
+        $this->assertNull(QueryUtils::findJoinByAlias($qb, 'w'));
     }
 
     /**

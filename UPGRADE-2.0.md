@@ -1,6 +1,10 @@
 UPGRADE FROM 1.10 to 2.0 
 ========================
 
+####ActionBundle
+- Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
+- Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
+
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: now it takes `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` and `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` as arguments.
     - method `getApplicableWorkflow` was removed -> new method `getApplicableWorkflows` with `$entity` (as instance or class name) was added instead.
@@ -30,3 +34,25 @@ UPGRADE FROM 1.10 to 2.0
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder trough specified workflowItem alias
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
+
+####LocaleBundle:
+- Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
+- Added provider `Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider` for providing current localization
+- Added manager `Oro\Bundle\LocaleBundle\Manager\LocalizationManager` for providing localizations
+- Added datagrid extension `Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension` for working with localized values in datagrids
+- Added datagrid property `Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty`
+- Added extension interface `Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface` for providing current localization
+- Added twig filter `localized_value` to `Oro\Bundle\LocaleBundle\Twig\LocalizationExtension` for getting localized values in Twig
+- Added ExpressionFunction `localized_value` to `Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider` - can be used in Layouts
+- Added Localization Settings page in System configuration
+- Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values
+
+###Layout Component:
+- Interface `Oro\Component\Layout\DataProviderInterface` was removed.
+- Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
+- Methods `Oro\Component\Layout\DataAccessorInterface::getIdentifier()` and `Oro\Component\Layout\DataAccessorInterface::get()`  was removed.
+- Added class `Oro\Component\Layout\DataProviderDecorator`.
+- Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
+- Method `Oro\Component\Layout\ContextDataCollection::getIdentifier()` was removed.
+- Twig method `layout_attr_merge` was renamed to `layout_attr_defaults`.
+- BlockType classes replaced with DI configuration for listed block types: `external_resource`, `input`, `link`, `meta`, `ordered_list`, `script` and `style`. Corresponding block type classes was removed.

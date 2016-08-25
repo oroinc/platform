@@ -151,11 +151,17 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     }
 
     /**
+     * Sort grid by column
+     * Example: When sort grid by Created at
+     * Example: But when I sort grid by First Name again
+     *
      * @When /^(?:|when )(?:|I )sort grid by (?P<field>([\w\s]*[^again]))(?:| again)$/
      */
     public function sortGridBy($field)
     {
-        $this->elementFactory->createElement('GridHeader')->getHeaderLink($field)->click();
+        /** @var GridHeader $gridHeader */
+        $gridHeader = $this->elementFactory->createElement('GridHeader');
+        $gridHeader->getHeaderLink($field)->click();
     }
 
     //@codingStandardsIgnoreStart
@@ -277,6 +283,18 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     }
 
     /**
+     * Reset filter
+     * Example: And I reset Activity Type filter
+     *
+     * @When /^(?:|I )reset (?P<filterName>([\w\s]+)) filter$/
+     */
+    public function resetFilter($filterName)
+    {
+        $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
+        $filterItem->find('css', 'span.reset-filter')->click();
+    }
+
+    /**
      * @When /^(?:|I )check All Visible records in grid$/
      */
     public function iCheckAllVisibleRecordsInGrid()
@@ -291,13 +309,14 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     {
         $this->getGrid()->massCheck('All');
     }
+
     /**
      * @Then there is no records in grid
      * @Then all records should be deleted
      */
     public function thereIsNoRecordsInGrid()
     {
-        $this->getGrid()->assertNoRecords();
+        self::assertCount(0, $this->getGrid()->getRows());
     }
 
     /**

@@ -8,6 +8,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProce
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
+use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Oro\Component\MessageQueue\Job\Topics;
@@ -31,6 +32,7 @@ class OroMessageQueueBundle extends Bundle
         $extension = $container->getExtension('oro_message_queue');
         $extension->addTransportFactory(new DefaultTransportFactory());
         $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DbalTransportFactory());
 
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::CALCULATE_ROOT_JOB_STATUS, 'Calculate root job status')

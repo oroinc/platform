@@ -35,7 +35,7 @@ define(['numeral', '../locale-settings', 'underscore'
         var formatters = {
             numeralFormat: function(value, options) {
                 var originLanguage = numeral.language();
-                numeral.language('en');
+                numeral.language(localeSettings.getLocale());
                 var result = numeral(value).format(createFormat(options));
                 if (result === '0') {
                     result = options.zero_digit_symbol;
@@ -55,19 +55,6 @@ define(['numeral', '../locale-settings', 'underscore'
                     suffix = options.negative_suffix;
                 }
                 return prefix + formattedNumber + suffix;
-            },
-            replaceSeparator: function(formattedNumber, options) {
-                var defaultGroupingSeparator = ',';
-                var defaultDecimalSeparator = '.';
-                if (defaultGroupingSeparator !== options.grouping_separator_symbol) {
-                    formattedNumber = formattedNumber
-                        .replace(defaultGroupingSeparator, options.grouping_separator_symbol);
-                }
-                if (defaultDecimalSeparator !== options.decimal_separator_symbol) {
-                    formattedNumber = formattedNumber
-                        .replace(defaultDecimalSeparator, options.decimal_separator_symbol);
-                }
-                return formattedNumber;
             },
             replaceMonetarySeparator: function(formattedNumber, options) {
                 var defaultGroupingSeparator = ',';
@@ -108,7 +95,6 @@ define(['numeral', '../locale-settings', 'underscore'
                 options.style = 'decimal';
                 var formattersChain = [
                     formatters.numeralFormat,
-                    formatters.replaceSeparator,
                     formatters.addPrefixSuffix
                 ];
                 return doFormat(value, options, formattersChain);
@@ -120,7 +106,6 @@ define(['numeral', '../locale-settings', 'underscore'
                 options.min_fraction_digits = 0;
                 var formattersChain = [
                     formatters.numeralFormat,
-                    formatters.replaceSeparator,
                     formatters.addPrefixSuffix
                 ];
                 return doFormat(value, options, formattersChain);
@@ -130,7 +115,6 @@ define(['numeral', '../locale-settings', 'underscore'
                 options.style = 'percent';
                 var formattersChain = [
                     formatters.numeralFormat,
-                    formatters.replaceSeparator,
                     formatters.clearPercent,
                     formatters.addPrefixSuffix
                 ];
@@ -145,7 +129,6 @@ define(['numeral', '../locale-settings', 'underscore'
                 options.currency_code = currency;
                 var formattersChain = [
                     formatters.numeralFormat,
-                    formatters.replaceSeparator,
                     formatters.addPrefixSuffix,
                     formatters.replaceCurrency
                 ];
@@ -189,14 +172,9 @@ define(['numeral', '../locale-settings', 'underscore'
                 return result;
             },
             unformat: function(value) {
-                var options = localeSettings.getNumberFormats('decimal');
                 var result = String(value);
-                var defaultGroupingSeparator = ',';
-                var defaultDecimalSeparator = '.';
-                result = result.replace(options.grouping_separator_symbol, defaultGroupingSeparator);
-                result = result.replace(options.decimal_separator_symbol, defaultDecimalSeparator);
-
                 var originLanguage = numeral.language();
+                numeral.language(localeSettings.getLocale());
                 result = numeral().unformat(result);
                 numeral.language(originLanguage);
 

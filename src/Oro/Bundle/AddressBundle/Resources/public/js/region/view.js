@@ -55,14 +55,14 @@ define([
                     this.addRequiredFlag(this.$simpleEl);
                 }
                 this.target.inputWidget('show');
-                this.targetLabel.show();
             } else {
                 this.target.inputWidget('hide');
-                this.targetLabel.hide();
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }
-                this.target.validate().hideElementErrors(this.target);
+                if (this.target.closest('form').data('validator')) {
+                    this.target.validate().hideElementErrors(this.target);
+                }
             }
         },
 

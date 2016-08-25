@@ -30,25 +30,43 @@ class Form extends Element
      */
     public function getLastSet()
     {
-        $maxSet = 10;
-        $prevSet = $this->find('css', 'div[data-content="0"]');
+        $sets = $this->findAll('css', '.oro-multiselect-holder');
+        self::assertNotCount(0, $sets, 'Can\'t find any set in form');
 
-        for ($i = 2; $i <= $maxSet; $i++) {
-            $set = $this->find('css', sprintf('div[data-content="%s"]', $i));
-
-            if (!$set) {
-                return $this->elementFactory->wrapElement('OroForm', $prevSet);
-            }
-
-            $prevSet = $set;
-        }
-
-        return null;
+        return $this->elementFactory->wrapElement('OroForm', array_pop($sets));
     }
 
     public function saveAndClose()
     {
-        $this->pressButton('Save and Close');
+        $this->pressActionButton('Save and Close');
+    }
+
+    public function save()
+    {
+        $this->pressActionButton('Save');
+    }
+
+    /**
+     * Choose from list Save, Save and Close, Save and New etc. on from element
+     * If button is visible it'll pressed
+     * If not, select from list and pressed
+     *
+     * @param string $actionLocator
+     */
+    protected function pressActionButton($actionLocator)
+    {
+        $button = $this->findButton($actionLocator);
+
+        self::assertNotNull($button, sprintf('Can\'t find "%s" form action button', $actionLocator));
+
+        if ($button->isVisible()) {
+            $button->press();
+
+            return;
+        }
+
+        $this->elementFactory->createElement('Action Button Chooser')->click();
+        $button->press();
     }
 
     /**
@@ -101,6 +119,7 @@ class Form extends Element
     {
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
+
             if ($sndParent->hasClass('control-group-collection')) {
                 $elementName = Inflector::singularize(trim($label->getText())).'Collection';
                 $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
@@ -114,6 +133,8 @@ class Form extends Element
                 return $select;
             } elseif ($sndParent->hasClass('control-group-checkbox')) {
                 return $sndParent->find('css', 'input[type=checkbox]');
+            } elseif ($sndParent->hasClass('control-group-choice')) {
+                return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
