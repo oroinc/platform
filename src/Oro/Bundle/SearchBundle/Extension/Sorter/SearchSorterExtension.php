@@ -7,9 +7,16 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 
 class SearchSorterExtension extends AbstractSorterExtension
 {
+    // data type mapping from configuration type to search engine type
+    protected static $typeMapping = [
+        'string'  => 'text',
+        'integer' => 'integer',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -18,16 +25,42 @@ class SearchSorterExtension extends AbstractSorterExtension
         return parent::isApplicable($config) && $config->getDatasourceType() === SearchDatasource::TYPE;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addSorterToDasource(array $sorter, $direction, DatasourceInterface $datasource)
     {
+        /* @var  $datasource SearchDatasource */
+
         $sortKey = $sorter['data_name'];
 
         if (array_key_exists(PropertyInterface::TYPE_KEY, $sorter)) {
             // pass type if specified
-            $datasource->getQuery()->setOrderBy($sortKey, $direction, $sorter[PropertyInterface::TYPE_KEY]);
+            $type = $this->mapType($sorter[PropertyInterface::TYPE_KEY]);
+            $datasource->getQuery()->setOrderBy($sortKey, $direction, $type);
         } else {
             // otherwise use default type
             $datasource->getQuery()->setOrderBy($sortKey, $direction);
+        }
+    }
+
+    /**
+     * Returns corresponding search data type for given configuration data type
+     *
+     * @param $configType
+     * @return string
+     * @throws InvalidConfigurationException On unknoewn config type
+     */
+    protected function mapType($configType)
+    {
+        if (array_key_exists($configType, static::$typeMapping)) {
+            return static::$typeMapping[$configType];
+        } else {
+            throw new InvalidConfigurationException(sprintf(
+                'Unknown data type %s, possible values: %s',
+                $configType,
+                implode(', ', static::$typeMapping)
+            ));
         }
     }
 }

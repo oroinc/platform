@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ocsi
- * Date: 2016.08.24.
- * Time: 16:44
- */
 
 namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 

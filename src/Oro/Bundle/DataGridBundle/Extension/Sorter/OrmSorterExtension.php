@@ -9,15 +9,19 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 class OrmSorterExtension extends AbstractSorterExtension
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
         return parent::isApplicable($config) && $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addSorterToDasource(array $sorter, $direction, DatasourceInterface $datasource)
     {
+        /* @var $datasource OrmDatasource */
         $datasource->getQueryBuilder()->addOrderBy($sorter['data_name'], $direction);
     }
 }
