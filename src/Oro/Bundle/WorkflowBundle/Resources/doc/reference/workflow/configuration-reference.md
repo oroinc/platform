@@ -128,8 +128,15 @@ Single workflow configuration has next properties:
     Contains configuration for Transitions
 * **transition_definitions**
     Contains configuration for Transition Definitions
+* **priority** - integer value of current workflow dominance level in part of automatically performed tasks (ordering, exclusiveness). It is recommended to use high degree integer values to give a scope for 3rd party integrators.
+* **exclusive_active_groups** - list of group names for which current workflow should be active exclusively
+* **exclusive_record_groups** - list of group names for which current workflow can not be performed together with other workflows with one of specified groups. E.g., no concurrent transitions are possible among workflows in same exclusive_record_group. 
 * **entity_restrictions**
     Contains configuration for Workflow Restrictions
+* **defaults** - node for default workflow configuration values that can be changed in UI later. 
+    * **active** - determine if workflow should be active right after first load of configuration.
+
+
 
 Example
 -------
@@ -137,11 +144,17 @@ Example
 workflows:                                                    # Root elements
     b2b_flow_sales:                                           # A unique name of workflow
         label: B2B Sales Flow                                 # This will be shown in UI
+        defaults:
+            active: true                                      # Active by default (when config is loaded)
         entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
         steps_display_ordered: true                           # Show all steps in step widget
+        priority: 100                                         # Priority level
+        exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
+        exclusive_record_groups:
+            - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps
@@ -288,7 +301,7 @@ workflows:
                     owner:
                         update: false
                         delete: false
-             start_conversation:
+            start_conversation:
                 label: 'Call Phone Conversation'
                 allowed_transitions:
                     - end_conversation
@@ -419,14 +432,20 @@ Transition definition configuration has next options.
 
 * **preactions**
     Configuration of Pre Actions that must be performed before Pre Conditions check.
-* **pre_conditions**
+* **preconditions**
     Configuration of Pre Conditions that must satisfy to allow displaying transition.
 * **conditions**
     Configuration of Conditions that must satisfy to allow transition.
-* **post_actions**
+* **actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
+* **form_init**
+    Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
+* **pre_conditions**
+    Deprecated, use `preconditions` instead.
 * **init_actions**
-    Configuration of Init Actions that may be performed on workflow item before conditions and post actions.
+    Deprecated, use `form_init` instead.
+* **post_actions**
+    Deprecated, use `actions` instead.
 
 Example
 -------
@@ -444,9 +463,9 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, true]
-                init_actions:
+                form_init:
                     - @increment_value: [$call_attempt]
             not_answered_definition: # Callee did not answer
                 # Set timeout value
@@ -458,7 +477,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, false]
             end_conversation_definition:
                 conditions:
@@ -469,7 +488,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -576,7 +595,7 @@ workflows:
         transition_definitions:
             # some transition definition
             qualify_call:
-                pre_conditions:
+                preconditions:
                     @equal: [$status, "in_progress"]
                 conditions:
                     # empty($call_timeout) || (($call_timeout >= 60 && $call_timeout < 100) || ($call_timeout > 0 && $call_timeout <= 30))
@@ -625,9 +644,9 @@ workflows:
             # some transition definition
                 preactions:
                     - @some_action: ~
-                init_actions:
+                form_init:
                     - @assign_value: [$call_attempt, 1]
-                post_actions:
+                actions:
                     - @create_entity: # create an entity PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -661,7 +680,6 @@ workflows:
     phone_call:
         label: 'Demo Call Workflow'
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-        enabled: true
         start_step: start_call
         steps:
             start_call:
@@ -721,7 +739,7 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, true]
             not_answered_definition: # Callee did not answer
@@ -731,7 +749,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, false]
             end_conversation_definition:
@@ -743,7 +761,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         parameters:
                             class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation

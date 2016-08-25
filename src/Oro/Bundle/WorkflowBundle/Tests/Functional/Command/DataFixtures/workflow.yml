@@ -3,6 +3,8 @@ workflows:
         label: 'Good Workflow'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: second_step
+        defaults:
+            active: true
         steps:
             second_step:
                 label: 'Second Step'
@@ -27,6 +29,9 @@ workflows:
         label: 'Bad Workflow'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: second_step
+        start_step: second_step
+        defaults:
+            active: true
         steps:
             second_step:
                 label: 'Second Step'

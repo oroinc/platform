@@ -66,40 +66,60 @@
 {%- endblock %}
 
 {% block input_widget -%}
+    {% set attr = attr|merge({
+        type: type,
+    }) %}
+
+    {% if name is defined %}
+        {% set attr = attr|merge({
+            name: name
+        }) %}
+    {% endif %}
+
+    {% if id is defined and id is not empty %}
+        {% set attr = attr|merge({
+            id: id
+        }) %}
+    {% endif %}
+
+    {% if placeholder is defined %}
+        {% set attr = attr|merge({
+            placeholder: placeholder
+        }) %}
+    {% endif %}
+
+    {% if value is defined %}
+        {% set attr = attr|merge({
+            value: value
+        }) %}
+    {% endif %}
+
+    {% if type == 'password' %}
+        {% set attr = attr|merge({
+            autocomplete: 'off'
+        }) %}
+    {% endif %}
+
+    {% if attr.placeholder is defined %}
+        {% set attr = layout_attr_defaults(attr, {
+            'placeholder': attr.placeholder|block_text(translation_domain)
+        }) %}
+    {% endif %}
+
     {%- if type == 'checkbox' -%}
         {% set attr = layout_attr_defaults(attr, {
             '~class': ' checkbox__input'
         }) %}
 
-        {% if attr.placeholder is defined %}
-            {% set attr = layout_attr_defaults(attr, {
-                'placeholder': attr.placeholder|block_text(translation_domain)
-            }) %}
-        {% endif %}
-        <label for="{{ id }}"
-               class="checkbox"
-        >
-            <input id="{{ id }}"
-                   type="checkbox"
-                   class="checkbox__input"
-                   {{ block('widget_attributes') }}
-                   {% if value is defined %} value="{{ value }}" {% endif %}
-                   {% if checked is defined %} checked="checked" {% endif %}
-            >
+        <label for="{{ id }}" class="checkbox">
+            <input{{ block('block_attributes') }}/>
             <span class="checkbox__icon"></span>
             <span class="checkbox__text">{{ label|block_text(translation_domain) }} </span>
         </label>
-
     {% else %}
         {% set attr = layout_attr_defaults(attr, {
             '~class': ' input'
         }) %}
-
-        {% if attr.placeholder is defined %}
-            {% set attr = layout_attr_defaults(attr, {
-                'placeholder': attr.placeholder|block_text(translation_domain)
-            }) %}
-        {% endif %}
 
         <input{{ block('block_attributes') }}/>
     {%- endif -%}
@@ -141,12 +161,64 @@
 {%- endblock %}
 
 {% block meta_widget %}
+    {% if charset is defined %}
+        {% set attr = attr|merge({
+            charset: charset
+        }) %}
+    {% endif %}
+
+    {% if content is defined %}
+        {% set attr = attr|merge({
+            content: content
+        }) %}
+    {% endif %}
+
+    {% if http_equiv is defined %}
+        {% set attr = attr|merge({
+            http_equiv: http_equiv
+        }) %}
+    {% endif %}
+
+    {% if name is defined %}
+        {% set attr = attr|merge({
+            name: name
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         <meta{{ block('block_attributes') }}/>
     {% endspaceless %}
 {% endblock %}
 
 {% block script_widget %}
+    {% set attr = attr|merge({
+        type: type,
+    }) %}
+
+    {% if src is defined %}
+        {% set attr = attr|merge({
+            src: src
+        }) %}
+    {% endif %}
+
+    {% if async != false %}
+        {% set attr = attr|merge({
+            async: 'async'
+        }) %}
+    {% endif %}
+
+    {% if defer != false %}
+        {% set attr = attr|merge({
+            defer: 'defer'
+        }) %}
+    {% endif %}
+
+    {% if crossorigin is defined %}
+        {% set attr = attr|merge({
+            crossorigin: crossorigin
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         {%- if attr.src is defined and attr.src is not empty -%}
             <script{{ block('block_attributes') }}></script>
@@ -159,6 +231,34 @@
 {% endblock %}
 
 {% block style_widget %}
+    {% set attr = attr|merge({
+        type: type,
+    }) %}
+
+    {% if src is defined %}
+        {% set attr = attr|merge({
+            href: src
+        }) %}
+    {% endif %}
+
+    {% if media is defined %}
+        {% set attr = attr|merge({
+            media: media
+        }) %}
+    {% endif %}
+
+    {% if scoped != false %}
+        {% set attr = attr|merge({
+            scoped: 'scoped'
+        }) %}
+    {% endif %}
+
+    {% if crossorigin is defined %}
+        {% set attr = attr|merge({
+            crossorigin: crossorigin
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         {%- if attr.href is defined and attr.href is not empty -%}
             <link rel="stylesheet"{{ block('block_attributes') }}/>
@@ -171,11 +271,7 @@
 {% endblock %}
 
 {% block body_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' body'
-    }) %}
-
-     <body{{ block('block_attributes') }}>
+    <body{{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </body>
 {% endblock %}
@@ -232,10 +328,6 @@
 {%- endblock %}
 
 {% block link_widget -%}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' link'
-    }) %}
-
     {% spaceless %}
         <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
             {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
@@ -253,10 +345,6 @@
 {%- endblock %}
 
 {% block button_widget_input -%}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' button'
-    }) %}
-
     {% spaceless %}
         <input{{ block('block_attributes') }}
             type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
@@ -266,10 +354,6 @@
 {%- endblock %}
 
 {% block button_widget_button -%}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' button'
-    }) %}
-
     {% spaceless %}
         <button{{ block('block_attributes') }}
                 type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
@@ -283,6 +367,17 @@
 {%- endblock %}
 
 {% block external_resource_widget %}
+    {% set attr = attr|merge({
+        rel: rel,
+        href: href,
+    }) %}
+
+    {% if type is defined %}
+        {% set attr = attr|merge({
+            type: type
+        }) %}
+    {% endif %}
+
     <link{{ block('block_attributes') }}/>
 {% endblock %}
 
@@ -301,6 +396,18 @@
 {%- endblock %}
 
 {% block ordered_list_widget -%}
+    {% if type is defined %}
+        {% set attr = attr|merge({
+        type: type
+        }) %}
+    {% endif %}
+
+    {% if start is defined %}
+        {% set attr = attr|merge({
+        start: start
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         <ol{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}

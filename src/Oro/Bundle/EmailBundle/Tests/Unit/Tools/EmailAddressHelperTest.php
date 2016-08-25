@@ -80,6 +80,9 @@ class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
             ['\'John Smith\' <john@example.com>', 'john@example.com', 'John Smith'],
             ['John Smith on behaf <john@example.com>', 'john@example.com', 'John Smith on behaf'],
             ['"john@example.com" <john@example.com>', 'john@example.com', 'john@example.com'],
+            ['<john@example.com> (Contact)', 'john@example.com', ''],
+            ['John Smith <john@example.com> (Contact)', 'john@example.com', 'John Smith'],
+            ['"John Smith" <john@example.com> (Contact)', 'john@example.com', 'John Smith'],
         ];
     }
 
