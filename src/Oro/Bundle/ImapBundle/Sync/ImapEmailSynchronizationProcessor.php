@@ -67,7 +67,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * {@inheritdoc}
      */
-    public function process(EmailOrigin $origin, $syncStartTime, $force)
+    public function process(EmailOrigin $origin, $syncStartTime, $force = false)
     {
         // make sure that the entity builder is empty
         $this->emailEntityBuilder->clear();
@@ -117,7 +117,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->cleanUp(true, $imapFolder->getFolder());
 
             $processSpentTime = time() - $processStartTime;
-            if ($processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+
+            if (!$force && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
                 break;
             }
         }
@@ -470,6 +471,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         EmailFolder $folder,
         $skipLastUid = false
     ) {
+        $lastUid = null;
         if (!$skipLastUid) {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
         }
