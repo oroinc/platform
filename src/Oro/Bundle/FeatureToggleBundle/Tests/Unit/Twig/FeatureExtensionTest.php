@@ -17,24 +17,21 @@ class FeatureExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $featureExtension;
 
-    protected function setUp()
-    {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureExtension = new FeatureExtension($this->featureChecker);
-    }
-
     public function testGetFunctions()
     {
         $functions = $this->featureExtension->getFunctions();
-        $this->assertArrayHasKey('feature_enabled', $functions);
-        $this->assertArrayHasKey('feature_resource_enabled', $functions);
+        $this->assertCount(2, $functions);
+        $expectedFunctions = ['feature_enabled', 'feature_resource_enabled'];
+        /** @var \Twig_SimpleFunction[] $functions */
+        foreach ($functions as $function) {
+            $this->assertInstanceOf(\Twig_SimpleFunction::class, $function);
+            $this->assertContains($function->getName(), $expectedFunctions);
+        }
     }
 
     public function testGetName()
     {
-        $this->assertEquals('oro_feature_extension', $this->featureExtension->getName());
+        $this->assertEquals('oro_featuretoggle_extension', $this->featureExtension->getName());
     }
 
     public function testIsFeatureEnabled()
@@ -62,5 +59,13 @@ class FeatureExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->assertTrue($this->featureExtension->isResourceEnabled($resource, $resourceType, $scopeIdentifier));
+    }
+
+    protected function setUp()
+    {
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->featureExtension = new FeatureExtension($this->featureChecker);
     }
 }

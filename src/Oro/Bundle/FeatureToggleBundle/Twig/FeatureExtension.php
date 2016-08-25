@@ -24,10 +24,10 @@ class FeatureExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            'feature_enabled' => new \Twig_Function_Method($this, 'isFeatureEnabled'),
-            'feature_resource_enabled' => new \Twig_Function_Method($this, 'isResourceEnabled'),
-        );
+        return [
+            new \Twig_SimpleFunction('feature_enabled', [$this, 'isFeatureEnabled']),
+            new \Twig_SimpleFunction('feature_resource_enabled', [$this, 'isResourceEnabled']),
+        ];
     }
 
     /**
@@ -35,12 +35,12 @@ class FeatureExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'oro_feature_extension';
+        return 'oro_featuretoggle_extension';
     }
 
     /**
      * @param string $feature
-     * @param int|null $scopeIdentifier
+     * @param int|object|null $scopeIdentifier
      * @return bool
      */
     public function isFeatureEnabled($feature, $scopeIdentifier = null)
@@ -51,7 +51,7 @@ class FeatureExtension extends \Twig_Extension
     /**
      * @param string $resource
      * @param string $resourceType
-     * @param null $scopeIdentifier
+     * @param int|object|null $scopeIdentifier
      * @return bool
      */
     public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
