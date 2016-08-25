@@ -60,7 +60,7 @@
         <div class="btn-group">
             <a type="button"
                class="btn export-btn icons-holder-text no-hash"
-               href="{{ path(exportRoute, defaultRouteParams|merge({'processorAlias': exportProcessor, 'entity': entity_class})) }}">
+               href="{{ path(exportRoute, defaultRouteParams|merge({'processorAlias': exportProcessor, 'entity': entity_class, 'filePrefix': filePrefix|default(null)})) }}">
                 <i class="icon-upload-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
