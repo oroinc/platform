@@ -84,7 +84,6 @@ parameters:
     oro_security.configuration.provider.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
     oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
 
-    oro_security.form.extension.aclprotected_fields_type.class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
     oro_security.serializer.filter_chain.class:                Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain
     oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
 
@@ -682,7 +681,7 @@ services:
             - { name: layout.data_provider, alias: acl }
 
     oro_security.form.extension.aclprotected_fields_type:
-        class: %oro_security.form.extension.aclprotected_fields_type.class%
+        class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
         arguments:
             - '@oro_security.security_facade'
             - '@oro_entity.orm.entity_class_resolver'
@@ -690,7 +689,7 @@ services:
             - '@oro_entity_config.provider.security'
             - '@logger'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_security.acl.extension.field:
         public: false

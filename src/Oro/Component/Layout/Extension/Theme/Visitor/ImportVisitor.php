@@ -86,6 +86,10 @@ class ImportVisitor implements VisitorInterface
 
         foreach ($imports as $importData) {
             $import = $this->createImport($importData);
+            if ($parentUpdate instanceof LayoutUpdateImportInterface) {
+                $import->setParent($parentUpdate->getImport());
+            }
+
             $files = $this->getImportResources($context->get(ThemeExtension::THEME_KEY), $import->getId());
             foreach ($files as $file) {
                 $update = $this->loader->load($file);
@@ -94,16 +98,16 @@ class ImportVisitor implements VisitorInterface
                     $update->setParentUpdate($parentUpdate);
                 }
 
+                if ($update instanceof ImportsAwareLayoutUpdateInterface) {
+                    $this->loadImportUpdate($update, $context);
+                }
+
                 $el = $update instanceof ElementDependentLayoutUpdateInterface
                     ? $update->getElement()
                     : 'root';
                 $this->updates[$el][] = $update;
 
                 $this->dependencyInitializer->initialize($update);
-
-                if ($update instanceof ImportsAwareLayoutUpdateInterface) {
-                    $this->loadImportUpdate($update, $context);
-                }
             }
         }
     }
