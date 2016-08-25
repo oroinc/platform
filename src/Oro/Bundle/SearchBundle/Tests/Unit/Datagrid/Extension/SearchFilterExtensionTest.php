@@ -76,7 +76,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'expected' => [
-                    ParameterBag::MINIFIED_PARAMETERS     => [
+                    ParameterBag::MINIFIED_PARAMETERS          => [
                         OrmFilterExtension::MINIFIED_FILTER_PARAM => [
                             'firstName' => ['value' => 'John'],
                         ],
@@ -162,7 +162,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
     public function valuesDataProvider()
     {
         return [
-            'default_filter_no_parameters_modified_grid'  => [
+            'default_filter_no_parameters_modified_grid' => [
                 [
                     'filters' => [
                         'columns' => [
@@ -184,7 +184,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['value' => 'filter-value']
             ],
-            'default_filter_no_parameters_new_grid'       => [
+            'default_filter_no_parameters_new_grid' => [
                 [
                     'filters' => [
                         'columns' => [
@@ -202,7 +202,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 [],
                 ['value' => 'filter-value']
             ],
-            'default_filter_no_parameters_grid_with_default_view'  => [
+            'default_filter_no_parameters_grid_with_default_view' => [
                 [
                     'filters' => [
                         'columns' => [
@@ -224,7 +224,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['value' => 'filter-value']
             ],
-            'parametrized_without_default_filters'        => [
+            'parametrized_without_default_filters' => [
                 [
                     'filters' => [
                         'columns' => [
@@ -243,7 +243,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['value' => 'filter-value']
             ],
-            'override_default_filters'                    => [
+            'override_default_filters' => [
                 [
                     'filters' => [
                         'columns' => [
