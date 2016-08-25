@@ -59,7 +59,7 @@ oro:
                     choices:
                         auto.label: Auto
                         manual.label: Manual
-                remove_larger_attachments.label: Remove larger attachments
+                remove_larger_attachments.label: Remove large attachments
 
             reply_configuration:
                 label: Reply
