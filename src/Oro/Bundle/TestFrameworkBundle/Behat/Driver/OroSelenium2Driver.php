@@ -283,18 +283,17 @@ JS;
     }
 
     /**
-     * Executes JS on a given element - pass in a js script string and {{ELEMENT}} will
-     * be replaced with a reference to the element
-     *
-     * @example $this->executeJsOnXpath($xpath, 'return {{ELEMENT}}.childNodes.length');
-     *
-     * @param Element $element the webdriver element
-     * @param string  $script  the script to execute
-     * @param Boolean $sync    whether to run the script synchronously (default is TRUE)
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    private function executeJsOnElement(Element $element, $script, $sync = true)
+    public function executeJsOnXpath($xpath, $script, $sync = true)
+    {
+        return $this->executeJsOnElement($this->findElement($xpath), $script, $sync);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function executeJsOnElement(Element $element, $script, $sync = true)
     {
         $script  = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
 
