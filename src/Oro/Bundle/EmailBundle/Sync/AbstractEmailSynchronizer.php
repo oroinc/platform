@@ -106,7 +106,6 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
-     * @param bool $force               Skip UID or last sync date
      *
      * @return int
      *
@@ -118,8 +117,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $maxConcurrentTasks,
         $minExecIntervalInMin,
         $maxExecTimeInMin = -1,
-        $maxTasks = 1,
-        $force = false
+        $maxTasks = 1
     ) {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -160,12 +158,13 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
             $processedOrigins[$origin->getId()] = true;
             try {
-                $this->doSyncOrigin($origin, $force);
+                $this->doSyncOrigin($origin);
             } catch (SyncFolderTimeoutException $ex) {
                 break;
             } catch (\Exception $ex) {
                 $failedOriginIds[] = $origin->getId();
             }
+
 
             if ($maxTasks > 0 && count($processedOrigins) >= $maxTasks) {
                 $this->logger->info('Exit because the limit of tasks are reached.');
@@ -182,9 +181,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origins.
      *
      * @param int[] $originIds
+     * @param bool $force
+     *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds)
+    public function syncOrigins(array $originIds, $force = false)
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -199,7 +200,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
-                    $this->doSyncOrigin($origin);
+                    $this->doSyncOrigin($origin, $force);
                 } catch (SyncFolderTimeoutException $ex) {
                     break;
                 } catch (\Exception $ex) {
@@ -265,9 +266,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
+     * @param bool $force
+     *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin, $force)
+    protected function doSyncOrigin(EmailOrigin $origin, $force = false)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
