@@ -680,6 +680,13 @@ services:
         tags:
             - { name: layout.data_provider, alias: acl }
 
+    oro_security.layout.data_provider.current_user:
+        class: Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: layout.data_provider, alias: current_user }
+
     oro_security.form.extension.aclprotected_fields_type:
         class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
         arguments:
