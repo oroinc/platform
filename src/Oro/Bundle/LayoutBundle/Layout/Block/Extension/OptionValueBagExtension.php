@@ -37,7 +37,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
         if ($options['resolve_value_bags']) {
-            $this->resolveValueBags($options, true);
+            $this->resolveValueBags($options);
         }
     }
 
@@ -54,14 +54,13 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
 
     /**
      * @param array $options
-     * @param bool $hasExpression
      *
      * @return array
      */
-    protected function resolveValueBags(array &$options, $hasExpression = false)
+    protected function resolveValueBags(array &$options)
     {
         foreach ($options as $key => $value) {
-            if ($hasExpression && $value instanceof Expression) {
+            if ($value instanceof Expression) {
                 continue;
             }
             if (is_array($value)) {
