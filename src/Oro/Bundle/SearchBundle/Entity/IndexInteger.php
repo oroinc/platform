@@ -10,6 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="oro_search_index_integer")
  * @ORM\Entity
  */
-class IndexInteger extends BaseIndexInteger
+class IndexInteger extends AbstractIndexInteger
 {
 }

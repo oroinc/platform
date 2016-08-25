@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\MappedSuperclass
  */
-class BaseIndexDecimal implements BaseItemFieldInterface
+abstract class AbstractIndexText implements ItemFieldInterface
 {
     /**
      * @var integer
@@ -19,7 +19,7 @@ class BaseIndexDecimal implements BaseItemFieldInterface
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Item", inversedBy="decimalFields")
+     * @ORM\ManyToOne(targetEntity="Item", inversedBy="textFields")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      */
     protected $item;
@@ -32,9 +32,9 @@ class BaseIndexDecimal implements BaseItemFieldInterface
     protected $field;
 
     /**
-     * @var float
+     * @var string
      *
-     * @ORM\Column(name="value", type="decimal", scale=2, nullable=false))
+     * @ORM\Column(name="value", type="text", nullable=false)
      */
     protected $value;
 
@@ -46,24 +46,6 @@ class BaseIndexDecimal implements BaseItemFieldInterface
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setItem(BaseItem $item = null)
-    {
-        $this->item = $item;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getItem()
-    {
-        return $this->item;
     }
 
     /**
@@ -100,5 +82,23 @@ class BaseIndexDecimal implements BaseItemFieldInterface
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setItem(AbstractItem $item = null)
+    {
+        $this->item = $item;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItem()
+    {
+        return $this->item;
     }
 }

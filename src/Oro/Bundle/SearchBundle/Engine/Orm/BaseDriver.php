@@ -9,10 +9,13 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\SearchBundle\Entity\BaseItem;
+use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class BaseDriver
 {
     /**
@@ -37,7 +40,7 @@ abstract class BaseDriver
      */
     public function initRepo(EntityManager $em, ClassMetadata $class)
     {
-        if (!is_a($class->name, BaseItem::class, true)) {
+        if (!is_a($class->name, AbstractItem::class, true)) {
             throw new \InvalidArgumentException(
                 'ClassMetadata doesn\'t represent Oro\Bundle\SearchBundle\Entity\Item class or its descendant'
             );

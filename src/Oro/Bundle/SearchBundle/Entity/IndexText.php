@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="oro_search_index_text")
  * @ORM\Entity
  */
-class IndexText extends BaseIndexText
+class IndexText extends AbstractIndexText
 {
     const HYPHEN_SUBSTITUTION = ' ';
 

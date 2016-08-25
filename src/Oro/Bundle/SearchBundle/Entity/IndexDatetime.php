@@ -10,6 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="oro_search_index_datetime")
  * @ORM\Entity
  */
-class IndexDatetime extends BaseIndexDatetime
+class IndexDatetime extends AbstractIndexDatetime
 {
 }

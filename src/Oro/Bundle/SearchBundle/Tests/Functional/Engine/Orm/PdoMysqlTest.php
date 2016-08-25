@@ -62,4 +62,3 @@ class PdoMysqlTest extends AbstractDriverTest
         $this->assertEquals($expectedQueries, $queries);
     }
 }
-

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\MappedSuperclass
  */
-class BaseIndexInteger implements BaseItemFieldInterface
+abstract class AbstractIndexInteger implements ItemFieldInterface
 {
     /**
      * @var integer
@@ -71,6 +71,10 @@ class BaseIndexInteger implements BaseItemFieldInterface
      */
     public function setValue($value)
     {
+        if (!is_numeric($value)) {
+            throw new \InvalidArgumentException('Value must be a number');
+        }
+
         $this->value = $value;
 
         return $this;
@@ -87,7 +91,7 @@ class BaseIndexInteger implements BaseItemFieldInterface
     /**
      * {@inheritdoc}
      */
-    public function setItem(BaseItem $index = null)
+    public function setItem(AbstractItem $index = null)
     {
         $this->item = $index;
 

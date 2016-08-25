@@ -62,4 +62,3 @@ class PdoPgsqlTest extends AbstractDriverTest
         $this->assertEquals($expectedQueries, $queries);
     }
 }
-

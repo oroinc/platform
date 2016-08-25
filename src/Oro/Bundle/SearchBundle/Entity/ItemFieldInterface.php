@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Entity;
 
-interface BaseItemFieldInterface
+interface ItemFieldInterface
 {
     /**
      * @param string $field
-     * @return BaseItemFieldInterface
+     * @return ItemFieldInterface
      */
     public function setField($field);
 
@@ -17,7 +17,7 @@ interface BaseItemFieldInterface
 
     /**
      * @param mixed $value
-     * @return BaseItemFieldInterface
+     * @return ItemFieldInterface
      * @throws \InvalidArgumentException
      */
     public function setValue($value);
@@ -28,13 +28,13 @@ interface BaseItemFieldInterface
     public function getValue();
 
     /**
-     * @param BaseItem $item
-     * @return BaseItemFieldInterface
+     * @param AbstractItem $item
+     * @return ItemFieldInterface
      */
-    public function setItem(BaseItem $item = null);
+    public function setItem(AbstractItem $item = null);
 
     /**
-     * @return BaseItem
+     * @return AbstractItem
      */
     public function getItem();
 }

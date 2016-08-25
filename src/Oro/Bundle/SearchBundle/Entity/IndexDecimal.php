@@ -10,6 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="oro_search_index_decimal")
  * @ORM\Entity
  */
-class IndexDecimal extends BaseIndexDecimal
+class IndexDecimal extends AbstractIndexDecimal
 {
 }

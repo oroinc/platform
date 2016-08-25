@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\MappedSuperclass
  */
-class BaseIndexDatetime implements BaseItemFieldInterface
+abstract class AbstractIndexDecimal implements ItemFieldInterface
 {
     /**
      * @var integer
@@ -19,7 +19,7 @@ class BaseIndexDatetime implements BaseItemFieldInterface
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Item", inversedBy="datetimeFields")
+     * @ORM\ManyToOne(targetEntity="Item", inversedBy="decimalFields")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      */
     protected $item;
@@ -32,9 +32,9 @@ class BaseIndexDatetime implements BaseItemFieldInterface
     protected $field;
 
     /**
-     * @var \DateTime
+     * @var float
      *
-     * @ORM\Column(name="value", type="datetime", nullable=false)
+     * @ORM\Column(name="value", type="decimal", scale=2, nullable=false))
      */
     protected $value;
 
@@ -51,7 +51,7 @@ class BaseIndexDatetime implements BaseItemFieldInterface
     /**
      * {@inheritdoc}
      */
-    public function setItem(BaseItem $item = null)
+    public function setItem(AbstractItem $item = null)
     {
         $this->item = $item;
 
@@ -89,8 +89,8 @@ class BaseIndexDatetime implements BaseItemFieldInterface
      */
     public function setValue($value)
     {
-        if (!$value instanceof \DateTime) {
-            throw new \InvalidArgumentException('Value has to be of \DateTime class');
+        if (!is_numeric($value)) {
+            throw new \InvalidArgumentException('Value must be a number');
         }
 
         $this->value = $value;

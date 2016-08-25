@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\MappedSuperclass
  */
-class BaseIndexText implements BaseItemFieldInterface
+abstract class AbstractIndexDatetime implements ItemFieldInterface
 {
     /**
      * @var integer
@@ -19,7 +19,7 @@ class BaseIndexText implements BaseItemFieldInterface
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Item", inversedBy="textFields")
+     * @ORM\ManyToOne(targetEntity="Item", inversedBy="datetimeFields")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      */
     protected $item;
@@ -32,9 +32,9 @@ class BaseIndexText implements BaseItemFieldInterface
     protected $field;
 
     /**
-     * @var string
+     * @var \DateTime
      *
-     * @ORM\Column(name="value", type="text", nullable=false)
+     * @ORM\Column(name="value", type="datetime", nullable=false)
      */
     protected $value;
 
@@ -46,6 +46,24 @@ class BaseIndexText implements BaseItemFieldInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setItem(AbstractItem $item = null)
+    {
+        $this->item = $item;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItem()
+    {
+        return $this->item;
     }
 
     /**
@@ -71,6 +89,10 @@ class BaseIndexText implements BaseItemFieldInterface
      */
     public function setValue($value)
     {
+        if (!$value instanceof \DateTime) {
+            throw new \InvalidArgumentException('Value has to be of \DateTime class');
+        }
+
         $this->value = $value;
 
         return $this;
@@ -82,23 +104,5 @@ class BaseIndexText implements BaseItemFieldInterface
     public function getValue()
     {
         return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setItem(BaseItem $item = null)
-    {
-        $this->item = $item;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getItem()
-    {
-        return $this->item;
     }
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
@@ -18,71 +17,8 @@ use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
  * @ORM\Entity(repositoryClass="Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class Item extends BaseItem
+class Item extends AbstractItem
 {
-    /**
-     * @ORM\OneToMany(targetEntity="IndexText", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $textFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexInteger", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $integerFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexDecimal", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $decimalFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexDatetime", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $datetimeFields;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->textFields = new ArrayCollection();
-        $this->integerFields = new ArrayCollection();
-        $this->decimalFields = new ArrayCollection();
-        $this->datetimeFields = new ArrayCollection();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIntegerFields()
-    {
-        return $this->integerFields;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDecimalFields()
-    {
-        return $this->decimalFields;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDatetimeFields()
-    {
-        return $this->datetimeFields;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTextFields()
-    {
-        return $this->textFields;
-    }
-
     /**
      * {@inheritdoc}
      */
