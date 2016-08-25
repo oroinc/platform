@@ -65,7 +65,7 @@ class ExpressionProcessor
         if (!$evaluate && $encoding === null) {
             return;
         }
-        if (property_exists($values, 'data') || property_exists($values, 'context')) {
+        if (array_key_exists('data', $values) || array_key_exists('context', $values)) {
             throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
         }
         $this->values = $values;

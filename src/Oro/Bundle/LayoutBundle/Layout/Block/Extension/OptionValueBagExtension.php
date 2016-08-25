@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
+use Symfony\Component\Finder\Expression\Expression;
+
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Action;
@@ -34,7 +36,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      */
     public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-        if ($options['resolve_value_bags'] && !$this->checkExpression($options)) {
+        if ($options['resolve_value_bags'] && !$this->hasExpression($options)) {
             $this->resolveValueBags($options);
         }
     }
@@ -56,11 +58,11 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      * @param $options
      * @return bool
      */
-    protected function checkExpression($options)
+    protected function hasExpression($options)
     {
         $check = false;
         foreach ($options as $value) {
-            if (is_string($value) && strpos($value, '=data') !== false) {
+            if ($value instanceof Expression) {
                 return true;
             }
         }
