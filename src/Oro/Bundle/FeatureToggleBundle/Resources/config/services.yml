@@ -56,3 +56,5 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_featuretoggle.configuration.manager'
+        tags:
+            - { name: oro_featuretogle.voter }
