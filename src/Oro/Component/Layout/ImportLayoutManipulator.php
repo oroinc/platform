@@ -13,7 +13,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     const NAMESPACE_PLACEHOLDER = '__';
     const NAMESPACE_SUFFIX = '_';
 
-    const ADDITIONAL_BLOCK_PREFIX_OPTION = 'additional_block_prefix';
+    const ADDITIONAL_BLOCK_PREFIX_OPTION = 'additional_block_prefixes';
     const ADDITIONAL_BLOCK_PREFIX_PATTERN = '__%s%s';
 
     /**
@@ -241,7 +241,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     protected function replaceRoot(&$id)
     {
         if (null !== $id && $id === self::ROOT_PLACEHOLDER) {
-            $rootId = $this->import->getRoot();
+            $rootId = $this->getRootId($this->import);
             if ($rootId === null) {
                 throw new LogicException('Import root is not defined.');
             }
@@ -249,6 +249,24 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @param LayoutUpdateImport $import
+     *
+     * @return string
+     */
+    protected function getRootId(LayoutUpdateImport $import)
+    {
+        $rootId = $import->getRoot();
+        if ($import->getParent()) {
+            if ($rootId === self::ROOT_PLACEHOLDER) {
+                $rootId = $this->getRootId($import->getParent());
+            } else {
+                $this->replaceNamespace($rootId, $import->getParent()->getNamespace());
+            }
+        }
+        return $rootId;
     }
 
     /**
@@ -264,21 +282,43 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     /**
      * @param string $id
      *
+     * @param string|null   $namespace
      * @return $this
      */
-    protected function replaceNamespace(&$id)
+    protected function replaceNamespace(&$id, $namespace = null)
     {
         if ($this->hasNamespacePlaceholder($id)) {
-            $namespace = $this->import->getNamespace();
-            $replacement = $namespace.self::NAMESPACE_SUFFIX;
-            if (!$namespace) {
-                $replacement = '';
+            $replacement = '';
+            if ($namespace === null) {
+                $namespace = $this->getNamespace($this->import);
+            }
+            if ($namespace) {
+                $replacement = $namespace.self::NAMESPACE_SUFFIX;
             }
 
             $id = substr_replace($id, $replacement, 0, strlen(self::NAMESPACE_PLACEHOLDER));
         }
 
         return $this;
+    }
+
+    /**
+     * @param LayoutUpdateImport $import
+     *
+     * @return string
+     */
+    protected function getNamespace(LayoutUpdateImport $import)
+    {
+        $namespace = $import->getNamespace();
+        if ($import->getParent()) {
+            $parentNamespace = $this->getNamespace($import->getParent());
+            if ($namespace && $parentNamespace) {
+                $namespace = $parentNamespace.self::NAMESPACE_SUFFIX.$namespace;
+            } elseif ($parentNamespace) {
+                $namespace = $parentNamespace;
+            }
+        }
+        return $namespace;
     }
 
     /**
@@ -290,13 +330,25 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     protected function addAdditionalBlockPrefixOption($id, array &$options)
     {
         if ($this->hasNamespacePlaceholder($id)) {
-            $options[self::ADDITIONAL_BLOCK_PREFIX_OPTION] = sprintf(
-                self::ADDITIONAL_BLOCK_PREFIX_PATTERN,
-                $this->import->getId(),
-                $id
-            );
+            $options[self::ADDITIONAL_BLOCK_PREFIX_OPTION] = $this->getAdditionalBlockPrefixes($id, $this->import);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $id
+     * @param LayoutUpdateImport $import
+     * @param array $prefixes
+     *
+     * @return array
+     */
+    protected function getAdditionalBlockPrefixes($id, LayoutUpdateImport $import, $prefixes = [])
+    {
+        $prefixes[] = sprintf(self::ADDITIONAL_BLOCK_PREFIX_PATTERN, $import->getId(), $id);
+        if ($import->getParent()) {
+            $prefixes = $this->getAdditionalBlockPrefixes($id, $import->getParent(), $prefixes);
+        }
+        return $prefixes;
     }
 }
