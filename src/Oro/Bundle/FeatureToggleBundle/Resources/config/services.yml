@@ -43,3 +43,18 @@ services:
         arguments:
             - '@oro_featuretoggle.configuration.manager'
             - []
+
+    oro_featuretoggle.layout.data_provider.feature_provider:
+        class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: layout.data_provider, alias: feature }
+
+    oro_featuretoggle.voter.config_voter:
+        class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter'
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_featuretoggle.configuration.manager'
+        tags:
+            - { name: oro_featuretogle.voter }
