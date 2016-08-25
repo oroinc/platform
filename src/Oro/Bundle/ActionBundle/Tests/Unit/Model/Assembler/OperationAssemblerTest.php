@@ -89,7 +89,15 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setActions(OperationDefinition::PREACTIONS, [])
             ->setActions(OperationDefinition::ACTIONS, [])
             ->setActions(OperationDefinition::FORM_INIT, [])
-            ->setFormType(OperationType::NAME);
+            ->setFormType(OperationType::NAME)
+            ->setConditions(
+                OperationDefinition::PRECONDITIONS,
+                [
+                    '@and' => [
+                        ['@feature_resource_enabled' => ['resource' => 'minimum_name', 'resource_type' => 'operation']]
+                    ]
+                ]
+            );
 
         $definition2 = clone $definition1;
         $definition2
@@ -100,7 +108,15 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
-            ->setConditions(OperationDefinition::PRECONDITIONS, ['config_pre_cond'])
+            ->setConditions(
+                OperationDefinition::PRECONDITIONS,
+                [
+                    '@and' => [
+                        ['config_pre_cond'],
+                        ['@feature_resource_enabled' => ['resource' => 'maximum_name', 'resource_type' => 'operation']]
+                    ]
+                ]
+            )
             ->setConditions(OperationDefinition::CONDITIONS, ['config_cond'])
             ->setActions(OperationDefinition::PREACTIONS, ['config_pre_func'])
             ->setActions(OperationDefinition::ACTIONS, ['@action' => 'action_config'])
@@ -122,9 +138,18 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 OperationDefinition::PRECONDITIONS,
                 [
                     '@and' => [
-                        ['config_pre_cond'],
+                        [
+                            '@and' => [
+                                ['config_pre_cond'],
+                                [
+                                    '@feature_resource_enabled' => [
+                                        'resource' => 'maximum_name_and_acl',
+                                        'resource_type' => 'operation'
+                                    ]
+                                ]
+                            ]
+                        ],
                         ['@acl_granted' => 'test_acl']
-
                     ]
                 ]
             )

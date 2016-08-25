@@ -5,6 +5,20 @@ services:
         calls:
             - [ setNamespace, [ 'oro_featuretoggle_features' ] ]
 
+    oro_featuretoggle.expression.feature_enabled:
+        class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_action.condition, alias: feature_enabled }
+
+    oro_featuretoggle.expression.feature_resource_enabled:
+        class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureResourceEnabled'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_action.condition, alias: feature_resource_enabled }
+
     oro_featuretoggle.configuration.provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
         arguments:
@@ -37,6 +51,13 @@ services:
     oro_featuretoggle.configuration:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
 
+    oro_featuretoggle.twig.feature_extension:
+        class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: twig.extension }
+
     oro_featuretoggle.checker.feature_checker:
         class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
         public: false
@@ -65,3 +86,11 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onRequest }
+
+    oro_featuretoggle.provider.api_exclusion_provider:
+        class: Oro\Bundle\FeatureToggleBundle\Provider\ApiExclusionProvider
+        public: false
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
