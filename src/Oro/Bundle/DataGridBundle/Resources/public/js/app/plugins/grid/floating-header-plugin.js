@@ -39,7 +39,7 @@ define(function(require) {
 
             this.setupCache();
 
-            this.$el.attr('floating-header-enabled', true);
+            this.$el.addClass('with-floating-header');
 
             this.isHeaderCellWidthFixed = false;
             this.rescrollCb = this.enableOtherScroll();
@@ -72,7 +72,7 @@ define(function(require) {
                 this.domCache.firstRowCells.attr('style', '');
             }
 
-            this.$el.removeAttr('floating-header-enabled');
+            this.$el.removeClass('with-floating-header');
 
             FloatingHeaderPlugin.__super__.disable.call(this);
         },
