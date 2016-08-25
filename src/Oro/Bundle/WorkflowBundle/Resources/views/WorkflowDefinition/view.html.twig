@@ -130,6 +130,56 @@
     </div>
 {% endblock breadcrumbs %}
 
+{% macro view_step_row(stepData, entity) %}
+    <tr>
+        <td class="step-name">
+            {{ stepData.label }}
+            {% if stepData.is_final %}
+                <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">
+                    ({{ "Final"|trans }})
+                </strong>
+            {% endif %}
+        </td>
+        <td class="step-transitions">
+            {% if stepData.allowed_transitions is not empty %}
+                <ul class="transitions-list-short">
+                    {% for transitionName in stepData.allowed_transitions %}
+                        {% set currentTransition = entity.configuration.transitions[transitionName] %}
+                        {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
+                        <li>
+                            <span>{{ currentTransition.label }}</span>
+                            <i class="icon-long-arrow-right"></i>
+                            <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ toStep.label }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </td>
+        <td>
+            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                {{ stepData.order }}
+            </span>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro view_start_step_row(entity) %}
+    {% set startTransitionNames = [] %}
+    {% for transitionName, transitionConfig in entity.configuration.transitions %}
+        {% if transitionConfig.is_start %}
+            {% set startTransitionNames = startTransitionNames|merge([transitionName]) %}
+        {% endif %}
+    {% endfor %}
+    {{-
+        _self.view_step_row({
+            'label': '(' ~ 'Start'|trans ~ ')',
+            'order': -1,
+            'is_final': false,
+            'allowed_transitions': startTransitionNames
+        }, entity)
+    -}}
+{% endmacro %}
+
 {% block content_data %}
     {% set workflowDefinitionInfo %}
         {{ oro_widget_render({
@@ -166,60 +216,19 @@
                                     </tr>
                                 </thead>
                                 <tbody class="item-container">
-                                {% set startTransitionNames = [] %}
-                                {% for transitionName, transitionConfig in entity.configuration.transitions %}
-                                    {% if transitionConfig.is_start %}
-                                        {% set startTransitionNames = startTransitionNames|merge([transitionName]) %}
+                                {%- for stepData in entity.configuration.steps -%}
+                                    {#
+                                        System workflows wont have (Start) step stored into database.
+                                        So we need to force show it for UI.
+                                    #}
+                                    {% if loop.first and entity.isSystem %}
+                                        {{ _self.view_start_step_row(entity) }}
                                     {% endif %}
-                                {% endfor %}
-                                {% set startStep = [{
-                                    'label': '(' ~ 'Start'|trans ~ ')',
-                                    'order': -1,
-                                    'is_final': false,
-                                    'allowed_transitions': startTransitionNames
-                                }] %}
 
-                                {% if entity.configuration.steps is defined %}
-                                    {% set steps = startStep|merge(entity.configuration.steps) %}
-                                {% else %}
-                                    {% set steps = [startStep] %}
-                                {% endif %}
-
-                                {% for stepData in steps %}
-                                    <tr>
-                                        <td class="step-name">
-                                            {{ stepData.label }}
-                                            {% if stepData.is_final %}
-                                                &nbsp;
-                                                <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">
-                                                    ({{ "Final"|trans }})
-                                                </strong>
-                                            {% endif %}
-                                        </td>
-                                        <td class="step-transitions">
-                                            {% if stepData.allowed_transitions is not empty %}
-                                                <ul class="transitions-list-short">
-                                                    {% for transitionName in stepData.allowed_transitions %}
-                                                        {% set currentTransition = entity.configuration.transitions[transitionName] %}
-                                                        {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
-                                                        <li>
-                                                            <span>{{ currentTransition.label }}</span>
-                                                            <i class="icon-long-arrow-right"></i>
-                                                    <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">
-                                                        {{ toStep.label }}
-                                                    </span>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
-                                                {{ stepData.order }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
+                                    {{ _self.view_step_row(stepData, entity) }}
+                                {%- else -%}
+                                    {{ _self.view_start_step_row(entity) }}
+                                {%- endfor -%}
                                 </tbody>
                             </table>
                         </div>
@@ -231,12 +240,15 @@
                 <div class="workflow-flowchart-container">
                     <div class="workflow-flowchart-controls clearfix"></div>
                     <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
-                        'module': 'oroui/js/app/components/view-component',
-                        'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
-                    }) }}><div class="workflow-flowchart clearfix"></div></div>
-                <div>
+                            'module': 'oroui/js/app/components/view-component',
+                            'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                        }) }}
+                    >
+                        <div class="workflow-flowchart clearfix"></div>
+                    </div>
+                </div>
             </div>
-            {%  endif %}
+            {% endif %}
         </div>
     {% endset %}
 

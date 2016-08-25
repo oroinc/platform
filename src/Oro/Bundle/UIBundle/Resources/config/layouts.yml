@@ -12,8 +12,8 @@ services:
         tags:
             - { name: layout.resource.path_provider, priority: -10 }
 
-    oro_ui.layout_context_configurator.user_agent:
-        class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
+    oro_ui.layout_context_configurator.is_mobile:
+        class: Oro\Bundle\UIBundle\Layout\Extension\IsMobileContextConfigurator
         arguments:
             - '@oro_ui.user_agent_provider'
         tags:
