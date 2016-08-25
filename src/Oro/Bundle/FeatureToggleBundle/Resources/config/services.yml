@@ -10,6 +10,7 @@ services:
         arguments:
             - []
             - '%kernel.bundles%'
+            - '@oro_featuretoggle.configuration'
             - '@oro_featuretoggle.cache.provider.features'
 
     oro_featuretoggle.configuration.manager:
@@ -33,12 +34,22 @@ services:
         tags:
             - { name: kernel.cache_warmer }
 
+    oro_featuretoggle.configuration:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
+
     oro_featuretoggle.checker.feature_checker:
         class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
         public: false
         arguments:
-            - '@oro_featuretoggle.configuration.provider'
+            - '@oro_featuretoggle.configuration.manager'
             - []
+
+    oro_featuretoggle.layout.data_provider.feature_provider:
+        class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: layout.data_provider, alias: feature }
 
     oro_featuretoggle.voter.config_voter:
         class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter'

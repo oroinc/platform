@@ -297,7 +297,7 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     public function getTagKeyForExtension()
     {
         return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-            ? 'extended-type'
+            ? 'extended_type'
             : 'alias';
     }
 }

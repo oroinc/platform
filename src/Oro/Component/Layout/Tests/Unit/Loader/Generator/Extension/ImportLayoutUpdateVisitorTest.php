@@ -61,6 +61,11 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
     {
         \$this->import = \$import;
     }
+
+    public function getImport()
+    {
+        return \$this->import;
+    }
 }
 CLASS
         ,
