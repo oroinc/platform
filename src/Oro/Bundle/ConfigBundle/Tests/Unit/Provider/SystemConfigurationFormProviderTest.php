@@ -335,7 +335,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
         $provider->setFeatureChecker($featureChecker);
         $tree = $this->getNodeNamesTree($provider->getTree());
-        $this->assertEquals($expected, $tree);
+        $this->assertEquals($expected, $tree, '', 0.0, 10, true);
     }
 
     /**
