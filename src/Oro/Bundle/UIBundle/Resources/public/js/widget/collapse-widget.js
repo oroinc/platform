@@ -20,7 +20,10 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         },
 
         _init: function() {
-            var storedState = this.options.storageKey ? JSON.parse(localStorage.getItem(this.options.storageKey + this.options.uid)) : null;
+            var storedState = null;
+            if (this.options.storageKey) {
+                storedState = JSON.parse(localStorage.getItem(this.options.storageKey + this.options.uid));
+            }
 
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);

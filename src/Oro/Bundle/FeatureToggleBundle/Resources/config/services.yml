@@ -51,6 +51,14 @@ services:
         tags:
             - { name: layout.data_provider, alias: feature }
 
+    oro_featuretoggle.voter.config_voter:
+        class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter'
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_featuretoggle.configuration.manager'
+        tags:
+            - { name: oro_featuretogle.voter }
+
     oro_featuretoggle.event_listener.request:
         class: 'Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener'
         arguments:
