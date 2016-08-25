@@ -85,6 +85,20 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
         $maxEmailsDisplay = 1;
         $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
 
+        $htmlCleanBody = <<<CLEANBODY
+Lorem ipsum 
+ dolor sit amet, consectetur adipiscing elit. 
+
+
+  
+    Integer
+    sagittis
+  
+  
+    ornare
+    dolor
+CLEANBODY;
+
         $this->assertEquals(
             [
                 [
@@ -106,6 +120,17 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
                     'seen' => 1,
                     'subject' => 'subject_1',
                     'bodyContent' => 'bodyContent_1',
+                    'fromName' => 'fromName_1',
+                    'linkFromName' => 'oro_email_email_reply',
+                ],
+                [
+                    'replyRoute' => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply',
+                    'forwardRoute' => 'oro_email_email_reply',
+                    'id' => 3,
+                    'seen' => 0,
+                    'subject' => 'subject_3',
+                    'bodyContent' => $htmlCleanBody,
                     'fromName' => 'fromName_1',
                     'linkFromName' => 'oro_email_email_reply',
                 ]
@@ -155,7 +180,51 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             true
         );
 
-        return [$firstEmail, $secondEmail];
+        $html1Body = <<<EMAILBODY
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 
+Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+      <meta name="viewport" content="width=device-width"/>
+      <title></title>
+ <body style="padding:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<style type="text/css">
+body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;}
+.phoenix-email-container {width: 512px !important;}
+</style>
+<script type="text/javascript">
+    document.write ('some text');
+  </script>
+<p>Lorem <b>ipsum</b> </p>
+<span> dolor sit amet, consectetur adipiscing elit. </span>
+<table>
+<table>
+  <tr>
+    <th>Integer</th>
+    <th>sagittis</th>
+  </tr>
+  <tr>
+    <td>ornare</td>
+    <td>dolor</td>
+  </tr>
+</table>
+</body>
+</html>
+EMAILBODY;
+
+        $htmlEmail = $this->prepareEmailUser(
+            [
+                'getId'          => 3,
+                'getSubject'     => 'subject_3',
+                'getFromName'    => 'fromName_1',
+                'getBodyContent' => $html1Body
+            ],
+            $user,
+            false
+        );
+
+        return [$firstEmail, $secondEmail, $htmlEmail];
     }
 
     /**
