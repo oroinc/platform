@@ -78,9 +78,34 @@ datagrid:
         acl_resource: oro_email_email_user_view
         source:
             type: orm
+            count_query:
+                select:
+                    - DISTINCT(eu.id)
+                groupBy: ~
             query:
                 select:
                     - partial eu.{id, email}
+                    - e
+                    - partial f.{id, type}
+                    - eb.bodyContent AS body_content
+                    - r_to
+                    - >
+                        (SELECT COUNT(_ec.id)
+                        FROM OroEmailBundle:Email _ec
+                        WHERE _ec.thread = e.thread) AS thread_email_count
+                    - >
+                        CASE
+                            WHEN e.thread IS NULL THEN eb.hasAttachments
+                            WHEN EXISTS(
+                                SELECT 1
+                                FROM OroEmailBundle:EmailAttachment _ea
+                                JOIN _ea.emailBody _eb
+                                JOIN _eb.email _e
+                                JOIN _e.thread _t
+                                WHERE _t = e.thread
+                            ) THEN true
+                            ELSE false
+                        END AS has_attachments
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
@@ -101,10 +126,21 @@ datagrid:
                         -
                             join: f.origin
                             alias: o
+                        -
+                            join: e.emailBody
+                            alias: eb
                 where:
                     and:
-                        - o.isActive = true
-                groupBy: eu.id, e.sentAt
+                        - >
+                            EXISTS(
+                                SELECT 1
+                                FROM OroEmailBundle:EmailOrigin _eo
+                                JOIN _eo.folders _f
+                                JOIN _f.emailUsers _eu
+                                WHERE _eo.isActive = true AND _eu.id = eu.id
+                            )
+                groupBy: eu.id
+
         columns:
             contacts:
                 data_name: email.contacts
@@ -119,7 +155,7 @@ datagrid:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
             attachments:
-                data_name: email.attachments
+                data_name: has_attachments
                 type: twig
                 label:
                 frontend_type: html

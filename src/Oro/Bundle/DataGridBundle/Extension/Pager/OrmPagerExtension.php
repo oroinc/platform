@@ -66,6 +66,7 @@ class OrmPagerExtension extends AbstractExtension
             $this->pager->setSkipCountWalker(
                 $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH)
             );
+            $this->pager->setCountQuery($config->getDatasourceCountQuery());
         }
 
         if ($config->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false) ||

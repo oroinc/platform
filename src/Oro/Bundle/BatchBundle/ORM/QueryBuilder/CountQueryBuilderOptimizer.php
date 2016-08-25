@@ -48,12 +48,25 @@ class CountQueryBuilderOptimizer
      * Get optimized query builder for count calculation.
      *
      * @param QueryBuilder $queryBuilder
+     * @param array        $countQuery
      * @return QueryBuilder
      * @throws \Exception
      */
-    public function getCountQueryBuilder(QueryBuilder $queryBuilder)
+    public function getCountQueryBuilder(QueryBuilder $queryBuilder, array $countQuery = [])
     {
-        $this->context = new QueryOptimizationContext($queryBuilder, $this->qbTools);
+        $originalQueryBuilder = $countQuery ? clone $queryBuilder : $queryBuilder;
+        if (isset($countQuery['select'])) {
+            $originalQueryBuilder->resetDqlPart('select');
+            foreach ($countQuery['select'] as $selectExpr) {
+                $originalQueryBuilder->addSelect($selectExpr);
+            }
+        }
+
+        if (array_key_exists('groupBy', $countQuery) && !$countQuery['groupBy']) {
+            $originalQueryBuilder->resetDqlPart('groupBy');
+        }
+
+        $this->context = new QueryOptimizationContext($originalQueryBuilder, $this->qbTools);
         try {
             $qb = $this->buildCountQueryBuilder();
             // remove a link to the context
@@ -110,11 +123,11 @@ class CountQueryBuilderOptimizer
             );
         }
 
-        if ($originalQueryParts['join']) {
-            $this->addJoins($optimizedQueryBuilder, $originalQueryParts);
-        }
         if (!$originalQueryParts['groupBy']) {
             $fieldsToSelect = $this->getFieldsToSelect($originalQueryParts);
+        }
+        if ($originalQueryParts['join']) {
+            $this->addJoins($optimizedQueryBuilder, $originalQueryParts, $this->useNonSymetricJoins($fieldsToSelect));
         }
 
         if ($originalQueryParts['where']) {
@@ -130,13 +143,29 @@ class CountQueryBuilderOptimizer
     }
 
     /**
+     * Method to check if using of non symetric joins is required (if they will affect number of rows or not).
+     *
+     * @param array $fieldsToSelect
+     *
+     * @return bool
+     */
+    protected function useNonSymetricJoins(array $fieldsToSelect)
+    {
+        return count($fieldsToSelect) !== 1 || stripos(reset($fieldsToSelect), 'DISTINCT(') !== 0;
+    }
+
+    /**
      * Add required JOINs to resulting Query Builder.
      *
      * @param QueryBuilder $optimizedQueryBuilder
      * @param array        $originalQueryParts
+     * @param bool         $useNonSymetricJoins
      */
-    protected function addJoins(QueryBuilder $optimizedQueryBuilder, array $originalQueryParts)
-    {
+    protected function addJoins(
+        QueryBuilder $optimizedQueryBuilder,
+        array $originalQueryParts,
+        $useNonSymetricJoins = true
+    ) {
         // Collect list of tables which should be added to new query
         $whereAliases   = $this->qbTools->getUsedTableAliases($originalQueryParts['where']);
         $groupByAliases = $this->qbTools->getUsedTableAliases($originalQueryParts['groupBy']);
@@ -147,14 +176,16 @@ class CountQueryBuilderOptimizer
         // this joins cannot be removed outside of this class
         $requiredJoinAliases = $joinAliases;
 
-        $joinAliases = array_merge(
-            $joinAliases,
-            $this->getNonSymmetricJoinAliases(
-                $originalQueryParts['from'],
-                $originalQueryParts['join'],
-                $groupByAliases
-            )
-        );
+        if ($useNonSymetricJoins) {
+            $joinAliases = array_merge(
+                $joinAliases,
+                $this->getNonSymmetricJoinAliases(
+                    $originalQueryParts['from'],
+                    $originalQueryParts['join'],
+                    $groupByAliases
+                )
+            );
+        }
 
         $rootAliases = [];
         /** @var Expr\From $from */
