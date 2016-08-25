@@ -50,9 +50,9 @@ class EmailController extends Controller
 {
     /**
      * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
-     * @AclAncestor("oro_email_email_attachment_view")
+     * @AclAncestor("oro_config_system")
      */
-    public function removeLargerAttachmentsAction()
+    public function purgeEmailsAttachmentsAction()
     {
         $job = new Job(PurgeEmailAttachmentCommand::NAME);
         $em = $this->getDoctrine()->getManagerForClass(Job::class);

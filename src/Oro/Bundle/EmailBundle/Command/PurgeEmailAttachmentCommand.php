@@ -21,7 +21,7 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
     const NAME = 'oro:email-attachment:purge';
 
     const OPTION_SIZE = 'size';
-    const OPTION_ALL = 'all';
+    const OPTION_ALL  = 'all';
 
     const LIMIT = 100;
 
@@ -43,7 +43,7 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
                 static::OPTION_ALL,
                 null,
                 InputOption::VALUE_NONE,
-                'Purges all emails attachments ignoring "size" option'
+                'Purges all emails attachments ignoring "size" option.'
             );
     }
 
@@ -52,47 +52,58 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $size = $this->getSize($input->getOption(static::OPTION_ALL), $input->getOption(static::OPTION_SIZE));
-        $qb = $this->createEmailAttachmentQb($size);
+        $size = $this->getSize($input);
 
-        if (!$qb) {
-            return;
+        $emailAttachments = $this->getEmailAttachments($size);
+
+        $count = count($emailAttachments);
+        if ($count) {
+            $progress = new ProgressBar($output, $count);
+            $progress->setFormat('debug');
+
+            $progress->start();
+            foreach ($emailAttachments as $attachment) {
+                $this->removeAttachment($attachment, $size);
+                $progress->advance();
+            }
+            $progress->finish();
+        } else {
+            $output->writeln('No emails attachments to purify.');
         }
-
-        $em = $this->getEntityManager();
-        $emailAttachments = (new BufferedQueryResultIterator($qb))
-            ->setBufferSize(static::LIMIT)
-            ->setPageCallback(function () use ($em) {
-                $em->flush();
-                $em->clear();
-            });
-
-        $removeAttachmentCallback = $this->createRemoveAttachmentCallback($size);
-
-        $progress = new ProgressBar($output, count($emailAttachments));
-        $progress->start();
-        foreach ($emailAttachments as $attachment) {
-            call_user_func($removeAttachmentCallback, $attachment);
-            $progress->advance();
-        }
-        $progress->finish();
     }
 
     /**
-     * @param int $size
+     * Returns size in bytes
      *
-     * @return callable
+     * @param InputInterface $input
+     *
+     * @return int
      */
-    protected function createRemoveAttachmentCallback($size)
+    protected function getSize(InputInterface $input)
     {
-        if ($size <= 0) {
-            return function (EmailAttachment $attachment) {
-                $attachment->getEmailBody()->removeAttachment($attachment);
-            };
+        $all  = $input->getOption(static::OPTION_ALL);
+        $size = $input->getOption(static::OPTION_SIZE);
+
+        if ($all) {
+            return 0;
         }
 
-        return function (EmailAttachment $attachment) use ($size) {
-            $content = $attachment->getContent();
+        if ($size === null) {
+            $size = $this->getConfigManager()->get('oro_email.attachment_sync_max_size');
+        }
+
+        return (int)$size * 1024 * 1024;
+    }
+
+    /**
+     * @param EmailAttachment $attachment
+     * @param int             $size
+     */
+    protected function removeAttachment(EmailAttachment $attachment, $size)
+    {
+        // Double check of attachment size
+        if ($size) {
+            $content     = $attachment->getContent();
             $contentSize = $content->getContentTransferEncoding() === 'base64'
                 ? strlen(base64_decode($content->getContent()))
                 : strlen($content->getContent());
@@ -100,9 +111,31 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
             if ($contentSize < $size) {
                 return;
             }
+        }
 
-            $attachment->getEmailBody()->removeAttachment($attachment);
-        };
+        $attachment->getEmailBody()->removeAttachment($attachment);
+    }
+
+    /**
+     * @param int $size
+     *
+     * @return BufferedQueryResultIterator
+     */
+    protected function getEmailAttachments($size)
+    {
+        $qb = $this->createEmailAttachmentQb($size);
+        $em = $this->getEntityManager();
+
+        $emailAttachments = (new BufferedQueryResultIterator($qb))
+            ->setBufferSize(static::LIMIT)
+            ->setPageCallback(
+                function () use ($em) {
+                    $em->flush();
+                    $em->clear();
+                }
+            );
+
+        return $emailAttachments;
     }
 
     /**
@@ -114,19 +147,16 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
     {
         $qb = $this->getEmailAttachmentRepository()
             ->createQueryBuilder('a')
-            ->join('a.attachmentContent', 'eac');
+            ->join('a.attachmentContent', 'attachment_content');
 
         if ($size > 0) {
-            /**
-             * Base64-encoded data takes about 33% more space than the original data.
-             * @see http://php.net/manual/en/function.base64-encode.php
-             */
             $qb
-                ->andWhere(<<<'DQL'
-CASE WHEN eac.contentTransferEncoding = 'base64' THEN
-    LENGTH(eac.content) * 0.67
+                ->andWhere(
+                    <<<'DQL'
+                    CASE WHEN attachment_content.contentTransferEncoding = 'base64' THEN
+    (LENGTH(attachment_content.content) - LENGTH(attachment_content.content)/77) * 3 / 4 - 2
 ELSE
-    LENGTH(eac.content)
+    LENGTH(attachment_content.content)
 END >= :size
 DQL
                 )
@@ -134,29 +164,6 @@ DQL
         }
 
         return $qb;
-    }
-
-    /**
-     * @param bool     $all
-     * @param int|null $size
-     *
-     * @return int
-     */
-    private function getSize($all, $size)
-    {
-        return $all ? 0 : $this->getSizeInBytes($size);
-    }
-
-    /**
-     * @param int|null $sizeInMb
-     *
-     * @return int
-     */
-    protected function getSizeInBytes($sizeInMb = null)
-    {
-        return $sizeInMb !== null
-            ? (int) ($sizeInMb * 1024 * 1024)
-            : (int) ($this->getConfigManager()->get('oro_email.attachment_sync_max_size') * 1024 * 1024);
     }
 
     /**
