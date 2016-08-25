@@ -58,7 +58,7 @@ public function viewAction()
 ```
 This means that the view action is executable if VIEW premission is granted to MyEntity
 
- - Using acl.yml file from MyBundle/Resource/config/acl.yml:
+ - Using acl.yml file from MyBundle/Resource/config/oro/acl.yml:
 
 ``` yml
 myentity_view:
@@ -105,7 +105,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl; #required for Acl annotation
 public function somethingAction()
 ```
 
- - Using acl.yml file from MyBundle/Resource/config/acl.yml:
+ - Using acl.yml file from MyBundle/Resource/config/oro/acl.yml:
 
 ``` yml
 can_do_something:

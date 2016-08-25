@@ -64,7 +64,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     {
         return new CumulativeConfigLoader(
             'oro_acl_config',
-            new YamlCumulativeFileLoader('Resources/config/acl.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/acl.yml')
         );
     }
 
