@@ -79,11 +79,7 @@ class ConfigurationProvider
      */
     public function getResourcesConfiguration($ignoreCache = false)
     {
-        $configuration = $this->getConfiguration($ignoreCache);
-
-        return isset($configuration[self::INTERNAL][self::BY_RESOURCE])
-            ? $configuration[self::INTERNAL][self::BY_RESOURCE]
-            : [];
+        return $this->getConfiguration($ignoreCache)[self::INTERNAL][self::BY_RESOURCE];
     }
 
     /**

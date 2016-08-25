@@ -25,6 +25,9 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new RequestListener($this->featureChecker);
     }
 
+    /**
+     * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function testWhenRouteFeatureDisabled()
     {
         $this->featureChecker
@@ -39,7 +42,6 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getRequest')->willReturn($request);
         
-        $event->expects($this->once())->method('setResponse');
         $this->listener->onRequest($event);
     }
 
@@ -57,7 +59,6 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getRequest')->willReturn($request);
         
-        $event->expects($this->never())->method('setResponse');
         $this->listener->onRequest($event);
     }
 }
