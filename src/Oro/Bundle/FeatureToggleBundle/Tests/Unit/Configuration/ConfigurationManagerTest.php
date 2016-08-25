@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 
 class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
 {

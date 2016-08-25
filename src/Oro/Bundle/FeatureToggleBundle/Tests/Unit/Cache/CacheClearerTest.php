@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Cache;
 
-use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Cache\CacheClearer;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 
 class CacheClearerTest extends \PHPUnit_Framework_TestCase
 {
