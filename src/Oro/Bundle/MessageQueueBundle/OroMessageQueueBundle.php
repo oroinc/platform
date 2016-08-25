@@ -36,6 +36,7 @@ class OroMessageQueueBundle extends Bundle
 
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::CALCULATE_ROOT_JOB_STATUS, 'Calculate root job status')
+            ->add(Topics::ROOT_JOB_STOPPED, 'Root job stopped')
         ;
         $container->addCompilerPass($addTopicPass);
     }
