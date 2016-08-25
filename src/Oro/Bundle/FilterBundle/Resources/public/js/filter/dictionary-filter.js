@@ -339,6 +339,8 @@ define(function(require) {
          * @return {*}
          */
         setValue: function(value) {
+            this.preloadSelectedData(value);
+
             var oldValue = this.value;
             this.value = tools.deepClone(value);
             this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
@@ -351,6 +353,33 @@ define(function(require) {
             }
 
             return this;
+        },
+
+        /**
+         * Preloads selectedData with available data from select2 so that we don't have to
+         * make additional requests
+         */
+        preloadSelectedData: function(value) {
+            if (!this.isInitSelect2 || !value.value) {
+                return;
+            }
+
+            var data = this.$(this.elementSelector).inputWidget('data');
+            _.each(value.value, function (id) {
+                if (this.selectedData[id]) {
+                    return;
+                }
+
+                var item = _.find(data, function (item) {
+                    return item.id === id;
+                });
+
+                if (!item) {
+                    return;
+                }
+
+                this.selectedData[item.id] = item;
+            }, this);
         },
 
         /**
