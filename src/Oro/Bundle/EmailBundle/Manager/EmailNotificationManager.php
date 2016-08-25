@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
@@ -74,9 +75,7 @@ class EmailNotificationManager
             $emailBody = $email->getEmailBody();
             if ($emailBody) {
                 $bodyContent = $this->htmlTagHelper->shorten(
-                    $this->htmlTagHelper->stripTags(
-                        $this->htmlTagHelper->purify($emailBody->getBodyContent())
-                    )
+                    $this->htmlTagHelper->stripTags(EmailBodyHelper::getClearBody($emailBody->getBodyContent()))
                 );
             }
 
