@@ -127,6 +127,9 @@ class Renderer implements FormRendererInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * {@inheritdoc}
      */
     public function searchAndRenderBlock(
