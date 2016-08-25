@@ -2,10 +2,8 @@ services:
     # Strategy
     oro_translation.importexport.strategy.translation.add_or_replace:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy'
-        public: false
         parent: 'oro_importexport.strategy.configurable_add_or_replace'
-        calls:
-            - [setMetadataCache, ['@oro_translation.database_translation.metadata.cache']]
+        public: false
 
     oro_translation.importexport.strategy.translation.reset:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy'
@@ -46,12 +44,6 @@ services:
             - '@oro_importexport.context_registry'
             - '@oro_entity.doctrine_helper'
             - '@translator'
-
-    # Writer
-    oro_translation.importexport.writer.translations:
-        parent: oro_integration.writer.persistent_batch_writer
-        class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter'
-        public: false
 
     # Normalizer
     oro_translation.importexport.normalizer.translation:
