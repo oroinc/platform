@@ -74,3 +74,8 @@ oro:
             hrs: hrs
         components:
             initialization_error: 'Error occurred during layout update. Please contact system administrator.'
+        select2:
+            input_too_short: "{1}Please enter {{ number }} more character|[2,Inf[Please enter {{ number }} more characters"
+            input_too_long: "{1}Please delete {{ number }} character|[2,Inf[Please delete {{ number }} characters"
+            selection_too_big: "{1}You can only select {{ limit }} item|[2,Inf[You can only select {{ limit }} items"
+            load_more: "Loading more results..."
