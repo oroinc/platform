@@ -265,16 +265,16 @@ services:
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
 
     oro_workflow.transition_schedule.process_configuration_generator:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator'
         public: false
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
             - '%oro_workflow.workflow_item.entity.class%'
 
     oro_workflow.async.execute_process_job:
-        class: Oro\Bundle\WorkflowBundle\Async\ExecuteProcessJobProcessor
+        class: 'Oro\Bundle\WorkflowBundle\Async\ExecuteProcessJobProcessor'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.process.process_handler'
-         tags:
-             - { name: 'oro_message_queue.client.message_processor' }
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
