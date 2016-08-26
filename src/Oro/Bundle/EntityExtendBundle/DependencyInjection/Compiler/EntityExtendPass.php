@@ -24,7 +24,7 @@ class EntityExtendPass implements CompilerPassInterface
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_entity_extend',
-            new YamlCumulativeFileLoader('Resources/config/entity_extend.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/entity_extend.yml')
         );
         $resources    = $configLoader->load($container);
         $configs      = [];

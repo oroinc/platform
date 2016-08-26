@@ -63,7 +63,7 @@ class OroUIExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_placeholders',
-            new YamlCumulativeFileLoader('Resources/config/placeholders.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/placeholders.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {

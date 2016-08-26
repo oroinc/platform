@@ -154,7 +154,7 @@ class SystemConfigurationPass implements CompilerPassInterface
 
         $configLoader = new CumulativeConfigLoader(
             'oro_system_configuration',
-            new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/system_configuration.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {

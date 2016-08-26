@@ -53,7 +53,7 @@ class OroHelpExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_help',
-            new YamlCumulativeFileLoader('Resources/config/oro_help.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/oro_help.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {

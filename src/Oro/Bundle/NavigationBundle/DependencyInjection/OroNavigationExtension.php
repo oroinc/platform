@@ -30,7 +30,7 @@ class OroNavigationExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_navigation',
-            new YamlCumulativeFileLoader('Resources/config/navigation.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/navigation.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {

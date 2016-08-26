@@ -23,7 +23,7 @@ class OroBatchExtension extends Extension
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_batch_jobs',
-            new YamlCumulativeFileLoader('Resources/config/batch_jobs.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/batch_jobs.yml')
         );
         $configLoader->registerResources($container);
 

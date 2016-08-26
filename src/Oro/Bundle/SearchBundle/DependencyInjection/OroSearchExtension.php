@@ -39,7 +39,7 @@ class OroSearchExtension extends Extension
     {
         // load entity search configuration from search.yml files
         $configPart          = [];
-        $ymlLoader           = new YamlCumulativeFileLoader('Resources/config/search.yml');
+        $ymlLoader           = new YamlCumulativeFileLoader('Resources/config/oro/search.yml');
         $configurationLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
         $engineResources     = $configurationLoader->load($container);
 
