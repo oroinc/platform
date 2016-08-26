@@ -3,19 +3,36 @@
 {% block form_widget %}
     {% set translationCompleteness = context.stat.translationStatus %}
 
-    {% if translationCompleteness is not null %}
-        <div class="oro-translation-languages">
-            <div class="translation-completeness">
-                <div class="progress">
-                    <div class="bar bar-success" style="width: {{ translationCompleteness }}%;"></div>
+    <div>
+        <div class="pull-left">
+            <i class="icon-info-sign tooltip-icon"
+               data-toggle="popover"
+               data-content="<div class='oro-popover-content'>{{ 'oro.translation.form.tooltip.translation_completeness'|trans }}</div>"
+            ></i>
+            {{ 'oro.translation.action.translation_completeness.label'|trans }}&nbsp;</div>
+        <div class="">
+            {% if translationCompleteness is not null %}
+                <div class="oro-translation-languages">
+                    <div class="translation-completeness">
+                        <div class="progress">
+                            <div class="bar bar-success" style="width: {{ translationCompleteness }}%;"></div>
+                        </div>
+                        <b>{{ (translationCompleteness / 100)|oro_format_percent }}</b>
+                    </div>
                 </div>
-                <b>{{ (translationCompleteness / 100)|oro_format_percent }}</b>
-                <span>{{ context.data.code|trans }}</span>
-            </div>
+            {% else %}
+                {{ 'N/A'|trans }}
+            {% endif %}
         </div>
-    {% else %}
-        {{ 'N/A'|trans }}
-    {% endif %}
-
+    </div>
     {{ form_widget(form) }}
+{% endblock %}
+
+{% block form_actions %}
+    <div class="widget-actions form-actions">
+        {% block form_actions_inner %}
+            <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+            <button class="btn btn-success" type="submit">{{ 'oro.translation.action.install'|trans }}</button>
+        {% endblock %}
+    </div>
 {% endblock %}

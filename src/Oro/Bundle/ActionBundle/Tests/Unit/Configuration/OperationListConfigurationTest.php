@@ -84,7 +84,8 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'attributes' => [],
                         'frontend_options' => [
                             'options' => [],
-                            'show_dialog' => true
+                            'show_dialog' => true,
+                            'title_parameters' => []
                         ],
                         'button_options' => [
                             'page_component_options' => [],
@@ -116,6 +117,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'frontend_options' => [
                             'template' => 'template',
                             'title' => 'dialog title',
+                            'title_parameters' => ['param' => 'value'],
                             'options' => ['width' => 400],
                             'confirmation' => 'Confirmation message',
                             'show_dialog' => false
@@ -216,6 +218,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'frontend_options' => [
                             'template' => 'template',
                             'title' => 'dialog title',
+                            'title_parameters' => ['param' => 'value'],
                             'options' => ['width' => 400],
                             'confirmation' => [
                                 'message' => 'Confirmation message',

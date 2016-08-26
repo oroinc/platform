@@ -121,13 +121,11 @@ class OptionsHelper
 
         $frontendOptions = $this->resolveOptions($actionData, $operation->getDefinition()->getFrontendOptions());
 
-        $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $operation->getDefinition()->getLabel();
-
         $options = [
             'hasDialog' => $operation->hasForm(),
             'showDialog' => !empty($frontendOptions['show_dialog']),
             'dialogOptions' => [
-                'title' => $this->translator->trans($title),
+                'title' => $this->getTitle($operation, $frontendOptions),
                 'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
             ],
             'executionUrl' => $executionUrl,
@@ -138,6 +136,19 @@ class OptionsHelper
         $this->addOption($options, $frontendOptions, 'confirmation');
 
         return $options;
+    }
+
+    /**
+     * @param Operation $operation
+     * @param array $frontendOptions
+     * @return string
+     */
+    protected function getTitle(Operation $operation, array $frontendOptions)
+    {
+        $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $operation->getDefinition()->getLabel();
+        $titleParams = isset($frontendOptions['title_parameters']) ? $frontendOptions['title_parameters'] : [];
+
+        return $this->translator->trans($title, $titleParams);
     }
 
     /**

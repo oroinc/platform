@@ -99,10 +99,15 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         $this->mockTranslator->expects($this->once())
             ->method('trans')
             ->willReturnCallback(
-                function ($label) {
+                function ($label, $params) {
                     if (strpos($label, '3')) {
                         return $label;
                     }
+
+                    foreach ($params as $name => $value) {
+                        $label = str_replace($name, $value, $label);
+                    }
+
                     return strtoupper($label);
                 }
             );
@@ -238,6 +243,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     'frontendOptions' => [
                         'show_dialog' => true,
                         'title' => 'Custom dialog title',
+                        'title_parameters' => ['title' => 't_i_t_l_e'],
                         'options' => ['option1' => 'value1'],
                     ],
                     'routerContext' => [
@@ -252,7 +258,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => 'CUSTOM DIALOG TITLE',
+                            'title' => 'CUSTOM DIALOG T_I_T_L_E',
                             'dialogOptions' => ['option1' => 'value1'],
                         ],
                         'executionUrl' => 'execution-url3',
