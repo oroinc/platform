@@ -31,7 +31,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
             }
             // Call one of formatDate formatTime formatDateTime
             return this._getFormatterFunction('format', this.type === 'dateTime' ? 'NBSP' : undefined)
-                .call(DateTimeFormatter, rawData, true);
+                .call(DateTimeFormatter, rawData);
         },
 
         /**
