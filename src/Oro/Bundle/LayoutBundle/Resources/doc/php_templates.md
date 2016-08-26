@@ -1,14 +1,16 @@
+# Using PHP instead of Twig for templates
 
-# Using PHP Templating instead of Twig
+Symfony defaults to Twig for its template engine, but you can still use plain PHP templates if necessary. Symfony provides equally good support of both templating engines.
 
-This article describes using php templates in layouts.
-In the official Symfony documentation you can find the following useful information: 
-* [How to Use PHP instead of Twig for Templates](http://symfony.com/doc/current/templating/PHP.html).
-* [How to Customize Form Rendering](http://symfony.com/doc/current/form/form_customization.html).
+If you preference is PHP templates, this article describes how to enable and use PHP templates with OroLayout bundle in the applications built on OroPlatform.
 
-## Configuring LayoutBundle
+The Symfony framework documentation contains additional useful information about PHP templates and form rendering customization: 
+* [How to Use PHP instead of Twig for Templates](http://symfony.com/doc/current/templating/PHP.html)
+* [How to Customize Form Rendering](http://symfony.com/doc/current/form/form_customization.html)
 
-Only one template engine can be used for the entire <ORO deployment>. If you decide to use php templates, disable the Twig and set php as default template engine in the `config.yml`:
+## Configure OroLayoutBundle
+
+Only one templating engine can be used at a time in an OroPlatform application. By default, OroLayoutBundle is configured to use Twig. If you decide to use PHP templates, you should disable Twig and make PHP templating the default templating engine in the application configuration file:
 
 ```Yaml
 oro_layout:
@@ -18,10 +20,9 @@ oro_layout:
             enabled: false
 ```
 
-## Defining Layouts with php templates
+## Modify layouts to use PHP templates
 
-To modify the default layout, update the default.yml file located in the theme's folder. 
-For example, the file below defines the standard page structure (head, metadata, and body) and two custom blocks in the body (content and greeting):
+The default ["base"](https://github.com/orocrm/platform/blob/84b1d81ac3a7198bdd0eed3dd76db48a72c10cd3/src/Oro/Bundle/UIBundle/Resources/views/layouts/base/page/layout.yml#L3-L4]) OroPlatform theme uses Twig templates. You should use a different approach in your default.yml file in your theme's folder: 
 
 ```Yaml
 #MyBundle/Resources/views/layouts/first_theme/default.yml
@@ -56,7 +57,7 @@ layout:
                             greeting: ~
 ```
 
-To help php search for the necessary template, we specified location of the theme's php folder:
+The example above creates a standard web page structure (head, metadata, and body) with two custom blocks in the body (content and greeting). And in this layout we specified a different "block theme" (so that the templating engine will know where to find our PHP templates):
 
 ```Yaml
     actions:
@@ -64,17 +65,18 @@ To help php search for the necessary template, we specified location of the them
             themes: 'MyBundle:layouts/first_theme/php'
 ```
 
+## Creating templates
 
-## Overriding Templates
+As you are not using Twig anymore, you should provide the PHP templates for the blocks used in the layout.
 
-You can override contents of any block template. For example, a `greeting` block that displays 'Hello!' <how is it linked to the filename? _..._widget.html.php?>:
+The PHP templates can be very simple, like in the following example of the `greeting` block template where we just want to display "Hello!":
 
 ```php
 #MyBundle/Resources/views/layouts/first_theme/php/_greeting_widget.html.php
 <p>Hello!</p>
 ```
 
-This simple template displays "Hello!" text. So let's create more complex template to override template for `content` block:
+You can also create more complex templates that use variables and functions provided by the layout. This is an example of the `content` block template:
 
 ```php
 #MyBundle/Resources/views/layouts/first_theme/php/_content_widget.html.php
@@ -84,7 +86,7 @@ This simple template displays "Hello!" text. So let's create more complex templa
 </div>
 ```
 
-Html output will be the following:
+The layout and templates from our examples will produce the following HTML output:
 
 ```html
 <!DOCTYPE html>
@@ -101,4 +103,6 @@ Html output will be the following:
 </html>
 ```
 
-To get a deeper understanding of using php templating with LayoutBundle take a look at folder with default templates: `platform/src/Oro/Bundle/LayoutBundle/Resources/views/Layout/php`.
+A number of fully working PHP templates for various block types is already included in OroLayoutBundle - check the [`src/Oro/Bundle/LayoutBundle/Resources/views/Layout/php`](https://github.com/orocrm/platform/tree/master/src/Oro/Bundle/LayoutBundle/Resources/views/Layout/php) folder to see all the examples.
+
+We prefer to use Twig in our products (e.g. see the [default theme](https://github.com/orocommerce/orocommerce/tree/master/src/OroB2B/Bundle/FrontendBundle/Resources/views/layouts/default) in [OroCommerce](https://www.orocommerce.com/)) to better express presentation and to avoid including the program logic in the templates. Your choice may be different based on the needs of your customers and the approach you selected to build your OroPlatform-based application.
