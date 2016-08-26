@@ -50,8 +50,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        $context = array('context');
-        $configuration = array('config');
+        $context = ['context'];
+        $configuration = ['config'];
 
         $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMock();
