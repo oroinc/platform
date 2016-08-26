@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
+namespace Oro\Bundle\ActionBundle\Datagrid\EventListener;
 
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
@@ -10,15 +10,12 @@ use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
+use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 
-class OperationExtension extends AbstractExtension
+class OperationListener
 {
-    const OPERATION_ROOT_PARAM = '_operation';
-    const DISABLED_PARAM  = '_disabled';
-
     /** @var OperationManager */
     protected $operationManager;
 
@@ -65,16 +62,6 @@ class OperationExtension extends AbstractExtension
     }
 
     /**
-     * @return bool
-     */
-    protected function isDisabled()
-    {
-        $operationParameters = $this->getParameters()->get(self::OPERATION_ROOT_PARAM);
-
-        return !empty($operationParameters[self::DISABLED_PARAM]);
-    }
-
-    /**
      * @param array $groups
      */
     public function setGroups(array $groups)
@@ -83,13 +70,12 @@ class OperationExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * @param ConfigureActionsBefore $event
      */
-    public function isApplicable(DatagridConfiguration $config)
+    public function onConfigureActions(ConfigureActionsBefore $event)
     {
-        if ($this->isDisabled()) {
-            return false;
-        }
+        $config = $event->getConfig();
+
         $this->datagridContext = $this->getDatagridContext($config);
         $this->operations = $this->getOperations(
             $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),
@@ -97,7 +83,7 @@ class OperationExtension extends AbstractExtension
         );
 
         if (0 === count($this->operations)) {
-            return false;
+            return;
         }
 
         $this->processDatagridConfig($config);
@@ -110,8 +96,6 @@ class OperationExtension extends AbstractExtension
                 $config->offsetGetOr(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [])
             )
         );
-
-        return true;
     }
 
     /**

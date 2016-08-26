@@ -142,6 +142,10 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added interface `Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface`
 - Added class `Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor` that implements `Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface`
 - Added method `Oro\Component\Layout\Extension\Theme\ThemeExtension::addVisitor` for adding visitors that implements `Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface`
+- Added method `Oro\Component\Layout\LayoutUpdateImportInterface::getImport`.
+- Added methods `Oro\Component\Layout\Model\LayoutUpdateImport::getParent` and `Oro\Component\Layout\Model\LayoutUpdateImport::setParent` that contains parent `Oro\Component\Layout\Model\LayoutUpdateImport` for nested imports.
+- Renamed option for `Oro\Component\Layout\Block\Type\BaseType` from `additional_block_prefix` to `additional_block_prefixes`, from now it contains array.
+- Added methods `getRoot`, `getReplacement`, `getNamespace` and `getAdditionalBlockPrefixes` to `Oro\Component\Layout\ImportLayoutManipulator` for working with nested imports.
 
 ####LayoutBundle
 - Class `Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider` added to provide available image types collected from all themes
@@ -156,3 +160,19 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 
 ####AttachmentBundle
 - Class `Oro\Bundle\AttachmentBundle\Resizer\ImageResizer` introduced to resize images by filter name
+
+####DatagridBundle:
+- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php` 
+    - construction signature was changed now it takes next arguments:
+        - `SystemAwareResolver` $resolver,
+        - `CacheProvider` $cache
+    - method `warmUpCache` was added to fill or refresh cache.
+    - method `loadConfiguration` was added to set raw configuration for all datagrid configs.
+    - method `getDatagridConfigurationLoader` was added to get loader for datagrid.yml files.
+    - method `ensureConfigurationLoaded` was added to check if datagrid config need to be loaded to cache.
+    - You can find example of refreshing datagrid cache in `Oro/Bundle/DataGridBundle/EventListener/ContainerListener.php`
+  
+####SecurityBundle
+- Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
+- Added layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator`.
+- Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
