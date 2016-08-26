@@ -678,6 +678,7 @@ services:
            - '@oro_email.mailbox.process_storage.link'
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
+           - '@oro_email.tools.email_body_helper'
         calls:
            - [ setSecurityContextLink, ['@security.context.link'] ]
         tags:
