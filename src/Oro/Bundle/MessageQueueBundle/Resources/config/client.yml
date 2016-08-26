@@ -3,10 +3,15 @@ services:
         class: 'Oro\Component\MessageQueue\Client\Config'
         public: false
 
+    oro_message_queue.client.driver_factory:
+        class: 'Oro\Component\MessageQueue\Client\DriverFactory'
+        public: false
+        arguments:
+            - []
+
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
-        public: false
-        factory: ['Oro\Component\MessageQueue\Client\DriverFactory', 'create']
+        factory: ['@oro_message_queue.client.driver_factory', 'create']
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.client.config'

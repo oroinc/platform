@@ -4,10 +4,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
+use Oro\Component\MessageQueue\Client\DbalDriver;
 use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,7 +22,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementConfigurationInterface()
     {
-        $this->assertClassExtends(Extension::class, OroMessageQueueExtension::class);
+        self::assertClassExtends(Extension::class, OroMessageQueueExtension::class);
     }
 
     public function testCouldBeConstructedWithoutAnyArguments()
@@ -58,9 +61,9 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ]], $container);
 
-        $this->assertTrue($container->hasDefinition('oro_message_queue.transport.null.connection'));
+        self::assertTrue($container->hasDefinition('oro_message_queue.transport.null.connection'));
         $connection = $container->getDefinition('oro_message_queue.transport.null.connection');
-        $this->assertEquals(NullConnection::class, $connection->getClass());
+        self::assertEquals(NullConnection::class, $connection->getClass());
     }
 
     public function testShouldUseNullTransportAsDefault()
@@ -78,11 +81,11 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ]], $container);
 
-        $this->assertEquals(
+        self::assertEquals(
             'oro_message_queue.transport.default.connection',
             (string) $container->getAlias('oro_message_queue.transport.connection')
         );
-        $this->assertEquals(
+        self::assertEquals(
             'oro_message_queue.transport.null.connection',
             (string) $container->getAlias('oro_message_queue.transport.default.connection')
         );
@@ -101,10 +104,10 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ]], $container);
 
-        $this->assertTrue($container->hasDefinition('foo.connection'));
+        self::assertTrue($container->hasDefinition('foo.connection'));
         $connection = $container->getDefinition('foo.connection');
-        $this->assertEquals(\stdClass::class, $connection->getClass());
-        $this->assertEquals([['foo_param' => 'aParam']], $connection->getArguments());
+        self::assertEquals(\stdClass::class, $connection->getClass());
+        self::assertEquals([['foo_param' => 'aParam']], $connection->getArguments());
     }
 
     public function testShouldUseFooTransportAsDefault()
@@ -122,11 +125,11 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ]], $container);
 
-        $this->assertEquals(
+        self::assertEquals(
             'oro_message_queue.transport.default.connection',
             (string) $container->getAlias('oro_message_queue.transport.connection')
         );
-        $this->assertEquals(
+        self::assertEquals(
             'oro_message_queue.transport.foo.connection',
             (string) $container->getAlias('oro_message_queue.transport.default.connection')
         );
@@ -146,8 +149,8 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ]], $container);
 
-        $this->assertTrue($container->hasDefinition('oro_message_queue.client.config'));
-        $this->assertTrue($container->hasDefinition('oro_message_queue.client.message_producer'));
+        self::assertTrue($container->hasDefinition('oro_message_queue.client.config'));
+        self::assertTrue($container->hasDefinition('oro_message_queue.client.message_producer'));
     }
 
     public function testShouldUseMessageProducerByDefault()
@@ -166,7 +169,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         ]], $container);
 
         $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
-        $this->assertEquals(MessageProducer::class, $messageProducer->getClass());
+        self::assertEquals(MessageProducer::class, $messageProducer->getClass());
     }
 
     public function testShouldUseMessageProducerIfTraceableProducerOptionSetToFalseExplicitly()
@@ -187,7 +190,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         ]], $container);
 
         $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
-        $this->assertEquals(MessageProducer::class, $messageProducer->getClass());
+        self::assertEquals(MessageProducer::class, $messageProducer->getClass());
     }
 
     public function testShouldUseTraceableMessageProducerIfTraceableProducerOptionSetToTrueExplicitly()
@@ -208,7 +211,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         ]], $container);
 
         $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
-        $this->assertEquals(TraceableMessageProducer::class, $messageProducer->getClass());
+        self::assertEquals(TraceableMessageProducer::class, $messageProducer->getClass());
     }
 
     public function testShouldConfigureDelayRedeliveredMessageExtension()
@@ -229,7 +232,31 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         ]], $container);
 
         $extension = $container->getDefinition('oro_message_queue.client.delay_redelivered_message_extension');
-        $this->assertEquals(12345, $extension->getArgument(1));
+        self::assertEquals(12345, $extension->getArgument(1));
+    }
+
+    public function testShouldAddNullAndDbalDriversToDriverFactoryIfClientEnabled()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load([[
+            'client' => true,
+            'transport' => [
+                'default' => 'foo',
+            ]
+        ]], $container);
+
+        self::assertTrue($container->hasDefinition('oro_message_queue.client.driver_factory'));
+        $factory = $container->getDefinition('oro_message_queue.client.driver_factory');
+
+        self::assertSame([
+            NullConnection::class => NullDriver::class,
+            DbalConnection::class => DbalDriver::class,
+        ], $factory->getArgument(0));
     }
 
     public function testShouldAllowGetConfiguration()
