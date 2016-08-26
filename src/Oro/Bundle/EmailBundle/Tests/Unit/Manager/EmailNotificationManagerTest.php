@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
@@ -70,135 +71,47 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             $this->entityManager,
             $this->htmlTagHelper,
             $this->router,
-            $this->configManager
+            $this->configManager,
+            new EmailBodyHelper($this->htmlTagHelper)
         );
-    }
-
-    public function testGetEmails()
-    {
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
-        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $testEmails = $this->getEmails($user);
-        $this->repository->expects($this->once())->method('getNewEmails')->willReturn($testEmails);
-        $maxEmailsDisplay = 1;
-        $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
-
-        $htmlCleanBody = <<<CLEANBODY
-Lorem ipsum 
- dolor sit amet, consectetur adipiscing elit. 
-
-
-  
-    Integer
-    sagittis
-  
-  
-    ornare
-    dolor
-CLEANBODY;
-
-        $this->assertEquals(
-            [
-                [
-                    'replyRoute' => 'oro_email_email_reply',
-                    'replyAllRoute' => 'oro_email_email_reply',
-                    'forwardRoute' => 'oro_email_email_reply',
-                    'id' => 1,
-                    'seen' => 0,
-                    'subject' => 'subject',
-                    'bodyContent' => 'bodyContent',
-                    'fromName' => 'fromName',
-                    'linkFromName' => 'oro_email_email_reply',
-                ],
-                [
-                    'replyRoute' => 'oro_email_email_reply',
-                    'replyAllRoute' => 'oro_email_email_reply',
-                    'forwardRoute' => 'oro_email_email_reply',
-                    'id' => 2,
-                    'seen' => 1,
-                    'subject' => 'subject_1',
-                    'bodyContent' => 'bodyContent_1',
-                    'fromName' => 'fromName_1',
-                    'linkFromName' => 'oro_email_email_reply',
-                ],
-                [
-                    'replyRoute' => 'oro_email_email_reply',
-                    'replyAllRoute' => 'oro_email_email_reply',
-                    'forwardRoute' => 'oro_email_email_reply',
-                    'id' => 3,
-                    'seen' => 0,
-                    'subject' => 'subject_3',
-                    'bodyContent' => $htmlCleanBody,
-                    'fromName' => 'fromName_1',
-                    'linkFromName' => 'oro_email_email_reply',
-                ]
-            ],
-            $emails
-        );
-    }
-
-    public function testGetCountNewEmails()
-    {
-        $this->repository->expects($this->once())->method('getCountNewEmails')->willReturn(1);
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
-        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $count = $this->emailNotificationManager->getCountNewEmails($user, $organization, null);
-        $this->assertEquals(1, $count);
     }
 
     /**
-     * @param EmailOwnerInterface $user
-     *
+     * @dataProvider getEmails
+     */
+    public function testGetEmails($user, $emails, $expectedResult)
+    {
+        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->repository->expects($this->once())->method('getNewEmails')->willReturn($emails);
+        $maxEmailsDisplay = 1;
+        $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
+
+        $this->assertEquals($expectedResult, $emails);
+    }
+
+    /**
      * @return array
      */
-    protected function getEmails($user)
+    public function getEmails()
     {
-        $firstEmail = $this->prepareEmailUser(
-            [
-                'getId'          => 1,
-                'getSubject'     => 'subject',
-                'getFromName'    => 'fromName',
-                'getBodyContent' => 'bodyContent',
-            ],
-            $user,
-            false
-        );
+        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
 
-        $secondEmail = $this->prepareEmailUser(
-            [
-                'getId'          => 2,
-                'getSubject'     => 'subject_1',
-                'getBodyContent' => 'bodyContent_1',
-                'getFromName'    => 'fromName_1',
-
-            ],
-            $user,
-            true
-        );
-
-        $html1Body = <<<EMAILBODY
+        $htmlBody = <<<EMAILBODY
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 
 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
    <head>
       <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-      <meta name="viewport" content="width=device-width"/>
       <title></title>
  <body style="padding:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
 <style type="text/css">
 body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;}
-.phoenix-email-container {width: 512px !important;}
 </style>
-<script type="text/javascript">
-    document.write ('some text');
-  </script>
+<script type="text/javascript">  document.write ('some text');</script>
 <p>Lorem <b>ipsum</b> </p>
-<span> dolor sit amet, consectetur adipiscing elit. </span>
-<table>
+<span>dolor sit amet, consectetur adipiscing elit.</span>
 <table>
   <tr>
     <th>Integer</th>
@@ -213,18 +126,73 @@ body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;}
 </html>
 EMAILBODY;
 
-        $htmlEmail = $this->prepareEmailUser(
-            [
-                'getId'          => 3,
-                'getSubject'     => 'subject_3',
-                'getFromName'    => 'fromName_1',
-                'getBodyContent' => $html1Body
-            ],
-            $user,
-            false
-        );
+        $htmlCleanBody = <<<CLEANBODY
+Lorem ipsum
+dolor sit amet, consectetur adipiscing elit. Integer
+sagittis ornare
+dolor
+CLEANBODY;
 
-        return [$firstEmail, $secondEmail, $htmlEmail];
+        $emails = [
+            $this->prepareEmailUser(
+                [
+                    'getId'          => 1,
+                    'getSubject'     => 'subject',
+                    'getFromName'    => 'fromName',
+                    'getBodyContent' => 'bodyContent',
+                ],
+                $user,
+                false
+            ),
+            $this->prepareEmailUser(
+                [
+                    'getId'          => 2,
+                    'getSubject'     => 'subject_1',
+                    'getBodyContent' => $htmlBody,
+                    'getFromName'    => 'fromName_1',
+                ],
+                $user,
+                true
+            )
+        ];
+
+        $expectedResult = [
+            [
+                'replyRoute' => 'oro_email_email_reply',
+                'replyAllRoute' => 'oro_email_email_reply',
+                'forwardRoute' => 'oro_email_email_reply',
+                'id' => 1,
+                'seen' => false,
+                'subject' => 'subject',
+                'bodyContent' => 'bodyContent',
+                'fromName' => 'fromName',
+                'linkFromName' => 'oro_email_email_reply',
+            ],
+            [
+                'replyRoute' => 'oro_email_email_reply',
+                'replyAllRoute' => 'oro_email_email_reply',
+                'forwardRoute' => 'oro_email_email_reply',
+                'id' => 2,
+                'seen' => true,
+                'subject' => 'subject_1',
+                'bodyContent' => $htmlCleanBody,
+                'fromName' => 'fromName_1',
+                'linkFromName' => 'oro_email_email_reply',
+            ]
+        ];
+
+        return [[$user, $emails, $expectedResult]];
+    }
+
+    public function testGetCountNewEmails()
+    {
+        $this->repository->expects($this->once())->method('getCountNewEmails')->willReturn(1);
+        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
+        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $count = $this->emailNotificationManager->getCountNewEmails($user, $organization, null);
+        $this->assertEquals(1, $count);
     }
 
     /**

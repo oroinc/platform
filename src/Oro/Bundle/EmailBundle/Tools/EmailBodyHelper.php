@@ -2,27 +2,45 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+
 class EmailBodyHelper
 {
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
-     * Returns clear email body.
-     * In case if email body is html, returns the <body> tag content with cleaned `style` and 'script' tags
+     * EmailBodyHelper constructor.
+     *
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function __construct(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
+    }
+
+    /**
+     * Returns the plain text representation of email body
      *
      * @param string $bodyContent
      *
      * @return string
      */
-    public static function getClearBody($bodyContent)
+    public function getClearBody($bodyContent)
     {
-        // get `body` content in case of html text
-        if (preg_match('~<body[^>]*>(.*?)</body>~si', $bodyContent, $body)) {
-            $bodyContent = $body[1];
+        if (extension_loaded('tidy')) {
+            $config = [
+                'show-body-only' => true,
+                'clean'          => true,
+                'hide-comments'  => true
+            ];
+            $tidy = new \tidy();
+            $out = $tidy->repairString($bodyContent, $config, 'UTF8');
+            $body = preg_replace('/<script\b[^>]*>(.*?)<\/script>/si', '', $out);
+        } else {
+            $body = $this->htmlTagHelper->purify($bodyContent);
         }
-        // clear `style` tags with content
-        $bodyContent = preg_replace('/<style\b[^>]*>(.*?)<\/style>/si', '', $bodyContent);
-        // clear `script` tags with content
-        $bodyContent = preg_replace('/<script\b[^>]*>(.*?)<\/script>/si', '', $bodyContent);
 
-        return $bodyContent;
+        return preg_replace('/\s\s+/', ' ', $this->htmlTagHelper->stripTags($body));
     }
 }
