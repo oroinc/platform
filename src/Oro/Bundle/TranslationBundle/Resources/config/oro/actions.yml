@@ -139,7 +139,11 @@ operations:
         datagrids:
             - oro-translation-language-grid
         button_options:
-            icon: icon-download
+            icon: icon-cloud-download
+        frontend_options:
+            title: oro.translation.action.install.title
+            title_parameters:
+                '%%language%%': $.languageName
         preactions:
             - '@assign_value': [$.successMessage, 'oro.translation.language.message.installed']
             - '@assign_value': [$.errorMessage, 'oro.translation.language.error.install']
@@ -148,6 +152,11 @@ operations:
                 method: isAvailableInstallTranslates
                 method_parameters: [$.data]
                 attribute: $.isAvailableInstall
+            - '@call_service_method':
+                service: oro_locale.formatter.language_code
+                method: formatLocale
+                method_parameters: [$.data.code]
+                attribute: $.languageName
         preconditions:
             '@equal': [$.isAvailableInstall, true]
 
@@ -157,7 +166,7 @@ operations:
             - oro-translation-language-grid
         label: oro.translation.action.update
         button_options:
-            icon: icon-refresh
+            icon: icon-cloud-download
         preactions:
             - '@call_service_method':
                 service: oro_translation.helper.language

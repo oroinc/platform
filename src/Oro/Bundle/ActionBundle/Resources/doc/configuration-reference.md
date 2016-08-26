@@ -301,6 +301,9 @@ Frontend Options configuration has next options:
 * **title**
     *string*
     Custom title of operation dialog window.
+* **title_parameters**
+    *array*
+    Parameter for replace placeholders from title. Operation data can be used.
 * **options**
     *array*
     Parameters related to widget component. Can be specified next options: *allowMaximize*, *allowMinimize*, *dblclick*,
@@ -324,6 +327,8 @@ operations:
             confirmation: aсme.demo.operations.operation_perform_confirm
             template: OroActionBundle:Operation:form.html.twig
             title: aсme.demo.operations.dialog.title
+            title_parameters:
+                %%some_param%%: $.paramValue
             options:
                 allowMaximize: true
                 allowMinimize: true
