@@ -325,6 +325,7 @@ define(function(require) {
         },
 
         hide: function() {
+            // keepAliveOnClose property is used to avoid disposing the widget on dialog close to be able open it again
             var keepAliveOnClose = this.keepAliveOnClose;
             this.keepAliveOnClose = true;
             this.widget.dialog('close');
