@@ -23,6 +23,9 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
     /** Determines how many emails can be loaded from IMAP server at once */
@@ -233,6 +236,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
     {
