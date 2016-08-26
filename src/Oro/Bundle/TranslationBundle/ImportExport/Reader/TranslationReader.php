@@ -45,11 +45,15 @@ class TranslationReader extends AbstractReader
     }
 
     /**
-     * @param int $locale
+     * @param string $locale
      * @return array
      */
     protected function getLanguageMessages($locale)
     {
+        if (!$locale) {
+            return [];
+        }
+
         if (!isset($this->messages[$locale])) {
             $defaultMessages = $this->getMessages(Translation::DEFAULT_LOCALE);
             $originalMessages = $this->getMessages($locale);
