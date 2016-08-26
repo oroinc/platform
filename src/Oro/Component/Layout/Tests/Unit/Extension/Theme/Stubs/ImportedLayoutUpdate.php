@@ -10,10 +10,7 @@ use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
-class ImportedLayoutUpdate implements
-    LayoutUpdateInterface,
-    LayoutUpdateImportInterface,
-    IsApplicableLayoutUpdateInterface
+class ImportedLayoutUpdate implements LayoutUpdateInterface, LayoutUpdateImportInterface
 {
     public function setImport(LayoutUpdateImport $import)
     {
@@ -26,11 +23,14 @@ class ImportedLayoutUpdate implements
     /**
      * {@inheritDoc}
      */
-    public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
+    public function isApplicable()
     {
     }
 
-    public function isApplicable()
+    /**
+     * {@inheritDoc}
+     */
+    public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
     }
 }

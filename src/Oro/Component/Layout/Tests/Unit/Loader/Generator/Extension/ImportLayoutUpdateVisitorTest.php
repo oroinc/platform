@@ -32,10 +32,11 @@ class ImportLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
 <<<CLASS
 use Oro\Component\Layout\ImportLayoutManipulator;
 
-class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportInterface, \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
+class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportInterface
 {
     private \$parentLayoutUpdate;
     private \$import;
+    private \$applicable = false;
 
     public function testMethod()
     {
@@ -43,9 +44,12 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
             throw new \RuntimeException('Missing import configuration for layout update');
         }
 
-        if (!\$this->isApplicable()) {
+        if (\$this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface
+            && !\$this->parentLayoutUpdate->isApplicable()) {
             return;
         }
+
+        \$this->applicable = true;
 
         \$layoutManipulator  = new ImportLayoutManipulator(\$layoutManipulator, \$this->import);
         echo 123;
@@ -63,11 +67,7 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
 
     public function isApplicable()
     {
-        if (\$this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface) {
-            return \$this->parentLayoutUpdate->isApplicable();
-        }
-
-        return true;
+        return \$this->applicable;
     }
 }
 CLASS

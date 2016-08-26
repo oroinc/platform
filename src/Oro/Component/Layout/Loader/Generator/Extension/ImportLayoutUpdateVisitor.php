@@ -20,14 +20,21 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $class = $visitContext->getClass();
         $class->addUseStatement('Oro\Component\Layout\ImportLayoutManipulator');
         $class->addInterfaceName('Oro\Component\Layout\LayoutUpdateImportInterface');
-        $class->addInterfaceName('Oro\Component\Layout\IsApplicableLayoutUpdateInterface');
+
+        $factoryProperty = PhpProperty::create('applicable');
+        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
+        $factoryProperty->setDefaultValue(false);
+        $class->setProperty($factoryProperty);
+        $setFactoryMethod = PhpMethod::create('isApplicable');
+        $setFactoryMethod->setBody($writer->reset()->write('return $this->applicable;')->getContent());
+        $class->setMethod($setFactoryMethod);
 
         $setFactoryMethod = PhpMethod::create('setImport');
         $setFactoryMethod->addParameter(
             PhpParameter::create('import')
                 ->setType('Oro\Component\Layout\Model\LayoutUpdateImport')
         );
-        $setFactoryMethod->setBody($writer->write('$this->import = $import;')->getContent());
+        $setFactoryMethod->setBody($writer->reset()->write('$this->import = $import;')->getContent());
         $class->setMethod($setFactoryMethod);
 
         $factoryProperty = PhpProperty::create('import');
@@ -49,23 +56,6 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
         $class->setProperty($factoryProperty);
 
-        $setFactoryMethod = PhpMethod::create('isApplicable');
-        $setFactoryMethod->setBody(
-            $writer->reset()
-                ->writeln(
-                    'if ($this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface) {'
-                )
-                ->indent()
-                ->writeln('return $this->parentLayoutUpdate->isApplicable();')
-                ->outdent()
-                ->writeln('}')
-                ->writeln('')
-                ->writeln('return true;')
-                ->getContent()
-        );
-        $class->setMethod($setFactoryMethod);
-
-
         $visitContext->getUpdateMethodWriter()
             ->writeln('if (null === $this->import) {')
             ->indent()
@@ -75,11 +65,14 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
             ->outdent()
             ->writeln('}')
             ->writeln('')
-            ->writeln('if (!$this->isApplicable()) {')
+            ->writeln('if ($this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface')
             ->indent()
+            ->writeln('&& !$this->parentLayoutUpdate->isApplicable()) {')
             ->writeln('return;')
             ->outdent()
             ->writeln('}')
+            ->writeln('')
+            ->writeln('$this->applicable = true;')
             ->writeln('')
             ->writeln('$layoutManipulator  = new ImportLayoutManipulator($layoutManipulator, $this->import);');
     }
