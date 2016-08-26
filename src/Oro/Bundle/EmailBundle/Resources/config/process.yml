@@ -4,7 +4,7 @@ definitions:
         enabled: true
         order:   50
         entity:  Oro\Bundle\EmailBundle\Entity\EmailUser
-        pre_conditions:
+        preconditions:
             '@and':
                 - '@not_empty': [$origin]
                 - '@equal': [$origin.active, true]

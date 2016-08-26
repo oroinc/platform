@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 

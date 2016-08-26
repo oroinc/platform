@@ -39,6 +39,8 @@ class SearchAdvancedController extends FOSRestController
      *
      * Supported keywords:
      *
+     *  select
+     *
      *  text
      *
      *  integer
@@ -65,6 +67,8 @@ class SearchAdvancedController extends FOSRestController
      *  replace spaces with _ underscore for fulltext search
      *
      * Examples:
+     *
+     *  select (name, price) from demo_products
      *
      *  from demo_product where name ~ samsung and double price > 100
      *
