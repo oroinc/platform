@@ -1,0 +1,36 @@
+.custom-checkbox {
+    &__input {
+        &:focus {
+            ~ .custom-checkbox__icon {
+                &:before {
+                    outline: 2px solid transparentize(get-color('ui', 'normal'), .45);
+                    outline-offset: -2px;
+                }
+            }
+        }
+
+        &:checked {
+            ~ .custom-checkbox__icon {
+                color: get-color('ui', 'focus');
+
+                &:before {
+                    content: '\e834';
+                }
+            }
+        }
+    }
+
+    &__icon {
+        color: get-color('additional', 'middle');
+
+        &:before {
+            content: '\e835';
+
+            display: inline-block;
+
+            font-family: $base-font-icon;
+            font-size: 17px;
+            line-height: 1;
+        }
+    }
+}

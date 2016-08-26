@@ -5,7 +5,7 @@ styles:
         - 'bundles/oroui/blank/scss/variables/grid-config.scss'
         - 'bundles/oroui/blank/scss/variables/link-config.scss'
         - 'bundles/oroui/blank/scss/variables/nitifications-config.scss'
-        - 'bundles/oroui/blank/scss/variables/page-titlec-config.scss'
+        - 'bundles/oroui/blank/scss/variables/page-title-config.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
     filters: ['cssrewrite', 'cssmin']
     output: 'css/layout/blank/styles.css'

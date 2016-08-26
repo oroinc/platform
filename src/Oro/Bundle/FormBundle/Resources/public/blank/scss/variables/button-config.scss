@@ -1,7 +1,18 @@
-$use-base-style: true !default;
+$use-base-style-for-button: true !default;
+
+// Default
+$button-padding: $base-ui-element-offset !default;
+$button-font-size: $base-ui-element-font-size !default;
+$button-font-family: $base-ui-element-font-family !default;
+$button-line-height: $base-ui-element-line-height !default;
+$button-border: $base-ui-element-border !default;
+$button-border-radius: $base-ui-element-border-radius !default;
+$button-background-color: $base-ui-element-bg-color !default;
+$button-color: $base-ui-element-color !default;
 
 // Hover
 $button-border-color-hover-state: get-color('additional', 'dark') !default;
+$button-color-hover-state: $button-color;
 
 // Focus
 $button-border-color-focus-state: $button-border-color-hover-state !default;

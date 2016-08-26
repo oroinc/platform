@@ -8,4 +8,5 @@ $checkbox-icon-bg-color-focus-state: get-color('ui', 'focus') !default;
 $checkbox-icon-border-focus-state: 1px solid get-color('ui', 'focus') !default;
 
 // Hover
-$checkbox-icon-border-hover-state: 1px solid get-color('additional', 'ultra') !default;
+$checkbox-icon-border-hover-state: 1px solid get-color('primary', 'light') !default;
+$checkbox-icon-border-focus-state: 1px solid get-color('primary', 'light') !default;

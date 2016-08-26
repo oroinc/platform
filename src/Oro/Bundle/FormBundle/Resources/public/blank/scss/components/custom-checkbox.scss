@@ -10,7 +10,12 @@
 
         opacity: 0;
 
-        &:hover,
+        &:hover {
+            ~ .custom-checkbox__icon{
+                border: $checkbox-icon-border-focus-state
+            }
+        }
+
         &:focus {
             ~ .custom-checkbox__icon {
                 border: $checkbox-icon-border-hover-state;

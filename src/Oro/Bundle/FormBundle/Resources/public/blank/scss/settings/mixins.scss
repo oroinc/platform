@@ -14,6 +14,7 @@
     $use-base-style:   false,
     $padding:          $base-ui-element-offset,
     $font-size:        $base-ui-element-font-size,
+    $font-family:      $base-ui-font-family,
     $line-height:      $base-ui-element-line-height,
     $border:           $base-ui-element-border,
     $border-radius:    $base-ui-element-border-radius,
@@ -25,6 +26,7 @@
         padding: $padding;
 
         font-size: $font-size;
+        font-family: $font-family;
         line-height: $line-height;
 
         border: $border;

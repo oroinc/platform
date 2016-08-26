@@ -16,6 +16,7 @@
     }
 }
 
+// Use: z-index: z('base');
 @function z($layer) {
     $layers: (
         'base': 1,
@@ -29,6 +30,9 @@
     @return $z-index;
 }
 
+// Use: @include breakpoint('desktop') {
+//  content
+//}
 @mixin breakpoint($type) {
     $breakpoints: (
         'desktop': '(min-width: ' + $breakpoint-desktop + ')',
@@ -41,6 +45,7 @@
     }
 }
 
+// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal);
 @mixin font-face($font-family, $file-path, $font-weight, $font-style) {
     @font-face {
         font-family: $font-family;
