@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -32,7 +33,7 @@ class FormStartType extends AbstractFormType
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
@@ -84,7 +85,7 @@ class FormStartType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 

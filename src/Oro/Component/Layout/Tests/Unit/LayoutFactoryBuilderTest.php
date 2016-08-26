@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
@@ -143,10 +144,9 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $typeExtension->expects($this->once())
             ->method('buildBlock')
-            ->with($this->identicalTo($blockBuilder), []);
+            ->with($this->identicalTo($blockBuilder), new Options());
 
-        $options = [];
-        $layoutFactory->getRegistry()->buildBlock($name, $blockBuilder, $options);
+        $layoutFactory->getRegistry()->buildBlock($name, $blockBuilder, new Options());
     }
 
     public function testAddLayoutUpdate()

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Form;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
@@ -51,7 +52,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->never())
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame([], $formAccessor->getProcessedFields());
     }
 
@@ -84,7 +85,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(2))
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field1' => self::FIELD_PREFIX . 'field1',
@@ -134,7 +135,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(3))
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field1'         => self::FIELD_PREFIX . 'field1',
@@ -177,7 +178,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('add');
 
         $this->builder->addSimpleFormTypes(['type1']);
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field1' => self::FIELD_PREFIX . 'field1',
@@ -218,7 +219,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(2))
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field2' => self::FIELD_PREFIX . 'field2',
@@ -270,7 +271,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(3))
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field2.field21' => self::FIELD_PREFIX . 'field2:field21',

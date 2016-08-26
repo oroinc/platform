@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
@@ -87,7 +88,7 @@ class FormTypeTest extends BlockTypeTestCase
             ]
         );
 
-        $type->buildBlock($builder, $options);
+        $type->buildBlock($builder, new Options($options));
     }
 
     public function testGetName()

@@ -9,6 +9,7 @@ use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ArrayOptionValueBuilder;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
@@ -16,7 +17,6 @@ use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\OptionValueBuilderInterface;
 use Oro\Component\Layout\StringOptionValueBuilder;
-use Oro\Component\Layout\Block\Type\Options;
 
 /**
  * Automatically converts OptionValueBag to an appropriate data representation
@@ -53,11 +53,10 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     }
 
     /**
-     * @param array $options
-     *
-     * @return array
+     * @param Options $options
+     * @return Options
      */
-    protected function resolveValueBags(array &$options)
+    protected function resolveValueBags(Options $options)
     {
         foreach ($options as $key => $value) {
             if ($value instanceof Expression) {

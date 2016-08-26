@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Util;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
@@ -17,7 +18,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['block', 'container', 'my_plugin', '_my_container'],
-            $view->vars['block_prefixes']
+            $view->vars['block_prefixes']->toArray()
         );
     }
 
@@ -71,7 +72,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
     {
         BlockUtils::processUrl(
             new BlockView(),
-            [],
+            new Options(),
             true
         );
     }
@@ -81,7 +82,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            []
+            new Options()
         );
 
         $this->assertArrayNotHasKey('path', $view->vars);
@@ -94,7 +95,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            [],
+            new Options(),
             false,
             'test'
         );
@@ -109,7 +110,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            ['path' => 'http://example.com']
+            new Options(['path' => 'http://example.com'])
         );
 
         $this->assertEquals('http://example.com', $view->vars['path']);
@@ -122,7 +123,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            ['test_path' => 'http://example.com'],
+            new Options(['test_path' => 'http://example.com']),
             false,
             'test'
         );
@@ -137,12 +138,12 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            ['route_name' => 'test_route']
+            new Options(['route_name' => 'test_route'])
         );
 
         $this->assertArrayNotHasKey('path', $view->vars);
         $this->assertEquals('test_route', $view->vars['route_name']);
-        $this->assertEquals([], $view->vars['route_parameters']);
+        $this->assertEquals(new Options(), $view->vars['route_parameters']);
     }
 
     public function testProcessUrlWithPrefixAndRoute()
@@ -150,14 +151,14 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            ['test_route_name' => 'test_route'],
+            new Options(['test_route_name' => 'test_route']),
             false,
             'test'
         );
 
         $this->assertArrayNotHasKey('test_path', $view->vars);
         $this->assertEquals('test_route', $view->vars['test_route_name']);
-        $this->assertEquals([], $view->vars['test_route_parameters']);
+        $this->assertEquals(new Options(), $view->vars['test_route_parameters']);
     }
 
     public function testProcessUrlWithRouteParameters()
@@ -165,12 +166,12 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            ['route_name' => 'test_route', 'route_parameters' => ['foo' => 'bar']]
+            new Options(['route_name' => 'test_route', 'route_parameters' => ['foo' => 'bar']])
         );
 
         $this->assertArrayNotHasKey('path', $view->vars);
         $this->assertEquals('test_route', $view->vars['route_name']);
-        $this->assertEquals(['foo' => 'bar'], $view->vars['route_parameters']);
+        $this->assertEquals(new Options(['foo' => 'bar']), $view->vars['route_parameters']);
     }
 
     public function testProcessUrlWithPrefixAndRouteParameters()
@@ -178,14 +179,14 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            ['test_route_name' => 'test_route', 'test_route_parameters' => ['foo' => 'bar']],
+            new Options(['test_route_name' => 'test_route', 'test_route_parameters' => ['foo' => 'bar']]),
             false,
             'test'
         );
 
         $this->assertArrayNotHasKey('test_path', $view->vars);
         $this->assertEquals('test_route', $view->vars['test_route_name']);
-        $this->assertEquals(['foo' => 'bar'], $view->vars['test_route_parameters']);
+        $this->assertEquals(new Options(['foo' => 'bar']), $view->vars['test_route_parameters']);
     }
 
     public function testProcessUrlWithPathAndRoute()
@@ -193,11 +194,11 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            [
+            new Options([
                 'path'             => 'http://example.com',
                 'route_name'       => 'test_route',
                 'route_parameters' => ['foo' => 'bar']
-            ]
+            ])
         );
 
         $this->assertEquals('http://example.com', $view->vars['path']);
@@ -210,11 +211,11 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         BlockUtils::processUrl(
             $view,
-            [
+            new Options([
                 'test_path'             => 'http://example.com',
                 'test_route_name'       => 'test_route',
                 'test_route_parameters' => ['foo' => 'bar']
-            ],
+            ]),
             false,
             'test'
         );

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -39,14 +40,14 @@ trait OptionsConfigTrait
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         foreach ($this->optionsConfig as $name => $settings) {
-            if (!array_key_exists($name, $options)) {
+            if (!$options->offsetExists($name)) {
                 continue;
             }
             $define = is_array($settings) && (!empty($settings['required']) || array_key_exists('default', $settings));
-            if ($define || isset($options[$name])) {
+            if ($define || !is_null($options[$name])) {
                 $view->vars[$name] = $options[$name];
             }
         }

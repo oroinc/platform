@@ -6,6 +6,7 @@ use Oro\Component\Layout\Block\Type\BaseType;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\TitleType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\OptionValueBag;
 
 class TitleTypeTest extends BlockTypeTestCase
@@ -30,7 +31,7 @@ class TitleTypeTest extends BlockTypeTestCase
 
         $view = $this->getBlockView(TitleType::NAME, ['value' => $title, 'separator' => $separator, 'reverse' => true]);
 
-        $this->assertEquals($title, $view->vars['value']);
+        $this->assertEquals(new Options($title), $view->vars['value']);
         $this->assertEquals(' > ', $view->vars['separator']);
         $this->assertTrue($view->vars['reverse']);
     }
@@ -43,7 +44,7 @@ class TitleTypeTest extends BlockTypeTestCase
 
         $view = $this->getBlockView(TitleType::NAME, ['value' => $optionBag]);
 
-        $this->assertEquals(['second'], $view->vars['value']);
+        $this->assertEquals(new Options(['second']), $view->vars['value']);
     }
 
     public function testGetName()

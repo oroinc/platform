@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -25,9 +26,9 @@ class HiddenExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['hidden'] = isset($options['hidden']) ? $options['hidden'] : false;
+        $view->vars['hidden'] = $options->offsetExists(['hidden']) ? $options['hidden'] : false;
     }
 
     /**

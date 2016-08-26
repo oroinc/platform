@@ -32,13 +32,13 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     public function testOffsetSet()
     {
         $this->options->offsetSet('attribute', 'bar');
-        $this->assertSame(['value' => 'test', 'attribute' => 'bar'], $this->options->getAll());
+        $this->assertSame(['value' => 'test', 'attribute' => 'bar'], $this->options->toArray());
     }
 
     public function testOffsetUnset()
     {
         $this->options->offsetUnset('value');
-        $this->assertSame([], $this->options->getAll());
+        $this->assertSame([], $this->options->toArray());
     }
 
     public function testOffsetExists()
@@ -49,6 +49,6 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAll()
     {
-        $this->assertSame(['value' => 'test'], $this->options->getAll());
+        $this->assertSame(['value' => 'test'], $this->options->toArray());
     }
 }

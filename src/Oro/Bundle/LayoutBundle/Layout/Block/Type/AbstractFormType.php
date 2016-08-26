@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
@@ -29,17 +30,17 @@ abstract class AbstractFormType extends AbstractType
      * Returns the form accessor.
      *
      * @param ContextInterface $context
-     * @param array            $options
+     * @param Options          $options
      *
      * @return FormAccessorInterface
      *
      * @throws \OutOfBoundsException if the context does not contain the form accessor
      * @throws UnexpectedTypeException if the form accessor stored in the context has invalid type
      */
-    protected function getFormAccessor(ContextInterface $context, array $options)
+    protected function getFormAccessor(ContextInterface $context, Options $options)
     {
         /** @var FormAccessorInterface $formAccessor */
-        if (isset($options['form'])) {
+        if ($options->isExistsAndNotEmpty('form')) {
             $formAccessor = $options['form'];
             if (!$formAccessor instanceof FormAccessorInterface) {
                 throw new UnexpectedTypeException(

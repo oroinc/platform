@@ -3,10 +3,10 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\Block\Type\Options;
 
 use Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ExpressionExtension;
@@ -37,7 +37,7 @@ class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->getContextMock();
         $data = $this->getDataAccessorMock();
-        $options = new Options([]);
+        $options = new Options();
 
         $this->processor->expects($this->once())
             ->method('processExpressions')
@@ -59,13 +59,13 @@ class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($data));
         $view = new BlockView();
-        $view->vars->offsetSet(null, 'test');
+        $view->vars[] = 'test';
 
-        $this->processor->expects($this->never())
+        $this->processor->expects($this->once())
             ->method('processExpressions')
             ->with($view->vars, $context, $data, true, 'json');
 
-        $this->extension->finishView($view, $block, new Options([]));
+        $this->extension->finishView($view, $block, new Options());
     }
 
     /**

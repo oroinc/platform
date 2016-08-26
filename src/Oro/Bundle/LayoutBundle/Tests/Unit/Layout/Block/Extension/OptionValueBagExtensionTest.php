@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DataAccessorInterface;
@@ -39,8 +40,9 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
         /** @var DataAccessorInterface $dataAccessor */
         $dataAccessor = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
-        $this->extension->normalizeOptions($actual, $context, $dataAccessor);
-        $this->assertEquals($expected, $actual);
+        $options = new Options($actual);
+        $this->extension->normalizeOptions($options, $context, $dataAccessor);
+        $this->assertEquals($expected, $options->toArray());
     }
 
     /**
@@ -53,7 +55,7 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
         $context = new LayoutContext();
 
         $view = new BlockView();
-        $view->vars = $actual;
+        $view->vars = new Options($actual);
 
         /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
@@ -61,8 +63,12 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getContext')
             ->willReturn($context);
 
-        $this->extension->finishView($view, $block, ['resolve_value_bags' => $actual['resolve_value_bags']]);
-        $this->assertEquals($expected, $view->vars);
+        $this->extension->finishView(
+            $view,
+            $block,
+            new Options(['resolve_value_bags' => $actual['resolve_value_bags']])
+        );
+        $this->assertEquals($expected, $view->vars->toArray());
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Form;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
 interface FormLayoutBuilderInterface
@@ -11,7 +12,7 @@ interface FormLayoutBuilderInterface
      *
      * @param FormAccessorInterface $formAccessor
      * @param BlockBuilderInterface $builder
-     * @param array                 $options
+     * @param Options               $options
      */
-    public function build(FormAccessorInterface $formAccessor, BlockBuilderInterface $builder, array $options);
+    public function build(FormAccessorInterface $formAccessor, BlockBuilderInterface $builder, Options $options);
 }

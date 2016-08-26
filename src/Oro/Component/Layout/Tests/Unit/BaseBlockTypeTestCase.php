@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;

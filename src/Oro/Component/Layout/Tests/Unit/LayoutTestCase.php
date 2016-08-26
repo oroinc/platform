@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\ArrayCollection;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 
 class LayoutTestCase extends \PHPUnit_Framework_TestCase
@@ -59,7 +60,12 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
             $view['vars']['class_prefix'] = null;
         }
 
-        $view['vars'] = array_merge($vars, $view['vars']);
+        if ($view['vars'] instanceof Options) {
+            $merged = array_merge($vars, $view['vars']->toArray());
+            $view['vars'] = new Options($merged);
+        } else {
+            $view['vars'] = array_merge($vars, $view['vars']);
+        }
 
         foreach ($view['children'] as &$child) {
             $this->completeView($child, $vars);

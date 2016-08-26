@@ -7,10 +7,10 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
-use Oro\Component\Layout\Block\Type\Options;
 
 use Oro\Bundle\LayoutBundle\Exception\CircularReferenceException;
 use Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry;
@@ -65,12 +65,12 @@ class ExpressionProcessor
         if (!$evaluate && $encoding === null) {
             return;
         }
-        if (array_key_exists('data', $values) || array_key_exists('context', $values)) {
+        if ($values->offsetExists('data') || $values->offsetExists('context')) {
             throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
         }
-        $this->values = $values;
+        $this->values = $values->toArray();
         $this->processedValues = [];
-        foreach ($values as $key => &$value) {
+        foreach ($values as $key => $value) {
             if (array_key_exists($key, $this->processedValues)) {
                 $value = $this->processedValues[$key];
             } else {
@@ -78,9 +78,9 @@ class ExpressionProcessor
                 $this->processValue($value, $context, $data, $evaluate, $encoding);
                 $this->processedValues[$key] = $value;
             }
+
+            $values[$key] = $value;
         }
-        unset($value);
-        $values = $this->processedValues;
     }
 
     /**
@@ -110,12 +110,11 @@ class ExpressionProcessor
                     $value = substr($value, 1);
                     break;
             }
-
-        } elseif (is_array($value)) {
-            foreach ($value as &$item) {
+        } elseif ($value instanceof Options) {
+            foreach ($value as $key => $item) {
                 $this->processValue($item, $context, $data, $evaluate, $encoding);
+                $value[$key] = $item;
             }
-            unset($item);
         } elseif ($value instanceof OptionValueBag) {
             foreach ($value->all() as $action) {
                 $args = $action->getArguments();

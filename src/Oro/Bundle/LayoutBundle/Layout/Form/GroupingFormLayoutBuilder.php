@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Form;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
 class GroupingFormLayoutBuilder extends FormLayoutBuilder
@@ -21,7 +22,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
     protected function initializeState(
         FormAccessorInterface $formAccessor,
         BlockBuilderInterface $builder,
-        array $options
+        Options $options
     ) {
         parent::initializeState($formAccessor, $builder, $options);
         $this->groups          = $options['groups'];

@@ -34,14 +34,15 @@ class BaseType extends AbstractType
     {
         // merge the passed variables with the existing ones
         if (!empty($options['vars'])) {
-            $view->vars = array_replace($view->vars, $options['vars']);
+            $replaced = array_replace($view->vars->toArray(), $options['vars']->toArray());
+            $view->vars = new Options($replaced);
         }
 
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
         $view->vars['block'] = $view;
 
         $view->vars['class_prefix'] = null;
-        if (isset($options['class_prefix'])) {
+        if ($options->offsetExists('class_prefix')) {
             $view->vars['class_prefix'] = $options['class_prefix'];
         } elseif ($view->parent) {
             $view->vars['class_prefix'] = $view->parent->vars['class_prefix'];
@@ -90,8 +91,9 @@ class BaseType extends AbstractType
      */
     public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if (isset($view->vars['attr']['id']) && !isset($view->vars['label_attr']['for'])) {
-            $view->vars['label_attr']['for'] = $view->vars['attr']['id'];
+        $vars = $view->vars->toArray();
+        if (isset($vars['attr']['id']) && !isset($vars['label_attr']['for'])) {
+            $view->vars['label_attr']['for'] = $vars['attr']['id'];
         }
 
         $view->vars['blocks'] = $view->blocks;

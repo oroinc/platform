@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\OptionsConfigTrait;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
@@ -39,7 +40,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
 
         $this->assertBlockView(
             [
-                'vars' => [
+                'vars' => new Options([
                     'id' => 'test:block--1',
                     'block_type' => static::TYPE_NAME,
                     'block_type_widget_id' => static::TYPE_NAME . '_widget',
@@ -55,7 +56,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
                     'option_default_false' => false,
                     'option_default_null' => null,
                     'option_required' => true,
-                ]
+                ])
             ],
             $view,
             false
@@ -117,19 +118,19 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
                     'option' => null,
                     'option_required' => true,
                 ]),
-                'expected' => ['vars' => array_merge($expected, [
+                'expected' => ['vars' => new Options(array_merge($expected, [
                     'option_required' => true,
-                ])],
+                ]))],
             ],
             [
                 'options' => array_merge($options, [
                     'option' => false,
                     'option_required' => true,
                 ]),
-                'expected' => ['vars' => array_merge($expected, [
+                'expected' => ['vars' => new Options(array_merge($expected, [
                     'option' => false,
                     'option_required' => true,
-                ])],
+                ]))],
             ],
         ];
     }
