@@ -29,14 +29,18 @@ class Message
     private $priority;
 
     /**
-     * @var int
+     * Gets the number of seconds the message should be removed from the queue without processing
+     *
+     * @var int|null
      */
-    private $expireSec;
+    private $expire;
 
     /**
-     * @var int
+     * Gets the number of seconds the message should be delayed before it will be send to a queue
+     *
+     * @var int|null
      */
-    private $delaySec;
+    private $delay;
 
     /**
      * @var array
@@ -135,35 +139,41 @@ class Message
     }
 
     /**
-     * @return int
+     * Gets the number of seconds the message should be removed from the queue without processing
+     *
+     * @return int|null
      */
-    public function getExpireSec()
+    public function getExpire()
     {
-        return $this->expireSec;
+        return $this->expire;
     }
 
     /**
-     * @param int $expireSec
+     * @param int|null $expire
      */
-    public function setExpireSec($expireSec)
+    public function setExpire($expire)
     {
-        $this->expireSec = $expireSec;
+        $this->expire = $expire;
     }
 
     /**
-     * @return int
+     * Gets the number of seconds the message should be delayed before it will be send to a queue
+     *
+     * @return int|null
      */
-    public function getDelaySec()
+    public function getDelay()
     {
-        return $this->delaySec;
+        return $this->delay;
     }
 
     /**
-     * @param int $delaySec
+     * Set delay in seconds
+     *
+     * @param int|null $delay
      */
-    public function setDelaySec($delaySec)
+    public function setDelay($delay)
     {
-        $this->delaySec = $delaySec;
+        $this->delay = $delay;
     }
 
     /**

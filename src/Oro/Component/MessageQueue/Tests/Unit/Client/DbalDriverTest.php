@@ -83,7 +83,7 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
         $queue = new DbalDestination('aQueue');
 
         $message = new Message();
-        $message->setExpireSec(123);
+        $message->setExpire(123);
 
         $transportMessage = new DbalMessage();
 
@@ -182,7 +182,7 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
         $queue = new DbalDestination('aQueue');
 
         $message = new Message();
-        $message->setDelaySec(123);
+        $message->setDelay(123);
 
         $transportMessage = new DbalMessage();
 

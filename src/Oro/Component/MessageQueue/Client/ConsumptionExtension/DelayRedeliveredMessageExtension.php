@@ -17,18 +17,20 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
     private $driver;
 
     /**
+     * Gets the number of seconds the message should be delayed
+     *
      * @var int
      */
-    private $delaySec;
+    private $delay;
 
     /**
      * @param DriverInterface $driver
-     * @param int             $delaySec
+     * @param int             $delay Gets the number of seconds the message should be delayed
      */
-    public function __construct(DriverInterface $driver, $delaySec)
+    public function __construct(DriverInterface $driver, $delay)
     {
         $this->driver = $driver;
-        $this->delaySec = $delaySec;
+        $this->delay = $delay;
     }
 
     /**
@@ -52,7 +54,7 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
         $delayedMessage->setBody($message->getBody());
         $delayedMessage->setHeaders($message->getHeaders());
         $delayedMessage->setProperties($properties);
-        $delayedMessage->setDelaySec($this->delaySec);
+        $delayedMessage->setDelay($this->delay);
 
         $queue = $context->getSession()->createQueue($context->getQueueName());
 

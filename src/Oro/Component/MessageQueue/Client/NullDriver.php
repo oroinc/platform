@@ -66,8 +66,8 @@ class NullDriver implements DriverInterface
 
         $headers = $message->getHeaders();
         $headers['content_type'] = $message->getContentType();
-        $headers['expiration'] = $message->getExpireSec();
-        $headers['delay'] = $message->getDelaySec();
+        $headers['expiration'] = $message->getExpire();
+        $headers['delay'] = $message->getDelay();
         $headers['priority'] = $message->getPriority();
 
         $transportMessage = $this->createTransportMessage();
