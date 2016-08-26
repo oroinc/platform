@@ -743,3 +743,31 @@ datagrid:
                             choices:
                                 2: Inactive
                                 1: Active
+
+    # TODO test, please remove before merge
+    user-search-grid:
+        source:
+            type: search
+            search_index: website
+            query:
+                select:
+                    - text.username
+                    - text.email
+                from:
+                    - { table: %oro_user.entity.class%, alias: user }
+        columns:
+            username:
+                data_name: username
+            email:
+                data_name: email
+        sorters:
+            columns:
+                username:
+                    data_name: username
+        filters:
+            columns:
+                username:
+                    type: string
+                    data_name: username
+                    label: oro.user.username.label
+        actions:
