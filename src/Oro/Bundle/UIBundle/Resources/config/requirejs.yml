@@ -90,6 +90,8 @@ config:
             'jquery': 'jquery'
         'oroui/js/extend/select2':
             'jquery.select2': 'jquery.select2'
+        'oroui/js/select2-l10n':
+            'jquery.select2': 'jquery.select2'
         'oroui/js/extend/jquery.multiselect':
             'jquery.multiselect': 'jquery.multiselect'
         'oroui/js/extend/jquery.multiselect-filter':
