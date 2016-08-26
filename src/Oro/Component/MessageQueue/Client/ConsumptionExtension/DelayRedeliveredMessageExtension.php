@@ -17,7 +17,7 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
     private $driver;
 
     /**
-     * Gets the number of seconds the message should be delayed
+     * The number of seconds the message should be delayed
      *
      * @var int
      */
@@ -25,7 +25,7 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
 
     /**
      * @param DriverInterface $driver
-     * @param int             $delay Gets the number of seconds the message should be delayed
+     * @param int             $delay The number of seconds the message should be delayed
      */
     public function __construct(DriverInterface $driver, $delay)
     {

@@ -29,14 +29,14 @@ class Message
     private $priority;
 
     /**
-     * Gets the number of seconds the message should be removed from the queue without processing
+     * The number of seconds the message should be removed from the queue without processing
      *
      * @var int|null
      */
     private $expire;
 
     /**
-     * Gets the number of seconds the message should be delayed before it will be send to a queue
+     * The number of seconds the message should be delayed before it will be send to a queue
      *
      * @var int|null
      */
