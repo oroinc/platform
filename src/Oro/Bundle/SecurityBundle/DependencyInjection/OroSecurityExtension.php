@@ -20,6 +20,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     const DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID = 'oro_security.wsse_nonce_cache';
     const DEFAULT_WSSE_NONCE_CACHE_CLASS = 'Oro\Bundle\SecurityBundle\Cache\WsseNoncePhpFileCache';
     const DEFAULT_WSSE_NONCE_CACHE_PATH = '%kernel.cache_dir%/security/nonces';
+    const ACLS_CONFIG_ROOT_NODE = 'acls';
 
     /**
      * {@inheritDoc}
@@ -64,7 +65,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     {
         return new CumulativeConfigLoader(
             'oro_acl_config',
-            new YamlCumulativeFileLoader('Resources/config/oro/acl.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/acls.yml')
         );
     }
 

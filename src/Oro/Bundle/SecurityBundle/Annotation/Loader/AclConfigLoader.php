@@ -16,18 +16,21 @@ class AclConfigLoader implements AclAnnotationLoaderInterface
     public function load(AclAnnotationStorage $storage)
     {
         $configLoader = OroSecurityExtension::getAclConfigLoader();
-        $resources    = $configLoader->load();
+        $resources = $configLoader->load();
+        $root = OroSecurityExtension::ACLS_CONFIG_ROOT_NODE;
         foreach ($resources as $resource) {
-            foreach ($resource->data as $id => $data) {
-                $data['id'] = $id;
-                $storage->add(new AclAnnotation($data));
-                if (isset($data['bindings'])) {
-                    foreach ($data['bindings'] as $binding) {
-                        $storage->addBinding(
-                            $id,
-                            isset($binding['class']) ? $binding['class'] : null,
-                            isset($binding['method']) ? $binding['method'] : null
-                        );
+            if (array_key_exists($root, $resource->data) && is_array($resource->data[$root])) {
+                foreach ($resource->data[$root] as $id => $data) {
+                    $data['id'] = $id;
+                    $storage->add(new AclAnnotation($data));
+                    if (isset($data['bindings'])) {
+                        foreach ($data['bindings'] as $binding) {
+                            $storage->addBinding(
+                                $id,
+                                isset($binding['class']) ? $binding['class'] : null,
+                                isset($binding['method']) ? $binding['method'] : null
+                            );
+                        }
                     }
                 }
             }
