@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
 use Oro\Component\MessageQueue\Client\MessageProducer;
@@ -229,5 +230,14 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension = $container->getDefinition('oro_message_queue.client.delay_redelivered_message_extension');
         $this->assertEquals(12345, $extension->getArgument(1));
+    }
+
+    public function testShouldAllowGetConfiguration()
+    {
+        $extension = new OroMessageQueueExtension();
+
+        $configuration = $extension->getConfiguration([], new ContainerBuilder());
+
+        self::assertInstanceOf(Configuration::class, $configuration);
     }
 }
