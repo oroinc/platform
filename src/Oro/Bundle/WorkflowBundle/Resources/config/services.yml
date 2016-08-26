@@ -129,6 +129,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.permission_registry:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
