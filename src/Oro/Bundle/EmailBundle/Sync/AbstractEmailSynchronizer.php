@@ -113,12 +113,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function sync(
-        $maxConcurrentTasks,
-        $minExecIntervalInMin,
-        $maxExecTimeInMin = -1,
-        $maxTasks = 1
-    ) {
+    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1)
+    {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
         }
@@ -164,7 +160,6 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             } catch (\Exception $ex) {
                 $failedOriginIds[] = $origin->getId();
             }
-
 
             if ($maxTasks > 0 && count($processedOrigins) >= $maxTasks) {
                 $this->logger->info('Exit because the limit of tasks are reached.');
@@ -266,7 +261,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
-     * @param bool $force
+     * @param bool|null $force
      *
      * @throws \Exception
      */
@@ -287,7 +282,12 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
-                $processor->process($origin, $syncStartTime, $force);
+
+                if ($force) {
+                    $processor->enableForceMode();
+                }
+
+                $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
                 $this->logger->info('Skip because it is already in process.');
