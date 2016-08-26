@@ -1,14 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use Oro\Component\MessageQueue\Client\Router;
 use Oro\Component\MessageQueue\Router\Recipient;
+use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\Router;
-use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
@@ -244,7 +244,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $driverMock = $this->getMock(DriverInterface::class);
         $driverMock
             ->expects($this->any())
-            ->method('createMessage')
+            ->method('createTransportMessage')
             ->willReturn(new NullMessage())
         ;
         $driverMock

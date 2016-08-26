@@ -6,9 +6,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -20,42 +19,13 @@ class ConfigurationPass implements CompilerPassInterface
     const EXTENSION_TAG_NAME = 'oro_datagrid.extension';
     const PROVIDER_TAG_NAME  = 'oro_datagrid.configuration.provider';
 
-    const ROOT_PARAMETER   = 'datagrids';
-
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $this->registerConfigFiles($container);
         $this->registerConfigProviders($container);
         $this->registerDataSources($container);
-    }
-
-    /**
-     * Collect datagrid configurations files and pass them to the configuration provider
-     *
-     * @param ContainerBuilder $container
-     */
-    protected function registerConfigFiles(ContainerBuilder $container)
-    {
-        if ($container->hasDefinition(self::PROVIDER_SERVICE_ID)) {
-            $config = [];
-
-            $configLoader = new CumulativeConfigLoader(
-                'oro_datagrid',
-                new YamlCumulativeFileLoader('Resources/config/oro/datagrids.yml')
-            );
-            $resources    = $configLoader->load($container);
-            foreach ($resources as $resource) {
-                if (isset($resource->data[self::ROOT_PARAMETER]) && is_array($resource->data[self::ROOT_PARAMETER])) {
-                    $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $resource->data[self::ROOT_PARAMETER]);
-                }
-            }
-
-            $configProviderDef = $container->getDefinition(self::PROVIDER_SERVICE_ID);
-            $configProviderDef->replaceArgument(0, $config);
-        }
     }
 
     /**

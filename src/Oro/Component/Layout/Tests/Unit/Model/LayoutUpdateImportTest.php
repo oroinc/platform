@@ -12,10 +12,14 @@ class LayoutUpdateImportTest extends \PHPUnit_Framework_TestCase
         $id = 'import_id';
         $root = 'root_block_id';
         $namespace = 'import_namespace';
+        $parent = new LayoutUpdateImport('parent_id', 'parent_root', 'parent_namespace');
         $import = new LayoutUpdateImport($id, $root, $namespace);
+        $import->setParent($parent);
         $this->assertEquals($id, $import->getId());
         $this->assertEquals($root, $import->getRoot());
         $this->assertEquals($namespace, $import->getNamespace());
+        $this->assertEquals($parent, $import->getParent());
+        $this->assertEquals($parent->getId(), $import->getParent()->getId());
     }
 
     public function testCreateFromArray()

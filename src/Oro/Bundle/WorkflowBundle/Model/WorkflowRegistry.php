@@ -6,9 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
 class WorkflowRegistry
@@ -89,6 +89,23 @@ class WorkflowRegistry
     }
 
     /**
+     * @param string $entityClass
+     * @return bool
+     */
+    public function hasActiveWorkflowsByEntityClass($entityClass)
+    {
+        $class = ClassUtils::getRealClass($entityClass);
+
+        if (array_key_exists($class, $this->workflowByEntityClass)) {
+            return true;
+        }
+
+        $items = $this->getEntityRepository()->findActiveForRelatedEntity($class);
+
+        return count($items) > 0;
+    }
+
+    /**
      * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
@@ -100,13 +117,8 @@ class WorkflowRegistry
         $class = ClassUtils::getRealClass($entityClass);
 
         if (!array_key_exists($class, $this->workflowByEntityClass)) {
-            $criteria = [
-                'relatedEntity' => $class,
-                'active' => true
-            ];
-
             $workflows = new ArrayCollection();
-            foreach ($this->getEntityRepository()->findBy($criteria, ['priority' => 'DESC']) as $definition) {
+            foreach ($this->getEntityRepository()->findActiveForRelatedEntity($class) as $definition) {
                 /** @var WorkflowDefinition $definition */
                 $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
             }
@@ -147,7 +159,7 @@ class WorkflowRegistry
             $definitions
         );
     }
-    
+
     /**
      * @return EntityManager
      */
@@ -157,7 +169,7 @@ class WorkflowRegistry
     }
 
     /**
-     * @return EntityRepository
+     * @return WorkflowDefinitionRepository
      */
     protected function getEntityRepository()
     {

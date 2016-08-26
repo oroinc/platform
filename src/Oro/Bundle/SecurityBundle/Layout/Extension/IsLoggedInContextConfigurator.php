@@ -3,14 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Layout\Extension;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
 
-class SecurityFacadeContextConfigurator implements ContextConfiguratorInterface
+class IsLoggedInContextConfigurator implements
+    ContextConfiguratorInterface
 {
-    /**
-     * @var SecurityFacade
-     */
+    const OPTION_NAME = 'is_logged_in';
+
+    /** @var SecurityFacade */
     protected $securityFacade;
 
     /**
@@ -22,16 +24,16 @@ class SecurityFacadeContextConfigurator implements ContextConfiguratorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()
-            ->setRequired(['logged_user'])
+            ->setRequired([self::OPTION_NAME])
             ->setAllowedTypes([
-                'logged_user' => ['Symfony\Component\Security\Core\User\UserInterface', 'string', 'null']
+                self::OPTION_NAME => ['bool']
             ]);
 
-        $context->set('logged_user', $this->securityFacade->getLoggedUser());
+        $context->set(self::OPTION_NAME, $this->securityFacade->hasLoggedUser());
     }
 }

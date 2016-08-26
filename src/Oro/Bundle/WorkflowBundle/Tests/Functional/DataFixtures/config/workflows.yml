@@ -2,6 +2,7 @@ workflows:
     test_flow:
         label: 'Test Flow'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 60
         steps:
             open:
                 label: 'Open'
@@ -19,6 +20,7 @@ workflows:
     test_start_step_flow:
         label: 'Test Flow With Start Step'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 20
         start_step: open
         steps:
             open:
@@ -39,6 +41,7 @@ workflows:
     test_multistep_flow:
         label: 'Test MultiStep Flow'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 50
         start_step: starting_point
         steps:
             starting_point:
@@ -73,6 +76,7 @@ workflows:
         label: 'Test Groups Flow 1'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: starting_point
+        priority: 40
         exclusive_active_groups:
             - active_group1
             - active_group2
@@ -146,3 +150,39 @@ workflows:
                  label: 'Start transition'
                  step_to: third_point
                  transition_definition: second_point_transition_definition
+                 
+    test_active_flow1:
+        label: 'Test Active Flow1'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults:
+            active: true
+        priority: 20
+        steps:
+            step1:
+                label: 'Step1'
+        transitions:
+            transition1:
+                label: 'Transition1'
+                step_to: step1
+                transition_definition: definition1
+                is_start: true
+        transition_definitions:
+            definition1: ~
+
+    test_active_flow2:
+        label: 'Test Active Flow2'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults:
+            active: true
+        priority: 10
+        steps:
+            step1:
+                label: 'Step1'
+        transitions:
+            transition1:
+                label: 'Transition1'
+                step_to: step1
+                transition_definition: definition1
+                is_start: true
+        transition_definitions:
+            definition1: ~
