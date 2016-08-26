@@ -402,7 +402,7 @@ class AssociationManagerTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.sclr_3 AS title '
+            'SELECT entity.id_0 as ownerId, entity.id_1 AS id, entity.sclr_2 AS entity, entity.sclr_3 AS title '
             . 'FROM ('
             . 'SELECT DISTINCT t0_.id AS id_0, t1_.id AS id_1, '
             . '\'' . $targetClass1 . '\' AS sclr_2, '

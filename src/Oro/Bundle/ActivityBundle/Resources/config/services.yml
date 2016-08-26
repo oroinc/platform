@@ -214,6 +214,7 @@ services:
             - '@oro_datagrid.grid_configuration.helper'
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_activity.manager'
-            - '@oro_activity.manager.activity_context.api'
+            - '@oro_entity_config.provider.entity'
+            - '@router'
         tags:
             - { name: oro_datagrid.extension }

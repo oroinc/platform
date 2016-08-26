@@ -139,7 +139,8 @@ class AssociationManager
      *
      * The resulting query would be something like this:
      * <code>
-     * SELECT entity.entityId AS id, entity.entityClass AS entity, entity.entityTitle AS title FROM (
+     * SELECT entity.id AS ownerId, entity.entityId AS id, entity.entityClass AS entity, entity.entityTitle AS title
+     * FROM (
      *      SELECT [DISTINCT]
      *          e.id AS id,
      *          target.id AS entityId,
@@ -228,7 +229,8 @@ class AssociationManager
             if (empty($selectStmt)) {
                 $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
                 $selectStmt = sprintf(
-                    'entity.%s AS id, entity.%s AS entity, entity.%s AS title',
+                    'entity.%s as ownerId, entity.%s AS id, entity.%s AS entity, entity.%s AS title',
+                    QueryUtils::getColumnNameByAlias($mapping, 'id'),
                     QueryUtils::getColumnNameByAlias($mapping, 'entityId'),
                     QueryUtils::getColumnNameByAlias($mapping, 'entityClass'),
                     QueryUtils::getColumnNameByAlias($mapping, 'entityTitle')
@@ -238,6 +240,7 @@ class AssociationManager
 
         $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
         $rsm
+            ->addScalarResult('ownerId', 'ownerId', Type::INTEGER)
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')
             ->addScalarResult('title', 'title');
