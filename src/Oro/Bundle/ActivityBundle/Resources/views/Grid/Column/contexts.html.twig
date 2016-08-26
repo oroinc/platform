@@ -1,0 +1,11 @@
+<span class="context-item" style="border: none">
+    {%- for item in value -%}
+        <span class="{{- item.icon -}}"></span>
+        {%- if item.link -%}
+            <a href="{{- item.link -}}"><span class="context-label">{{- item.title -}}</span></a>
+        {%- else -%}
+            <span class="context-label">{{- item.title -}}</span>
+        {%- endif -%}
+        {{- not loop.last ? ', ' -}}
+    {%- endfor -%}
+</span>

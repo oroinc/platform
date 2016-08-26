@@ -207,3 +207,13 @@ services:
         arguments:
             - '@oro_activity.resolver.entity_title.entity_name'
             - '@translator'
+
+    oro_activity.grid.contexts_extension:
+        class: Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension
+        arguments:
+            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_activity.manager'
+            - '@oro_activity.manager.activity_context.api'
+        tags:
+            - { name: oro_datagrid.extension }
