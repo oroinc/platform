@@ -63,49 +63,32 @@ class MessageProducer implements MessageProducerInterface
             $contentType = $contentType ?: 'text/plain';
             $body = (string) $body;
         } elseif (is_array($body)) {
-            $this->prepareArrayBody($message);
+            $body = $message->getBody();
+            $contentType = $message->getContentType();
 
-            return;
+
+            if ($contentType && $contentType !== 'application/json') {
+                throw new \LogicException(sprintf('Content type "application/json" only allowed when body is array'));
+            }
+
+            // only array of scalars is allowed.
+            array_walk_recursive($body, function ($value) {
+                if (!is_scalar($value) && !is_null($value)) {
+                    throw new \LogicException(sprintf(
+                        'The message\'s body must be an array of scalars. Found not scalar in the array: %s',
+                        is_object($value) ? get_class($value) : gettype($value)
+                    ));
+                }
+            });
+
+            $contentType = 'application/json';
+            $body = JSON::encode($body);
         } else {
             throw new \InvalidArgumentException(sprintf(
                 'The message\'s body must be either null, scalar or array. Got: %s',
                 is_object($body) ? get_class($body) : gettype($body)
             ));
         }
-
-        $message->setContentType($contentType);
-        $message->setBody($body);
-    }
-
-    /**
-     * The method is not really needed here,
-     * but there is a very smart intelligent tool called phpmd which does not like it.
-     * Without the method it complains on high NPathComplexity so I must make it happy.
-     *
-     * @param Message $message
-     */
-    private function prepareArrayBody(Message $message)
-    {
-        $body = $message->getBody();
-        $contentType = $message->getContentType();
-
-
-        if ($contentType && $contentType !== 'application/json') {
-            throw new \LogicException(sprintf('Content type "application/json" only allowed when body is array'));
-        }
-
-        // only array of scalars is allowed.
-        array_walk_recursive($body, function ($value) {
-            if (!is_scalar($value) && !is_null($value)) {
-                throw new \LogicException(sprintf(
-                    'The message\'s body must be an array of scalars. Found not scalar in the array: %s',
-                    is_object($value) ? get_class($value) : gettype($value)
-                ));
-            }
-        });
-
-        $contentType = 'application/json';
-        $body = JSON::encode($body);
 
         $message->setContentType($contentType);
         $message->setBody($body);
