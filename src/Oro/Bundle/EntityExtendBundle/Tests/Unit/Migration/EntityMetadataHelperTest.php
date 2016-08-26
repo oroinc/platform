@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 
 class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
@@ -26,15 +28,8 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityClassByTableName()
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->once())
-            ->method('getTableName')
-            ->will($this->returnValue('acme_test'));
-        $metadata->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity'));
+        $metadata = new ClassMetadataInfo('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity');
+        $metadata->table['name'] = 'acme_test';
 
         $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()
@@ -64,17 +59,48 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetTableNameByEntityClass()
+    public function testGetEntityClassesByTableName()
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+        $testEntityMetadata = new ClassMetadataInfo('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity');
+        $testEntityMetadata->table['name'] = 'acme_test';
+        $testEntity2Metadata = new ClassMetadataInfo('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity2');
+        $testEntity2Metadata->table['name'] = 'acme_test';
+
+        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $metadata->expects($this->once())
-            ->method('getTableName')
-            ->will($this->returnValue('acme_test'));
-        $metadata->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity'));
+        $metadataFactory->expects($this->once())
+            ->method('getAllMetadata')
+            ->will($this->returnValue([$testEntityMetadata, $testEntity2Metadata]));
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($metadataFactory));
+
+        $this->doctrine->expects($this->once())
+            ->method('getManagers')
+            ->will($this->returnValue(array('default' => $em)));
+        $this->doctrine->expects($this->once())
+            ->method('getManager')
+            ->with($this->equalTo('default'))
+            ->will($this->returnValue($em));
+
+        $this->assertEquals(
+            [
+                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity',
+                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity2',
+            ],
+            $this->helper->getEntityClassesByTableName('acme_test')
+        );
+    }
+
+    public function testGetTableNameByEntityClass()
+    {
+        $metadata = new ClassMetadataInfo('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity');
+        $metadata->table['name'] = 'acme_test';
 
         $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()
@@ -106,19 +132,9 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFieldNameByColumnName()
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->once())
-            ->method('getTableName')
-            ->will($this->returnValue('acme_test'));
-        $metadata->expects($this->once())
-            ->method('getFieldName')
-            ->with('name_column')
-            ->will($this->returnValue('name_field'));
-        $metadata->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity'));
+        $metadata = new ClassMetadataInfo('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity');
+        $metadata->table['name'] = 'acme_test';
+        $metadata->fieldNames['name_column'] = 'name_field';
 
         $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()

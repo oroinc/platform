@@ -50,12 +50,30 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
         $this->entityMetadataHelper->expects($this->any())
+            ->method('getEntityClassesByTableName')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['table1', ['Acme\AcmeBundle\Entity\Entity1']],
+                        ['table2', ['Acme\AcmeBundle\Entity\Entity2']],
+                        ['oro_enum_test_enum', [ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum']],
+                    ]
+                )
+            );
+        $this->entityMetadataHelper->expects($this->any())
             ->method('getFieldNameByColumnName')
             ->will($this->returnArgument(1));
         $this->extendOptionsManager = new ExtendOptionsManager();
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->any())
+            ->method('hasConfig')
+            ->will($this->returnValue(true));
         $this->extendOptionsParser  = new ExtendOptionsParser(
             $this->entityMetadataHelper,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
+            $configManager
         );
     }
 

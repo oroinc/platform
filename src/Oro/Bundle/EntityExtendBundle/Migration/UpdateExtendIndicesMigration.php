@@ -112,8 +112,8 @@ class UpdateExtendIndicesMigration implements
      */
     protected function processColumn(Schema $schema, QueryBag $queries, $tableName, $columnName, $options)
     {
-        $className = $this->entityMetadataHelper->getEntityClassByTableName($tableName);
-        if (null === $className) {
+        $classNames = $this->entityMetadataHelper->getEntityClassesByTableName($tableName);
+        if (!$classNames) {
             return;
         }
 
@@ -124,11 +124,15 @@ class UpdateExtendIndicesMigration implements
 
         if (!isset($options[ExtendOptionsManager::NEW_NAME_OPTION])) {
             if (isset($options[ExtendOptionsManager::TYPE_OPTION])) {
-                $this->buildIndex($columnName, $options, $className, $table);
+                foreach ($classNames as $className) {
+                    $this->buildIndex($columnName, $options, $className, $table);
+                }
             }
         } else {
             // in case of renaming column name we should rename existing index
-            $this->renameIndex($schema, $queries, $tableName, $columnName, $options, $className, $table);
+            foreach ($classNames as $className) {
+                $this->renameIndex($schema, $queries, $tableName, $columnName, $options, $className, $table);
+            }
         }
     }
 
