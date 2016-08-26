@@ -301,13 +301,4 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $result);
         $this->assertSame($result->first(), $organization);
     }
-
-    public function testToString()
-    {
-        $username = 'testUser';
-        $user = $this->getUser();
-        $user->setUsername($username);
-        $this->assertEquals($username, (string)$user);
-        $this->assertEquals($username, $user->toString());
-    }
 }

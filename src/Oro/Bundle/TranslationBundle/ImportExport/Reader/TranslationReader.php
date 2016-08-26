@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\ImportExport\Reader;
 
-use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorBagInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -15,7 +15,7 @@ class TranslationReader extends AbstractReader
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var DataCollectorTranslator */
+    /** @var TranslatorBagInterface */
     protected $translator;
 
     /** @var array */
@@ -24,12 +24,12 @@ class TranslationReader extends AbstractReader
     /**
      * @param ContextRegistry $contextRegistry
      * @param DoctrineHelper $doctrineHelper
-     * @param DataCollectorTranslator $translator
+     * @param TranslatorBagInterface $translator
      */
     public function __construct(
         ContextRegistry $contextRegistry,
         DoctrineHelper $doctrineHelper,
-        DataCollectorTranslator $translator
+        TranslatorBagInterface $translator
     ) {
         parent::__construct($contextRegistry);
 
@@ -64,7 +64,7 @@ class TranslationReader extends AbstractReader
         if (!isset($this->messages[$locale])) {
 
             $defaultMessages = $this->getMessages(Translation::DEFAULT_LOCALE);
-            $originalMessages = $this->getMessages($locale, true);
+            $originalMessages = $this->getMessages($locale);
 
             $messages = array_merge($defaultMessages, $originalMessages);
 

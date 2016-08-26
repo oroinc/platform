@@ -12,16 +12,17 @@ class TranslationNormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (!is_array($data) || !isset($data['domain'], $data['key'], $data['value'])) {
             throw new UnexpectedValueException('Incorrect record format');
         }
+
         $translation = new Translation();
-        $translation->setLocale($context['language_code']);
-        $translation->setDomain($data['domain']);
-        $translation->setKey($data['key']);
-        $translation->setValue($data['value']);
+        $translation->setLocale($context['language_code'])
+            ->setDomain($data['domain'])
+            ->setKey($data['key'])
+            ->setValue($data['value']);
 
         return $translation;
     }
@@ -29,7 +30,7 @@ class TranslationNormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = array())
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
         return $type === Translation::class && !empty($context['language_code']);
     }

@@ -1,7 +1,7 @@
 operations:
     oro_translation_add_language:
         label: oro.translation.action.add
-        applications: [backend]
+        applications: [default]
         routes:
             - oro_translation_language_index
         button_options:
@@ -32,7 +32,7 @@ operations:
 
     oro_translation_disable_language:
         label: oro.translation.action.disable
-        applications: [backend]
+        applications: [default]
         datagrids:
             - oro-translation-language-grid
         order: 10
@@ -54,7 +54,7 @@ operations:
 
     oro_translation_enable_language:
         label: oro.translation.action.enable
-        applications: [backend]
+        applications: [default]
         datagrids:
             - oro-translation-language-grid
         order: 10

@@ -23,6 +23,11 @@ class LayoutUpdateImport
     protected $namespace;
 
     /**
+     * @var LayoutUpdateImport
+     */
+    protected $parent;
+
+    /**
      * @param string $id
      * @param string $root
      * @param string $namespace
@@ -56,6 +61,21 @@ class LayoutUpdateImport
     public function getNamespace()
     {
         return $this->namespace;
+    }
+
+    /**
+     * @return LayoutUpdateImport
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+    /**
+     * @param LayoutUpdateImport $parent
+     */
+    public function setParent(LayoutUpdateImport $parent)
+    {
+        $this->parent = $parent;
     }
 
     /**

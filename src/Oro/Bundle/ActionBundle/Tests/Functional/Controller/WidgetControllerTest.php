@@ -315,7 +315,7 @@ class WidgetControllerTest extends WebTestCase
                 'label' => $label,
                 'enabled' => true,
                 'order' => 10,
-                'applications' => ['backend', 'frontend'],
+                'applications' => ['default', 'test'],
                 'frontend_options' => [],
                 'entities' => [],
                 'routes' => [],

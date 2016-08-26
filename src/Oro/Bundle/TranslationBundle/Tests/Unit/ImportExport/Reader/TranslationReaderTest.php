@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\ImportExport\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
-use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -23,7 +23,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var DataCollectorTranslator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorBagInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
     /** @var StepExecution|\PHPUnit_Framework_MockObject_MockObject */
@@ -46,9 +46,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMockBuilder(DataCollectorTranslator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->getMock(TranslatorBagInterface::class);
         $this->stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
