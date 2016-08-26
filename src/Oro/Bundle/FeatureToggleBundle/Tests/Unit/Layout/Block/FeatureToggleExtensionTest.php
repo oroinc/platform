@@ -45,6 +45,7 @@ class FeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
 
         $view = new BlockView();
         $view->vars['visible'] = $initVisible;
+        /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
         $block = $this->getMock(BlockInterface::class);
 
         $options = [
@@ -87,6 +88,7 @@ class FeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
 
         $view = new BlockView();
         $view->vars['visible'] = $initVisible;
+        /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
         $block = $this->getMock(BlockInterface::class);
 
         $options = [
