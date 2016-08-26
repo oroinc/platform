@@ -130,7 +130,6 @@ JS;
      */
     protected function fillSelect2Entities($xpath, $values)
     {
-        $values = true === is_array($values) ? $values : [$values];
         $input = $this->findElement($xpath);
 
         // Remove all existing entities
@@ -145,9 +144,11 @@ JS;
 
         $this->waitForAjax();
 
+        $values = true === is_array($values) ? $values : [$values];
+
         foreach ($values as $value) {
             $input->postValue(['value' => [$value]]);
-            $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
+            $this->wait(30000, "0 == $('ul.select2-results li.select2-searching').length");
 
             $results = $this->getEntitiesSearchResultXpaths();
             $firstResult = $this->findElement(array_shift($results));
@@ -159,6 +160,7 @@ JS;
             );
 
             $firstResult->click();
+            $this->waitForAjax();
         }
     }
 
@@ -196,8 +198,14 @@ JS;
      */
     protected function fillSelect2Entity($xpath, $value)
     {
+        $selectArrow = $this->xpathManipulator->prepend('/../a/span[contains(@class, "select2-arrow")]', $xpath);
+        $driver = $this;
+        $this->waitFor(60000, function () use ($driver, $selectArrow) {
+            return $driver->isVisible($selectArrow);
+        });
+
         $this
-            ->findElement($this->xpathManipulator->prepend('/../a/span[contains(@class, "select2-arrow")]', $xpath))
+            ->findElement($selectArrow)
             ->click();
 
         foreach ($this->findElementXpaths('//div[contains(@class, "select2-search")]/input') as $input) {
@@ -207,7 +215,8 @@ JS;
             }
         }
 
-        $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
+        $this->waitForAjax();
+        $this->wait(60000, "0 == $('ul.select2-results li.select2-searching').length");
         $results = $this->getEntitiesSearchResultXpaths();
 
         if (1 < count($results)) {
@@ -227,13 +236,14 @@ JS;
         self::assertNotCount(0, $results, sprintf('Not found result for "%s"', $value));
 
         $this->findElement(array_shift($results))->click();
+        $this->waitForAjax();
     }
 
     /**
      * Wait PAGE load
      * @param int $time Time should be in milliseconds
      */
-    public function waitPageToLoad($time = 15000)
+    public function waitPageToLoad($time = 60000)
     {
         $this->wait(
             $time,
@@ -246,7 +256,7 @@ JS;
      * Wait AJAX request
      * @param int $time Time should be in milliseconds
      */
-    public function waitForAjax($time = 15000)
+    public function waitForAjax($time = 60000)
     {
         $this->waitPageToLoad($time);
 
@@ -283,18 +293,17 @@ JS;
     }
 
     /**
-     * Executes JS on a given element - pass in a js script string and {{ELEMENT}} will
-     * be replaced with a reference to the element
-     *
-     * @example $this->executeJsOnXpath($xpath, 'return {{ELEMENT}}.childNodes.length');
-     *
-     * @param Element $element the webdriver element
-     * @param string  $script  the script to execute
-     * @param Boolean $sync    whether to run the script synchronously (default is TRUE)
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    private function executeJsOnElement(Element $element, $script, $sync = true)
+    public function executeJsOnXpath($xpath, $script, $sync = true)
+    {
+        return $this->executeJsOnElement($this->findElement($xpath), $script, $sync);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function executeJsOnElement(Element $element, $script, $sync = true)
     {
         $script  = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
 
@@ -353,5 +362,18 @@ for (i = 0; i < l; i++) {
 JS;
 
         $this->executeJsOnElement($element, $script);
+    }
+
+    private function waitFor($timeout, \Closure $function)
+    {
+        $start = microtime(true);
+        $end = $start + $timeout / 1000.0;
+
+        do {
+            $result = $function();
+            usleep(100000);
+        } while (microtime(true) < $end && !$result);
+
+        return (bool) $result;
     }
 }

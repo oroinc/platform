@@ -123,6 +123,7 @@ class Form extends Element
     {
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
+
             if ($sndParent->hasClass('control-group-collection')) {
                 $elementName = Inflector::singularize(trim($label->getText())).'Collection';
                 $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
@@ -136,6 +137,8 @@ class Form extends Element
                 return $select;
             } elseif ($sndParent->hasClass('control-group-checkbox')) {
                 return $sndParent->find('css', 'input[type=checkbox]');
+            } elseif ($sndParent->hasClass('control-group-choice')) {
+                return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }

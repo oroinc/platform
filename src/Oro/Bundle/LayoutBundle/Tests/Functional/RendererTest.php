@@ -167,7 +167,12 @@ class RendererTest extends LayoutTestCase
                     'defer'   => '=false'
                 ]
             )
-            ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
+            ->add(
+                'external_resource',
+                'head',
+                'external_resource',
+                ['href' => 'test_external.css', 'rel' => 'stylesheet']
+            )
             ->add(
                 'content',
                 'root',
@@ -176,7 +181,7 @@ class RendererTest extends LayoutTestCase
                     'class_prefix' => 'content',
                     'attr' => [
                         'class' => '{{ class_prefix }}-body',
-                        'data-json' => ['test1'],
+                        'data-json' => '{"0":"test1"}',
                     ],
                 ]
             )
@@ -362,7 +367,7 @@ class RendererTest extends LayoutTestCase
         <script type="text/javascript" async="async">
             alert('test');
         </script>
-        <link rel="stylesheet" href="test.css"/>
+        <link rel="stylesheet" href="test_external.css"/>
     </head>
 <body class="content-body test-body class2" data-json="{&quot;0&quot;:&quot;test1&quot;}">
     <button type="button" name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>

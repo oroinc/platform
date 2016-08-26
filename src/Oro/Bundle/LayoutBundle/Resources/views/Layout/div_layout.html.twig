@@ -36,7 +36,7 @@
     {%- endif -%}
     {%- for attrname, attrvalue in attr -%}
         {%- if (attrvalue is iterable) -%}
-            {% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}
+            {% set attrvalue = attrvalue|json_encode() %}
         {%- endif -%}
         {%- if attrname is same as('title') -%}
             {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain) }}"
@@ -66,6 +66,40 @@
 {%- endblock %}
 
 {% block input_widget -%}
+    {% set attr = attr|merge({
+        type: type,
+    }) %}
+
+    {% if name is defined %}
+        {% set attr = attr|merge({
+            name: name
+        }) %}
+    {% endif %}
+
+    {% if id is defined and id is not empty %}
+        {% set attr = attr|merge({
+            id: id
+        }) %}
+    {% endif %}
+
+    {% if placeholder is defined %}
+        {% set attr = attr|merge({
+            placeholder: placeholder
+        }) %}
+    {% endif %}
+
+    {% if value is defined %}
+        {% set attr = attr|merge({
+            value: value
+        }) %}
+    {% endif %}
+
+    {% if type == 'password' %}
+        {% set attr = attr|merge({
+        autocomplete: 'off'
+        }) %}
+    {% endif %}
+
     {% if attr.placeholder is defined %}
         {% set attr = attr|merge({
             placeholder: attr.placeholder|block_text(translation_domain)
@@ -110,12 +144,64 @@
 {%- endblock %}
 
 {% block meta_widget %}
+    {% if charset is defined %}
+        {% set attr = attr|merge({
+            charset: charset
+        }) %}
+    {% endif %}
+
+    {% if content is defined %}
+        {% set attr = attr|merge({
+            content: content
+        }) %}
+    {% endif %}
+
+    {% if http_equiv is defined %}
+        {% set attr = attr|merge({
+            http_equiv: http_equiv
+        }) %}
+    {% endif %}
+
+    {% if name is defined %}
+        {% set attr = attr|merge({
+            name: name
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         <meta{{ block('block_attributes') }}/>
     {% endspaceless %}
 {% endblock %}
 
 {% block script_widget %}
+    {% set attr = attr|merge({
+        type: type,
+    }) %}
+
+    {% if src is defined %}
+        {% set attr = attr|merge({
+            src: src
+        }) %}
+    {% endif %}
+
+    {% if async != false %}
+        {% set attr = attr|merge({
+            async: 'async'
+        }) %}
+    {% endif %}
+
+    {% if defer != false %}
+        {% set attr = attr|merge({
+            defer: 'defer'
+        }) %}
+    {% endif %}
+
+    {% if crossorigin is defined %}
+        {% set attr = attr|merge({
+            crossorigin: crossorigin
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         {%- if attr.src is defined and attr.src is not empty -%}
             <script{{ block('block_attributes') }}></script>
@@ -128,6 +214,34 @@
 {% endblock %}
 
 {% block style_widget %}
+    {% set attr = attr|merge({
+        type: type,
+    }) %}
+
+    {% if src is defined %}
+        {% set attr = attr|merge({
+            href: src
+        }) %}
+    {% endif %}
+
+    {% if media is defined %}
+        {% set attr = attr|merge({
+            media: media
+        }) %}
+    {% endif %}
+
+    {% if scoped != false %}
+        {% set attr = attr|merge({
+            scoped: 'scoped'
+        }) %}
+    {% endif %}
+
+    {% if crossorigin is defined %}
+        {% set attr = attr|merge({
+            crossorigin: crossorigin
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         {%- if attr.href is defined and attr.href is not empty -%}
             <link rel="stylesheet"{{ block('block_attributes') }}/>
@@ -236,6 +350,17 @@
 {%- endblock %}
 
 {% block external_resource_widget %}
+    {% set attr = attr|merge({
+        rel: rel,
+        href: href,
+    }) %}
+
+    {% if type is defined %}
+        {% set attr = attr|merge({
+            type: type
+        }) %}
+    {% endif %}
+
     <link{{ block('block_attributes') }}/>
 {% endblock %}
 
@@ -254,6 +379,18 @@
 {%- endblock %}
 
 {% block ordered_list_widget -%}
+    {% if type is defined %}
+        {% set attr = attr|merge({
+        type: type
+        }) %}
+    {% endif %}
+
+    {% if start is defined %}
+        {% set attr = attr|merge({
+        start: start
+        }) %}
+    {% endif %}
+
     {% spaceless %}
         <ol{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
