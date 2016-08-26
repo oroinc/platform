@@ -96,7 +96,10 @@ use Oro\Component\MessageQueue\Consumption\Extensions;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 
-$doctrineConnection = DriverManager::getConnection(['url' => 'mysql://user:secret@localhost/mydb'], new Configuration);
+$doctrineConnection = DriverManager::getConnection(
+    ['url' => 'mysql://user:secret@localhost/mydb'],
+    new Configuration
+);
 
 $connection = new DbalConnection($doctrineConnection, 'oro_message_queue');
 
@@ -175,15 +178,17 @@ class Step1MessageProcessor implements MessageProcessorInterface
                 foreach ($entities as $entity) {
                     // every job name must be unique
                     $jobName = 'oro:index:index-single-entity:' . $entity->getId();
-                    $runner->createDelayed($jobName, function (JobRunner $runner, Job $childJob) use ($entity) {
-                        $this->producer->send('oro:index:index-single-entity', [
-                            'entityId' => $entity->getId(),
-                            'jobId' => $childJob->getId(),
-                        ])
+                    $runner->createDelayed(
+                        $jobName,
+                        function (JobRunner $runner, Job $childJob) use ($entity) {
+                            $this->producer->send('oro:index:index-single-entity', [
+                                'entityId' => $entity->getId(),
+                                'jobId' => $childJob->getId(),
+                            ])
                     });
                 }
 
-                return true // if you want to ACK message or false to REJECT
+                return true; // if you want to ACK message or false to REJECT
             }
         );
 
