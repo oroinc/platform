@@ -270,29 +270,33 @@ class UserAclHandler implements SearchHandlerInterface
                 'where',
                 $queryBuilder->expr()->orX(
                     $queryBuilder->expr()->like(
-                        $queryBuilder->expr()->concat(
-                            'user.firstName',
+                        $queryBuilder->expr()->lower(
                             $queryBuilder->expr()->concat(
-                                $queryBuilder->expr()->literal(' '),
-                                'user.lastName'
+                                'user.firstName',
+                                $queryBuilder->expr()->concat(
+                                    $queryBuilder->expr()->literal(' '),
+                                    'user.lastName'
+                                )
                             )
                         ),
                         '?1'
                     ),
                     $queryBuilder->expr()->like(
-                        $queryBuilder->expr()->concat(
-                            'user.lastName',
+                        $queryBuilder->expr()->lower(
                             $queryBuilder->expr()->concat(
-                                $queryBuilder->expr()->literal(' '),
-                                'user.firstName'
+                                'user.lastName',
+                                $queryBuilder->expr()->concat(
+                                    $queryBuilder->expr()->literal(' '),
+                                    'user.firstName'
+                                )
                             )
                         ),
                         '?1'
                     ),
-                    $queryBuilder->expr()->like('user.username', '?1')
+                    $queryBuilder->expr()->like($queryBuilder->expr()->lower('user.username'), '?1')
                 )
             )
-            ->setParameter(1, '%' . str_replace(' ', '%', $search) . '%');
+            ->setParameter(1, '%' . str_replace(' ', '%', strtolower($search)) . '%');
     }
 
     /**

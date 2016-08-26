@@ -26,7 +26,7 @@ class LoadBasePermissionsQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        $this->assertConnectionCalled(['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
+        $this->assertConnectionCalled(['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN'], 4);
 
         $query = new LoadBasePermissionsQuery();
         $query->setConnection($this->connection);
@@ -35,8 +35,9 @@ class LoadBasePermissionsQueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $permissions
+     * @param int $countCalls
      */
-    protected function assertConnectionCalled(array $permissions)
+    protected function assertConnectionCalled(array $permissions, $countCalls)
     {
         $permissions = array_map(
             function ($permission) {
@@ -52,7 +53,12 @@ class LoadBasePermissionsQueryTest extends \PHPUnit_Framework_TestCase
             $permissions
         );
 
-        $this->connection->expects($this->exactly(count($permissions)))
+        $this->connection->expects($this->once())
+            ->method('fetchAll')
+            ->with('SELECT name FROM oro_security_permission')
+            ->willReturn([['name' => 'ASSIGN']]);
+
+        $this->connection->expects($this->exactly($countCalls))
             ->method('executeUpdate')
             ->willReturnCallback(
                 function ($query, array $params = [], array $types = []) use (&$data) {

@@ -438,6 +438,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         validateContainer($listContainer);
     });
 
+    //TODO: implement clone row
+
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();
         if ($(this).attr('disabled')) {

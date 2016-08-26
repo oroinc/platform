@@ -55,10 +55,8 @@ define([
                     this.addRequiredFlag(this.$simpleEl);
                 }
                 this.target.inputWidget('show');
-                this.targetLabel.show();
             } else {
                 this.target.inputWidget('hide');
-                this.targetLabel.hide();
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }

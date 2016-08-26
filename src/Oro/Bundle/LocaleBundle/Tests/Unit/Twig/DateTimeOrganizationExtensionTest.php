@@ -58,8 +58,8 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturnMap(
                 [
-                    ['oro_locale.locale', false, false, $organizationLocale],
-                    ['oro_locale.timezone', false, false, $organizationTimezone],
+                    ['oro_locale.locale', false, false, null, $organizationLocale],
+                    ['oro_locale.timezone', false, false, null, $organizationTimezone],
                 ]
             );
         $this->formatter->expects($this->once())
