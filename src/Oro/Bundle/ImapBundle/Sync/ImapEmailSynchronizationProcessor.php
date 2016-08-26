@@ -67,7 +67,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * {@inheritdoc}
      */
-    public function process(EmailOrigin $origin, $syncStartTime, $force = false)
+    public function process(EmailOrigin $origin, $syncStartTime)
     {
         // make sure that the entity builder is empty
         $this->emailEntityBuilder->clear();
@@ -89,7 +89,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->emailEntityBuilder->setFolder($folder);
 
                 // sync emails using this search query
-                $lastSynchronizedAt = $this->syncEmails($origin, $imapFolder, $force);
+                $lastSynchronizedAt = $this->syncEmails($origin, $imapFolder);
                 $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
 
                 $startDate = $folder->getSynchronizedAt();
@@ -118,7 +118,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $processSpentTime = time() - $processStartTime;
 
-            if (!$force && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+            if (!$this->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
                 break;
             }
         }
@@ -159,11 +159,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @return \DateTime The max sent date
      */
-    protected function syncEmails(EmailOrigin $origin, ImapEmailFolder $imapFolder, $force = false)
+    protected function syncEmails(EmailOrigin $origin, ImapEmailFolder $imapFolder)
     {
         $folder             = $imapFolder->getFolder();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
-        $emails = $this->getEmailIterator($origin, $imapFolder, $folder, $force);
+        $emails = $this->getEmailIterator($origin, $imapFolder, $folder);
         $count = $processed = $invalid = $totalInvalid = 0;
         $emails->setIterationOrder(true);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
@@ -468,11 +468,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function getEmailIterator(
         EmailOrigin $origin,
         ImapEmailFolder $imapFolder,
-        EmailFolder $folder,
-        $skipLastUid = false
+        EmailFolder $folder
     ) {
         $lastUid = null;
-        if (!$skipLastUid) {
+        if (!$this->isForceMode()) {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
         }
 
