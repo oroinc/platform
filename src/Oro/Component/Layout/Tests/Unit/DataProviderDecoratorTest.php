@@ -40,4 +40,12 @@ class DataProviderDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->decorator->getFlags();
     }
+
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function testCallNotExistMethodCallException()
+    {
+        $this->decorator->offsetFlags();
+    }
 }
