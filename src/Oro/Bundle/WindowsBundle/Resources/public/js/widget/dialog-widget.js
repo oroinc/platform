@@ -244,12 +244,11 @@ define(function(require) {
          * Removes dialog widget
          */
         remove: function() {
-            if (this.widget) {
+            if (this.widget && this.widget.dialog('isOpen')) {
                 // There's widget, close it before remove.
                 // Close handler will invoke dispose method,
                 // where remove method will be called again
                 this.widget.dialog('close');
-                _.defer(_.bind(this.dispose, this));
             } else {
                 DialogWidget.__super__.remove.call(this);
             }
