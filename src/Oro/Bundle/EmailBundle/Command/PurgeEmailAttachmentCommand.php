@@ -58,12 +58,13 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
 
         $count = count($emailAttachments);
         if ($count) {
+            $em = $this->getEntityManager();
             $progress = new ProgressBar($output, $count);
             $progress->setFormat('debug');
 
             $progress->start();
             foreach ($emailAttachments as $attachment) {
-                $this->removeAttachment($attachment, $size);
+                $this->removeAttachment($em, $attachment, $size);
                 $progress->advance();
             }
             $progress->finish();
@@ -92,28 +93,25 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
             $size = $this->getConfigManager()->get('oro_email.attachment_sync_max_size');
         }
 
-        return (int)$size * 1024 * 1024;
+        /** Convert Megabytes to Bytes */
+        return (int)$size * pow(10, 6);
     }
 
     /**
+     * @param EntityManager   $em
      * @param EmailAttachment $attachment
      * @param int             $size
      */
-    protected function removeAttachment(EmailAttachment $attachment, $size)
+    protected function removeAttachment(EntityManager $em, EmailAttachment $attachment, $size)
     {
         // Double check of attachment size
         if ($size) {
-            $content     = $attachment->getContent();
-            $contentSize = $content->getContentTransferEncoding() === 'base64'
-                ? strlen(base64_decode($content->getContent()))
-                : strlen($content->getContent());
-
-            if ($contentSize < $size) {
+            if ($attachment->getSize() < $size) {
                 return;
             }
         }
 
-        $attachment->getEmailBody()->removeAttachment($attachment);
+        $em->remove($attachment);
     }
 
     /**
