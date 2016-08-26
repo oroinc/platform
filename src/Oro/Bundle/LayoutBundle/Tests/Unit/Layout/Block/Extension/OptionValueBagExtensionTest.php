@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
+use Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension;
+
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
@@ -9,7 +11,6 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
-use Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension;
 
 class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,11 +49,13 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $actual
      * @param array $expected
+     * @param bool $isApplied
      * @dataProvider optionsDataProvider
      */
-    public function testFinishView(array $actual, array $expected)
+    public function testFinishView(array $actual, array $expected, $isApplied = true)
     {
         $context = new LayoutContext();
+        $context['expressions_evaluate'] = $isApplied;
 
         $view = new BlockView();
         $view->vars = new Options($actual);
@@ -83,7 +86,8 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'resolve_value_bags' => true,
-                ]
+                ],
+                'isApplied' => false,
             ],
             'empty bag' => [
                 'actual' => [

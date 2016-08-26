@@ -62,7 +62,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
             if ($value instanceof Expression) {
                 continue;
             }
-            if (is_array($value)) {
+            if ($value instanceof Options) {
                 $options[$key] = $this->resolveValueBags($value);
             } elseif ($value instanceof OptionValueBag) {
                 $options[$key] = $value->buildValue($this->getOptionsBuilder($value, $options));
