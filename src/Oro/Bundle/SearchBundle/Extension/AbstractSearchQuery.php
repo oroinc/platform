@@ -18,6 +18,14 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     protected $result;
 
     /**
+     * Performing an internal query() to the engine, without
+     * data postprocessing etc.
+     *
+     * @return mixed
+     */
+    abstract protected function query();
+
+    /**
      * Getting the results from the query() and caching them.
      *
      * @return mixed|Result
@@ -40,7 +48,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     }
 
     /**
-     * @return Query
+     * {@inheritdoc}
      */
     public function getQuery()
     {
@@ -54,6 +62,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         $this->query = $query;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -116,5 +125,21 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
     {
         return $this->query->setOrderBy($fieldName, $direction, $type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addSelect($fieldName, $enforcedFieldType = null)
+    {
+        return $this->query->addSelect($fieldName, $enforcedFieldType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function from($entities)
+    {
+        return $this->query->from($entities);
     }
 }

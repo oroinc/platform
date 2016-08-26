@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Pager;
 
+use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
@@ -135,9 +138,17 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setMaxPerPage')
             ->with($maxPerPage);
 
-        /** @var DatasourceInterface $dataSource */
-        $dataSource = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        $dataSource = $this->getMockBuilder(OrmDatasource::class)
+            ->disableOriginalConstructor()->getMock();
+
         $configObject = DatagridConfiguration::create($config);
+
+        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $dataSource
+            ->method('getQueryBuilder')->withAnyParameters()->willReturn($queryBuilder);
 
         $this->extension->setParameters(new ParameterBag());
         $this->extension->visitDatasource($configObject, $dataSource);
@@ -161,8 +172,16 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
                 ->with($count);
         }
 
-        /** @var DatasourceInterface $dataSource */
-        $dataSource = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        $dataSource = $this->getMockBuilder(OrmDatasource::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $dataSource
+            ->method('getQueryBuilder')->withAnyParameters()->willReturn($queryBuilder);
+
         $configObject = DatagridConfiguration::create([]);
         $parameters = [];
         if (null !== $count) {
