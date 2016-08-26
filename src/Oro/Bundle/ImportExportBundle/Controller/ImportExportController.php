@@ -147,13 +147,13 @@ class ImportExportController extends Controller
     public function instantExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
-        $options = $this->getOptionsFromRequest();
+
         return $this->getExportHandler()->handleExport(
             $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT,
             'csv',
-            $request->get('filePrefix',  null),
+            $request->get('filePrefix', null),
             array_merge(
                 $this->getOptionsFromRequest(),
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]

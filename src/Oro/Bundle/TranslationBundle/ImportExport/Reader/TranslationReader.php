@@ -4,17 +4,12 @@ namespace Oro\Bundle\TranslationBundle\ImportExport\Reader;
 
 use Symfony\Component\Translation\TranslatorBagInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
-
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class TranslationReader extends AbstractReader
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var TranslatorBagInterface */
     protected $translator;
 
@@ -23,17 +18,12 @@ class TranslationReader extends AbstractReader
 
     /**
      * @param ContextRegistry $contextRegistry
-     * @param DoctrineHelper $doctrineHelper
      * @param TranslatorBagInterface $translator
      */
-    public function __construct(
-        ContextRegistry $contextRegistry,
-        DoctrineHelper $doctrineHelper,
-        TranslatorBagInterface $translator
-    ) {
+    public function __construct(ContextRegistry $contextRegistry, TranslatorBagInterface $translator)
+    {
         parent::__construct($contextRegistry);
 
-        $this->doctrineHelper = $doctrineHelper;
         $this->translator = $translator;
     }
 
@@ -43,7 +33,6 @@ class TranslationReader extends AbstractReader
     public function read()
     {
         $offset = $this->getStepExecution()->getReadCount();
-
         $messages = $this->getLanguageMessages($this->getContext()->getOption('language_code'));
 
         if (!isset($messages[$offset])) {
@@ -62,7 +51,6 @@ class TranslationReader extends AbstractReader
     protected function getLanguageMessages($locale)
     {
         if (!isset($this->messages[$locale])) {
-
             $defaultMessages = $this->getMessages(Translation::DEFAULT_LOCALE);
             $originalMessages = $this->getMessages($locale);
 

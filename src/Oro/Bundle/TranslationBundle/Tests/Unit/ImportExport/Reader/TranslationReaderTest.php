@@ -7,11 +7,9 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 
-use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader;
 
@@ -19,9 +17,6 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $contextRegistry;
-
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
 
     /** @var TranslatorBagInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
@@ -43,9 +38,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
         $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+
         $this->translator = $this->getMock(TranslatorBagInterface::class);
         $this->stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
@@ -57,12 +50,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
             ->with($this->stepExecution)
             ->willReturn($this->context);
 
-        $this->reader = new TranslationReader(
-            $this->contextRegistry,
-            $this->doctrineHelper,
-            $this->translator
-        );
-
+        $this->reader = new TranslationReader($this->contextRegistry, $this->translator);
         $this->reader->setStepExecution($this->stepExecution);
     }
 
@@ -80,12 +68,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValueMap($this->getCatalogueMap()));
 
         $this->stepExecution->expects($this->once())->method('getReadCount')->willReturn($offset);
-        $this->context->expects($this->once())->method('getOption')->with('language_id')->willReturn(1);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityReference')
-            ->with(Language::class, 1)
-            ->willReturn((new Language())->setCode($locale));
+        $this->context->expects($this->once())->method('getOption')->with('language_code')->willReturn('locale1');
 
         $this->assertEquals($expectedData, $this->reader->read());
     }

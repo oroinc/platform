@@ -7,13 +7,13 @@ services:
 
     oro_translation.importexport.strategy.translation.reset:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy'
-        public: false
         parent: 'oro_translation.importexport.strategy.translation.add_or_replace'
+        public: false
 
     # Import processor
     oro_translation.importexport.processor.import.translation:
-        public: false
         parent: oro_importexport.processor.import_abstract
+        public: false
         calls:
              - [setStrategy, ['@oro_translation.importexport.strategy.translation.add_or_replace']]
         tags:
@@ -21,8 +21,8 @@ services:
             - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
 
     oro_translation.importexport.processor.import.translation_reset:
-        public: false
         parent: oro_importexport.processor.import_abstract
+        public: false
         calls:
              - [setStrategy, ['@oro_translation.importexport.strategy.translation.reset']]
         tags:
@@ -31,8 +31,8 @@ services:
 
     # Export processor
     oro_translation.importexport.processor.export.translation:
-        public: false
         parent: oro_importexport.processor.export_abstract
+        public: false
         tags:
             - { name: oro_importexport.processor, type: export, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation }
 
@@ -42,7 +42,6 @@ services:
         public: false
         arguments:
             - '@oro_importexport.context_registry'
-            - '@oro_entity.doctrine_helper'
             - '@translator'
 
     # Normalizer
