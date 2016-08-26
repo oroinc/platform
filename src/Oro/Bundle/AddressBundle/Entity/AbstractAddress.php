@@ -312,6 +312,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @param int $id
      * @return AbstractAddress
+     * @deprecated since 1.10, to be removed in 2.0
      */
     public function setId($id)
     {
