@@ -118,7 +118,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $processSpentTime = time() - $processStartTime;
 
-            if (!$this->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+            if (false === $this->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
                 break;
             }
         }
@@ -249,7 +249,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if (!$this->checkOnOldEmailForMailbox($folder, $email, $folder->getOrigin()->getMailbox())) {
                 continue;
             }
-            if (!$this->checkOnExistsSavedEmail($email, $existingUids)) {
+
+            if (false === $this->isForceMode() && !$this->checkOnExistsSavedEmail($email, $existingUids)) {
                 continue;
             }
 
@@ -276,16 +277,20 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                         $emailUser->addFolder($folder);
                     }
                 }
-                $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
-                $newImapEmails[] = $imapEmail;
-                $this->em->persist($imapEmail);
-                $this->logger->notice(
-                    sprintf(
-                        'The "%s" (UID: %d) email was persisted.',
-                        $email->getSubject(),
-                        $email->getId()->getUid()
-                    )
-                );
+
+                if (false === $this->isForceMode() ||
+                    (true  === $this->isForceMode() && count($relatedExistingImapEmails) === 0)) {
+                    $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
+                    $newImapEmails[] = $imapEmail;
+                    $this->em->persist($imapEmail);
+                    $this->logger->notice(
+                        sprintf(
+                            'The "%s" (UID: %d) email was persisted.',
+                            $email->getSubject(),
+                            $email->getId()->getUid()
+                        )
+                    );
+                }
             } catch (\Exception $e) {
                 $this->logger->warning(
                     sprintf(
@@ -471,7 +476,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         EmailFolder $folder
     ) {
         $lastUid = null;
-        if (!$this->isForceMode()) {
+        if (false === $this->isForceMode()) {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
         }
 
