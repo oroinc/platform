@@ -1,5 +1,5 @@
-define(['underscore', 'jquery', 'backgrid'
-    ], function(_, $, Backgrid) {
+define(['underscore', 'backgrid'
+    ], function(_, Backgrid) {
     'use strict';
 
     /**
@@ -28,24 +28,13 @@ define(['underscore', 'jquery', 'backgrid'
         },
 
         /**
-         * @param {string|number} phoneNumber
-         * @return {string}
-         */
-        formatWithNbsp: function(phoneNumber) {
-            phoneNumber = $.trim(phoneNumber);
-            var phones = phoneNumber.split(/,\s*/);
-            return phones.map(function(number) {
-                return '<a href="tel:' + _.escape(number) + '" class="nowrap">' + _.escape(number) + '</a>';
-            }).join(', ');
-        },
-
-        /**
          * Generate 'a' element
          * @param {string|number} phoneNumber
          * @return {string}
          */
         generateLinkHTML: function(phoneNumber) {
-            return this.formatWithNbsp(phoneNumber);
+            var number = phoneNumber.trim();
+            return '<a href="tel:' + _.escape(number) + '" class="nowrap">' + _.escape(number) + '</a>';
         }
     });
 
