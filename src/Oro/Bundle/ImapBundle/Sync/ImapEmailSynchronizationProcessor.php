@@ -256,8 +256,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 continue;
             }
 
-            if (false === $this->isForceMode() && !$this->checkOnExistsSavedEmail($email, $existingUids)) {
-                continue;
+            if (!$this->checkOnExistsSavedEmail($email, $existingUids)) {
+                if (false === $this->isForceMode()) {
+                    continue;
+                }
             }
 
             /** @var ImapEmail[] $relatedExistingImapEmails */
@@ -370,13 +372,23 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function checkOnExistsSavedEmail(Email $email, array $existingUids)
     {
         if (in_array($email->getId()->getUid(), $existingUids)) {
-            $this->logger->info(
-                sprintf(
-                    'Skip "%s" (UID: %d) email, because it is already synchronised.',
-                    $email->getSubject(),
-                    $email->getId()->getUid()
-                )
-            );
+            if ($this->isForceMode()) {
+                $this->logger->info(
+                    sprintf(
+                        'Sync "%s" (UID: %d) email, because force mode is enabled.',
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+            } else {
+                $this->logger->info(
+                    sprintf(
+                        'Skip "%s" (UID: %d) email, because it is already synchronised.',
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+            }
             return false;
         }
 
