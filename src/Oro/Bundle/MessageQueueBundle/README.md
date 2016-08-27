@@ -133,7 +133,7 @@ You have to provide an implementation for them
 
 To functionally test that a message was sent, you can use [MessageQueueExtension](./Test/Functional/MessageQueueExtension.php).
 
-But before you start, you need to register `oro_message_queue.test.message_collector` service in `test` environment.
+But before you start, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
 
 ```yaml
 # app/config/config_test.yml
