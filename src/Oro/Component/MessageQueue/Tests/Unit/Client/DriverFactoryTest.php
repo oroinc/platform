@@ -1,36 +1,53 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Doctrine\DBAL\Connection;
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\DbalDriver;
+use Oro\Component\MessageQueue\Client\DriverFactory;
+use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\NullDriver;
-use Oro\Component\MessageQueue\Client\DriverFactory;
 
 class DriverFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldCreateNullSessionInstance()
     {
         $config = new Config('', '', '', '');
+        $connection = new NullConnection();
 
-        $connection = $this->createNullConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('createSession')
-            ->will($this->returnValue($this->createNullSessionMock()))
-        ;
+        $factory = new DriverFactory([NullConnection::class => NullDriver::class]);
+        $driver = $factory->create($connection, $config);
 
-        $driver = DriverFactory::create($connection, $config);
+        self::assertInstanceOf(NullDriver::class, $driver);
+        self::assertAttributeInstanceOf(NullSession::class, 'session', $driver);
+        self::assertAttributeSame($config, 'config', $driver);
+    }
 
-        $this->assertInstanceOf(NullDriver::class, $driver);
+    public function testShouldCreateDbalSessionInstance()
+    {
+        $config = new Config('', '', '', '');
+
+        $doctrineConnection = $this->getMock(Connection::class, [], [], '', false);
+        $connection = new DbalConnection($doctrineConnection, 'aTableName');
+
+        $factory = new DriverFactory([DbalConnection::class => DbalDriver::class]);
+        $driver = $factory->create($connection, $config);
+
+        self::assertInstanceOf(DbalDriver::class, $driver);
+        self::assertAttributeInstanceOf(DbalSession::class, 'session', $driver);
+        self::assertAttributeSame($config, 'config', $driver);
     }
 
     public function testShouldThrowExceptionIfUnexpectedConnectionInstance()
     {
-        $this->setExpectedException(\LogicException::class, 'Unexpected connection instance: "Mock_Connection');
+        $factory = new DriverFactory([]);
 
-        DriverFactory::create($this->getMock(ConnectionInterface::class), new Config('', '', '', ''));
+        $this->setExpectedException(\LogicException::class, 'Unexpected connection instance: "Mock_Connection');
+        $factory->create($this->getMock(ConnectionInterface::class), new Config('', '', '', ''));
     }
 
     /**

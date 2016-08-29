@@ -9,6 +9,7 @@ class Lexer
 {
     /** @var array */
     protected $keywords = [
+        Query::KEYWORD_SELECT,
         Query::KEYWORD_FROM,
         Query::KEYWORD_WHERE,
 
