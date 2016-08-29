@@ -20,9 +20,4 @@ interface LayoutUpdateImportInterface
      * @param ImportsAwareLayoutUpdateInterface $parentLayoutUpdate
      */
     public function setParentUpdate(ImportsAwareLayoutUpdateInterface $parentLayoutUpdate);
-
-    /**
-     * @return boolean
-     */
-    public function isApplicable();
 }

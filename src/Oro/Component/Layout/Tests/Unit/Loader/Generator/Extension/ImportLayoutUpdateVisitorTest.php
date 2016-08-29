@@ -32,7 +32,7 @@ class ImportLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
 <<<CLASS
 use Oro\Component\Layout\ImportLayoutManipulator;
 
-class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportInterface
+class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportInterface, \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {
     private \$parentLayoutUpdate;
     private \$import;

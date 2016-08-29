@@ -20,6 +20,7 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $class = $visitContext->getClass();
         $class->addUseStatement('Oro\Component\Layout\ImportLayoutManipulator');
         $class->addInterfaceName('Oro\Component\Layout\LayoutUpdateImportInterface');
+        $class->addInterfaceName('Oro\Component\Layout\IsApplicableLayoutUpdateInterface');
 
         $factoryProperty = PhpProperty::create('applicable');
         $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);

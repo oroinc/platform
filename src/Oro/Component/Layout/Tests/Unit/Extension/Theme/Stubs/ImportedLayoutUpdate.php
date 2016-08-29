@@ -27,13 +27,6 @@ class ImportedLayoutUpdate implements LayoutUpdateInterface, LayoutUpdateImportI
     /**
      * {@inheritDoc}
      */
-    public function isApplicable()
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
     }
