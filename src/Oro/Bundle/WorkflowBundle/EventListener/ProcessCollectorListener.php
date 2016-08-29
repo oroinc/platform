@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
@@ -364,9 +365,10 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 foreach ($processJobs as $processJob) {
                     $message = new Message();
                     $message->setBody(['process_job_id' => $processJob->getId()]);
+                    $message->setPriority(ProcessPriority::convertToMessageQueuePriority($priority));
 
                     if ($timeShift) {
-                        $message->setDelaySec($timeShift);
+                        $message->setDelay($timeShift);
                     }
 
                     $this->messageProducer->send(Topics::EXECUTE_PROCESS_JOB, $message);

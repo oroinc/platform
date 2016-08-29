@@ -3,11 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Cron\CronExpression;
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
 
 class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
@@ -18,7 +15,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessDefinitions(array $configuration)
     {
-        $definitions = array();
+        $definitions = [];
         foreach ($configuration as $name => $definitionConfiguration) {
             $definitions[] = $this->buildProcessDefinition($name, $definitionConfiguration);
         }
@@ -33,13 +30,13 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessDefinition($name, array $configuration)
     {
-        $this->assertConfigurationOptions($configuration, array('label', 'entity'));
+        $this->assertConfigurationOptions($configuration, ['label', 'entity']);
 
         $enabled = $this->getConfigurationOption($configuration, 'enabled', true);
         $order = $this->getConfigurationOption($configuration, 'order', 0);
-        $excludeDefinitions = $this->getConfigurationOption($configuration, 'exclude_definitions', array());
-        $actionsConfiguration = $this->getConfigurationOption($configuration, 'actions_configuration', array());
-        $preConditionsConfiguration = $this->getConfigurationOption($configuration, 'preconditions', array());
+        $excludeDefinitions = $this->getConfigurationOption($configuration, 'exclude_definitions', []);
+        $actionsConfiguration = $this->getConfigurationOption($configuration, 'actions_configuration', []);
+        $preConditionsConfiguration = $this->getConfigurationOption($configuration, 'preconditions', []);
 
         $definition = new ProcessDefinition();
         $definition
@@ -63,7 +60,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessTriggers(array $configuration, array $definitionsByName)
     {
-        $triggers = array();
+        $triggers = [];
         foreach ($configuration as $definitionName => $triggersConfiguration) {
             if (empty($definitionsByName[$definitionName])) {
                 throw new \LogicException(sprintf('Process definition "%s" not found', $definitionName));
@@ -91,7 +88,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         $this->validateEventAndCronParameters($event, $cron);
 
         $field     = $this->getConfigurationOption($configuration, 'field', null);
-        $priority  = $this->getConfigurationOption($configuration, 'priority', Job::PRIORITY_DEFAULT);
+        $priority  = $this->getConfigurationOption($configuration, 'priority', ProcessPriority::PRIORITY_DEFAULT);
         $queued    = $this->getConfigurationOption($configuration, 'queued', false);
         $timeShift = $this->getConfigurationOption($configuration, 'time_shift', null);
 

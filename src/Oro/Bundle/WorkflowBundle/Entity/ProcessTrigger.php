@@ -3,11 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 
 /**
  * @ORM\Table(
@@ -72,7 +70,7 @@ class ProcessTrigger
      *
      * @ORM\Column(name="priority", type="smallint")
      */
-    protected $priority = Job::PRIORITY_DEFAULT;
+    protected $priority = ProcessPriority::PRIORITY_DEFAULT;
 
     /**
      * Whether process should be queued or processed immediately
