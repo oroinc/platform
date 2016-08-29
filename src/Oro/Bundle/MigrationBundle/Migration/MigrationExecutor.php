@@ -85,13 +85,8 @@ class MigrationExecutor
      */
     public function executeUp(array $migrations, $dryRun = false)
     {
-        $platform    = $this->queryExecutor->getConnection()->getDatabasePlatform();
-        $sm          = $this->queryExecutor->getConnection()->getSchemaManager();
-        $schema      = $this->createSchemaObject(
-            $sm->listTables(),
-            $platform->supportsSequences() ? $sm->listSequences() : [],
-            $sm->createSchemaConfig()
-        );
+        $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $schema = $this->getActualSchema();
         $failedMigrations = false;
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
@@ -151,6 +146,10 @@ class MigrationExecutor
 
             foreach ($queries as $query) {
                 $this->queryExecutor->execute($query, $dryRun);
+            }
+
+            if ($queryBag->getPreQueries() || $queryBag->getPostQueries()) {
+                $schema = $this->getActualSchema();
             }
         } catch (\Exception $ex) {
             $result = false;
@@ -320,5 +319,20 @@ class MigrationExecutor
         );
 
         return $table;
+    }
+
+    /**
+     * @return Schema
+     */
+    protected function getActualSchema()
+    {
+        $platform    = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $sm          = $this->queryExecutor->getConnection()->getSchemaManager();
+
+        return $this->createSchemaObject(
+            $sm->listTables(),
+            $platform->supportsSequences() ? $sm->listSequences() : [],
+            $sm->createSchemaConfig()
+        );
     }
 }
