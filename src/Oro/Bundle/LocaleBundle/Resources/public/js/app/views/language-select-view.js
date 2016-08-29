@@ -32,6 +32,17 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        dispose: function(options) {
+            if (this.disposed) {
+                return;
+            }
+
+            mediator.off(null, null, this);
+        },
+
+        /**
          * @param {Object} data
          */
         onSupportedLanguagesChanged: function(data) {
