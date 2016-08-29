@@ -141,7 +141,7 @@ class EmailBodyBuilderTest extends \PHPUnit_Framework_TestCase
                 'data' => [
                     'contentTransferEncoding' => 'base64',
                     'embeddedContentId' => 123,
-                    'contentSize' => 1024 * 1024 * 5,
+                    'contentSize' => 1000 * 1000 * 5,
                 ],
                 'configSyncEnabled' => true,
                 'configSyncMaxSize' => 0.1,
@@ -151,7 +151,7 @@ class EmailBodyBuilderTest extends \PHPUnit_Framework_TestCase
                 'data' => [
                     'contentTransferEncoding' => 'base64',
                     'embeddedContentId' => 123,
-                    'contentSize' => 1024 * 1024 * 0.49 * 4 / 3,
+                    'contentSize' => 1000 * 1000 * 0.49 * 4 / 3,
                 ],
                 'configSyncEnabled' => true,
                 'configSyncMaxSize' => 0.5,
