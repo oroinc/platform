@@ -48,8 +48,8 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
         $message->setContentType('theContentType');
         $message->setMessageId('theMessageId');
         $message->setTimestamp(12345);
-        $message->setDelaySec(123);
-        $message->setExpireSec(345);
+        $message->setDelay(123);
+        $message->setExpire(345);
         $message->setPriority(MessagePriority::LOW);
         $message->setHeaders(['theHeaderFoo' => 'theFoo']);
         $message->setProperties(['thePropertyBar' => 'theBar']);

@@ -3,9 +3,6 @@ namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Util\JSON;
 
-/**
- * @SuppressWarnings(PHPMD.NPathComplexity)
- */
 class MessageProducer implements MessageProducerInterface
 {
     /**
@@ -39,9 +36,15 @@ class MessageProducer implements MessageProducerInterface
         $message->setProperty(Config::PARAMETER_PROCESSOR_NAME, $config->getRouterMessageProcessorName());
         $message->setProperty(Config::PARAMETER_QUEUE_NAME, $config->getRouterQueueName());
 
-        $message->setMessageId($message->getMessageId() ?: uniqid('oro.', true));
-        $message->setTimestamp($message->getTimestamp() ?: time());
-        $message->setPriority($message->getPriority() ?: MessagePriority::NORMAL);
+        if (!$message->getMessageId()) {
+            $message->setMessageId(uniqid('oro.', true));
+        }
+        if (!$message->getTimestamp()) {
+            $message->setTimestamp(time());
+        }
+        if (!$message->getPriority()) {
+            $message->setPriority(MessagePriority::NORMAL);
+        }
 
         $queue = $this->driver->createQueue($config->getRouterQueueName());
 
@@ -60,6 +63,10 @@ class MessageProducer implements MessageProducerInterface
             $contentType = $contentType ?: 'text/plain';
             $body = (string) $body;
         } elseif (is_array($body)) {
+            $body = $message->getBody();
+            $contentType = $message->getContentType();
+
+
             if ($contentType && $contentType !== 'application/json') {
                 throw new \LogicException(sprintf('Content type "application/json" only allowed when body is array'));
             }

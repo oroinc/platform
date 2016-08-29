@@ -129,11 +129,12 @@ class EmailBodyBuilder
         }
 
         if ($this->configManager) {
+            /** Maximum sync attachment size, Mb. */
             $attachmentSyncMaxSize = $this->configManager->get(self::ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE);
         }
 
         // unlimited or size < configured max size
-        return $attachmentSyncMaxSize === 0 || $size / 1024 / 1024 <= $attachmentSyncMaxSize;
+        return $attachmentSyncMaxSize === 0 || $size / 1000 / 1000 <= $attachmentSyncMaxSize;
     }
 
     /**

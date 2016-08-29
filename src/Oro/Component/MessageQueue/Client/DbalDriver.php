@@ -48,15 +48,15 @@ class DbalDriver implements DriverInterface
         $transportMessage->setMessageId($message->getMessageId());
         $transportMessage->setTimestamp($message->getTimestamp());
 
-        if ($message->getDelaySec()) {
-            $transportMessage->setDelay($message->getDelaySec());
+        if ($message->getDelay()) {
+            $transportMessage->setDelay($message->getDelay());
         }
 
         if ($message->getPriority()) {
             $this->setMessagePriority($transportMessage, $message->getPriority());
         }
 
-        if ($message->getExpireSec()) {
+        if ($message->getExpire()) {
             throw new \InvalidArgumentException('Expire is not supported by the transport');
         }
 

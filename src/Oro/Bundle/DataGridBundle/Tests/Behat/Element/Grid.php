@@ -99,7 +99,6 @@ class Grid extends Element
 
     /**
      * @param string $content
-     * @throws ExpectationException
      */
     public function checkRecord($content)
     {
@@ -224,7 +223,6 @@ class Grid extends Element
 
     /**
      * @param NodeElement $row
-     * @throws ExpectationException
      */
     protected function checkRowCheckbox(NodeElement $row)
     {

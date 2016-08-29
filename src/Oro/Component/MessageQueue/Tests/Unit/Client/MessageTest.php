@@ -28,22 +28,22 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         self::assertSame('theContentType', $message->getContentType());
     }
 
-    public function testShouldAllowGetPreviouslySetDelaySec()
+    public function testShouldAllowGetPreviouslySetDelay()
     {
         $message = new Message();
 
-        $message->setDelaySec('theDelaySec');
+        $message->setDelay('theDelay');
 
-        self::assertSame('theDelaySec', $message->getDelaySec());
+        self::assertSame('theDelay', $message->getDelay());
     }
 
-    public function testShouldAllowGetPreviouslySetExpireSec()
+    public function testShouldAllowGetPreviouslySetExpire()
     {
         $message = new Message();
 
-        $message->setExpireSec('theExpireSec');
+        $message->setExpire('theExpire');
 
-        self::assertSame('theExpireSec', $message->getExpireSec());
+        self::assertSame('theExpire', $message->getExpire());
     }
 
     public function testShouldAllowGetPreviouslySetPriority()
