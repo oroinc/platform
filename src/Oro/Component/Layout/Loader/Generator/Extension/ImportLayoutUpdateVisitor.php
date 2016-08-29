@@ -28,6 +28,10 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $setFactoryMethod = PhpMethod::create('isApplicable');
         $setFactoryMethod->setBody($writer->reset()->write('return $this->applicable;')->getContent());
         $class->setMethod($setFactoryMethod);
+        
+        $setFactoryMethod = PhpMethod::create('getImport');
+        $setFactoryMethod->setBody($writer->reset()->write('return $this->import;')->getContent());
+        $class->setMethod($setFactoryMethod);
 
         $setFactoryMethod = PhpMethod::create('setImport');
         $setFactoryMethod->addParameter(
