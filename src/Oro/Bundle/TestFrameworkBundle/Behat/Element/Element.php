@@ -105,6 +105,27 @@ class Element extends NodeElement
     }
 
     /**
+     * @param string $name Element name
+     *
+     * @return Element
+     */
+    public function getElement($name)
+    {
+        return $this->elementFactory->createElement($name, $this);
+    }
+
+    /**
+     * @param string $name
+     * @param string $text
+     *
+     * @return Element
+     */
+    public function findElementContains($name, $text)
+    {
+        return $this->elementFactory->findElementContains($name, $text, $this);
+    }
+
+    /**
      * Returns element's driver.
      *
      * @return OroSelenium2Driver

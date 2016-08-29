@@ -3,8 +3,16 @@ Grid:
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
 
 GridHeader:
-  selector: 'div.grid-container .grid-header:nth-child(1)'
+  selector: '.grid-header:nth-child(1)'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader
+
+GridRow:
+  selector: 'tbody tr'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+GridHeaderLink:
+  selector: 'th a'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
 GridFilters:
   selector: 'div.filter-box'
