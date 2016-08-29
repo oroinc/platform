@@ -9,6 +9,8 @@ oro.translation:
         install: 'Install'
         update: 'Update'
         add: 'Add Language'
+        translation_completeness.label: 'Translation Completeness:'
+        install.title: 'Install %language% language'
 
     language:
         entity_label: 'Language'
@@ -16,16 +18,16 @@ oro.translation:
 
         id.label: 'Id'
         code.label: 'Code'
-        enabled.label: 'Enabled'
+        enabled.label: 'Status'
         installed_build_date.label: 'Installed Build Date'
         organization.label: 'Organization'
         status:
             enabled: 'Enabled'
             disabled: 'Disabled'
         translation_status:
-            label: 'Translation Status'
+            label: 'Updates'
             up_to_date: 'Up to date'
-            update_needed: 'Available update'
+            update_needed: 'Update is available'
         translation_completeness.label: 'Translation Completeness'
 
         message:
@@ -41,3 +43,7 @@ oro.translation:
 
     menu:
         languages.label: Languages
+
+    form:
+        tooltip:
+            translation_completeness: "Translation coverage indicator relates to translation package volume. Some bundles may still not be translated."

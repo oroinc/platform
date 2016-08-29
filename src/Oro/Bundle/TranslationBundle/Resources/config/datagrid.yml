@@ -28,9 +28,11 @@ datagrid:
             createdAt:
                 label: oro.ui.created_at
                 frontend_type: datetime
+                renderable: false
             updatedAt:
                 label: oro.ui.updated_at
                 frontend_type: datetime
+                renderable: false
             import:
                 label: oro.importexport.import.label
                 type: twig
@@ -70,8 +72,10 @@ datagrid:
                 createdAt:
                     type:      datetime
                     data_name: language.createdAt
+                    enabled:   false
                 updatedAt:
                     type:      datetime
                     data_name: language.updatedAt
+                    enabled:   false
         properties:
             id: ~

@@ -78,7 +78,9 @@ operations:
 
         frontend_options:                                           # (optional) display options for operation button
             template: customDialogTemplate.html.twig                # (optional) custom template, can be used both for page or dialog
-            title: Custom Title                                     # (optional) custom title
+            title: aсme.demo.operations.dialog.title                # (optional) custom title
+            title_parameters:
+                %%some_param%%: $.paramValue
             options:                                                # (optional) modal dialog options
                 allowMaximize: true
                 allowMinimize: true

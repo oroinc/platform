@@ -153,7 +153,7 @@ class ImportExportController extends Controller
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT,
             'csv',
-            null,
+            $request->get('filePrefix', null),
             array_merge(
                 $this->getOptionsFromRequest(),
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]

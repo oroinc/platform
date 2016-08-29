@@ -169,6 +169,15 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
 
+    oro_translation.event_listener.translation:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\TranslationListener'
+        lazy: true
+        arguments:
+            - '@oro_translation.database_translation.metadata.cache'
+            - 'language_translations_import_from_csv'
+        tags:
+            - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterImportTranslations}
+
     oro_translation.strategy.default:
         class: '%oro_translation.strategy.default.class%'
         public: false
