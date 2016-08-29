@@ -161,18 +161,15 @@ class WorkflowRegistry
         $definitions = array_filter(
             $this->getEntityRepository()->findBy(['active' => true]),
             function (WorkflowDefinition $definition) use ($groupNames) {
-                $groups = $definition->getExclusiveActiveGroups();
-                foreach ($groupNames as $groupName) {
-                    if (in_array($groupName, $groups, true)) {
-                        return true;
-                    }
-                }
+                $isResourceEnabled = $this->featureChecker->isResourceEnabled(
+                    $definition->getName(),
+                    self::FEATURE_CONFIG_WORKFLOW_KEY
+                );
+                $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
-                return false;
+                return $isResourceEnabled && (bool)array_intersect($groupNames, $exclusiveActiveGroups);
             }
         );
-
-        $definitions = $this->filterEnabledFeaturesWorkflows($definitions);
 
         return array_map(
             function ($definition) {
