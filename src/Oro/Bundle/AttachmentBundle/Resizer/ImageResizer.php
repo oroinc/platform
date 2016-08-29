@@ -61,7 +61,7 @@ class ImageResizer
      * @param File $image
      * @param string $filterName
      * @param bool $force
-     * @return bool False if image has been already stored and no force flag passed, true otherwise
+     * @return bool False if image has been already stored and no force flag passed or on error, true otherwise
      */
     public function resizeImage(File $image, $filterName, $force)
     {
@@ -71,7 +71,11 @@ class ImageResizer
             return false;
         }
 
-        $content = $this->fileManager->getContent($image);
+        try {
+            $content = $this->fileManager->getContent($image);
+        } catch (\Exception $e) {
+            return false;
+        }
         $filteredBinary = $this->imageFactory->createImage($content, $filterName);
         $this->cacheManager->store($filteredBinary, $path, $filterName, $this->cacheResolverName);
 
