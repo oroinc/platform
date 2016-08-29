@@ -97,7 +97,7 @@ class ContentProcessor
             $header = $part->getHeader($headerKey);
             if ($header instanceof \ArrayIterator) {
                 foreach ($header as $headerItem) {
-                    if ($headerItem->getFieldName() == $headerKey) {
+                    if ($headerItem->getFieldName() === $headerKey) {
                         $contentTransferEncoding = $headerItem->getFieldValue();
                     }
                 }
