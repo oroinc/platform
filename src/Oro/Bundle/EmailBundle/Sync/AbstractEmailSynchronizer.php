@@ -282,7 +282,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
-                $processor->setForceMode($force)->process($origin, $syncStartTime);
+                $processor->setForceMode($force);
+                $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
                 $this->logger->info('Skip because it is already in process.');
