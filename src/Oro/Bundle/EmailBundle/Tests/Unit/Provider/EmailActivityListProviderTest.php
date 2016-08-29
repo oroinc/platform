@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -93,7 +94,8 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityFacadeLink,
             $this->mailboxProcessStorageLink,
             $this->activityAssociationHelper,
-            $this->commentAssociationHelper
+            $this->commentAssociationHelper,
+            new EmailBodyHelper($htmlTagHelper)
         );
         $this->emailActivityListProvider->setSecurityContextLink($this->securityContextLink);
     }
