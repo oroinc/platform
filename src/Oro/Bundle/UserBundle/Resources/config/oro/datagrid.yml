@@ -755,9 +755,9 @@ datagrid:
                 from: oro_user
         columns:
             username:
-                data_name: username
+                data_name: entity.username
             email:
-                data_name: email
+                data_name: entity.email
         sorters:
             columns:
                 username:
