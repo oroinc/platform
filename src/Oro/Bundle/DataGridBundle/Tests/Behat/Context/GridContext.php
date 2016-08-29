@@ -208,6 +208,7 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
         /** @var GridHeader $gridHeader */
         $gridHeader = $grid->getElement('GridHeader');
         $row = $grid->findElementContains('GridRow', $content);
+        self::assertTrue($row->isValid(), sprintf('Row with "%s" not found', $content));
 
         $crawler = new Crawler($row->getHtml());
         /** @var Crawler[] $columns */
