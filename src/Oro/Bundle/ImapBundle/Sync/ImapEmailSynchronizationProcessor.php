@@ -371,10 +371,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function checkOnExistsSavedEmail(Email $email, array $existingUids)
     {
         if (in_array($email->getId()->getUid(), $existingUids)) {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
