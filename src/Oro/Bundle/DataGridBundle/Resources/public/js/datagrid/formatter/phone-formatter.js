@@ -33,7 +33,8 @@ define(['underscore', 'backgrid'
          * @return {string}
          */
         generateLinkHTML: function(phoneNumber) {
-            return '<a href="tel:' + _.escape(phoneNumber) + '">' + _.escape(phoneNumber) + '</a>';
+            var number = phoneNumber.trim();
+            return '<a href="tel:' + _.escape(number) + '" class="nowrap">' + _.escape(number) + '</a>';
         }
     });
 

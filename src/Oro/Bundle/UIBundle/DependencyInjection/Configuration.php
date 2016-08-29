@@ -46,7 +46,7 @@ class Configuration implements ConfigurationInterface
             $rootNode,
             [
                 'organization_name'  => ['value' => 'ORO'],
-                'application_url'   => ['value' => 'http://localhost/oro/'],
+                'application_url'   => ['value' => 'http://localhost/'],
                 'navbar_position'   => ['value' => 'top'],
             ]
         );

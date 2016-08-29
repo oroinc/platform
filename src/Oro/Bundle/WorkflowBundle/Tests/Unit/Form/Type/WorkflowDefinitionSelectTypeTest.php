@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\Query\Expr;
-
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -11,7 +9,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
@@ -22,8 +20,8 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     const WORKFLOW_ENTITY_NAME = 'stdClass';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowManager */
-    protected $workflowManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry */
+    protected $workflowRegistry;
 
     /** @var WorkflowDefinitionSelectType */
     protected $type;
@@ -35,11 +33,11 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new WorkflowDefinitionSelectType($this->workflowManager);
+        $this->type = new WorkflowDefinitionSelectType($this->workflowRegistry);
     }
 
     public function testSubmitWithWorkflowNameOption()
@@ -50,7 +48,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         $workflow = array_shift($workflows);
         $definition = $workflow->getDefinition();
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')
             ->with($definition->getLabel())
             ->willReturn($workflow);
@@ -71,8 +69,8 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     {
         $definitions = $this->getDefinitions();
 
-        $this->workflowManager->expects($this->once())
-            ->method('getApplicableWorkflows')
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByEntityClass')
             ->with(self::WORKFLOW_ENTITY_NAME)
             ->willReturn($this->getWorkflows());
 
