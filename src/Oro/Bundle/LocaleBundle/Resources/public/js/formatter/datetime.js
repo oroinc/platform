@@ -72,6 +72,35 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
         },
 
         /**
+         * @returns {string}
+         */
+        getDateTimeFormatNBSP: function() {
+            if (!this.frontendFormats.datetimeNBSP) {
+                this.frontendFormats.datetimeNBSP = this.prepareNbspFormat(this.frontendFormats.datetime);
+            }
+            return this.frontendFormats.datetimeNBSP;
+        },
+
+        /**
+         * Replaces spaces to nbsp in format
+         *
+         * @param {string} format
+         * @returns {string}
+         */
+        prepareNbspFormat: function(format) {
+            format = format.replace(/\s+/g, '\u00a0');
+            // format starts from time part
+            if (/[AaHsSzZ]/.test(format[0])) {
+                // first nbps before date part replace to usual space
+                format = format.replace(/([^xXgGYWwEdDQM\u00a0])\s([^HsSAazZ]+)$/, '$1 $2');
+            } else {
+                // first nbps before time part replace to usual space
+                format = format.replace(/([^HsSAazZ\u00a0])\s([^xXgGYWwEdDQM]+)$/, '$1 $2');
+            }
+            return format;
+        },
+
+        /**
          * Return separator between date and time for current format
          *
          * @returns {string}
@@ -273,6 +302,15 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
         formatDateTime: function(value) {
             return this.getMomentForBackendDateTime(value).tz(this.timezone)
                 .format(this.getDateTimeFormat());
+        },
+
+        /**
+         * @param {string} value
+         * @returns {string}
+         */
+        formatDateTimeNBSP: function(value) {
+            return this.getMomentForBackendDateTime(value).tz(this.timezone)
+                .format(this.getDateTimeFormatNBSP());
         },
 
         /**

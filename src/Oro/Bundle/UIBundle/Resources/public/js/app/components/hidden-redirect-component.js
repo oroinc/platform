@@ -25,6 +25,11 @@ define(function(require) {
         type: 'info',
 
         /**
+         * @property {Boolean}
+         */
+        showLoading: false,
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
@@ -37,8 +42,14 @@ define(function(require) {
                 this.type = options.type;
             }
 
+            if (options.showLoading) {
+                this.showLoading = options.showLoading;
+            }
+
             var self = this;
             this.element.on('click.' + this.cid, function(e) {
+                self._showLoading();
+
                 e.preventDefault();
                 var pageStateView = mediator.execute('composer:retrieve', 'pageState', true);
 
@@ -74,16 +85,19 @@ define(function(require) {
         saveAndRedirect: function() {
             var form = $('form[data-collect=true]');
             var actionInput = form.find('input[name="input_action"]');
+            var _this = this;
             $.ajax({
                 url: this.element.attr('href'),
                 type: 'GET',
                 success: function(response) {
+                    _this._hideLoading();
                     actionInput.val(JSON.stringify({
                         redirectUrl: response.url
                     }));
                     form.trigger('submit');
                 },
                 error: function(xhr) {
+                    _this._hideLoading();
                     Error.handle({}, xhr, {enforce: true});
                 }
             });
@@ -95,9 +109,11 @@ define(function(require) {
                 url: this.element.attr('href'),
                 type: 'GET',
                 success: function(response) {
+                    _this._hideLoading();
                     _this._processResponse(response.url, response.message);
                 },
                 error: function(xhr) {
+                    _this._hideLoading();
                     Error.handle({}, xhr, {enforce: true});
                 }
             });
@@ -158,6 +174,22 @@ define(function(require) {
          */
         _showMessage: function(type, message) {
             mediator.execute('showFlashMessage', type, message);
+        },
+
+        _showLoading: function() {
+            if (!this.showLoading) {
+                return;
+            }
+
+            mediator.execute('showLoading');
+        },
+
+        _hideLoading: function() {
+            if (!this.showLoading) {
+                return;
+            }
+
+            mediator.execute('hideLoading');
         }
     });
 
