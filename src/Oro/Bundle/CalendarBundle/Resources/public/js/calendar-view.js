@@ -23,7 +23,7 @@ define(function(require) {
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
     var persistentStorage = require('oroui/js/persistent-storage');
-    require('jquery.fullcalendar');
+    require('fullcalendar');
 
     CalendarView = BaseView.extend({
         MOMENT_BACKEND_FORMAT: dateTimeFormatter.getBackendDateTimeFormat(),

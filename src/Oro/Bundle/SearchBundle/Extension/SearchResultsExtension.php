@@ -84,6 +84,7 @@ class SearchResultsExtension extends AbstractExtension
                         null,
                         null,
                         null,
+                        [],
                         $this->mapper->getEntityConfig($entityName)
                     );
                 }
