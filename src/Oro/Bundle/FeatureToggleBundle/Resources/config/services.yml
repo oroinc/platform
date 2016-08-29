@@ -103,3 +103,11 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: layout.block_type_extension, alias: block }
+
+    oro_featuretoggle.event_listener.system_config:
+        class: 'Oro\Bundle\FeatureToggleBundle\EventListener\ConfigListener'
+        arguments:
+            - '@event_dispatcher'
+            - '@oro_featuretoggle.configuration.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }

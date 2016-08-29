@@ -13,6 +13,7 @@ class ConfigurationProvider
     const FEATURES = '__features__';
     const BY_RESOURCE = 'by_resource';
     const DEPENDENCIES = 'dependencies';
+    const DEPENDENTS = 'dependents';
     const DEPENDENCY_KEY = 'dependency';
 
     /**
@@ -94,6 +95,15 @@ class ConfigurationProvider
     /**
      * @param bool $ignoreCache
      * @return array
+     */
+    public function getDependentsConfiguration($ignoreCache = false)
+    {
+        return $this->getConfiguration($ignoreCache)[self::INTERNAL][self::DEPENDENTS];
+    }
+
+    /**
+     * @param bool $ignoreCache
+     * @return array
      * @throws InvalidConfigurationException
      */
     protected function getConfiguration($ignoreCache = false)
@@ -127,6 +137,9 @@ class ConfigurationProvider
         if (count($configs) > 0) {
             $data[self::FEATURES] = $this->configuration->processConfiguration($configs);
             $data[self::INTERNAL][self::DEPENDENCIES] = $this->resolveDependencies($data[self::FEATURES]);
+            $data[self::INTERNAL][self::DEPENDENTS] = $this->resolveDependent(
+                $data[self::INTERNAL][self::DEPENDENCIES]
+            );
             $data[self::INTERNAL][self::BY_RESOURCE] = $this->resolveResources($data[self::FEATURES]);
         }
 
@@ -168,6 +181,22 @@ class ConfigurationProvider
 
         return $featureDependencies;
     }
+    
+    /**
+     * @param array $data
+     * @return array
+     * @throws CircularReferenceException
+     */
+    protected function resolveDependent(array $data)
+    {
+        $FeatureDependents = [];
+        foreach (array_keys($data) as $feature) {
+            $dependent = $this->getFeatureDependents($feature, $data);
+            $FeatureDependents[$feature] = array_unique($dependent);
+        }
+
+        return $FeatureDependents;
+    }
 
     /**
      * @param string $feature
@@ -201,6 +230,23 @@ class ConfigurationProvider
         }
 
         return $dependsOnFeatures;
+    }
+
+    /**
+     * @param string $feature
+     * @param array $dependenciesData
+     * @return array
+     */
+    protected function getFeatureDependents($feature, array $dependenciesData)
+    {
+        $depended = [];
+        foreach ($dependenciesData as $featureName => $dependencies) {
+            if (in_array($feature, $dependencies, true)) {
+                $depended[] = $featureName;
+            }
+        }
+        
+        return $depended;
     }
 
     /**
