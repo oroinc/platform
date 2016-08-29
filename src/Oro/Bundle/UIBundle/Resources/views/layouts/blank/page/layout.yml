@@ -29,6 +29,9 @@ layout:
                         src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
                 body:
                     blockType: body
+                    options:
+                        attr:
+                            class: body
             tree:
                 root:
                     head:

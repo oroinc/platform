@@ -1,8 +1,8 @@
 $charset: 'UTF-8';
 
-@include font-face('Lato', '#{$global-url}/orob2bfrontend/default/fonts/lato/lato-regular-webfont', 400, normal);
-@include font-face('Lato', '#{$global-url}/orob2bfrontend/default/fonts/lato/lato-bold-webfont', 700, normal);
-@include font-face('custom-font-icon', '#{$global-url}/orob2bfrontend/default/fonts/custom-font-icon/custom-font-icon', normal, normal);
+@include font-face('Lato', '#{$global-url}/orofrontend/default/fonts/lato/lato-regular-webfont', 400, normal);
+@include font-face('Lato', '#{$global-url}/orofrontend/default/fonts/lato/lato-bold-webfont', 700, normal);
+@include font-face('custom-font-icon', '#{$global-url}/orofrontend/default/fonts/custom-font-icon/custom-font-icon', normal, normal);
 
 $base-font: 'Lato';
 $base-font-icon: 'custom-font-icon';
