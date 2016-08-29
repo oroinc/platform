@@ -14,7 +14,7 @@
             'themeOptions': themeOptions,
             'toolbarOptions': toolbarOptions
         }) %}
-        {% for child in block -%}{{ block_widget(child) }}{%- endfor %}
+        {{ block("container_widget") }}
     {% endif %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
     {{ dataGrid.renderGrid(grid_full_name, grid_parameters, grid_render_parameters) }}
