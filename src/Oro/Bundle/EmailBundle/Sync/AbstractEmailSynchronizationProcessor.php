@@ -464,7 +464,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
-     * Enable force mode.
+     * Disable force mode.
      */
     public function disableForceMode()
     {
