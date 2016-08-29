@@ -103,9 +103,15 @@ abstract class AbstractFilter implements FilterInterface
                     ->resetDqlPart('orderBy')
                     ->select($fieldExpr)
                     ->andWhere($comparisonExpr);
-                $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
+                list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
+                list($fieldAlias, $field) = explode('.', $fieldExpr);
+                $dql .= sprintf(' AND %s = %s.%s', $fieldExpr, $replacements[$fieldAlias], $field);
 
-                $subExprs[] = $joinOperator ? $qb->expr()->notIn($fieldExpr, $dql) : $qb->expr()->in($fieldExpr, $dql);
+                $subExpr = $qb->expr()->exists($dql);
+                if ($joinOperator) {
+                    $subExpr = $qb->expr()->not($subExpr);
+                }
+                $subExprs[] = $subExpr;
             }
             $this->applyFilterToClause($ds, call_user_func_array([$qb->expr(), 'andX'], $subExprs));
         } else {
@@ -348,7 +354,7 @@ abstract class AbstractFilter implements FilterInterface
      * @param FilterDatasourceAdapterInterface $ds
      * @param QueryBuilder $qb
      *
-     * @return string
+     * @return [$dql, $replacedAliases]
      */
     protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
     {
@@ -362,17 +368,20 @@ abstract class AbstractFilter implements FilterInterface
             $qb->getAllAliases()
         );
 
-        return array_reduce(
-            $replacements,
-            function ($carry, array $replacement) {
-                /*
-                 * Replaces old parameter names by newly generated parameter names, so that we don't have
-                 * conflicts in the query.
-                 */
-                return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
-            },
-            $qb->getDql()
-        );
+        return [
+            array_reduce(
+                $replacements,
+                function ($carry, array $replacement) {
+                    /*
+                     * Replaces old parameter names by newly generated parameter names, so that we don't have
+                     * conflicts in the query.
+                     */
+                    return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
+                },
+                $qb->getDql()
+            ),
+            array_combine(array_column($replacements, 0), array_column($replacements, 1))
+        ];
     }
 
     /**
