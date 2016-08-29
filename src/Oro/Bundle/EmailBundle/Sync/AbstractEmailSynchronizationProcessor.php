@@ -51,8 +51,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /** @var OrganizationInterface */
     protected $currentOrganization;
 
-    /** @var  bool|null In this mode all emails again will re-synced in checked folders */
-    protected $forceMode;
+    /** @var  bool In this mode all emails will be re-synced again for checked folders */
+    protected $forceMode = false;
 
     /**
      * Constructor
@@ -456,19 +456,17 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
-     * Enable force mode.
+     * Set force mode.
+     *
+     * @param bool $mode
+     *
+     * @return $this
      */
-    public function enableForceMode()
+    public function setForceMode($mode)
     {
-        $this->forceMode = true;
-    }
+        $this->forceMode = $mode;
 
-    /**
-     * Disable force mode.
-     */
-    public function disableForceMode()
-    {
-        $this->forceMode = false;
+        return $this;
     }
 
     /**

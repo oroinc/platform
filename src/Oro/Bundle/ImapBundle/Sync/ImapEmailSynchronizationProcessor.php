@@ -256,10 +256,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 continue;
             }
 
-            if (!$this->checkOnExistsSavedEmail($email, $existingUids)) {
-                if (false === $this->isForceMode()) {
-                    continue;
-                }
+            if ($this->checkToSkipSyncEmail($email, $existingUids)) {
+                continue;
             }
 
             /** @var ImapEmail[] $relatedExistingImapEmails */
@@ -286,8 +284,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     }
                 }
 
-                if (false === $this->isForceMode() ||
-                    (true  === $this->isForceMode() && count($relatedExistingImapEmails) === 0)) {
+                if (false === $this->isForceMode()
+                    || (true  === $this->isForceMode() && count($relatedExistingImapEmails) === 0)
+                ) {
                     $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
                     $newImapEmails[] = $imapEmail;
                     $this->em->persist($imapEmail);
@@ -362,7 +361,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
-     * Check allowing to save email by uid
+     * Check the email was synced by Uid or wasn't.
      *
      * @param Email $email
      * @param array $existingUids
@@ -372,27 +371,45 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function checkOnExistsSavedEmail(Email $email, array $existingUids)
     {
         if (in_array($email->getId()->getUid(), $existingUids)) {
-            if ($this->isForceMode()) {
-                $this->logger->info(
-                    sprintf(
-                        'Sync "%s" (UID: %d) email, because force mode is enabled.',
-                        $email->getSubject(),
-                        $email->getId()->getUid()
-                    )
-                );
-            } else {
-                $this->logger->info(
-                    sprintf(
-                        'Skip "%s" (UID: %d) email, because it is already synchronised.',
-                        $email->getSubject(),
-                        $email->getId()->getUid()
-                    )
-                );
-            }
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Check allowing to save email by uid
+     *
+     * @param Email $email
+     * @param array $existingUids
+     *
+     * @return bool
+     */
+    protected function checkToSkipSyncEmail($email, $existingUids)
+    {
+        $existsSavedEmail = $this->checkOnExistsSavedEmail($email, $existingUids);
+
+        $skipSync = false;
+
+        if ($existsSavedEmail) {
+            $msg = 'Skip "%s" (UID: %d) email, because it is already synchronised.';
+            $skipSync = true;
+
+            if ($this->isForceMode()) {
+                $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+                $skipSync = false;
+            }
+
+            $this->logger->info(
+                sprintf(
+                    $msg,
+                    $email->getSubject(),
+                    $email->getId()->getUid()
+                )
+            );
+        }
+
+        return $skipSync;
     }
 
     /**
