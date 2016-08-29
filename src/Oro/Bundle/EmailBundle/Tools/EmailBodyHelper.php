@@ -28,6 +28,9 @@ class EmailBodyHelper
      */
     public function getClearBody($bodyContent)
     {
+        /**
+         * @todo: Should be refactored or deleted in scope of BAP-11622
+         */
         if (extension_loaded('tidy')) {
             $config = [
                 'show-body-only' => true,
