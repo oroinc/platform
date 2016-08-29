@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
@@ -87,7 +88,7 @@ class OperationExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        if ($this->isDisabled()) {
+        if ($this->isDisabled() || $config->getDatasourceType() !== OrmDatasource::TYPE) {
             return false;
         }
         $this->datagridContext = $this->getDatagridContext($config);

@@ -748,13 +748,11 @@ datagrid:
     user-search-grid:
         source:
             type: search
-            search_index: website
             query:
                 select:
                     - text.username
                     - text.email
-                from:
-                    - { table: %oro_user.entity.class%, alias: user }
+                from: oro_user
         columns:
             username:
                 data_name: username

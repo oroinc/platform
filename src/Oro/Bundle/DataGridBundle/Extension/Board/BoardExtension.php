@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -113,6 +114,10 @@ class BoardExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return false;
+        }
+
         if ($this->restrictionManager->boardViewEnabled($config)) {
             $this->initBoards($config);
         }

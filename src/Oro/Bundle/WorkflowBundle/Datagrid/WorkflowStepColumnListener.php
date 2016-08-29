@@ -87,6 +87,11 @@ class WorkflowStepColumnListener
     {
         $config = $event->getConfig();
 
+        // datasource type other than ORM is not supported yet
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return;
+        }
+
         // get root entity
         list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
 

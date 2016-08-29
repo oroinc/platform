@@ -62,6 +62,7 @@ class TagsExtension extends AbstractTagsExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
+            parent::isApplicable($config) &&
             !$this->isDisabled() &&
             !$this->isReportOrSegmentGrid($config) &&
             $this->isGridRootEntityTaggable($config) &&

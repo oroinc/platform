@@ -55,6 +55,7 @@ class TagsReportExtension extends AbstractTagsExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
+            parent::isApplicable($config) &&
             $this->hasTagFields($config) &&
             $this->isReportOrSegmentGrid($config);
     }
