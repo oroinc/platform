@@ -18,3 +18,7 @@ Close Large Image Preview:
 AttachmentItem:
   selector: '.attachment-item'
   class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+AttachmentListRow:
+  selector: '.attachment-list-row'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
