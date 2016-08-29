@@ -22,5 +22,5 @@ layout:
             parentId: __datagrid_toolbar_pagination_container
             siblingId: __datagrid_toolbar_pagination
 
-    conditions: 'context["user_agent"]["mobile"]==true'
+    conditions: 'context["is_mobile"]==true'
 
