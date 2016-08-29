@@ -21,6 +21,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /** @var array */
     protected $rawConfiguration = [];
 
+    /** @var array */
+    protected $gridApplicability = [];
+
     /** @var SystemAwareResolver */
     protected $resolver;
 
@@ -47,8 +50,12 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function isApplicable($gridName)
     {
-        $this->ensureConfigurationLoaded($gridName);
-        return isset($this->rawConfiguration[$gridName]);
+        if (!isset($this->gridApplicability[$gridName])) {
+            $this->ensureConfigurationLoaded($gridName);
+            $this->gridApplicability[$gridName] = isset($this->rawConfiguration[$gridName]);
+        }
+
+        return $this->gridApplicability[$gridName];
     }
 
     /**
