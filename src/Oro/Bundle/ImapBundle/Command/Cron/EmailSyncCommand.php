@@ -94,7 +94,8 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 'force',
                 null,
                 InputOption::VALUE_NONE,
-                'Forces operation to be executed. Requires options id'
+                'Allows set the force mode. In this mode all emails will be re-synced again for checked folders. 
+                Option "--force" can be used only with option "--id".'
             );
     }
 

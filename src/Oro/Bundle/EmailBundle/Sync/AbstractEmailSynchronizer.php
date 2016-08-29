@@ -261,7 +261,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
-     * @param bool|null $force
+     * @param bool $force
      *
      * @throws \Exception
      */
@@ -282,12 +282,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
-
-                if ($force) {
-                    $processor->enableForceMode();
-                }
-
-                $processor->process($origin, $syncStartTime);
+                $processor->setForceMode($force)->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
                 $this->logger->info('Skip because it is already in process.');
