@@ -369,21 +369,11 @@ abstract class AbstractFilter implements FilterInterface
                     $ds->generateParameterName($this->getName()),
                 ];
             },
-            $qb->getAllAliases()
+            QueryUtils::getDqlAliases($qb->getDQL())
         );
 
         return [
-            array_reduce(
-                $replacements,
-                function ($carry, array $replacement) {
-                    /*
-                     * Replaces old parameter names by newly generated parameter names, so that we don't have
-                     * conflicts in the query.
-                     */
-                    return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
-                },
-                $qb->getDql()
-            ),
+            QueryUtils::replaceDqlAliases($qb->getDQL(), $replacements),
             array_combine(array_column($replacements, 0), array_column($replacements, 1))
         ];
     }
@@ -411,7 +401,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function createConditionFieldExprs(QueryBuilder $qb)
     {
-        $groupByFields = $this->getSelectFieldFromGroupBy($qb->getDqlPart('groupBy'));
+        $groupByFields = $this->getSelectFieldFromGroupBy($qb);
         if ($groupByFields) {
             return $groupByFields;
         }
@@ -428,16 +418,18 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * @param Expr\GroupBy[] $groupBy
+     * @param QueryBuilder $qb
      *
      * @return array
      */
-    protected function getSelectFieldFromGroupBy(array $groupBy)
+    protected function getSelectFieldFromGroupBy(QueryBuilder $qb)
     {
+        $groupBy = $qb->getDQLPart('groupBy');
+
         $expressions = [];
         foreach ($groupBy as $groupByPart) {
             foreach ($groupByPart->getParts() as $part) {
-                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($qb, $part));
             }
         }
 
@@ -445,11 +437,12 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * @param string $groupByPart
+     * @param QueryBuilder $qb
+     * @param string       $groupByPart
      *
      * @return array
      */
-    protected function getSelectFieldFromGroupByPart($groupByPart)
+    protected function getSelectFieldFromGroupByPart(QueryBuilder $qb, $groupByPart)
     {
         $expressions = [];
         if (strpos($groupByPart, ',') !== false) {
@@ -458,7 +451,9 @@ abstract class AbstractFilter implements FilterInterface
                 $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
             }
         } else {
-            $expressions[] = trim($groupByPart);
+            $trimmedGroupByPart = trim($groupByPart);
+            $expr = QueryUtils::getSelectExprByAlias($qb, $groupByPart);
+            $expressions[] = $expr ?: $trimmedGroupByPart;
         }
 
         return $expressions;
