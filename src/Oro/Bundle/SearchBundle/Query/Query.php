@@ -180,12 +180,14 @@ class Query
     }
 
     /**
-     * @param string $fieldName
-     * @param string $enforcedFieldType
-     * @return $this
+     * {@inheritdoc}
      */
     public function addSelect($fieldName, $enforcedFieldType = null)
     {
+        if (!$fieldName) {
+            return $this;
+        }
+
         $fieldType = self::TYPE_TEXT;
 
         list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
@@ -211,11 +213,7 @@ class Query
     }
 
     /**
-     * Insert entities array to query from
-     *
-     * @param array|string $entities
-     *
-     * @return Query
+     * {@inheritdoc}
      */
     public function from($entities)
     {

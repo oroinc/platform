@@ -10,15 +10,15 @@ parameters:
 
     oro_search.entity.item.class: Oro\Bundle\SearchBundle\Entity\Item
     oro_search.entity.repository.search_index.class: Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
-    oro_website_search.entity.repository.website_search_index.class: Oro\Bundle\WebsiteSearchBundle\Entity\Repository\WebsiteSearchIndexRepository
-    oro_website_search.entity.item.class: Oro\Bundle\WebsiteSearchBundle\Entity\Item
 
     oro_search.extension.formatter.property.search_result_property.class: Oro\Bundle\SearchBundle\Extension\SearchResultProperty
     oro_search.extension.search_results.class:                            Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
+    oro_search.extension.search_filter.class:                             Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension
 
     oro_search.event_listener.search_results_grid_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchResultsGridListener
     oro_search.event_listener.demo_data_listener.class:           Oro\Bundle\SearchBundle\EventListener\DemoDataMigrationListener
-    oro_search.datasource.search.class:                           Oro\Bundle\SearchBundle\Extension\SearchDatasource
+    oro_search.datasource.search.class:                           Oro\Bundle\SearchBundle\Datasource\SearchDatasource
+    oro_search.query_factory.class:                               Oro\Bundle\SearchBundle\Query\Factory\QueryFactory
 
     oro_search.extension.orm_pager.class:          Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
     oro_search.extension.pager.search.pager.class: Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
@@ -26,16 +26,21 @@ parameters:
     oro_search.provider.search_mapping.class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
 
     oro_search.cache.search_mapping_cache.class: Oro\Bundle\SearchBundle\Cache\SearchMappingCache
-    oro_search.event_listener.search_mapping_change_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchMappingChangeListener
 
     # services used only for ORM search engine
     oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
     oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
     oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
 
+    # search sorter
+    oro_search.extension.search_sorter.class: Oro\Bundle\SearchBundle\Extension\Sorter\SearchSorterExtension
+
     oro_search.drivers:
         pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
         pdo_pgsql: Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql
+
+    oro_website_search.entity.item.class: Oro\Bundle\WebsiteSearchBundle\Entity\Item
+    oro_website_search.entity.repository.search_index.class: Oro\Bundle\WebsiteSearchBundle\Entity\Repository\WebsiteSearchIndexRepository
 
 services:
     oro_search.index:
@@ -127,10 +132,16 @@ services:
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.search-grid, method: onBuildAfter }
 
+    oro_search.query_factory:
+        class: %oro_search.query_factory.class%
+        arguments:
+            - '@oro_search.index'
+
     oro_search.datasource.search:
         class: %oro_search.datasource.search.class%
         arguments:
-            - '@oro_search.index'
+            - '@oro_search.query_factory'
+            - '@event_dispatcher'
         tags:
             - { name: oro_datagrid.datasource, type: search }
 
@@ -178,6 +189,14 @@ services:
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
+    oro_search.event_listener.orm.website_fulltext_index_listener:
+        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
+        arguments:
+            - %database_driver%
+            - 'oro_website_search_text'
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
+
     oro_search.provider.search_mapping:
         class: %oro_search.provider.search_mapping.class%
         arguments:
@@ -200,8 +219,8 @@ services:
         calls:
             - [setRegistry,  ['@doctrine']]
 
-    oro_website_search.entity.repository.website_search_index:
-        class: '%oro_website_search.entity.repository.website_search_index.class%'
+    oro_website_search.entity.repository.search_index:
+        class: '%oro_website_search.entity.repository.search_index.class%'
         factory: ["@doctrine", getRepository]
         arguments:
             - '%oro_website_search.entity.item.class%'
@@ -233,3 +252,16 @@ services:
         class: Oro\Bundle\SearchBundle\Resolver\EntityToStringTitleResolver
         arguments:
             - '@oro_search.resolver.entity_title.title_fields'
+
+    oro_search.extension.search_filter:
+        class: %oro_search.extension.search_filter.class%
+        arguments:
+            - '@oro_datagrid.configuration.provider'
+            - '@translator'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_search.extension.search_sorter:
+        class: %oro_search.extension.search_sorter.class%
+        tags:
+            - { name: oro_datagrid.extension }

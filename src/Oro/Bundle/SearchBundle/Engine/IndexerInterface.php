@@ -7,19 +7,18 @@ interface IndexerInterface
     /**
      * Save one of several entities to search index
      *
-     * @param array $entities entities of the same type
-     * @param array $context
+     * @param object|array $entity
+     * @param array        $context
      *
      * @return bool
-     * @throws \InvalidArgumentException
      */
-    public function save($entities, array $context = []);
+    public function save($entity, array $context = []);
 
     /**
      * Delete one or several entities from search index
      *
-     * @param object|array $entity
-     * @param array        $context
+     * @param array $entity
+     * @param array $context
      *
      * @return bool
      */
@@ -34,7 +33,7 @@ interface IndexerInterface
      *
      * @return string[]
      */
-    public function getClassesForReindex($class = null, $context = []);
+    public function getClassesForReindex($class = null, array $context = []);
 
     /**
      * Resets data for one or several classes in index
@@ -43,7 +42,7 @@ interface IndexerInterface
      * @param string|string[] $class
      * @param array           $context
      */
-    public function resetIndex($class = null, $context = []);
+    public function resetIndex($class = null, array $context = []);
 
     /**
      * Reindex data for one or several classes in index
@@ -51,6 +50,8 @@ interface IndexerInterface
      *
      * @param string|string[] $class
      * @param array           $context
+     *
+     * @return int Number of reindexed entities
      */
-    public function reindex($class = null, $context = []);
+    public function reindex($class = null, array $context = []);
 }
