@@ -719,7 +719,15 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
                 null,
                 []
             ],
-
+            '0 column (key for which empty() is true)' => [
+                [
+                    ['a', 'b'],
+                    ['first', 'second'],
+                ],
+                0,
+                null,
+                ['a', 'first'],
+            ]
         ];
     }
 
