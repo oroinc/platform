@@ -87,4 +87,69 @@ You also can provide template for block template by end identifier in layout upd
 {% block _form_fields_update_widget %}
 {% endblock %}
 ```
+Referencing imported blocks using block_type_widget_id
+----------------------------------------------------
+Sometimes you need to render block for imported block type without direct reference to it's template name.
+For this purpose you can use TWIG variable `block_type_widget_id`. It's equal to twig widget id for current block type (for example: container_widget, menu_widget, etc.)
 
+Suppose we need to customize defined in `DataGridBundle` toolbar element for our product page. 
+In `DataGridBundle` we have already defined this strucure:
+
+1) `layout.yml` with imported `datagrid_toolbar`:
+```yaml
+layout:
+    actions:
+		...
+    imports:
+        -
+            id: datagrid_toolbar		
+``` 
+2) In `imports/datagrid_toolbar/layout.yml` block element `__datagrid_toolbar_mass_actions` will be looks like:
+```yaml
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'layout.html.twig'
+        - '@addTree':
+            items:
+                __datagrid_toolbar:
+                    blockType: container
+                __datagrid_toolbar_actions_container:
+                    blockType: container
+                __datagrid_toolbar_mass_actions:
+                    blockType: container
+            ...
+            tree:
+                __root:
+                    __datagrid_toolbar:
+                        __datagrid_toolbar_sorting: ~
+                        __datagrid_toolbar_actions_container:
+                            __datagrid_toolbar_mass_actions: ~  
+            ...                                  
+
+```
+3) In `imports/datagrid_toolbar/layout.html.twig` block element `__datagrid_toolbar_mass_actions` will look like:
+```twig
+{% block __datagrid_toolbar__datagrid_toolbar_mass_actions_widget %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+```
+And in `ProductBundle` we redefine this block:
+```twig
+{% block _datagrid_toolbar_mass_actions_widget %}
+	...
+    <div class="catalog__filter-controls__item">
+        <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+    </div>
+{% endblock %}
+```
+Function `block_widget(block)` will render this block as template defined in imports. But that's not what we need: to render block type properly lets use `block_type_widget_id`:
+
+```twig
+{% block _datagrid_toolbar_mass_actions_widget %}
+	...
+    <div class="catalog__filter-controls__item">
+        <div{{ block('block_attributes') }}>{{ block(block_type_widget_id) }}</div>
+    </div>
+{% endblock %}
+```
