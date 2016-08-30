@@ -296,3 +296,56 @@ class User extends ExtendUser
 
 This option is used to recognize grid for entity with higher priority than `default` option.
 In cases if these options (`context` or `default`) are not defined for entity, it won`t appear in the context dialog.
+
+
+How to enable 'contexts' column in activity entity grids
+--------------------------------------------------------
+
+For any activity entity grid you are able to include a column that includes all context entities
+
+To do so use the following configuration for *datagrid.yml*:
+
+``` yml
+datagrid:
+    tasks-grid:
+        # extension configuration
+        options:
+            contexts:
+                enabled: true          # default `false`
+                column_name: contexts  # optional, column identifier, default is `contexts`
+                entity_name: ~         # optional, set the FQCN of the grid base entity if auto detection fails
+```
+This will create a column named `contexts` and will try to automatically detect the activity class name. If for some reason it fails you can specify a FQCN in the `entity_name` option
+
+If you wish to configure the column you are able to do it if you add a section with the name specified in the `column_name` option
+``` yml
+datagrid:
+    tasks-grid:
+        # column configuration
+        columns:
+             contexts:                      # the column name defined in options
+                label: oro.contexts.label   # optional
+                renderable: true            # optional, default `true`
+                ...
+```
+
+Column type is `twig` so you are also able to specify a template. 
+
+Default is [OroActivityBundle:Grid:Column/contexts.html.twig](./Resources/views/Grid/Column/contexts.html.twig)
+
+``` twig
+{% for item in value %}
+    {% spaceless %}
+        <span class="context-item">
+            <span class="{{ item.icon }}"></span>
+            {% if item.link %}
+                <a href="{{ item.link }}" class="context-label">{{ item.title|trim }}</a>
+            {% else %}
+                <span class="context-label">{{ item.title|trim }}</span>
+            {% endif %}
+        </span>
+    {% endspaceless %}
+    {{- not loop.last ? ', ' }}
+{% endfor %}
+
+```
