@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -14,7 +11,6 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -34,22 +30,6 @@ class OroMainContext extends MinkContext implements
     use AssertTrait;
     use KernelDictionary, ElementFactoryDictionary;
 
-    /** @BeforeStep */
-    public function beforeStep(BeforeStepScope $scope)
-    {
-        $url = $this->getSession()->getCurrentUrl();
-
-        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
-            $this->getSession()->getDriver()->waitPageToLoad();
-
-            return;
-        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
-            return;
-        }
-
-        $this->getSession()->getDriver()->waitForAjax();
-    }
-
     /**
      * @BeforeScenario
      */
@@ -59,45 +39,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @AfterScenario
-     */
-    public function afterScenario(AfterScenarioScope $scope)
-    {
-        if ($scope->getTestResult()->isPassed()) {
-            return;
-        }
-
-        $screenshot = sprintf(
-            '%s/%s-%s-line.png',
-            $this->getKernel()->getLogDir(),
-            $scope->getFeature()->getTitle(),
-            $scope->getScenario()->getLine()
-        );
-
-        file_put_contents($screenshot, $this->getSession()->getScreenshot());
-    }
-
-    /**
-     * @Then /^(?:|I should )see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
     public function iShouldSeeFlashMessage($title)
     {
-        $this->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
+        $this->spin(function (MinkContext $context) use ($title) {
+            $context->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
+
+            return true;
+        });
     }
 
-    /**
-     * @Then /^(?:|I )click update schema$/
-     */
-    public function iClickUpdateSchema()
+    public function assertPageContainsText($text)
     {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-        $page = $this->getSession()->getPage();
+        $this->spin(function (MinkContext $context) use ($text) {
+            $context->assertSession()->pageTextContains($this->fixStepArgument($text));
 
-        $page->clickLink('Update schema');
-        $driver->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $driver->waitForAjax(120000);
+            return true;
+        });
     }
 
     /**
@@ -108,7 +67,44 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeErrorMessage($title)
     {
-        $this->assertSession()->elementTextContains('css', '.alert-error', $title);
+        $this->spin(function (MinkContext $context) use ($title) {
+            $context->assertSession()->elementTextContains('css', '.alert-error', $title);
+
+            return true;
+        });
+    }
+
+    public function spin($lambda)
+    {
+        $time = 60;
+
+        while ($time > 0) {
+            try {
+                if ($lambda($this)) {
+                    return true;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            usleep(250000);
+            $time -= 0.25;
+        }
+    }
+
+    /**
+     * @Then /^(?:|I )click update schema$/
+     */
+    public function iClickUpdateSchema()
+    {
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $page = $this->getPage();
+
+        $page->clickLink('Update schema');
+        $driver->waitForAjax();
+        $page->clickLink('Yes, Proceed');
+        $driver->waitForAjax(120000);
     }
 
     /**
@@ -211,19 +207,22 @@ class OroMainContext extends MinkContext implements
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
+        $this->getSession()->getDriver()->waitForAjax();
         $form = $fieldSet->getLastSet();
         $form->fill($table);
     }
 
     /**
      * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
+     * @Given /^(?:|I )login as administrator$/
      */
-    public function loginAsUserWithPassword($login, $password)
+    public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
     {
         $this->visit('user/login');
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
+
     }
 
     /**
@@ -250,7 +249,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
+     * @Then /^(?:|I )should see large image$/
+     */
+    public function iShouldSeeLargeImage()
+    {
+        $largeImage = $this->getSession()->getPage()->find('css', '.lg-image');
+        self::assertNotNull($largeImage, 'Large image not visible');
+    }
+
+    /**
+     * @Then /^(?:|I )close large image preview$/
+     */
+    public function closeLargeImagePreview()
+    {
+        $page = $this->getSession()->getPage();
+        $page->find('css', '.lg-image')->mouseOver();
+        $page->find('css', 'span.lg-close')->click();
+    }
+
+     /**
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      */
     public function pressButton($button)
     {

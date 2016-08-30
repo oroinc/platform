@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class StepManager
 {
+    const DEFAULT_START_STEP_NAME = 'step:starting_point';
+
     /**
      * @var Collection|Step[]
      */
@@ -75,18 +77,39 @@ class StepManager
     /**
      * Get steps sorted by order.
      *
+     * @param bool $withoutDefaultStartStep
+     * @param bool $onlyNames
      * @return Collection|Step[]
      */
-    public function getOrderedSteps()
+    public function getOrderedSteps($withoutDefaultStartStep = false, $onlyNames = false)
     {
-        $steps = $this->steps->toArray();
-        
+        $steps = $this->steps;
+
+        if ($withoutDefaultStartStep) {
+            $steps = $steps->filter(
+                function (Step $step) {
+                    return $step->getName() !== self::DEFAULT_START_STEP_NAME;
+                }
+            );
+        }
+
+        $steps = $steps->toArray();
+
         usort(
             $steps,
             function (Step $stepOne, Step $stepTwo) {
                 return ($stepOne->getOrder() >= $stepTwo->getOrder()) ? 1 : -1;
             }
         );
+
+        if ($onlyNames) {
+            $steps = array_map(
+                function (Step $step) {
+                    return $step->getName();
+                },
+                $steps
+            );
+        }
 
         return new ArrayCollection($steps);
     }
@@ -133,5 +156,13 @@ class StepManager
         $startStep = $this->getStartStep();
 
         return !empty($startStep);
+    }
+
+    /**
+     * @return null|Transition
+     */
+    public function getDefaultStartStep()
+    {
+        return $this->getStep(self::DEFAULT_START_STEP_NAME);
     }
 }

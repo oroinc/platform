@@ -18,7 +18,7 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
         'DELETE',
         'ASSIGN'
     ];
-    
+
     /**
      * {@inheritdoc}
      */
@@ -35,7 +35,9 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
             'description' => Type::STRING
         ];
 
-        foreach ($this->permissions as $permission) {
+        $permissions = array_diff($this->permissions, $this->getExistingPermissions($logger));
+
+        foreach ($permissions as $permission) {
             $this->addSql(
                 $query,
                 [
@@ -50,5 +52,17 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
         }
 
         parent::processQueries($logger, $dryRun);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @return array
+     */
+    protected function getExistingPermissions(LoggerInterface $logger)
+    {
+        $sql = 'SELECT name FROM oro_security_permission';
+        $this->logQuery($logger, $sql);
+
+        return array_column((array)$this->connection->fetchAll($sql), 'name');
     }
 }
