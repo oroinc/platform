@@ -458,6 +458,17 @@ class OroMainContext extends MinkContext implements
         $driver->typeIntoInput($field->getXpath(), $value);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementOnPage($element)
+    {
+        self::assertTrue(
+            $this->createElement($element)->isVisible(),
+            sprintf('Element "%s" is not visible, or not present on the page', $element)
+        );
+    }
+
     /**.
      * @return OroForm
      */
