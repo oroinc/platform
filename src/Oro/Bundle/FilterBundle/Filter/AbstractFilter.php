@@ -102,10 +102,14 @@ abstract class AbstractFilter implements FilterInterface
                 $subQb
                     ->resetDqlPart('orderBy')
                     ->select($fieldExpr)
-                    ->andWhere($comparisonExpr);
+                    ->andWhere($comparisonExpr)
+                    ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
                 list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
                 list($fieldAlias, $field) = explode('.', $fieldExpr);
-                $dql .= sprintf(' AND %s = %s.%s', $fieldExpr, $replacements[$fieldAlias], $field);
+                $replacedFieldExpr = sprintf('%s.%s', $replacements[$fieldAlias], $field);
+                $oldExpr = sprintf('%1$s = %1$s', $replacedFieldExpr);
+                $newExpr = sprintf('%s = %s', $replacedFieldExpr, $fieldExpr);
+                $dql = strtr($dql, [$oldExpr => $newExpr]);
 
                 $subExpr = $qb->expr()->exists($dql);
                 if ($joinOperator) {
