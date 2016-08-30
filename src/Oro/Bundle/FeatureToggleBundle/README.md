@@ -239,7 +239,7 @@ class FeatureVoter implements VoterInterface
 {
     /**
      * @var StateChecker
-     * /
+     */
     private $stateChecker;
     
     /**
