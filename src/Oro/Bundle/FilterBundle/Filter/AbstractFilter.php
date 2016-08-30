@@ -13,6 +13,9 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class AbstractFilter implements FilterInterface
 {
     /** @var FormFactoryInterface */
@@ -448,7 +451,7 @@ abstract class AbstractFilter implements FilterInterface
         if (strpos($groupByPart, ',') !== false) {
             $groupByParts = explode(',', $groupByPart);
             foreach ($groupByParts as $part) {
-                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($qb, $part));
             }
         } else {
             $trimmedGroupByPart = trim($groupByPart);
