@@ -26,5 +26,3 @@ class OroActionBundle extends Bundle
         $container->addCompilerPass(new MassActionProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
 }
-
-

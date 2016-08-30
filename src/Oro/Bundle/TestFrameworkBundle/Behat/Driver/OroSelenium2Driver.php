@@ -7,6 +7,7 @@ use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use WebDriver\Element;
+use WebDriver\Key;
 
 class OroSelenium2Driver extends Selenium2Driver
 {
@@ -80,6 +81,25 @@ class OroSelenium2Driver extends Selenium2Driver
         }
 
         parent::setValue($xpath, $value);
+    }
+
+    /**
+     * @param string $xpath
+     * @param string $value
+     */
+    public function typeIntoInput($xpath, $value)
+    {
+        $element = $this->findElement($xpath);
+        $elementName = strtolower($element->name());
+
+        if (in_array($elementName, array('input', 'textarea'))) {
+            $existingValueLength = strlen($element->attribute('value'));
+            // Add the TAB key to ensure we unfocus the field as browsers are triggering the change event only
+            // after leaving the field.
+            $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value . Key::TAB;
+        }
+
+        $element->postValue(array('value' => array($value)));
     }
 
     /**

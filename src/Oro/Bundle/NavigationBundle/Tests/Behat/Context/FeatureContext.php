@@ -26,7 +26,7 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
      */
     public function iSaveSetting()
     {
-        $this->getSession()->getPage()->pressButton('Save settings');
+        $this->getPage()->pressButton('Save settings');
     }
 
     /**
@@ -45,5 +45,16 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     public function menuMustBeOnRightSide()
     {
         self::assertTrue($this->createElement('MainMenu')->hasClass('main-menu-top'));
+    }
+
+    /**
+     * @When /^(?:|I )click "(?P<link>[^"]+)" in shortcuts search results$/
+     */
+    public function clickInShortcutsSearchResults($link)
+    {
+        $result = $this->getPage()->find('css', sprintf('li[data-value="%s"] a', $link));
+        self::assertNotNull($result, sprintf('Link "%s" not found', $link));
+
+        $result->click();
     }
 }

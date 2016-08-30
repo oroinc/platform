@@ -435,6 +435,29 @@ class OroMainContext extends MinkContext implements
         $this->createOroForm()->selectFieldOption($select, $option);
     }
 
+    /**
+     * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
+     */
+    public function iTypeInFieldWith($locator, $value)
+    {
+        $locator = $this->fixStepArgument($locator);
+        $value = $this->fixStepArgument($value);
+        $field = $this->getPage()->find('named', array('field', $locator));
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $this->getSession()->getDriver(),
+                'form field',
+                'id|name|label|value|placeholder',
+                $locator
+            );
+        }
+
+        $driver->typeIntoInput($field->getXpath(), $value);
+    }
+
     /**.
      * @return OroForm
      */

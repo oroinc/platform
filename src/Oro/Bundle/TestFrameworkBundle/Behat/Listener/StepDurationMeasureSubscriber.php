@@ -54,7 +54,7 @@ class StepDurationMeasureSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            BeforeStepTested::BEFORE  => ['beforeStep', 999],
+            BeforeStepTested::BEFORE  => ['beforeStep', -999],
             AfterStepTested::AFTER  => ['afterStep', 999],
             AfterExerciseCompleted::AFTER => ['printResults', -999],
         ];
