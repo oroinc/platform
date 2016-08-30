@@ -417,8 +417,7 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            //do not use htmlTagHelper->purify - it leads to a huge performance degradation
-            $list->setDescription(trim(strip_tags($provider->getDescription($entity))));
+            $list->setDescription($provider->getDescription($entity));
             $this->setDate($entity, $provider, $list);
             $list->setOwner($provider->getOwner($entity));
             if ($provider instanceof ActivityListUpdatedByProviderInterface) {
