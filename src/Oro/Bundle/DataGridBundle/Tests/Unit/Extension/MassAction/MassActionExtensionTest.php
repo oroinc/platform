@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -12,34 +13,43 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ContainerInterface */
+    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
-    /** @var SecurityFacade */
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
-    /** @var TranslatorInterface */
+    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
+
+    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
 
     /** @var MassActionExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->getMock(ContainerInterface::class);
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
 
-        $this->extension = new MassActionExtension($this->container, $this->securityFacade, $this->translator);
+        $this->extension = new MassActionExtension(
+            $this->container,
+            $this->securityFacade,
+            $this->translator,
+            $this->eventDispatcher
+        );
     }
 
     protected function tearDown()
     {
-        unset($this->extension, $this->container, $this->securityFacade, $this->translator);
+        unset($this->extension, $this->container, $this->securityFacade, $this->translator, $this->eventDispatcher);
     }
 
     public function testIsApplicable()
