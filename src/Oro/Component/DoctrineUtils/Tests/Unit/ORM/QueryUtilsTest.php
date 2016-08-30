@@ -392,6 +392,143 @@ class QueryUtilsTest extends OrmTestCase
     }
 
     /**
+     * @dataProvider getDqlAliasesDataProvider
+     */
+    public function testGetDqlAliases(callable $dqlFactory, array $expectedAliases)
+    {
+        $this->assertEquals($expectedAliases, QueryUtils::getDqlAliases($dqlFactory($this->em)));
+    }
+
+    public function getDqlAliasesDataProvider()
+    {
+        return [
+            'query with fully qualified entity name' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.bestItem', 'i')
+                        ->getDQL();
+                },
+                ['p', 'i'],
+            ],
+            'query aliased entity name' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Test:Person', 'p')
+                        ->join('p.bestItem', 'i')
+                        ->getDQL();
+                },
+                ['p', 'i'],
+            ],
+            'query with subquery' => [
+                function (EntityManager $em) {
+                    $qb = $em->createQueryBuilder();
+
+                    return $qb
+                        ->select('p')
+                        ->from('Test:Person', 'p')
+                        ->join('p.bestItem', 'i')
+                        ->where(
+                            $qb->expr()->exists(
+                                $em->createQueryBuilder()
+                                    ->select('p2')
+                                    ->from('Test:Person', 'p2')
+                                    ->join('p2.groups', '_g2')
+                                    ->where('p2.id = p.id')
+                            )
+                        )
+                        ->getDQL();
+                },
+                ['p', 'i', 'p2', '_g2'],
+            ],
+            'query with newlines after aliases' => [
+                function () {
+                    return <<<DQL
+SELECT p
+FROM TestPerson p
+JOIN p.bestItem i
+WHERE EXISTS(
+    SELECT p2
+    FROM TestPerson p2
+    JOIN p2.groups _g2
+    WHERE p2.id = p.id
+)
+DQL
+                    ;
+                },
+                ['p', 'i', 'p2', '_g2'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider replaceDqlAliasesProvider
+     */
+    public function testReplaceDqlAliases($dql, array $replacements, $expectedDql)
+    {
+        $this->assertEquals($expectedDql, QueryUtils::replaceDqlAliases($dql, $replacements));
+    }
+
+    public function replaceDqlAliasesProvider()
+    {
+        return [
+            [
+                <<<DQL
+SELECT eu.id
+FROM OroEmailBundle:EmailUser eu
+LEFT JOIN eu.email e
+LEFT JOIN eu.mailboxOwner mb
+LEFT JOIN e.recipients r_to
+LEFT JOIN eu.folders f
+LEFT JOIN f.origin o
+LEFT JOIN e.emailBody eb
+WHERE (EXISTS(
+    SELECT 1
+    FROM OroEmailBundle:EmailOrigin _eo
+    JOIN _eo.folders _f
+    JOIN _f.emailUsers _eu
+    WHERE _eo.isActive = true AND _eu.id = eu.id
+))
+AND e.head = true AND (eu.owner = :owner AND eu.organization  = :organization) AND e.subject LIKE :subject1027487935
+DQL
+                ,
+                [
+                    ['eu', 'eur'],
+                    ['e', 'er'],
+                    ['mb', 'mbr'],
+                    ['r_to', 'r_tor'],
+                    ['f', 'fr'],
+                    ['o', 'or'],
+                    ['eb', 'ebr'],
+                    ['_eo', '_eor'],
+                    ['_f', '_fr'],
+                    ['_eu', '_eur'],
+                ],
+                <<<DQL
+SELECT eur.id
+FROM OroEmailBundle:EmailUser eur
+LEFT JOIN eur.email er
+LEFT JOIN eur.mailboxOwner mbr
+LEFT JOIN er.recipients r_tor
+LEFT JOIN eur.folders fr
+LEFT JOIN fr.origin or
+LEFT JOIN er.emailBody ebr
+WHERE (EXISTS(
+    SELECT 1
+    FROM OroEmailBundle:EmailOrigin _eor
+    JOIN _eor.folders _fr
+    JOIN _fr.emailUsers _eur
+    WHERE _eor.isActive = true AND _eur.id = eur.id
+))
+AND er.head = true AND (eur.owner = :owner AND eur.organization  = :organization) AND er.subject LIKE :subject1027487935
+DQL
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider getJoinClassDataProvider
      */
     public function testGetJoinClass(callable $qbFactory, $joinPath, $expectedClass)

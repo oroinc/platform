@@ -431,6 +431,36 @@ class QueryUtils
     }
 
     /**
+     * @param string $dql
+     *
+     * @return array
+     */
+    public static function getDqlAliases($dql)
+    {
+        $matches = [];
+        preg_match_all('/(FROM|JOIN) +[^\s]+ +([^\s]+)/', $dql, $matches);
+
+        return $matches[2];
+    }
+
+    /**
+     * @param string $dql
+     * @param array $replacements
+     *
+     * @return string
+     */
+    public static function replaceDqlAliases($dql, array $replacements)
+    {
+        return array_reduce(
+            $replacements,
+            function ($carry, array $replacement) {
+                return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
+            },
+            $dql
+        );
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param Expr\Join $join
      *
