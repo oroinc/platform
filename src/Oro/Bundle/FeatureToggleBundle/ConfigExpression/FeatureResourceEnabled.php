@@ -54,9 +54,8 @@ class FeatureResourceEnabled extends AbstractCondition implements ContextAccesso
      *
      * Configuration examples:
      *
-     * @feature_enabled: ['feature_name']
-     * @feature_enabled: ['feature': 'feature_name']
-     * @feature_enabled: ['feature': 'feature_name', 'scope_identifier': $.website]
+     * '@feature_resource_enabled': ['some_route', 'route']
+     * '@feature_resource_enabled': ['resource': 'some_route', 'resource_type': 'route', 'scope_identifier': $.scopeId]
      */
     public function initialize(array $options)
     {

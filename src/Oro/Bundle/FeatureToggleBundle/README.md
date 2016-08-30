@@ -46,12 +46,12 @@ features:
             - Acme\Bundle\Entity\Page
 ```
 
-Adding new section to features configuration
+Adding new options to feature configuration
 --------------------------------------------
 
-Feature configuration may be extended with new configuration nodes. To add new configuration node feature configuration
+Feature configuration may be extended with new configuration options. To add new configuration option feature configuration
  that implements ConfigurationExtensionInterface should be added and registered with `oro_feature.config_extension` tag.
-For example there are some Acme Processors which should be configured with `acme_processor` key
+For example there are some Acme Processors which should be configured with `acme_processor` option
 
 Configuration extension:
 ```php
@@ -87,15 +87,77 @@ services:
             - { name: oro_feature.config_extension }
 ```
 
+Helper functionality to check feature state
+-------------------------------------------
+
+Feature state is determined by `FeatureChecker`. There are proxy classes that expose feature check functionality to
+layout updates, operations, workflows, processes and twig.
+
+Feature state may is resolved by `isFeatureEnabled($featureName, $scopeIdentifier = null)`
+ 
+Feature resource types are nodes of feature configuration (route, workflow, configuration, process, operation, api),
+resources are their values. Resource is disabled if it is included into at least one disabled feature. 
+Resource state is resolved by `public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)` 
+
+####Layout updates
+
+ - Check feature state `=data['feature'].isFeatureEnabled('feature_name')`
+ - Check resource state `=data['feature'].isResourceEnabled('acme_product_view', 'route')`
+ 
+ Example:
+ 
+```yaml
+layout:
+    actions:
+        - '@add':
+            id: products
+            parentId: content
+            blockType: datagrid
+            options:
+                grid_name: products-grid
+                visible: '=data["feature"].isFeatureEnabled("product_feature")'
+ ```
+
+####Processes, workflows, operations
+
+In Processes, workflows and operations config expression may be used to check feature state
+
+ - Check feature state 
+
+```yaml
+'@feature_enabled': 
+    feature: 'feature_name'
+    scope_identifier: $.scopeIdentifier
+```
+
+ - Check resource state 
+
+```yaml
+'@feature_resource_enabled': 
+    resource: 'some_route'
+    resource_type: 'route'
+    scope_identifier: $.scopeId
+```
+
+####Twig
+
+ - Check feature state `feature_enabled($featureName, $scopeIdentifier = null)`
+ - Check resource state `feature_resource_enabled($resource, $resourceType, $scopeIdentifier = null)`
+
 Including a service into a feature
 ---------------------------------
 
-Sometimes there is a need to add some service to feature. As example some form extension may extend external form 
-and we want to include this extension functionality to feature. In this case `FeatureChecker` should be injected into service
+Service that need feature functionality needs to implement `FeatureToggleableInterface` interface.
+All checks are done by developer.
+
+OroFeatureToggleBundle provides helper functionality to inject feature checker and feature name 
+into services marked with `oro_featuretogle.feature` tag. 
+`FeatureCheckerHolderTrait` contains implementation of methods from `FeatureToggleableInterface`.
+
+As example some form extension may extend external form and we want to include this extension 
+functionality into a feature. In this case `FeatureChecker` should be injected into service
 and feature availability should be checked where needed.
-OroFeatureToggleBundle provides helper functionality to inject feature checker and feature name to your service.
-First of all service should implement `FeatureToggleableInterface` interface which methods are implemented in `FeatureCheckerHolderTrait`
-To mark that service is related to some feature it should be marked with `oro_featuretoggle.checker.feature_checker` and `feature` name.
+
 
 Extension:
 ```php
@@ -161,7 +223,7 @@ Feature checker makes the decision based on configured strategy defined in syste
 By default `ConfigVoter` is registered to check features availability.
 It checks feature state based on value of toggle option, defined in features.yml configuration.
  
-A custom voter needs to implement `VoterInterface`.
+A custom voter needs to implement `Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface`.
 Suppose we have State checker that return decision based on feature name and scope identifier.
 If state is valid feature is enabled, for invalid state feature is disabled in all other cases do not vote.
 Such voter will look like this:

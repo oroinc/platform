@@ -49,9 +49,9 @@ class FeatureEnabled extends AbstractCondition implements ContextAccessorAwareIn
      *
      * Configuration examples:
      *
-     * @feature_enabled: ['feature_name']
-     * @feature_enabled: ['feature': 'feature_name']
-     * @feature_enabled: ['feature': 'feature_name', 'scope_identifier': $.website]
+     * '@feature_enabled': ['feature_name']
+     * '@feature_enabled': ['feature': 'feature_name']
+     * '@feature_enabled': ['feature': 'feature_name', 'scope_identifier': $.scopeId]
      */
     public function initialize(array $options)
     {
