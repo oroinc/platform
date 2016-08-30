@@ -265,7 +265,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin, $force)
+    protected function doSyncOrigin(EmailOrigin $origin, $force = false)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
