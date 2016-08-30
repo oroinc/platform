@@ -96,6 +96,7 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsDecreasedBy($number)
     {
+        $this->getSession()->getDriver()->waitForAjax();
         self::assertEquals(
             $this->gridRecordsNumber - $number,
             $this->getGridPaginator()->getTotalRecordsCount()
