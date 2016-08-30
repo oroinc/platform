@@ -39,9 +39,6 @@ parameters:
         pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
         pdo_pgsql: Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql
 
-    oro_website_search.entity.item.class: Oro\Bundle\WebsiteSearchBundle\Entity\Item
-    oro_website_search.entity.repository.search_index.class: Oro\Bundle\WebsiteSearchBundle\Entity\Repository\WebsiteSearchIndexRepository
-
 services:
     oro_search.index:
         class:                        %oro_search.index.class%
@@ -189,14 +186,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
-    oro_search.event_listener.orm.website_fulltext_index_listener:
-        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
-        arguments:
-            - %database_driver%
-            - 'oro_website_search_text'
-        tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
-
     oro_search.provider.search_mapping:
         class: %oro_search.provider.search_mapping.class%
         arguments:
@@ -219,28 +208,12 @@ services:
         calls:
             - [setRegistry,  ['@doctrine']]
 
-    oro_website_search.entity.repository.search_index:
-        class: '%oro_website_search.entity.repository.search_index.class%'
-        factory: ["@doctrine", getRepository]
-        arguments:
-            - '%oro_website_search.entity.item.class%'
-            - 'search'
-        calls:
-            - [setRegistry,  ['@doctrine']]
-
     oro_search.cache.search_mapping_cache:
         class: %oro_search.cache.search_mapping_cache.class%
         arguments:
             - '@oro_search.provider.search_mapping'
         tags:
             - { name: kernel.cache_warmer }
-
-    oro_website_search.fulltext_index_manager:
-        class: '%oro_search.fulltext_index_manager.class%'
-        arguments:
-            - '@doctrine.dbal.default_connection'
-            - '%oro_search.drivers%'
-            - 'oro_website_search_text'
 
     oro_search.resolver.entity_title.title_fields:
         public: false
