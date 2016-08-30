@@ -33,7 +33,7 @@ class ApiSourceListener
         $this->apiDocViews = $apiDocViews;
     }
 
-    public function cacheClear()
+    public function clearCache()
     {
         // clear the cache for API resources
         $this->resourcesCache->clear();

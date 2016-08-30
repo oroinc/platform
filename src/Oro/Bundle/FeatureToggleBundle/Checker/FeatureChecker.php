@@ -127,6 +127,11 @@ class FeatureChecker
         return true;
     }
 
+    public function resetCache()
+    {
+        $this->featuresStates = [];
+    }
+    
     /**
      * @param string $feature
      * @param object|int|null $scopeIdentifier

@@ -158,7 +158,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
 
         $this->assertEquals(
-            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENTS],
+            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENT_FEATURES],
             $configurationProvider->getDependentsConfiguration($ignoreCache)
         );
     }
@@ -195,7 +195,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($mergedConfiguration);
 
         $this->assertEquals(
-            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENTS],
+            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENT_FEATURES],
             $configurationProvider->getDependentsConfiguration($ignoreCache)
         );
     }
@@ -391,7 +391,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'feature2' => [],
                             'feature3' => ['feature1', 'feature2'],
                         ],
-                        ConfigurationProvider::DEPENDENTS => [
+                        ConfigurationProvider::DEPENDENT_FEATURES => [
                             'feature1' => ['feature3'],
                             'feature2' => ['feature1', 'feature3'],
                             'feature3' => [],

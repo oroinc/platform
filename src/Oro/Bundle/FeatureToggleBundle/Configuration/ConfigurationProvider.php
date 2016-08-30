@@ -13,7 +13,7 @@ class ConfigurationProvider
     const FEATURES = '__features__';
     const BY_RESOURCE = 'by_resource';
     const DEPENDENCIES = 'dependencies';
-    const DEPENDENTS = 'dependents';
+    const DEPENDENT_FEATURES = 'dependent_features';
     const DEPENDENCY_KEY = 'dependency';
 
     /**
@@ -98,7 +98,7 @@ class ConfigurationProvider
      */
     public function getDependentsConfiguration($ignoreCache = false)
     {
-        return $this->getConfiguration($ignoreCache)[self::INTERNAL][self::DEPENDENTS];
+        return $this->getConfiguration($ignoreCache)[self::INTERNAL][self::DEPENDENT_FEATURES];
     }
 
     /**
@@ -137,7 +137,7 @@ class ConfigurationProvider
         if (count($configs) > 0) {
             $data[self::FEATURES] = $this->configuration->processConfiguration($configs);
             $data[self::INTERNAL][self::DEPENDENCIES] = $this->resolveDependencies($data[self::FEATURES]);
-            $data[self::INTERNAL][self::DEPENDENTS] = $this->resolveDependent(
+            $data[self::INTERNAL][self::DEPENDENT_FEATURES] = $this->resolveDependentFeatures(
                 $data[self::INTERNAL][self::DEPENDENCIES]
             );
             $data[self::INTERNAL][self::BY_RESOURCE] = $this->resolveResources($data[self::FEATURES]);
@@ -187,15 +187,15 @@ class ConfigurationProvider
      * @return array
      * @throws CircularReferenceException
      */
-    protected function resolveDependent(array $data)
+    protected function resolveDependentFeatures(array $data)
     {
-        $FeatureDependents = [];
+        $featureDependents = [];
         foreach (array_keys($data) as $feature) {
             $dependent = $this->getFeatureDependents($feature, $data);
-            $FeatureDependents[$feature] = array_unique($dependent);
+            $featureDependents[$feature] = array_unique($dependent);
         }
 
-        return $FeatureDependents;
+        return $featureDependents;
     }
 
     /**

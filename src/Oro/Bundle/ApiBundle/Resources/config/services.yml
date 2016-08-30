@@ -154,8 +154,8 @@ services:
             - '@nelmio_api_doc.extractor.api_doc_extractor'
             - '%oro_api.api_doc.views%'
         tags:
-            - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: cacheClear }
-            - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: cacheClear }
+            - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: clearCache }
+            - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: clearCache }
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
