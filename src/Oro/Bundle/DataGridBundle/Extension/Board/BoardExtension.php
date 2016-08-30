@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardException;
 use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException;

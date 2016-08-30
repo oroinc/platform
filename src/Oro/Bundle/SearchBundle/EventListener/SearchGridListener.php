@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
 
@@ -21,6 +20,5 @@ class SearchGridListener
                 $datasource->getQuery()->from($from);
             }
         }
-
     }
 }
