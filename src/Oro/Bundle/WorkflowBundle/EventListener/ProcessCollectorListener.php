@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnClearEventArgs;
@@ -21,17 +20,13 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ProcessCollectorListener implements OptionalListenerInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
     /**
      * @var DoctrineHelper
      */
@@ -93,30 +88,18 @@ class ProcessCollectorListener implements OptionalListenerInterface
     private $messageProducer;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     * @param ProcessHandler $handler
-     * @param ProcessLogger $logger
-     * @param ProcessTriggerCache $triggerCache
-     * @param ProcessSchedulePolicy $schedulePolicy
-     * @param MessageProducerInterface $messageProducer
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        ManagerRegistry $registry,
-        DoctrineHelper $doctrineHelper,
-        ProcessHandler $handler,
-        ProcessLogger $logger,
-        ProcessTriggerCache $triggerCache,
-        ProcessSchedulePolicy $schedulePolicy,
-        MessageProducerInterface $messageProducer
-    ) {
-        $this->registry       = $registry;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->handler        = $handler;
-        $this->logger         = $logger;
-        $this->triggerCache   = $triggerCache;
-        $this->schedulePolicy = $schedulePolicy;
-        $this->messageProducer = $messageProducer;
+    public function __construct(ContainerInterface $container)
+    {
+        //  The container injected because of
+        // circular reference detected for service "doctrine.dbal.default_connection"
+        $this->doctrineHelper = $container->get('oro_entity.doctrine_helper');
+        $this->handler        = $container->get('oro_workflow.process.process_handler');
+        $this->logger         = $container->get('oro_workflow.process.logger');
+        $this->triggerCache   = $container->get('oro_workflow.cache.process_trigger');
+        $this->schedulePolicy = $container->get('oro_workflow.process.schedule_policy');
+        $this->messageProducer = $container->get('oro_message_queue.message_producer');
     }
 
     /**
@@ -144,7 +127,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
     protected function getTriggers($entityClass, $event, $field = null)
     {
         if (null === $this->triggers) {
-            $triggers = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')
+            $triggers = $this->doctrineHelper->getEntityRepository(ProcessTrigger::class)
                 ->findAllWithDefinitions(true);
 
             $this->triggers = [];
@@ -345,7 +328,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
 
         // delete unused processes
         if ($this->removedEntityHashes) {
-            $this->registry->getRepository('OroWorkflowBundle:ProcessJob')->deleteByHashes($this->removedEntityHashes);
+            $this->doctrineHelper->getEntityRepository(ProcessJob::class)->deleteByHashes($this->removedEntityHashes);
             $this->removedEntityHashes = [];
         }
 
