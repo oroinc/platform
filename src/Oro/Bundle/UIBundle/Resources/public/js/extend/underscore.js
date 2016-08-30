@@ -19,8 +19,8 @@ define(['underscore', 'asap'], function(_, asap) {
         isMobile: function() {
             var elem = document.getElementsByTagName('body')[0];
             return elem && (' ' + elem.className + ' ')
-                .replace(/[\t\r\n\f]/g, ' ')
-                .indexOf(' mobile-version ') !== -1;
+                    .replace(/[\t\r\n\f]/g, ' ')
+                    .indexOf(' mobile-version ') !== -1;
         },
 
         /* This function is available in newer underscore/lodash versions */
@@ -48,8 +48,19 @@ define(['underscore', 'asap'], function(_, asap) {
         }
     });
 
+    _.templateSettings.innerTempStart = '<%#';
+    _.templateSettings.innerTempEnd = '#%>';
+
     _.template = _.wrap(_.template, function(original, text, settings, oldSettings) {
-        text = _.trim(text).replace(/^<%#/, '').replace(/#%>$/, '');
+        if (!settings && oldSettings) settings = oldSettings;
+        settings = _.defaults({}, settings, _.templateSettings);
+
+        var regexStart = new RegExp('^' + settings.innerTempStart);
+        var regexEnd = new RegExp(settings.innerTempEnd + '$');
+        var innerTempEvaluate = new RegExp('(' + _.templateSettings.innerTempStart + ')|(' + _.templateSettings.innerTempEnd + ')', 'g');
+
+        text = _.trim(text).replace(regexStart, '').replace(regexEnd, '');
+
         var escapedText = text;
 
         var levelOffsets = {};
@@ -57,13 +68,10 @@ define(['underscore', 'asap'], function(_, asap) {
         var offsetDelta = 0;
 
         var escapeText = function(text) {
-            text = text.replace(/&([amplgt;]+%)/g, '&amp;$1');
-            text = text.replace(/<%/g, '&lt;%')
-                .replace(/%>/g, '%&gt;');
-            return text;
+            return text.replace(/\&lt\;\%/g, '&amp;lt;%').replace(/<%/g, '&lt;%').replace(/%>/g, '%&gt;');
         };
 
-        text.replace(/(<%#)|(#%>)/g, function(match, open, close, offset) {
+        text.replace(innerTempEvaluate, function(match, open, close, offset) {
             offset += offsetDelta;
             if (open) {
                 level++;
@@ -72,16 +80,19 @@ define(['underscore', 'asap'], function(_, asap) {
             if (close && level) {
                 var start = escapedText.slice(0, levelOffsets[level]);
                 var end = escapedText.slice(offset + close.length);
-                var escape = escapedText.slice(levelOffsets[level] + 3, offset);
+                var escape = escapedText.slice(levelOffsets[level] + settings.innerTempStart.length, offset);
                 var newEscape = escapeText(escape);
-                offsetDelta += newEscape.length - escape.length - 6;
+
+                offsetDelta += newEscape.length - escape.length - (settings.innerTempEnd.length * 2);
                 escapedText = start + newEscape + end;
                 level--;
             }
-            // Adobe VMs need the match returned to produce the correct offest.
+
+            // Adobe VMs need the match returned to produce the correct offset.
             return match;
         });
         arguments[1] = _.trim(escapedText);
+
         return original.apply(this, _.rest(arguments));
     });
 
