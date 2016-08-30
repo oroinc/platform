@@ -324,7 +324,7 @@ define([
             this.$el.html(this.template({
                 model: this.model ? this.model.attributes : {},
                 themeOptions: this.themeOptions ? this.themeOptions : {},
-                render: function(columnName){
+                render: function(columnName) {
                     var columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;
                     });
@@ -333,7 +333,7 @@ define([
                     }
                     return '';
                 },
-                attributes: function(columnName, additionalAttributes){
+                attributes: function(columnName, additionalAttributes) {
                     var attributes = additionalAttributes || {};
                     var columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;

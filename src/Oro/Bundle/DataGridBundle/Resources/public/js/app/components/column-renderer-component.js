@@ -1,6 +1,6 @@
 define(function(Chaplin) {
     'use strict';
-    
+
     var ColumnRendererComponent;
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
@@ -15,7 +15,7 @@ define(function(Chaplin) {
          * @type {Backgrid.Columns}
          */
         columns: null,
-        
+
         /**
          * @inheritDoc
          */
@@ -33,7 +33,7 @@ define(function(Chaplin) {
 
             ColumnRendererComponent.__super__.dispose.apply(this, arguments);
         },
-        
+
         getHtml: function($element) {
             return $element.html();
         },
@@ -46,7 +46,7 @@ define(function(Chaplin) {
             }
             return this._getAttributesRaw(attributes);
         },
-        
+
         _getElementClasses: function($element, additionalRawClasses) {
             var elementRawClasses = $element.attr('class') || '';
             var elementClasses = _.union(additionalRawClasses.split(' '), elementRawClasses.split(' '));
@@ -56,12 +56,12 @@ define(function(Chaplin) {
 
         _getAttributesRaw: function(attributes) {
             var raw = '';
-            _.each(attributes, function(value, name){
+            _.each(attributes, function(value, name) {
                 raw += ' ' + name + '=' + value;
             });
             return raw.trim();
         }
     });
-    
+
     return ColumnRendererComponent;
 });
