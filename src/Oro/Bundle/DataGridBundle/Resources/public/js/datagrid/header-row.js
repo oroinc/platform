@@ -1,9 +1,10 @@
 define([
+    'underscore',
     './header-cell/header-cell',
     'chaplin',
     '../app/components/column-renderer-component',
     './util'
-], function(HeaderCell, Chaplin, ColumnRendererComponent, util) {
+], function(_, HeaderCell, Chaplin, ColumnRendererComponent, util) {
     'use strict';
 
     var HeaderRow;

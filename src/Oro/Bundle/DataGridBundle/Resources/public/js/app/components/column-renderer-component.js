@@ -42,7 +42,7 @@ define(function(Chaplin) {
             attributes.class = attributes.class || '';
 
             if ($element.length) {
-                attributes.class = this._getElementClasses($element, attributes.class)
+                attributes.class = this._getElementClasses($element, attributes.class);
             }
             return this._getAttributesRaw(attributes);
         },
