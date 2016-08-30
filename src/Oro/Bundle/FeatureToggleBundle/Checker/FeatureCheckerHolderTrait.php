@@ -7,7 +7,7 @@ trait FeatureCheckerHolderTrait
     /**
      * @var FeatureChecker
      */
-    protected $checker;
+    protected $featureChecker;
 
     /**
      * @var array
@@ -19,7 +19,7 @@ trait FeatureCheckerHolderTrait
      */
     public function setFeatureChecker(FeatureChecker $checker)
     {
-        $this->checker = $checker;
+        $this->featureChecker = $checker;
     }
 
     /**
@@ -31,12 +31,13 @@ trait FeatureCheckerHolderTrait
     }
 
     /**
+     * @param null|int|object $scopeIdentifier
      * @return bool
      */
-    public function isFeaturesEnabled()
+    public function isFeaturesEnabled($scopeIdentifier = null)
     {
         foreach ($this->features as $feature) {
-            if (!$this->checker->isFeatureEnabled($feature)) {
+            if (!$this->featureChecker->isFeatureEnabled($feature, $scopeIdentifier)) {
                 return false;
             }
         }
