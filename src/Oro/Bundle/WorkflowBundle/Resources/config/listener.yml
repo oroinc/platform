@@ -38,7 +38,7 @@ services:
     oro_workflow.listener.process_collector:
         class: %oro_workflow.listener.process_collector.class%
         arguments:
-            - '@container_service'
+            - '@service_container'
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
