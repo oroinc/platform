@@ -7,6 +7,7 @@ services:
 
     oro_featuretoggle.expression.feature_enabled:
         class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled'
+        public: false
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -15,6 +16,7 @@ services:
 
     oro_featuretoggle.expression.feature_resource_enabled:
         class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureResourceEnabled'
+        public: false
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -23,6 +25,7 @@ services:
 
     oro_featuretoggle.configuration.provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
+        public: false
         arguments:
             - []
             - '%kernel.bundles%'
@@ -31,6 +34,7 @@ services:
 
     oro_featuretoggle.configuration.manager:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'
+        public: false
         arguments:
             - '@oro_featuretoggle.configuration.provider'
 
@@ -52,9 +56,11 @@ services:
 
     oro_featuretoggle.configuration:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
+        public: false
 
     oro_featuretoggle.twig.feature_extension:
         class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'
+        public: false
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -69,6 +75,7 @@ services:
 
     oro_featuretoggle.layout.data_provider.feature_provider:
         class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
+        public: false
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -76,6 +83,7 @@ services:
 
     oro_featuretoggle.voter.config_voter:
         class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter'
+        public: false
         arguments:
             - '@oro_config.manager'
             - '@oro_featuretoggle.configuration.manager'
@@ -84,21 +92,15 @@ services:
 
     oro_featuretoggle.event_listener.request:
         class: 'Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener'
+        public: false
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onRequest }
 
-    oro_featuretoggle.provider.api_exclusion_provider:
-        class: Oro\Bundle\FeatureToggleBundle\Provider\ApiExclusionProvider
-        public: false
-        arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
-        tags:
-            - { name: oro_entity.exclusion_provider.api }
-
     oro_featuretoggle.event_listener.system_config:
         class: 'Oro\Bundle\FeatureToggleBundle\EventListener\ConfigListener'
+        public: false
         arguments:
             - '@event_dispatcher'
             - '@oro_featuretoggle.configuration.manager'
