@@ -214,34 +214,34 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     public function onConfigureActionsProvider()
     {
         return [
-//            'configure with provider' => [
-//                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-//                'actions' => ['test_operation' => $this->createOperation(
-//                    'test_operation',
-//                    true,
-//                    [
-//                        'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
-//                    ]
-//                )],
-//                'expected' => true,
-//                'expectedConfiguration' => [
-//                    'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
-//                ]
-//            ],
-//            'configure with single mass action' => [
-//                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-//                'actions' => ['test_operation' => $this->createOperation(
-//                    'test_operation',
-//                    true,
-//                    [
-//                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
-//                    ]
-//                )],
-//                'expected' => true,
-//                'expectedConfiguration' => [
-//                    'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
-//                ]
-//            ],
+            'configure with provider' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'actions' => ['test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
+                    ]
+                )],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
+                ]
+            ],
+            'configure with single mass action' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'actions' => ['test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
+                    ]
+                )],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
+                ]
+            ],
             'configure with single action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => ['action3' => $this->createOperation(
@@ -257,35 +257,35 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     'actions' => ['action3' => $this->getRowActionConfig('action3', 'Action 3 label')],
                 ]
             ],
-//            'should not replace existing default action' => [
-//                'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
-//                'actions' => ['action3' => $this->createOperation(
-//                    'action3',
-//                    true,
-//                    [
-//                        'getName' => 'action3',
-//                        'getLabel' => 'Action 3 label'
-//                    ]
-//                ), 'test_operation' => $this->createOperation(
-//                    'test_operation',
-//                    true,
-//                    [
-//                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
-//                    ]
-//                )],
-//                'expected' => true,
-//                'expectedConfiguration' => [
-//                    'actions' => [
-//                        'action3' => ['label' => 'default action3'],
-//                        'test_operation' => $this->getRowActionConfig('test_operation'),
-//                    ]
-//                ]
-//            ],
-//            'not configure' => [
-//                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-//                'actions' => [],
-//                'expected' => false
-//            ]
+            'should not replace existing default action' => [
+                'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
+                'actions' => ['action3' => $this->createOperation(
+                    'action3',
+                    true,
+                    [
+                        'getName' => 'action3',
+                        'getLabel' => 'Action 3 label'
+                    ]
+                ), 'test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
+                    ]
+                )],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'actions' => [
+                        'action3' => ['label' => 'default action3'],
+                        'test_operation' => $this->getRowActionConfig('test_operation'),
+                    ]
+                ]
+            ],
+            'not configure' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'actions' => [],
+                'expected' => false
+            ]
         ];
     }
 

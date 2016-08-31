@@ -22,6 +22,7 @@ oro.translation:
         code.label: 'Code'
         enabled.label: 'Status'
         installed_build_date.label: 'Installed Build Date'
+        owner.label: 'Owner'
         organization.label: 'Organization'
         status:
             enabled: 'Enabled'

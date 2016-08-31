@@ -44,7 +44,7 @@ define([
         initialize: function() {
             ModelAction.__super__.initialize.apply(this, arguments);
 
-            if(this.options.dataGridName === null) {
+            if (this.options.dataGridName === null) {
                 this.options.dataGridName = this.datagrid.name;
             }
 
@@ -53,23 +53,24 @@ define([
             var importRoute;
             var importRouteParams = {
                 options: this.options.routeOptions,
-                entity: this.entity_class||null,
+                entity: this.entity_class || null,
                 processorAlias: this.importProcessor,
-                importJob: this.importJob||null,
-                importValidateJob: this.importValidateJob||null
+                importJob: this.importJob || null,
+                importValidateJob: this.importValidateJob || null
             };
-            var exportRoute = this.isExportPopupRequired ? 'oro_importexport_export_config' : 'oro_importexport_export_instant';
+            var exportRoute = this.isExportPopupRequired ? 'oro_importexport_export_config' :
+                'oro_importexport_export_instant';
             var exportRouteParams = {
                 options: this.options.routeOptions,
-                entity: this.entity_class||null,
+                entity: this.entity_class || null,
                 processorAlias: this.exportProcessor,
-                filePrefix: this.options.filePrefix||null,
-                exportJob: this.exportJob||null,
-                exportTemplateJob: this.exportTemplateJob||null
+                filePrefix: this.options.filePrefix || null,
+                exportJob: this.exportJob || null,
+                exportTemplateJob: this.exportTemplateJob || null
             };
 
-            var importUrl = routing.generate(importRoute||'oro_importexport_import_form', importRouteParams);
-            var exportUrl = routing.generate(exportRoute||'oro_importexport_export_instant', exportRouteParams);
+            var importUrl = routing.generate(importRoute || 'oro_importexport_import_form', importRouteParams);
+            var exportUrl = routing.generate(exportRoute || 'oro_importexport_export_instant', exportRouteParams);
             this.importExportManager = new ImportExportManager({
                 exportUrl: exportUrl,
                 importUrl: importUrl,
@@ -88,10 +89,10 @@ define([
             switch (this.type) {
                 case 'import':
                     this.importExportManager.handleImport();
-                break
+                    break
                 case 'export':
                     this.importExportManager.handleExport();
-                break
+                    break
             }
         },
 
@@ -111,16 +112,16 @@ define([
          */
         expandOptions: function(opts) {
             var options = $.extend({}, opts);
-            _.each(options, function (value, key) {
+            _.each(options, function(value, key) {
                 switch (typeof value) {
                     case 'string':
                         if (this.model.has(value)) {
                             options[key] = this.model.get(value);
                         }
-                    break
+                        break
                     case 'object':
                         options[key] = this.expandOptions(value);
-                    break
+                        break
                 }
             }, this);
 
