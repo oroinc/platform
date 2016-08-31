@@ -5,7 +5,7 @@ To enable inline editing on a grid, do the following actions:
 - Go to the datagrid yml
 - Add the following lines into the datagrid configuration
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         # <grid configuration> goes here
         inline_editing:
@@ -18,7 +18,7 @@ datagrid:
 
 ## Datagrid configuration details
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         inline_editing:
             enable: true
@@ -66,7 +66,7 @@ Please note that `{id}` will be taken from the current row in the grid
 
 ## Column configuration options
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         # <grid configuration> goes here
         columns:
@@ -106,7 +106,7 @@ frontend_type: select - simple choice from provided values
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         # <grid configuration> goes here
         columns:
@@ -127,7 +127,7 @@ frontend_type: multi-select - simple choice from provided values allow choose fe
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         # <grid configuration> goes here
         columns:
@@ -147,7 +147,7 @@ frontend_type: relation - select2 type with autocomplete search function
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         # <grid configuration> goes here
         columns:
@@ -165,7 +165,7 @@ frontend_type: multi-relation - select2 type with autocomplete search function a
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         # <grid configuration> goes here
         columns:

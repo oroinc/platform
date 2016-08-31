@@ -15,7 +15,7 @@ Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface contains method to get scop
 It's also possible to specify scope of the grid in configuration, there is an option "scope" for this purpose:
 
 ``` yaml
-datagrid:
+datagrids:
     acme-demo-grid:
         scope: demo-scope
         # ...

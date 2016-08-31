@@ -11,7 +11,7 @@ Settings
 Sorters setting should be placed under `sorters` tree node.
 
 ```
-datagrid:
+datagrids:
     demo:
         source:
             type: orm

@@ -4,7 +4,7 @@ Number cell content editor.
 
 ### Column configuration samples:
 ``` yml
-datagrid:
+datagrids:
   {grid-uid}:
     inline_editing:
       enable: true

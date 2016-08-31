@@ -25,7 +25,7 @@ The configuration declares all aspects related to specific entity. The  configur
 All entities, except custom entities, dictionaries and enumerations are not accessible through Data API. To allow usage of an entity in Data API you have to enable it directly. For example, to make `Acme\Bundle\ProductBundle\Product` entity available through Data API you can write the following configuration:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\ProductBundle\Product: ~
 ```
@@ -67,7 +67,7 @@ The first level sections of configuration are:
 Top level configuration example:
 
 ```yaml
-oro_api:
+api:
     entity_aliases:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             ...
@@ -111,7 +111,7 @@ The `exclude` configuration option describes whether an entity or some of its fi
 Example:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
             exclude: true # exclude the entity from Data API
@@ -126,7 +126,7 @@ Also the `exclude` option can be used to indicate whether filtering or sorting f
 Example:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
             sorter:
@@ -164,7 +164,7 @@ Please see [documentation](../../../EntityBundle/Resources/doc/entity_aliases.md
 An example:
 
 ```yaml
-oro_api:
+api:
     entity_aliases:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             alias: acmeentity
@@ -201,7 +201,7 @@ By default the following form options are set:
 Example:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             inherit:              false
@@ -243,7 +243,7 @@ This section describes entity fields' configuration.
 Examples:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             fields:
@@ -320,7 +320,7 @@ This section describes fields by which the result data can be filtered. It conta
 Example:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             filters:
@@ -351,7 +351,7 @@ This section describes fields by which the result data can be sorted. It contain
 Example:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             sorters:
@@ -404,7 +404,7 @@ Examples of `actions` section configuration:
 Disable `delete` action for an entity:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -415,7 +415,7 @@ oro_api:
 Also a short syntax can be used:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -425,7 +425,7 @@ oro_api:
 Set custom ACL resource for the `get_list` action:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -436,7 +436,7 @@ oro_api:
 Turn off access checks for the `get` action:
 
 ```yaml
-oro_api:
+api:
     entities:
        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -447,7 +447,7 @@ oro_api:
 Add additional status code for `delete` action:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -459,7 +459,7 @@ oro_api:
 or
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -472,7 +472,7 @@ oro_api:
 Remove existing status code for `delete` action:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -484,7 +484,7 @@ oro_api:
 or
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -497,7 +497,7 @@ oro_api:
 Exclude a field for `update` action:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
@@ -521,7 +521,7 @@ The `subresources` configuration section allows to provide options for sub-resou
 Example:
 
 ```yaml
-oro_api:
+api:
     entities:
         Oro\Bundle\EmailBundle\Entity\Email:
             subresources:

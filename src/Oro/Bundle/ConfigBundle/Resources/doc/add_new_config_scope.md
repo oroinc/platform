@@ -58,7 +58,7 @@ To be able to change values for new scope, developer should add new tree structu
 
 ```yml
 
-    oro_system_configuration:
+    system_configuration:
        tree:
           test_configuration:
               platform:

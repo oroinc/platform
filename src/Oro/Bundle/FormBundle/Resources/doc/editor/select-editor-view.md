@@ -6,7 +6,7 @@ The editor will use the same mapping
 
 ### Column configuration samples:
 ``` yml
-datagrid:
+datagrids:
   {grid-uid}:
     inline_editing:
       enable: true

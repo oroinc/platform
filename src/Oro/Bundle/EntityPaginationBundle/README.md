@@ -21,7 +21,7 @@ Let's assume that pagination must be enabled for the User entity with identifier
 1) Datagrid must have ``entity_pagination`` option in configuration:
 
 ```yml
-datagrid:
+datagrids:
     users-grid:
         ...
         options:
@@ -31,7 +31,7 @@ datagrid:
 2) Datagrid has identifier column in result:
 
 ```yml
-datagrid:
+datagrids:
     users-grid:
         ...
         source:

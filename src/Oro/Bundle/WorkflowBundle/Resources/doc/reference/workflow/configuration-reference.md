@@ -41,13 +41,13 @@ Structure of configuration is declared in class Oro\Bundle\WorkflowBundle\Config
 Configuration File
 ==================
 
-Configuration must be placed in a file named Resources/config/workflow.yml. For example
-src/Acme/DemoWorkflowBundle/Resources/config/workflow.yml.
+Configuration must be placed in a file named Resources/config/oro/workflows.yml. For example
+src/Acme/DemoWorkflowBundle/Resources/config/oro/workflows.yml.
 
 Configuration file may be split by parts. All included parts must be placed under imports section. Imports may be used
 in any part of workflow configuration.
 
-**Example - workflow.yml**
+**Example - workflows.yml**
 ```
 imports:
     - { resource: 'oro/workflow/b2b_flow_lead.yml' }

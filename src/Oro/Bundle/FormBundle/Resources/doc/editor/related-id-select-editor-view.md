@@ -9,7 +9,7 @@ Please pay attention to the registration of the `value_field_name` in `query` an
 sample yml configuration below
 
 ``` yml
-datagrid:
+datagrids:
   {grid-uid}:
     inline_editing:
       enable: true

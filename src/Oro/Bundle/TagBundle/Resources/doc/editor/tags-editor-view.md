@@ -5,7 +5,7 @@ corresponding to [tags-view](../viewer/tags-view.md).
 
 ### Column configuration samples:
 ``` yml
-datagrid:
+datagrids:
   {grid-uid}:
     inline_editing:
       enable: true

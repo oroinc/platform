@@ -9,6 +9,7 @@
 **Configuration Example**
 
 ```yml
+charts:
   line_chart:                                       # Chart key used for identify chart type (line_chart in example below)
     label: oro.chart.line_chart.label               # Chart label used for text representation of chart type
 

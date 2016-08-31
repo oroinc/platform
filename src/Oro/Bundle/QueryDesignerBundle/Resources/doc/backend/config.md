@@ -1,6 +1,6 @@
 Query Designer Configuration
 ----------------------------
-The Query Designer behavior can be tuned using configuration files. These files should be named `query_designer.yml` and can be located in any bundle in `Resources/config` directory. The following code snippet shows the main structure of `query_designer.yml` file.
+The Query Designer behavior can be tuned using configuration files. These files should be named `query_designer.yml` and can be located in any bundle in `Resources/config/oro` directory. The following code snippet shows the main structure of `query_designer.yml` file.
 
 ``` yaml
 query_designer:
@@ -17,7 +17,7 @@ The all available configuration options you can find in [Configuration.php](../.
 Filters configuration
 ---------------------
 This section describes how you can configure the list of filters are shown on the result page, for instance on report result grid, and intended to filter resulting data.
-The configuration of [default filters](../../config/query_designer.yml) describes filters for general data types, such as `string`, `integer`, `money`, `percent` etc. For instance, take a look on configuration of a filter used to filter textual data:
+The configuration of [default filters](../../config/oro/query_designer.yml) describes filters for general data types, such as `string`, `integer`, `money`, `percent` etc. For instance, take a look on configuration of a filter used to filter textual data:
 ``` yaml
 query_designer:
     filters:
@@ -50,7 +50,7 @@ This will add an additional condition to the `applicable` attribute of the exist
 
 Grouping configuration
 ----------------------
-Currently the configuration of the grouping columns has only one attribute. It is `exclude` attribute. Using this attribute you can specify which fields cannot be used in `GROUP BY` SQL clause. By [default](../../config/query_designer.yml) the following data types are not available for grouping: `text`, `array`, `object`. Here is an example of grouping configuration:
+Currently the configuration of the grouping columns has only one attribute. It is `exclude` attribute. Using this attribute you can specify which fields cannot be used in `GROUP BY` SQL clause. By [default](../../config/oro/query_designer.yml) the following data types are not available for grouping: `text`, `array`, `object`. Here is an example of grouping configuration:
 ``` yaml
 query_designer:
     grouping:

@@ -170,7 +170,7 @@ This action is intended to delete a list of entities.
 The entities list is built based on input filters. Please take into account that at least one filter must be specified, otherwise an error raises.
 
 By default the maximum number of entities that can be deleted by one request is 100. This limit was introduced to minimize impact on the server.
-You can change this limit for an entity in `Resources/config/acl.yml`, but please test your limit carefully because a big limit may make a big impact to the server.
+You can change this limit for an entity in `Resources/config/oro/acls.yml`, but please test your limit carefully because a big limit may make a big impact to the server.
 An example how to change default limit you can read at [how-to](how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request).
 
 The route name for REST API: `oro_rest_api_cdelete`.
@@ -819,7 +819,7 @@ Also you need to register your processor in the dependency injection container:
 In case if you need to create groups for your action, they should be registered in the ApiBundle configuration. To do this just add `Resources\config\oro\app.yml` to your bundle, for example:
 
 ```yaml
-oro_api:
+api:
     actions:
         my_action:
             processing_groups:

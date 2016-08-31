@@ -12,7 +12,7 @@ Table of content
 
 ##Overview
 Datagrid is table oriented representation of some data from some datasource.
- It's configuration is declarative YAML based file, that should be placed in `Resources/config` folder of your bundle and named `datagrid.yml`.
+ It's configuration is declarative YAML based file, that should be placed in `Resources/config` folder of your bundle and named `datagrids.yml`.
   This file should contain root node `datagrid` and each grid configuration should be placed under it.
 
 ##Getting Started
@@ -21,7 +21,7 @@ First of all to define own datagrid you should create configuration file as desc
 After that, you have to choose identifier of yours future grid and declare it by adding associative array with identifier as key.
 e.g.
 ``` yaml
-datagrid:
+datagrids:
     acme-demo-datagrid:     # grid identifier
         ...                 # configuration will be here
 ``` 
@@ -31,7 +31,7 @@ When it's done, next step is to configure datasource, basically it's similar arr
 You have to choose datasource type and properly configure  depending on it. For further details [see](./datasources.md).
 e.g.
 ``` yaml
-datagrid:
+datagrids:
     acme-demo-datagrid:
         source:
             type: orm  # datasource type
@@ -44,7 +44,7 @@ datagrid:
 If datasource supports parameters binding, additional option "bind_parameters" can be specified. For example
 
 ``` yaml
-datagrid:
+datagrids:
     acme-demo-datagrid:
         source:
             type: orm
@@ -90,7 +90,7 @@ For detailed explanation [see](./extensions/formatter.md).
 
 So lets define few columns:
 ``` yaml
-datagrid:
+datagrids:
     acme-demo-datagrid:
         source:
             type: orm
@@ -118,7 +118,7 @@ Basically it's array of column names where value is sorter configuration.
 
 Lets make all columns sortable:
 ``` yaml
-datagrid:
+datagrids:
     acme-demo-datagrid:
         ...                                 # definition from previous examples
         sorters:

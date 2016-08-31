@@ -44,7 +44,7 @@ To map a hint to a custom output walker use the attribute `output_walker` instea
 The following example shows how hints can be used in YAML configuration files:
 
 ``` yaml
-datagrid:
+datagrids:
     my-email-origins-grid:
         source:
             type: orm

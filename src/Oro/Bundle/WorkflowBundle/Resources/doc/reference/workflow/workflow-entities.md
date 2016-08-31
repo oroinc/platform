@@ -596,7 +596,7 @@ Workflow Configuration Provider
 Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider
 
 **Description:**
-Parses files workflow.yml in all bundles and processes merged configuration using Workflow List Configuration.
+Parses files workflows.yml in all bundles and processes merged configuration using Workflow List Configuration.
 
 **Methods:**
 * **getWorkflowDefinitionConfiguration()** - get list of configurations for Workflow Definitions.

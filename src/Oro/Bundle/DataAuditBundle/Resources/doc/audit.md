@@ -50,6 +50,6 @@ How to add new auditable types
     }
 ```
 
-* to see auditable option in entity configuration, make sure your field type is in allowed types here: DataAuditBundle/Resources/config/entity_config.yml
+* to see auditable option in entity configuration, make sure your field type is in allowed types here: DataAuditBundle/Resources/config/oro/entity_config.yml
 * to make sure your column is correctly shown in grids (segments, reports...) it might be necessary to
 create new column options guesser with tag: "oro_datagrid.column_options_guesser" and set frontend_type property

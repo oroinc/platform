@@ -4,7 +4,7 @@ Text cell content editor. This view is used by default (if no frontend type has 
 
 ### Column configuration samples:
 ``` yml
-datagrid:
+datagrids:
   {grid-uid}:
     inline_editing:
       enable: true

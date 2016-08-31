@@ -6,9 +6,9 @@ OroEntityConfigBundle
 
 Getting Started
 ---------------
-To show how metadata can be added to an entity lets add the following YAML file (this file must be located in [BundleName]\Resources\config\entity_config.yml):
+To show how metadata can be added to an entity lets add the following YAML file (this file must be located in `[BundleName]/Resources/config/oro/entity_config.yml`):
 ``` yaml
-oro_entity_config:
+entity_config:
     acme:                                      # a configuration scope name
         entity:                                # a section describes an entity
             items:                             # starts a description of entity attributes
@@ -66,7 +66,7 @@ The result is demonstrated in the following code:
 ```
 Basically it is all you need to add metadata to any entity. But in most cases you want to allow an administrator to manage your attribute in UI. To accomplish this lets change our YAML file in the following way:
 ``` yaml
-oro_entity_config:
+entity_config:
     acme:                                           # a configuration scope name
         entity:                                     # a section describes an entity
             items:                                  # starts a description of entity attributes
@@ -98,7 +98,7 @@ Indexed attributes
 ------------------
 All configuration data are stored as a serialized array in `data` column of `oro_entity_config` and `oro_entity_config_field` tables for entities and fields appropriately. But sometime you need to get a value of some configuration attribute in SQL query. For example it is required for attributes visible in grids in System > Entities section and have a filter or allow sorting in this grid. In this case you can mark an attribute as indexed. For example:
 ``` yaml
-oro_entity_config:
+entity_config:
     acme:
         entity:
             items:
