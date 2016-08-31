@@ -17,7 +17,7 @@ interface TransportFactoryInterface
      * @param ContainerBuilder $container
      * @param array $config
      *
-     * @return string service id
+     * @return string The method must return a connection service id.
      */
     public function createService(ContainerBuilder $container, array $config);
 
