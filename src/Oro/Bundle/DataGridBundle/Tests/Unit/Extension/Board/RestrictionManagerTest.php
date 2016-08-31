@@ -54,7 +54,11 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testBoardViewEnabledDesktopAndNoWorkflow()
     {
-        $config = DatagridConfiguration::create([]);
+        $config = DatagridConfiguration::create([
+            'source' => [
+                'type' => 'orm',
+            ]
+        ]);
 
         $userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')->disableOriginalConstructor()
                     ->getMock();
@@ -70,7 +74,12 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testBoardViewEnabledMobile()
     {
-        $config = DatagridConfiguration::create([]);
+        $config = DatagridConfiguration::create([
+            'source' => [
+                'type' => 'orm',
+            ]
+        ]);
+
         $userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')->disableOriginalConstructor()
                     ->getMock();
         $userAgent->expects($this->once())->method('isDesktop')->will($this->returnValue(false));
