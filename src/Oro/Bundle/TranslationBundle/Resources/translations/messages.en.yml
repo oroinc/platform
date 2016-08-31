@@ -8,6 +8,8 @@ oro.translation:
         download: 'Download'
         install: 'Install'
         update: 'Update'
+        import: 'Import'
+        export: 'Export'
         add: 'Add Language'
         translation_completeness.label: 'Translation Completeness:'
         install.title: 'Install %language% language'
@@ -47,3 +49,9 @@ oro.translation:
     form:
         tooltip:
             translation_completeness: "Translation coverage indicator relates to translation package volume. Some bundles may still not be translated."
+
+oro.importexport:
+    import:
+        oro_translation_translation:
+            add_or_replace: 'Add and Replace'
+            reset: 'Reset and Add'

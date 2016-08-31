@@ -74,6 +74,59 @@ operations:
                 type: 'success'
             - '@refresh_grid': oro-translation-language-grid
 
+    oro_translation_language_import:
+        datagrids:
+            - oro-translation-language-grid
+        label: oro.translation.action.import
+        order: 20
+        button_options:
+            icon: download-alt
+            data:
+                type: import
+                entity_class: 'Oro\Bundle\TranslationBundle\Entity\Translation'
+                importProcessor: 'oro_translation_translation'
+                importJob: 'language_translations_import_from_csv'
+                options:
+                    importTitle: $.importTitle
+                    dataGridName: ~
+                    routeOptions:
+                        language_code: $code
+        preactions:
+            - '@trans':
+                attribute: $.entityLabel
+                id: 'oro.translation.language.entity_label'
+            - '@trans':
+                attribute: $.importTitle
+                id: 'oro.importexport.import.entity'
+            - '@format_string':
+                attribute: $.importTitle
+                string: $.importTitle
+                arguments:
+                    entityName: $.entityLabel
+
+    oro_translation_language_export:
+        datagrids:
+            - oro-translation-language-grid
+        label: oro.translation.action.export
+        order: 30
+        button_options:
+            icon: upload-alt
+            data:
+                type: export
+                entity_class: 'Oro\Bundle\TranslationBundle\Entity\Translation'
+                exportProcessor: 'oro_translation_translation'
+                exportJob: 'language_translations_export_to_csv'
+                options:
+                    filePrefix: $.filePrefix
+                    routeOptions:
+                        language_code: $code
+        preactions:
+            - '@format_string':
+                attribute: $.filePrefix
+                string: 'translations-%%lang%%'
+                arguments:
+                    lang: $code
+
     oro_translation_language_load_base:
         label: oro.translation.action.install
         acl_resource: [EDIT, $.data]

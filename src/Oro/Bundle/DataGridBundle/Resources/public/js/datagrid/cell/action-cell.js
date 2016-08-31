@@ -147,23 +147,25 @@ define([
             _.each(actions, function(action, name) {
                 // filter available actions for current row
                 if (!config || config[name] !== false) {
-                    result.push(this.createAction(action));
+                    result.push(this.createAction(action, config[name] || {}));
                 }
             }, this);
 
-            return result;
+            return _.sortBy(result, 'order');
         },
 
         /**
          * Creates action
          *
          * @param {Function} Action
+         * @param {Object} config
          * @protected
          */
-        createAction: function(Action) {
+        createAction: function(Action, config) {
             return new Action({
                 model: this.model,
-                datagrid: this.column.get('datagrid')
+                datagrid: this.column.get('datagrid'),
+                config: config
             });
         },
 

@@ -35,3 +35,15 @@ services:
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: frontend }
+
+    oro_datagrid.extension.action.type.import:
+        class: 'Oro\Bundle\DataGridBundle\Extension\Action\Actions\ImportAction'
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: import }
+
+    oro_datagrid.extension.action.type.export:
+        class: 'Oro\Bundle\DataGridBundle\Extension\Action\Actions\ExportAction'
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: export }

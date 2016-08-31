@@ -3,11 +3,8 @@ define(function(require) {
 
     var ImportExportButtonsView;
     var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
     var _ = require('underscore');
-    var DialogWidget = require('oro/dialog-widget');
-    var exportHandler = require('oroimportexport/js/export-handler');
+    var ImportExportManager = require('oroimportexport/js/importexport-manager');
 
     ImportExportButtonsView = BaseView.extend({
         /**
@@ -18,19 +15,17 @@ define(function(require) {
                 importButton: '.import-btn',
                 exportButton: '.export-btn',
                 templateButton: '.template-btn'
-            },
-            importTitle: 'Import',
-            exportTitle: 'Export',
-            templateTitle: 'Template',
-            gridname: null,
-            afterRefreshPageMessage: null,
-            refreshPageOnSuccess: false,
-            isExportPopupRequired: false
+            }
         },
 
         $importButton: null,
         $exportButton: null,
         $templateButton: null,
+
+        /**
+         * @property {ImportExportManager}
+         */
+        importExportManager: null,
 
         /**
          * @inheritDoc
@@ -45,6 +40,18 @@ define(function(require) {
             this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
             this.$exportButton.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
             this.$templateButton.on('click' + this.eventNamespace(), _.bind(this.onTemplateClick, this));
+
+            this.importExportManager = new ImportExportManager({
+                importTitle: options.importTitle,
+                exportTitle: options.exportTitle,
+                gridname: options.gridname,
+                refreshPageOnSuccess: options.refreshPageOnSuccess,
+                afterRefreshPageMessage: options.afterRefreshPageMessage,
+                isExportPopupRequired: options.isExportPopupRequired,
+                importUrl: this.$importButton.attr('href') || null,
+                exportUrl: this.$exportButton.attr('href') || null,
+                templateUrl: this.$templateButton.attr('href') || null
+            });
         },
 
         /**
@@ -53,42 +60,7 @@ define(function(require) {
         onImportClick: function(e) {
             e.preventDefault();
 
-            var widget = new DialogWidget({
-                'url': e.currentTarget.href,
-                'title': this.options.importTitle,
-                'stateEnabled': false,
-                'incrementalPosition': false,
-                'dialogOptions': {
-                    'width': 650,
-                    'autoResize': true,
-                    'modal': true,
-                    'minHeight': 100
-                }
-            });
-            widget.render();
-
-            if (!_.isEmpty(this.options.gridname) || this.options.refreshPageOnSuccess) {
-                var self = this;
-
-                widget.on('importComplete', function(data) {
-                    if (data.success) {
-                        if (self.options.refreshPageOnSuccess) {
-                            if (!_.isEmpty(self.options.afterRefreshPageMessage)) {
-                                mediator.once('page:afterChange', function() {
-                                    mediator.execute(
-                                        'showFlashMessage',
-                                        'warning',
-                                        self.options.afterRefreshPageMessage
-                                    );
-                                });
-                            }
-                            mediator.execute('refreshPage');
-                        } else if (!_.isEmpty(self.options.gridname)) {
-                            mediator.trigger('datagrid:doRefresh:' + self.options.gridname);
-                        }
-                    }
-                });
-            }
+            this.importExportManager.handleImport();
         },
 
         /**
@@ -97,27 +69,7 @@ define(function(require) {
         onExportClick: function(e) {
             e.preventDefault();
 
-            if (this.options.isExportPopupRequired) {
-                var widget = new DialogWidget({
-                    'url': e.currentTarget.href,
-                    'title': this.options.exportTitle,
-                    'stateEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'width': 650,
-                        'autoResize': true,
-                        'modal': true,
-                        'minHeight': 100
-                    }
-                });
-                widget.render();
-            } else {
-                var exportStartedMessage = exportHandler.startExportNotificationMessage();
-                $.getJSON(e.currentTarget.href, function(data) {
-                    exportStartedMessage.close();
-                    exportHandler.handleExportResponse(data);
-                });
-            }
+            this.importExportManager.handleExport();
         },
 
         /**
@@ -126,19 +78,7 @@ define(function(require) {
         onTemplateClick: function(e) {
             e.preventDefault();
 
-            var widget = new DialogWidget({
-                'url': e.currentTarget.href,
-                'title': this.options.templateTitle,
-                'stateEnabled': false,
-                'incrementalPosition': false,
-                'dialogOptions': {
-                    'width': 650,
-                    'autoResize': true,
-                    'modal': true,
-                    'minHeight': 100
-                }
-            });
-            widget.render();
+            this.importExportManager.handleTemplate();
         },
 
         /**
@@ -148,6 +88,8 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+
+            delete this.importExportManager;
 
             this.$importButton.off('click' + this.eventNamespace());
             this.$exportButton.off('click' + this.eventNamespace());

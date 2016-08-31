@@ -1,8 +1,0 @@
-{% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
-    entity_class: 'Oro\\Bundle\\TranslationBundle\\Entity\\Translation',
-    exportProcessor: 'oro_translation_translation',
-    exportJob: 'language_translations_export_to_csv',
-	filePrefix: 'translations-'~record.getValue('code'),
-    dataGridName: 'oro-translation-language-grid',
-    options: {'language_code': record.getValue('code')}
-} %}

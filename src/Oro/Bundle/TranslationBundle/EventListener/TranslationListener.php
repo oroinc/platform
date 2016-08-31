@@ -48,6 +48,6 @@ class TranslationListener
      */
     protected function isApplicable(JobExecution $jobExecution)
     {
-        return sprintf('import.%s', $this->jobName) === $jobExecution->getLabel();
+        return $this->jobName === $jobExecution->getLabel();
     }
 }

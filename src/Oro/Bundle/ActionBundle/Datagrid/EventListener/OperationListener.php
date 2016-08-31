@@ -192,7 +192,7 @@ class OperationListener
 
         $frontendOptions = $this->optionsHelper->getFrontendOptions($operation, $context);
 
-        return $frontendOptions['options'];
+        return array_merge($frontendOptions['options'], $frontendOptions['data']);
     }
 
     /**
@@ -231,16 +231,24 @@ class OperationListener
         $buttonOptions = $operation->getDefinition()->getButtonOptions();
         $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
 
-        return [
-            'type' => 'action-widget',
-            'label' => $operation->getDefinition()->getLabel(),
-            'rowAction' => false,
-            'link' => '#',
-            'icon' => $icon,
-            'options' => [
-                'operationName' => $operationName,
-            ]
-        ];
+        $buttonOptions['data']['options']['operationName'] = $operationName;
+
+        $config = array_merge(
+            [
+                'type' => 'action-widget',
+                'label' => $operation->getDefinition()->getLabel(),
+                'rowAction' => false,
+                'link' => '#',
+                'icon' => $icon,
+            ],
+            $buttonOptions['data']
+        );
+
+        if ($operation->getDefinition()->getOrder()) {
+            $config['order'] = $operation->getDefinition()->getOrder();
+        }
+
+        return $config;
     }
 
     /**

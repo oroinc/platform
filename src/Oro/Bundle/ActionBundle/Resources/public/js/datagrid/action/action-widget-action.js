@@ -26,11 +26,7 @@ define(function(require) {
         initialize: function() {
             ActionWidgetAction.__super__.initialize.apply(this, arguments);
 
-            var config = this.model.get('action_configuration') || {};
-
-            var options = config[this.options.operationName.toLowerCase()] || {};
-
-            this.actionManager = new ActionManager(options);
+            this.actionManager = new ActionManager(this);
         },
 
         /**

@@ -98,7 +98,12 @@ define([
             if (!options.datagrid) {
                 throw new TypeError('"datagrid" is required');
             }
-            this.order = options.order;
+            if (options.config) {
+                $.extend(true, this, options.config);
+            }
+            if (options.order) {
+                this.order = options.order;
+            }
             this.subviews = [];
             this.datagrid = options.datagrid;
             // make own messages property from prototype
