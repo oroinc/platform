@@ -24,7 +24,7 @@ define(function(require) {
 
         defaults: {
             enabled: true,
-            plugins: ['textcolor', 'code', 'bdesk_photo'],
+            plugins: ['textcolor', 'code', 'bdesk_photo', 'paste'],
             menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar: false,
@@ -122,13 +122,13 @@ define(function(require) {
                             }
                         });
                     }
-                    _.defer(function() {
+                    _.delay(function() {
                         /**
                          * fixes jumping dialog on refresh page
                          * (promise should be resolved in a separate process)
                          */
                         self._resolveDeferredRender();
-                    });
+                    }, 20);
                 }
             }, options));
             this.tinymceConnected = true;

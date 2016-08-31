@@ -83,7 +83,7 @@ class PermissionMapTest extends \PHPUnit_Framework_TestCase
                 32768 + (1 << 8),
                 32768 + (1 << 9)
             )),
-            array(new TestEntity(), 'SHARE', array(
+            array(new TestEntity(), 'PERMIT', array(
                 32768 + (1 << 10),
                 32768 + (1 << 11),
                 32768 + (1 << 12),
@@ -96,6 +96,9 @@ class PermissionMapTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public static function containsProvider()
     {
         return array(
@@ -104,7 +107,7 @@ class PermissionMapTest extends \PHPUnit_Framework_TestCase
             array('CREATE', true),
             array('DELETE', true),
             array('ASSIGN', true),
-            array('SHARE', true),
+            array('PERMIT', true),
             array('EXECUTE', true),
             array('OTHER', false),
         );

@@ -11,6 +11,28 @@ Usually you need to run this command when you add a new entity to `Resources/con
 php app/console oro:api:cache:clear
 ```
 
+### oro:api:doc:cache:clear
+
+This command allows to clear or warm-up API documentation cache.
+
+If this command is launched without parameters it warm-ups all API documentation caches:
+
+```bash
+php app/console oro:api:doc:cache:clear
+```
+
+Also you can use `--no-warmup` option if you need to clear the cache, but do not need to warm-up it:
+
+```bash
+php app/console oro:api:doc:cache:clear --no-warmup
+```
+
+To work only with the specified [API documentation views](https://github.com/nelmio/NelmioApiDocBundle/blob/master/Resources/doc/multiple-api-doc.rst) use `--view` option:
+
+```bash
+php app/console oro:api:doc:cache:clear --view=rest_json_api
+```
+
 ### oro:api:dump
 
 This command shows all resources accessible through Data API.
@@ -43,6 +65,12 @@ or
 
 ```bash
 php app/console oro:api:dump users --sub-resources
+```
+
+In additional you can use this command to get all entities that are not accessible through Data API. Use `--not-accessible` option for this:
+
+```bash
+php app/console oro:api:dump --not-accessible
 ```
 
 ### oro:api:debug

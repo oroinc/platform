@@ -1,15 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
-use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Transport\Null\NullQueue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class MessageProducerTest extends \PHPUnit_Framework_TestCase
@@ -18,40 +17,67 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageProducerInterface()
     {
-        $this->assertClassImplements(MessageProducerInterface::class, MessageProducer::class);
+        self::assertClassImplements(MessageProducerInterface::class, MessageProducer::class);
     }
 
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithDriverAsFirstArgument()
     {
-        new MessageProducer($this->createTransportMessageProducer(), $this->createDriverStub());
+        new MessageProducer($this->createDriverStub());
     }
 
-    public function testShouldSendMessageAndCreateSchema()
+    public function testShouldCreateQueueAndSendMessage()
     {
-        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
-        $queue = new NullQueue('queue');
+        $config = new Config('', '', 'theRouterQueue', '', '');
+        $queue = new NullQueue('therouterqueue');
 
-        $message = new NullMessage();
+        $message = new Message();
 
-        $messageProducer = $this->createTransportMessageProducer();
-        $messageProducer
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('createQueue')
+            ->with('therouterqueue')
+            ->willReturn($queue)
+        ;
+        $driver
             ->expects($this->once())
             ->method('send')
-            ->with($this->identicalTo($queue), $this->identicalTo($message))
+            ->with(self::identicalTo($queue), self::identicalTo($message))
         ;
 
-        $driver = $this->createDriverStub($message, $config, $queue);
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
+    }
 
-        $producer = new MessageProducer($messageProducer, $driver);
-        $producer->send('topic', 'message');
+    public function testShouldSendMessageToRouterProcessor()
+    {
+        $config = new Config('', 'theRouteMessageProcessor', 'theRouterQueue', '', '');
+        $queue = new NullQueue('queue');
+
+        $message = new Message();
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('createQueue')
+            ->willReturn($queue)
+        ;
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send('theTopic', $message);
 
         $expectedProperties = [
-            'oro.message_queue.client.topic_name' => 'topic',
-            'oro.message_queue.client.processor_name' => 'route-message-processor',
-            'oro.message_queue.client.queue_name' => 'router-queue',
+            'oro.message_queue.client.topic_name' => 'theTopic',
+            'oro.message_queue.client.processor_name' => 'theRouteMessageProcessor',
+            'oro.message_queue.client.queue_name' => 'therouterqueue',
         ];
 
-        $this->assertEquals($expectedProperties, $message->getProperties());
+        self::assertEquals($expectedProperties, $message->getProperties());
     }
 
     public function testShouldSendMessageWithNormalPriorityByDefault()
@@ -59,19 +85,19 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
         $queue = new NullQueue('queue');
 
-        $message = new NullMessage();
+        $message = new Message();
 
-        $messageProducer = $this->createTransportMessageProducer();
-
-        $driver = $this->createDriverStub($message, $config, $queue);
+        $driver = $this->createDriverStub($config, $queue);
         $driver
             ->expects($this->once())
-            ->method('setMessagePriority')
-            ->with($this->identicalTo($message), MessagePriority::NORMAL)
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
         ;
 
-        $producer = new MessageProducer($messageProducer, $driver);
-        $producer->send('topic', 'message');
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
+
+        self::assertSame(MessagePriority::NORMAL, $message->getPriority());
     }
 
     public function testShouldSendMessageWithCustomPriority()
@@ -79,41 +105,102 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
         $queue = new NullQueue('queue');
 
-        $message = new NullMessage();
+        $message = new Message();
+        $message->setPriority(MessagePriority::HIGH);
 
-        $messageProducer = $this->createTransportMessageProducer();
-
-        $driver = $this->createDriverStub($message, $config, $queue);
+        $driver = $this->createDriverStub($config, $queue);
         $driver
             ->expects($this->once())
-            ->method('setMessagePriority')
-            ->with($this->identicalTo($message), MessagePriority::HIGH)
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
         ;
 
-        $producer = new MessageProducer($messageProducer, $driver);
-        $producer->send('topic', 'message', MessagePriority::HIGH);
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
+
+        self::assertSame(MessagePriority::HIGH, $message->getPriority());
     }
 
-    public function testShouldSendNullAsPlainText()
+    public function testShouldSendMessageWithGeneratedMessageId()
     {
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
         $queue = new NullQueue('queue');
 
-        $message = new NullMessage();
+        $message = new Message();
 
-        $messageProducer = $this->createTransportMessageProducer();
-        $messageProducer
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
             ->expects($this->once())
             ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
         ;
 
-        $driver = $this->createDriverStub($message, $config, $queue);
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
 
-        $producer = new MessageProducer($messageProducer, $driver);
-        $producer->send('topic', null);
+        self::assertNotEmpty($message->getMessageId());
+    }
 
-        $this->assertSame('', $message->getBody());
-        $this->assertSame('text/plain', $message->getHeader('content_type'));
+    public function testShouldSendMessageWithCustomMessageId()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $message = new Message();
+        $message->setMessageId('theCustomMessageId');
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
+
+        self::assertSame('theCustomMessageId', $message->getMessageId());
+    }
+
+    public function testShouldSendMessageWithGeneratedTimestamp()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $message = new Message();
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
+
+        self::assertNotEmpty($message->getTimestamp());
+    }
+
+    public function testShouldSendMessageWithCustomTimestamp()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $message = new Message();
+        $message->setTimestamp('theCustomTimestamp');
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($message))
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
+
+        self::assertSame('theCustomTimestamp', $message->getTimestamp());
     }
 
     public function testShouldSendStringAsPlainText()
@@ -121,61 +208,163 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
         $queue = new NullQueue('queue');
 
-        $message = new NullMessage();
-
-        $messageProducer = $this->createTransportMessageProducer();
-        $messageProducer
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
             ->expects($this->once())
             ->method('send')
+            ->willReturnCallback(function (QueueInterface $queue, Message $message) {
+                self::assertSame('theStringMessage', $message->getBody());
+                self::assertSame('text/plain', $message->getContentType());
+            })
         ;
 
-        $driver = $this->createDriverStub($message, $config, $queue);
-
-        $producer = new MessageProducer($messageProducer, $driver);
-        $producer->send('topic', 'message');
-
-        $this->assertSame('message', $message->getBody());
-        $this->assertSame('text/plain', $message->getHeader('content_type'));
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', 'theStringMessage');
     }
 
-    public function testShouldSendArrayAsJson()
+    public function testShouldSendArrayAsJsonString()
     {
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
         $queue = new NullQueue('queue');
 
-        $message = new NullMessage();
-
-        $messageProducer = $this->createTransportMessageProducer();
-        $messageProducer
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
             ->expects($this->once())
             ->method('send')
+            ->willReturnCallback(function (QueueInterface $queue, Message $message) {
+                self::assertSame('{"foo":"fooVal"}', $message->getBody());
+                self::assertSame('application/json', $message->getContentType());
+            })
         ;
 
-        $driver = $this->createDriverStub($message, $config, $queue);
-
-        $producer = new MessageProducer($messageProducer, $driver);
+        $producer = new MessageProducer($driver);
         $producer->send('topic', ['foo' => 'fooVal']);
-
-        $this->assertSame('{"foo":"fooVal"}', $message->getBody());
-        $this->assertSame('application/json', $message->getHeader('content_type'));
     }
 
-    public function testThrowIfBodyIsNotSerializable()
+    public function testShouldConvertMessageArrayBodyJsonString()
     {
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
         $queue = new NullQueue('queue');
 
-        $message = new NullMessage();
+        $message = new Message();
+        $message->setBody(['foo' => 'fooVal']);
 
-        $messageProducer = $this->createTransportMessageProducer();
-        $messageProducer
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function (QueueInterface $queue, Message $message) {
+                self::assertSame('{"foo":"fooVal"}', $message->getBody());
+                self::assertSame('application/json', $message->getContentType());
+            })
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send('topic', $message);
+    }
+
+    public function testSendShouldForceScalarsToStringAndSetTextContentType()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function (QueueInterface $queue, Message $message) {
+                self::assertEquals('text/plain', $message->getContentType());
+
+                self::assertInternalType('string', $message->getBody());
+                self::assertEquals('12345', $message->getBody());
+            })
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send($queue, 12345);
+    }
+
+    public function testSendShouldForceMessageScalarsBodyToStringAndSetTextContentType()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+
+        $message = new Message();
+        $message->setBody(12345);
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function (QueueInterface $queue, Message $message) {
+                self::assertEquals('text/plain', $message->getContentType());
+
+                self::assertInternalType('string', $message->getBody());
+                self::assertEquals('12345', $message->getBody());
+            })
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send($queue, $message);
+    }
+
+    public function testSendShouldForceNullToEmptyStringAndSetTextContentType()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function (QueueInterface $queue, Message $message) {
+                self::assertEquals('text/plain', $message->getContentType());
+
+                self::assertInternalType('string', $message->getBody());
+                self::assertEquals('', $message->getBody());
+            })
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send($queue, null);
+    }
+
+    public function testSendShouldForceNullBodyToEmptyStringAndSetTextContentType()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+
+        $message = new Message();
+        $message->setBody(null);
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function (QueueInterface $queue, Message $message) {
+                self::assertEquals('text/plain', $message->getContentType());
+
+                self::assertInternalType('string', $message->getBody());
+                self::assertEquals('', $message->getBody());
+            })
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send($queue, $message);
+    }
+
+    public function testShouldThrowExceptionIfBodyIsObjectOnSend()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
             ->expects($this->never())
             ->method('send')
         ;
 
-        $driver = $this->createDriverStub($message, $config, $queue);
-
-        $producer = new MessageProducer($messageProducer, $driver);
+        $producer = new MessageProducer($driver);
 
         $this->setExpectedException(
             \InvalidArgumentException::class,
@@ -184,88 +373,52 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer->send('topic', new \stdClass());
     }
 
-
-
-    public function testSendShouldForceScalarsToStringAndSetTextContentType()
+    public function testShouldThrowExceptionIfBodyIsArrayWithObjectsInsideOnSend()
     {
         $config = new Config('', 'route-message-processor', 'router-queue', '', '');
-        $queue = new NullQueue('');
-        $message = new NullMessage();
+        $queue = new NullQueue('queue');
 
-        $sentMessage = null;
-
-        $messageProcessor = $this->createTransportMessageProducer();
-        $messageProcessor
-            ->expects($this->once())
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->never())
             ->method('send')
-            ->willReturnCallback(function ($destination, $message) use (&$sentMessage) {
-                $sentMessage = $message;
-            })
         ;
 
-        $producer = new MessageProducer($messageProcessor, $this->createDriverStub($message, $config, $queue));
-        $producer->send($queue, 12345);
-
-        $this->assertInstanceOf(MessageInterface::class, $sentMessage);
-        $this->assertEquals(['content_type' => 'text/plain'], $sentMessage->getHeaders());
-        $this->assertInternalType('string', $sentMessage->getBody());
-        $this->assertEquals('12345', $sentMessage->getBody());
-    }
-
-    public function testSendShouldForceNullToStringAndSetTextContentType()
-    {
-        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
-        $queue = new NullQueue('');
-        $message = new NullMessage();
-
-        $sentMessage = null;
-
-        $messageProcessor = $this->createTransportMessageProducer();
-        $messageProcessor
-            ->expects($this->once())
-            ->method('send')
-            ->willReturnCallback(function ($destination, $message) use (&$sentMessage) {
-                $sentMessage = $message;
-            })
-        ;
-
-        $producer = new MessageProducer($messageProcessor, $this->createDriverStub($message, $config, $queue));
-        $producer->send($queue, null);
-
-        $this->assertInstanceOf(MessageInterface::class, $sentMessage);
-        $this->assertEquals(['content_type' => 'text/plain'], $sentMessage->getHeaders());
-        $this->assertInternalType('string', $sentMessage->getBody());
-        $this->assertEquals('', $sentMessage->getBody());
-    }
-
-    public function testSendShouldThrowExceptionIfBodyIsObject()
-    {
-        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
-        $queue = new NullQueue('');
-        $message = new NullMessage();
-
-        $messageProcessor = $this->createTransportMessageProducer();
-
-        $producer = new MessageProducer($messageProcessor, $this->createDriverStub($message, $config, $queue));
+        $producer = new MessageProducer($driver);
 
         $this->setExpectedException(
             \LogicException::class,
-            'The message\'s body must be either null, scalar or array. Got: stdClass'
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
-        $producer->send($queue, new \stdClass);
+        $producer->send($queue, ['foo' => new \stdClass]);
+    }
+
+    public function testShouldThrowExceptionIfBodyIsArrayWithObjectsInSubArraysInsideOnSend()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $driver = $this->createDriverStub($config, $queue);
+        $driver
+            ->expects($this->never())
+            ->method('send')
+        ;
+
+        $producer = new MessageProducer($driver);
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
+        );
+        $producer->send($queue, ['foo' => ['bar' => new \stdClass]]);
     }
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
      */
-    protected function createDriverStub($message = null, $config = null, $queue = null)
+    protected function createDriverStub($config = null, $queue = null)
     {
         $driverMock = $this->getMock(DriverInterface::class, [], [], '', false);
-        $driverMock
-            ->expects($this->any())
-            ->method('createMessage')
-            ->will($this->returnValue($message))
-        ;
         $driverMock
             ->expects($this->any())
             ->method('getConfig')
@@ -278,13 +431,5 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         return $driverMock;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TransportMessageProducer
-     */
-    protected function createTransportMessageProducer()
-    {
-        return $this->getMock(TransportMessageProducer::class, [], [], '', false);
     }
 }

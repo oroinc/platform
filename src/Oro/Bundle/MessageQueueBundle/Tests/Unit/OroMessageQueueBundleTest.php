@@ -8,6 +8,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistr
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
+use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -82,6 +83,28 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(1))
             ->method('addTransportFactory')
             ->with($this->isInstanceOf(NullTransportFactory::class))
+        ;
+
+        $container = $this->getMock(ContainerBuilder::class);
+        $container
+            ->expects($this->at(5))
+            ->method('getExtension')
+            ->with('oro_message_queue')
+            ->willReturn($extensionMock)
+        ;
+
+        $bundle = new OroMessageQueueBundle();
+        $bundle->build($container);
+    }
+
+    public function testShouldRegisterDbalTransportFactory()
+    {
+        $extensionMock = $this->getMock(OroMessageQueueExtension::class, [], [], '', false);
+
+        $extensionMock
+            ->expects($this->at(2))
+            ->method('addTransportFactory')
+            ->with($this->isInstanceOf(DbalTransportFactory::class))
         ;
 
         $container = $this->getMock(ContainerBuilder::class);

@@ -9,7 +9,7 @@ use Symfony\Component\Process\Process;
 class FileCacheDumper implements DumperInterface
 {
     /** The max runtime for a process in seconds */
-    const TIMEOUT = 30;
+    const TIMEOUT = 120;
 
     /** @var string */
     protected $cacheDir;

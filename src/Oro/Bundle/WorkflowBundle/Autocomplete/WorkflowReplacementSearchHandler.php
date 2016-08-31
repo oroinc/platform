@@ -7,33 +7,32 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowReplacementSearchHandler extends SearchHandler
 {
     const DELIMITER = ';';
 
-    /**
-     * @var WorkflowManager
-     */
-    protected $workflowManager;
+    /** @var WorkflowRegistry */
+    protected $workflowRegistry;
 
     /**
      * {@inheritdoc}
      */
     protected function checkAllDependenciesInjected()
     {
-        if (!$this->entityRepository || !$this->idFieldName || !$this->workflowManager) {
+        if (!$this->entityRepository || !$this->idFieldName || !$this->workflowRegistry) {
             throw new \RuntimeException('Search handler is not fully configured');
         }
     }
 
     /**
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowRegistry $workflowRegistry
      */
-    public function setWorkflowManager(WorkflowManager $workflowManager)
+    public function setWorkflowRegistry(WorkflowRegistry $workflowRegistry)
     {
-        $this->workflowManager = $workflowManager;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     /**
@@ -45,7 +44,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
             return [];
         }
 
-        list($searchTerm, $entityId) = $this->explodeSearchTerm($search);
+        list($searchTerm, $workflowName) = $this->explodeSearchTerm($search);
 
         /* @var $queryBuilder QueryBuilder */
         $queryBuilder = $this->entityRepository->createQueryBuilder('w');
@@ -59,15 +58,20 @@ class WorkflowReplacementSearchHandler extends SearchHandler
                 ->setParameter('search', '%' . $searchTerm . '%');
         }
 
-        if ($entityId) {
+        if ($workflowName) {
             $queryBuilder
                 ->andWhere($queryBuilder->expr()->notIn('w.' . $this->idFieldName, ':id'))
-                ->setParameter('id', $entityId);
+                ->setParameter('id', $this->getWorkflowNamesForExclusion($workflowName));
         }
 
-        return array_filter($queryBuilder->getQuery()->getResult(), function (WorkflowDefinition $definition) {
-            return $this->workflowManager->isActiveWorkflow($definition);
-        });
+        $workflows = $queryBuilder->getQuery()->getResult();
+
+        return array_filter(
+            $workflows,
+            function (WorkflowDefinition $definition) {
+                return $definition->isActive();
+            }
+        );
     }
 
     /**
@@ -78,8 +82,33 @@ class WorkflowReplacementSearchHandler extends SearchHandler
     {
         $delimiterPos = strrpos($search, self::DELIMITER);
         $searchTerm = substr($search, 0, $delimiterPos);
-        $entityId = substr($search, $delimiterPos + 1);
+        $workflowName = substr($search, $delimiterPos + 1);
 
-        return [$searchTerm, $entityId === false ? '' : $entityId];
+        return [$searchTerm, (string) $workflowName];
+    }
+
+    /**
+     * @param string $workflowName
+     * @return array
+     */
+    protected function getWorkflowNamesForExclusion($workflowName)
+    {
+        $workflow = $this->workflowRegistry->getWorkflow($workflowName);
+        if ($workflow) {
+            $activeWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
+                $workflow->getDefinition()->getExclusiveActiveGroups()
+            );
+
+            $workflows = array_map(
+                function (Workflow $workflow) {
+                    return $workflow->getName();
+                },
+                $activeWorkflows
+            );
+        }
+
+        $workflows[] = $workflowName;
+
+        return array_unique($workflows);
     }
 }

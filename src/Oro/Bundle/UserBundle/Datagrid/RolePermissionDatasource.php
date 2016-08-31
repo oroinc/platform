@@ -31,13 +31,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var AbstractRole */
     protected $role;
 
-    /** @var string[] Exclude share permissions in platform application because it is enterprise feature
-     * Should be fixed by - CRM-5781 */
-    protected static $excludePermissions = ['SHARE'];
-
     /**
-     * RolePermissionDatasource constructor.
-     *
      * @param TranslatorInterface           $translator
      * @param PermissionManager             $permissionManager
      * @param AclRoleHandler                $aclRoleHandler
@@ -123,7 +117,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
      */
     protected function preparePermissions(AclPrivilege $privilege, $item)
     {
-        $orders = [];
+        $permissions = [];
         foreach ($privilege->getPermissions() as $permissionName => $permission) {
             /** @var AclPermission $permission */
             $permissionEntity = $this->permissionManager->getPermissionByName($permission->getName());
@@ -134,26 +128,22 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
                     $permissionName,
                     $permission
                 );
-                $item['permissions'][] = $privilegePermission;
-                $orders[] = $privilegePermission['label'];
+                $permissions[$permission->getName()] = $privilegePermission;
             }
         }
-        array_multisort($orders, $item['permissions']);
+        $item['permissions'] = $this->sortPermissions($permissions);
 
         return $item;
     }
 
     /**
-     * Filter some permissions like SHARE in platform. Should be fixed by - CRM-5781
-     * Should be fixed in PermissionCollectionType too.
-     *
      * @param string $permissionName
      *
      * @return bool
      */
     protected function isSupportedPermission($permissionName)
     {
-        return !in_array($permissionName, static::$excludePermissions, true);
+        return true;
     }
 
     /**
@@ -200,5 +190,33 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     protected function getRoleTranslationPrefix()
     {
         return AclAccessLevelSelectorType::TRANSLATE_KEY_ACCESS_LEVEL . '.';
+    }
+
+    /**
+     * Sort permissions. The CRUD permissions goes first and other ordered by the alphabet.
+     *
+     * @param array $permissions
+     *
+     * @return array
+     */
+    protected function sortPermissions(array $permissions)
+    {
+        $result = [];
+        $permissionsList = ['VIEW', 'CREATE', 'EDIT', 'DELETE'];
+        foreach ($permissionsList as $permissionName) {
+            if (array_key_exists($permissionName, $permissions)) {
+                $result[] = $permissions[$permissionName];
+                unset($permissions[$permissionName]);
+            }
+        }
+
+        if (count($permissions)) {
+            ksort($permissions);
+            foreach ($permissions as $permission) {
+                $result[] = $permission;
+            }
+        }
+
+        return $result;
     }
 }

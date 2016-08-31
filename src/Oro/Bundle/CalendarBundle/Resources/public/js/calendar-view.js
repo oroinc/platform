@@ -23,7 +23,7 @@ define(function(require) {
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
     var persistentStorage = require('oroui/js/persistent-storage');
-    require('jquery.fullcalendar');
+    require('fullcalendar');
 
     CalendarView = BaseView.extend({
         MOMENT_BACKEND_FORMAT: dateTimeFormatter.getBackendDateTimeFormat(),
@@ -143,7 +143,12 @@ define(function(require) {
                 }
 
                 if (defaultDate && !isNaN(defaultDate)) {
-                    this.options.eventsOptions.defaultDate =  moment.unix(defaultDate);
+                    defaultDate = moment.unix(defaultDate);
+                    this.options.eventsOptions.defaultDate = defaultDate;
+                    /**
+                     * @TODO This is hotfix. Should be fixed in CRM-6061
+                     */
+                    this.enableEventLoading = (defaultDate.format('M') !== moment().format('M'));
                 }
             }
 

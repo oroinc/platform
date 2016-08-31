@@ -27,7 +27,7 @@ class WorkflowExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('has_workflows', [$this->workflowManager, 'hasApplicableWorkflowsByEntityClass']),
+            new \Twig_SimpleFunction('has_workflows', [$this->workflowManager, 'hasApplicableWorkflows']),
             new \Twig_SimpleFunction('has_workflow_items', [$this->workflowManager, 'hasWorkflowItemsByEntity'])
         ];
     }

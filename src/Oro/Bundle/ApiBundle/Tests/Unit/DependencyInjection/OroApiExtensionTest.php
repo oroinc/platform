@@ -40,22 +40,14 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry = new ConfigExtensionRegistry(3);
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
-        $container->set('oro_api.config_extension_registry', $configExtensionRegistry);
+        $container->set(OroApiExtension::CONFIG_EXTENSION_REGISTRY_SERVICE_ID, $configExtensionRegistry);
 
         $extension->load([], $container);
 
-        $this->assertNotNull(
-            $container->getDefinition('oro_api.config_bag'),
-            'Expected oro_api.config_bag service'
-        );
-        $this->assertNotNull(
-            $container->getDefinition('oro_api.entity_exclusion_provider.config'),
-            'Expected oro_api.entity_exclusion_provider.config service'
-        );
-        $this->assertNotNull(
-            $container->getDefinition('oro_api.entity_exclusion_provider'),
-            'Expected oro_api.entity_exclusion_provider service'
-        );
+        $this->assertServiceExists($container, OroApiExtension::CONFIG_BAG_SERVICE_ID);
+        $this->assertServiceExists($container, OroApiExtension::ENTITY_ALIAS_PROVIDER_SERVICE_ID);
+        $this->assertServiceExists($container, OroApiExtension::CONFIG_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID);
+        $this->assertServiceExists($container, OroApiExtension::ENTITY_EXCLUSION_PROVIDER_SERVICE_ID);
 
         $this->assertEquals(
             [
@@ -135,7 +127,29 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 'relations' => [],
             ],
-            $container->getDefinition('oro_api.config_bag')->getArgument(0)
+            $container->getDefinition(OroApiExtension::CONFIG_BAG_SERVICE_ID)->getArgument(0)
+        );
+
+        $this->assertEquals(
+            [
+                'Test\Entity4' => [
+                    'alias'        => 'entity4',
+                    'plural_alias' => 'entity4_plural'
+                ],
+                'Test\Entity5' => [
+                    'alias'        => 'entity5',
+                    'plural_alias' => 'entity5_plural'
+                ],
+            ],
+            $container->getDefinition(OroApiExtension::ENTITY_ALIAS_PROVIDER_SERVICE_ID)->getArgument(0)
+        );
+        $this->assertEquals(
+            [
+                'Test\Entity1',
+                'Test\Entity2',
+                'Test\Entity3',
+            ],
+            $container->getDefinition(OroApiExtension::ENTITY_ALIAS_PROVIDER_SERVICE_ID)->getArgument(1)
         );
 
         $this->assertEquals(
@@ -144,14 +158,27 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
                 ['entity' => 'Test\Entity2'],
                 ['entity' => 'Test\Entity3'],
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider.config')->getArgument(1)
+            $container->getDefinition(OroApiExtension::CONFIG_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID)->getArgument(1)
         );
+
         $this->assertEquals(
             [
                 ['entity' => 'Test\Entity12'],
                 ['entity' => 'Test\Entity12', 'field' => 'field1'],
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider')->getArgument(1)
+            $container->getDefinition(OroApiExtension::ENTITY_EXCLUSION_PROVIDER_SERVICE_ID)->getArgument(1)
+        );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $serviceId
+     */
+    protected function assertServiceExists(ContainerBuilder $container, $serviceId)
+    {
+        $this->assertNotNull(
+            $container->getDefinition($serviceId),
+            sprintf('Expected "%s" service', $serviceId)
         );
     }
 }

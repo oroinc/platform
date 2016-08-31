@@ -9,6 +9,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class CreateEntityRestrictionsTable implements Migration
 {
+    /**
+     * {@inheritdoc}
+     */
     public function up(Schema $schema, QueryBag $queries)
     {
         self::createOroWorkflowEntityRestrictionsTable($schema);

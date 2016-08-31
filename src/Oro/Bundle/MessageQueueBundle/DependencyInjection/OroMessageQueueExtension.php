@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
+use Oro\Component\MessageQueue\Client\DbalDriver;
+use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\DependencyInjection\TransportFactoryInterface;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -58,12 +63,16 @@ class OroMessageQueueExtension extends Extension
         if (isset($config['client'])) {
             $loader->load('client.yml');
 
-            $routerProcessorName = 'oro_message_queue.client.route_message_processor';
+            $driverFactory = $container->getDefinition('oro_message_queue.client.driver_factory');
+            $driverFactory->replaceArgument(0, [
+                NullConnection::class => NullDriver::class,
+                DbalConnection::class => DbalDriver::class,
+            ]);
 
             $configDef = $container->getDefinition('oro_message_queue.client.config');
             $configDef->setArguments([
                 $config['client']['prefix'],
-                $config['client']['router_processor'] ?: $routerProcessorName,
+                $config['client']['router_processor'],
                 $config['client']['router_destination'],
                 $config['client']['default_destination'],
             ]);
@@ -80,6 +89,25 @@ class OroMessageQueueExtension extends Extension
 
                 $container->setDefinition('oro_message_queue.client.message_producer', $traceableMessageProducer);
             }
+
+            $delayRedeliveredExtension = $container->getDefinition(
+                'oro_message_queue.client.delay_redelivered_message_extension'
+            );
+            $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return Configuration
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        $rc = new \ReflectionClass(Configuration::class);
+
+        $container->addResource(new FileResource($rc->getFileName()));
+
+        return new Configuration($this->factories);
     }
 }
