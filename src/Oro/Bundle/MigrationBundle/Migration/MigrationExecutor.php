@@ -144,11 +144,18 @@ class MigrationExecutor
 
             $schema = $toSchema;
 
+            $isSchemaUpdateRequired = false;
             foreach ($queries as $query) {
                 $this->queryExecutor->execute($query, $dryRun);
+                if (is_object($query) && $query instanceof SchemaUpdateQuery) {
+                    // check if schema update required
+                    if (!$isSchemaUpdateRequired && $query->isUpdateRequired()) {
+                        $isSchemaUpdateRequired = true;
+                    }
+                }
             }
 
-            if ($queryBag->getPreQueries() || $queryBag->getPostQueries()) {
+            if ($isSchemaUpdateRequired) {
                 $schema = $this->getActualSchema();
             }
         } catch (\Exception $ex) {

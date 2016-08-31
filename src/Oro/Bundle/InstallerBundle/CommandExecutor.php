@@ -13,7 +13,7 @@ use Symfony\Component\Process\ProcessBuilder;
 
 class CommandExecutor
 {
-    const DEFAULT_TIMEOUT = 300;
+    const DEFAULT_TIMEOUT = 600;
 
     /**
      * @var string|null
