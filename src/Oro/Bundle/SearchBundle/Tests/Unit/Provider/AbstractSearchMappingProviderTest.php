@@ -2,25 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
 abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AbstractSearchMappingProvider */
     protected $provider;
-
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $eventDispatcher;
-
-    /** @var Cache|null|\PHPUnit_Framework_MockObject_MockObject */
-    protected $cacheDriver;
 
     /** @var array */
     protected $testMapping = [
@@ -36,22 +23,12 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
 
     protected function setUp()
     {
-        $this->eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->eventDispatcher->expects($this->any())
-            ->method('dispatch');
+        $this->provider = $this->getProvider();
     }
 
     protected function tearDown()
     {
-        unset($this->provider, $this->eventDispatcher);
-    }
-
-    public function testGetMappingConfig()
-    {
-        $this->assertEquals($this->testMapping, $this->provider->getMappingConfig());
+        unset($this->provider);
     }
 
     public function testGetEntitiesListAliases()
@@ -149,4 +126,9 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
             $this->provider->getEntityClass('unknown_entity')
         );
     }
+
+    /**
+     * @return AbstractSearchMappingProvider
+     */
+    abstract protected function getProvider();
 }

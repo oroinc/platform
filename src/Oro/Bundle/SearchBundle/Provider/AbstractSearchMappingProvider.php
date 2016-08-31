@@ -2,59 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\ArrayCache;
-
 abstract class AbstractSearchMappingProvider
 {
-    const CACHE_KEY = 'oro_abstract_search.mapping_config';
-
-    /** @var array */
-    protected $cacheDriver;
-
-    /** @var array */
-    protected $mappingConfig;
-
-    /** @var bool */
-    protected $isCollected = false;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param Cache|null               $cacheDriver
-     */
-    public function __construct(EventDispatcherInterface $dispatcher, Cache $cacheDriver = null)
-    {
-        $this->dispatcher = $dispatcher;
-        $this->cacheDriver = $cacheDriver ?: new ArrayCache();
-    }
-
-    /**
-     * @param array $mappingConfig
-     */
-    public function setMappingConfig($mappingConfig)
-    {
-        $this->mappingConfig = $mappingConfig;
-    }
-
-    /**
-     * Get full mapping config
-     *
      * @return array
      */
     abstract public function getMappingConfig();
-
-    /**
-     * Clears mapping cache
-     */
-    public function clearMappingCache()
-    {
-        $this->cacheDriver->delete(static::CACHE_KEY);
-    }
 
     /**
      * Get array with entity aliases

@@ -21,8 +21,6 @@ parameters:
     oro_search.extension.orm_pager.class:          Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
     oro_search.extension.pager.search.pager.class: Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
 
-    oro_search.provider.search_mapping.class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
-
     oro_search.cache.search_mapping_cache.class: Oro\Bundle\SearchBundle\Cache\SearchMappingCache
     oro_search.event_listener.search_mapping_change_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchMappingChangeListener
 
@@ -176,11 +174,17 @@ services:
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
+    oro_search.cache.mapping_configuration:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_search_mapping_configuration' ] ]
+
     oro_search.provider.search_mapping:
-        class: %oro_search.provider.search_mapping.class%
+        class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
         arguments:
             - '@event_dispatcher'
-            - '@doctrine.orm.default_metadata_cache'
+            - '@oro_search.cache.mapping_configuration'
         calls:
             - [setMappingConfig, [%oro_search.entities_config%]]
 
@@ -204,6 +208,7 @@ services:
             - '@oro_search.provider.search_mapping'
         tags:
             - { name: kernel.cache_warmer }
+            - { name: kernel.cache_clearer }
 
     oro_website_search.fulltext_index_manager:
         class: '%oro_search.fulltext_index_manager.class%'
