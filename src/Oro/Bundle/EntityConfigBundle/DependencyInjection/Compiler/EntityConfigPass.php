@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -13,8 +14,6 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 class EntityConfigPass implements CompilerPassInterface
 {
     const CONFIG_MANAGER_SERVICE = 'oro_entity_config.config_manager';
-
-    const CONFIG_ROOT_NODE = 'entity_config';
 
     /**
      * {@inheritdoc}
@@ -31,8 +30,8 @@ class EntityConfigPass implements CompilerPassInterface
         $resources = $configLoader->load($container);
         $scopes    = [];
         foreach ($resources as $resource) {
-            if (!empty($resource->data[self::CONFIG_ROOT_NODE])) {
-                foreach ($resource->data[self::CONFIG_ROOT_NODE] as $scope => $config) {
+            if (!empty($resource->data[Configuration::ROOT_NODE])) {
+                foreach ($resource->data[Configuration::ROOT_NODE] as $scope => $config) {
                     if (!empty($scopes[$scope])) {
                         $scopes[$scope] = array_merge_recursive($scopes[$scope], $config);
                     } else {

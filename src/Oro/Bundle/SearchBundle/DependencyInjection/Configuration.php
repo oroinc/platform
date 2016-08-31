@@ -15,6 +15,8 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_ENGINE                 = 'orm';
     const RELATION_FIELDS_NODE_MAX_LEVEL = 4;
 
+    const ROOT_NODE = 'oro_search';
+
     protected $targetTypes   = array(
         Query::TYPE_TEXT,
         Query::TYPE_DECIMAL,
@@ -38,7 +40,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_search');
+        $rootNode    = $treeBuilder->root(self::ROOT_NODE);
 
         $rootNode
             ->children()

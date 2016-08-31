@@ -17,7 +17,7 @@ class OroHelpExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
         $this->setConfigurationToLinkProvider($configs, $container);
@@ -38,7 +38,7 @@ class OroHelpExtension extends Extension
         $configuration = array_merge_recursive($bundleConfig, $applicationConfig);
 
         $linkProvider = $container->getDefinition('oro_help.model.help_link_provider');
-        $linkProvider->addMethodCall('setConfiguration', array($configuration));
+        $linkProvider->addMethodCall('setConfiguration', [$configuration]);
     }
 
     /**
@@ -53,11 +53,13 @@ class OroHelpExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_help',
-            new YamlCumulativeFileLoader('Resources/config/oro/oro_help.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/help.yml')
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $result[] = $resource->data;
+            if (array_key_exists(BundleConfiguration::CONFIG_ROOT_NODE, $resource->data)) {
+                $result[] = $resource->data[BundleConfiguration::CONFIG_ROOT_NODE];
+            }
         }
 
         return $result;
