@@ -130,6 +130,82 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      * @param array $bundles
      * @param array $mergedConfiguration
      */
+    public function testGetDependentsConfigurationNotInCache(
+        array $configuration,
+        array $bundles,
+        array $mergedConfiguration
+    ) {
+        $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        $cache = $this->getMock(CacheProvider::class);
+        $configurationProvider = new ConfigurationProvider(
+            $configuration,
+            $bundles,
+            $config,
+            $cache
+        );
+
+        $ignoreCache = false;
+        $cache->expects($this->once())
+            ->method('contains')
+            ->with(FeatureToggleConfiguration::ROOT)
+            ->willReturn(false);
+        $cache->expects($this->once())
+            ->method('delete')
+            ->with(FeatureToggleConfiguration::ROOT);
+        $cache->expects($this->once())
+            ->method('save')
+            ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
+
+        $this->assertEquals(
+            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENT_FEATURES],
+            $configurationProvider->getDependentsConfiguration($ignoreCache)
+        );
+    }
+
+    /**
+     * @dataProvider configurationDataProvider
+     * @param array $configuration
+     * @param array $bundles
+     * @param array $mergedConfiguration
+     */
+    public function testGetDependentsConfigurationInCache(
+        array $configuration,
+        array $bundles,
+        array $mergedConfiguration
+    ) {
+        $config = new FeatureToggleConfiguration();
+        /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
+        $cache = $this->getMock(CacheProvider::class);
+        $configurationProvider = new ConfigurationProvider(
+            $configuration,
+            $bundles,
+            $config,
+            $cache
+        );
+
+        $ignoreCache = false;
+        $cache->expects($this->once())
+            ->method('contains')
+            ->with(FeatureToggleConfiguration::ROOT)
+            ->willReturn(true);
+        $cache->expects($this->once())
+            ->method('fetch')
+            ->with(FeatureToggleConfiguration::ROOT)
+            ->willReturn($mergedConfiguration);
+
+        $this->assertEquals(
+            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENT_FEATURES],
+            $configurationProvider->getDependentsConfiguration($ignoreCache)
+        );
+    }
+
+    /**
+     * @dataProvider configurationDataProvider
+     * @param array $configuration
+     * @param array $bundles
+     * @param array $mergedConfiguration
+     */
     public function testGetDependenciesConfigurationNotInCache(
         array $configuration,
         array $bundles,
@@ -314,6 +390,11 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'feature1' => ['feature2'],
                             'feature2' => [],
                             'feature3' => ['feature1', 'feature2'],
+                        ],
+                        ConfigurationProvider::DEPENDENT_FEATURES => [
+                            'feature1' => ['feature3'],
+                            'feature2' => ['feature1', 'feature3'],
+                            'feature3' => [],
                         ],
                     ],
                 ],

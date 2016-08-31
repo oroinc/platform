@@ -163,6 +163,29 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testResetCache()
+    {
+        /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        $configManager = $this->getMockBuilder(ConfigurationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $checker = new FeatureChecker($configManager);
+
+        $checker->isFeatureEnabled('feature1');
+
+        $reflectionClass = new \ReflectionClass($checker);
+
+        $reflectionProperty = $reflectionClass->getProperty('featuresStates');
+        $reflectionProperty->setAccessible(true);
+
+        $this->assertNotEmpty($reflectionProperty->getValue($checker));
+
+        $checker->resetCache();
+
+        $this->assertEmpty($reflectionProperty->getValue($checker));
+    }
+
     /**
      * @param int $enabled
      * @param int $disabled

@@ -76,4 +76,37 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($dependsOn, $this->configurationManager->getFeatureDependencies($feature));
     }
+
+    public function testGetFeatureDependents()
+    {
+        $feature = 'feature1';
+        $dependents = ['feature2', 'feature3'];
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getDependentsConfiguration')
+            ->willReturn([$feature => $dependents]);
+
+        $this->assertEquals($dependents, $this->configurationManager->getFeatureDependents($feature));
+    }
+
+    public function testGetFeatureByToggle()
+    {
+        $feature = 'feature1';
+        $toggle = 'oro_bundle.toggle_key';
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([$feature => ['toggle' => $toggle]]);
+
+        $this->assertSame($feature, $this->configurationManager->getFeatureByToggle($toggle));
+    }
+
+    public function testGetFeatureByWrongToggle()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getFeaturesConfiguration')
+            ->willReturn(['feature1' => ['toggle' => 'oro_bundle.toggle_key']]);
+
+        $this->assertNull($this->configurationManager->getFeatureByToggle('wrong_toggle_key'));
+    }
 }

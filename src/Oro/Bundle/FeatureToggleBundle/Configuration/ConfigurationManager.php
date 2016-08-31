@@ -34,6 +34,23 @@ class ConfigurationManager
     }
 
     /**
+     * @param string $toggle
+     * @return null|string
+     */
+    public function getFeatureByToggle($toggle)
+    {
+        $configuration = $this->configurationProvider->getFeaturesConfiguration();
+        
+        foreach ($configuration as $featureName => $featureConfig) {
+            if ($featureConfig['toggle'] == $toggle) {
+                return $featureName;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
      * @param string $resourceType
      * @param string $resource
      * @return array
@@ -57,6 +74,20 @@ class ConfigurationManager
     public function getFeatureDependencies($feature)
     {
         $configuration = $this->configurationProvider->getDependenciesConfiguration();
+        if (array_key_exists($feature, $configuration)) {
+            return $configuration[$feature];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param string $feature
+     * @return array
+     */
+    public function getFeatureDependents($feature)
+    {
+        $configuration = $this->configurationProvider->getDependentsConfiguration();
         if (array_key_exists($feature, $configuration)) {
             return $configuration[$feature];
         }
