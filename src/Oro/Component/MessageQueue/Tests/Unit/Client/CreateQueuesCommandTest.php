@@ -23,8 +23,8 @@ class CreateQueuesCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCreateQueues()
     {
-        $destinationMeta1 = new DestinationMeta('queue1', '');
-        $destinationMeta2 = new DestinationMeta('queue2', '');
+        $destinationMeta1 = new DestinationMeta('', 'queue1');
+        $destinationMeta2 = new DestinationMeta('', 'queue2');
 
         $destinationMetaRegistry = $this->createDestinationMetaRegistryMock();
         $destinationMetaRegistry
