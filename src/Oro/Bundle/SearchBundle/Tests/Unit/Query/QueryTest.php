@@ -158,6 +158,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ],
             $query->getSelect()
         );
+
+        $query->addSelect('');
+        $this->assertCount(4, $query->getSelect());
     }
 
     public function testStringQueryWithSelect()

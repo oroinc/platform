@@ -25,13 +25,25 @@ class MysqlDumper extends AbstractDbDumper
     public function restore()
     {
         $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -u %s'.
-            ' && MYSQL_PWD=%1$s mysql -e "create database %2$s;" -h %3$s -u %4$s'.
-            ' && MYSQL_PWD=%1$s mysql -h %3$s -u %4$s %2$s < %5$s/%2$s.sql',
+            'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -u %s',
             $this->dbPass,
             $this->dbName,
             $this->dbHost,
+            $this->dbUser
+        ));
+        $this->runProcess(sprintf(
+            'MYSQL_PWD=%s mysql -e "create database %s;" -h %s -u %s',
+            $this->dbPass,
+            $this->dbName,
+            $this->dbHost,
+            $this->dbUser
+        ));
+        $this->runProcess(sprintf(
+            'MYSQL_PWD=%s mysql -h %s -u %s %s < %s/%4$s.sql',
+            $this->dbPass,
+            $this->dbHost,
             $this->dbUser,
+            $this->dbName,
             $this->cacheDir
         ));
     }
