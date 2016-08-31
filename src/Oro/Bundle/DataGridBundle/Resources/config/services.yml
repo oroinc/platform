@@ -151,7 +151,7 @@ services:
     oro_datagrid.config.dumper:
             class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
             public: false
-            lazy: true
+            #lazy: true
             arguments: [ %kernel.cache_dir%, %kernel.debug%, 'oro_datagrid' ]
 
     oro_datagrid.event_listener.mixin:

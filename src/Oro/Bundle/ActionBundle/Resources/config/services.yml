@@ -160,7 +160,7 @@ services:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
             - { name: oro_datagrid.extension }
-        lazy: true
+        #lazy: true
 
     oro_action.datagrid.action.action_widget_action:
         class: %oro_action.datagrid.action.action_widget_action.class%

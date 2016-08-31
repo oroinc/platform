@@ -8,7 +8,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class CumulativeConfigMetadataDumper implements ConfigMetadataDumperInterface
 {
-    /** @var string  */
+    /** @var string */
     protected $cacheDir;
 
     /** @var bool */
@@ -61,12 +61,11 @@ class CumulativeConfigMetadataDumper implements ConfigMetadataDumperInterface
      */
     public function isFresh()
     {
-        $file = $this->getMetaFile();
-
         if (!$this->isDebug) {
             return true;
         }
 
+        $file = $this->getMetaFile();
         if (!is_file($file)) {
             return false;
         }
