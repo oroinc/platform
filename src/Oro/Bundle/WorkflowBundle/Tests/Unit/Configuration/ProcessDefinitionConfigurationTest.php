@@ -36,44 +36,45 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function processDataProvider()
     {
-        return array(
-            'minimum data' => array(
-                'input' => array(
+        return [
+            'minimum data' => [
+                'input' => [
                     'label' => 'My Label',
                     'entity' => 'My\Entity',
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'label' => 'My Label',
                     'entity' => 'My\Entity',
                     'enabled' => true,
                     'order' => 0,
-                    'exclude_definitions'   => array(),
-                    'actions_configuration' => array(),
-                    'pre_conditions' => array()
-                ),
-            ),
-            'maximum data' => array(
-                'input' => array(
+                    'exclude_definitions'   => [],
+                    'actions_configuration' => [],
+                    'preconditions' => []
+                ],
+            ],
+            'maximum data' => [
+                'input' => [
                     'name' => 'my_definition',
                     'label' => 'My Label',
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'exclude_definitions'   => array(),
-                    'actions_configuration' => array('key' => 'value'),
-                    'pre_conditions' => array('test')
-                ),
-                'expected' => array(
+                    'exclude_definitions'   => [],
+                    'actions_configuration' => ['key' => 'value'],
+                    'preconditions' => ['test'],
+                    'pre_conditions' => ['test2'],
+                ],
+                'expected' => [
                     'name' => 'my_definition',
                     'label' => 'My Label',
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'exclude_definitions'   => array(),
-                    'actions_configuration' => array('key' => 'value'),
-                    'pre_conditions' => array('test')
-                ),
-            ),
-        );
+                    'exclude_definitions'   => [],
+                    'actions_configuration' => ['key' => 'value'],
+                    'preconditions' => ['test', 'test2'],
+                ],
+            ],
+        ];
     }
 }
