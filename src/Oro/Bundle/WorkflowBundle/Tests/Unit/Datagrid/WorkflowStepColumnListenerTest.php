@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
@@ -220,6 +221,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             ],
                             'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -233,6 +235,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             ],
                             'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]]
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -260,6 +263,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -295,6 +299,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']]
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -362,6 +367,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -414,6 +420,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -499,6 +506,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 ],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -545,6 +553,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 ],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
