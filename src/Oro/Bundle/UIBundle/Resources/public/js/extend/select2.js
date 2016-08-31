@@ -414,6 +414,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
         formatSearching: function() { return __('Searching...'); },
-        formatNoMatches: function() { return __('No matches found'); }
+        formatNoMatches: function() { return __('No matches found'); },
+        formatLoadMore: function(pageNumber) { return __('Loading more results...'); },
+        formatInputTooShort: function(input, min) {
+            var n = min - input.length;
+            return __('oro.ui.format_input_too_short', {'count': n}, n);
+        },
+        formatInputTooLong: function(input, max) {
+            var n = input.length - max;
+            return __('oro.ui.format_input_too_long', {'count': n}, n);
+        },
+        formatSelectionTooBig: function(limit) {
+            return __('oro.ui.format_selection_too_big', {'count': limit}, limit);
+        }
     });
 });
