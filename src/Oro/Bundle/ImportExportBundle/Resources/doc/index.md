@@ -6,3 +6,4 @@ OroImportExportBundle Documentation
 - [Classes Diagram](./reference/classes-diagram.md)
 - [How to use] (./reference/how-to-use.md)
 - [Fields Configuration] (./reference/fields-configuration.md)
+- [Events] (./reference/events.md)
