@@ -299,7 +299,12 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'not configure' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => [],
                 'expected' => false
             ]
