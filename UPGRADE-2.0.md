@@ -127,6 +127,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Changed signature of constructor of `Oro\Bundle\LocaleBundle\Form\Type\LanguageType` - now it takes following arguments: 
     - `ConfigManager $cm`,
     - `LanguageProvider $languageProvider`.
+
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
 - Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
