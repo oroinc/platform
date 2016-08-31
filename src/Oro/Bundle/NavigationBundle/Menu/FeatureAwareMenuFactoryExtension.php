@@ -28,7 +28,7 @@ class FeatureAwareMenuFactoryExtension implements Factory\ExtensionInterface
     {
         if (!$this->alreadyDenied($options) && !empty($options['route'])) {
             $options['extras']['isAllowed'] = $this->featureChecker
-                ->isResourceEnabled($options['route'], 'route');
+                ->isResourceEnabled($options['route'], 'routes');
         }
 
         return $options;

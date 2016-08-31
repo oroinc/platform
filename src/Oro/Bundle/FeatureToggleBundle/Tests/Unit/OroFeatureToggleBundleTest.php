@@ -21,7 +21,7 @@ class OroFeatureToggleBundleTest extends \PHPUnit_Framework_TestCase
         $passes = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();
 
         $this->assertInternalType('array', $passes);
-        $this->assertCount(1, $passes);
+        $this->assertCount(2, $passes);
         $this->assertInstanceOf(FeatureToggleVotersPass::class, $passes[0]);
     }
 

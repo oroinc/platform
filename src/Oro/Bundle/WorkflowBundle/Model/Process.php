@@ -73,7 +73,7 @@ class Process
             $featureResourceDefinition = [
                 '@feature_resource_enabled' => [
                     'resource' => $this->processDefinition->getName(),
-                    'resource_type' => 'process'
+                    'resource_type' => 'processes'
                 ]
             ];
 

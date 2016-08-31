@@ -3,9 +3,9 @@ features:
         label: "Feature 1"
         toggle: toggle1
         description: "Description 1"
-        dependency:
+        dependencies:
             - 'feature2'
-        route:
+        routes:
             - f1_route1
             - f1_route2
         configuration:

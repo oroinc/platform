@@ -7,7 +7,7 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class ApiExclusionProvider extends AbstractExclusionProvider
 {
-    const API_RESOURCE_KEY = 'api';
+    const API_RESOURCE_KEY = 'api_resources';
 
     /**
      * @var FeatureChecker

@@ -149,7 +149,7 @@ class OperationAssembler extends AbstractAssembler
         $featureResourceDefinition = [
             '@feature_resource_enabled' => [
                 'resource' => $operationDefinition->getName(),
-                'resource_type' => 'operation'
+                'resource_type' => 'operations'
             ]
         ];
         $definition = $operationDefinition->getConditions(OperationDefinition::PRECONDITIONS);

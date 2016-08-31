@@ -170,17 +170,17 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                 'feature1' => [
                     'label' => 'Feature 1',
                     'toggle' => 'toggle1',
-                    'dependency' => ['feature2'],
+                    'dependencies' => ['feature2'],
                 ],
                 'feature2' => [
                     'label' => 'Feature 2',
                     'toggle' => 'toggle2',
-                    'dependency' => ['feature3'],
+                    'dependencies' => ['feature3'],
                 ],
                 'feature3' => [
                     'label' => 'Feature 3',
                     'toggle' => 'toggle3',
-                    'dependency' => ['feature1'],
+                    'dependencies' => ['feature1'],
                 ],
             ],
         ];
@@ -208,12 +208,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                 'feature1' => [
                     'label' => 'Feature 1',
                     'toggle' => 'toggle1',
-                    'dependency' => ['feature2'],
+                    'dependencies' => ['feature2'],
                 ],
                 'feature2' => [
                     'label' => 'Feature 2',
                     'toggle' => 'toggle2',
-                    'dependency' => ['feature1'],
+                    'dependencies' => ['feature1'],
                 ],
             ],
         ];
@@ -247,27 +247,27 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'label' => 'Feature 1',
                             'toggle' => 'toggle1',
                             'description' => 'Description 1',
-                            'dependency' => ['feature2'],
-                            'route' => ['f1_route1', 'f1_route2'],
+                            'dependencies' => ['feature2'],
+                            'routes' => ['f1_route1', 'f1_route2'],
                             'configuration' => ['config_section1', 'config_leaf1']
                         ],
                     ],
                     TestBundle2::class => [
                         'feature1' => [
                             'toggle' => 'changed_toggle',
-                            'route' => ['f1_route3'],
+                            'routes' => ['f1_route3'],
                             'configuration' => ['config_leaf2']
                         ],
                         'feature2' => [
                             'label' => 'Feature 2',
                             'toggle' => 'toggle2',
-                            'route' => ['f1_route3'],
+                            'routes' => ['f1_route3'],
                             'configuration' => ['config_leaf2']
                         ],
                         'feature3' => [
                             'label' => 'Feature 3',
                             'toggle' => 'toggle3',
-                            'dependency' => ['feature1'],
+                            'dependencies' => ['feature1'],
                         ],
                     ],
                 ],
@@ -278,28 +278,28 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'label' => 'Feature 1',
                             'toggle' => 'changed_toggle',
                             'description' => 'Description 1',
-                            'dependency' => ['feature2'],
-                            'route' => ['f1_route1', 'f1_route2', 'f1_route3'],
+                            'dependencies' => ['feature2'],
+                            'routes' => ['f1_route1', 'f1_route2', 'f1_route3'],
                             'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2']
                         ],
                         'feature2' => [
                             'label' => 'Feature 2',
                             'toggle' => 'toggle2',
-                            'dependency' => [],
-                            'route' => ['f1_route3'],
+                            'dependencies' => [],
+                            'routes' => ['f1_route3'],
                             'configuration' => ['config_leaf2']
                         ],
                         'feature3' => [
                             'label' => 'Feature 3',
                             'toggle' => 'toggle3',
-                            'dependency' => ['feature1'],
-                            'route' => [],
+                            'dependencies' => ['feature1'],
+                            'routes' => [],
                             'configuration' => []
                         ],
                     ],
                     ConfigurationProvider::INTERNAL => [
                         ConfigurationProvider::BY_RESOURCE => [
-                            'route' => [
+                            'routes' => [
                                 'f1_route1' => ['feature1'],
                                 'f1_route2' => ['feature1'],
                                 'f1_route3' => ['feature1', 'feature2'],

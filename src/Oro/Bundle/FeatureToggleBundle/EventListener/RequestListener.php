@@ -27,7 +27,7 @@ class RequestListener
     public function onRequest(GetResponseEvent $event)
     {
         $route = $event->getRequest()->get('_route');
-        if (!$this->featureChecker->isResourceEnabled($route, 'route')) {
+        if (!$this->featureChecker->isResourceEnabled($route, 'routes')) {
             throw new NotFoundHttpException();
         }
     }

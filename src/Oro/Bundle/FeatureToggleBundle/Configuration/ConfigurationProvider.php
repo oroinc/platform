@@ -13,7 +13,7 @@ class ConfigurationProvider
     const FEATURES = '__features__';
     const BY_RESOURCE = 'by_resource';
     const DEPENDENCIES = 'dependencies';
-    const DEPENDENCY_KEY = 'dependency';
+    const DEPENDENCY_KEY = 'dependencies';
 
     /**
      * @var array

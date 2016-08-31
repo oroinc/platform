@@ -96,10 +96,3 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: oro_entity.exclusion_provider.api }
-
-    oro_featuretoggle.block_type_extension.feature_toggle:
-        class: Oro\Bundle\FeatureToggleBundle\Layout\Block\FeatureToggleExtension
-        arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
-        tags:
-            - { name: layout.block_type_extension, alias: block }

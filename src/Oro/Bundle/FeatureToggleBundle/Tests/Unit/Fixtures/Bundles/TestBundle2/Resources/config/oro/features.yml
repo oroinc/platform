@@ -1,7 +1,7 @@
 features:
     feature1:
         toggle: changed_toggle
-        route:
+        routes:
             - f1_route3
         configuration:
             - config_leaf2

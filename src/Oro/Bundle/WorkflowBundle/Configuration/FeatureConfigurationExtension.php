@@ -13,15 +13,11 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface
     public function extendConfigurationTree(NodeBuilder $node)
     {
         $node
-            ->arrayNode('workflow')
+            ->arrayNode('workflows')
                 ->prototype('variable')
                 ->end()
             ->end()
-            ->arrayNode('operation')
-                ->prototype('variable')
-                ->end()
-            ->end()
-            ->arrayNode('process')
+            ->arrayNode('processes')
                 ->prototype('variable')
                 ->end()
             ->end();

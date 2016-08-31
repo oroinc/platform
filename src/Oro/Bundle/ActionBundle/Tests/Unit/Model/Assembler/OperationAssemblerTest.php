@@ -94,7 +94,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 OperationDefinition::PRECONDITIONS,
                 [
                     '@and' => [
-                        ['@feature_resource_enabled' => ['resource' => 'minimum_name', 'resource_type' => 'operation']]
+                        ['@feature_resource_enabled' => ['resource' => 'minimum_name', 'resource_type' => 'operations']]
                     ]
                 ]
             );
@@ -113,7 +113,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     '@and' => [
                         ['config_pre_cond'],
-                        ['@feature_resource_enabled' => ['resource' => 'maximum_name', 'resource_type' => 'operation']]
+                        ['@feature_resource_enabled' => ['resource' => 'maximum_name', 'resource_type' => 'operations']]
                     ]
                 ]
             )
@@ -144,7 +144,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                                 [
                                     '@feature_resource_enabled' => [
                                         'resource' => 'maximum_name_and_acl',
-                                        'resource_type' => 'operation'
+                                        'resource_type' => 'operations'
                                     ]
                                 ]
                             ]

@@ -11,13 +11,13 @@ Each feature consists of required options: title and toggle. Out of the box feat
  - title - feature title
  - description - feature description
  - toggle - system configuration option key that will be used as feature toggle
- - dependency - list of feature names that current feature depends on
- - route - list of route names
+ - dependencies - list of feature names that current feature depends on
+ - routes - list of route names
  - configuration - list of system configuration groups and fields
- - workflow - list of workflow names
- - process - list of process names
- - operation - list of operation names
- - api - list of entity FQCNs
+ - workflows - list of workflow names
+ - processes - list of process names
+ - operations - list of operation names
+ - api_resources - list of entity FQCNs
  
 Example of features.yml configuration
 
@@ -27,22 +27,22 @@ features:
         title: acme.feature.label
         description: acme.feature.description
         toggle: acme.feature_enabled
-        dependency:
+        dependencies:
             - foo
             - bar
-        route:
+        routes:
             - acme_entity_view
             - acme_entity_create
         configuration:
             - acme_general_section
             - acme.some_option
-        workflow:
+        workflows:
             - acme_sales_flow
-        process:
+        processes:
             - acme_some_process
-        operation:
+        operations:
             - acme_some_operation
-        api:
+        api_resources:
             - Acme\Bundle\Entity\Page
 ```
 
@@ -93,19 +93,18 @@ Helper functionality to check feature state
 Feature state is determined by `FeatureChecker`. There are proxy classes that expose feature check functionality to
 layout updates, operations, workflows, processes and twig.
 
-Feature state may is resolved by `isFeatureEnabled($featureName, $scopeIdentifier = null)`
+Feature state is resolved by `isFeatureEnabled($featureName, $scopeIdentifier = null)`
  
-Feature resource types are nodes of feature configuration (route, workflow, configuration, process, operation, api),
+Feature resource types are nodes of feature configuration (routes, workflows, configuration, processes, operations, api_resources),
 resources are their values. Resource is disabled if it is included into at least one disabled feature. 
 Resource state is resolved by `public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)` 
 
 ####Layout updates
 
  - Check feature state `=data['feature'].isFeatureEnabled('feature_name')`
- - Check resource state `=data['feature'].isResourceEnabled('acme_product_view', 'route')`
+ - Check resource state `=data['feature'].isResourceEnabled('acme_product_view', 'routes')`
  
- Example:
- 
+ Set block visibility based on feature state:
 ```yaml
 layout:
     actions:
@@ -116,7 +115,21 @@ layout:
             options:
                 grid_name: products-grid
                 visible: '=data["feature"].isFeatureEnabled("product_feature")'
- ```
+```
+
+Use feature state in condition:
+```yaml
+layout:
+    actions:
+        - '@add':
+            id: products
+            parentId: content
+            blockType: datagrid
+            options:
+                grid_name: products-grid
+
+    conditions: '=data["feature"].isFeatureEnabled("product_feature")'
+```
 
 ####Processes, workflows, operations
 
@@ -135,7 +148,7 @@ In Processes, workflows and operations config expression may be used to check fe
 ```yaml
 '@feature_resource_enabled': 
     resource: 'some_route'
-    resource_type: 'route'
+    resource_type: 'routes'
     scope_identifier: $.scopeId
 ```
 

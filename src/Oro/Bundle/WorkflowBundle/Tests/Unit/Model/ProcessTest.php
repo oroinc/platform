@@ -75,7 +75,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $expectedConditionConfiguration = [
             '@feature_resource_enabled' => [
                 'resource' => '',
-                'resource_type' => 'process'
+                'resource_type' => 'processes'
             ]
         ];
         $this->conditionFactory->expects($this->once())
@@ -93,7 +93,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $expectedConditionConfiguration = [
             '@feature_resource_enabled' => [
                 'resource' => '',
-                'resource_type' => 'process'
+                'resource_type' => 'processes'
             ]
         ];
 
@@ -117,7 +117,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
                 [
                     '@feature_resource_enabled' => [
                         'resource' => '',
-                        'resource_type' => 'process'
+                        'resource_type' => 'processes'
                     ]
                 ],
                 ['test' => []]
@@ -153,7 +153,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
                 [
                     '@feature_resource_enabled' => [
                         'resource' => '',
-                        'resource_type' => 'process'
+                        'resource_type' => 'processes'
                     ]
                 ],
                 ['test' => []]

@@ -35,8 +35,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'dependency' => [],
-                'route' => [],
+                'dependencies' => [],
+                'routes' => [],
                 'configuration' => []
             ]
         ];
@@ -50,8 +50,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'dependency' => ['feature_one', 'feature_two'],
-                'route' => ['oro_feature_route'],
+                'dependencies' => ['feature_one', 'feature_two'],
+                'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another']
             ],
         ];
@@ -60,8 +60,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
             'feature1' => [
                 'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
-                'dependency' => ['feature_one', 'feature_two'],
-                'route' => ['oro_feature_route'],
+                'dependencies' => ['feature_one', 'feature_two'],
+                'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another']
             ]
         ];
@@ -123,15 +123,15 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'Invalid type for path "features.feature1.description". ' .
                     'Expected scalar, but got array'
             ],
-            'incorrect dependency' => [
+            'incorrect dependencies' => [
                 'input' => [
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
                         'label' => 'Feature 1 Label',
-                        'dependency' => 'not_array'
+                        'dependencies' => 'not_array'
                     ]
                 ],
-                'message' => 'Invalid type for path "features.feature1.dependency". ' .
+                'message' => 'Invalid type for path "features.feature1.dependencies". ' .
                     'Expected array, but got string'
             ],
             'incorrect route' => [
@@ -139,10 +139,10 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                     'feature1' => [
                         'toggle' => 'oro_feature.test.feature_enabled',
                         'label' => 'Feature 1 Label',
-                        'route' => 'not_array'
+                        'routes' => 'not_array'
                     ]
                 ],
-                'message' => 'Invalid type for path "features.feature1.route". ' .
+                'message' => 'Invalid type for path "features.feature1.routes". ' .
                     'Expected array, but got string'
             ],
             'incorrect configuration' => [

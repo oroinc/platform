@@ -30,15 +30,15 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     'label' => 'Feature 1',
                     'toggle' => 'toggle1',
                     'description' => 'Description 1',
-                    'dependency' => ['feature2'],
-                    'route' => ['f1_route1', 'f1_route2'],
+                    'dependencies' => ['feature2'],
+                    'routes' => ['f1_route1', 'f1_route2'],
                     'configuration' => ['config_section1', 'config_leaf1'],
                 ]
             ],
             TestBundle2::class => [
                 'feature1' => [
                     'toggle' => 'changed_toggle',
-                    'route' => ['f1_route3'],
+                    'routes' => ['f1_route3'],
                     'configuration' => ['config_leaf2'],
                 ],
                 'feature2' => [

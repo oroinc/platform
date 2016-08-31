@@ -134,13 +134,12 @@ class FeatureChecker
      */
     protected function checkFeatureState($feature, $scopeIdentifier = null)
     {
-        if (!empty($this->featuresStates) && isset($this->featuresStates[$feature])) {
-            return $this->featuresStates[$feature];
+        $cacheKey = $this->getCacheKey($feature, $scopeIdentifier);
+        if (!array_key_exists($cacheKey, $this->featuresStates)) {
+            $this->featuresStates[$cacheKey] = $this->check($feature, $scopeIdentifier);
         }
 
-        $this->featuresStates[$feature] = $this->check($feature, $scopeIdentifier);
-
-        return $this->featuresStates[$feature];
+        return $this->featuresStates[$cacheKey];
     }
 
     /**
@@ -267,5 +266,25 @@ class FeatureChecker
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    /**
+     * @param string $feature
+     * @param null|int|object $scopeIdentifier
+     * @return string
+     */
+    protected function getCacheKey($feature, $scopeIdentifier = null)
+    {
+        $cacheKey = $feature;
+        if ($scopeIdentifier) {
+            if (is_scalar($scopeIdentifier)) {
+                $cacheKey .= ':' . $scopeIdentifier;
+            }
+            if (is_object($scopeIdentifier)) {
+                $cacheKey .= ':' . spl_object_hash($scopeIdentifier);
+            }
+        }
+
+        return $cacheKey;
     }
 }

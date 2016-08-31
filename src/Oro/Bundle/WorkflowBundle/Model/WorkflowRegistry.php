@@ -14,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
 class WorkflowRegistry
 {
-    const FEATURE_CONFIG_WORKFLOW_KEY = 'workflow';
+    const FEATURE_CONFIG_WORKFLOW_KEY = 'workflows';
 
     /** @var ManagerRegistry */
     protected $managerRegistry;

@@ -13,7 +13,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface
     public function extendConfigurationTree(NodeBuilder $node)
     {
         $node
-            ->arrayNode('operation')
+            ->arrayNode('operations')
                 ->prototype('variable')
                 ->end()
             ->end();
