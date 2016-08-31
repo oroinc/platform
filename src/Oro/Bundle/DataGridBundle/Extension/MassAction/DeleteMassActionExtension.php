@@ -43,19 +43,22 @@ class DeleteMassActionExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        // validate configuration and fill default values
-        $options = $this->validateConfiguration(
-            new DeleteMassActionConfiguration(),
-            ['delete' => $config->offsetGetByPath(self::MASS_ACTION_OPTION_PATH, true)]
-        );
+        if (!$this->isDeleteActionExists($config, static::MASS_ACTION_KEY) // is 'mass delete action' do not exists
+            && $this->isDeleteActionExists($config, static::ACTION_KEY) // is 'delete action' exists
+            && $this->isApplicableForEntity($config)
+        ) {
+            // validate configuration and fill default values
+            $options = $this->validateConfiguration(
+                new DeleteMassActionConfiguration(),
+                ['delete' => $config->offsetGetByPath(self::MASS_ACTION_OPTION_PATH, true)]
+            );
 
-        return
-            // Checks if mass delete action does not exists
-            !$this->isDeleteActionExists($config, static::MASS_ACTION_KEY) &&
-            // Checks if delete action exists
-            $this->isDeleteActionExists($config, static::ACTION_KEY) &&
-            $this->isApplicableForEntity($config) &&
-            $options['enabled'];
+            if ($options['enabled']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
