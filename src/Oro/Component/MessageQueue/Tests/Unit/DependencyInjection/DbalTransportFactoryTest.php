@@ -6,7 +6,7 @@ use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessage
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\TransportFactoryInterface;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
@@ -70,25 +70,32 @@ class DbalTransportFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_message_queue.transport.dbal.connection', $serviceId);
         $this->assertTrue($container->hasDefinition($serviceId));
 
-        $this->assertTrue($container->hasDefinition('oro_message_queue.transport.dbal.dbal_connection'));
-        $dbalConnection = $container->getDefinition('oro_message_queue.transport.dbal.dbal_connection');
-        $this->assertEquals(Connection::class, $dbalConnection->getClass());
-        $this->assertFalse($dbalConnection->isPublic());
-
-        $dbalConnectionFactory = $dbalConnection->getFactory();
-        $this->assertInstanceOf(Reference::class, $dbalConnectionFactory[0]);
-        $this->assertEquals('doctrine', (string) $dbalConnectionFactory[0]);
-        $this->assertEquals('getConnection', $dbalConnectionFactory[1]);
-
         $this->assertTrue($container->hasDefinition('oro_message_queue.transport.dbal.connection'));
         $connection = $container->getDefinition('oro_message_queue.transport.dbal.connection');
-        $this->assertEquals(DbalConnection::class, $connection->getClass());
-        $this->assertEquals('table-name', $connection->getArgument(1));
-        $this->assertEquals(['polling_interval' => 7890], $connection->getArgument(2));
+        $this->assertEquals(DbalLazyConnection::class, $connection->getClass());
+        $this->assertInstanceOf(Reference::class, $connection->getArgument(0));
+        $this->assertEquals('doctrine', (string) $connection->getArgument(0));
+        $this->assertEquals('connection-name', $connection->getArgument(1));
+        $this->assertEquals('table-name', $connection->getArgument(2));
+        $this->assertEquals(['polling_interval' => 7890], $connection->getArgument(3));
+    }
 
-        $dbalConnectionRef = $connection->getArgument(0);
-        $this->assertInstanceOf(Reference::class, $dbalConnectionRef);
-        $this->assertEquals('oro_message_queue.transport.dbal.dbal_connection', (string) $dbalConnectionRef);
+    public function testShouldCreateDbalExtensions()
+    {
+        $container = new ContainerBuilder();
+
+        $transport = new DbalTransportFactory();
+
+        $serviceId = $transport->createService($container, [
+            'connection' => 'connection-name',
+            'table' => 'table-name',
+            'orphan_time' => 12345,
+            'polling_interval' => 7890,
+        ]);
+
+        //guard
+        $this->assertEquals('oro_message_queue.transport.dbal.connection', $serviceId);
+        $this->assertTrue($container->hasDefinition($serviceId));
 
         $this->assertTrue($container->hasDefinition(
             'oro_message_queue.consumption.dbal.redeliver_orphan_messages_extension'

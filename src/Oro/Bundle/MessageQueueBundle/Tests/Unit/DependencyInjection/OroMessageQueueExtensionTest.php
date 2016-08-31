@@ -14,6 +14,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
@@ -210,8 +211,18 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ]], $container);
 
-        $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
+        $messageProducer = $container->getDefinition('oro_message_queue.client.traceable_message_producer');
         self::assertEquals(TraceableMessageProducer::class, $messageProducer->getClass());
+        self::assertEquals(
+            ['oro_message_queue.client.message_producer', null, 0],
+            $messageProducer->getDecoratedService()
+        );
+
+        self::assertInstanceOf(Reference::class, $messageProducer->getArgument(0));
+        self::assertEquals(
+            'oro_message_queue.client.traceable_message_producer.inner',
+            (string) $messageProducer->getArgument(0)
+        );
     }
 
     public function testShouldConfigureDelayRedeliveredMessageExtension()
@@ -235,7 +246,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(12345, $extension->getArgument(1));
     }
 
-    public function testShouldAddNullAndDbalDriversToDriverFactoryIfClientEnabled()
+    public function testShouldAddNullConnectionToNullDriverMapToDriverFactory()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
@@ -253,10 +264,55 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertTrue($container->hasDefinition('oro_message_queue.client.driver_factory'));
         $factory = $container->getDefinition('oro_message_queue.client.driver_factory');
 
-        self::assertSame([
-            NullConnection::class => NullDriver::class,
-            DbalConnection::class => DbalDriver::class,
-        ], $factory->getArgument(0));
+        $firstArgument = $factory->getArgument(0);
+        self::assertArrayHasKey(NullConnection::class, $firstArgument);
+        self::assertEquals(NullDriver::class, $firstArgument[NullConnection::class]);
+    }
+
+    public function testShouldAddDbalConnectionToDbalDriverMapToDriverFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load([[
+            'client' => true,
+            'transport' => [
+                'default' => 'foo',
+            ]
+        ]], $container);
+
+        self::assertTrue($container->hasDefinition('oro_message_queue.client.driver_factory'));
+        $factory = $container->getDefinition('oro_message_queue.client.driver_factory');
+
+        $firstArgument = $factory->getArgument(0);
+        self::assertArrayHasKey(DbalConnection::class, $firstArgument);
+        self::assertEquals(DbalDriver::class, $firstArgument[DbalConnection::class]);
+    }
+
+    public function testShouldAddDbalLazyConnectionToDbalDriverMapToDriverFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load([[
+            'client' => true,
+            'transport' => [
+                'default' => 'foo',
+            ]
+        ]], $container);
+
+        self::assertTrue($container->hasDefinition('oro_message_queue.client.driver_factory'));
+        $factory = $container->getDefinition('oro_message_queue.client.driver_factory');
+
+        $firstArgument = $factory->getArgument(0);
+        self::assertArrayHasKey(DbalConnection::class, $firstArgument);
+        self::assertEquals(DbalDriver::class, $firstArgument[DbalConnection::class]);
     }
 
     public function testShouldAllowGetConfiguration()
