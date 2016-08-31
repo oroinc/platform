@@ -32,7 +32,7 @@ class PermissionRepositoryTest extends WebTestCase
 
     protected function tearDown()
     {
-        $this->getContainer()->get('oro_security.cache.provider.permission')->flushAll();
+        $this->getContainer()->get('oro_security.cache.provider.permission')->deleteAll();
 
         parent::tearDown();
     }
