@@ -366,6 +366,9 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'view' => ['key1' => 'value1'],
                         'update' => false,
                     ],
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => [
@@ -389,6 +392,9 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                             'update' => true,
                         ];
                     },
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => [
