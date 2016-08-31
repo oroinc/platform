@@ -39,6 +39,14 @@ services:
         tags:
             - { name: event_dispatcher.subscriber, priority: 0 }
 
+    oro_test.listener.runtime_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\RunTimeSubscriber
+        arguments:
+            - '@mink'
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: event_dispatcher.subscriber, priority: 10 }
+
     oro_test.listener.feature_isolation_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureIsolationSubscriber
         arguments:
