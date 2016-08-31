@@ -4,7 +4,7 @@ Feature: Shortcuts feature
   I need to shortcuts functionality
 
   Scenario: Full list of shortcuts
-    Given I login as "admin" user with "admin" password
+    Given I login as administrator
     And I follow "Shortcuts"
     And I follow "See full list"
     And I should be on "/shortcutactionslist"
