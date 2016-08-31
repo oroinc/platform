@@ -455,6 +455,8 @@ class OroMainContext extends MinkContext implements
             );
         }
 
+        self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
+
         $driver->typeIntoInput($field->getXpath(), $value);
     }
 
