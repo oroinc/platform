@@ -85,7 +85,7 @@ class TranslationListenerTest extends \PHPUnit_Framework_TestCase
         $executionContext->expects($this->any())->method('get')->with('language_code')->willReturn($languageCode);
 
         $jobExecution = $this->getMockBuilder(JobExecution::class)->disableOriginalConstructor()->getMock();
-        $jobExecution->expects($this->any())->method('getLabel')->willReturn('import.' . $jobLabel);
+        $jobExecution->expects($this->any())->method('getLabel')->willReturn($jobLabel);
         $jobExecution->expects($this->any())->method('getExecutionContext')->willReturn($executionContext);
 
         $jobResult = $this->getMockBuilder(JobResult::class)->disableOriginalConstructor()->getMock();

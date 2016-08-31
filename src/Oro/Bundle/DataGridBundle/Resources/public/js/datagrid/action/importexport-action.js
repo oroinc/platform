@@ -111,19 +111,18 @@ define([
          */
         expandOptions: function(opts) {
             var options = $.extend({}, opts);
-            var self = this;
             _.each(options, function (value, key) {
                 switch (typeof value) {
                     case 'string':
-                        if (self.model.has(value)) {
-                            options[key] = self.model.get(value);
+                        if (this.model.has(value)) {
+                            options[key] = this.model.get(value);
                         }
                     break
                     case 'object':
-                        options[key] = self.expandOptions(value);
+                        options[key] = this.expandOptions(value);
                     break
                 }
-            });
+            }, this);
 
             return options;
         }

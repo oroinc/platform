@@ -16,6 +16,6 @@ class ImportAction extends ImportExportAction
      */
     protected function getType()
     {
-        return self::ACTION_IMPORT;
+        return self::TYPE_IMPORT;
     }
 }

@@ -16,6 +16,6 @@ class ExportAction extends ImportExportAction
      */
     protected function getType()
     {
-        return self::ACTION_EXPORT;
+        return self::TYPE_EXPORT;
     }
 }
