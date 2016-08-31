@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
+
 use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;

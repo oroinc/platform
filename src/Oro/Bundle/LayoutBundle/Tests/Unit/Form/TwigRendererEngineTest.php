@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
-use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
-
 use Symfony\Component\Form\FormView;
 
+use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
-class TwigRendererEngineTest extends \PHPUnit_Framework_TestCase
+class TwigRendererEngineTest extends RendererEngineTest
 {
     /**
      * @var TwigRendererEngine
@@ -75,5 +74,10 @@ class TwigRendererEngineTest extends \PHPUnit_Framework_TestCase
     protected function getMockLayoutHelper()
     {
         return $this->getMock('Oro\Bundle\LayoutBundle\Request\LayoutHelper', [], [], '', false);
+    }
+
+    public function createRendererEngine()
+    {
+        return new TwigRendererEngine();
     }
 }

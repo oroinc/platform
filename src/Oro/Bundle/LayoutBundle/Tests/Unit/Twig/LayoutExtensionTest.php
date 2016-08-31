@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 
 class LayoutExtensionTest extends \PHPUnit_Framework_TestCase

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
-use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Layout\BlockView;
 
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
 class LayoutExtension extends \Twig_Extension
