@@ -19,6 +19,8 @@ class ApiConfiguration implements ConfigurationInterface
     const ENTITIES_SECTION       = 'entities';
     const RELATIONS_SECTION      = 'relations';
 
+    const ROOT_NODE = 'api';
+
     /** @var ConfigurationSettingsInterface */
     protected $settings;
 
@@ -43,7 +45,7 @@ class ApiConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_api');
+        $rootNode    = $treeBuilder->root(self::ROOT_NODE);
         $children    = $rootNode->children();
 
         $this->addEntityAliasesSection($children);

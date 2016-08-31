@@ -17,6 +17,7 @@ class EntityExtendPass implements CompilerPassInterface
 
     const EXTEND_VALIDATION_LOADER_ID = 'oro_entity_extend.validation_loader';
 
+
     /**
      * {@inheritdoc}
      */
@@ -29,7 +30,7 @@ class EntityExtendPass implements CompilerPassInterface
         $resources    = $configLoader->load($container);
         $configs      = [];
         foreach ($resources as $resource) {
-            $configs[] = $resource->data['oro_entity_extend'];
+            $configs[] = $resource->data[EntityExtendConfiguration::ROOT_NODE];
         }
         $processor = new Processor();
         $config    = $processor->processConfiguration(new EntityExtendConfiguration(), $configs);

@@ -16,7 +16,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 {
     const COMPILER_PASS_NAME = 'oro_datagrid';
     const CACHE_POSTFIX      = 'data';
-    const ROOT_PARAMETER     = 'datagrid';
+    const ROOT_PARAMETER     = 'datagrids';
 
     /** @var array */
     protected $rawConfiguration = [];
@@ -151,7 +151,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     {
         return new CumulativeConfigLoader(
             self::COMPILER_PASS_NAME,
-            new YamlCumulativeFileLoader('Resources/config/datagrid.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/datagrids.yml')
         );
     }
 }

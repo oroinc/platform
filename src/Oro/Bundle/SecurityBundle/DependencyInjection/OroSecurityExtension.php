@@ -12,9 +12,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper;
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
-use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 
 class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {

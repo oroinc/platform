@@ -25,12 +25,12 @@ class OroChartExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_chart',
-            new YamlCumulativeFileLoader('Resources/config/oro/chart.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/charts.yml')
         );
 
         $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $mergedConfig = array_replace_recursive($mergedConfig, $resource->data['oro_chart']);
+            $mergedConfig = array_replace_recursive($mergedConfig, $resource->data[Configuration::CONFIG_ROOT_NODE]);
         }
 
         foreach ($configs as $config) {

@@ -25,7 +25,7 @@ class SettingsPass implements CompilerPassInterface
         $configs      = [];
         $configLoader = new CumulativeConfigLoader(
             'oro_integration_settings',
-            new YamlCumulativeFileLoader('Resources/config/oro/integration_settings.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/integrations.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {

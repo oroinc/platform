@@ -28,6 +28,8 @@ class OroTestFrameworkExtension implements TestworkExtension
 {
     const DUMPER_TAG = 'oro_test.dumper';
 
+    const ELEMENTS_CONFIG_ROOT = 'behat_elements';
+
     /**
      * {@inheritdoc}
      */
@@ -242,7 +244,9 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse(file_get_contents($mappingPath)));
+            $config = Yaml::parse(file_get_contents($mappingPath));
+
+            $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
