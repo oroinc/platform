@@ -88,7 +88,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @var ReferenceRepository
      */
-    protected static $referenceRepository;
+    private static $referenceRepository;
 
     protected function tearDown()
     {
