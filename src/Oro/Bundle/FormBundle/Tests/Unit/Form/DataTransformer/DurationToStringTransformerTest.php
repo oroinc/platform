@@ -124,6 +124,10 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
                 '1.5h 2.25m 3.5s',
                 5539, // '01:32:19' rounded
             ],
+            'JIRA style all parts with comma fractions' => [
+                '1,5h 2.5m 3,5s',
+                5554, // '01:32:34' rounded
+            ],
             'JIRA style no spaces fractions' => [
                 '1.5h2.5m3.5s',
                 5554, // '01:32:34' rounded
