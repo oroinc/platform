@@ -119,19 +119,12 @@ body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;}
   </tr>
   <tr>
     <td>ornare</td>
-    <td>dolor</td>
+    <td>do</td>
   </tr>
 </table>
 </body>
 </html>
 EMAILBODY;
-
-        $htmlCleanBody = <<<CLEANBODY
-Lorem ipsum
-dolor sit amet, consectetur adipiscing elit. Integer
-sagittis ornare
-dolor
-CLEANBODY;
 
         $emails = [
             $this->prepareEmailUser(
@@ -175,7 +168,7 @@ CLEANBODY;
                 'id' => 2,
                 'seen' => true,
                 'subject' => 'subject_1',
-                'bodyContent' => $htmlCleanBody,
+                'bodyContent' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sagittis ornare do',
                 'fromName' => 'fromName_1',
                 'linkFromName' => 'oro_email_email_reply',
             ]
