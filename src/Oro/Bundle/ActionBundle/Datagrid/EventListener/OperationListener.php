@@ -77,6 +77,11 @@ class OperationListener
     {
         $config = $event->getConfig();
 
+        // datasource type other than ORM is not handled
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return;
+        }
+
         $this->datagridContext = $this->getDatagridContext($config);
         $this->operations = $this->getOperations(
             $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),

@@ -128,6 +128,16 @@ class Item
     }
 
     /**
+     * Alias for getRecordId
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->recordId;
+    }
+
+    /**
      * Load related object
      * @return object
      */
