@@ -1,21 +1,15 @@
 define([
     'underscore',
     'jquery',
-    'routing',
     './model-action',
     'oroimportexport/js/importexport-manager'
-], function(_, $, routing, ModelAction, ImportExportManager) {
+], function(_, $, ModelAction, ImportExportManager) {
     'use strict';
 
     return ModelAction.extend({
         /** @property {Object} */
         options: {
-            importTitle: null,
-            exportTitle: null,
-            dataGridName: null,
-            filePrefix: null,
-            refreshPageOnSuccess: null,
-            afterRefreshPageMessage: null,
+            dataGridName: undefined,
             routeOptions: {}
         },
 
@@ -32,8 +26,6 @@ define([
         exportJob: null,
         /** @property {String} */
         exportTemplateJob: null,
-        /** @property {Boolean} */
-        isExportPopupRequired: null,
 
         /** @property {ImportExportManager} */
         importExportManager: null,
@@ -48,38 +40,17 @@ define([
                 this.options.dataGridName = this.datagrid.name;
             }
 
-            this.options = this.expandOptions(this.options);
-
-            var importRoute;
-            var importRouteParams = {
-                options: this.options.routeOptions,
-                entity: this.entity_class || null,
-                processorAlias: this.importProcessor,
-                importJob: this.importJob || null,
-                importValidateJob: this.importValidateJob || null
-            };
-            var exportRoute = this.isExportPopupRequired ? 'oro_importexport_export_config' :
-                'oro_importexport_export_instant';
-            var exportRouteParams = {
-                options: this.options.routeOptions,
-                entity: this.entity_class || null,
-                processorAlias: this.exportProcessor,
-                filePrefix: this.options.filePrefix || null,
-                exportJob: this.exportJob || null,
-                exportTemplateJob: this.exportTemplateJob || null
-            };
-
-            var importUrl = routing.generate(importRoute || 'oro_importexport_import_form', importRouteParams);
-            var exportUrl = routing.generate(exportRoute || 'oro_importexport_export_instant', exportRouteParams);
-            this.importExportManager = new ImportExportManager({
-                exportUrl: exportUrl,
-                importUrl: importUrl,
-                importTitle: this.options.importTitle,
-                exportTitle: this.options.exportTitle,
-                gridname: this.options.dataGridName,
-                refreshPageOnSuccess: this.options.refreshPageOnSuccess,
-                afterRefreshPageMessage: this.options.afterRefreshPageMessage,
+            var options = $.extend(this.extractVars(this.options), {
+                entity: this.entity_class,
+                importProcessor: this.importProcessor,
+                importJob: this.importJob,
+                importValidateJob: this.importValidateJob,
+                exportProcessor: this.exportProcessor,
+                exportJob: this.exportJob,
+                exportTemplateJob: this.exportTemplateJob
             });
+
+            this.importExportManager = new ImportExportManager(options);
         },
 
         /**
@@ -110,17 +81,18 @@ define([
          * @param {Object} opts
          * @returns {Object}
          */
-        expandOptions: function(opts) {
+        extractVars: function(opts) {
             var options = $.extend({}, opts);
             _.each(options, function(value, key) {
                 switch (typeof value) {
                     case 'string':
-                        if (this.model.has(value)) {
-                            options[key] = this.model.get(value);
+                        var variable = value.substr(1);
+                        if ('$' === value[0] && this.model.has(variable)) {
+                            options[key] = this.model.get(variable);
                         }
                         break
                     case 'object':
-                        options[key] = this.expandOptions(value);
+                        options[key] = this.extractVars(value);
                         break
                 }
             }, this);

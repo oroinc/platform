@@ -15,7 +15,8 @@ define(function(require) {
                 importButton: '.import-btn',
                 exportButton: '.export-btn',
                 templateButton: '.template-btn'
-            }
+            },
+            data: {}
         },
 
         $importButton: null,
@@ -41,17 +42,7 @@ define(function(require) {
             this.$exportButton.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
             this.$templateButton.on('click' + this.eventNamespace(), _.bind(this.onTemplateClick, this));
 
-            this.importExportManager = new ImportExportManager({
-                importTitle: options.importTitle,
-                exportTitle: options.exportTitle,
-                gridname: options.gridname,
-                refreshPageOnSuccess: options.refreshPageOnSuccess,
-                afterRefreshPageMessage: options.afterRefreshPageMessage,
-                isExportPopupRequired: options.isExportPopupRequired,
-                importUrl: this.$importButton.attr('href') || null,
-                exportUrl: this.$exportButton.attr('href') || null,
-                templateUrl: this.$templateButton.attr('href') || null
-            });
+            this.importExportManager = new ImportExportManager(this.options.data);
         },
 
         /**

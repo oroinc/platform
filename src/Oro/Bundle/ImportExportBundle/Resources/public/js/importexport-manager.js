@@ -5,6 +5,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var $ = require('jquery');
+    var routing = require('routing');
     var mediator = require('oroui/js/mediator');
     var DialogWidget = require('oro/dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
@@ -18,32 +19,86 @@ define(function(require) {
          * @property {Object}
          */
         options: {
+            entity: null,
+
             importTitle: 'Import',
+            importRoute: 'oro_importexport_import_form',
+
             exportTitle: 'Export',
-            templateTitle: 'Template',
-            gridname: null,
+            exportProcessor: null,
+            exportJob: null,
+            exportRoute: 'oro_importexport_export_instant',
+            exportConfigRoute: 'oro_importexport_export_config',
+            isExportPopupRequired: false,
+
+            exortTemplateTitle: 'Template',
+            exportTemplateProcessor: null,
+            exportTemplateJob: null,
+            exportTemplateRoute: 'oro_importexport_export_template',
+            exportTemplateConfigRoute: 'oro_importexport_export_template_config',
+            isExportTemplatePopupRequired: false,
+
+            filePrefix: null,
+            dataGridName: null,
             afterRefreshPageMessage: null,
             refreshPageOnSuccess: false,
-            isExportPopupRequired: false,
-            importUrl: null,
-            exportUrl: null,
-            templateUrl: null
+
+            routeOptions: {}
         },
+
+        /** @property {String} */
+        importUrl: null,
+        /** @property {String} */
+        exportUrl: null,
+        /** @property {String} */
+        exportTemplateUrl: null,
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
+
+            if (this.options.isExportPopupRequired) {
+                this.options.exportRoute = this.options.exportConfigRoute;
+            }
+
+            if (this.options.isExportTemplatePopupRequired) {
+                this.options.exportTemplateRoute = this.options.exportTemplateConfigRoute;
+            }
+
+            var routeOptions = {
+                options: this.options.routeOptions,
+                entity: this.options.entity,
+                importJob: this.options.importJob,
+                importValidateJob: this.options.importValidateJob,
+                exportJob: this.options.exportJob,
+                exportTemplateJob: this.options.exportTemplateJob
+            };
+
+            if (this.options.exportProcessor) {
+                this.exportUrl = this._generateUrl(this.options.exportRoute, routeOptions, {
+                    processorAlias: this.options.exportProcessor,
+                    filePrefix: this.options.filePrefix,
+                });
+            }
+
+            this.importUrl = this._generateUrl(this.options.importRoute, routeOptions, {});
+
+            if (this.options.exportTemplateProcessor) {
+                this.exportTemplateUrl = this._generateUrl(this.options.exportTemplateRoute, routeOptions, {
+                    processorAlias: this.options.exportTemplateProcessor,
+                });
+            }
         },
 
         handleImport: function() {
             var widget = this._renderDialogWidget({
-                url: this.options.importUrl,
+                url: this.importUrl,
                 title: this.options.importTitle,
             });
 
-            if (!_.isEmpty(this.options.gridname) || this.options.refreshPageOnSuccess) {
+            if (!_.isEmpty(this.options.dataGridName) || this.options.refreshPageOnSuccess) {
                 var self = this;
 
                 widget.on('importComplete', function(data) {
@@ -59,8 +114,8 @@ define(function(require) {
                                 });
                             }
                             mediator.execute('refreshPage');
-                        } else if (!_.isEmpty(self.options.gridname)) {
-                            mediator.trigger('datagrid:doRefresh:' + self.options.gridname);
+                        } else if (!_.isEmpty(self.options.dataGridName)) {
+                            mediator.trigger('datagrid:doRefresh:' + self.options.dataGridName);
                         }
                     }
                 });
@@ -70,12 +125,12 @@ define(function(require) {
         handleExport: function() {
             if (this.options.isExportPopupRequired) {
                 this._renderDialogWidget({
-                    url: this.options.exportUrl,
+                    url: this.exportUrl,
                     title: this.options.exportTitle,
                 });
             } else {
                 var exportStartedMessage = exportHandler.startExportNotificationMessage();
-                $.getJSON(this.options.exportUrl, function(data) {
+                $.getJSON(this.exportUrl, function(data) {
                     exportStartedMessage.close();
                     exportHandler.handleExportResponse(data);
                 });
@@ -83,21 +138,31 @@ define(function(require) {
         },
 
         handleTemplate: function() {
-            if (this.options.isExportPopupRequired) {
+            if (this.options.isExportTemplatePopupRequired) {
                 this._renderDialogWidget({
-                    url: this.options.templateUrl,
-                    title: this.options.templateTitle
+                    url: this.exportTemplateUrl,
+                    title: this.options.exportTemplateTitle
                 });
             } else {
-                window.open(this.options.templateUrl);
+                window.open(this.exportTemplateUrl);
             }
+        },
+
+        /**
+         * @param {String} route
+         * @param {Object} defaultOptions
+         * @param {Object} options
+         * @returns {String}
+         */
+        _generateUrl: function(route, defaultOptions, options) {
+            return routing.generate(route, $.extend({}, defaultOptions, options));
         },
 
         /**
          * @param {Object} options
          * @returns {DialogWidget}
          */
-        _renderDialogWidget: function (options) {
+        _renderDialogWidget: function(options) {
             var opts = _.defaults({
                 stateEnabled: false,
                 incrementalPosition: false,
