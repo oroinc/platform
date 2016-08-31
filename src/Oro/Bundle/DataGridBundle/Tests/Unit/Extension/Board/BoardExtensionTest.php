@@ -83,7 +83,10 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
                 'grid' => [],
                 'board' => [],
                 'chart' => []
-            ]
+            ],
+            'source' => [
+                'type' => 'orm',
+            ],
         ]);
         $this->restrictionManager->expects($this->once())->method('boardViewEnabled')
             ->with($config)
@@ -105,7 +108,10 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
                         Configuration::ACL_RESOURCE_KEY => 'update_acl_resource',
                     ]
                 ]
-            ]
+            ],
+            'source' => [
+                'type' => 'orm',
+            ],
         ]);
         $this->restrictionManager->expects($this->once())->method('boardViewEnabled')->will($this->returnValue(true));
         $this->assertTrue($this->extension->isApplicable($config));
@@ -169,7 +175,10 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
                         Configuration::PROCESSOR_KEY => 'non-default'
                     ]
                 ]
-            ]
+            ],
+            'source' => [
+                'type' => 'orm',
+            ],
         ]);
         $this->restrictionManager->expects($this->once())->method('boardViewEnabled')->will($this->returnValue(true));
         $this->extension->isApplicable($config);
@@ -189,7 +198,10 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
                         ],
                     ]
                 ]
-            ]
+            ],
+            'source' => [
+                'type' => 'orm',
+            ],
         ]);
 
         $processor = $this->getMock('Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface');
