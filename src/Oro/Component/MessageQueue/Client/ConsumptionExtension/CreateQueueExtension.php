@@ -14,7 +14,7 @@ class CreateQueueExtension extends AbstractExtension
     private $driver;
 
     /**
-     * @var bool
+     * @var bool[]
      */
     private $createdQueues = [];
 
