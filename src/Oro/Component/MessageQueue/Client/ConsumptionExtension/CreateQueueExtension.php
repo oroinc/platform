@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client\ConsumptionExtension;
 
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
