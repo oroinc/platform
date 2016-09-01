@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class EntityExtendConfiguration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'entity_extend';
+    const ROOT_NODE = 'oro_entity_extend';
     /**
      * {@inheritDoc}
      */

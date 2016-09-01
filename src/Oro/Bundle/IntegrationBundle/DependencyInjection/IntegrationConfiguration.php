@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class IntegrationConfiguration implements ConfigurationInterface
 {
-    const ROOT_NODE_NAME = 'integrations';
+    const ROOT_NODE_NAME = 'oro_integration';
     const FORM_NODE_NAME = 'form';
 
     /**

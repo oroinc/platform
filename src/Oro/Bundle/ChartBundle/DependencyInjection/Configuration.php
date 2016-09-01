@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const CONFIG_ROOT_NODE = 'charts';
+    const CONFIG_ROOT_NODE = 'oro_chart';
     /**
      * {@inheritdoc}
      *

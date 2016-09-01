@@ -12,6 +12,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroChartExtension extends Extension
 {
+    const CHARTS_CONFIG_ROOT = 'charts';
     /**
      * {@inheritdoc}
      */
@@ -30,7 +31,7 @@ class OroChartExtension extends Extension
 
         $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $mergedConfig = array_replace_recursive($mergedConfig, $resource->data[Configuration::CONFIG_ROOT_NODE]);
+            $mergedConfig = array_replace_recursive($mergedConfig, $resource->data[self::CHARTS_CONFIG_ROOT]);
         }
 
         foreach ($configs as $config) {
