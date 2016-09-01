@@ -33,7 +33,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->featureChecker
             ->expects($this->once())
             ->method('isResourceEnabled')
-            ->with('oro_login', 'route')
+            ->with('oro_login', 'routes')
             ->willReturn(false);
 
         $request = $this->getMock(Request::class);
@@ -50,7 +50,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->featureChecker
             ->expects($this->once())
             ->method('isResourceEnabled')
-            ->with('oro_login', 'route')
+            ->with('oro_login', 'routes')
             ->willReturn(true);
 
         $request = $this->getMock(Request::class);
