@@ -44,6 +44,7 @@ class RenameExtension extends BaseRenameExtension
                 if ($tableName === $oldTableName) {
                     $tableName = $newTableName;
                     $this->extendOptionsManager->removeColumnOptions($oldTableName, $columnName);
+                    $this->extendOptionsManager->setColumnOptions($newTableName, $columnName, $options);
                 }
 
                 // replace table name in target section
