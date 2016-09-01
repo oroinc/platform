@@ -96,11 +96,17 @@ operations:
                 importProcessor: 'oro_translation_translation'
                 importJob: 'language_translations_import_from_csv'
                 options:
+                    refreshPageOnSuccess: $.isDefaultLanguage
                     importTitle: $.importTitle
                     dataGridName: ~
                     routeOptions:
                         language_code: $code
         preactions:
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isDefaultLanguage
+                method_parameters: [$.data]
+                attribute: $.isDefaultLanguage
             - '@trans':
                 attribute: $.entityLabel
                 id: 'oro.translation.language.entity_label'
