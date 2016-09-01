@@ -2,71 +2,20 @@ layout:
     actions:
         - '@setBlockTheme':
             themes: 'OroUIBundle:layouts:base/page/layout.html.twig'
-#        - '@addTree':
-#            items:
-#                head:
-#                    blockType: head
-#                title:
-#                    blockType: title
-#                meta_charset:
-#                    blockType: meta
-#                    options:
-#                        charset: 'UTF-8'
-#                meta_viewport:
-#                    blockType: meta
-#                    options:
-#                        name: viewport
-#                        content: 'width=device-width, initial-scale=1'
-#                theme_icon:
-#                    blockType: external_resource
-#                    options:
-#                        visible: '=data["theme"].getIcon(context["theme"])!=null'
-#                        href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
-#                        rel: shortcut icon
-#                styles:
-#                    blockType: style
-#                    options:
-#                        src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
-#                body:
-#                    blockType: body
-#                scripts_before:
-#                    blockType: container
-#                    parentId: body
-#                require_js:
-#                    blockType: container
-#                    parentId: body
-#                requirejs_scripts:
-#                    blockType: requires
-#                requirejs_scripts_after:
-#                    blockType: block
-#                require_modules:
-#                    blockType: container
-#                app_script:
-#                    blockType: script
-
         - @add:
             id: scripts_before
             blockType: container
             parentId: head
         - @add:
-            id: require_js
-            blockType: container
-            parentId: head
-        - @add:
-            id: requirejs_scripts
-            blockType: requires
-            parentId: require_js
-        - @add:
             id: requirejs_scripts_after
             blockType: container
             parentId: require_js
-        - @add:
-            id: require_modules
-            blockType: container
-            parentId: head
-        - @add:
+        - '@setOption':
             id: app_script
-            blockType: script
-            parentId: require_modules
-            options:
-                content: 'require(["oroui/js/app"]); require(["oroui/js/init-layout"]);'
+            optionName: content
+            optionValue: 'require(["oroui/js/app"]); require(["oroui/js/init-layout"]);'
+        - '@removeOption':
+            id: requirejs_scripts
+            optionName: provider_alias
+
+
