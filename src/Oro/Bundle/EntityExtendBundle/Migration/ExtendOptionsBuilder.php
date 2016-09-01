@@ -143,14 +143,19 @@ class ExtendOptionsBuilder
             }
 
             if (!isset($options['extend']['relation_key'])) {
-                foreach ($entityClassNames as $entityClassName) {
-                    $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
-                        $entityClassName,
-                        $fieldName,
-                        $columnUnderlyingType,
-                        $options['extend']['target_entity']
-                    );
+                if (count($entityClassNames) > 1) {
+                    throw new \LogicException(sprintf(
+                        'Table "%s" is expected to be related with 1 entity, but %d entities found',
+                        $tableName,
+                        count($entityClassNames)
+                    ));
                 }
+                $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
+                    reset($entityClassNames),
+                    $fieldName,
+                    $columnUnderlyingType,
+                    $options['extend']['target_entity']
+                );
             }
         }
 
