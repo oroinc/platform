@@ -15,7 +15,7 @@ class SearchGridListener
         $datasource = $grid->getDatasource();
 
         if ($datasource instanceof SearchDatasource) {
-            $from =$grid->getConfig()->offsetGetByPath(self::FROM_PATH);
+            $from = $grid->getConfig()->offsetGetByPath(self::FROM_PATH);
             if (!empty($from)) {
                 $datasource->getQuery()->from($from);
             }
