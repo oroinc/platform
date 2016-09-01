@@ -9,6 +9,11 @@ class SearchGridListener
 {
     const FROM_PATH = '[source][query][from]';
 
+    /**
+     * Reads 'from' part in configuration and adds it to the query
+     *
+     * @param BuildAfter $event
+     */
     public function onBuildAfter(BuildAfter $event)
     {
         $grid = $event->getDatagrid();
