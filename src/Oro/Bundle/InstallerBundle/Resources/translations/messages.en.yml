@@ -89,7 +89,6 @@ process:
             assets:        Install assets
             assetic:       Dump assetic
             translation:   Prepare translations
-            message-queue: Prepare message queue
             requirejs:     Optimize JS resources (optional)
             finish:        Clear cache to finalize installation
         final:
