@@ -83,36 +83,37 @@ All processes are described in configuration. Look at the example of simple proc
 some action with Contact entity.
 
 ```
-definitions:                                                 # list of definitions
-    contact_definition:                                      # name of process definition
-        label: 'Contact Definition'                          # label of the process definition
-        enabled: true                                        # this definition is enabled (activated)
-        entity: OroCRM\Bundle\ContactBundle\Entity\Contact   # related entity
-        order: 20                                            # processing order
-        exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
-        preconditions:                                       # List of preconditions to check before scheduling process
-            @equal: [$source.name, 'other']                  # Perform process only for entities that have "other" source
-        actions_configuration:                               # list of actions to perform
-            - @find_entity:                                  # find existing entity
-                conditions:                                  # action conditions
-                    @empty: $assignedTo                      # if field $assignedTo is empty
-                parameters:                                  # action parameters
-                    class: Oro\Bundle\UserBundle\Entity\User # $assignedTo entity full class name
-                    attribute: $assignedTo                   # name of attribute that will store entity
-                    where:                                   # where conditions
-                        username: 'admin'                    # username is 'admin'
-triggers:                                                    # list of triggers
-    contact_definition:                                      # name of trigger
-        -
-            event: create                                    # event on which the trigger performed
-        -
-            event: update                                    # event on which the trigger performed
-            field: assignedTo                                # field name to listen
-            priority: 10                                     # priority of the job queue
-            queued: true                                     # this process must be executed in queue
-            time_shift: 60                                   # this process must be executed with 60 seconds delay
-        -
-            cron: */1 * * * *                                # execute process every 1 minute
+processes:
+    definitions:                                                 # list of definitions
+        contact_definition:                                      # name of process definition
+            label: 'Contact Definition'                          # label of the process definition
+            enabled: true                                        # this definition is enabled (activated)
+            entity: OroCRM\Bundle\ContactBundle\Entity\Contact   # related entity
+            order: 20                                            # processing order
+            exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
+            preconditions:                                       # List of preconditions to check before scheduling process
+                @equal: [$source.name, 'other']                  # Perform process only for entities that have "other" source
+            actions_configuration:                               # list of actions to perform
+                - @find_entity:                                  # find existing entity
+                    conditions:                                  # action conditions
+                        @empty: $assignedTo                      # if field $assignedTo is empty
+                    parameters:                                  # action parameters
+                        class: Oro\Bundle\UserBundle\Entity\User # $assignedTo entity full class name
+                        attribute: $assignedTo                   # name of attribute that will store entity
+                        where:                                   # where conditions
+                            username: 'admin'                    # username is 'admin'
+    triggers:                                                    # list of triggers
+        contact_definition:                                      # name of trigger
+            -
+                event: create                                    # event on which the trigger performed
+            -
+                event: update                                    # event on which the trigger performed
+                field: assignedTo                                # field name to listen
+                priority: 10                                     # priority of the job queue
+                queued: true                                     # this process must be executed in queue
+                time_shift: 60                                   # this process must be executed with 60 seconds delay
+            -
+                cron: */1 * * * *                                # execute process every 1 minute
 ```
 
 This configuration describes process that relates to the ``Contact`` entity; every 1 minute, or every time when any contact is
