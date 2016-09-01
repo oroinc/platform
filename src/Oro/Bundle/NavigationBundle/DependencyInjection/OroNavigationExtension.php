@@ -17,9 +17,9 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
  */
 class OroNavigationExtension extends Extension
 {
-    const TITLES_KEY              = 'oro_titles';
-    const MENU_CONFIG_KEY         = 'oro_menu_config';
-    const NAVIGATION_ELEMENTS_KEY = 'oro_navigation_elements';
+    const TITLES_KEY              = 'titles';
+    const MENU_CONFIG_KEY         = 'menu_config';
+    const NAVIGATION_ELEMENTS_KEY = 'navigation_elements';
 
     /**
      * {@inheritDoc}
@@ -47,16 +47,14 @@ class OroNavigationExtension extends Extension
                 $this->appendConfigPart(
                     $entitiesConfig[self::MENU_CONFIG_KEY],
                     $resource->data[self::NAVIGATION_ELEMENTS_KEY],
-                    self::NAVIGATION_ELEMENTS_KEY
+                    Configuration::NAVIGATION_ELEMENTS_NODE
                 );
             }
         }
 
         // Merge menu from application configuration
-        if (is_array($configs)) {
-            foreach ($configs as $configPart) {
-                $this->mergeMenuConfig($entitiesConfig, $configPart);
-            }
+        foreach ($configs as $configPart) {
+            $this->mergeMenuConfig($entitiesConfig, $configPart);
         }
 
         // process configurations to validate and merge
@@ -82,7 +80,7 @@ class OroNavigationExtension extends Extension
             ->addMethodCall('setTitles', array($titlesConfig));
         $container
             ->getDefinition('oro_navigation.content_provider.navigation_elements')
-            ->replaceArgument(0, $config[self::NAVIGATION_ELEMENTS_KEY]);
+            ->replaceArgument(0, $config[Configuration::NAVIGATION_ELEMENTS_NODE]);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
 
@@ -104,16 +102,16 @@ class OroNavigationExtension extends Extension
     {
         if (array_key_exists('tree', $configPart)) {
             foreach ($configPart['tree'] as $type => &$menuPartConfig) {
-                if (isset($config[self::MENU_CONFIG_KEY]['tree'][$type])
-                    && is_array($config[self::MENU_CONFIG_KEY]['tree'][$type])
+                if (isset($config[Configuration::ROOT_NODE]['tree'][$type])
+                    && is_array($config[Configuration::ROOT_NODE]['tree'][$type])
                     && is_array($menuPartConfig)
                 ) {
-                    $this->reorganizeTree($config[self::MENU_CONFIG_KEY]['tree'][$type], $menuPartConfig);
+                    $this->reorganizeTree($config[Configuration::ROOT_NODE]['tree'][$type], $menuPartConfig);
                 }
             }
         }
 
-        $this->appendConfigPart($config, $configPart, self::MENU_CONFIG_KEY);
+        $this->appendConfigPart($config, $configPart, Configuration::ROOT_NODE);
     }
 
     /**

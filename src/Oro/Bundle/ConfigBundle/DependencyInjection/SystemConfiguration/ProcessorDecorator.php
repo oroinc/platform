@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ProcessorDecorator
 {
-    const ROOT          = 'oro_system_configuration';
+    const ROOT          = 'system_configuration';
     const GROUPS_NODE   = 'groups';
     const FIELDS_ROOT   = 'fields';
     const TREE_ROOT     = 'tree';
