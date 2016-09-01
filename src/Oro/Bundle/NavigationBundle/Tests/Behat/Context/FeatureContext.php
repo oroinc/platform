@@ -52,8 +52,17 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
      */
     public function clickInShortcutsSearchResults($link)
     {
-        $result = $this->getPage()->find('css', sprintf('li[data-value="%s"] a', $link));
-        self::assertNotNull($result, sprintf('Link "%s" not found', $link));
+        $result = $this->spin(function (FeatureContext $context) use ($link) {
+            $result = $context->getPage()->find('css', sprintf('li[data-value="%s"] a', $link));
+
+            if ($result && $result->isVisible()) {
+                return $result;
+            }
+
+            return false;
+        });
+
+        self::assertNotFalse($result, sprintf('Link "%s" not found', $link));
 
         $result->click();
     }

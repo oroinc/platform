@@ -414,7 +414,7 @@ class OroMainContext extends MinkContext implements
             foreach ($labels as $label) {
                 $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-                if (false !== preg_match(sprintf('/%s/i', $row[1]), $text)) {
+                if (1 === preg_match(sprintf('/%s/i', $row[1]), $text)) {
                     continue 2;
                 }
             }
