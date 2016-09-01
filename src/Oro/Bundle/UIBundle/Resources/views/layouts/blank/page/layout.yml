@@ -29,9 +29,18 @@ layout:
                         src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
                 body:
                     blockType: body
+                require_js:
+                    blockType: container
+                requirejs_scripts:
+                    blockType: requires
                     options:
-                        attr:
-                            class: body
+                        provider_alias: oro_layout_requirejs_config_provider
+                require_modules:
+                    blockType: container
+                app_script:
+                    blockType: script
+                    options:
+                        content: 'require(["oroui/js/app"]);'
             tree:
                 root:
                     head:
@@ -40,4 +49,8 @@ layout:
                         meta_viewport: ~
                         theme_icon: ~
                         styles: ~
+                        require_js:
+                            requirejs_scripts: ~
+                        require_modules:
+                            app_script: ~
                     body: ~
