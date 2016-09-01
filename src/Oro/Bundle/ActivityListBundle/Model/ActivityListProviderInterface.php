@@ -30,6 +30,8 @@ interface ActivityListProviderInterface
     public function getSubject($entity);
 
     /**
+     * Return text representation. Should be a plain text.
+     *
      * @param object $entity
      *
      * @return string|null
