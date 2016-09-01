@@ -45,8 +45,10 @@ class TemplatingRendererEngineTest extends RendererEngineTest
             ->method('exists')
             ->will($this->returnCallback(function ($path) use ($firstTheme) {
                 switch ($path) {
-                    case $firstTheme . ':root.html.php': return true;
-                    default: return false;
+                    case $firstTheme . ':root.html.php':
+                        return true;
+                    default:
+                        return false;
                 }
             }))
         ;
@@ -77,10 +79,14 @@ class TemplatingRendererEngineTest extends RendererEngineTest
             ->method('exists')
             ->will($this->returnCallback(function ($path) use ($firstTheme, $secondTheme, $thirdTheme) {
                 switch ($path) {
-                    case $firstTheme . ':container.html.php': return true;
-                    case $secondTheme . ':main_menu.html.php': return true;
-                    case $thirdTheme . ':main_menu.html.php': return true;
-                    default: return false;
+                    case $firstTheme . ':container.html.php':
+                        return true;
+                    case $secondTheme . ':main_menu.html.php':
+                        return true;
+                    case $thirdTheme . ':main_menu.html.php':
+                        return true;
+                    default:
+                        return false;
                 }
             }))
         ;
@@ -116,9 +122,12 @@ class TemplatingRendererEngineTest extends RendererEngineTest
             ->method('exists')
             ->will($this->returnCallback(function ($path) use ($firstTheme, $secondTheme, $thirdTheme) {
                 switch ($path) {
-                    case $firstTheme . ':main_menu.html.php': return true;
-                    case $thirdTheme . ':main_menu.html.php': return true;
-                    default: return false;
+                    case $firstTheme . ':main_menu.html.php':
+                        return true;
+                    case $thirdTheme . ':main_menu.html.php':
+                        return true;
+                    default:
+                        return false;
                 }
             }))
         ;
@@ -162,9 +171,12 @@ class TemplatingRendererEngineTest extends RendererEngineTest
             ->method('exists')
             ->will($this->returnCallback(function ($path) use ($firstTheme, $secondTheme, $thirdTheme) {
                 switch ($path) {
-                    case $firstTheme . ':container.html.php': return true;
-                    case $thirdTheme . ':main_menu.html.php': return true;
-                    default: return false;
+                    case $firstTheme . ':container.html.php':
+                        return true;
+                    case $thirdTheme . ':main_menu.html.php':
+                        return true;
+                    default:
+                        return false;
                 }
             }));
 

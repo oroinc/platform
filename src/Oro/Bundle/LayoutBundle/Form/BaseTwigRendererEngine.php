@@ -187,7 +187,6 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
             $isHighestHierarchyLevelBlock = ($i == count($blockNameHierarchy) - 1);
 
             if (array_key_exists($blockName, $this->resourcesHierarchy)) {
-
                 // if there is only one resource on the highest hierarchy level
                 // then its only current resource there, no parent resources
                 if ($isHighestHierarchyLevelBlock && count($this->resourcesHierarchy[$blockName]) < 2) {
