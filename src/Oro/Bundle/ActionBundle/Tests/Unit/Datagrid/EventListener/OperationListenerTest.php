@@ -1,35 +1,60 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\EventListener;
 
-use Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension;
+use Oro\Bundle\ActionBundle\Datagrid\EventListener\OperationListener;
+use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
+use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class OperationExtensionTest extends AbstractExtensionTest
+class OperationListenerTest extends \PHPUnit_Framework_TestCase
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
     const TEST_ROUTE = 'test_route';
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
+    protected $manager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
+    protected $entityClassResolver;
+
+    /** @var GridConfigurationHelper */
+    protected $gridConfigurationHelper;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
 
-    /** @var OperationExtension */
-    protected $extension;
+    /** @var OperationListener */
+    protected $listener;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        parent::setUp();
+        $this->manager = $this->getMockBuilder(OperationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->gridConfigurationHelper = new GridConfigurationHelper($this->entityClassResolver);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
-        $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+        $contextHelper = $this->getMockBuilder(ContextHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
         $contextHelper->expects($this->any())
@@ -48,13 +73,12 @@ class OperationExtensionTest extends AbstractExtensionTest
                 ]
             );
 
-        $provider = $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
+        $provider = $this->getMock(MassActionProviderInterface::class);
         $provider->expects($this->any())
             ->method('getActions')
             ->willReturn(['test_config' => ['label' => 'test_label']]);
 
-        $this->massActionProviderRegistry = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry')
+        $this->massActionProviderRegistry = $this->getMockBuilder(MassActionProviderRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -64,28 +88,34 @@ class OperationExtensionTest extends AbstractExtensionTest
             ->willReturn($provider);
 
         /* @var $optionsHelper OptionsHelper|\PHPUnit_Framework_MockObject_MockObject */
-        $optionsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\OptionsHelper')
+        $optionsHelper = $this->getMockBuilder(OptionsHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
         $optionsHelper->expects($this->any())
             ->method('getFrontendOptions')
             ->willReturn(['options' => ['option1' => 'value1', 'option2' => 'value2']]);
 
-        $this->extension = new OperationExtension(
+        $this->listener = new OperationListener(
             $this->manager,
             $contextHelper,
             $this->massActionProviderRegistry,
             $optionsHelper,
             $this->gridConfigurationHelper
         );
-        $this->extension->setParameters(new ParameterBag());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
-        unset($this->extension, $this->massActionProviderRegistry);
-
-        parent::tearDown();
+        unset(
+            $this->listener,
+            $this->massActionProviderRegistry,
+            $this->manager,
+            $this->entityClassResolver,
+            $this->gridConfigurationHelper
+        );
     }
 
     /**
@@ -94,9 +124,9 @@ class OperationExtensionTest extends AbstractExtensionTest
      * @param bool $expected
      * @param array $expectedConfiguration
      *
-     * @dataProvider isApplicableProvider
+     * @dataProvider onConfigureActionsProvider
      */
-    public function testIsApplicable(
+    public function testOnConfigureActions(
         DatagridConfiguration $config,
         array $operations,
         $expected,
@@ -106,7 +136,7 @@ class OperationExtensionTest extends AbstractExtensionTest
             ->method('getOperations')
             ->willReturn($operations);
 
-        $this->assertEquals($expected, $this->extension->isApplicable($config));
+        $this->listener->onConfigureActions(new ConfigureActionsBefore($config));
 
         if ($expected) {
             $options = $config->offsetGetOr('options');
@@ -123,6 +153,10 @@ class OperationExtensionTest extends AbstractExtensionTest
                 $this->assertNotEmpty($config->offsetGetOr($name));
                 $this->assertEquals($params, $config->offsetGetOr($name));
             }
+        } else {
+            $this->assertEmpty($config->offsetGetOr('options'));
+            $this->assertEmpty($config->offsetGetOr('actions'));
+            $this->assertEmpty($config->offsetGetOr('action_configuration'));
         }
     }
 
@@ -150,55 +184,29 @@ class OperationExtensionTest extends AbstractExtensionTest
             ->willReturn($actions);
 
         if ($groups) {
-            $this->extension->setGroups($groups);
+            $this->listener->setGroups($groups);
         }
 
-        if ($this->extension->isApplicable($datagridConfig)) {
-            $actionConfigurationCallback = $datagridConfig->offsetGet(ActionExtension::ACTION_CONFIGURATION_KEY);
+        $this->listener->onConfigureActions(new ConfigureActionsBefore($datagridConfig));
 
+        $actionConfigurationCallback = $datagridConfig->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY, []);
+
+        if ($actionConfigurationCallback) {
             $this->assertInstanceOf('Closure', $actionConfigurationCallback);
 
             $this->assertEquals($expectedActions, call_user_func($actionConfigurationCallback, $record, []));
+        } else {
+            $this->assertEmpty($actionConfigurationCallback);
         }
-    }
-
-    /**
-     * @dataProvider testIsDisabledByParametersDataProvider
-     *
-     * @param bool  $expected
-     * @param array $parameters
-     */
-    public function testIsDisabledByParameters($expected, array $parameters)
-    {
-        $this->extension->getParameters()->add($parameters);
-        $reflection = new \ReflectionObject($this->extension);
-        $method = $reflection->getMethod('isDisabled');
-        $method->setAccessible(true);
-        $this->assertEquals($expected, $method->invoke($this->extension));
-    }
-
-    public function testIsDisabledByParametersDataProvider()
-    {
-        return [
-            'disabled' => [
-                true,
-                [OperationExtension::OPERATION_ROOT_PARAM => [OperationExtension::DISABLED_PARAM => true]]
-            ],
-            'not disabled' => [
-                false,
-                [OperationExtension::OPERATION_ROOT_PARAM => [OperationExtension::DISABLED_PARAM => false]]
-            ],
-            'not disabled(no root key)' => [false, []]
-        ];
     }
 
     /**
      * @return array
      */
-    public function isApplicableProvider()
+    public function onConfigureActionsProvider()
     {
         return [
-            'applicable with provider' => [
+            'configure with provider' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => ['test_operation' => $this->createOperation(
                     'test_operation',
@@ -212,7 +220,7 @@ class OperationExtensionTest extends AbstractExtensionTest
                     'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
                 ]
             ],
-            'applicable with single mass action' => [
+            'configure with single mass action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => ['test_operation' => $this->createOperation(
                     'test_operation',
@@ -226,7 +234,7 @@ class OperationExtensionTest extends AbstractExtensionTest
                     'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
                 ]
             ],
-            'applicable with single action' => [
+            'configure with single action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => ['action3' => $this->createOperation(
                     'action3',
@@ -265,7 +273,7 @@ class OperationExtensionTest extends AbstractExtensionTest
                     ]
                 ]
             ],
-            'not applicable' => [
+            'not configure' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => [],
                 'expected' => false
@@ -385,5 +393,30 @@ class OperationExtensionTest extends AbstractExtensionTest
                 'operationName' => $action,
             ]
         ];
+    }
+
+    /**
+     * @param string $name
+     * @param bool $isAvailable
+     * @param array $definitionParams
+     *
+     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createOperation($name = 'test_operation', $isAvailable = true, array $definitionParams = [])
+    {
+        /** @var $definition OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
+        $definition = $this->getMock(OperationDefinition::class);
+
+        foreach ($definitionParams as $method => $params) {
+            $definition->expects($this->any())->method($method)->willReturn($params);
+        }
+
+        /** @var $operation Operation|\PHPUnit_Framework_MockObject_MockObject */
+        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $operation->expects($this->any())->method('getName')->willReturn($name);
+        $operation->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
+
+        return $operation;
     }
 }

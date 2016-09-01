@@ -214,6 +214,7 @@ define(function(require) {
             var self = this;
 
             model.save({
+                icon: void 0,
                 label: model.get('label'),
                 filters: this.collection.state.filters,
                 sorters: this.collection.state.sorters,
