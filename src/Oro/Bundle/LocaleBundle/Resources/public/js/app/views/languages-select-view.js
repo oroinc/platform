@@ -37,11 +37,11 @@ define(function(require) {
         onChange: function() {
             var options = this.$select.find('option:selected');
             var selected = options.map(function(index, option) {
-                var option = $(option);
+                var $option = $(option);
 
                 return {
-                    id: option.val(),
-                    label: option.text()
+                    id: $option.val(),
+                    label: $option.text()
                 };
             });
 

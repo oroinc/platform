@@ -60,10 +60,10 @@ define([
             switch (this.type) {
                 case 'import':
                     this.importExportManager.handleImport();
-                    break
+                    break;
                 case 'export':
                     this.importExportManager.handleExport();
-                    break
+                    break;
             }
         },
 
@@ -90,10 +90,10 @@ define([
                         if ('$' === value[0] && this.model.has(variable)) {
                             options[key] = this.model.get(variable);
                         }
-                        break
+                        break;
                     case 'object':
                         options[key] = this.extractVars(value);
-                        break
+                        break;
                 }
             }, this);
 
