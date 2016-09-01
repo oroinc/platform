@@ -94,12 +94,14 @@ class TemplatingRendererEngine extends BaseEngine implements FormRendererEngineI
         if ($this->engine->exists($templateName = $theme.':'.$blockName.'.html.php')) {
             $this->resources[$cacheKey][$blockName] = $templateName;
 
-            for ($i = count($this->themes[$cacheKey]) - 1; $i >= 0; $i--) {
-                if ($this->engine->exists($templateName = $this->themes[$cacheKey][$i].':'.$blockName.'.html.php')) {
-                    if (!array_key_exists($blockName, $this->resourcesHierarchy)) {
-                        $this->resourcesHierarchy[$blockName] = [$templateName];
-                    } else {
-                        array_unshift($this->resourcesHierarchy[$blockName], $templateName);
+            if (array_key_exists($cacheKey, $this->themes)) {
+                for ($i = count($this->themes[$cacheKey]) - 1; $i >= 0; $i--) {
+                    if ($this->engine->exists($templateName = $this->themes[$cacheKey][$i] . ':' . $blockName . '.html.php')) {
+                        if (!array_key_exists($blockName, $this->resourcesHierarchy)) {
+                            $this->resourcesHierarchy[$blockName] = [$templateName];
+                        } else {
+                            array_unshift($this->resourcesHierarchy[$blockName], $templateName);
+                        }
                     }
                 }
             }
