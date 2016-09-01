@@ -209,7 +209,7 @@ services:
             - '@event_dispatcher'
             - '@oro_search.cache.mapping_configuration'
         calls:
-            - [setMappingConfig, [%oro_search.entities_config%]]
+            - [setMappingConfig, ['%oro_search.entities_config%']]
 
     oro_search.cache.doctrine_metadata:
         parent: oro.cache.abstract

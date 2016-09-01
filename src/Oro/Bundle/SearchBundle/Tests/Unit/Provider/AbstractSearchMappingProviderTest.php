@@ -4,6 +4,9 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AbstractSearchMappingProvider */
