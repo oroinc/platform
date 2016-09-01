@@ -390,11 +390,11 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Assert text by label in page. Accept regexp as parameter to label
+     * Assert text by label in page.
      * Example: Then I should see call with:
      *            | Subject             | Proposed Charlie to star in new film |
      *            | Additional comments | Charlie was in a good mood           |
-     *            | Call date & time    | Aug 24, 2017,? 11:00 AM              |
+     *            | Call date & time    | Aug 24, 2017, 11:00 AM               |
      *            | Phone number        | (310) 475-0859                       |
      *            | Direction           | Outgoing                             |
      *            | Duration            | 5:30                                 |
@@ -414,7 +414,7 @@ class OroMainContext extends MinkContext implements
             foreach ($labels as $label) {
                 $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-                if (1 === preg_match(sprintf('/%s/i', $row[1]), $text)) {
+                if (1 === preg_match(sprintf('/%s/i', preg_quote($row[1])), $text)) {
                     continue 2;
                 }
             }
