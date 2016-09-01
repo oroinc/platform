@@ -63,8 +63,8 @@ class EmailTemplateTypeTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
-                ['oro_locale.languages', false, false, null, ['en', 'fr_FR']],
-                ['oro_email.sanitize_html', false, false, null, true]
+                ['oro_locale.languages', false, false, ['en', 'fr_FR']],
+                ['oro_email.sanitize_html', false, false, true]
             ]));
 
         $this->type->buildForm($builder, array());
