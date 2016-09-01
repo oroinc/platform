@@ -572,6 +572,4 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             );
         }
     }
-
-
 }
