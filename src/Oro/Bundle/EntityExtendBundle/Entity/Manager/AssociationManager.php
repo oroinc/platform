@@ -200,11 +200,6 @@ class AssociationManager
         $subQueries = [];
         foreach ($associationTargets as $entityClass => $fieldName) {
             $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'target');
-            // Need to forcibly convert expression to string when the title is different type.
-            // Example of error: "UNION types text and integer cannot be matched".
-            if ($nameExpr) {
-                $nameExpr = sprintf('CONCAT(%s,\'\')', $nameExpr);
-            }
             $subQb    = $em->getRepository($associationOwnerClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(

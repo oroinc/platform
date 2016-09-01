@@ -49,16 +49,16 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
         return [
             'first and last name exists'                                 => [
                 'CONCAT('
-                . 'CASE WHEN NULLIF(a.lastName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.lastName, \' \') END, '
-                . 'CASE WHEN NULLIF(a.firstName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.firstName, \' \') END'
+                . 'COALESCE(CONCAT(CAST(a.lastName as string), \' \'), \'\'), '
+                . 'COALESCE(CONCAT(CAST(a.firstName as string), \' \'), \'\')'
                 . ')',
                 '%last_name% %first_name% %suffix%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'first and last name exists, has unknown placeholders'       => [
                 'CONCAT('
-                . 'CASE WHEN NULLIF(a.lastName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.lastName, \' \') END, '
-                . 'CASE WHEN NULLIF(a.firstName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.firstName, \' \') END'
+                . 'COALESCE(CONCAT(CAST(a.lastName as string), \' \'), \'\'), '
+                . 'COALESCE(CONCAT(CAST(a.firstName as string), \' \'), \'\')'
                 . ')',
                 '%unknown_data_one% %last_name% %first_name% %suffix% %unknown_data_two%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
@@ -66,41 +66,34 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
             'has both prepend and append separators'                     => [
                 'CONCAT('
                 . '\'(\', '
-                . 'CONCAT('
-                . 'CASE WHEN NULLIF(a.firstName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.firstName, \' \') END, '
-                . 'CASE WHEN NULLIF(a.lastName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.lastName, \') - \') END'
-                . ')'
+                . 'COALESCE(CONCAT(CAST(a.firstName as string), \' \'), \'\'), '
+                . 'COALESCE(CONCAT(CAST(a.lastName as string), \') - \'), \'\')'
                 . ')',
                 '(%first_name% %last_name%) - %suffix%!',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'first and last name exists, first name should be uppercase' => [
                 'CONCAT('
-                . 'CASE WHEN NULLIF(a.lastName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.lastName, \' \') END, '
-                . 'CASE WHEN NULLIF(UPPER(a.firstName), \'\') IS NULL'
-                . ' THEN \'\' ELSE CONCAT(UPPER(a.firstName), \' \') END'
+                . 'COALESCE(CONCAT(CAST(a.lastName as string), \' \'), \'\'), '
+                . 'COALESCE(CONCAT(CAST(UPPER(a.firstName) as string), \' \'), \'\')'
                 . ')',
                 '%last_name% %FIRST_NAME% %suffix%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'full name format, and entity contains all parts'            => [
                 'CONCAT('
-                . 'CASE WHEN NULLIF(a.namePrefix, \'\') IS NULL THEN \'\' ELSE CONCAT(a.namePrefix, \' \') END, '
-                . 'CONCAT('
-                . 'CASE WHEN NULLIF(a.lastName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.lastName, \' \') END, '
-                . 'CONCAT('
-                . 'CASE WHEN NULLIF(a.firstName, \'\') IS NULL THEN \'\' ELSE CONCAT(a.firstName, \' - \') END, '
-                . 'CASE WHEN NULLIF(a.nameSuffix, \'\') IS NULL THEN \'\' ELSE a.nameSuffix END'
-                . ')'
-                . ')'
+                . 'COALESCE(CONCAT(CAST(a.namePrefix as string), \' \'), \'\'), '
+                . 'COALESCE(CONCAT(CAST(a.lastName as string), \' \'), \'\'), '
+                . 'COALESCE(CONCAT(CAST(a.firstName as string), \' - \'), \'\'), '
+                . 'COALESCE(CAST(a.nameSuffix as string), \'\')'
                 . ')',
                 '%prefix% %last_name% %first_name% - %suffix%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Model\FullNameInterface')
             ],
             'without separators'                                         => [
                 'CONCAT('
-                . 'CASE WHEN NULLIF(a.lastName, \'\') IS NULL THEN \'\' ELSE a.lastName END, '
-                . 'CASE WHEN NULLIF(a.firstName, \'\') IS NULL THEN \'\' ELSE a.firstName END'
+                . 'COALESCE(CAST(a.lastName as string), \'\'), '
+                . 'COALESCE(CAST(a.firstName as string), \'\')'
                 . ')',
                 '%last_name%%first_name%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
@@ -108,7 +101,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
             'one item and prefix'                                        => [
                 'CONCAT('
                 . '\' - \', '
-                . 'CASE WHEN NULLIF(a.lastName, \'\') IS NULL THEN \'\' ELSE a.lastName END'
+                . 'COALESCE(CAST(a.lastName as string), \'\')'
                 . ')',
                 ' - %last_name%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
