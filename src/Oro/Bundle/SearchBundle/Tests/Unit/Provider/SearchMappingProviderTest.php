@@ -65,7 +65,7 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
         $this->cache
             ->expects($this->once())
             ->method('contains')
-            ->with('oro_search.mapping_config')
+            ->with(SearchMappingProvider::CACHE_KEY)
             ->willReturn(false);
 
         $this->cache
@@ -88,9 +88,7 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
             ->with(SearchMappingProvider::CACHE_KEY, []);
 
         $this->assertEquals([], $this->provider->getMappingConfig());
-
-        // Test local cache
-        $this->provider->getMappingConfig();
+        $this->assertEquals([], $this->provider->getMappingConfig());
     }
 
     public function testClearMappingCache()
@@ -98,7 +96,7 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
         $this->cache
             ->expects($this->once())
             ->method('delete')
-            ->with('oro_search.mapping_config');
+            ->with(SearchMappingProvider::CACHE_KEY);
 
         $this->provider->clearCache();
     }

@@ -23,6 +23,8 @@ parameters:
     oro_search.extension.orm_pager.class:          Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
     oro_search.extension.pager.search.pager.class: Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
 
+    oro_search.provider.search_mapping.class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
+
     oro_search.cache.search_mapping_cache.class: Oro\Bundle\SearchBundle\Cache\SearchMappingCache
 
     # services used only for ORM search engine
@@ -200,8 +202,9 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_search_mapping_configuration' ] ]
+
     oro_search.provider.search_mapping:
-        class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
+        class: '%oro_search.provider.search_mapping.class%'
         arguments:
             - '@event_dispatcher'
             - '@oro_search.cache.mapping_configuration'
