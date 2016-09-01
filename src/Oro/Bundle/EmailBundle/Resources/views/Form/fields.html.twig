@@ -1,3 +1,16 @@
+{% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}
+    {{ form_widget(form) }}
+    {% if is_granted('oro_config_system') %}
+    <span class="help-block">
+        <a class="btn btn-danger"
+           href="{{ path('oro_email_purge_emails_attachments') }}"
+           data-page-component-module="{{ 'oroui/js/app/components/hidden-redirect-component' }}"
+           data-page-component-options="{{ {showLoading: true}|json_encode }}"
+        >{{ 'oro.email.system_configuration.attachment_configuration.remove_larger_attachments.label'|trans }}</a>
+    </span>
+    {% endif %}
+{% endblock %}
+
 {% block _oro_email_autoresponserule_conditions_entry_field_row %}
     {{ form_widget(form) }}
 {% endblock %}

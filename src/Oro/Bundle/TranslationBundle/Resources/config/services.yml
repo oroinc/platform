@@ -219,13 +219,9 @@ services:
             - '@oro_translation.packages_provider'
             - '@oro_translation.oro_translation_adapter'
             - '@oro_translation.service_provider'
-
-    oro_translation.acl.voter.language:
-        class: 'Oro\Bundle\TranslationBundle\Acl\Voter\LanguageVoter'
-        arguments:
-            - '@oro_entity.doctrine_helper'
             - '@oro_config.global'
-        calls:
-            - [setClassName, ['%oro_translation.entity.language.class%']]
+
+    oro_translation.form.type.import:
+        class: 'Oro\Bundle\TranslationBundle\Form\Type\TranslationImportType'
         tags:
-            - { name: security.voter }
+            - { name: form.type, alias: oro_translation_import }

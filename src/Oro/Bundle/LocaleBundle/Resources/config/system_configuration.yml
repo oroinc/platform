@@ -59,6 +59,19 @@ oro_system_configuration:
                 constraints:
                     - NotBlank: ~
 
+        oro_locale.languages:
+            data_type: array
+            type: oro_language
+            priority: 35
+            options:
+                label: oro.locale.system_configuration.fields.languages.label
+                tooltip: oro.locale.form.tooltip.languages
+                required: true
+                multiple: true
+                show_all: true
+                constraints:
+                    - NotBlank: ~
+
         oro_locale.timezone:
             data_type: string
             type: oro_locale_timezone
@@ -180,6 +193,7 @@ oro_system_configuration:
                                     language_languages:
                                         children:
                                             - oro_locale.language
+                                            - oro_locale.languages
         user_configuration:
             platform:
                 children:
@@ -211,6 +225,7 @@ oro_system_configuration:
     api_tree:
         localization:
             oro_locale.language: ~
+            oro_locale.languages: ~
             oro_locale.locale: ~
             oro_locale.country: ~
             oro_locale.format_address_by_address_country: ~

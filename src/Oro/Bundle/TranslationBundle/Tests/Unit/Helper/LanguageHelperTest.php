@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
@@ -26,6 +28,9 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationServiceProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationServiceProvider;
 
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
     /** @var LanguageHelper */
     protected $helper;
 
@@ -43,12 +48,16 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
         $this->translationServiceProvider = $this->getMockBuilder(TranslationServiceProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->helper = new LanguageHelper(
             $this->statisticProvider,
             $this->packagesProvider,
             $this->translationAdapter,
-            $this->translationServiceProvider
+            $this->translationServiceProvider,
+            $this->configManager
         );
     }
 
@@ -59,7 +68,8 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
             $this->statisticProvider,
             $this->packagesProvider,
             $this->translationAdapter,
-            $this->translationServiceProvider
+            $this->translationServiceProvider,
+            $this->configManager
         );
     }
 
@@ -213,7 +223,6 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testDownloadLanguageFile()
     {
-        $statistic = ['code' => 'en_US', 'translationStatus' => 50, 'lastBuildDate' => date('Y-m-dTH:i:sO')];
         $this->packagesProvider->expects($this->once())
             ->method('getInstalledPackages')
             ->willReturn(['Oro']);
@@ -228,5 +237,43 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
             ->with('test_path', ['Oro'], 'en_US')
             ->willReturn(true);
         $this->assertEquals('test_path', $this->helper->downloadLanguageFile('en_US'));
+    }
+
+    /**
+     * @dataProvider isDefaultLanguageDataProvider
+     *
+     * @param Language $language
+     * @param Language $defaultLanguage
+     * @param bool $expected
+     */
+    public function testIsDefaultLanguage($language, $defaultLanguage, $expected)
+    {
+        $this->configManager
+            ->expects($this->any())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::LANGUAGE))
+            ->willReturn($defaultLanguage);
+
+        $this->assertEquals($expected, $this->helper->isDefaultLanguage($language));
+    }
+
+    /**
+     * return array
+     */
+    public function isDefaultLanguageDataProvider()
+    {
+        $lang = (new Language())->setCode('en');
+        return [
+            'true' => [
+                'language' => $lang,
+                'defaultLanguage' => 'en',
+                'expected' => true
+            ],
+            'false' => [
+                'language' => $lang,
+                'defaultLanguage' => 'fr_FR',
+                'expected' => false
+            ],
+        ];
     }
 }

@@ -39,8 +39,17 @@ operations:
         button_options:
             icon: icon-remove
         acl_resource: [EDIT, $.data]
+        preactions:
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isDefaultLanguage
+                method_parameters: [$.data]
+                attribute: $.isDefaultLanguage
         preconditions:
-            '@equal': [$enabled, true]
+            '@and':
+                - '@not_equal': [$code, 'en']
+                - '@equal': [$.isDefaultLanguage, false]
+                - '@equal': [$enabled, true]
         actions:
             - '@run_action_group':
                 action_group: oro_translation_language_set_enabled
