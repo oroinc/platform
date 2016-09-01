@@ -59,8 +59,8 @@ Here we can see that *visible* option depends on context value, let's review how
 ```php
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        // here we can get scalar value as well as an expression
-        $view->vars['visible'] = $options['visible'];
+        // this operation better to use on finishView but if you are really sure you can write like this
+        $view->vars['visible'] =  $options->get('visible', false);
     }
     
     public function finishView(BlockView $view, BlockInterface $block, Options $options)

@@ -768,8 +768,9 @@ class LinkExtension extends AbstractBlockTypeExtension
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if (!empty($options['image'])) {
-            $view->vars['image'] = $options['image'];
+        // this operation better to use on finishView but if you are really sure you can write like this
+        if ($options->isExistsAndNotEmpty('image')) {
+            $view->vars['image'] = $options->get('image', false);
         }
     }
 
@@ -1469,8 +1470,9 @@ class ImageType extends AbstractType
     {
         BlockUtils::processUrl($view, $options, true);
 
-        if (!empty($options['alt'])) {
-            $view->vars['alt'] = $options['alt'];
+        // this operation better to use on finishView but if you are really sure you can write like this
+        if ($options->isExistsAndNotEmpty('alt')) {
+            $view->vars['alt'] = $options->get('alt', false);
         }
     }
 
