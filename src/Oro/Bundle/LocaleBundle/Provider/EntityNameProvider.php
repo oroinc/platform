@@ -66,9 +66,7 @@ class EntityNameProvider implements EntityNameProviderInterface
             $nameDQL = sprintf('COALESCE(NULLIF(%s, \'\'), %s)', $nameDQL, join(', ', $subSelects));
         }
 
-        // Need to forcibly convert expression to string when the title is different type.
-        // Example of error: "UNION types text and integer cannot be matched".
-        return 'CAST(' . $nameDQL .' as string)';
+        return $nameDQL;
     }
 
     /**
