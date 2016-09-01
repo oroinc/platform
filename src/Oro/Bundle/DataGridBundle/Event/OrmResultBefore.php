@@ -12,7 +12,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
  * Class ResultBefore
  * @package Oro\Bundle\DataGridBundle\Event
  *
- * This event dispatched before datagrid builder starts build result
+ * This event is dispatched before datagrid builder starts to build result
  */
 class OrmResultBefore extends Event implements GridEventInterface
 {
