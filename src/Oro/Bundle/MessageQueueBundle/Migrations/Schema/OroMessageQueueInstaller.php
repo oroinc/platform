@@ -26,13 +26,20 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $this->createDbalQueueTable($schema);
     }
 
+    /**
+     * @param Schema $schema
+     */
     private function createDbalQueueTable(Schema $schema)
     {
-        $dbalQueueSchema = new DbalSchema(
-            $this->getDbalConnection()
-        )
+        $queueSchema = new DbalSchema(
+            $this->getDbalConnection(),
+            'oro_message_queue'
+        );
+
+        $queueSchema->addToSchema($schema);
     }
 
     /**

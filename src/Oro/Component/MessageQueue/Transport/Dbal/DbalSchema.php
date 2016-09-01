@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
 use Doctrine\DBAL\Connection;
 
@@ -9,21 +10,51 @@ class DbalSchema extends BaseSchema
     /**
      * @var string
      */
-    private $queueTableName;
+    private $tableName;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var AbstractSchemaManager
+     */
+    private $schemaManager;
 
     /**
      * @param Connection $connection
-     * @param string     $queueTableName
+     * @param string     $tableName
      */
-    public function __construct(Connection $connection, $queueTableName)
+    public function __construct(Connection $connection, $tableName)
     {
-        $this->queueTableName = $queueTableName;
+        $this->connection = $connection;
+        $this->tableName = $tableName;
 
-        $schemaConfig = $connection->getSchemaManager()->createSchemaConfig();
+        $this->schemaManager = $this->connection->getSchemaManager();
 
-        parent::__construct([], [], $schemaConfig);
+        parent::__construct([], [], $this->schemaManager->createSchemaConfig());
 
         $this->addQueueTable();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTableExists()
+    {
+        return $this->schemaManager->tablesExist([$this->tableName]);
+    }
+
+    public function createTables()
+    {
+        if (empty($this->getTables())) {
+            throw new \LogicException('List of tables is empty');
+        }
+
+        foreach ($this->getTables() as $table) {
+            $this->schemaManager->createTable($table);
+        }
     }
 
     /**
@@ -44,7 +75,7 @@ class DbalSchema extends BaseSchema
 
     private function addQueueTable()
     {
-        $table = $this->createTable($this->queueTableName);
+        $table = $this->createTable($this->tableName);
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true,]);
         $table->addColumn('body', 'text', ['notnull' => false,]);
         $table->addColumn('headers', 'text', ['notnull' => false,]);

@@ -12,6 +12,11 @@ class DbalConnection implements ConnectionInterface
     private $connection;
 
     /**
+     * @var DbalSchema
+     */
+    private $schema;
+
+    /**
      * @var
      */
     private $tableName;
@@ -23,12 +28,14 @@ class DbalConnection implements ConnectionInterface
 
     /**
      * @param Connection $connection
-     * @param string     $tableName
-     * @param array      $options
+     * @param DbalSchema $schema
+     * @param string $tableName
+     * @param array $options
      */
-    public function __construct(Connection $connection, $tableName, array $options = [])
+    public function __construct(Connection $connection, DbalSchema $schema, $tableName, array $options = [])
     {
         $this->connection = $connection;
+        $this->schema = $schema;
         $this->tableName = $tableName;
         $this->options = $options;
     }
@@ -49,6 +56,14 @@ class DbalConnection implements ConnectionInterface
     public function getDBALConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * @return DbalSchema
+     */
+    public function getDBALSchema()
+    {
+        return $this->schema;
     }
 
     /**

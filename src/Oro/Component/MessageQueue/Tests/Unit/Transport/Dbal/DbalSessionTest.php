@@ -3,12 +3,12 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Table;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
@@ -105,36 +105,22 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldDeclareQueue()
     {
-        $sm = $this->createSchemaManager();
-        $sm
+        $schema = $this->createDbalSchemaMock();
+        $schema
             ->expects($this->once())
-            ->method('tablesExist')
-            ->with(['tableName'])
+            ->method('isTableExists')
             ->will($this->returnValue(false))
         ;
-        $sm
+        $schema
             ->expects($this->once())
-            ->method('createTable')
-            ->with($this->isInstanceOf(Table::class))
-        ;
-
-        $dbalConnection = $this->createDBALConnectionMock();
-        $dbalConnection
-            ->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($sm))
+            ->method('createTables')
         ;
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
-            ->method('getDBALConnection')
-            ->will($this->returnValue($dbalConnection))
-        ;
-        $connection
-            ->expects($this->any())
-            ->method('getTableName')
-            ->will($this->returnValue('tableName'))
+            ->method('getDBALSchema')
+            ->will($this->returnValue($schema))
         ;
 
         $session = new DbalSession($connection);
@@ -143,36 +129,22 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldDeclareTopic()
     {
-        $sm = $this->createSchemaManager();
-        $sm
+        $schema = $this->createDbalSchemaMock();
+        $schema
             ->expects($this->once())
-            ->method('tablesExist')
-            ->with(['tableName'])
+            ->method('isTableExists')
             ->will($this->returnValue(false))
         ;
-        $sm
+        $schema
             ->expects($this->once())
-            ->method('createTable')
-            ->with($this->isInstanceOf(Table::class))
-        ;
-
-        $dbalConnection = $this->createDBALConnectionMock();
-        $dbalConnection
-            ->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($sm))
+            ->method('createTables')
         ;
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
-            ->method('getDBALConnection')
-            ->will($this->returnValue($dbalConnection))
-        ;
-        $connection
-            ->expects($this->any())
-            ->method('getTableName')
-            ->will($this->returnValue('tableName'))
+            ->method('getDBALSchema')
+            ->will($this->returnValue($schema))
         ;
 
         $session = new DbalSession($connection);
@@ -181,35 +153,22 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testDeclareTopicShouldNotCreateTableIfExists()
     {
-        $sm = $this->createSchemaManager();
-        $sm
+        $schema = $this->createDbalSchemaMock();
+        $schema
             ->expects($this->once())
-            ->method('tablesExist')
-            ->with(['tableName'])
+            ->method('isTableExists')
             ->will($this->returnValue(true))
         ;
-        $sm
+        $schema
             ->expects($this->never())
-            ->method('createTable')
-        ;
-
-        $dbalConnection = $this->createDBALConnectionMock();
-        $dbalConnection
-            ->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($sm))
+            ->method('createTables')
         ;
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
-            ->method('getDBALConnection')
-            ->will($this->returnValue($dbalConnection))
-        ;
-        $connection
-            ->expects($this->any())
-            ->method('getTableName')
-            ->will($this->returnValue('tableName'))
+            ->method('getDBALSchema')
+            ->will($this->returnValue($schema))
         ;
 
         $session = new DbalSession($connection);
@@ -218,35 +177,22 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testDeclareQueueShouldNotCreateTableIfExists()
     {
-        $sm = $this->createSchemaManager();
-        $sm
+        $schema = $this->createDbalSchemaMock();
+        $schema
             ->expects($this->once())
-            ->method('tablesExist')
-            ->with(['tableName'])
+            ->method('isTableExists')
             ->will($this->returnValue(true))
         ;
-        $sm
+        $schema
             ->expects($this->never())
-            ->method('createTable')
-        ;
-
-        $dbalConnection = $this->createDBALConnectionMock();
-        $dbalConnection
-            ->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($sm))
+            ->method('createTables')
         ;
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
-            ->method('getDBALConnection')
-            ->will($this->returnValue($dbalConnection))
-        ;
-        $connection
-            ->expects($this->any())
-            ->method('getTableName')
-            ->will($this->returnValue('tableName'))
+            ->method('getDBALSchema')
+            ->will($this->returnValue($schema))
         ;
 
         $session = new DbalSession($connection);
@@ -262,18 +208,10 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSchema
      */
-    private function createDBALConnectionMock()
+    private function createDbalSchemaMock()
     {
-        return $this->getMock(Connection::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractSchemaManager
-     */
-    private function createSchemaManager()
-    {
-        return $this->getMock(AbstractSchemaManager::class, [], [], '', false);
+        return $this->getMock(DbalSchema::class, [], [], '', false);
     }
 }
