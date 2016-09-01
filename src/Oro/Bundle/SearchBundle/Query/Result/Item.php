@@ -124,7 +124,7 @@ class Item
      */
     public function getRecordId()
     {
-        return $this->getRecordId();
+        return $this->recordId;
     }
 
     /**
@@ -134,7 +134,7 @@ class Item
      */
     public function getId()
     {
-        return $this->recordId;
+        return $this->getRecordId();
     }
 
     /**
