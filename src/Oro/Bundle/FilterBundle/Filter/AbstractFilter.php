@@ -105,6 +105,8 @@ abstract class AbstractFilter implements FilterInterface
                 $subQb = clone $qb;
                 $subQb
                     ->resetDqlPart('orderBy')
+                    // replace aliases from SELECT by expressions, since SELECT clause is changed
+                    ->groupBy(implode(', ', $this->getSelectFieldFromGroupBy($qb)))
                     ->select($fieldExpr)
                     ->andWhere($comparisonExpr)
                     ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
@@ -437,7 +439,12 @@ abstract class AbstractFilter implements FilterInterface
             }
         }
 
-        return $expressions;
+        $fields = [];
+        foreach ($expressions as $expression) {
+            $fields[] = QueryUtils::getSelectExprByAlias($qb, $expression) ?: $expression;
+        }
+
+        return $fields;
     }
 
     /**
