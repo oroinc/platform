@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -96,7 +97,13 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 InputOption::VALUE_NONE,
                 'Allows set the force mode. In this mode all emails will be re-synced again for checked folders. 
                 Option "--force" can be used only with option "--id".'
-            );
+            )
+            ->addOption(
+                'vvv',
+                null,
+                InputOption::VALUE_NONE,
+                'The option allows show the log messages during sync email'
+            );;
     }
 
     /**
@@ -109,13 +116,15 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
         $synchronizer->setLogger(new OutputLogger($output));
 
         $force = $input->getOption('force');
+        $showMessage = $input->getOption('vvv');
         $originIds = $input->getOption('id');
 
         if ($force && empty($originIds)) {
             $this->writeAttentionMessageForOptionForce($output);
         } else {
             if (!empty($originIds)) {
-                $synchronizer->syncOrigins($originIds, $force);
+                $settings = new SynchronizationProcessorSettings($force, $showMessage);
+                $synchronizer->syncOrigins($originIds, $settings);
             } else {
                 $synchronizer->sync(
                     (int)$input->getOption('max-concurrent-tasks'),

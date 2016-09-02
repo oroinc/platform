@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -51,8 +52,10 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /** @var OrganizationInterface */
     protected $currentOrganization;
 
-    /** @var  bool In this mode all emails will be re-synced again for checked folders */
-    protected $forceMode = false;
+//    /** @var  bool In this mode all emails will be re-synced again for checked folders */
+//    protected $forceMode = false;
+    /** @var SynchronizationProcessorSettings */
+    protected $settings;
 
     /**
      * Constructor
@@ -456,24 +459,39 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
-     * Set force mode.
-     *
-     * @param bool $mode
-     *
-     * @return $this
+     * @param SynchronizationProcessorSettings $settings
      */
-    public function setForceMode($mode)
+    public function setSettings(SynchronizationProcessorSettings $settings)
     {
-        $this->forceMode = $mode;
-
-        return $this;
+        $this->settings = $settings;
     }
 
     /**
-     * Check is force mode enabled.
+     * @return SynchronizationProcessorSettings
      */
-    public function isForceMode()
+    public function getSettings()
     {
-        return $this->forceMode === true;
+        return $this->settings;
     }
+//    /**
+//     * Set force mode.
+//     *
+//     * @param bool $mode
+//     *
+//     * @return $this
+//     */
+//    public function setForceMode($mode)
+//    {
+//        $this->forceMode = $mode;
+//
+//        return $this;
+//    }
+//
+//    /**
+//     * Check is force mode enabled.
+//     */
+//    public function isForceMode()
+//    {
+//        return $this->forceMode === true;
+//    }
 }
