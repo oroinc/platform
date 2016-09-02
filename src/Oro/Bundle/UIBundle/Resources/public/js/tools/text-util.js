@@ -8,7 +8,8 @@ define(['orotranslation/js/translator'], function(__) {
     var shortWordsAtEndRegExp = /(\w+|^)(\s+(\w{1,3}|\w\.)\s+(\w{1,3}|\w\.)|\s+(\w{1,3}|\w\.?))$/;
 
     var postpositionsRegExp = new RegExp('\\s+(' + __('postpositions') + ')(\\W|$)', 'gi');
-    var prepositionsRegExp = new RegExp('(\\W|^)(' + __('prepositions') + ')((\\s+)(' + __('articles') + ')|)\\s+', 'gi');
+    var prepositionsRegExp = new RegExp('(\\W|^)(' + __('prepositions') + ')((\\s+)(' +
+        __('articles') + ')|)\\s+', 'gi');
 
     var abbreviateIgnoreList = __('abbreviate_ignore_list').split('|');
 
@@ -77,7 +78,7 @@ define(['orotranslation/js/translator'], function(__) {
                 return text;
             }
             return words.map(function(word) {
-                if (abbreviateIgnoreList.indexOf(word) !== -1) {
+                if (abbreviateIgnoreList.indexOf(word.toLowerCase()) !== -1) {
                     return '';
                 }
                 return word[0].toUpperCase();
