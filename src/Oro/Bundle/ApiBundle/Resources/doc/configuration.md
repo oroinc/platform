@@ -6,6 +6,7 @@ Table of Contents
  - [Overview](#overview)
  - [Configuration structure](#configuration-structure)
  - [**exclude** option](#exclude-option)
+ - [**entity_aliases** configuration section](#entity_aliases-configuration-section)
  - [**entities** configuration section](#entities-configuration-section)
  - [**fields** configuration section](#fields-configuration-section)
  - [**filters** configuration section](#filters-configuration-section)
@@ -59,13 +60,18 @@ parameters:
 
 The first level sections of configuration are:
 
-* [entities](#entities-configuration-section)   - describes the configuration of entities.
-* [relations](#relations-configuration-section)  - describes the configuration of relationships.
+* [entity_aliases](#entity_aliases-configuration-section) - allows to override entity aliases.
+* [entities](#entities-configuration-section) - describes the configuration of entities.
+* [relations](#relations-configuration-section) - describes the configuration of relationships.
 
 Top level configuration example:
 
 ```yaml
 oro_api:
+    entity_aliases:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             exclude:
@@ -142,6 +148,27 @@ oro_entity:
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1 }
         # exclude field1 of Acme\Bundle\AcmeBundle\Entity\Entity2 entity
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
+```
+
+"entity_aliases" configuration section
+--------------------------------------
+
+The `entity_aliases` section allows to override existing system-wide entity aliases.
+
+It can be helpful when you need to provide entity aliases for Data API but it is not possible to make them system-wide. For example because the backwards compatibility promise.
+
+Please note that you can override existing entity aliases via `Resources/config/oro/api.yml`, but it is not possible to introduce aliases for new entities here.
+
+Please see [documentation](../../../EntityBundle/Resources/doc/entity_aliases.md) for more details about entity aliases.
+
+An example:
+
+```yaml
+oro_api:
+    entity_aliases:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            alias: acmeentity
+            plural_alias: acmeentities
 ```
 
 "entities" configuration section

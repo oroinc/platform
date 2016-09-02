@@ -634,6 +634,88 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'computed to-many association'                               => [
+                'config'       => [
+                    'fields' => [
+                        'id'         => null,
+                        'folders'    => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'emailUsers.folders'
+                        ],
+                        'emailUsers' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id'      => null,
+                                'folders' => [
+                                    'exclusion_policy' => 'all',
+                                    'fields'           => ['id' => null]
+                                ],
+                            ],
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'         => 123,
+                        'emailUsers' => [
+                            'id'      => 456,
+                            'folders' => [
+                                ['id' => 789]
+                            ],
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'         => 123,
+                        'folders'    => [
+                            ['id' => 789]
+                        ],
+                        'emailUsers' => [
+                            'id' => 456
+                        ]
+                    ]
+                ]
+            ],
+            'already filled computed to-many association'                => [
+                'config'       => [
+                    'fields' => [
+                        'id'         => null,
+                        'folders'    => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'emailUsers.folders'
+                        ],
+                        'emailUsers' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id'      => null,
+                                'folders' => [
+                                    'exclusion_policy' => 'all',
+                                    'fields'           => ['id' => null]
+                                ],
+                            ],
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'      => 123,
+                        'folders' => [
+                            ['id' => 456]
+                        ],
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'      => 123,
+                        'folders' => [
+                            ['id' => 456]
+                        ],
+                    ]
+                ]
+            ],
         ];
     }
 }

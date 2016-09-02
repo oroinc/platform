@@ -154,6 +154,8 @@ define(function(require) {
 
             // need to remove components in widget before DOM will be deleted
             this.disposePageComponents();
+            _.invoke(this.subviews, 'dispose');
+
             if (this.widget) {
                 this.widget.remove();
                 delete this.widget;

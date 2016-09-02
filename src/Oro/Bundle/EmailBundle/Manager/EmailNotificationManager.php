@@ -68,9 +68,8 @@ class EmailNotificationManager
 
         $emailsData = [];
         /** @var $email Email */
-        foreach ($emails as $element) {
-            $isSeen = $element['seen'];
-            $email = $element[0];
+        foreach ($emails as $emailUser) {
+            $email = $emailUser->getEmail();
             $bodyContent = '';
             $emailBody = $email->getEmailBody();
             if ($emailBody) {
@@ -87,7 +86,7 @@ class EmailNotificationManager
                 'replyAllRoute' => $this->router->generate('oro_email_email_reply_all', ['id' => $emailId]),
                 'forwardRoute' => $this->router->generate('oro_email_email_forward', ['id' => $emailId]),
                 'id' => $emailId,
-                'seen' => $isSeen,
+                'seen' => $emailUser->isSeen(),
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName(),

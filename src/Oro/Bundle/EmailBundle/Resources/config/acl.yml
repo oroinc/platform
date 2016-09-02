@@ -1,5 +1,11 @@
 oro_email_email_view:
     type: entity
+    class: OroEmailBundle:Email
+    permission: VIEW
+    group_name: ""
+
+oro_email_email_user_view:
+    type: entity
     class: OroEmailBundle:EmailUser
     permission: VIEW
     group_name: ""

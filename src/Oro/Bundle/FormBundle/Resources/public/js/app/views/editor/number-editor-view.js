@@ -71,7 +71,7 @@ define(function(require) {
 
         getValidationRules: function() {
             var rules = NumberEditorView.__super__.getValidationRules.call(this);
-            rules.number = true;
+            rules.Number = true;
             return rules;
         },
 

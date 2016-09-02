@@ -2,7 +2,7 @@ Address Type
 ------------
 
 Address type is the entity that is used to specify type of address. Address can have several address types.
-Be default there are two address types - billing and shipping. Address type entity called AddressType
+By default there are two address types - billing and shipping. Address type entity called AddressType
 and stored in Oro/Bundle/AddressBundle/Entity/AddressType.php. It has two properties:
 "name" that defined symbolic name of type and "label" that is used at frontend.
 Address types are translatable entities - their label should be defined for each supported locale.

@@ -12,7 +12,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
     const TEST_ENTITY_CLASS = 'SomeEntity';
 
     const TEST_SENDER_EMAIL = 'admin@example.com';
-    const TEST_SENDER_NAME  = 'asdSDA';
+    const TEST_SENDER_NAME = 'asdSDA';
 
     const TEST_ENV = 'prod';
 
@@ -65,8 +65,14 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['oro_notification.email_notification_sender_email', false, false, self::TEST_SENDER_EMAIL],
-                        ['oro_notification.email_notification_sender_name', false, false, self::TEST_SENDER_NAME]
+                        [
+                            'oro_notification.email_notification_sender_email',
+                            false,
+                            false,
+                            null,
+                            self::TEST_SENDER_EMAIL,
+                        ],
+                        ['oro_notification.email_notification_sender_name', false, false, null, self::TEST_SENDER_NAME],
                     ]
                 )
             );
@@ -111,7 +117,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $data, array $expected)
     {
-        $object       = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $template->expects($this->once())
@@ -186,15 +192,15 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                     'subject' => 'subject',
                     'body' => 'body',
                     'to' => 'recipient@example.com',
-                    'senderAware' => false
+                    'senderAware' => false,
                 ],
                 'expected' => [
                     'subject' => 'subject',
                     'body' => 'body',
                     'to' => 'recipient@example.com',
                     'fromName' => self::TEST_SENDER_NAME,
-                    'fromEmail' => self::TEST_SENDER_EMAIL
-                ]
+                    'fromEmail' => self::TEST_SENDER_EMAIL,
+                ],
             ],
             'Process Notification implement SenderAwareEmailNotificationInterface' => [
                 'data' => [
@@ -203,15 +209,15 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                     'to' => 'recipient@example.com',
                     'fromName' => 'test sender',
                     'fromEmail' => 'test_sender@mail.com',
-                    'senderAware' => true
+                    'senderAware' => true,
                 ],
                 'expected' => [
                     'subject' => 'subject',
                     'body' => 'body',
                     'to' => 'recipient@example.com',
                     'fromName' => 'test sender',
-                    'fromEmail' => 'test_sender@mail.com'
-                ]
+                    'fromEmail' => 'test_sender@mail.com',
+                ],
             ],
             'Process Notification implement SenderAwareEmailNotificationInterface but sender email is empty' => [
                 'data' => [
@@ -220,15 +226,15 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                     'to' => 'recipient@example.com',
                     'fromName' => null,
                     'fromEmail' => null,
-                    'senderAware' => true
+                    'senderAware' => true,
                 ],
                 'expected' => [
                     'subject' => 'subject',
                     'body' => 'body',
                     'to' => 'recipient@example.com',
                     'fromName' => self::TEST_SENDER_NAME,
-                    'fromEmail' => self::TEST_SENDER_EMAIL
-                ]
+                    'fromEmail' => self::TEST_SENDER_EMAIL,
+                ],
             ],
         ];
     }
@@ -236,10 +242,10 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
     public function testAddLogType()
     {
         $spool = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool')
-                    ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()->getMock();
         $spool->expects($this->once())->method('setLogType')->with('test type');
         $tranport = $this->getMockBuilder('Swift_Transport_SpoolTransport')
-                    ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()->getMock();
         $tranport->expects($this->once())->method('getSpool')->will(
             $this->returnValue($spool)
         );
@@ -254,8 +260,8 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessErrors()
     {
-        $object        = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $notification  = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
+        $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
         $notifications = array($notification);
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
@@ -316,7 +322,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'command' => EmailNotificationProcessor::SEND_COMMAND,
-                    'state'   => [Job::STATE_RUNNING, Job::STATE_PENDING]
+                    'state' => [Job::STATE_RUNNING, Job::STATE_PENDING],
                 ]
             )
             ->will($this->returnSelf());
@@ -347,10 +353,11 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                             array(
                                 '--message-limit=' . self::TEST_MESSAGE_LIMIT,
                                 '--env=' . self::TEST_ENV,
-                                '--mailer=db_spool_mailer'
+                                '--mailer=db_spool_mailer',
                             ),
                             $job->getArgs()
                         );
+
                         return true;
                     }
                 )

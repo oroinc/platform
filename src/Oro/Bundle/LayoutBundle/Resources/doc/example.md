@@ -553,31 +553,27 @@ To implement a language switcher we'll create a separate data provider class, si
 ```php
 namespace Acme\Bundle\LocaleBundle\Layout\Extension\Provider;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataProviderInterface;
-
-class LocaleDataProvider implements DataProviderInterface
+class LocaleDataProvider
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getIdentifier()
+    public function getDefaultLanguage()
     {
-        throw new \BadMethodCallException('Not implemented');
+        $this->options['default_language'] = 'english';
+        return $this->options['default_language'];
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getData(ContextInterface $context)
+    public function getAvailableLanguages()
     {
-        return [
-            'default_language'    => 'english',
-            'available_languages' => [
-                'english' => 'English',
-                'french'  => 'French'
-            ]
+        $this->options['available_languages'] = [
+            'english' => 'English',
+            'french'  => 'French'
         ];
+        return $this->options['available_languages'];
     }
 }
 ```
@@ -585,7 +581,7 @@ class LocaleDataProvider implements DataProviderInterface
 We need to register our data provider in the DI container by `layout.data_provider` tag:
 ```yaml
     acme_locale.layout.data_provider.locale:
-        class: Acme\Bundle\LocaleBundle\Layout\Extension\Provider\LocaleDataProvider
+        class: Acme\Bundle\LocaleBundle\Layout\DataProvider\LocaleProvider
         tags:
             - { name: layout.data_provider, alias: locale }
 ```
@@ -1395,7 +1391,7 @@ services:
             - { name: layout.block_type, alias: datetime }
 ```
 
-`setOptions` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
+`setOptionsConfig` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
 
 Container block type:
 ```yaml

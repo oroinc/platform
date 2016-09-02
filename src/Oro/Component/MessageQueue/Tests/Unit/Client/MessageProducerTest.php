@@ -336,6 +336,41 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer->send($queue, new \stdClass);
     }
 
+    public function testSendShouldThrowExceptionIfBodyIsArrayWithObjectsInside()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+        $message = new NullMessage();
+
+        $messageProcessor = $this->createTransportMessageProducer();
+
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub($message, $config, $queue));
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
+        );
+        $producer->send($queue, ['foo' => new \stdClass]);
+    }
+
+    public function testSendShouldThrowExceptionIfBodyIsArrayWithObjectsInSubArraysInside()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('');
+        $message = new NullMessage();
+
+        $messageProcessor = $this->createTransportMessageProducer();
+
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub($message, $config, $queue));
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
+        );
+        $producer->send($queue, ['foo' => ['bar' => new \stdClass]]);
+    }
+
+
     public function testShouldCreateMessageForNullBody()
     {
         $expectedMessage = new NullMessage();
@@ -404,6 +439,38 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             'The message\'s body must be either null, scalar or array. Got: stdClass'
         );
         $producer->createMessage(new \stdClass());
+    }
+
+    public function testShouldThrowExceptionIfBodyIsArrayWithObjectsInsideOnCreateMessage()
+    {
+        $expectedMessage = new NullMessage();
+
+        $producer = new MessageProducer(
+            $this->createTransportMessageProducer(),
+            $this->createDriverStub($expectedMessage, null, null)
+        );
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
+        );
+        $producer->createMessage(['foo' => new \stdClass()]);
+    }
+
+    public function testShouldThrowExceptionIfBodyIsArrayWithObjectsInSubArraysInsideOnCreateMessage()
+    {
+        $expectedMessage = new NullMessage();
+
+        $producer = new MessageProducer(
+            $this->createTransportMessageProducer(),
+            $this->createDriverStub($expectedMessage, null, null)
+        );
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
+        );
+        $producer->createMessage(['foo' => ['bar' => new \stdClass()]]);
     }
 
     /**

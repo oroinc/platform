@@ -42,6 +42,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
                 'vars' => [
                     'id' => 'test:block--1',
                     'block_type' => static::TYPE_NAME,
+                    'block_type_widget_id' => static::TYPE_NAME . '_widget',
                     'unique_block_prefix' => '_test_block_1',
                     'block_prefixes' => [
                         'block',
@@ -93,6 +94,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         $expected = [
             'id' => static::TYPE_NAME . '_id',
             'block_type' => static::TYPE_NAME,
+            'block_type_widget_id' => static::TYPE_NAME . '_widget',
             'unique_block_prefix' => $id,
             'block_prefixes' => [
                 'block',

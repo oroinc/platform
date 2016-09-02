@@ -21,12 +21,16 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $class->addUseStatement('Oro\Component\Layout\ImportLayoutManipulator');
         $class->addInterfaceName('Oro\Component\Layout\LayoutUpdateImportInterface');
 
+        $setFactoryMethod = PhpMethod::create('getImport');
+        $setFactoryMethod->setBody($writer->write('return $this->import;')->getContent());
+        $class->setMethod($setFactoryMethod);
+
         $setFactoryMethod = PhpMethod::create('setImport');
         $setFactoryMethod->addParameter(
             PhpParameter::create('import')
                 ->setType('Oro\Component\Layout\Model\LayoutUpdateImport')
         );
-        $setFactoryMethod->setBody($writer->write('$this->import = $import;')->getContent());
+        $setFactoryMethod->setBody($writer->reset()->write('$this->import = $import;')->getContent());
         $class->setMethod($setFactoryMethod);
 
         $factoryProperty = PhpProperty::create('import');

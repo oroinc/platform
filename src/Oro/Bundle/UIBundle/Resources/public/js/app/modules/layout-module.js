@@ -1,4 +1,4 @@
-require([
+define([
     'oroui/js/mediator',
     'oroui/js/app/controllers/base/controller'
 ], function(mediator, BaseController) {

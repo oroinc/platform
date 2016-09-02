@@ -88,7 +88,8 @@ class HttpImportHandler extends AbstractImportHandler
         }
         if ($context && $context instanceof StepExecutionProxyContext) {
             // each warning is for an invalid item
-            $counts['invalid_entries'] = count($context->getWarnings());
+            $countWarnings = count($context->getWarnings());
+            $counts['error_entries'] += $countWarnings;
         }
 
         return [

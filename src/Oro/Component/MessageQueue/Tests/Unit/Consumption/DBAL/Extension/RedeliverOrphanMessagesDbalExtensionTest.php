@@ -22,7 +22,8 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
         $dbal
             ->expects($this->once())
             ->method('executeUpdate')
-            ->with('UPDATE tableName SET consumer_id=NULL, delivered_at=NULL, redelivered=1 WHERE delivered_at <= ?')
+            ->with('UPDATE tableName SET consumer_id=NULL, delivered_at=NULL, redelivered=:isRedelivered '.
+                'WHERE delivered_at <= :deliveredAt')
             ->will($this->returnValue(3))
         ;
 

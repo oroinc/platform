@@ -128,6 +128,9 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 'association3' => [
                     'property_path' => 'realAssociation3'
                 ],
+                'association4' => [
+                    'exclude' => false
+                ],
             ]
         ];
 
@@ -193,6 +196,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     'association3' => [
                         'property_path' => 'realAssociation3'
                     ],
+                    'association4' => null,
                 ]
             ],
             $this->context->getResult()

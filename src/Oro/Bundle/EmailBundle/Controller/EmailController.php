@@ -440,7 +440,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/user-emails", name="oro_email_user_emails")
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_user_view")
      * @Template
      */
     public function userEmailsAction()

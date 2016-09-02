@@ -48,15 +48,19 @@ class SessionsListener extends MinkSessionsListener
     public static function getSubscribedEvents()
     {
         return array(
-            FeatureTested::BEFORE   => array('prepareDefaultMinkSession', 10),
+            FeatureTested::BEFORE   => array('prepareDefaultMinkFeatureSession', 10),
             ExerciseCompleted::AFTER => array('tearDownMinkSessions', -10)
         );
     }
 
-    public function prepareDefaultMinkSession(BeforeFeatureTested $event)
+    public function prepareDefaultMinkFeatureSession(BeforeFeatureTested $event)
     {
         $this->mink->stopSessions();
         gc_collect_cycles();
+
+        if (0 === count($event->getFeature()->getScenarios())) {
+            return;
+        }
 
         $newEvent = new BeforeScenarioTested(
             $event->getEnvironment(),

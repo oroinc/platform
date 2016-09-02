@@ -154,34 +154,12 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
-            if ($association->isCollection()) {
-                $value = [];
-                if (array_key_exists($name, $data)) {
-                    $val = $data[$name];
-                    if (!empty($val)) {
-                        foreach ($val as $object) {
-                            $value[] = $this->processRelatedObject($object, $association);
-                        }
-                    }
-                }
-            } else {
-                $value = null;
-                if (array_key_exists($name, $data)) {
-                    $val = $data[$name];
-                    if (null !== $val) {
-                        $value = $this->processRelatedObject($val, $association);
-                    }
-                }
-            }
-            $result[$name] = $value;
+            $result[$name] = $this->getRelationshipValue($data, $name, $association);
         }
     }
 
     /**
-     * @param mixed               $object
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     protected function processRelatedObject($object, AssociationMetadata $associationMetadata)
     {
@@ -190,7 +168,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
 
         $targetMetadata = $associationMetadata->getTargetMetadata();
-        if ($targetMetadata && $this->isIdentity($targetMetadata)) {
+        if ($targetMetadata && $this->hasIdentifierFieldsOnly($targetMetadata)) {
             $data = $this->objectAccessor->toArray($object);
 
             return count($data) === 1
@@ -204,12 +182,12 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function isIdentity(EntityMetadata $metadata)
+    protected function hasIdentifierFieldsOnly(EntityMetadata $metadata)
     {
         if (count($metadata->getMetaProperties()) > 0) {
             return false;
         }
 
-        return parent::isIdentity($metadata);
+        return parent::hasIdentifierFieldsOnly($metadata);
     }
 }

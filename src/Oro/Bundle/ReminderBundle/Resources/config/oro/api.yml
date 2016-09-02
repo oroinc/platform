@@ -1,3 +1,3 @@
 oro_api:
     entities:
-        Oro\Bundle\ReminderBundle\Entity\Reminder: ~
+#        Oro\Bundle\ReminderBundle\Entity\Reminder: ~

@@ -27,13 +27,15 @@ class ConfigGetEventTest extends \PHPUnit_Framework_TestCase
         $key = 'key';
         $value = 'value';
         $full = true;
+        $scopeId = 1;
 
-        $event = new ConfigGetEvent($this->configManager, $key, $value, $full);
+        $event = new ConfigGetEvent($this->configManager, $key, $value, $full, $scopeId);
 
         $this->assertSame($this->configManager, $event->getConfigManager());
         $this->assertEquals($key, $event->getKey());
         $this->assertEquals($value, $event->getValue());
         $this->assertEquals($full, $event->isFull());
+        $this->assertEquals($scopeId, $event->getScopeId());
 
         $newValue = 'new_value';
         $event->setValue($newValue);

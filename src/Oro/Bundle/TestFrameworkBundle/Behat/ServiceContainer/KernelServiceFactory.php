@@ -17,6 +17,7 @@ class KernelServiceFactory
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
+        $this->kernel->boot();
     }
 
     /**

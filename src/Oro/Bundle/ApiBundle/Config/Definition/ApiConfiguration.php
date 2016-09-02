@@ -11,12 +11,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ApiConfiguration implements ConfigurationInterface
 {
-    const EXCLUSIONS_SECTION = 'exclusions';
-    const INCLUSIONS_SECTION = 'inclusions';
-    const ENTITY_ATTRIBUTE   = 'entity';
-    const FIELD_ATTRIBUTE    = 'field';
-    const ENTITIES_SECTION   = 'entities';
-    const RELATIONS_SECTION  = 'relations';
+    const EXCLUSIONS_SECTION     = 'exclusions';
+    const INCLUSIONS_SECTION     = 'inclusions';
+    const ENTITY_ATTRIBUTE       = 'entity';
+    const FIELD_ATTRIBUTE        = 'field';
+    const ENTITY_ALIASES_SECTION = 'entity_aliases';
+    const ENTITIES_SECTION       = 'entities';
+    const RELATIONS_SECTION      = 'relations';
 
     /** @var ConfigurationSettingsInterface */
     protected $settings;
@@ -44,6 +45,8 @@ class ApiConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_api');
         $children    = $rootNode->children();
+
+        $this->addEntityAliasesSection($children);
 
         $entityNode = $this->addEntitySection(
             $children,
@@ -83,6 +86,24 @@ class ApiConfiguration implements ConfigurationInterface
             $this->settings,
             $this->maxNestingLevel
         );
+    }
+
+    /**
+     * @param NodeBuilder $parentNode
+     *
+     * @return NodeBuilder
+     */
+    protected function addEntityAliasesSection(NodeBuilder $parentNode)
+    {
+        $node = $parentNode
+            ->arrayNode(self::ENTITY_ALIASES_SECTION)
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                ->children();
+        $configuration = new EntityAliasesConfiguration();
+        $configuration->configure($node);
+
+        return $node;
     }
 
     /**

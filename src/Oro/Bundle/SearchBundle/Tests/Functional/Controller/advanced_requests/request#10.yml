@@ -1,0 +1,24 @@
+# test case with the select statement for fields that do not exists (null values)
+request:
+    query: "select notExistingValue from oro_test_item order_by stringValue asc max_results 1"
+response:
+    records_count: 9
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item1@mail.com
+                record_url: http://localhost/search/
+                selected_data:
+                    notExistingValue: ''
+    soap:
+        data:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item1@mail.com
+                recordUrl: http://localhost/search/
+                selectedData:
+                    item:
+                        key: notExistingValue
+                        value: ''

@@ -54,20 +54,22 @@
 }
 
 /* changes position of bubble point of dropdown when it's shown above */
-.dropup .column-manager .dropdown-menu {
-  top: auto;
-  margin-top: 0;
-  margin-bottom: 40px;
-  &:before {
+.dropup, .dropup-area {
+  .column-manager .dropdown-menu {
     top: auto;
-    bottom: -7px;
-    border-bottom: 0 none;
-    border-top: 7px solid rgba(0,0,0,0.1);
-  }
-  &:after {
-    top: auto;
-    bottom: -6px;
-    border-bottom: 0 none;
-    border-top: 6px solid #fff;
+    margin-top: 0;
+    margin-bottom: 40px;
+    &:before {
+      top: auto;
+      bottom: -7px;
+      border-bottom: 0 none;
+      border-top: 7px solid rgba(0, 0, 0, 0.1);
+    }
+    &:after {
+      top: auto;
+      bottom: -6px;
+      border-bottom: 0 none;
+      border-top: 6px solid #fff;
+    }
   }
 }

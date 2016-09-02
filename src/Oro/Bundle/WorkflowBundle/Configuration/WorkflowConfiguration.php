@@ -11,13 +11,15 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
-class WorkflowConfiguration implements ConfigurationInterface
+class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
     const NODE_STEPS = 'steps';
     const NODE_ATTRIBUTES = 'attributes';
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
+    const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
+    const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -74,11 +76,24 @@ class WorkflowConfiguration implements ConfigurationInterface
             ->booleanNode('steps_display_ordered')
                 ->defaultFalse()
             ->end()
+            ->arrayNode('defaults')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('active')
+                        ->defaultFalse()
+                    ->end()
+                ->end()
+            ->end()
+            ->integerNode('priority')
+                ->defaultValue(0)
+            ->end()
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
             ->append($this->getTransitionDefinitionsNode())
-            ->append($this->getEntityRestrictionsNode());
+            ->append($this->getEntityRestrictionsNode())
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_ACTIVE_GROUPS))
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_RECORD_GROUPS));
 
         return $nodeBuilder;
     }
@@ -261,6 +276,13 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->arrayNode('form_options')
                         ->prototype('variable')
                         ->end()
+                        ->beforeNormalization()
+                            ->always(function ($config) {
+                                return $this->mergeConfigs([
+                                    'form_init' => 'init_actions',
+                                ], $config);
+                            })
+                        ->end()
                     ->end()
                     ->scalarNode('page_template')
                         ->defaultNull()
@@ -304,18 +326,28 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('pre_conditions')
+                    ->arrayNode('preconditions')
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('pre_conditions')->end() // deprecated, use `preconditions` instead
                     ->arrayNode('conditions')
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('post_actions')
+                    ->arrayNode('actions')
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('post_actions')->end() // deprecated, use `actions` instead
+                ->end()
+                ->beforeNormalization()
+                    ->always(function ($config) {
+                        return $this->mergeConfigs([
+                            'preconditions' => 'pre_conditions',
+                            'actions' => 'post_actions',
+                        ], $config);
+                    })
                 ->end()
             ->end();
 
@@ -353,6 +385,26 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getGroupsNode($nodeName)
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root($nodeName);
+        $rootNode
+            ->beforeNormalization()
+                ->always()
+                ->then(function ($v) {
+                    return array_map('strtolower', $v);
+                })
+            ->end()
+            ->prototype('scalar')
             ->end();
 
         return $rootNode;

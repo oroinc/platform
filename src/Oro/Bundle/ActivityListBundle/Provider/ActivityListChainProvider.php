@@ -17,7 +17,6 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -49,28 +48,22 @@ class ActivityListChainProvider
     /** @var string[] */
     protected $ownerActivities;
 
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
-
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      * @param EntityRoutingHelper $routingHelper
-     * @param HtmlTagHelper       $htmlTagHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        EntityRoutingHelper $routingHelper,
-        HtmlTagHelper $htmlTagHelper
+        EntityRoutingHelper $routingHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
         $this->translator     = $translator;
         $this->routingHelper  = $routingHelper;
-        $this->htmlTagHelper  = $htmlTagHelper;
     }
 
     /**
@@ -410,7 +403,7 @@ class ActivityListChainProvider
      * @param string                        $verb
      * @param ActivityList|null             $list
      *
-     * @return ActivityList
+     * @return ActivityList|null
      */
     protected function getActivityListEntityForEntity(
         $entity,
@@ -424,9 +417,8 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            $list->setDescription($this->htmlTagHelper->stripTags(
-                $this->htmlTagHelper->purify($provider->getDescription($entity))
-            ));
+            //do not use htmlTagHelper->purify - it leads to a huge performance degradation
+            $list->setDescription(trim(strip_tags($provider->getDescription($entity))));
             $this->setDate($entity, $provider, $list);
             $list->setOwner($provider->getOwner($entity));
             if ($provider instanceof ActivityListUpdatedByProviderInterface) {

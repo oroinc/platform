@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -43,6 +47,12 @@ class DumpCommand extends AbstractDebugCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Shows sub-resources'
+            )
+            ->addOption(
+                'not-accessible',
+                null,
+                InputOption::VALUE_NONE,
+                'Shows only entities that are not accessible through Data API'
             );
         parent::configure();
     }
@@ -52,21 +62,87 @@ class DumpCommand extends AbstractDebugCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $isNotAccessible = $input->getOption('not-accessible');
+        if ($isNotAccessible) {
+            $this->dumpNotAccessibleEntities($input, $output);
+        } else {
+            $this->dumpResources($input, $output);
+        }
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    public function dumpNotAccessibleEntities(InputInterface $input, OutputInterface $output)
+    {
         $requestType = $this->getRequestType($input);
-        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
         // @todo: API version is not supported for now
         //$version = $input->getArgument('version');
         $version = Version::normalizeVersion(null);
+
+        /** @var ResourcesProvider $resourcesProvider */
+        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
+        $resources = $resourcesProvider->getResources($version, $requestType);
+        $accessibleEntities = [];
+        foreach ($resources as $resource) {
+            $accessibleEntities[$resource->getEntityClass()] = true;
+        }
+
+        $notAccessibleEntities = [];
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->getContainer()->get('doctrine');
+        $managers = $doctrine->getManagers();
+        foreach ($managers as $manager) {
+            if (!$manager instanceof EntityManager) {
+                continue;
+            }
+            /** @var ClassMetadata[] $allMetadata */
+            $allMetadata = $manager->getMetadataFactory()->getAllMetadata();
+            foreach ($allMetadata as $metadata) {
+                if (!isset($accessibleEntities[$metadata->name])
+                    && !isset($notAccessibleEntities[$metadata->name])
+                    && !$metadata->isMappedSuperclass
+                ) {
+                    $notAccessibleEntities[$metadata->name] = true;
+                }
+            }
+        }
+        $notAccessibleEntities = array_keys($notAccessibleEntities);
+        sort($notAccessibleEntities);
+
+        foreach ($notAccessibleEntities as $entityClass) {
+            $output->writeln(sprintf('<info>%s</info>', $entityClass));
+        }
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    public function dumpResources(InputInterface $input, OutputInterface $output)
+    {
+        $requestType = $this->getRequestType($input);
+        // @todo: API version is not supported for now
+        //$version = $input->getArgument('version');
+        $version = Version::normalizeVersion(null);
+        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
         $isSubresourcesRequested = $input->getOption('sub-resources');
 
         /** @var ResourcesProvider $resourcesProvider */
         $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
         $resources = $resourcesProvider->getResources($version, $requestType);
+        /** @var ApiResource[] $sortedResources */
+        $sortedResources = [];
+        foreach ($resources as $resource) {
+            $sortedResources[$resource->getEntityClass()] = $resource;
+        }
+        ksort($sortedResources);
 
         /** @var SubresourcesProvider $subresourcesProvider */
         $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
 
-        foreach ($resources as $resource) {
+        foreach ($sortedResources as $resource) {
             if ($entityClass && $resource->getEntityClass() !== $entityClass) {
                 continue;
             }

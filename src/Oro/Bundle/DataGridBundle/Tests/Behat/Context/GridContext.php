@@ -151,11 +151,17 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     }
 
     /**
+     * Sort grid by column
+     * Example: When sort grid by Created at
+     * Example: But when I sort grid by First Name again
+     *
      * @When /^(?:|when )(?:|I )sort grid by (?P<field>([\w\s]*[^again]))(?:| again)$/
      */
     public function sortGridBy($field)
     {
-        $this->elementFactory->createElement('GridHeader')->getHeaderLink($field)->click();
+        /** @var GridHeader $gridHeader */
+        $gridHeader = $this->elementFactory->createElement('GridHeader');
+        $gridHeader->getHeaderLink($field)->click();
     }
 
     //@codingStandardsIgnoreStart

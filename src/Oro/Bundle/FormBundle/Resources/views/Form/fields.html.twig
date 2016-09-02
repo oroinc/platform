@@ -359,24 +359,14 @@
 {% endblock %}
 
 {% macro oro_collection_validate_primary_js(context) %}
-    <script type="text/javascript">
-        require(['jquery'],
-        function($){
-            $(function() {
-                var container = $('#{{ context.id }}');
-                /**
-                 * Allow only 1 primary checkbox to be checked.
-                 * This logic convert checkbox logic to logic used in radiobutton
-                 */
-                container.on('click', '[name$="[primary]"]', function() {
-                    container.find('[name$="[primary]"]').each(function (idx, el) {
-                        el.checked = false;
-                    });
-                    this.checked = true;
-                });
-            });
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroui/js/app/components/view-component',
+        options: {
+            _sourceElement: '#' ~ context.id,
+            view: 'oroform/js/app/views/fields-groups-collection-view'
+        }
+    }) }}></div>
 {% endmacro %}
 
 {% block oro_form_js_validation %}

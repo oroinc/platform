@@ -5,9 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\UIBundle\Route\Router;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -125,6 +122,8 @@ class ControllersRoleTest extends WebTestCase
         );
 
         self::assertContains('testRoleUpdated', $crawler->filter('.responsive-section')->first()->html());
-        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->html());
+        self::assertContains('Clone', $crawler->filter('.navigation .title-buttons-container a')->eq(0)->html());
+        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->eq(1)->html());
+        self::assertContains('Delete', $crawler->filter('.navigation .title-buttons-container a')->eq(2)->html());
     }
 }

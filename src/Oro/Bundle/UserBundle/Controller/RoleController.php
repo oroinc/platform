@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -14,7 +13,6 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/role")
@@ -61,7 +59,14 @@ class RoleController extends Controller
                 'data' => $this->getRolePrivilegeCapabilityProvider()->getCapabilities($role),
                 'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabList(),
                 'readonly' => true
-            ]
+            ],
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete a role and un-assign it from all users or reassign users to another role before
+            'allow_delete' =>
+                $role->getId() &&
+                !$this->get('doctrine.orm.entity_manager')
+                    ->getRepository('OroUserBundle:Role')
+                    ->hasAssignedUsers($role)
         ];
     }
 

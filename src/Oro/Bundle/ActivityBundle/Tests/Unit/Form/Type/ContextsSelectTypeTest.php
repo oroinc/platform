@@ -4,10 +4,11 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
@@ -20,14 +21,14 @@ class ContextsSelectTypeTest extends TypeTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mapper;
-
     /* @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityTokenStorage;
 
     /* @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dispatcher;
+
+    /* @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityTitleResolver;
 
     protected function setUp()
     {
@@ -44,10 +45,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -56,6 +53,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
                 ->disableOriginalConstructor()
                 ->getMock();
+
+        $this->entityTitleResolver = $this->getMock(EntityTitleResolverInterface::class);
     }
 
     protected function getExtensions()
@@ -79,9 +78,9 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->mapper,
             $this->securityTokenStorage,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->entityTitleResolver
         );
         $type->buildForm($builder, []);
     }
@@ -109,9 +108,9 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->mapper,
             $this->securityTokenStorage,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->entityTitleResolver
         );
         $type->setDefaultOptions($resolver);
     }
@@ -122,9 +121,9 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->mapper,
             $this->securityTokenStorage,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->entityTitleResolver
         );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
 
@@ -136,9 +135,9 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->mapper,
             $this->securityTokenStorage,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->entityTitleResolver
         );
         $this->assertEquals('oro_activity_contexts_select', $type->getName());
     }

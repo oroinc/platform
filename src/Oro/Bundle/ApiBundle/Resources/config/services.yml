@@ -216,6 +216,34 @@ services:
         arguments:
             - '@oro_api.get_relation_config.processor'
 
+    oro_api.entity_alias_resolver:
+        class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
+        arguments:
+            - '@oro_api.entity_alias_loader'
+            - '@oro_api.entity_alias_cache'
+            - %kernel.debug%
+        lazy: true
+
+    oro_api.entity_alias_cache:
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_entity_aliases_api' ] ]
+
+    oro_api.entity_alias_loader:
+        class: Oro\Bundle\EntityBundle\Provider\EntityAliasLoader
+        public: false
+        lazy: true
+        calls:
+            - [ addEntityAliasProvider, [ '@oro_api.entity_alias_provider' ] ]
+
+    oro_api.entity_alias_provider:
+        class: Oro\Bundle\ApiBundle\Provider\EntityAliasProvider
+        public: false
+        arguments:
+            - [] # aliases; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - [] # exclusions; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+
     oro_api.entity_exclusion_provider:
         class: Oro\Bundle\ApiBundle\Provider\ChainExclusionProvider
         public: false
@@ -410,3 +438,13 @@ services:
             - '@property_accessor'
         tags:
             - { name: oro.api.filter_factory, priority: -10 }
+
+    oro_api.constraint_text_extractor:
+        class: Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor
+        public: false
+
+    oro_api.constraint_text_extractor.default:
+        class: Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor
+        public: false
+        tags:
+            - { name: oro.api.constraint_text_extractor, priority: -10 }

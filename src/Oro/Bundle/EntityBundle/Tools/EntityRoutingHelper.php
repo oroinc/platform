@@ -209,7 +209,7 @@ class EntityRoutingHelper
      * @return object The entity object
      *
      * @throws BadRequestHttpException
-     * @throws NotFoundHttpException
+     * @throws RecordNotFoundException in case entity not found
      */
     public function getEntity($entityClass, $entityId)
     {

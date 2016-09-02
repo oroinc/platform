@@ -171,34 +171,17 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
-            if ($association->isCollection()) {
-                $value = [];
-                if (array_key_exists($name, $data)) {
-                    $val = $data[$name];
-                    if (!empty($val)) {
-                        foreach ($val as $object) {
-                            $value[] = $this->processRelatedObject($object, $association);
-                        }
-                    }
-                }
+            $value = $this->getRelationshipValue($data, $name, $association);
+            if ($this->isArrayAttribute($association)) {
+                $result[self::ATTRIBUTES][$name] = $value;
             } else {
-                $value = null;
-                if (array_key_exists($name, $data)) {
-                    $val = $data[$name];
-                    if (null !== $val) {
-                        $value = $this->processRelatedObject($val, $association);
-                    }
-                }
+                $result[self::RELATIONSHIPS][$name][self::DATA] = $value;
             }
-            $result[self::RELATIONSHIPS][$name][self::DATA] = $value;
         }
     }
 
     /**
-     * @param mixed               $object
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return array The resource identifier
+     * {@inheritdoc}
      */
     protected function processRelatedObject($object, AssociationMetadata $associationMetadata)
     {
@@ -246,7 +229,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                     );
                 }
 
-                if ($this->isIdentity($targetMetadata)) {
+                if ($this->hasIdentifierFieldsOnly($targetMetadata)) {
                     $idOnly = true;
                     $idFieldNames = $targetMetadata->getIdentifierFieldNames();
                     if (count($idFieldNames) === 1) {

@@ -111,7 +111,7 @@
                             {% endif %}
                             mediator.execute('refreshPage');
                         {% elseif dataGridName is defined %}
-                            mediator.trigger('datagrid:doReset:' + {{ dataGridName|json_encode|raw }});
+                            mediator.trigger('datagrid:doRefresh:' + {{ dataGridName|json_encode|raw }});
                         {% endif %}
                     }
                 });

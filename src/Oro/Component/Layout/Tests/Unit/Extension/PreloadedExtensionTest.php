@@ -142,7 +142,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDataProviders()
     {
         $name         = 'test';
-        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+        $dataProvider = $this->getMock(\stdClass::class);
 
         $extension = new PreloadedExtension(
             [],
@@ -309,24 +309,6 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $dataProviders array must be DataProviderInterface.
-     */
-    public function testConstructWithInvalidDataProviders()
-    {
-        new PreloadedExtension(
-            [],
-            [],
-            [],
-            [],
-            [
-                'test1' => $this->getMock('Oro\Component\Layout\DataProviderInterface'),
-                'test2' => new \stdClass()
-            ]
-        );
-    }
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Keys of $dataProviders array must be strings.
      */
     public function testConstructWithInvalidKeysForDataProviders()
@@ -337,8 +319,8 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                'test' => $this->getMock('Oro\Component\Layout\DataProviderInterface'),
-                $this->getMock('Oro\Component\Layout\DataProviderInterface')
+                'test' => $this->getMock(\stdClass::class),
+                $this->getMock(\stdClass::class)
             ]
         );
     }

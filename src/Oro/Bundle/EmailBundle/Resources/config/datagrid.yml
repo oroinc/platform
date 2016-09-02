@@ -75,7 +75,7 @@ datagrid:
                 - oroemail/js/datagrid/auto-response-rules-extension
 
     base-email-grid:
-        acl_resource: oro_email_email_view
+        acl_resource: oro_email_email_user_view
         source:
             type: orm
             query:

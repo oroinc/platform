@@ -11,9 +11,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
 {
-    /**
-     * @var WorkflowAssembler
-     */
+    /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
     /**
@@ -59,6 +57,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             'steps_display_ordered',
             false
         );
+        $groups = [
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => $this->getConfigurationOption(
+                $configuration,
+                WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
+                []
+            ),
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => $this->getConfigurationOption(
+                $configuration,
+                WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
+                []
+            ),
+        ];
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -67,7 +77,10 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setRelatedEntity($configuration['entity'])
             ->setStepsDisplayOrdered($stepsDisplayOrdered)
             ->setSystem($system)
+            ->setActive($configuration['defaults']['active'])
+            ->setPriority($configuration['priority'])
             ->setEntityAttributeName($entityAttributeName)
+            ->setGroups($groups)
             ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
@@ -139,7 +152,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     protected function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $restrictions = $workflow->getRestrictions();
-        $workflowDefinition->getConfiguration();
         $workflowRestrictions = [];
         foreach ($restrictions as $restriction) {
             $workflowRestriction = new WorkflowRestriction();
