@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;

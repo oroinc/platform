@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension as BaseRenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;

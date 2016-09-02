@@ -14,7 +14,9 @@ use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
+
 use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
 class MigrationExecutor
@@ -333,8 +335,8 @@ class MigrationExecutor
      */
     protected function getActualSchema()
     {
-        $platform    = $this->queryExecutor->getConnection()->getDatabasePlatform();
-        $sm          = $this->queryExecutor->getConnection()->getSchemaManager();
+        $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $sm = $this->queryExecutor->getConnection()->getSchemaManager();
 
         return $this->createSchemaObject(
             $sm->listTables(),
