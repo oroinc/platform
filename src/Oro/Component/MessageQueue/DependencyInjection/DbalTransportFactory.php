@@ -4,7 +4,6 @@ namespace Oro\Component\MessageQueue\DependencyInjection;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -63,21 +62,6 @@ class DbalTransportFactory implements TransportFactoryInterface
             $rejectOnExceptionExtension
         );
 
-        $dbalConnection = new Definition(Connection::class);
-        $dbalConnection->setPublic(false);
-        $dbalConnection->setFactory([new Reference('doctrine'), 'getConnection']);
-        $dbalConnection->setArguments([$config['connection']]);
-
-        $dbalConnectionId = sprintf('oro_message_queue.transport.%s.dbal_connection', $this->name);
-        $container->setDefinition($dbalConnectionId, $dbalConnection);
-
-        $dbalSchema = new Definition(DbalSchema::class);
-        $dbalSchema->setPublic(false);
-        $dbalSchema->setArguments([new Reference($dbalConnectionId), $config['table']]);
-
-        $dbalSchemaId = sprintf('oro_message_queue.transport.%s.dbal_schema', $this->name);
-        $container->setDefinition($dbalSchemaId, $dbalSchema);
-
         $options = [
             'polling_interval' => $config['polling_interval'],
         ];
@@ -86,7 +70,6 @@ class DbalTransportFactory implements TransportFactoryInterface
         $connection->setArguments([
             new Reference('doctrine'),
             $config['connection'],
-            new Reference($dbalSchemaId),
             $config['table'],
             $options
         ]);

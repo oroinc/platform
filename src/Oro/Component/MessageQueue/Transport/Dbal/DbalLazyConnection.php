@@ -105,8 +105,12 @@ class DbalLazyConnection extends DbalConnection
             return;
         }
 
+        $connection = $this->registry->getConnection($this->connectionName);
+        $schema = new DbalSchema($connection, $this->tableName);
+
         parent::__construct(
-            $this->registry->getConnection($this->connectionName),
+            $connection,
+            $schema,
             $this->tableName,
             $this->options
         );

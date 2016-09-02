@@ -1,13 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\DependencyInjection;
 
-use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\TransportFactoryInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
@@ -70,27 +68,6 @@ class DbalTransportFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('oro_message_queue.transport.dbal.connection', $serviceId);
         $this->assertTrue($container->hasDefinition($serviceId));
-
-        $this->assertTrue($container->hasDefinition('oro_message_queue.transport.dbal.dbal_connection'));
-        $dbalConnection = $container->getDefinition('oro_message_queue.transport.dbal.dbal_connection');
-        $this->assertEquals(Connection::class, $dbalConnection->getClass());
-        $this->assertFalse($dbalConnection->isPublic());
-
-        $dbalConnectionFactory = $dbalConnection->getFactory();
-        $this->assertInstanceOf(Reference::class, $dbalConnectionFactory[0]);
-        $this->assertEquals('doctrine', (string) $dbalConnectionFactory[0]);
-        $this->assertEquals('getConnection', $dbalConnectionFactory[1]);
-
-        $this->assertTrue($container->hasDefinition('oro_message_queue.transport.dbal.dbal_schema'));
-        $dbalSchema = $container->getDefinition('oro_message_queue.transport.dbal.dbal_schema');
-        $this->assertEquals(DbalSchema::class, $dbalSchema->getClass());
-        $this->assertFalse($dbalSchema->isPublic());
-        $this->assertEquals('oro_message_queue.transport.dbal.dbal_connection', (string) $dbalSchema->getArgument(0));
-        $this->assertEquals('table-name', $dbalSchema->getArgument(1));
-
-        $dbalSchemaRef = $connection->getArgument(1);
-        $this->assertInstanceOf(Reference::class, $dbalSchemaRef);
-        $this->assertEquals('oro_message_queue.transport.dbal.dbal_schema', (string) $dbalSchemaRef);
 
         $this->assertTrue($container->hasDefinition('oro_message_queue.transport.dbal.connection'));
         $connection = $container->getDefinition('oro_message_queue.transport.dbal.connection');

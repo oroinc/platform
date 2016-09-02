@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Client\DriverFactory;
 use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
@@ -32,7 +33,8 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
         $config = new Config('', '', '', '');
 
         $doctrineConnection = $this->getMock(Connection::class, [], [], '', false);
-        $connection = new DbalConnection($doctrineConnection, 'aTableName');
+        $dbalSchema = $this->getMock(DbalSchema::class, [], [], '', false);
+        $connection = new DbalConnection($doctrineConnection, $dbalSchema, 'aTableName');
 
         $factory = new DriverFactory([DbalConnection::class => DbalDriver::class]);
         $driver = $factory->create($connection, $config);
