@@ -71,23 +71,16 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      */
     public function reverseTransform($file)
     {
-        if (null === $file) {
-            return null;
+        if (null === $file || $file->isEmptyFile()) {
+            return '';
         }
 
         $em = $this->doctrineHelper->getEntityManagerForClass(File::class);
 
-        if ($file->isEmptyFile()) {
-            $this->fileManager->deleteFile($file->getFilename());
-            $em->remove($file);
-            $em->flush($file);
-
-            return null;
-        }
-
         $httpFile = $file->getFile();
 
         if ($httpFile && $httpFile->isFile() && $this->isValidHttpFile($httpFile)) {
+            $file = clone $file;
             $file->preUpdate();
             $em->persist($file);
             $em->flush($file);
