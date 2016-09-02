@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
@@ -90,6 +91,6 @@ class EmailSynchronizationManagerTest extends \PHPUnit_Framework_TestCase
         $manager->addSynchronizer('sync1');
         $manager->addSynchronizer('sync2');
 
-        $manager->syncOrigins([$origin1, $origin2, $origin3]);
+        $manager->syncOrigins([$origin1, $origin2, $origin3], new SynchronizationProcessorSettings());
     }
 }

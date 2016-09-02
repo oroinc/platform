@@ -70,6 +70,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         $this->em                       = $em;
         $this->emailEntityBuilder       = $emailEntityBuilder;
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
+        $this->settings = new SynchronizationProcessorSettings();
     }
 
     /**
