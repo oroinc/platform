@@ -9,8 +9,13 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 
-class EntityAliasResolver
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+
+class EntityAliasResolver implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     const CACHE_KEY = 'entity_aliases';
 
     /** @var EntityAliasLoader */
@@ -186,7 +191,16 @@ class EntityAliasResolver
             } else {
                 $this->storage = new EntityAliasStorage();
                 $this->storage->setDebug($this->debug);
-                $this->loader->load($this->storage);
+                try {
+                    $this->loader->load($this->storage);
+                } catch (\Exception $e) {
+                   if ($this->logger){
+                       $this->logger->error($e->getMessage(), ['exception' => $e]);
+                   }
+
+                    return;
+                }
+
                 $this->cache->save(self::CACHE_KEY, $this->storage);
             }
         }

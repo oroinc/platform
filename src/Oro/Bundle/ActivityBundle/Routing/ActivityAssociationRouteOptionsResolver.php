@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Routing;
 
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
@@ -71,12 +72,16 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
     protected function getSupportedActivities()
     {
         if (null === $this->supportedActivities) {
-            $this->supportedActivities = array_map(
+            $this->supportedActivities = array_filter(array_map(
                 function (ConfigInterface $config) {
-                    // convert to entity alias
-                    return $this->entityAliasResolver->getPluralAlias(
-                        $config->getId()->getClassName()
-                    );
+                    try {
+                        // convert to entity alias
+                        return $this->entityAliasResolver->getPluralAlias(
+                            $config->getId()->getClassName()
+                        );
+                    } catch (EntityAliasNotFoundException $e) {
+                        return false;
+                    }
                 },
                 $this->groupingConfigProvider->filter(
                     function (ConfigInterface $config) {
@@ -88,7 +93,7 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
                             && in_array(ActivityScope::GROUP_ACTIVITY, $groups, true);
                     }
                 )
-            );
+            ));
         }
 
         return $this->supportedActivities;
