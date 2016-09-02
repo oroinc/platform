@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -17,6 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;

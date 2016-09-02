@@ -181,7 +181,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings)
+    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null)
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -266,7 +266,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings)
+    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -283,7 +283,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
-                $processor->setSettings($settings);
+                if ($settings) {
+                    $processor->setSettings($settings);
+                }
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {

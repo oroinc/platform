@@ -57,7 +57,7 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         $this->now = $now;
     }
 
-    public function callDoSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings)
+    public function callDoSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)
     {
         $this->doSyncOrigin($origin, $settings);
     }
