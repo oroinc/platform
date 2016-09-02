@@ -154,11 +154,10 @@ services:
 
     oro_email.entity.cache.clearer:
         class: %oro_email.entity.cache.clearer.class%
+        deprecated: true
         arguments:
             - %oro_email.entity.cache_dir%
             - %oro_email.entity.proxy_name_template%
-        tags:
-            - { name: kernel.cache_clearer }
 
     oro_email.email.cache.manager:
         class: %oro_email.email.cache.manager.class%

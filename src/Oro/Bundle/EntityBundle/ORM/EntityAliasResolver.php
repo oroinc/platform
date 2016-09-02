@@ -194,9 +194,9 @@ class EntityAliasResolver implements LoggerAwareInterface
                 try {
                     $this->loader->load($this->storage);
                 } catch (\Exception $e) {
-                   if ($this->logger){
-                       $this->logger->error($e->getMessage(), ['exception' => $e]);
-                   }
+                    if ($this->logger) {
+                        $this->logger->error($e->getMessage(), ['exception' => $e]);
+                    }
 
                     return;
                 }
