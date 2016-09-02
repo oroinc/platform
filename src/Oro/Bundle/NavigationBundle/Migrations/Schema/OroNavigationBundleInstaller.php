@@ -14,7 +14,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -28,6 +28,7 @@ class OroNavigationBundleInstaller implements Installation
         $this->createOroNavigationItemPinbarTable($schema);
         $this->createOroNavigationPageStateTable($schema);
         $this->createOroNavigationTitleTable($schema);
+        $this->createOroNavigationMenuUpdateTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroNavigationHistoryForeignKeys($schema);
@@ -134,6 +135,26 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('is_system', 'boolean', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['route'], 'unq_route');
+    }
+
+    /**
+     * Create oro_navigation_menu_update
+     *
+     * @param Schema $schema
+     */
+    protected function createOroNavigationMenuUpdateTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_navigation_menu_update');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('key', 'string', ['length' => 100]);
+        $table->addColumn('parent_id', 'string', ['length' => 100]);
+        $table->addColumn('title', 'string', ['length' => 255]);
+        $table->addColumn('menu', 'string', ['length' => 100]);
+        $table->addColumn('ownership_type', 'integer');
+        $table->addColumn('owner_id', 'integer', []);
+        $table->addColumn('is_active', 'boolean', []);
+        $table->addColumn('priority', 'integer', []);
+        $table->setPrimaryKey(['id']);
     }
 
     /**
