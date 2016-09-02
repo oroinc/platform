@@ -446,14 +446,14 @@ class QueryUtilsTest extends OrmTestCase
             'query with newlines after aliases, AS keyword and case insensitive' => [
                 function () {
                     return <<<DQL
-SELECT p
-FROM TestPerson p
-JOIN p.bestItem AS i
+SELECT  p
+FROM  TestPerson  p
+JOIN  p.bestItem  AS  i
 WHERE EXISTS(
     SELECT p2
-    FROM TestPerson p2
-    join p2.groups _g2
-    WHERE p2.id = p.id
+    FROM TestPerson  p2
+    join  p2.groups  _g2
+    WHERE  p2.id  =  p.id
 )
 DQL
                     ;
