@@ -1,0 +1,12 @@
+services:
+    oro_entity.fallback.resolver.entity_fallback_resolver:
+        class: Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver
+        arguments:
+            - "@oro_entity_config.provider.fallback"
+
+    oro_entity.fallback.provider.system_config_provider:
+        class: Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider
+        arguments:
+            - "@oro_config.manager"
+        tags:
+            - { name: oro.fallback.provider, id: systemConfig }

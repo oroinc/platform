@@ -53,3 +53,6 @@ oro:
                     items:
                         is_displayable: Show on view
                         priority: Priority
+
+        fallback:
+            use_fallback.label: Use

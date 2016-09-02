@@ -1,0 +1,8 @@
+services:
+    oro_entity.twig.fallback.get_fallback_extension:
+        class: 'Oro\Bundle\EntityBundle\Twig\GetEntityFallbackExtension'
+        public: false
+        arguments:
+            - "@oro_entity.fallback.resolver.entity_fallback_resolver"
+        tags:
+            - { name: twig.extension }
