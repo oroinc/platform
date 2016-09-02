@@ -119,19 +119,12 @@ body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;}
   </tr>
   <tr>
     <td>ornare</td>
-    <td>dolor</td>
+    <td>do</td>
   </tr>
 </table>
 </body>
 </html>
 EMAILBODY;
-
-        $htmlCleanBody = <<<CLEANBODY
-Lorem ipsum
-dolor sit amet, consectetur adipiscing elit. Integer
-sagittis ornare
-dolor
-CLEANBODY;
 
         $emails = [
             $this->prepareEmailUser(
@@ -162,7 +155,7 @@ CLEANBODY;
                 'replyAllRoute' => 'oro_email_email_reply',
                 'forwardRoute' => 'oro_email_email_reply',
                 'id' => 1,
-                'seen' => false,
+                'seen' => 0,
                 'subject' => 'subject',
                 'bodyContent' => 'bodyContent',
                 'fromName' => 'fromName',
@@ -173,9 +166,9 @@ CLEANBODY;
                 'replyAllRoute' => 'oro_email_email_reply',
                 'forwardRoute' => 'oro_email_email_reply',
                 'id' => 2,
-                'seen' => true,
+                'seen' => 1,
                 'subject' => 'subject_1',
-                'bodyContent' => $htmlCleanBody,
+                'bodyContent' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sagittis ornare do',
                 'fromName' => 'fromName_1',
                 'linkFromName' => 'oro_email_email_reply',
             ]
