@@ -27,6 +27,17 @@ class Product implements TestFrameworkEntityInterface
     protected $name;
 
     /**
+     * @param int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      */
     public function setName($name)
