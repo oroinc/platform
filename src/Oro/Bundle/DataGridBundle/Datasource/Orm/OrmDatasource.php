@@ -17,7 +17,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\DataGridBundle\Exception\BadMethodCallException;
@@ -136,8 +136,8 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
         }
-        $event = new OrmResultAfter($this->datagrid, $rows, $query);
-        $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
+        $event = new GridResultAfter($this->datagrid, $rows, $query);
+        $this->eventDispatcher->dispatch(GridResultAfter::NAME, $event);
 
         return $event->getRecords();
     }
