@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 
 class TestEmailSynchronizer extends AbstractEmailSynchronizer
 {
@@ -56,9 +57,9 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         $this->now = $now;
     }
 
-    public function callDoSyncOrigin(EmailOrigin $origin)
+    public function callDoSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings)
     {
-        $this->doSyncOrigin($origin);
+        $this->doSyncOrigin($origin, $settings);
     }
 
     public function callChangeOriginSyncState(EmailOrigin $origin, $syncCode, $synchronizedAt)

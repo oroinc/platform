@@ -7,9 +7,10 @@ class SynchronizationProcessorSettings
     /** @var  bool In this mode all emails will be re-synced again for checked folders */
     protected $forceMode = false;
 
+    /** @var bool Allows to define show or hide log messages during resync of emails */
     protected $showMessage = false;
 
-    public function __construct($forceMode, $showMessage)
+    public function __construct($forceMode = false, $showMessage = false)
     {
         $this->forceMode = $forceMode;
         $this->showMessage = $showMessage;
@@ -19,14 +20,10 @@ class SynchronizationProcessorSettings
      * Set force mode.
      *
      * @param bool $mode
-     *
-     * @return $this
      */
     public function setForceMode($mode)
     {
         $this->forceMode = $mode;
-
-        return $this;
     }
 
     /**
@@ -37,11 +34,21 @@ class SynchronizationProcessorSettings
         return $this->forceMode === true;
     }
 
+    /**
+     * Set value to show or hide log messages
+     *
+     * @param bool $value
+     */
     public function setShowMessage($value)
     {
-        return $this->showMessage = $value;
+        $this->showMessage = $value;
     }
 
+    /**
+     * Check value is true.
+     *
+     * @return bool
+     */
     public function needShowMessage()
     {
         return $this->showMessage === true;

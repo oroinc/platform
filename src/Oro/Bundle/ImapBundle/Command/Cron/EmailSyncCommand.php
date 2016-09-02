@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
-use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,6 +11,7 @@ use Oro\Component\Log\OutputLogger;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandConcurrentJobsInterface;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 
 class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface, CronCommandConcurrentJobsInterface
@@ -102,7 +102,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 'vvv',
                 null,
                 InputOption::VALUE_NONE,
-                'The option allows show the log messages during sync email'
+                'THis option allows show the log messages during resync email'
             );;
     }
 
