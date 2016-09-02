@@ -27,14 +27,11 @@ class Product implements TestFrameworkEntityInterface
     protected $name;
 
     /**
-     * @param int $id
-     * @return $this
+     * @return int
      */
-    public function setId($id)
+    public function getId()
     {
-        $this->id = $id;
-
-        return $this;
+        return $this->id;
     }
 
     /**
