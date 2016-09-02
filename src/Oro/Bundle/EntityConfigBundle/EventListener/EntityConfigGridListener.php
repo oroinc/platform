@@ -39,7 +39,7 @@ class EntityConfigGridListener extends AbstractConfigGridListener
     }
 
     /**
-     * Call this method from datagrids.yml
+     * Call this method from oro/datagrids.yml
      * invoked in Manager when datagrid configuration prepared for grid build process
      *
      * @return array

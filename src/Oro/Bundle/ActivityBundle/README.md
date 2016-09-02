@@ -116,7 +116,7 @@ Please pay attention that:
 
  - The controller action must accept two parameters: `$entityClass` and `$entityId`.
  - The entity class name can be encoded to avoid routing collisions. So you need to use `oro_entity.routing_helper` service to get the entity by it's class name and id.
- - In the following example the `activity-email-grid` datagrid is used to render the list of activities. This grid is defined in *datagrids.yml* file.
+ - In the following example the `activity-email-grid` datagrid is used to render the list of activities. This grid is defined in *oro/datagrids.yml* file.
 
 An example:
 

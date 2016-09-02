@@ -22,8 +22,8 @@ This param will be passed to datagrid parameter bag and will be bind to datasour
 of "oro_datagrid.datagrid.build.after" event automatically if you will specify "bind_parameters" option in datasource
 configuration:
 
-``` ymldatagrids:
-
+``` yml
+datagrids:
     acme-demo-grid:
         source:
             type: orm
@@ -275,7 +275,7 @@ my_bundle.event_listener.my_grid_listener:
 ```
 - last step is implementing grid listener
 - as an example see:
-    - Oro/Bundle/UserBundle/Resources/config/datagrids.yml (owner-users-select-grid)
+    - Oro/Bundle/UserBundle/Resources/config/oro/datagrids.yml (owner-users-select-grid)
     - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php (service name: "oro_user.event_listener.owner_user_grid_listener")
 
 #### Problem:

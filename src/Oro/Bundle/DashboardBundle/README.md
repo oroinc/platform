@@ -112,7 +112,7 @@ oro_default:
 How to add new widget
 ---------------------
  
-In this example lets create a grid widget. First you need to create a grid. Use `datagrids.yml` of your bundle to do this. For example lets create `dashboard-recent-calls-grid` grid:
+In this example lets create a grid widget. First you need to create a grid. Use `oro/datagrids.yml` of your bundle to do this. For example lets create `dashboard-recent-calls-grid` grid:
 ```yaml
 datagrids:
     dashboard-recent-calls-grid:

@@ -6,7 +6,7 @@ Grid Views Extension
 Configuration
 -------------
 
-### datagrids.yml
+### oro/datagrids.yml
 
 ``` yml
     # ...
