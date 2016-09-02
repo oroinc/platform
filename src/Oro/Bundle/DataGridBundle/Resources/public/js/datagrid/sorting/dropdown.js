@@ -79,12 +79,12 @@ define(function(require) {
             SortingDropdown.__super__.initialize.call(this, options);
         },
 
-        _initCurrentSortableColumn: function (){
+        _initCurrentSortableColumn: function() {
             var keys = Object.keys(this.collection.state.sorters);
             if (keys.length) {
                 var columnName = keys[0];
                 var direction;
-                var column = this.columns.find(function (column) {
+                var column = this.columns.find(function(column) {
                     return column.get('name') === columnName;
                 });
                 switch (parseInt(this.collection.state.sorters[columnName], 10)) {
@@ -144,7 +144,7 @@ define(function(require) {
         /**
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             this.enabled = false;
             this.render();
             return this;
@@ -153,7 +153,7 @@ define(function(require) {
         /**
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             this.enabled = true;
             this.render();
             return this;
@@ -269,7 +269,7 @@ define(function(require) {
             var select2Config = {
                 dropdownCssClass: _.result(this, 'dropdownClassName'),
                 dropdownAutoWidth: true
-            }
+            };
             var searchCapabilityGate =  this.SEARCH_CAPABILITY_GATE;
             if (!this.hasSortingOrderButton) {
                 searchCapabilityGate = Math.floor(searchCapabilityGate / this.DIRECTIONS.length);

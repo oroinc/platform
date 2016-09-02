@@ -657,8 +657,20 @@ define(function(require) {
         },
 
         changeAppearance: function(key, options) {
-            this.$el.addClass(key + '-appearance');
+            this.switchAppearanceClass(key);
             this.trigger('changeAppearance', key, options);
+        },
+
+        switchAppearanceClass: function(appearanceType) {
+            var appearanceClass = _.find(this.el.classList, function(cls) {
+                return /-appearance$/.test(cls);
+            });
+            if (appearanceClass) {
+                this.$el.removeClass(appearanceClass);
+            }
+            if (appearanceType) {
+                this.$el.addClass(appearanceType + '-appearance');
+            }
         },
 
         /**
@@ -921,10 +933,7 @@ define(function(require) {
 
             this.rendered = true;
 
-            var key = _.result(this.metadata.state, 'appearanceType');
-            if (key) {
-                this.$el.addClass(key + '-appearance');
-            }
+            this.switchAppearanceClass(_.result(this.metadata.state, 'appearanceType'));
             return this;
         },
 
