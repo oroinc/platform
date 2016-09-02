@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
@@ -67,10 +68,12 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
                 $oldSequenceName = $this->platform->getIdentitySequenceName($oldTableName, $primaryKey);
                 if ($schema->hasSequence($oldSequenceName)) {
                     $newSequenceName = $this->platform->getIdentitySequenceName($newTableName, $primaryKey);
-                    $renameSequenceQuery = new SqlSchemaUpdateMigrationQuery(
-                        "ALTER SEQUENCE $oldSequenceName RENAME TO $newSequenceName"
-                    );
-                    $queries->addQuery($renameSequenceQuery);
+                    if ($this->platform instanceof PostgreSqlPlatform) {
+                        $renameSequenceQuery = new SqlSchemaUpdateMigrationQuery(
+                            "ALTER SEQUENCE $oldSequenceName RENAME TO $newSequenceName"
+                        );
+                        $queries->addQuery($renameSequenceQuery);
+                    }
                 }
             }
         }

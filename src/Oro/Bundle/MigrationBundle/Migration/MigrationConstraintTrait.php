@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Table;
 
-trait MigrationTrait
+trait MigrationConstraintTrait
 {
     /**
      * @param Table $table
