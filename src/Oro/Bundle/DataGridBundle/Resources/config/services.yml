@@ -96,7 +96,6 @@ services:
         arguments:
             - '@oro_datagrid.provider.resolver'
             - '@oro_datagrid.configuration_provider.cache'
-            - %kernel.debug%
         tags:
             - { name: oro_datagrid.configuration.provider, priority: -10 }
 

@@ -21,9 +21,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /** @var array */
     protected $rawConfiguration = [];
 
-    /** @var array */
-    protected $gridApplicability = [];
-
     /** @var SystemAwareResolver */
     protected $resolver;
 
@@ -33,21 +30,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /** @var CacheProvider  */
     private $cache;
 
-    /** @var bool */
-    protected $debug;
-
     /**
      * Constructor
      *
      * @param SystemAwareResolver $resolver
      * @param CacheProvider       $cache
-     * @param bool                $debug
      */
-    public function __construct(SystemAwareResolver $resolver, CacheProvider $cache, $debug = true)
+    public function __construct(SystemAwareResolver $resolver, CacheProvider $cache)
     {
         $this->resolver         = $resolver;
         $this->cache            = $cache;
-        $this->debug            = $debug;
     }
 
     /**
@@ -55,12 +47,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function isApplicable($gridName)
     {
-        if (!isset($this->gridApplicability[$gridName])) {
-            $this->ensureConfigurationLoaded($gridName);
-            $this->gridApplicability[$gridName] = isset($this->rawConfiguration[$gridName]);
-        }
-
-        return $this->gridApplicability[$gridName];
+        $this->ensureConfigurationLoaded($gridName);
+        return isset($this->rawConfiguration[$gridName]);
     }
 
     /**
@@ -102,8 +90,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             $data = $this->cache->fetch($gridName.'_'.self::CACHE_POSTFIX);
             if ($data) {
                 $this->rawConfiguration = array_merge($this->rawConfiguration, $data);
-            } elseif ($this->debug) {
-                $this->loadConfiguration();
             }
         }
     }
