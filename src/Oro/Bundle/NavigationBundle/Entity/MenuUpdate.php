@@ -12,6 +12,9 @@ use Oro\Bundle\NavigationBundle\Model\MenuUpdate as MenuUpdateModel;
  */
 class MenuUpdate extends MenuUpdateModel
 {
+    const OWNERSHIP_BUSINESS_UNIT = 3;
+    const OWNERSHIP_USER          = 4;
+
     /**
      * {@inheritdoc}
      */
