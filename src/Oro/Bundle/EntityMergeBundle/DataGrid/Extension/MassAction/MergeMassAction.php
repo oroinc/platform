@@ -8,7 +8,6 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class MergeMassAction extends AbstractMassAction
 {
