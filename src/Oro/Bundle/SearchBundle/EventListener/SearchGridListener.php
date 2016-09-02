@@ -7,6 +7,7 @@ use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
 
 class SearchGridListener
 {
+    const SELECT_PATH = '[source][query][select]';
     const FROM_PATH = '[source][query][from]';
 
     /**
@@ -20,6 +21,13 @@ class SearchGridListener
         $datasource = $grid->getDatasource();
 
         if ($datasource instanceof SearchDatasource) {
+            $select = $grid->getConfig()->offsetGetByPath(self::SELECT_PATH);
+            if (is_array($select)) {
+                foreach ($select as $field) {
+                    $datasource->getQuery()->addSelect($field);
+                }
+            }
+
             $from = $grid->getConfig()->offsetGetByPath(self::FROM_PATH);
             if (!empty($from)) {
                 $datasource->getQuery()->from($from);

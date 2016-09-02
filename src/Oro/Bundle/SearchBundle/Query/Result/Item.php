@@ -250,14 +250,4 @@ class Item
 
         return $result;
     }
-
-    /**
-     * Non-existing getters will be obtained from entity
-     *
-     * @param $property
-     */
-    public function __get($property)
-    {
-        return $this->propertyAccessor->getValue($this->getEntity(), $property);
-    }
 }

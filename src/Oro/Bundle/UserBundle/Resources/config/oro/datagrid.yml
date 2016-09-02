@@ -752,6 +752,7 @@ datagrid:
                 select:
                     - text.username
                     - text.email
+
                 # from part must be string or array of string, each string is an index alias name
                 from:
                     - oro_user
