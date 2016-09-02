@@ -11,10 +11,6 @@
     ],
     "repositories": [
         {
-            "type": "git",
-            "url": "https://github.com/orocrm/TranslationFormBundle.git"
-        },
-        {
             "type": "composer",
             "url": "https://packagist.orocrm.com"
         }
@@ -56,7 +52,7 @@
         "leafo/lessphp": "0.4.0",
         "genemu/form-bundle": "2.2.1",
         "zendframework/zend-mail": "2.1.5",
-        "a2lix/translation-form-bundle": "dev-1.x-symfony2.8",
+        "a2lix/translation-form-bundle": "1.x-dev",
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "0.1.*",
         "guzzle/guzzle": "3.7.*",

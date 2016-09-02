@@ -18,6 +18,10 @@ Validation
 The validation rules are loaded from *Resources/config/validation.yml* and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applicable in Data API as well.
 Also, by default, Data API uses two validation groups: **Default** and **api**. If you need to add validation constrains that should be applicable in Data API only you should add them in **api** validation group.
 
+In case if input data violates some validation constraints, these constraints will be automatically converted to validation errors which are used to build correct response of Data API. The conversion is performed by [CollectFormErrors][../../Processor/Shared/CollectFormErrors.php] processor. By default the HTTP status code for validation errors is `400 Bad Request`. But, if needed, there are several ways to change it:
+
+- Implement [ConstraintWithStatusCodeInterface][../../Validator/Constraints/ConstraintWithStatusCodeInterface.php] in you constraint class.
+- Implement own constraint text extractor. The API bundle has the [default implementation of constraint text extractor](../../Request/ConstraintTextExtractor.php). To add new extractor just create a class implements [ConstraintTextExtractorInterface](../../Request/ConstraintTextExtractorInterface.php) and tag it with the `oro.api.constraint_text_extractor` in the dependency injection container. Also this service can be used to change an error code and type for a validation constraint.
 
 Forms
 -----

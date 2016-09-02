@@ -1,6 +1,10 @@
-define(['underscore', 'orotranslation/js/translator', './cell-formatter', 'orolocale/js/formatter/number'
-    ], function(_, __, CellFormatter, formatter) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var CellFormatter = require('./cell-formatter');
+    var formatter = require('orolocale/js/formatter/number');
 
     function getFormatter(style) {
         var functionName = 'format' + style.charAt(0).toUpperCase() + style.slice(1);

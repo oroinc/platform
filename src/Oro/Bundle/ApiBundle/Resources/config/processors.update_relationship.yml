@@ -168,6 +168,8 @@ services:
 
     oro_api.update_relationship.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors
+        arguments:
+            - '@oro_api.constraint_text_extractor'
         tags:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -100 }
 

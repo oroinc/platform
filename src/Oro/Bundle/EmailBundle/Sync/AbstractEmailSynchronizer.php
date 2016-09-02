@@ -106,6 +106,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
+     *
      * @return int
      *
      * @throws \Exception
@@ -175,9 +176,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origins.
      *
      * @param int[] $originIds
+     * @param bool $force
+     *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds)
+    public function syncOrigins(array $originIds, $force = false)
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -192,7 +195,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
-                    $this->doSyncOrigin($origin);
+                    $this->doSyncOrigin($origin, $force);
                 } catch (SyncFolderTimeoutException $ex) {
                     break;
                 } catch (\Exception $ex) {
@@ -258,9 +261,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
+     * @param bool $force
+     *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin)
+    protected function doSyncOrigin(EmailOrigin $origin, $force = false)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -271,12 +276,15 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         } catch (\Exception $ex) {
             $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
 
+            $this->setOriginSyncStateToFailed($origin);
+
             throw $ex;
         }
 
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
+                $processor->setForceMode($force);
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
@@ -288,15 +296,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
             throw $ex;
         } catch (\Exception $ex) {
-            try {
-                $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
-            } catch (\Exception $innerEx) {
-                // ignore any exception here
-                $this->logger->error(
-                    sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
-                    ['exception' => $innerEx]
-                );
-            }
+            $this->setOriginSyncStateToFailed($origin);
 
             $this->logger->error(
                 sprintf('The synchronization failed. Error: %s', $ex->getMessage()),
@@ -404,6 +404,24 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $affectedRows = $qb->getQuery()->execute();
 
         return $affectedRows > 0;
+    }
+
+    /**
+     *  Attempts to sets the state of a given email origin to failed.
+     *
+     * @param EmailOrigin $origin
+     */
+    protected function setOriginSyncStateToFailed(EmailOrigin $origin)
+    {
+        try {
+            $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
+        } catch (\Exception $innerEx) {
+            // ignore any exception here
+            $this->logger->error(
+                sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
+                ['exception' => $innerEx]
+            );
+        }
     }
 
     /**
