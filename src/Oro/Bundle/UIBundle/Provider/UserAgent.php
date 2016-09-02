@@ -52,7 +52,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function toString()
     {
