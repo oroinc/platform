@@ -39,6 +39,7 @@ define(function(require) {
         defaultPos: 'center center',
         openedWindows: 0,
         contentTop: null,
+        keepAliveOnClose: false,
         /**
          * Flag if the widget is embedded to the page
          * (dialog has own life cycle)
@@ -129,7 +130,9 @@ define(function(require) {
             if (_.isFunction(onClose)) {
                 onClose();
             }
-            this.dispose();
+            if (!this.keepAliveOnClose) {
+                this.dispose();
+            }
         },
 
         /**
@@ -241,7 +244,7 @@ define(function(require) {
          * Removes dialog widget
          */
         remove: function() {
-            if (this.widget) {
+            if (this.widget && this.widget.dialog('isOpen')) {
                 // There's widget, close it before remove.
                 // Close handler will invoke dispose method,
                 // where remove method will be called again
@@ -302,6 +305,9 @@ define(function(require) {
                 this.widget.html(this.$el).dialog(dialogOptions);
                 this.getLayoutElement().attr('data-layout', 'separate');
             } else {
+                if (this.widget.dialog('instance') !== void 0 && !this.widget.dialog('isOpen')) {
+                    this.widget.dialog('open');
+                }
                 this.widget.html(this.$el);
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
@@ -316,6 +322,14 @@ define(function(require) {
                 this._fixDialogMinHeight(false);
                 this.widget.trigger('resize');
             }, this));
+        },
+
+        hide: function() {
+            // keepAliveOnClose property is used to avoid disposing the widget on dialog close to be able open it again
+            var keepAliveOnClose = this.keepAliveOnClose;
+            this.keepAliveOnClose = true;
+            this.widget.dialog('close');
+            this.keepAliveOnClose = keepAliveOnClose;
         },
 
         _renderHandler: function() {

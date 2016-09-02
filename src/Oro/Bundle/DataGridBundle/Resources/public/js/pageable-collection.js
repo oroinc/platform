@@ -99,7 +99,8 @@ define([
             filters: {},
             sorters: {},
             columns: {},
-            appearanceType: 'grid'
+            appearanceType: 'grid',
+            appearanceData: {}
         },
 
         /**
@@ -108,7 +109,8 @@ define([
          * @property
          */
         state: _.extend({
-            appearanceType: 'grid'
+            appearanceType: 'grid',
+            appearanceData: {}
         }, BackbonePageableCollection.prototype.state),
 
         /**

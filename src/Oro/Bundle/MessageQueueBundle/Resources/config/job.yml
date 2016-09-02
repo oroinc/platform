@@ -1,0 +1,53 @@
+parameters:
+    oro_message_queue.job.unique_job_table_name: 'oro_message_queue_job_unique'
+
+services:
+    oro_message_queue.job.storage:
+        class: 'Oro\Component\MessageQueue\Job\JobStorage'
+        arguments:
+            - '@doctrine'
+            - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
+            - '%oro_message_queue.job.unique_job_table_name%'
+
+    oro_message_queue.job.processor:
+        class: 'Oro\Component\MessageQueue\Job\JobProcessor'
+        arguments:
+            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.client.message_producer'
+
+    oro_message_queue.job.runner:
+        class: 'Oro\Component\MessageQueue\Job\JobRunner'
+        arguments:
+            - '@oro_message_queue.job.processor'
+
+    oro_message_queue.job.calculate_root_job_status_service:
+        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobStatusService'
+        arguments:
+            - '@oro_message_queue.job.storage'
+
+    oro_message_queue.job.calculate_root_job_status_processor:
+        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor'
+        arguments:
+            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.job.calculate_root_job_status_service'
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.job.dependent_job_processor:
+        class: 'Oro\Component\MessageQueue\Job\DependentJobMessageProcessor'
+        arguments:
+            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.job.dependent_job_service:
+        class: 'Oro\Component\MessageQueue\Job\DependentJobService'
+        arguments:
+            - '@oro_message_queue.job.storage'
+
+    oro_message_queue.job.grid.root_job_action_configuration:
+        class: 'Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration'

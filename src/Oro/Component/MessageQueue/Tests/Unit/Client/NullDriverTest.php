@@ -1,101 +1,154 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Null\NullMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
-use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
-use Oro\Component\MessageQueue\Client\MessageProducer;
-use Oro\Component\MessageQueue\Client\NullDriver;
-use Oro\Component\MessageQueue\Client\Config;
 
 class NullDriverTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new NullDriver($this->createSessionMock(), new Config('', '', '', '', ''));
+        new NullDriver(new NullSession(), new Config('', '', '', '', ''));
     }
 
-    public function testShouldCreateMessageInstance()
+    public function testShouldSendJustCreatedMessageToQueue()
     {
-        $message = new NullMessage();
+        $config = new Config('', '', '', '', '');
+        $queue = new NullQueue('aQueue');
 
-        $transportSession = $this->createSessionMock();
-        $transportSession
-            ->expects($this->once())
-            ->method('createMessage')
-            ->with(null, [], [])
-            ->will($this->returnValue($message))
+        $transportMessage = new NullMessage();
+
+        $producer = $this->createMessageProducer();
+        $producer
+            ->expects(self::once())
+            ->method('send')
+            ->with(self::identicalTo($queue), self::identicalTo($transportMessage))
         ;
 
-        $driver = new NullDriver($transportSession, new Config('', '', '', '', ''));
-        $result = $driver->createMessage();
+        $session = $this->createSessionStub($transportMessage, $producer);
 
-        $this->assertSame($message, $result);
+        $driver = new NullDriver($session, $config);
+
+        $driver->send($queue, new Message());
     }
 
-    public function testShouldSetMessagePriority()
+    public function testShouldConvertClientMessageToTransportMessage()
     {
-        $message = new NullMessage();
+        $config = new Config('', '', '', '', '');
+        $queue = new NullQueue('aQueue');
 
-        $session = $this->createSessionMock();
+        $message = new Message();
+        $message->setBody('theBody');
+        $message->setContentType('theContentType');
+        $message->setMessageId('theMessageId');
+        $message->setTimestamp(12345);
+        $message->setDelay(123);
+        $message->setExpire(345);
+        $message->setPriority(MessagePriority::LOW);
+        $message->setHeaders(['theHeaderFoo' => 'theFoo']);
+        $message->setProperties(['thePropertyBar' => 'theBar']);
 
-        $driver = new NullDriver($session, new Config('', '', '', '', ''));
-        $driver->setMessagePriority($message, $priority = 3);
+        $transportMessage = new NullMessage();
 
-        $this->assertSame($priority, $message->getHeader('priority'));
-    }
-
-    public function testShouldCreateProducerInstance()
-    {
-        $transportSession = $this->createSessionMock();
-        $transportSession
-            ->expects($this->once())
-            ->method('createProducer')
-            ->will($this->returnValue($this->getMock(TransportMessageProducer::class)))
+        $producer = $this->createMessageProducer();
+        $producer
+            ->expects(self::once())
+            ->method('send')
         ;
 
-        $driver = new NullDriver($transportSession, new Config('', '', '', '', ''));
-        $result = $driver->createProducer();
+        $session = $this->createSessionStub($transportMessage, $producer);
 
-        $this->assertInstanceOf(MessageProducer::class, $result);
+        $driver = new NullDriver($session, $config);
+
+        $driver->send($queue, $message);
+
+        self::assertSame('theBody', $transportMessage->getBody());
+        self::assertSame([
+            'theHeaderFoo' => 'theFoo',
+            'content_type' => 'theContentType',
+            'expiration' => 345,
+            'delay' => 123,
+            'priority' => MessagePriority::LOW,
+        ], $transportMessage->getHeaders());
+        self::assertSame([
+            'thePropertyBar' => 'theBar',
+        ], $transportMessage->getProperties());
     }
 
     public function testShouldReturnConfigInstance()
     {
         $config = new Config('', '', '', '', '');
 
-        $driver = new NullDriver($this->createSessionMock(), $config);
+        $driver = new NullDriver($this->createSessionStub(), $config);
         $result = $driver->getConfig();
 
-        $this->assertSame($config, $result);
+        self::assertSame($config, $result);
     }
 
-    public function testShouldCreateQueue()
+    public function testAllowCreateTransportMessage()
     {
-        $queue = new NullQueue('');
-
         $config = new Config('', '', '', '', '');
 
-        $transportSession = $this->createSessionMock();
-        $transportSession
-            ->expects($this->once())
-            ->method('createQueue')
-            ->with('queue-name')
-            ->will($this->returnValue($queue))
+        $message = new NullMessage();
+
+        $session = $this->createSessionMock();
+        $session
+            ->expects(self::once())
+            ->method('createMessage')
+            ->willReturn($message)
         ;
 
-        $driver = new NullDriver($transportSession, $config);
-        $result = $driver->createQueue('queue-name');
+        $driver = new NullDriver($session, $config);
 
-        $this->assertSame($queue, $result);
+        self::assertSame($message, $driver->createTransportMessage());
     }
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
      */
-    protected function createSessionMock()
+    private function createSessionMock()
     {
         return $this->getMock(NullSession::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
+     */
+    private function createSessionStub($message = null, $messageProducer = null)
+    {
+        $sessionMock = $this->getMock(NullSession::class, [], [], '', false);
+        $sessionMock
+            ->expects($this->any())
+            ->method('createMessage')
+            ->willReturn($message)
+        ;
+        $sessionMock
+            ->expects($this->any())
+            ->method('createQueue')
+            ->willReturnCallback(function ($name) {
+                return new NullQueue($name);
+            })
+        ;
+        $sessionMock
+            ->expects($this->any())
+            ->method('createProducer')
+            ->willReturn($messageProducer)
+        ;
+
+        return $sessionMock;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|NullMessageProducer
+     */
+    private function createMessageProducer()
+    {
+        return $this->getMock(NullMessageProducer::class, [], [], '', false);
     }
 }
