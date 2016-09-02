@@ -40,8 +40,8 @@ define([
         keepElement: false,
 
         events: {
-            mouseover: 'onMouseOver',
-            mouseout: 'onMouseOut',
+            mouseenter: 'onMouseEnter',
+            mouseleave: 'onMouseLeave',
             click: 'onClick'
         },
 
@@ -177,7 +177,7 @@ define([
             }
         },
 
-        onMouseOver: function() {
+        onMouseEnter: function(e) {
             var _this = this;
             var $label = this.$('.grid-header-cell-label');
 
@@ -192,21 +192,32 @@ define([
                 return;
             }
 
+            this.popoverAdded = true;
+
+            $label.popover({
+                content: _this.column.get('label'),
+                trigger: 'manual',
+                placement: 'bottom',
+                animation: 'false',
+                container: 'body',
+                template: '<div class="popover" role="tooltip">' +
+                              '<div class="arrow"></div>' +
+                              '<h3 class="popover-title"></h3>' +
+                              '<div class="popover-content popover-no-close-button"></div>' +
+                          '</div>'
+            });
+
             this.hintTimeout = setTimeout(function addHeaderCellHint() {
-                $(document.body).append('<span class="grid-header-cell-hint">' +
-                    _.escape(_this.column.get('label')) + '</span>');
-                var hint = $('body > .grid-header-cell-hint');
-                hint.position({
-                    my: 'left top',
-                    at: 'left bottom+5',
-                    of: $label
-                });
+                $label.popover('show');
             }, 300);
         },
 
-        onMouseOut: function() {
+        onMouseLeave: function(e) {
             clearTimeout(this.hintTimeout);
-            $('body > .grid-header-cell-hint').remove();
+            var $label = this.$('.grid-header-cell-label');
+            $label.popover('hide');
+            $label.popover('destroy');
+            this.popoverAdded = false;
         }
     });
 
