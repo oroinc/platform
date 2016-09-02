@@ -105,11 +105,14 @@ abstract class AbstractFilter implements FilterInterface
                 $subQb = clone $qb;
                 $subQb
                     ->resetDqlPart('orderBy')
-                    // replace aliases from SELECT by expressions, since SELECT clause is changed
-                    ->groupBy(implode(', ', $this->getSelectFieldFromGroupBy($qb)))
                     ->select($fieldExpr)
                     ->andWhere($comparisonExpr)
                     ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
+                $groupBy = implode(', ', $this->getSelectFieldFromGroupBy($qb));
+                if ($groupBy) {
+                    // replace aliases from SELECT by expressions, since SELECT clause is changed
+                    $subQb->groupBy($groupBy);
+                }
                 list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
                 list($fieldAlias, $field) = explode('.', $fieldExpr);
                 $replacedFieldExpr = sprintf('%s.%s', $replacements[$fieldAlias], $field);
