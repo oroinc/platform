@@ -752,16 +752,19 @@ datagrid:
                 select:
                     - text.username
                     - text.email
-                from: oro_user
+                # from part must be string or array of string, each string is an index alias name
+                from:
+                    - oro_user
         columns:
             username:
-                data_name: entity.username
+                data_name: username
             email:
-                data_name: entity.email
+                data_name: email
         sorters:
             columns:
                 username:
                     data_name: username
+                    type: string
         filters:
             columns:
                 username:
