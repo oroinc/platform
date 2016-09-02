@@ -98,6 +98,13 @@ services:
     # security_check
     #
 
+    oro_api.add_relationship.parent_entity_type_feature_check:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeFeatureCheck
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: security_check, priority: 20 }
+
     oro_api.add_relationship.parent_entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
@@ -127,13 +134,6 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -10 }
-
-    oro_api.add_relationship.parent_entity_object_feature_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeFeatureCheck
-        arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
-        tags:
-            - { name: oro.api.processor, action: add_relationship, group: security_check, priority: -20 }
 
     oro_api.add_relationship.parent_entity_object_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
