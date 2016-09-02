@@ -117,7 +117,11 @@ class OroEntityExtendBundle extends Bundle
                     return;
                 }
 
-                $pb->getProcess()->run();
+                $process = $pb->getProcess();
+                $exitStatusCode = $process->run();
+                if ($exitStatusCode) {
+                    throw new \RuntimeException($process->getErrorOutput());
+                }
 
                 return;
             } else {
@@ -151,7 +155,11 @@ class OroEntityExtendBundle extends Bundle
                     return;
                 }
 
-                $pb->getProcess()->run();
+                $process = $pb->getProcess();
+                $exitStatusCode = $process->run();
+                if ($exitStatusCode) {
+                    throw new \RuntimeException($process->getErrorOutput());
+                }
 
                 return;
             } else {
