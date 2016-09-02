@@ -7,6 +7,7 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
 class Element extends NodeElement
 {
@@ -28,16 +29,28 @@ class Element extends NodeElement
     protected $options;
 
     /**
+     * @var SelectorManipulator
+     */
+    protected $selectorManipulator;
+
+    /**
      * @param Session $session
      * @param OroElementFactory $elementFactory
      * @param array|string $selector
      */
-    public function __construct(Session $session, OroElementFactory $elementFactory, $selector = ['xpath' => '//'])
-    {
-        parent::__construct($this->getSelectorAsXpath($session->getSelectorsHandler(), $selector), $session);
-
+    public function __construct(
+        Session $session,
+        OroElementFactory $elementFactory,
+        $selector = ['type' => 'xpath', 'locator' => '/html/body']
+    ) {
         $this->elementFactory = $elementFactory;
         $this->session = $session;
+        $this->selectorManipulator = new SelectorManipulator();
+
+        parent::__construct(
+            $this->selectorManipulator->getSelectorAsXpath($session->getSelectorsHandler(), $selector),
+            $session
+        );
     }
 
     /**
@@ -64,25 +77,11 @@ class Element extends NodeElement
      *
      * @param string $locator label text
      *
-     * @return NodeElement|null
+     * @return Element|null
      */
-    public function findLabel($locator)
+    public function findLabel($text)
     {
-        $labelSelector = sprintf("label:contains('%s')", $locator);
-        $label = $this->find('css', $labelSelector);
-
-        if (null !== $label) {
-            return $label;
-        }
-
-        /** @var NodeElement $label */
-        foreach ($this->findAll('css', 'label') as $label) {
-            if (preg_match(sprintf('/%s/i', $locator), $label->getText())) {
-                return $label;
-            }
-        }
-
-        return null;
+        return $this->find('css', $this->selectorManipulator->addContainsSuffix('label', $text));
     }
 
     /**
@@ -106,6 +105,16 @@ class Element extends NodeElement
     }
 
     /**
+     * Returns element's driver.
+     *
+     * @return OroSelenium2Driver
+     */
+    protected function getDriver()
+    {
+        return parent::getDriver();
+    }
+
+    /**
      * @return DocumentElement
      */
     protected function getPage()
@@ -119,19 +128,5 @@ class Element extends NodeElement
     protected function getName()
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
-    }
-
-    /**
-     * @param SelectorsHandler $selectorsHandler
-     * @param array|string $selector
-     *
-     * @return string
-     */
-    private function getSelectorAsXpath(SelectorsHandler $selectorsHandler, $selector)
-    {
-        $selectorType = is_array($selector) ? $selector['type'] : 'css';
-        $locator = is_array($selector) ? $selector['locator'] : $selector;
-
-        return $selectorsHandler->selectorToXpath($selectorType, $locator);
     }
 }

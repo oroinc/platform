@@ -99,7 +99,7 @@ class LocalizationManager
      */
     public function getDefaultLocalization()
     {
-        $id = $this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
+        $id = (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
 
         $localization = $this->getLocalization($id);
 

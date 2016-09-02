@@ -24,19 +24,11 @@ class TraceableMessageProducer implements MessageProducerInterface
     /**
      * {@inheritdoc}
      */
-    public function createMessage($body)
+    public function send($topic, $message)
     {
-        return $this->messageProducer->createMessage($body);
-    }
+        $this->messageProducer->send($topic, $message);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function send($topic, $message, $priority = MessagePriority::NORMAL)
-    {
-        $this->messageProducer->send($topic, $message, $priority);
-
-        $this->traces[] = ['topic' => $topic, 'message' => $message, 'priority' => $priority];
+        $this->traces[] = ['topic' => $topic, 'message' => $message];
     }
 
     /**

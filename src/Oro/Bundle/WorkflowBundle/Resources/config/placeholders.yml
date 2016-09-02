@@ -1,26 +1,9 @@
 placeholders:
-    view_navButtons_before:
+    page_title_after:
         items:
-            workflow_buttons:
-                order: 100
-# TODO: Uncomment this placeholder in scope of BAP-4637
-#    index_navButtons_before:
-#        items:
-#            workflow_buttons:
-#                order: 100
-    page_title_before:
-        items:
-            workflow_steps_data:
-                order: 100
-    breadcrumb_pin_after:
-        items:
-            workflow_steps_placeholder:
+            entity_workflows:
                 order: 100
 
 items:
-    workflow_buttons:
-        template: OroWorkflowBundle:Widget:buttons.html.twig
-    workflow_steps_data:
-        template: OroWorkflowBundle:Widget:steps.html.twig
-    workflow_steps_placeholder:
-        template: OroWorkflowBundle:Widget:placeholder.html.twig
+    entity_workflows:
+        template: OroWorkflowBundle:Widget:entityWorkflows.html.twig

@@ -438,3 +438,13 @@ services:
             - '@property_accessor'
         tags:
             - { name: oro.api.filter_factory, priority: -10 }
+
+    oro_api.constraint_text_extractor:
+        class: Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor
+        public: false
+
+    oro_api.constraint_text_extractor.default:
+        class: Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor
+        public: false
+        tags:
+            - { name: oro.api.constraint_text_extractor, priority: -10 }
