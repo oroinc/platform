@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityPaginationBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
@@ -37,9 +37,9 @@ class EntityPaginationListener
     }
 
     /**
-     * @param OrmResultAfter $event
+     * @param GridResultAfter $event
      */
-    public function onResultAfter(OrmResultAfter $event)
+    public function onResultAfter(GridResultAfter $event)
     {
         if (!$this->paginationManager->isEnabled()) {
             return;
