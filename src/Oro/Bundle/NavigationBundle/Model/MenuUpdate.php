@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Model;
 
+use Doctrine\ORM\Mapping as ORM;
+
 abstract class MenuUpdate
 {
     const OWNERSHIP_GLOBAL        = 1;
@@ -21,56 +23,56 @@ abstract class MenuUpdate
      *
      * @ORM\Column(name="key", type="string", length=100)
      */
-    private $key;
+    protected $key;
 
     /**
      * @var string
      *
      * @ORM\Column(name="parent_id", type="string", length=100)
      */
-    private $parentId;
+    protected $parentId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255)
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      *
      * @ORM\Column(name="menu", type="string", length=100)
      */
-    private $menu;
+    protected $menu;
 
     /**
      * @var int
      *
      * @ORM\Column(name="ownership_type", type="integer")
      */
-    private $ownershipType;
+    protected $ownershipType;
 
     /**
      * @var int
      *
      * @ORM\Column(name="owner_id", type="integer")
      */
-    private $ownerId;
+    protected $ownerId;
 
     /**
      * @var bool
      *
      * @ORM\Column(name="is_active", type="boolean")
      */
-    private $isActive;
+    protected $isActive;
 
     /**
      * @var int
      *
      * @ORM\Column(name="priority", type="integer")
      */
-    private $priority;
+    protected $priority;
 
     /**
      * Get array of extra data that is not declared in MenuUpdate model
