@@ -90,3 +90,7 @@ oro:
             input_too_long: "{1}Please delete {{ number }} character|[2,Inf[Please delete {{ number }} characters"
             selection_too_big: "{1}You can only select {{ limit }} item|[2,Inf[You can only select {{ limit }} items"
             load_more: "Loading more results..."
+articles: "a|an|the|some|every|any|no"
+abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
+postpositions: "ago|apart|aside|away|hence|through"
+prepositions:  "a|an|per|aboard|about|bout|above|abreast|abroad|across|after|against|again|along|amid|among|around|as|astride|at|atop|ontop|bar|before|afore|tofore|B4|behind|ahind|below|ablow|beneath|beside|besides|between|beyond|but|by|come|despite|spite|down|during|except|for|4|from|in|inside|into|less|like|minus|near|of|off|on|onto|opposite|out|outside|over|past|per|post|pre|pro|re|short|since|than|through|thru|throughout|thruout|to|2|@|the|toward|towards|under|underneath|unlike|until|til|till|up|upon|upside|versus|via|vice|with|within|without|worth"
