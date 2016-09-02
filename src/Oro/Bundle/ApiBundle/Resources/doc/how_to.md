@@ -97,7 +97,7 @@ You can disable access checks for some action by setting `null` as a value to `a
 
 ```yaml
 acls:
-    api:
+    oro_api:
         entities:
             Acme\Bundle\ProductBundle\Product:
                 actions:
@@ -114,7 +114,7 @@ In case if an action should not be accessible, you can disable it in `Resources/
 
 ```yaml
 acls:
-    api:
+    oro_api:
         entities:
             Acme\Bundle\ProductBundle\Product:
                 actions:
@@ -126,7 +126,7 @@ Also, you can use short syntax:
 
 ```yaml
 acls:
-    api:
+    oro_api:
         entities:
             Acme\Bundle\ProductBundle\Product:
                 actions:
@@ -142,7 +142,7 @@ If your want to use another delete handler, you can set it by the `delete_handle
 
 ```yaml
 acls:
-    api:
+    oro_api:
         entities:
             Acme\Bundle\ProductBundle\Product:
                 delete_handler: acme.demo.product_delete_handler
@@ -161,7 +161,7 @@ If your want to use another limit, you can set it by the `max_results` option in
 
 ```yaml
 acls:
-    api:
+    oro_api:
         entities:
             Acme\Bundle\ProductBundle\Product:
                 actions:
@@ -173,7 +173,7 @@ Also you can remove the limit at all. To do this, set `-1` as a value for the `m
 
 ```yaml
 acls:
-    api:
+    oro_api:
         entities:
             Acme\Bundle\ProductBundle\Product:
                 actions:
