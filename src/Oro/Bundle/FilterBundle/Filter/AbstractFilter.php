@@ -15,6 +15,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @todo refactor in BAP-11688
  */
 abstract class AbstractFilter implements FilterInterface
 {

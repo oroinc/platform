@@ -443,16 +443,16 @@ class QueryUtilsTest extends OrmTestCase
                 },
                 ['p', 'i', 'p2', '_g2'],
             ],
-            'query with newlines after aliases' => [
+            'query with newlines after aliases, AS keyword and case insensitive' => [
                 function () {
                     return <<<DQL
 SELECT p
 FROM TestPerson p
-JOIN p.bestItem i
+JOIN p.bestItem AS i
 WHERE EXISTS(
     SELECT p2
     FROM TestPerson p2
-    JOIN p2.groups _g2
+    join p2.groups _g2
     WHERE p2.id = p.id
 )
 DQL
