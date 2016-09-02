@@ -9,8 +9,10 @@ use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
-class AbstractResultAfter extends Event implements GridEventInterface
+class GridResultAfter extends Event implements GridEventInterface
 {
+    const NAME = 'oro_datagrid.orm_datasource.result.after';
+
     /**
      * @var DatagridInterface
      */

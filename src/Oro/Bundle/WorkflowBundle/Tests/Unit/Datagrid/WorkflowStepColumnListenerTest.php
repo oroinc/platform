@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
@@ -866,14 +866,14 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param DatagridConfiguration $configuration
-     * @return OrmResultAfter|\PHPUnit_Framework_MockObject_MockObject
+     * @return GridResultAfter|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createResultAfterEvent(DatagridConfiguration $configuration)
     {
         $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $datagrid->expects($this->any())->method('getConfig')->willReturn($configuration);
 
-        $event = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\OrmResultAfter')
+        $event = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\GridResultAfter')
             ->disableOriginalConstructor()
             ->getMock();
         $event->expects($this->any())->method('getDatagrid')->willReturn($datagrid);
