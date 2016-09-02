@@ -819,7 +819,7 @@ Also you need to register your processor in the dependency injection container:
 In case if you need to create groups for your action, they should be registered in the ApiBundle configuration. To do this just add `Resources\config\oro\app.yml` to your bundle, for example:
 
 ```yaml
-api:
+oro_api:
     actions:
         my_action:
             processing_groups:
