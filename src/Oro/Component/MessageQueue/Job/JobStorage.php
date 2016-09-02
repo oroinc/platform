@@ -157,6 +157,9 @@ class JobStorage
             });
         } else {
             if (! $job->getId() && $job->isRoot()) {
+                // Dbal transaction is used here because Doctrine closes EntityManger any time
+                // exception occurs but UniqueConstraintViolationException here is expected here
+                // and we should keep EntityManager in open state.
                 $this->getEntityManager()->getConnection()->transactional(function (Connection $connection) use ($job) {
                     try {
                         $connection->insert($this->uniqueTableName, [
