@@ -17,9 +17,10 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
  */
 class OroNavigationExtension extends Extension
 {
-    const TITLES_KEY              = 'titles';
-    const MENU_CONFIG_KEY         = 'menu_config';
+    const TITLES_KEY = 'titles';
+    const MENU_CONFIG_KEY = 'menu_config';
     const NAVIGATION_ELEMENTS_KEY = 'navigation_elements';
+    const NAVIGATION_CONFIG_ROOT = 'navigation';
 
     /**
      * {@inheritDoc}
@@ -32,21 +33,28 @@ class OroNavigationExtension extends Extension
             'oro_navigation',
             new YamlCumulativeFileLoader('Resources/config/oro/navigation.yml')
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
+
             // Merge menu from bundle configuration
-            if (isset($resource->data[self::MENU_CONFIG_KEY])) {
-                $this->mergeMenuConfig($entitiesConfig, $resource->data[self::MENU_CONFIG_KEY]);
+            if (isset($resource->data[self::NAVIGATION_CONFIG_ROOT][self::MENU_CONFIG_KEY])) {
+                $this->mergeMenuConfig(
+                    $entitiesConfig,
+                    $resource->data[self::NAVIGATION_CONFIG_ROOT][self::MENU_CONFIG_KEY]
+                );
             }
             // Merge titles from bundle configuration
-            if (!empty($resource->data[self::TITLES_KEY])) {
-                $titlesConfig = array_merge($titlesConfig, (array)$resource->data[self::TITLES_KEY]);
+            if (!empty($resource->data[self::NAVIGATION_CONFIG_ROOT][self::TITLES_KEY])) {
+                $titlesConfig = array_merge(
+                    $titlesConfig,
+                    (array)$resource->data[self::NAVIGATION_CONFIG_ROOT][self::TITLES_KEY]
+                );
             }
             // Merge navigation elements node from bundle configuration
-            if (!empty($resource->data[self::NAVIGATION_ELEMENTS_KEY])) {
+            if (!empty($resource->data[self::NAVIGATION_CONFIG_ROOT][self::NAVIGATION_ELEMENTS_KEY])) {
                 $this->appendConfigPart(
-                    $entitiesConfig[self::MENU_CONFIG_KEY],
-                    $resource->data[self::NAVIGATION_ELEMENTS_KEY],
+                    $entitiesConfig[Configuration::ROOT_NODE],
+                    $resource->data[self::NAVIGATION_CONFIG_ROOT][self::NAVIGATION_ELEMENTS_KEY],
                     Configuration::NAVIGATION_ELEMENTS_NODE
                 );
             }
@@ -59,7 +67,7 @@ class OroNavigationExtension extends Extension
 
         // process configurations to validate and merge
         $configuration = new Configuration();
-        $config        = $this->processConfiguration($configuration, $entitiesConfig);
+        $config = $this->processConfiguration($configuration, $entitiesConfig);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -118,8 +126,8 @@ class OroNavigationExtension extends Extension
      * Smart append of particular config into base config. Config to append will be iterated through and each node
      * will be append or merged via array_replace_recursive
      *
-     * @param array  $parentConfig
-     * @param array  $particularConfig
+     * @param array $parentConfig
+     * @param array $particularConfig
      * @param string $configBranchName Node name to append into
      *
      * @internal param array $config
@@ -151,7 +159,7 @@ class OroNavigationExtension extends Extension
                         if (!empty($existingItem['children'])) {
                             $childChildren = isset($childConfig['children']) ? $childConfig['children'] : array();
                             $childConfig['children']
-                                           = array_merge($existingItem['children'], $childChildren);
+                                = array_merge($existingItem['children'], $childChildren);
                         }
                     }
                     $this->removeItem($config, $childName);
@@ -163,7 +171,7 @@ class OroNavigationExtension extends Extension
     }
 
     /**
-     * @param array  $config
+     * @param array $config
      * @param string $childName
      */
     protected function removeItem(array &$config, $childName)
