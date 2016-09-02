@@ -112,9 +112,11 @@ class Imap extends \Zend\Mail\Storage\Imap
         $this->protocol->connect($host, $port, $ssl);
 
         if ($params->accessToken === null) {
-            if (!$this->protocol->login($params->user, $password)) {
+            $response = $this->protocol->login($params->user, $password);
+            if (!$response) {
                 throw new BaseException\RuntimeException('cannot login, user or password wrong');
             }
+            $this->checkAndSetCapability($response);
         } else {
             $this->oauth2Authenticate($params->user, $params->accessToken);
         }
@@ -488,5 +490,32 @@ class Imap extends \Zend\Mail\Storage\Imap
                 }
             }
         }
+    }
+
+    /**
+     * A server MAY include a CAPABILITY response code
+     * @see https://tools.ietf.org/search/rfc3501#section-6.2.3
+     *
+     * @param array $loginResponse
+     *
+     * @return Imap
+     */
+    protected function checkAndSetCapability($loginResponse)
+    {
+        if (is_array($loginResponse)) {
+            $result = [];
+            foreach ($loginResponse as $item) {
+                if (strstr($item, 'CAPABILITY')) {
+                    $capabilities = explode(' ', $item);
+                    $result = array_merge($result, $capabilities);
+                }
+            }
+
+            if (count($result) > 0) {
+                $this->capability = $this->capability === null ? $result : array_merge($this->capability, $result);
+            }
+        }
+
+        return $this;
     }
 }

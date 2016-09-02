@@ -283,6 +283,7 @@ services:
 
     oro_entity.entity_alias_cache:
         parent: oro.cache.abstract
+        public: false
         calls:
             - [ setNamespace, [ 'oro_entity_aliases' ] ]
 

@@ -30,4 +30,4 @@ LocalizedFallbackValue entity contains following fields:
 * `localization` (Localization) - localization
 
 For retrieve translated value for the needed localization can be used
-trait `Oro\Bundle\LocaleBundle\Entity\FallbackTrait` that provides method `getLocalizedFallbackValue`.
+trait `Oro\Bundle\LocaleBundle\Entity\FallbackTrait` that provides methods `getFallbackValue()`, `getDefaultFallbackValue()` and `setDefaultFallbackValue()`.

@@ -4,7 +4,7 @@ services:
     # get_subresource
     #
 
-    oro_email.get_subresource.load_email_suggestions:
+    oro_email.api.get_subresource.load_email_suggestions:
         class: Oro\Bundle\EmailBundle\Api\Processor\GetSubresource\LoadEmailSuggestions
         arguments:
             - '@oro_email.manager.email_activity_suggestion.api'

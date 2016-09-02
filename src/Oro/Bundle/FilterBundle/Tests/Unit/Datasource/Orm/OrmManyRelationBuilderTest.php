@@ -85,10 +85,10 @@ class OrmManyRelationBuilderTest extends OrmTestCase
         $this->assertEquals(
             'SELECT o.id FROM Stub:TestOrder o'
             . ' WHERE o ' . $operator . '('
-            . 'SELECT filter_test'
-            . ' FROM Stub:TestOrder filter_test'
-            . ' INNER JOIN filter_test.products filter_test_rel'
-            . ' WHERE filter_test_rel IN(:param1))',
+            . 'SELECT filter_param1'
+            . ' FROM Stub:TestOrder filter_param1'
+            . ' INNER JOIN filter_param1.products filter_param1_rel'
+            . ' WHERE filter_param1_rel IN(:param1))',
             $result
         );
     }
@@ -141,10 +141,10 @@ class OrmManyRelationBuilderTest extends OrmTestCase
             'SELECT o.id, p1.id FROM Stub:TestOrder o'
             . ' LEFT JOIN o.products p'
             . ' WHERE p ' . $operator . '('
-            . 'SELECT filter_test'
-            . ' FROM ' . self::NS . 'TestProduct filter_test'
-            . ' INNER JOIN filter_test.notes filter_test_rel'
-            . ' WHERE filter_test_rel IN(:param1))',
+            . 'SELECT filter_param1'
+            . ' FROM ' . self::NS . 'TestProduct filter_param1'
+            . ' INNER JOIN filter_param1.notes filter_param1_rel'
+            . ' WHERE filter_param1_rel IN(:param1))',
             $result
         );
     }
@@ -174,10 +174,10 @@ class OrmManyRelationBuilderTest extends OrmTestCase
             . ' LEFT JOIN Stub:TestComment c WITH c.products = p AND p.id = 5'
             . ' LEFT JOIN c.products p1'
             . ' WHERE p1 ' . $operator . '('
-            . 'SELECT filter_test'
-            . ' FROM ' . self::NS . 'TestProduct filter_test'
-            . ' INNER JOIN filter_test.orders filter_test_rel'
-            . ' WHERE filter_test_rel IN(:param1))',
+            . 'SELECT filter_param1'
+            . ' FROM ' . self::NS . 'TestProduct filter_param1'
+            . ' INNER JOIN filter_param1.orders filter_param1_rel'
+            . ' WHERE filter_param1_rel IN(:param1))',
             $result
         );
     }

@@ -11,10 +11,6 @@
     ],
     "repositories": [
         {
-            "type": "git",
-            "url": "https://github.com/orocrm/TranslationFormBundle.git"
-        },
-        {
             "type": "composer",
             "url": "https://packagist.orocrm.com"
         }
@@ -28,7 +24,7 @@
         "symfony/symfony": "2.8.*",
         "twig/twig": "1.24.*",
         "doctrine/orm": "2.5.1",
-        "doctrine/doctrine-bundle": "~1.6.0",
+        "doctrine/doctrine-bundle": "1.6.3",
         "doctrine/dbal": "2.5.1",
         "doctrine/data-fixtures": "1.1.1",
         "doctrine/doctrine-fixtures-bundle": "2.2.0",
@@ -56,13 +52,13 @@
         "leafo/lessphp": "0.4.0",
         "genemu/form-bundle": "2.2.1",
         "zendframework/zend-mail": "2.1.5",
-        "a2lix/translation-form-bundle": "dev-1.x-symfony2.8",
+        "a2lix/translation-form-bundle": "1.x-dev",
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "0.1.*",
         "guzzle/guzzle": "3.7.*",
         "lexik/maintenance-bundle": "v1.0.3",
         "sylius/flow-bundle": "0.6.*",
-        "composer/composer": "1.0.0-p1",
+        "composer/composer": "1.2.*",
         "akeneo/batch-bundle": "0.4.2",
         "nesbot/Carbon": "1.8.*",
         "monolog/monolog": "1.8.*",
@@ -80,7 +76,8 @@
         "oro/jsplumb": "~1.7",
         "oro/moment-timezone": "0.3.*",
         "vakata/jstree": "^3.2",
-        "symfony/polyfill-php70":"1.*"
+        "symfony/polyfill-php70":"1.*",
+        "liuggio/excelbundle": "~2.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",

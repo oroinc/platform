@@ -308,7 +308,17 @@ define([
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
-        ignore: ':hidden:not([type=hidden])'
+        ignore: ':hidden:not([type=hidden])',
+        onfocusout: function(element, event) {
+            if (!this.checkable(element)) {
+                this.element(element);
+            }
+        },
+        onkeyup: function(element, event) {
+            if (element.name in this.submitted || element.name in this.invalid) {
+                this.element(element);
+            }
+        }
     });
 
     // general validation methods

@@ -194,12 +194,17 @@ services:
         tags:
             - { name: form.type, alias: oro_entity_extend_enum_public }
 
-    oro_entity_extend.entity_config_type.extension.enum:
-        class: %oro_entity_extend.entity_config_type.extension.enum.class%
+    oro_entity_extend.entity_config_type.enum.subscriber:
+        class: Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber
         arguments:
             - '@oro_entity_config.config_manager'
             - '@translator'
             - '@oro_entity_extend.enum_synchronizer'
+
+    oro_entity_extend.entity_config_type.extension.enum:
+        class: %oro_entity_extend.entity_config_type.extension.enum.class%
+        arguments:
+            - '@oro_entity_extend.entity_config_type.enum.subscriber'
         tags:
             - { name: form.type_extension, alias: oro_entity_config_type }
 

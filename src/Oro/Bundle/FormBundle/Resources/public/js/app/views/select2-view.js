@@ -30,9 +30,6 @@ define(function(require) {
             this.$el.inputWidget('create', 'select2', {
                 initializeOptions: this.select2Config
             });
-            if (this.select2Config.className) {
-                this.$el.parent().find('.select2-container').addClass(this.select2Config.className);
-            }
             if (this.select2Config.onAfterInit) {
                 this.select2Config.onAfterInit(this.$el.data('select2'));
             }

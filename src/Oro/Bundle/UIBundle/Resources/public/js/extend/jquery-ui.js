@@ -146,6 +146,11 @@ define(['jquery', 'jquery-ui'], function($) {
             original._destroyDatepicker.apply(this, arguments);
         };
     }());
+    $(document).off('select2-open.dropdown.data-api').on('select2-open.dropdown.data-api', function() {
+        if ($.datepicker._curInst && $.datepicker._datepickerShowing && !($.datepicker._inDialog && $.blockUI)) {
+            $.datepicker._hideDatepicker();
+        }
+    });
     /* datepicker extend:end */
 
     /* dialog extend:start*/

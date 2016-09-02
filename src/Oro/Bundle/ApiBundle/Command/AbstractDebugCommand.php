@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
@@ -97,20 +98,34 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
 
     /**
      * @param string|null $entityName
+     * @param string      $version
      * @param RequestType $requestType
      *
-     * @return string
+     * @return string|null
      */
-    protected function resolveEntityClass($entityName, RequestType $requestType)
+    protected function resolveEntityClass($entityName, $version, RequestType $requestType)
     {
-        if ($entityName && false !== strpos($entityName, '\\')) {
-            return $entityName;
+        if (!$entityName) {
+            return null;
         }
 
-        return ValueNormalizerUtil::convertToEntityClass(
-            $this->getContainer()->get('oro_api.value_normalizer'),
-            $entityName,
-            $requestType
-        );
+        $entityClass = $entityName;
+        if (false === strpos($entityClass, '\\')) {
+            $entityClass = ValueNormalizerUtil::convertToEntityClass(
+                $this->getContainer()->get('oro_api.value_normalizer'),
+                $entityName,
+                $requestType
+            );
+        }
+
+        /** @var ResourcesProvider $resourcesProvider */
+        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
+        if (!$resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
+            throw new \RuntimeException(
+                sprintf('The "%s" entity is not accessible through Data API.', $entityClass)
+            );
+        }
+
+        return $entityClass;
     }
 }

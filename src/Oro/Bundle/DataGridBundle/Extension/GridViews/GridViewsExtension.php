@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -222,6 +223,10 @@ class GridViewsExtension extends AbstractExtension
             if ($defaultGridView) {
                 $this->getParameters()->mergeKey('_filter', $defaultGridView->getFiltersData());
                 $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
+                $this->getParameters()->mergeKey(AppearanceExtension::APPEARANCE_ROOT_PARAM, [
+                    AppearanceExtension::APPEARANCE_TYPE_PARAM => $defaultGridView->getAppearanceTypeName(),
+                    AppearanceExtension::APPEARANCE_DATA_PARAM => $defaultGridView->getAppearanceData()
+                ]);
                 $filtersState = array_merge(
                     $defaultGridView->getFiltersData(),
                     $data->offsetGetByPath('[state][filters]', [])

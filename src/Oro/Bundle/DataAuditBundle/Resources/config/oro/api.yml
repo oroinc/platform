@@ -1,4 +1,0 @@
-oro_api:
-    entities:
-        Oro\Bundle\DataAuditBundle\Entity\Audit: ~
-        Oro\Bundle\DataAuditBundle\Entity\AuditField: ~

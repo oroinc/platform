@@ -84,9 +84,17 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         $cretePreviousPeriod = !empty($config['converter_attributes']['create_previous_period']);
         if (isset($value['type']) && in_array($value['type'], AbstractDateFilterType::$valueTypes)) {
             return $this->processValueTypes($value, $cretePreviousPeriod);
-        }
-        if (null === $value || ($value['value']['start'] === null && $value['value']['end'] === null)) {
-            list($start, $end) = $this->dateHelper->getDateTimeInterval('P1M');
+        } elseif (null === $value || ($value['value']['start'] === null && $value['value']['end'] === null)) {
+            return $this->processValueTypes(
+                [
+                    'type' => empty($config['options']['value_types'])
+                        ? AbstractDateFilterType::TYPE_ALL_TIME
+                        : AbstractDateFilterType::TYPE_THIS_MONTH,
+                    'value' => ['start' => null, 'end' => null],
+                    'part' => 'value',
+                ],
+                $cretePreviousPeriod
+            );
         } else {
             $saveOpenRange = !empty($config['converter_attributes']['save_open_range']);
             list($start, $end, $type) = $this->getPeriodValues($value, $saveOpenRange);
@@ -163,7 +171,9 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 $this->formatter->formatDate($start)
             );
         }
-        if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
+        if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
+            || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$start
+        ) {
             return sprintf(
                 '%s %s',
                 $this->translator->trans('oro.filter.form.label_date_type_less_than'),

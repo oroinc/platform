@@ -24,8 +24,7 @@ abstract class AbstractUser implements
     LoginInfoInterface,
     \Serializable,
     OrganizationAwareUserInterface,
-    PasswordRecoveryInterface,
-    ContextItemInterface
+    PasswordRecoveryInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -240,14 +239,6 @@ abstract class AbstractUser implements
     public function __toString()
     {
         return (string)$this->getUsername();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toString()
-    {
-        return (string)$this;
     }
 
     /**

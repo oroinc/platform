@@ -100,6 +100,15 @@ define([
         },
 
         /**
+         * Returns if form state was changed
+         *
+         * @returns {Boolean}
+         */
+        isStateChanged: function() {
+            return this._isStateChanged();
+        },
+
+        /**
          * Handles navigation action and shows confirm dialog
          * if page changes is not preserved and the state is changed from initial
          * (excludes cancel action)

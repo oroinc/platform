@@ -40,23 +40,29 @@ Microsecond: Microsecond
 "Choose File": "Choose File"
 "Searching...": "Searching..."
 "No matches found": "No matches found"
+"Loading more results...": "Loading more results..."
 OK: OK
 "N/A": "N/A"
 maximize: maximize
 restore: restore
 minimize: minimize
 close: close
-Undo: Undo
-Redo: Redo
+Save: Save
+Discard: Discard
 "Copy to Clipboard": "Copy to Clipboard"
 oro:
     ui:
+        format_input_too_short: "{1}Please enter {{ count }} more character|]1,Inf[ Please enter {{ count }} more characters"
+        format_input_too_long: "{1}Please delete {{ count }} character|]1,Inf[Please delete {{ count }} characters"
+        format_selection_too_big: "{1}You can only select {{ count }} item|]1,Inf[You can only select {{ count }} items"
         widget_loading_failed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
         unexpected_error: Unexpected error occurred. Please contact system administrator.
         item_add_error: Item adding failed.
         item_delete_error: Item deleting failed.
         leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
+        leave_page_save_data_or_discard_title: "Navigation confirmation"
+        leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
         page_header:
             button:
                 more: "More"

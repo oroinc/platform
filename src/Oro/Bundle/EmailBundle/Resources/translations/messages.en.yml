@@ -14,7 +14,10 @@ oro:
             recently_used: Recently used
             contexts: Contexts
         filter.inactive: inactive
-        controller.emailtemplate.saved.message: "Template saved"
+        controller:
+            emailtemplate.saved.message: "Template saved"
+            job_scheduled.message: "The job has been added to the queue %link%"
+            job_progress: Check progress
         form:
             choose_template:                     ""
             add_signature:                       Add Signature
@@ -29,7 +32,7 @@ oro:
             tooltip:
                 attachment_sync:
                     enable: Enable load attachments on email sync.
-                    max_size: Maximum sync attacment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
+                    max_size: Maximum sync attachment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
                     preview_limit: Limit to show preview for attachments (thumbnail for images and big file icon for other files). Set to 0 to see a list with file names only.
 
         variable.not.found:                     N/A
@@ -56,6 +59,7 @@ oro:
                     choices:
                         auto.label: Auto
                         manual.label: Manual
+                remove_larger_attachments.label: Remove large attachments
 
             reply_configuration:
                 label: Reply
@@ -328,7 +332,7 @@ oro:
             message:
                 success: Email sync completed.
                 error: Email sync failed.
-                processing: Email sync started, please wait...
+                processing: Email sync started, please wait, grid will updated on done...
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

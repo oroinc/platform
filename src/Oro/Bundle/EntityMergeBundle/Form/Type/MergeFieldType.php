@@ -44,7 +44,6 @@ class MergeFieldType extends AbstractType
             'entity',
             array(
                 'class'                   => $metadata->getEntityMetadata()->getClassName(),
-                'data_class'              => $metadata->getEntityMetadata()->getClassName(),
                 'choices'                 => $options['entities'],
                 'multiple'                => false,
                 'expanded'                => true,

@@ -131,7 +131,7 @@ class RequireJSConfigProvider extends AbstractConfigProvider
 
         $reflection = new \ReflectionClass($bundle);
         $file = dirname($reflection->getFileName()) .
-            sprintf('/Resources/views/layouts/%s/requirejs.yml', $theme->getDirectory());
+            sprintf('/Resources/views/layouts/%s/config/requirejs.yml', $theme->getDirectory());
 
         if (is_file($file)) {
             $files[] = $file;

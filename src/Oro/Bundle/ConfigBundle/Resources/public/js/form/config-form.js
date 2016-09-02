@@ -56,9 +56,11 @@ define([
                     $(elem).inputWidget('val', null, true);
                 });
                 this.$el.find('.removeRow').each(function() {
-                    $(this).closest('*[data-content]')
-                        .trigger('content:remove')
-                        .remove();
+                    var $row = $(this).closest('*[data-content]');
+                    // non-persisted options have a simple number for data-content
+                    if (_.isNumber($row.data('content'))) {
+                        $row.trigger('content:remove').remove();
+                    }
                 });
                 $checkboxes
                     .prop('checked', true)

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing;
 
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser;
@@ -109,7 +110,12 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->authChecker->expects($this->any())
             ->method('isGranted')
-            ->willReturn(true);
+            ->willReturnCallback(
+                function ($permission, FieldVote $object) {
+                    $fieldName = $object->getField();
+                    return !in_array($fieldName, ['nonAvailable1', 'nonAvailable2']);
+                }
+            );
         $config = DatagridConfiguration::create($configValues);
 
         $callback = $this->getProcessConfigsCallBack();
@@ -168,6 +174,13 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                 'id' => ['label' => 'test_black_list'],
                 'updatedAt' => ['label' => 'test_black_list'],
                 'createdAt' => ['label' => 'test_black_list'],
+                'nonAvailable1' => [
+                    'label' => 'nonAvailable1'
+                ],
+                'nonAvailable2' => [
+                    'label' => 'nonAvailable2',
+                    'inline_editing' => ['enable' => false]
+                ]
             ]
         ];
     }
@@ -221,6 +234,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         'id' => ['label' => 'test_black_list'],
                         'updatedAt' => ['label' => 'test_black_list'],
                         'createdAt' => ['label' => 'test_black_list'],
+                        'nonAvailable1' => ['label' => 'nonAvailable1'],
+                        'nonAvailable2' => [
+                            'label' => 'nonAvailable2',
+                            'inline_editing' => ['enable' => true]
+                        ]
                     ]
                 ],
                 $entityName
@@ -244,6 +262,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         'id' => ['label' => 'test_black_list'],
                         'updatedAt' => ['label' => 'test_black_list'],
                         'createdAt' => ['label' => 'test_black_list'],
+                        'nonAvailable1' => ['label' => 'nonAvailable1'],
+                        'nonAvailable2' => [
+                            'label' => 'nonAvailable2',
+                            'inline_editing' => ['enable' => true]
+                        ]
                     ]
                 ],
                 $entityName
@@ -268,6 +291,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         'id' => ['label' => 'test_black_list'],
                         'updatedAt' => ['label' => 'test_black_list'],
                         'createdAt' => ['label' => 'test_black_list'],
+                        'nonAvailable1' => ['label' => 'nonAvailable1'],
+                        'nonAvailable2' => [
+                            'label' => 'nonAvailable2',
+                            'inline_editing' => ['enable' => true]
+                        ]
                     ]
                 ],
                 $entityName

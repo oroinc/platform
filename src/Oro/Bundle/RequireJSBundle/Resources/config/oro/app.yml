@@ -1,0 +1,7 @@
+services:
+    oro_requirejs.platform_cache:
+        parent: oro.cache.abstract
+        decorates: oro_requirejs.cache
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_requirejs' ] ]

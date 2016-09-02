@@ -250,6 +250,13 @@ services:
         tags:
             - { name: oro_action.action, alias: assign_url }
 
+    oro_action.action.count:
+        class: 'Oro\Component\Action\Action\Count'
+        arguments:
+            - '@oro_action.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: count }
+
     oro_action.action.clone_object:
         class: '%oro_action.action.clone_object.class%'
         arguments:

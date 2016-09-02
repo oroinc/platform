@@ -173,15 +173,9 @@ define([
          * @protected
          */
         createLaunchers: function() {
-            var result = [];
-
-            _.each(this.actions, function(action) {
-                var options = {};
-                var launcher = action.createLauncher(options);
-                result.push(launcher);
+            return _.map(this.actions, function(action) {
+                return action.createLauncher({});
             }, this);
-
-            return result;
         },
 
         /**

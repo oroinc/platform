@@ -31,6 +31,8 @@ Table of Contents
  - [Support Entities](#support-entities)
    - [Workflow Manager](#workflow-manager)
    - [Workflow Aware Manager](#workflow-aware-manager)
+   - [Workflow Start Arguments](#workflow-start-arguments)
+   - [Workflow Events](#workflow-events)
    - [Workflow Data](#workflow-data)
    - [Workflow Result](#workflow-result)
    - [Step Manager](#step-manager)
@@ -42,6 +44,7 @@ Table of Contents
    - [Workflow Entity Voter](#workflow-entity-voter)
    - [Workflow Configuration](#workflow-configuration)
    - [Workflow List Configuration](#workflow-list-configuration)
+   - [Workflow Entity Connector](#workflow-entity-connector)
    - [Workflow Configuration Provider](#configuration-provider)
    - [Workflow Definition Configuration Builder](#workflow-definition-configuration-builder)
    - [Workflow Data Serializer](#workflow-data-serializer)
@@ -57,8 +60,8 @@ Workflow
 Oro\Bundle\WorkflowBundle\Model\Workflow
 
 **Description:**
-Encapsulates all logic of workflow, contains lists of steps, attributes and transitions. Uses Entity Connector for the
-connects related entities with workflow entities. Create instance of Workflow Item, performs transition if it's allowed,
+Encapsulates all logic of workflow, contains lists of steps, attributes and transitions. 
+Create instance of Workflow Item, performs transition if it's allowed,
 gets allowed transitions and start transitions. Delegates operations with aggregated domain models to corresponding
 managers, such as Step Manager, Transition Manager and Attribute Manager.
 
@@ -391,18 +394,15 @@ references into null and remove workflow item. If active workflow definition has
 then active workflow will be started automatically;
 * **startWorkflow(workflow, entity, transition, data)** - start workflow for input entity using start transition
 and workflow data as array;
-* **massStartWorkflow(data)** - starts several workflows in one transaction, receives set of array that contains
-workflow identifier, entity, transition (optional) and workflow data (optional);
+* **massStartWorkflow(data)** - starts several workflows, receives set (an array) of `Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments` instances that contains workflow name, entity, transition (optional) and workflow data (optional);
 * **transit(WorkflowItem, transition)** - perform transition for specified workflow item;
-* **getApplicableWorkflow(entity)** - returns active workflow by related entity object;
-* **getApplicableWorkflowByEntityClass(entityClass)** - returns active workflow by related entity class;
-* **hasApplicableWorkflowByEntityClass(entityClass)** - check there entity class has active workflow;
+* **getApplicableWorkflows(entity)** - returns valid workflows for related entity that can be managed right now;
+* **hasApplicableWorkflows(entity)** - check there entity has applicable workflows (see `getApplicableWorkflows`);
 * **getWorkflowItemByEntity(entity)** - returns Workflow Definition by related entity object;
 * **getWorkflow(workflowIdentifier)** - get workflow instance by workflow name, workflow instance of workflow item or by
 workflow itself;
-* **activateWorkflow(workflowIdentifier)** - perform activation workflow by workflow name, Workflow instance,
-WorkflowItem instance or WorkflowDefinition instance;
-* **deactivateWorkflow(entityClass)** - perform deactivation workflow by entity class;
+* **activateWorkflow(workflowName)** - ensures activation of workflow by workflow name. Emits Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_ACTIVATED event if Workflow state was changed to active; 
+* **deactivateWorkflow(workflowName)** - ensures deactivation of workflow by workflow name. Emits Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_DEACTIVATED event if workflow state was changed to deactivated;
 * **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for given workflow definition;
 
 Workflow Aware Manager
@@ -439,6 +439,34 @@ You should avoid to use name of workflow as a string at multiple code places. So
 * **setWorkflowName(workflowName)** - configures the manager to manage specific workflow.
 * **getWorkflowName():string** - gets current configured name of workflow for the manager.
 
+Workflow Events
+---------------
+**Class**
+Oro\Bundle\WorkflowBundle\Event\WorkflowEvents
+
+**Description**
+Class that encapsulate a list of workflow events names as contsants.
+ 
+**Constants** 
+* **WORKFLOW_BEFORE_UPDATE** - `oro.workflow.before_update`;
+* **WORKFLOW_AFTER_UPDATE** - `oro.workflow.after_update`;
+* **WORKFLOW_BEFORE_CREATE** - `oro.workflow.before_create`;
+* **WORKFLOW_AFTER_CREATE** - `oro.workflow.after_create`;
+* **WORKFLOW_AFTER_DELETE** - `oro.workflow.after_delete`;
+* **WORKFLOW_ACTIVATED** - `oro.workflow.activated`;
+* **WORKFLOW_DEACTIVATED** - `oro.workflow.deactivated`;
+
+Workflow Start Arguments
+------------------------
+**Class**
+Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments
+
+**Description**
+Arguments bag class to encapsulate all needed arguments for workflow start.
+
+**Methods**
+* **__construct(string workflowName, object entity, array data = [], string transition = null)**
+* **get..** - getters for each appropriate constructor argument with corresponded return type.
 
 Workflow Data
 -------------
@@ -549,6 +577,18 @@ Contains tree builder for list of Workflows, processConfiguration raw configurat
 **Methods:**
 * **getConfigTreeBuilder()** - configuration tree builder for list of Workflows.
 * **processConfiguration(configs)** - processes raw configuration according to configuration tree builder
+
+Workflow Entity Connector
+-------------------------
+
+**Class**
+Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector
+
+**Description**
+Provide logic to check if an entity can be involved in workflow as its related entity and managed within as well.
+
+**Methods**
+* **isApplicableEntity(entity)** (boolean) - determine is entity can be applied to workflow as related one. 
 
 Workflow Configuration Provider
 -------------------------------

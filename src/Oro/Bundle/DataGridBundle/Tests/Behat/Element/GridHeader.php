@@ -70,7 +70,7 @@ class GridHeader extends Element
      */
     protected function findHeaderLink($header)
     {
-        if ($link = $this->find('css', sprintf('a:contains("%s")', $header))) {
+        if ($link = $this->find('css', sprintf('th a:contains("%s")', $header))) {
             return $link;
         }
 

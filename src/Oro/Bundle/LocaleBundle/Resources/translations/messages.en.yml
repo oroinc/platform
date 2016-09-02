@@ -84,6 +84,7 @@ oro.locale:
             language_languages.title: 'Languages'
             locale_settings.title: 'Localization options'
             map_settings.title: 'Map options'
+            localization_settings.title: 'Localization settings'
         fields:
             locale.label: 'Locale'
             country.label: 'Primary Location'
@@ -104,6 +105,8 @@ oro.locale:
                     miles_per_hour: 'Miles per hour'
                     kilometers_per_hour: 'Kilometers per hour'
                     meters_per_second: 'Meters per second'
+            enabled_localizations.label: 'Enabled Localizations'
+            default_localization.label: 'Default Localization'
     formatter:
         datetime:
             default: N/A

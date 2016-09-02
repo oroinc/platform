@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr;
+
+use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -14,6 +14,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
+use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -30,6 +31,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     const SYNC_CODE_FAILURE    = 2;
     const SYNC_CODE_SUCCESS    = 3;
 
+    const ID_OPTION = 'id';
+
+    /** @var string */
+    static protected $jobCommand;
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -45,6 +51,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     /** @var TokenInterface */
     private $currentToken;
 
+    /** @var JobManager */
+    private $jobManager;
+
     /**
      * Constructor
      *
@@ -57,6 +66,14 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     ) {
         $this->doctrine                        = $doctrine;
         $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
+    }
+
+    /**
+     * @param JobManager $jobManager
+     */
+    public function setJobManager(JobManager $jobManager)
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -89,6 +106,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
+     *
      * @return int
      *
      * @throws \Exception
@@ -158,9 +176,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origins.
      *
      * @param int[] $originIds
+     * @param bool $force
+     *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds)
+    public function syncOrigins(array $originIds, $force = false)
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -175,7 +195,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
-                    $this->doSyncOrigin($origin);
+                    $this->doSyncOrigin($origin, $force);
                 } catch (SyncFolderTimeoutException $ex) {
                     break;
                 } catch (\Exception $ex) {
@@ -185,6 +205,45 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         $this->assertSyncSuccess($failedOriginIds);
+    }
+
+    /**
+     * Schedule origins sync job
+     *
+     * @return bool
+     */
+    public function supportScheduleJob()
+    {
+        return false;
+    }
+
+    /**
+     * Schedule origins sync job
+     *
+     * @param int[] $originIds
+     */
+    public function scheduleSyncOriginsJob(array $originIds)
+    {
+        // todo: order ids to correct check in queue
+        if (static::$jobCommand && $this->jobManager) {
+            $jobArgs = array_map(
+                function ($id) {
+                    return sprintf(
+                        '--%s=%s',
+                        self::ID_OPTION,
+                        $id
+                    );
+                },
+                $originIds
+            );
+
+            if (!$this->jobManager->hasJobInQueue(static::$jobCommand, json_encode($jobArgs))) {
+                $job = new Job(static::$jobCommand, $jobArgs);
+                $em = $this->getEntityManager();
+                $em->persist($job);
+                $em->flush();
+            }
+        }
     }
 
     /**
@@ -202,9 +261,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
+     * @param bool $force
+     *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin)
+    protected function doSyncOrigin(EmailOrigin $origin, $force = false)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -221,6 +282,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
+                $processor->setForceMode($force);
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {

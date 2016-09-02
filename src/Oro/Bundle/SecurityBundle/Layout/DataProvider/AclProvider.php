@@ -4,12 +4,12 @@ namespace Oro\Bundle\SecurityBundle\Layout\DataProvider;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Component\Layout\AbstractServerRenderDataProvider;
 
-class AclProvider extends AbstractServerRenderDataProvider
+class AclProvider
 {
     /** @var SecurityFacade */
     protected $securityFacade;

@@ -3,10 +3,11 @@ define([
     'backbone',
     'orotranslation/js/translator',
     './pagination-input',
+    './visible-items-counter',
     './page-size',
     './actions-panel',
-    './sorting/dropdown'
-], function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel, SortingDropdown) {
+    './sorting/select'
+], function(_, Backbone, __, PaginationInput, VisibleItemsCounter, PageSize, ActionsPanel, SortingDropdown) {
     'use strict';
 
     var Toolbar;
@@ -27,6 +28,9 @@ define([
         pagination: PaginationInput,
 
         /** @property */
+        itemsCounter: VisibleItemsCounter,
+
+        /** @property */
         pageSize: PageSize,
 
         /** @property */
@@ -41,6 +45,7 @@ define([
         /** @property */
         selector: {
             pagination: '[data-grid-pagination]',
+            itemsCounter: '[data-grid-items-counter]',
             pagesize: '[data-grid-pagesize]',
             actionsPanel: '[data-grid-actions-panel]',
             extraActionsPanel: '[data-grid-extra-actions-panel]',
@@ -70,6 +75,7 @@ define([
 
             this.subviews = {
                 pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
+                itemsCounter: new this.itemsCounter(_.defaults({collection: this.collection}, options.itemsCounter)),
                 pageSize: new this.pageSize(_.defaults({collection: this.collection}, options.pageSize)),
                 actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
                 extraActionsPanel: new this.extraActionsPanel()
@@ -78,7 +84,7 @@ define([
             if (options.addSorting) {
                 this.subviews.sortingDropdown = new this.sortingDropdown({
                     collection: this.collection,
-                    columns: options.columns,
+                    columns: options.columns
                 });
             }
 
@@ -155,8 +161,12 @@ define([
             this.$(this.selector.pagination).replaceWith($pagination);
             this.$(this.selector.pagesize).append(this.subviews.pageSize.render().$el);
             this.$(this.selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
+
+            this.$(this.selector.itemsCounter).replaceWith(this.subviews.itemsCounter.render().$el);
+            this.subviews.itemsCounter.$el.hide();
+
             if (this.subviews.sortingDropdown) {
-                this.$(this.selector.sortingDropdown).append(this.subviews.sortingDropdown.render().$el);
+                this.$(this.selector.sortingDropdown).hide().append(this.subviews.sortingDropdown.render().$el);
             }
 
             if (this.subviews.extraActionsPanel.haveActions()) {

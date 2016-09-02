@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use LogicException;
-
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -14,17 +12,16 @@ class ManyToManyFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new LogicException(sprintf(
+            throw new \LogicException(sprintf(
                 '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
                 get_class($ds)
             ));
         }
 
-        $expression = $this->createExpression($ds, $data['type']);
-        $this->applyFilterToClause($ds, $expression);
+        return $this->createExpression($ds, $comparisonType);
     }
 
     /**
@@ -43,7 +40,7 @@ class ManyToManyFilter extends AbstractFilter
                 return $ds->expr()->isNotNull($joinIdentifier);
         }
 
-        throw new LogicException('Type "%s" is not supported.');
+        throw new \LogicException('Type "%s" is not supported.');
     }
 
     /**
@@ -58,7 +55,7 @@ class ManyToManyFilter extends AbstractFilter
         $metadata = $em->getClassMetadata($class);
         $fieldNames = $metadata->getIdentifierFieldNames();
         if ($count = count($fieldNames) !== 1) {
-            throw new LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
+            throw new \LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
         }
 
         return sprintf('%s.%s', $joinAlias, $fieldNames[0]);

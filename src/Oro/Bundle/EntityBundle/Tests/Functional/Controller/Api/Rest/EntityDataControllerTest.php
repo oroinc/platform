@@ -57,7 +57,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"firstName": "Test1"}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+        $this->assertLastResponseStatus(Codes::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals('Test1', $user->getFirstName());
@@ -73,7 +73,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"loginCount": 10}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+        $this->assertLastResponseStatus(Codes::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals(10, $user->getLoginCount());
@@ -89,7 +89,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"enabled": false}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+        $this->assertLastResponseStatus(Codes::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertFalse($user->isEnabled());
@@ -105,7 +105,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"birthday": "2000-05-05T00:00:00+0000"}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+        $this->assertLastResponseStatus(Codes::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals(new \DateTime('2000-05-05T00:00:00+0000'), $user->getBirthday());
@@ -121,7 +121,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"lastLogin":"2000-05-05T01:05:05+0000"}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+        $this->assertLastResponseStatus(Codes::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals(new \DateTime('2000-05-05T01:05:05+0000'), $user->getLastLogin());
@@ -204,7 +204,7 @@ class EntityDataControllerTest extends WebTestCase
 
         $this->assertEquals($responseCode, $this->client->getResponse()->getStatusCode());
 
-        if ($responseCode === Codes::HTTP_NO_CONTENT) {
+        if ($responseCode === Codes::HTTP_OK) {
             $this->getContainer()->get('doctrine')->getManager()->clear();
             $repository = $this->getContainer()->get('doctrine')->getRepository($className);
             $object = $repository->find($id);
@@ -256,7 +256,7 @@ class EntityDataControllerTest extends WebTestCase
                 'Oro\Bundle\UserBundle\Entity\User',
                 'currentStatus',
                 'status1',
-                Codes::HTTP_NO_CONTENT
+                Codes::HTTP_OK
             ],
             'entity one to many' => [
                 'Oro\Bundle\UserBundle\Entity\User',
@@ -268,13 +268,13 @@ class EntityDataControllerTest extends WebTestCase
                 'Oro\Bundle\UserBundle\Entity\User',
                 'roles',
                 ['ROLE_TEST_1', 'ROLE_TEST_2'],
-                Codes::HTTP_NO_CONTENT
+                Codes::HTTP_OK
             ],
             'entity many to one' => [
                 'Oro\Bundle\UserBundle\Entity\User',
                 'owner',
                 'TestBusinessUnit',
-                Codes::HTTP_NO_CONTENT
+                Codes::HTTP_OK
             ]
         ];
     }

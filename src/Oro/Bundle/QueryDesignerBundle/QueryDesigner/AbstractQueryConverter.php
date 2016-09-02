@@ -136,7 +136,7 @@ abstract class AbstractQueryConverter
     /**
      * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
-    public function setVirtualRelationProvider($virtualRelationProvider)
+    public function setVirtualRelationProvider(VirtualRelationProviderInterface $virtualRelationProvider)
     {
         $this->virtualRelationProvider = $virtualRelationProvider;
     }
@@ -380,6 +380,9 @@ abstract class AbstractQueryConverter
             throw new InvalidConfigurationException('The "columns" definition must not be empty.');
         }
 
+        $this->aliases                  = [];
+        $this->virtualRelationsJoins    = [];
+        $this->tableAliasesCount        = 0;
         $this->joinIdHelper             = new JoinIdentifierHelper($this->rootEntity);
         $this->joins                    = [];
         $this->tableAliases             = [];

@@ -43,16 +43,6 @@ services:
         tags:
              - { name: layout.block_type, alias: title }
 
-    oro_layout.block_type.meta:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\MetaType
-        tags:
-             - { name: layout.block_type, alias: meta }
-
-    oro_layout.block_type.script:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ScriptType
-        tags:
-             - { name: layout.block_type, alias: script }
-
     oro_layout.block_type.requires:
         parent: oro_layout.block_type.abstract_configurable
         calls:
@@ -60,16 +50,6 @@ services:
             - [setName, ['requires']]
         tags:
             - { name: layout.block_type, alias: requires }
-
-    oro_layout.block_type.style:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
-        tags:
-             - { name: layout.block_type, alias: style }
-
-    oro_layout.block_type.input:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\InputType
-        tags:
-             - { name: layout.block_type, alias: input }
 
     oro_layout.block_type.body:
         parent: oro_layout.block_type.abstract_configurable_container
@@ -129,11 +109,6 @@ services:
         tags:
              - { name: layout.block_type, alias: text }
 
-    oro_layout.block_type.link:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType
-        tags:
-             - { name: layout.block_type, alias: link }
-
     oro_layout.block_type.button:
         parent: oro_layout.block_type.abstract_configurable
         calls:
@@ -158,22 +133,12 @@ services:
         tags:
              - { name: layout.block_type, alias: button_group }
 
-    oro_layout.block_type.resource:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ExternalResourceType
-        tags:
-             - { name: layout.block_type, alias: external_resource }
-
     oro_layout.block_type.list:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
             - [setName, ['list']]
         tags:
              - { name: layout.block_type, alias: list }
-
-    oro_layout.block_type.ordered_list:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\OrderedListType
-        tags:
-             - { name: layout.block_type, alias: ordered_list }
 
     oro_layout.block_type.list_item:
         parent: oro_layout.block_type.abstract_configurable_container
@@ -218,3 +183,111 @@ services:
             - [setExtendedType, ['block']]
         tags:
             - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.input:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'text'}
+                        id: {default: null}
+                        name: ~
+                        value: ~
+                        placeholder: ~
+            - [setName, ['input']]
+        tags:
+             - { name: layout.block_type, alias: input }
+
+    oro_layout.block_type.external_resource:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        rel: {required: true}
+                        href: {required: true}
+                        type: ~
+            - [setName, ['external_resource']]
+        tags:
+             - { name: layout.block_type, alias: external_resource }
+
+    oro_layout.block_type.link:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        path: ~
+                        route_name: ~
+                        route_parameters: {default: []}
+                        text: ~
+                        icon: ~
+            - [setName, ['link']]
+        tags:
+             - { name: layout.block_type, alias: link }
+
+    oro_layout.block_type.ordered_list:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: ~
+                        start: ~
+            - [setName, ['ordered_list']]
+        tags:
+             - { name: layout.block_type, alias: ordered_list }
+
+    oro_layout.block_type.meta:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        charset: ~
+                        content: ~
+                        http_equiv: ~
+                        name: ~
+            - [setName, ['meta']]
+        tags:
+             - { name: layout.block_type, alias: meta }
+
+    oro_layout.block_type.style:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'text/css'}
+                        content: {default: ''}
+                        src: ~
+                        media: ~
+                        scoped: {default: false}
+                        crossorigin: ~
+            - [setName, ['style']]
+        tags:
+             - { name: layout.block_type, alias: style }
+
+    oro_layout.block_type.script:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'text/javascript'}
+                        content: {default: ''}
+                        src: ~
+                        async: {default: false}
+                        defer: {default: false}
+                        crossorigin: ~
+            - [setName, ['script']]
+        tags:
+             - { name: layout.block_type, alias: script }

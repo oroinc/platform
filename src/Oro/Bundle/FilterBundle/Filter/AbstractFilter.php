@@ -2,9 +2,15 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Doctrine\ORM\Query\Expr as Expr;
+use Doctrine\ORM\QueryBuilder;
+
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractFilter implements FilterInterface
@@ -32,6 +38,9 @@ abstract class AbstractFilter implements FilterInterface
 
     /** @var array */
     protected $state;
+
+    /** @var array */
+    protected $joinOperators = [];
 
     /**
      * Constructor
@@ -63,6 +72,47 @@ abstract class AbstractFilter implements FilterInterface
                 unset($this->params[FilterUtility::FORM_OPTIONS_KEY][$key]);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    {
+        $data = $this->parseData($data);
+        if (!$data) {
+            return false;
+        }
+
+        $joinOperator = $this->getJoinOperator($data['type']);
+        $relatedJoin = $this->findRelatedJoin($ds);
+        $type = ($joinOperator && $relatedJoin) ? $joinOperator : $data['type'];
+        $comparisonExpr = $this->buildExpr($ds, $type, $this->get(FilterUtility::DATA_NAME_KEY), $data);
+        if (!$comparisonExpr) {
+            return true;
+        }
+
+        if ($relatedJoin) {
+            $qb = $ds->getQueryBuilder();
+
+            $fieldsExprs = $this->createConditionFieldExprs($qb);
+            $subExprs = [];
+            foreach ($fieldsExprs as $fieldExpr) {
+                $subQb = clone $qb;
+                $subQb
+                    ->resetDqlPart('orderBy')
+                    ->select($fieldExpr)
+                    ->andWhere($comparisonExpr);
+                $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
+
+                $subExprs[] = $joinOperator ? $qb->expr()->notIn($fieldExpr, $dql) : $qb->expr()->in($fieldExpr, $dql);
+            }
+            $this->applyFilterToClause($ds, call_user_func_array([$qb->expr(), 'andX'], $subExprs));
+        } else {
+            $this->applyFilterToClause($ds, $comparisonExpr);
+        }
+
+        return true;
     }
 
     /**
@@ -253,5 +303,151 @@ abstract class AbstractFilter implements FilterInterface
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
 
         return isset($options['lazy']) && $options['lazy'];
+    }
+
+    /**
+     * Build an expression used to filter data
+     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param int                              $comparisonType 0 to compare with false, 1 to compare with true
+     * @param string                           $fieldName
+     * @param mixed                            $data
+     *
+     * @return string
+     */
+    protected function buildExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName,
+        $data
+    ) {
+        throw new \BadMethodCallException('Method buildExpr is not implemented');
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return array|bool
+     */
+    protected function parseData($data)
+    {
+        return $data;
+    }
+
+    /**
+     * @param mixed $operator
+     *
+     * @return mixed
+     */
+    protected function getJoinOperator($operator)
+    {
+        return isset($this->joinOperators[$operator]) ? $this->joinOperators[$operator] : null;
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param QueryBuilder $qb
+     *
+     * @return string
+     */
+    protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
+    {
+        $replacements = array_map(
+            function ($alias) use ($ds) {
+                return [
+                    $alias,
+                    $ds->generateParameterName($this->getName()),
+                ];
+            },
+            $qb->getAllAliases()
+        );
+
+        return array_reduce(
+            $replacements,
+            function ($carry, array $replacement) {
+                /*
+                 * Replaces old parameter names by newly generated parameter names, so that we don't have
+                 * conflicts in the query.
+                 */
+                return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
+            },
+            $qb->getDql()
+        );
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     *
+     * @return Expr\Join|null
+     */
+    protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
+    {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            return null;
+        }
+
+        list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
+
+        return QueryUtils::findJoinByAlias($ds->getQueryBuilder(), $alias);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     *
+     * @return array
+     */
+    protected function createConditionFieldExprs(QueryBuilder $qb)
+    {
+        $groupByFields = $this->getSelectFieldFromGroupBy($qb->getDqlPart('groupBy'));
+        if ($groupByFields) {
+            return $groupByFields;
+        }
+
+        $entities = $qb->getRootEntities();
+        $idField = $qb
+            ->getEntityManager()
+            ->getClassMetadata(reset($entities))
+            ->getSingleIdentifierFieldName();
+
+        $rootAliases = $qb->getRootAliases();
+
+        return [sprintf('%s.%s', reset($rootAliases), $idField)];
+    }
+
+    /**
+     * @param Expr\GroupBy[] $groupBy
+     *
+     * @return array
+     */
+    protected function getSelectFieldFromGroupBy(array $groupBy)
+    {
+        $expressions = [];
+        foreach ($groupBy as $groupByPart) {
+            foreach ($groupByPart->getParts() as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        }
+
+        return $expressions;
+    }
+
+    /**
+     * @param string $groupByPart
+     *
+     * @return array
+     */
+    protected function getSelectFieldFromGroupByPart($groupByPart)
+    {
+        $expressions = [];
+        if (strpos($groupByPart, ',') !== false) {
+            $groupByParts = explode(',', $groupByPart);
+            foreach ($groupByParts as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        } else {
+            $expressions[] = trim($groupByPart);
+        }
+
+        return $expressions;
     }
 }

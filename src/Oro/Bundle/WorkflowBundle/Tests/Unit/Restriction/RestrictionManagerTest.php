@@ -5,13 +5,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Restriction\RestrictionManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
 class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowManager;
+    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowRegistry;
 
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -24,13 +24,14 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)->disableOriginalConstructor()
+            ->getMock();
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
         $this->repository = $this->getMockBuilder(WorkflowRestrictionRepository::class)
             ->disableOriginalConstructor()->getMock();
 
         $this->restrictionManager = new RestrictionManager(
-            $this->workflowManager,
+            $this->workflowRegistry,
             $this->doctrineHelper
         );
     }
@@ -57,12 +58,11 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
         $workflow->expects($this->once())->method('getName')->willReturn('test_workflow');
 
-        $this->workflowManager->expects($this->once())
-            ->method('getApplicableWorkflows')
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByEntityClass')
             ->with('DateTime')
             ->willReturn([$workflow]);
 
         $this->assertTrue($this->restrictionManager->hasEntityClassRestrictions($class));
-        
     }
 }

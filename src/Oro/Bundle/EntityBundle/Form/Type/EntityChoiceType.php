@@ -40,7 +40,7 @@ class EntityChoiceType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices'              => function (Options $options) {
-                    return $this->getChoices($options['show_plural']);
+                    return $this->getChoices($options['show_plural'], $options['apply_exclusions']);
                 },
                 'choice_attr'          => function ($choice) {
                     return $this->getChoiceAttributes($choice);
@@ -49,6 +49,7 @@ class EntityChoiceType extends AbstractType
                 'show_plural'          => false,
                 'configs'              => $defaultConfigs,
                 'translatable_options' => false,
+                'apply_exclusions'     => true,
                 'group_by' => function () {
                     // @codingStandardsIgnoreStart
                     /**
@@ -80,15 +81,16 @@ class EntityChoiceType extends AbstractType
      * Returns a list of entities
      *
      * @param bool $showPlural If true a plural label will be used as a choice text; otherwise, a label will be used
+     * @param bool $applyExclusions
      *
      * @return array [{full class name} => [{attr1} => {val1}, ...], ...]
      */
-    protected function getEntities($showPlural)
+    protected function getEntities($showPlural, $applyExclusions = true)
     {
         if (null === $this->itemsCache) {
             $this->itemsCache = [];
 
-            foreach ($this->provider->getEntities($showPlural) as $entity) {
+            foreach ($this->provider->getEntities($showPlural, $applyExclusions) as $entity) {
                 $entityClass = $entity['name'];
                 unset($entity['name']);
                 $this->itemsCache[$entityClass] = $entity;
@@ -102,13 +104,14 @@ class EntityChoiceType extends AbstractType
      * Returns a list of choices
      *
      * @param bool $showPlural If true a plural label will be used as a choice text; otherwise, a label will be used
+     * @param bool $applyExclusions
      *
      * @return array
      */
-    protected function getChoices($showPlural)
+    protected function getChoices($showPlural, $applyExclusions = true)
     {
         $choices = [];
-        foreach ($this->getEntities($showPlural) as $entityClass => $entity) {
+        foreach ($this->getEntities($showPlural, $applyExclusions) as $entityClass => $entity) {
             $choices[$entityClass] = $showPlural ? $entity['plural_label'] : $entity['label'];
         }
 

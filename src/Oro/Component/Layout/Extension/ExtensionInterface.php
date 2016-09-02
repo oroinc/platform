@@ -5,7 +5,6 @@ namespace Oro\Component\Layout\Extension;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
-use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
@@ -90,7 +89,7 @@ interface ExtensionInterface
      *
      * @param string $name The name of the data provider
      *
-     * @return DataProviderInterface
+     * @return object
      *
      * @throws Exception\InvalidArgumentException if the given data provider is not supported by this extension
      */

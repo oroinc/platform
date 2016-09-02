@@ -52,6 +52,7 @@ class OroLocaleExtension extends Extension
         $loader->load('services.yml');
         $loader->load('form_types.yml');
         $loader->load('importexport.yml');
+        $loader->load('cache.yml');
 
         $this->addClassesToCompile(['Oro\Bundle\LocaleBundle\EventListener\LocaleListener']);
     }

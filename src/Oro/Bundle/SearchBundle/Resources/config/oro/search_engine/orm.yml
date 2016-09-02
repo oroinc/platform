@@ -9,6 +9,7 @@ services:
             - '@event_dispatcher'
             - '@oro_entity.doctrine_helper'
             - '@oro_search.mapper'
+            - '@oro_search.resolver.entity_title'
         calls:
             - [setLogQueries, [%oro_search.log_queries%]]
             - [setDrivers, [%oro_search.drivers%]]

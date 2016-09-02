@@ -7,12 +7,12 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class ContextsToViewTransformer implements DataTransformerInterface
 {
@@ -25,37 +25,37 @@ class ContextsToViewTransformer implements DataTransformerInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var ObjectMapper */
-    protected $mapper;
-
     /* @var TokenStorageInterface */
     protected $securityTokenStorage;
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
+    /** @var EntityTitleResolverInterface */
+    protected $entityTitleResolver;
+
     /**
      * @param EntityManager         $entityManager
      * @param ConfigManager         $configManager
      * @param TranslatorInterface   $translator
-     * @param ObjectMapper          $mapper
      * @param TokenStorageInterface $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
+     * @param EntityTitleResolverInterface $entityTitleResolver
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        ObjectMapper $mapper,
         TokenStorageInterface $securityTokenStorage,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        EntityTitleResolverInterface $entityTitleResolver
     ) {
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
         $this->translator           = $translator;
-        $this->mapper               = $mapper;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->dispatcher           = $dispatcher;
+        $this->entityTitleResolver  = $entityTitleResolver;
     }
 
     /**
@@ -79,29 +79,18 @@ class ContextsToViewTransformer implements DataTransformerInterface
                     continue;
                 }
 
-                if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
-                    $text = [];
-                    foreach ($fields as $field) {
-                        $text[] = $this->mapper->getFieldValue($target, $field);
-                    }
-                } elseif (method_exists($target, '__toString')) {
-                    $text = [(string) $target];
-                } else {
-                    $text = [$this->translator->trans('oro.entity.item', ['%id%' => $target->getId()])];
-                }
-                $text = implode(' ', $text);
+                $title = $this->entityTitleResolver->resolve($target);
                 if ($label = $this->getClassLabel($targetClass)) {
-                    $text .= ' (' . $label . ')';
+                    $title .= ' (' . $label . ')';
                 }
 
-                $item['title'] = $text;
+                $item['title'] = $title;
                 $item['targetId'] = $target->getId();
                 $event = new PrepareContextTitleEvent($item, $targetClass);
                 $this->dispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
                 $item = $event->getItem();
-                $text = $item['title'];
 
-                $result[] = json_encode($this->getResult($text, $target));
+                $result[] = json_encode($this->getResult($item['title'], $target));
             }
 
             $value = implode(';', $result);

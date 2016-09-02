@@ -67,7 +67,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                     '"' . implode('", "', array_keys($this->getKnownExtras())) . '"',
                     'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
                 ),
-                ['definition', 'filters', 'sorters']
+                ['definition', 'filters', 'sorters', 'customize_loaded_data', 'data_transformers']
             )
             ->addOption(
                 'action',
@@ -95,7 +95,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
         $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
-        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
+        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
 
         switch ($input->getOption('section')) {
             case 'entities':

@@ -3,15 +3,13 @@ Feature: User email activity
   As OroCRM sales rep
   I need to have email activity functionality
 
-Background:
-  Given I login as "admin" user with "admin" password
-
 Scenario: Send email
   Given the following users:
     | firstName | lastName | email             | username |
     | Charlie   | Sheen    | charlie@sheen.com | charlie  |
     | Brad      | Pitt     | brad@pitt.com     | brad     |
     | Bruce     | Willis   | bruce@willis.com  | bruce    |
+  And I login as "admin" user with "admin" password
   And I go to System/User Management/Users
   And click view Charlie in grid
   And follow "More actions"
@@ -60,17 +58,13 @@ Scenario: Response email
 #  Then I should see view of 2 attachment
 
 Scenario: Forward email
-  When I go to System/User Management/Users
-  And click view Charlie in grid
-  And shouldn't see "Fwd: Re: Work for you" email in activity list
-  And I click "Forward" on "Work for you" in activity list
+  Given shouldn't see "Fwd: Re: Work for you" email in activity list
+  When I click "Forward" on "Work for you" in activity list
   And I fill in "To" with "Bruce"
   And press "Send"
-  And should see "Fwd: Re: Work for you" email in activity list
+  Then should see "Fwd: Re: Work for you" email in activity list
 
 Scenario: Delete contexts
-  Given I go to System/User Management/Users
-  And click view Charlie in grid
   When I collapse "Fwd: Re: Work for you" in activity list
   And delete all contexts from collapsed email
   Then shouldn't see "Fwd: Re: Work for you" email in activity list
@@ -87,4 +81,4 @@ Scenario: Add contexts
   Then I should see "The context has been added" flash message
   When I go to System/User Management/Users
   And click view Charlie in grid
-  Then I should see "Work for you" email in activity list
+  Then I should see "Fwd: Re: Work for you" email in activity list

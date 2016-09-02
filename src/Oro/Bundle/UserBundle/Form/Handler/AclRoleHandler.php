@@ -234,6 +234,8 @@ class AclRoleHandler
      * @param AbstractRole $role
      *
      * @return array
+     *   key - privilege type (entity, action)
+     *   value - ArrayCollection of AclPrivilege data
      */
     public function getAllPrivileges(AbstractRole $role)
     {

@@ -54,6 +54,10 @@ define([
                 this.set('sorters', {});
             }
 
+            if (_.isArray(data.appearanceData) && _.isEmpty(data.appearanceData)) {
+                this.set('appearanceData', {});
+            }
+
             _.each(data.sorters, function(direction, key) {
                 if (typeof this.directions[direction] !== 'undefined') {
                     data.sorters[key] = this.directions[direction];
@@ -70,10 +74,12 @@ define([
          */
         toGridState: function() {
             return {
-                filters:  this.get('filters'),
-                sorters:  this.get('sorters'),
-                columns:  this.get('columns'),
-                gridView: this.get('name')
+                filters:    this.get('filters'),
+                sorters:    this.get('sorters'),
+                columns:    this.get('columns'),
+                gridView:   this.get('name'),
+                appearanceType: this.get('appearanceType') !== '' ? this.get('appearanceType') : void 0,
+                appearanceData: this.get('appearanceData')
             };
         },
 

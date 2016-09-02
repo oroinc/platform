@@ -10,31 +10,36 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 class StringFilter extends AbstractFilter
 {
     /**
+     * {@inheritdoc}
+     */
+    protected $joinOperators = [
+        FilterUtility::TYPE_NOT_EMPTY => FilterUtility::TYPE_EMPTY,
+        TextFilterType::TYPE_NOT_CONTAINS => TextFilterType::TYPE_CONTAINS,
+        TextFilterType::TYPE_NOT_IN => TextFilterType::TYPE_IN,
+    ];
+
+    /**
      * {@inheritDoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        $data = $this->parseData($data);
-        if (!$data) {
-            return false;
-        }
-
-        $type = $data['type'];
         $parameterName = $ds->generateParameterName($this->getName());
         $this->setCaseSensitivity($ds);
-        $comparisonExpr = $this->buildComparisonExpr(
+        $expr = $this->buildComparisonExpr(
             $ds,
-            $type,
-            $this->get(FilterUtility::DATA_NAME_KEY),
+            $comparisonType,
+            $fieldName,
             $parameterName
         );
         $this->resetCaseSensitivity($ds);
-        $this->applyFilterToClause($ds, $comparisonExpr);
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-            $ds->setParameter($parameterName, $data['value']);
+        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+            $ds->setParameter(
+                $parameterName,
+                is_array($data['value']) ? array_map('strtolower', $data['value']) : $data['value']
+            );
         }
 
-        return true;
+        return $expr;
     }
 
     /**

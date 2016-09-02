@@ -178,10 +178,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         });
 
-        $(document).on('focus', '.select2-focusser, .select2-input', function(e) {
-            $('.hasDatepicker').datepicker('hide');
-        });
-
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .dropup.open, .dropup .open, ' +
             '.oro-drop.open, .oro-drop .open';
         $('html')[0].addEventListener('click', function(e) {
@@ -441,6 +437,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         });
         validateContainer($listContainer);
     });
+
+    //TODO: implement clone row
 
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();

@@ -8,13 +8,16 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
-use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
 
@@ -40,9 +43,9 @@ class WorkflowAttributesType extends AbstractType
     protected $defaultValuesListener;
 
     /**
-     * @var InitActionsListener
+     * @var FormInitListener
      */
-    protected $initActionsListener;
+    protected $formInitListener;
 
     /**
      * @var RequiredAttributesListener
@@ -60,30 +63,38 @@ class WorkflowAttributesType extends AbstractType
     protected $dispatcher;
 
     /**
+     * @var AuthorizationCheckerInterface
+     */
+    protected $authorizationChecker;
+
+    /**
      * @param WorkflowRegistry $workflowRegistry
      * @param AttributeGuesser $attributeGuesser ,
      * @param DefaultValuesListener $defaultValuesListener
-     * @param InitActionsListener $initActionsListener
+     * @param FormInitListener $formInitListener
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
      * @param EventDispatcherInterface $dispatcher
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         AttributeGuesser $attributeGuesser,
         DefaultValuesListener $defaultValuesListener,
-        InitActionsListener $initActionsListener,
+        FormInitListener $formInitListener,
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
         $this->defaultValuesListener = $defaultValuesListener;
-        $this->initActionsListener = $initActionsListener;
+        $this->formInitListener = $formInitListener;
         $this->requiredAttributesListener = $requiredAttributesListener;
         $this->contextAccessor = $contextAccessor;
         $this->dispatcher = $dispatcher;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -111,12 +122,12 @@ class WorkflowAttributesType extends AbstractType
             $builder->addEventSubscriber($this->defaultValuesListener);
         }
 
-        if (!empty($options['init_actions'])) {
-            $this->initActionsListener->initialize(
+        if (!empty($options['form_init'])) {
+            $this->formInitListener->initialize(
                 $options['workflow_item'],
-                $options['init_actions']
+                $options['form_init']
             );
-            $builder->addEventSubscriber($this->initActionsListener);
+            $builder->addEventSubscriber($this->formInitListener);
         }
 
         if (!empty($options['attribute_fields'])) {
@@ -136,6 +147,12 @@ class WorkflowAttributesType extends AbstractType
     {
         /** @var Workflow $workflow */
         $workflow = $options['workflow'];
+        $entity = null;
+        if (isset($options['data'])) {
+            /** @var WorkflowData $data */
+            $data = $options['data'];
+            $entity = $data->get($workflow->getDefinition()->getEntityAttributeName());
+        }
 
         foreach ($options['attribute_fields'] as $attributeName => $attributeOptions) {
             $attribute = $workflow->getAttributeManager()->getAttribute($attributeName);
@@ -151,8 +168,24 @@ class WorkflowAttributesType extends AbstractType
             if (null === $attributeOptions) {
                 $attributeOptions = array();
             }
-            $this->addAttributeField($builder, $attribute, $attributeOptions, $options);
+            if (!$entity || $this->isEditableField($entity, $attribute->getName())) {
+                $this->addAttributeField($builder, $attribute, $attributeOptions, $options);
+            }
         }
+    }
+
+    /**
+     * @param object $entity
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isEditableField($entity, $fieldName)
+    {
+        return $this->authorizationChecker->isGranted(
+            'EDIT',
+            new FieldVote($entity, $fieldName)
+        );
     }
 
     /**
@@ -276,7 +309,7 @@ class WorkflowAttributesType extends AbstractType
             array(
                 'attribute_fields',
                 'attribute_default_values',
-                'init_actions',
+                'form_init',
                 'workflow'
             )
         );
@@ -296,7 +329,7 @@ class WorkflowAttributesType extends AbstractType
                 'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
                 'attribute_fields' => 'array',
                 'attribute_default_values' => 'array',
-                'init_actions' => 'Oro\Component\Action\Action\ActionInterface',
+                'form_init' => 'Oro\Component\Action\Action\ActionInterface',
             )
         );
     }

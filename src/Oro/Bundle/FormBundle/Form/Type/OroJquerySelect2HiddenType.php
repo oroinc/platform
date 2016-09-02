@@ -8,17 +8,16 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 
 class OroJquerySelect2HiddenType extends AbstractType
 {
@@ -66,19 +65,16 @@ class OroJquerySelect2HiddenType extends AbstractType
         $resolver
             ->setDefaults(
                 [
-                    'empty_value'                   => '',
-                    'empty_data'                    => null,
-                    'data_class'                    => null,
-                    'entity_class'                  => null,
-                    'configs'                       => $defaultConfig,
-                    'converter'                     => null,
-                    'autocomplete_alias'            => null,
-                    'excluded'                      => null,
-                    'random_id'                     => true,
-                    'error_bubbling'                => false,
-                    'new_item_property_name'        => null,
-                    'new_item_allow_empty_property' => false,
-                    'new_item_value_path'           => 'value',
+                    'empty_value'        => '',
+                    'empty_data'         => null,
+                    'data_class'         => null,
+                    'entity_class'       => null,
+                    'configs'            => $defaultConfig,
+                    'converter'          => null,
+                    'autocomplete_alias' => null,
+                    'excluded'           => null,
+                    'random_id'          => true,
+                    'error_bubbling'     => false,
                 ]
             );
 
@@ -103,12 +99,7 @@ class OroJquerySelect2HiddenType extends AbstractType
                     },
                     'transformer'  => function (Options $options, $value) {
                         if (!$value && !empty($options['entity_class'])) {
-                            $value = $this->createDefaultTransformer(
-                                $options['entity_class'],
-                                $options['new_item_property_name'],
-                                $options['new_item_allow_empty_property'],
-                                $options['new_item_value_path']
-                            );
+                            $value = $this->createDefaultTransformer($options['entity_class']);
                         }
 
                         if (!$value instanceof DataTransformerInterface) {
@@ -198,30 +189,13 @@ class OroJquerySelect2HiddenType extends AbstractType
     }
 
     /**
-     *
-     * @param string      $entityClass
-     * @param string|null $newItemPropertyName
-     * @param bool        $newItemAllowEmptyProperty
-     * @param string|null $newItemValuePath
+     * @param string $entityClass
      *
      * @return EntityToIdTransformer
      */
-    public function createDefaultTransformer(
-        $entityClass,
-        $newItemPropertyName = null,
-        $newItemAllowEmptyProperty = false,
-        $newItemValuePath = null
-    ) {
-        if ($newItemPropertyName) {
-            $transformer = new EntityCreationTransformer($this->entityManager, $entityClass);
-            $transformer->setNewEntityPropertyName($newItemPropertyName);
-            $transformer->setAllowEmptyProperty($newItemAllowEmptyProperty);
-            $transformer->setValuePath($newItemValuePath);
-        } else {
-            $transformer = new EntityToIdTransformer($this->entityManager, $entityClass);
-        }
-
-        return $transformer;
+    public function createDefaultTransformer($entityClass)
+    {
+        return new EntityToIdTransformer($this->entityManager, $entityClass);
     }
 
     /**

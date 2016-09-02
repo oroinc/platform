@@ -119,6 +119,49 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             } else {
                 original.apply(this, _.rest(arguments));
             }
+        },
+        initContainer: function(original) {
+            original.apply(this, _.rest(arguments));
+
+            this.focusser.off('keyup-change input');
+            this.focusser.on('keyup-change input', this.bind(function(e) {
+                var showSearch = this.results[0].children.length >= this.opts.minimumResultsForSearch;
+
+                if (showSearch) {
+                    e.stopPropagation();
+                    if (this.opened()) {
+                        return;
+                    }
+                    this.open();
+                } else {
+                    this.clearSearch();
+                }
+            }));
+        },
+        tokenize: function(original) {
+            var opts = this.opts;
+            var search = this.search;
+            var results = this.results;
+            if (opts.allowCreateNew && opts.createSearchChoice) {
+                var def = opts.createSearchChoice.call(this, search.val(), []);
+                if (def !== void 0 && def !== null && this.id(def) !== void 0 && this.id(def) !== null) {
+                    results.empty();
+                    if (search.val()) {
+                        opts.populateResults.call(this, results, [def], {
+                            term: search.val(),
+                            page: this.resultsPage,
+                            context: null
+                        });
+                        this.highlight(0);
+                    }
+                    if (opts.formatSearching) {
+                        results.append('<li class="select2-searching">' + opts.formatSearching() + '</li>');
+                    }
+                    search.removeClass('select2-active');
+                    this.positionDropdown();
+                }
+            }
+            original.apply(this, _.rest(arguments));
         }
     };
 
@@ -268,6 +311,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
 
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
+        prototype.initContainer = _.wrap(prototype.initContainer, overrideMethods.initContainer);
+        prototype.tokenize = _.wrap(prototype.tokenize, overrideMethods.tokenize);
 
     }(Select2['class'].single.prototype));
 
@@ -414,6 +459,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
         formatSearching: function() { return __('Searching...'); },
-        formatNoMatches: function() { return __('No matches found'); }
+        formatNoMatches: function() { return __('No matches found'); },
+        formatLoadMore: function(pageNumber) { return __('Loading more results...'); },
+        formatInputTooShort: function(input, min) {
+            var n = min - input.length;
+            return __('oro.ui.format_input_too_short', {'count': n}, n);
+        },
+        formatInputTooLong: function(input, max) {
+            var n = input.length - max;
+            return __('oro.ui.format_input_too_long', {'count': n}, n);
+        },
+        formatSelectionTooBig: function(limit) {
+            return __('oro.ui.format_selection_too_big', {'count': limit}, limit);
+        }
     });
 });

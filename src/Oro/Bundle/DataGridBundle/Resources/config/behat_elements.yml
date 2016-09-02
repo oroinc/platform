@@ -11,15 +11,15 @@ GridFilters:
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters
 
 GridFilterStringItem:
-  selector: 'div.filter-item:contains("%s")'
+  selector: 'div.filter-item'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem
 
 GridFilterDateTimeItem:
-  selector: 'div.filter-item:contains("%s")'
+  selector: 'div.filter-item'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem
 
 MultipleChoice:
-  selector: 'div.filter-item:contains("%s")'
+  selector: 'div.filter-item'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice
 
 DateTimePicker:

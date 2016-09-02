@@ -197,6 +197,7 @@ define(function(require) {
             var activityClass;
             var activityOptions;
             var DateRangeFilterWithMeta;
+            var $filterContainer = $el.find('.filter-container');
 
             /*
              * render "Activity Type" filter
@@ -219,7 +220,7 @@ define(function(require) {
 
             this.activityTypeFilter.render();
             this.activityTypeFilter.on('update', this.onFilterStateChange, this);
-            $el.find('.activity-type-filter').append(this.activityTypeFilter.$el);
+            $filterContainer.append(this.activityTypeFilter.$el);
             this.activityTypeFilter.rendered();
 
             /*
@@ -235,7 +236,7 @@ define(function(require) {
             // render
             this.dateRangeFilter.render();
             this.dateRangeFilter.on('update', this.onFilterStateChange, this);
-            $el.find('.date-range-filter').append(this.dateRangeFilter.$el);
+            $filterContainer.append(this.dateRangeFilter.$el);
             this.dateRangeFilter.rendered();
         },
 

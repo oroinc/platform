@@ -108,6 +108,22 @@ class GridView implements ViewInterface
     protected $gridName;
 
     /**
+     * @var AppearanceType
+     *
+     * @ORM\ManyToOne(targetEntity="AppearanceType")
+     * @ORM\JoinColumn(name="appearanceType", referencedColumnName="name")
+     **/
+    protected $appearanceType;
+
+    /**
+     * @var array
+     * Contains data related to appearance, e.g. board id for boards
+     *
+     * @ORM\Column(type="array", nullable=true)
+     */
+    protected $appearanceData = [];
+
+    /**
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
@@ -308,10 +324,68 @@ class GridView implements ViewInterface
      */
     public function createView()
     {
-        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type, $this->getColumnsData());
+        $view = new View(
+            $this->id,
+            $this->filtersData,
+            $this->sortersData,
+            $this->type,
+            $this->getColumnsData(),
+            (string) $this->appearanceType
+        );
+        $view->setAppearanceData($this->getAppearanceData());
         $view->setLabel($this->name);
 
         return $view;
+    }
+
+    /**
+     * @return AppearanceType
+     */
+    public function getAppearanceType()
+    {
+        return $this->appearanceType;
+    }
+
+    /**
+     * @param AppearanceType $appearanceType
+     * @return $this
+     */
+    public function setAppearanceType($appearanceType)
+    {
+        $this->appearanceType = $appearanceType;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppearanceTypeName()
+    {
+        return (string) $this->appearanceType;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAppearanceData()
+    {
+        if ($this->appearanceData === null) {
+            $this->appearanceData = [];
+        }
+
+        return $this->appearanceData;
+    }
+
+    /**
+     * @param array $appearanceData
+     * @return $this
+     */
+    public function setAppearanceData(array $appearanceData = [])
+    {
+        $this->appearanceData = $appearanceData;
+
+        return $this;
     }
 
     /**
@@ -327,7 +401,7 @@ class GridView implements ViewInterface
      *
      * @param OrganizationInterface $organization
      *
-     * @return User
+     * @return $this
      */
     public function setOrganization(OrganizationInterface $organization = null)
     {

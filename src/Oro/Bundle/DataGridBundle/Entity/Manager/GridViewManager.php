@@ -4,13 +4,17 @@ namespace Oro\Bundle\DataGridBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
+use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
+use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
+use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -34,16 +38,32 @@ class GridViewManager
 
     protected $cacheData;
 
+    /** @var  array */
+    protected $appearanceTypes;
+
+    /** @var RestrictionManager */
+    protected $restrictionManager;
+
+    /** @var array  */
+    protected $gridConfigurations = [];
+
     /**
      * @param AclHelper $aclHelper
      * @param Registry $registry
      * @param Manager $gridManager
+     * @param RestrictionManager $restrictionManager
      */
-    public function __construct(AclHelper $aclHelper, Registry $registry, Manager $gridManager)
-    {
+    public function __construct(
+        AclHelper $aclHelper,
+        Registry $registry,
+        Manager $gridManager,
+        RestrictionManager $restrictionManager
+    ) {
         $this->aclHelper = $aclHelper;
+        $this->registry  = $registry;
         $this->registry = $registry;
         $this->gridManager = $gridManager;
+        $this->restrictionManager = $restrictionManager;
     }
 
     /**
@@ -124,11 +144,12 @@ class GridViewManager
     public function getSystemViews($gridName)
     {
         if (!isset($this->cacheData[self::SYSTEM_VIEWS_KEY])) {
-            $config = $this->gridManager->getConfigurationForGrid($gridName);
+            $config = $this->getConfigurationForGrid($gridName);
             $list = $config->offsetGetOr(GridViewsExtension::VIEWS_LIST_KEY, false);
             $gridViews[] = new View(GridViewsExtension::DEFAULT_VIEW_ID);
             if ($list) {
-                $gridViews = array_merge($gridViews, $list->getList()->getValues());
+                $list = $this->applyAppearanceRestrictions($list->getList()->getValues(), $gridName);
+                $gridViews = array_merge($gridViews, $list);
             }
             $this->cacheData[self::SYSTEM_VIEWS_KEY] = $gridViews;
         }
@@ -150,6 +171,7 @@ class GridViewManager
                 $gridViews = $this->registry
                     ->getRepository('OroDataGridBundle:GridView')
                     ->findGridViews($this->aclHelper, $user, $gridName);
+                $gridViews = $this->applyAppearanceRestrictions($gridViews, $gridName);
             }
             $this->cacheData[self::ALL_VIEWS_KEY] = [
                 'system' => $systemViews,
@@ -192,6 +214,17 @@ class GridViewManager
                     $systemViews
                 );
             }
+            /**
+             * If default view is restricted, fallback to the default system view
+             */
+            if ($defaultView && !$this->applyAppearanceRestrictions([$defaultView], $gridName)) {
+                $defaultView = ArrayUtil::find(
+                    function ($systemView) {
+                        return $systemView->getName() === GridViewsExtension::DEFAULT_VIEW_ID;
+                    },
+                    $systemViews
+                );
+            }
             $this->cacheData[self::DEFAULT_VIEW_KEY] = $defaultView;
         }
 
@@ -222,5 +255,35 @@ class GridViewManager
         }
 
         return $gridView;
+    }
+
+    /**
+     * @param string $gridName
+     * @return DatagridConfiguration
+     */
+    protected function getConfigurationForGrid($gridName)
+    {
+        if (!isset($this->gridConfigurations[$gridName])) {
+            $this->gridConfigurations[$gridName] = $this->gridManager->getConfigurationForGrid($gridName);
+        }
+
+        return $this->gridConfigurations[$gridName];
+    }
+
+    /**
+     * @param ViewInterface[] $views
+     * @param string $gridName
+     * @return ViewInterface[]
+     */
+    protected function applyAppearanceRestrictions($views, $gridName)
+    {
+        $config = $this->getConfigurationForGrid($gridName);
+        if (!$this->restrictionManager->boardViewEnabled($config)) {
+            $views = array_filter($views, function (ViewInterface $view) {
+                return $view->getAppearanceTypeName() !== BoardExtension::APPEARANCE_TYPE;
+            });
+        }
+
+        return $views;
     }
 }

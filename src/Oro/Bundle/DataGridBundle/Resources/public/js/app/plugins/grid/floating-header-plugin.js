@@ -14,6 +14,10 @@ define(function(require) {
         initialize: function(grid) {
             this.grid = grid;
             this.grid.on('shown', _.bind(this.onGridShown, this));
+            this.grid.on('changeAppearance', _.bind(function() {
+                // remove header height cache
+                delete this.headerHeight;
+            }, this));
 
             this.selectMode = _.bind(this.selectMode, this);
             this.checkLayout = _.bind(this.checkLayout, this);
@@ -34,7 +38,6 @@ define(function(require) {
             }
 
             this.setupCache();
-            this.headerHeight = this.domCache.theadTr.height();
 
             this.isHeaderCellWidthFixed = false;
             this.rescrollCb = this.enableOtherScroll();
@@ -85,6 +88,9 @@ define(function(require) {
                 thead: this.$grid.find('thead:first'),
                 theadTr: this.$grid.find('thead:first tr:first')
             };
+            if (!this.headerHeight) {
+                this.headerHeight = this.domCache.theadTr.height();
+            }
         },
 
         supportDropdowns: function() {

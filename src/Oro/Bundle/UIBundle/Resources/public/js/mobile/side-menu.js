@@ -47,6 +47,7 @@ define(['../side-menu', '../mediator'], function($, mediator) {
          * @private
          */
         _hide: function() {
+            this.$toggle.removeClass('open');
             $('#main-menu').hide();
             this.$toggle.trigger('tohide.bs.dropdown');
             $(document).off('click shown.bs.dropdown', this._onOutsideClick);

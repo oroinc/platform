@@ -156,6 +156,7 @@ services:
 
     oro_layout.layout_context_holder:
         class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder
+
     oro_layout.expression_language.cache:
         public: false
         parent: oro.cache.abstract
@@ -171,6 +172,7 @@ services:
         class: Symfony\Component\ExpressionLanguage\ExpressionLanguage
         arguments:
             - @oro_layout.expression_language.parsed_cache
+            - []
 
     oro_layout.data_provider.asset:
         class: Oro\Bundle\LayoutBundle\Layout\DataProvider\AssetProvider

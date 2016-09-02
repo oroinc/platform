@@ -2,24 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
-abstract class CsvFileStreamWriter implements ItemWriterInterface, ClosableInterface, ContextAwareInterface
+abstract class CsvFileStreamWriter extends FileStreamWriter
 {
-    /**
-     * @var string
-     */
-    protected $filePath;
-
-    /**
-     * @var resource
-     */
-    protected $fileHandle;
-
     /**
      * @var string
      */
@@ -39,6 +26,11 @@ abstract class CsvFileStreamWriter implements ItemWriterInterface, ClosableInter
      * @var array
      */
     protected $header;
+
+    /**
+     * @var resource
+     */
+    protected $fileHandle;
 
     /**
      * {@inheritdoc}

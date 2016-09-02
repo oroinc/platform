@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection;
 
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -13,8 +12,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
+use Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper;
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
+use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 
 class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
@@ -27,10 +27,6 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        self::getAclConfigLoader()->registerResources($container);
-        $aclMetadataManager = new AclAnnotationMetadataDumper($container->getParameterBag());
-        $aclMetadataManager->dump();
-
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
 

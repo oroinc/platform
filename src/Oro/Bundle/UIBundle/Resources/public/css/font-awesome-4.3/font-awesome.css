@@ -57,3 +57,6 @@
 .fa-file-movie-o:before {
     content: "\f1c8";
 }
+.fa-users:before {
+    content: "\f0c0";
+}

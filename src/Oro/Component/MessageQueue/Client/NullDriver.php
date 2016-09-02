@@ -1,7 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
+use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 
@@ -29,8 +31,10 @@ class NullDriver implements DriverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return NullMessage
      */
-    public function createMessage()
+    public function createTransportMessage()
     {
         return $this->session->createMessage();
     }
@@ -38,36 +42,41 @@ class NullDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function setMessagePriority(MessageInterface $message, $priority)
-    {
-        $headers = $message->getHeaders();
-        $headers['priority'] = $priority;
-        $message->setHeaders($headers);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createProducer()
-    {
-        return new MessageProducer($this->session->createProducer(), $this);
-    }
-
-    /**
-     * @param string $queueName
-     *
-     * @return QueueInterface
-     */
     public function createQueue($queueName)
     {
         return $this->session->createQueue($queueName);
     }
 
     /**
-     * @return Config
+     * {@inheritdoc}
      */
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function send(QueueInterface $queue, Message $message)
+    {
+        InvalidDestinationException::assertDestinationInstanceOf($queue, NullQueue::class);
+
+        $destination = $queue;
+
+        $headers = $message->getHeaders();
+        $headers['content_type'] = $message->getContentType();
+        $headers['expiration'] = $message->getExpire();
+        $headers['delay'] = $message->getDelay();
+        $headers['priority'] = $message->getPriority();
+
+        $transportMessage = $this->createTransportMessage();
+        $transportMessage->setBody($message->getBody());
+        $transportMessage->setProperties($message->getProperties());
+        $transportMessage->setMessageId($message->getMessageId());
+        $transportMessage->setTimestamp($message->getTimestamp());
+        $transportMessage->setHeaders($headers);
+
+        $this->session->createProducer()->send($destination, $transportMessage);
     }
 }

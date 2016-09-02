@@ -13,5 +13,3 @@ To enable field ACL protection for a column, you should use `field_acl` section 
 ```
 
 Please note that now only fields from the root entity of a datagrid's ORM query are supported.
-
-Enabling Field ACL for a datagrid will automatically turns off inline editing for this datagrid.

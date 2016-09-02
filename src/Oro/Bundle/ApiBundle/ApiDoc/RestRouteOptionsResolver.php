@@ -34,8 +34,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var array [entity type => ApiResource, ...] */
-    protected $resources;
+    /** @var array [request type + version => [entity type => ApiResource, ...], ...] */
+    protected $resources = [];
 
     /**
      * @param RestDocViewDetector  $docViewDetector
@@ -87,24 +87,26 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function getResources()
     {
-        if (null === $this->resources) {
-            $this->resources = [];
-            $requestType = $this->docViewDetector->getRequestType();
-            $resources = $this->resourcesProvider->getResources(
-                $this->docViewDetector->getVersion(),
-                $requestType
-            );
-            foreach ($resources as $resource) {
-                $entityType = $this->valueNormalizer->normalizeValue(
-                    $resource->getEntityClass(),
-                    DataType::ENTITY_TYPE,
-                    $requestType
-                );
-                $this->resources[$entityType] = $resource;
-            }
+        $version = $this->docViewDetector->getVersion();
+        $requestType = $this->docViewDetector->getRequestType();
+        $cacheKey = $version . (string)$requestType;
+        if (isset($this->resources[$cacheKey])) {
+            return $this->resources[$cacheKey];
         }
 
-        return $this->resources;
+        $result = [];
+        $resources = $this->resourcesProvider->getResources($version, $requestType);
+        foreach ($resources as $resource) {
+            $entityType = $this->valueNormalizer->normalizeValue(
+                $resource->getEntityClass(),
+                DataType::ENTITY_TYPE,
+                $requestType
+            );
+            $result[$entityType] = $resource;
+        }
+        $this->resources[$cacheKey] = $result;
+
+        return $result;
     }
 
     /**

@@ -123,10 +123,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetDataProvider()
     {
         $extension = $this->getAbstractExtension();
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\DataProviderInterface',
-            $extension->getDataProvider('test')
-        );
+        $this->assertTrue(is_object($extension->getDataProvider('test')));
     }
 
     /**
@@ -137,18 +134,6 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = $this->getAbstractExtension();
         $extension->getDataProvider('unknown');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\DataProviderInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testLoadInvalidDataProviders()
-    {
-        $extension = new AbstractExtensionStub([], [], [], [], [123]);
-        $extension->hasDataProvider('test');
     }
 
     // @codingStandardsIgnoreStart
@@ -256,7 +241,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [$this->getMock('Oro\Component\Layout\ContextConfiguratorInterface')],
-            ['test' => $this->getMock('Oro\Component\Layout\DataProviderInterface')]
+            ['test' => $this->getMock(\stdClass::class)]
         );
     }
 

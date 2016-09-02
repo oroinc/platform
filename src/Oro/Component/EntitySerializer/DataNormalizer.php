@@ -78,7 +78,7 @@ class DataNormalizer
             $childPropertyPath = array_slice($propertyPath, 1);
             if (array_key_exists(0, $row[$field])) {
                 foreach ($row[$field] as &$subRow) {
-                    $subRow = $this->extractValueByPropertyPath($subRow, $childPropertyPath);
+                    $subRow = $this->extractValueByPropertyPath($subRow, $childPropertyPath, $subRow);
                 }
             } else {
                 $row[$field] = $this->extractValueByPropertyPath($row[$field], $childPropertyPath);
@@ -95,10 +95,11 @@ class DataNormalizer
     /**
      * @param array    $row
      * @param string[] $propertyPath
+     * @param mixed    $defaultValue
      *
      * @return mixed
      */
-    protected function extractValueByPropertyPath(array &$row, array $propertyPath)
+    protected function extractValueByPropertyPath(array &$row, array $propertyPath, $defaultValue = null)
     {
         $result     = null;
         $lastIndex  = count($propertyPath) - 1;
@@ -108,6 +109,7 @@ class DataNormalizer
         while ($i <= $lastIndex) {
             $property = $propertyPath[$i];
             if (null === $currentRow || !array_key_exists($property, $currentRow)) {
+                $result = $defaultValue;
                 break;
             }
             if ($i === $lastIndex) {

@@ -33,7 +33,8 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                     'disable_partial_load' => true,
                     'hints'                => [
                         'hint1',
-                        ['name' => 'hint2', 'value' => 'val']
+                        ['name' => 'hint2'],
+                        ['name' => 'hint3', 'value' => 'val']
                     ],
                     'order_by'             => ['field1' => 'DESC'],
                     'max_results'          => 123,
@@ -50,8 +51,9 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                             'exclusion_policy'     => 'all',
                             'disable_partial_load' => true,
                             'hints'                => [
-                                'hint3',
-                                ['name' => 'hint4', 'value' => 'val']
+                                'hint10',
+                                ['name' => 'hint11'],
+                                ['name' => 'hint12', 'value' => 'val']
                             ],
                             'order_by'             => ['field2' => 'DESC'],
                             'max_results'          => 456,
@@ -64,7 +66,8 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                     'disable_partial_load' => true,
                     'hints'                => [
                         'hint1',
-                        ['name' => 'hint2', 'value' => 'val']
+                        'hint2',
+                        ['name' => 'hint3', 'value' => 'val']
                     ],
                     'order_by'             => ['field1' => 'DESC'],
                     'max_results'          => 123,
@@ -81,8 +84,9 @@ class ConfigConverterTest extends \PHPUnit_Framework_TestCase
                             'exclusion_policy'     => 'all',
                             'disable_partial_load' => true,
                             'hints'                => [
-                                'hint3',
-                                ['name' => 'hint4', 'value' => 'val']
+                                'hint10',
+                                'hint11',
+                                ['name' => 'hint12', 'value' => 'val']
                             ],
                             'order_by'             => ['field2' => 'DESC'],
                             'max_results'          => 456,

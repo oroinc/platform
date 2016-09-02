@@ -66,12 +66,12 @@ define(function(require) {
         getValue: function() {
             var userInput = this.$('input[name=value]').val();
             var parsed = this.formatter.toRaw(userInput);
-            return _.isNumber(parsed) ? parsed : NaN;
+            return _.isNumber(parsed) ? parsed : (!parsed ? void 0 : NaN);
         },
 
         getValidationRules: function() {
             var rules = NumberEditorView.__super__.getValidationRules.call(this);
-            rules.number = true;
+            rules.Number = true;
             return rules;
         },
 
@@ -96,13 +96,15 @@ define(function(require) {
 
         getServerUpdateData: function() {
             var data = {};
-            data[this.fieldName] = isNaN(this.getValue()) ? null : this.getValue();
+            var value = this.getValue();
+            data[this.fieldName] = isNaN(value) ? null : value;
             return data;
         },
 
         getModelUpdateData: function() {
             var data = {};
-            data[this.fieldName] = isNaN(this.getValue()) ? void 0 : this.getValue();
+            var value = this.getValue();
+            data[this.fieldName] = isNaN(value) ? null : value;
             return data;
         }
     });

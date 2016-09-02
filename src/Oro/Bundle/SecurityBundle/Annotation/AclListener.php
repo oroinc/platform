@@ -2,62 +2,45 @@
 
 namespace Oro\Bundle\SecurityBundle\Annotation;
 
-use Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheWarmer;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+
+use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
+use Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
 
 class AclListener
 {
-    /** @var ContainerInterface */
-    private $container;
+    /** @var AclAnnotationProvider */
+    protected $cacheProvider;
 
-    /** @var AclAnnotationCacheWarmer  */
-    private $cacheWarmer;
+    /** @var CumulativeConfigMetadataDumper */
+    protected $dumper;
 
     /**
-     * @param ContainerInterface $container
-     * @param AclAnnotationCacheWarmer $cacheWarmer
+     * @param AclAnnotationProvider $cacheProvider
+     * @param ConfigMetadataDumperInterface $dumper
      */
-    public function __construct(
-        ContainerInterface $container,
-        AclAnnotationCacheWarmer $cacheWarmer
-    ) {
-        $this->container = $container;
-        $this->cacheWarmer = $cacheWarmer;
-        $this->cacheDir = $this->container->getParameter('kernel.cache_dir');
-        $this->dumper = new AclAnnotationMetadataDumper($this->container->getParameterBag());
-        $this->file = $this->dumper->getMetaFile();
+    public function __construct(AclAnnotationProvider $cacheProvider, ConfigMetadataDumperInterface $dumper)
+    {
+        $this->cacheProvider = $cacheProvider;
+        $this->dumper = $dumper;
     }
 
+    /**
+     * @param GetResponseEvent $event
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$this->isFresh()) {
-            $this->cacheWarmer->warmUp($this->cacheDir.'/annotations');
-            $this->dumper->dump();
-        }
-    }
+        if (!$this->dumper->isFresh()) {
+            $this->cacheProvider->warmUpCache();
 
-    /**
-     * Check is meta file for acl annotations fresh
-     * @return bool
-     */
-    public function isFresh()
-    {
-        if (!is_file($this->file)) {
-            return false;
+            $tempAclContainer = new ContainerBuilder();
+            $loader = AclAnnotationLoader::getAclAnnotationResourceLoader();
+            $loader->registerResources($tempAclContainer);
+
+            $this->dumper->dump($tempAclContainer);
         }
-        if (!$this->container->getParameter('kernel.debug')) {
-            return true;
-        }
-        $time = filemtime($this->file);
-        $meta = unserialize(file_get_contents($this->file));
-        foreach ($meta as $resource) {
-            if (!$resource->isFresh($time)) {
-                return false;
-            }
-        }
-        return true;
     }
 }

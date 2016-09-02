@@ -34,6 +34,20 @@ class GridViewType extends AbstractType
             ->add('grid_name', 'text', [
                 'property_path' => 'gridName',
             ])
+            ->add(
+                'appearanceType',
+                'entity',
+                [
+                    'class' => 'OroDataGridBundle:AppearanceType',
+                    'property_path' => 'appearanceType',
+                    'required' => false,
+                ]
+            )
+            ->add('appearanceData', 'text', [
+                'property_path' => 'appearanceData',
+                'empty_data'    => [],
+                'required' => false,
+            ])
             ->add('filters', null, [
                 'property_path' => 'filtersData',
                 'empty_data'    => [],
