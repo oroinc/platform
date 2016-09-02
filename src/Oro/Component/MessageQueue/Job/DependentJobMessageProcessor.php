@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -94,11 +95,14 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         }
 
         foreach ($dependentJobs as $dependentJob) {
+            $message = new Message();
+            $message->setBody($dependentJob['message']);
+
             if (isset($dependentJob['priority'])) {
-                $this->producer->send($dependentJob['topic'], $dependentJob['message'], $dependentJob['priority']);
-            } else {
-                $this->producer->send($dependentJob['topic'], $dependentJob['message']);
+                $message->setPriority($dependentJob['priority']);
             }
+
+            $this->producer->send($dependentJob['topic'], $message);
         }
 
         return self::ACK;

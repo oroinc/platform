@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -241,11 +242,15 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($job))
         ;
 
+        $expectedMessage = null;
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with('topic-name', 'message', MessagePriority::NORMAL)
+            ->with('topic-name', $this->isInstanceOf(Message::class))
+            ->will($this->returnCallback(function ($topic, Message $message) use (&$expectedMessage) {
+                $expectedMessage = $message;
+            }))
         ;
 
         $logger = $this->createLoggerMock();
@@ -258,6 +263,9 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
+
+        $this->assertEquals('message', $expectedMessage->getBody());
+        $this->assertNull($expectedMessage->getPriority());
     }
 
     public function testShouldPublishDependentMessageWithPriority()
@@ -282,11 +290,15 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($job))
         ;
 
+        $expectedMessage = null;
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with('topic-name', 'message', 'priority')
+            ->with('topic-name', $this->isInstanceOf(Message::class))
+            ->will($this->returnCallback(function ($topic, Message $message) use (&$expectedMessage) {
+                $expectedMessage = $message;
+            }))
         ;
 
         $logger = $this->createLoggerMock();
@@ -299,6 +311,9 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
+
+        $this->assertEquals('message', $expectedMessage->getBody());
+        $this->assertEquals('priority', $expectedMessage->getPriority());
     }
 
     /**
