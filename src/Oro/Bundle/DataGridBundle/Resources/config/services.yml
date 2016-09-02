@@ -310,3 +310,9 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.acl_helper'
 
+    oro_datagrid.cache.datagrid_configuration_cache_warmer:
+        class: Oro\Bundle\DataGridBundle\Cache\DatagridConfigurationCacheWarmer
+        arguments:
+            - @oro_datagrid.configuration.provider
+        tags:
+            - { name: kernel.cache_warmer }

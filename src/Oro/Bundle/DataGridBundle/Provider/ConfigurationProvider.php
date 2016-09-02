@@ -90,8 +90,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             $data = $this->cache->fetch($gridName.'_'.self::CACHE_POSTFIX);
             if ($data) {
                 $this->rawConfiguration = array_merge($this->rawConfiguration, $data);
-            } else {
-                $this->loadConfiguration();
             }
         }
     }
