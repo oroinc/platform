@@ -44,9 +44,9 @@ class CreateQueuesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $meta) {
-            $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getClientName()));
+            $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getTransportName()));
 
-            $this->driver->createQueue($meta->getClientName());
+            $this->driver->createQueue($meta->getTransportName());
         }
     }
 }

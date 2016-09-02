@@ -3171,10 +3171,12 @@ label .popover-content {
   }
 }
 
-.entity-create-or-select-container .entity-create-btn {
-  padding: 0 6px;
-  margin-left: 3px;
-  height: 30px;
+.entity-create-or-select-container {
+  .entity-create-btn, .entity-create-btn[disabled], .entity-create-btn[disabled]:active {
+    padding: 0 6px;
+    margin-left: 3px;
+    height: 30px;
+  }
 }
 
 .entity-create-enabled .input-prepend .select2-container,
