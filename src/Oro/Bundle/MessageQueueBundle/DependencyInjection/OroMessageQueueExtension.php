@@ -7,11 +7,11 @@ use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\DependencyInjection\TransportFactoryInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -66,6 +66,7 @@ class OroMessageQueueExtension extends Extension
             $driverFactory->replaceArgument(0, [
                 NullConnection::class => NullDriver::class,
                 DbalConnection::class => DbalDriver::class,
+                DbalLazyConnection::class => DbalDriver::class,
             ]);
 
             $configDef = $container->getDefinition('oro_message_queue.client.config');
@@ -77,16 +78,11 @@ class OroMessageQueueExtension extends Extension
             ]);
 
             if (false == empty($config['client']['traceable_producer'])) {
-                $container->setDefinition(
-                    'oro_message_queue.client.internal_message_producer',
-                    $container->getDefinition('oro_message_queue.client.message_producer')
-                );
-
-                $traceableMessageProducer = new Definition(TraceableMessageProducer::class, [
-                    new Reference('oro_message_queue.client.internal_message_producer')
-                ]);
-
-                $container->setDefinition('oro_message_queue.client.message_producer', $traceableMessageProducer);
+                $producerId = 'oro_message_queue.client.traceable_message_producer';
+                $container->register($producerId, TraceableMessageProducer::class)
+                    ->setDecoratedService('oro_message_queue.client.message_producer')
+                    ->addArgument(new Reference('oro_message_queue.client.traceable_message_producer.inner'))
+                ;
             }
 
             $delayRedeliveredExtension = $container->getDefinition(

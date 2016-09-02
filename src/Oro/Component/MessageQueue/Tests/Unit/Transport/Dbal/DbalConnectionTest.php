@@ -2,12 +2,21 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
+use Oro\Component\Testing\ClassExtensionTrait;
 
 class DbalConnectionTest extends \PHPUnit_Framework_TestCase
 {
+    use ClassExtensionTrait;
+
+    public function testShouldImplementConnectionInterface()
+    {
+        self::assertClassImplements(ConnectionInterface::class, DbalConnection::class);
+    }
+
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new DbalConnection($this->createDBALConnectionMock(), $this->createDbalSchemaMock(), 'table');
