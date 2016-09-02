@@ -5,7 +5,7 @@ Overview
 --------
 
 Filter bundle provides extension for data grid with ORM datasource.
-Filters could be added to datagrid in the datagrid.yml file for specified datagrid under `filters` node.
+Filters could be added to datagrid in the `oro/datagrids.yml` file for specified datagrid under `filters` node.
 Definition of any filter has required option `data_name` that should be reference to column in query and type - filter type.
 For example:
 

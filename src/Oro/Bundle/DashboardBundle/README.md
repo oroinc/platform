@@ -10,7 +10,7 @@ Developer also can configure what widgets are available using configuration file
 Dashboard configuration
 -----------------------
 ```yaml
-oro_dashboard_config:
+dashboards:
     # Configuration of widgets
     widgets:                                                 # widget declaration section
         quick_launchpad:                                     # widget name
@@ -112,9 +112,9 @@ oro_default:
 How to add new widget
 ---------------------
  
-In this example lets create a grid widget. First you need to create a grid. Use `datagrid.yml` of your bundle to do this. For example lets create `dashboard-recent-calls-grid` grid:
+In this example lets create a grid widget. First you need to create a grid. Use `oro/datagrids.yml` of your bundle to do this. For example lets create `dashboard-recent-calls-grid` grid:
 ```yaml
-datagrid:
+datagrids:
     dashboard-recent-calls-grid:
         options:
             entityHint: call
@@ -191,9 +191,9 @@ Next you need to create a TWIG template renders your grid. This template should 
 {% endblock %}
 ```
  
-After that you need to register your widget and add it on the appropriate dashboard. Use `dashboard.yml` of your bundle to do this. For example:
+After that you need to register your widget and add it on the appropriate dashboard. Use `dashboards.yml` of your bundle to do this. For example:
 ```yaml
-oro_dashboard_config:
+dashboards:
     widgets:
         recent_calls:                               # register a widget
             label:      orocrm.dashboard.recent_calls.title
@@ -213,7 +213,7 @@ Each widget can have own configuration. Configuration values stores for each wid
 To add configuration, the widget configuration should contain 'configuration' block, there should be list of available configuration values. For example:
 
 ```yaml
-oro_dashboard_config:
+dashboards:
     widgets:
         my_test_chart:
   ...
@@ -224,10 +224,10 @@ oro_dashboard_config:
                        label: acme.test.label    # field label            
                     show_on_widget: true         # if true - value of config parameter will be shown at the bottom of widget. By default - false
 ```
-If developer wants to add some config value to all widgets, he can use 'widgets_configuration' block of dashboard.yml file. For example:
+If developer wants to add some config value to all widgets, he can use 'widgets_configuration' block of dashboards.yml file. For example:
 
 ```yaml
-oro_dashboard_config:
+dashboards:
     widgets_configuration:
         globalConfigParameter:
             type: text
@@ -242,7 +242,7 @@ There is special route "oro_dashboard_grid" for rendering grids allowing to set 
 
 This action also allows you to configure shown view for grid.
 
-### dashboard.yml
+### dashboards.yml
 
 ``` yml
     accounts_grid:

@@ -2,7 +2,7 @@
 ### Configuration Form Definition ###
 
 Config form definitions should be defined in system_configuration.yml file in any bundle.
-Root node should be `oro_system_configuration`
+Root node should be `system_configuration`
 
 ####Available nodes:####
 - `groups`    - definition of field groups. More [details](#groups)
@@ -16,7 +16,7 @@ and dependent on its position in tree.
 This means that group could be rendered as fieldset or tab or like part of accordion list.
 
 ```
-oro_system_configuration:
+system_configuration:
     groups:
         platform: #unique name
             title: 'Platform'             # title is required
@@ -29,7 +29,7 @@ oro_system_configuration:
 Groups definitions will be replaced recursive from configs that will parse after original definition.
 So way to override existed group title is just to redefine group with the same name and `title` value
 ```
-oro_system_configuration:
+system_configuration:
     groups:
         platform:
             title: 'New title' # overridden title
@@ -38,7 +38,7 @@ oro_system_configuration:
 To customize system configuration form without implementing own form type, it is possible to use configurator when
 defining form-level group. Configurator is callable with static access syntax.
 ```
-oro_system_configuration:
+system_configuration:
     groups:
         custom_group:
             title: 'Settings form'
@@ -70,7 +70,7 @@ Also `options` available property here, it's just a proxy to form type definitio
 
 **Example**
 ```
-oro_system_configuration:
+system_configuration:
        fields:
         date_format:
             type: text # can be any custom type
@@ -89,7 +89,7 @@ Tree name should be unique to prevent merge of content from another trees.
 All nested elements of the group should be placed under "children" node.
 Sort order can be set with "priority" property
 ```
-oro_system_configuration:
+system_configuration:
     tree:
         tree_name:
             group1:
