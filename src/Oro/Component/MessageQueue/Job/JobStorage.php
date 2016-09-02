@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
@@ -9,6 +10,16 @@ use Doctrine\ORM\EntityRepository;
 
 class JobStorage
 {
+    /**
+     * @var ManagerRegistry
+     */
+    private $doctrine;
+
+    /**
+     * @var string
+     */
+    private $entityClass;
+
     /**
      * @var EntityManager
      */
@@ -25,14 +36,14 @@ class JobStorage
     private $uniqueTableName;
 
     /**
-     * @param EntityManager    $em
-     * @param EntityRepository $repository
-     * @param string           $uniqueTableName
+     * @param ManagerRegistry $doctrine
+     * @param string $entityClass
+     * @param string $uniqueTableName
      */
-    public function __construct(EntityManager $em, EntityRepository $repository, $uniqueTableName)
+    public function __construct(ManagerRegistry $doctrine, $entityClass, $uniqueTableName)
     {
-        $this->em = $em;
-        $this->repository = $repository;
+        $this->doctrine = $doctrine;
+        $this->entityClass = $entityClass;
         $this->uniqueTableName = $uniqueTableName;
     }
 
@@ -43,7 +54,7 @@ class JobStorage
      */
     public function findJobById($id)
     {
-        $qb = $this->repository->createQueryBuilder('job');
+        $qb = $this->getEntityRepository()->createQueryBuilder('job');
 
         return $qb
             ->addSelect('rootJob')
@@ -62,7 +73,7 @@ class JobStorage
      */
     public function findRootJobByOwnerIdAndJobName($ownerId, $jobName)
     {
-        $qb = $this->repository->createQueryBuilder('job');
+        $qb = $this->getEntityRepository()->createQueryBuilder('job');
 
         return $qb
             ->where('job.ownerId = :ownerId AND job.name = :jobName')
@@ -82,7 +93,7 @@ class JobStorage
      */
     public function findChildJobByName($name, Job $rootJob)
     {
-        $qb = $this->repository->createQueryBuilder('job');
+        $qb = $this->getEntityRepository()->createQueryBuilder('job');
 
         return $qb
             ->addSelect('rootJob')
@@ -99,7 +110,7 @@ class JobStorage
      */
     public function createJob()
     {
-        $class = $this->repository->getClassName();
+        $class = $this->getEntityRepository()->getClassName();
 
         return new $class;
     }
@@ -112,7 +123,7 @@ class JobStorage
      */
     public function saveJob(Job $job, \Closure $lockCallback = null)
     {
-        $class = $this->repository->getClassName();
+        $class = $this->getEntityRepository()->getClassName();
         if (! $job instanceof $class) {
             throw new \LogicException(sprintf(
                 'Got unexpected job instance: expected: "%s", actual" "%s"',
@@ -126,19 +137,19 @@ class JobStorage
                 throw new \LogicException('Is not possible to create new job with lock, only update is allowed');
             }
 
-            $this->em->transactional(function (EntityManager $em) use ($job, $lockCallback) {
+            $this->getEntityManager()->transactional(function (EntityManager $em) use ($job, $lockCallback) {
                 /** @var Job $job */
-                $job = $this->repository->find($job->getId(), LockMode::PESSIMISTIC_WRITE);
+                $job = $this->getEntityRepository()->find($job->getId(), LockMode::PESSIMISTIC_WRITE);
 
                 $lockCallback($job);
 
                 if ($job->getStoppedAt()) {
-                    $em->getConnection()->delete($this->uniqueTableName, [
+                    $this->getEntityManager()->getConnection()->delete($this->uniqueTableName, [
                         'name' => $job->getOwnerId(),
                     ]);
 
                     if ($job->isUnique()) {
-                        $em->getConnection()->delete($this->uniqueTableName, [
+                        $this->getEntityManager()->getConnection()->delete($this->uniqueTableName, [
                             'name' => $job->getName(),
                         ]);
                     }
@@ -146,7 +157,7 @@ class JobStorage
             });
         } else {
             if (! $job->getId() && $job->isRoot()) {
-                $this->em->getConnection()->transactional(function (Connection $connection) use ($job) {
+                $this->getEntityManager()->getConnection()->transactional(function (Connection $connection) use ($job) {
                     try {
                         $connection->insert($this->uniqueTableName, [
                             'name' => $job->getOwnerId()
@@ -158,16 +169,44 @@ class JobStorage
                             ]);
                         }
                     } catch (UniqueConstraintViolationException $e) {
-                        throw new DuplicateJobException();
+                        throw new DuplicateJobException(sprintf(
+                            'Duplicate job. ownerId:"%s", name:"%s"',
+                            $job->getOwnerId(),
+                            $job->getName()
+                        ));
                     }
 
-                    $this->em->persist($job);
-                    $this->em->flush();
+                    $this->getEntityManager()->persist($job);
+                    $this->getEntityManager()->flush();
                 });
             } else {
-                $this->em->persist($job);
-                $this->em->flush();
+                $this->getEntityManager()->persist($job);
+                $this->getEntityManager()->flush();
             }
         }
+    }
+
+    /**
+     * @return EntityRepository
+     */
+    private function getEntityRepository()
+    {
+        if (! $this->repository) {
+            $this->repository = $this->getEntityManager()->getRepository($this->entityClass);
+        }
+
+        return $this->repository;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getEntityManager()
+    {
+        if (! $this->em) {
+            $this->em = $this->doctrine->getManagerForClass($this->entityClass);
+        }
+
+        return $this->em;
     }
 }

@@ -60,6 +60,11 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $table->addColumn('stopped_at', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
 
+        $table->addColumn('data', 'json_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:json_array)',
+        ]);
+
         $table->addForeignKeyConstraint(
             $table,
             ['root_job_id'],

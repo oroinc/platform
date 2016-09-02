@@ -14,37 +14,37 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     /**
      * @var JobStorage
      */
-    protected $jobStorage;
+    private $jobStorage;
 
     /**
-     * @var CalculateRootJobStatusCase
+     * @var CalculateRootJobStatusService
      */
-    protected $calculateRootJobStatusCase;
+    private $calculateRootJobStatusService;
 
     /**
      * @var MessageProducerInterface
      */
-    protected $producer;
+    private $producer;
 
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @param JobStorage $jobStorage
-     * @param CalculateRootJobStatusCase $calculateRootJobStatusCase
+     * @param CalculateRootJobStatusService $calculateRootJobStatusCase
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
      */
     public function __construct(
         JobStorage $jobStorage,
-        CalculateRootJobStatusCase $calculateRootJobStatusCase,
+        CalculateRootJobStatusService $calculateRootJobStatusCase,
         MessageProducerInterface $producer,
         LoggerInterface $logger
     ) {
         $this->jobStorage = $jobStorage;
-        $this->calculateRootJobStatusCase = $calculateRootJobStatusCase;
+        $this->calculateRootJobStatusService = $calculateRootJobStatusCase;
         $this->producer = $producer;
         $this->logger = $logger;
     }
@@ -56,20 +56,20 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     {
         $data = JSON::decode($message->getBody());
 
-        if (! isset($data['id'])) {
+        if (! isset($data['jobId'])) {
             $this->logger->critical(sprintf('Got invalid message. body: "%s"', $message->getBody()));
 
             return self::REJECT;
         }
 
-        $job = $this->jobStorage->findJobById($data['id']);
+        $job = $this->jobStorage->findJobById($data['jobId']);
         if (! $job) {
-            $this->logger->critical(sprintf('Job was not found. id: "%s"', $data['id']));
+            $this->logger->critical(sprintf('Job was not found. id: "%s"', $data['jobId']));
 
             return self::REJECT;
         }
 
-        $isRootJobStopped = $this->calculateRootJobStatusCase->calculate($job);
+        $isRootJobStopped = $this->calculateRootJobStatusService->calculate($job);
 
         if ($isRootJobStopped) {
             $this->producer->send(Topics::ROOT_JOB_STOPPED, [

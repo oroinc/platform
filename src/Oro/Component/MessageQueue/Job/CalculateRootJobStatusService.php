@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Job;
 
 use Doctrine\Common\Collections\Collection;
 
-class CalculateRootJobStatusCase
+class CalculateRootJobStatusService
 {
     /**
      * @var JobStorage
@@ -97,6 +97,20 @@ class CalculateRootJobStatusCase
             }
         }
 
+        return $this->getRootJobStatus($new, $running, $cancelled, $failed, $success);
+    }
+
+    /**
+     * @param int $new
+     * @param int $running
+     * @param int $cancelled
+     * @param int $failed
+     * @param int $success
+     *
+     * @return string
+     */
+    protected function getRootJobStatus($new, $running, $cancelled, $failed, $success)
+    {
         $status = Job::STATUS_NEW;
         if (! $new && ! $running) {
             if ($cancelled) {

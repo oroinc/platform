@@ -85,6 +85,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param int $id
@@ -103,6 +106,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param string $ownerId
@@ -121,6 +127,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param string $name
@@ -139,6 +148,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param string $status
@@ -157,6 +169,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param boolean $interrupted
@@ -175,6 +190,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param boolean $unique
@@ -193,11 +211,14 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param Job $rootJob
      */
-    public function setRootJob($rootJob)
+    public function setRootJob(Job $rootJob)
     {
         $this->rootJob = $rootJob;
     }
@@ -211,6 +232,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param \DateTime $createdAt
@@ -229,6 +253,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param \DateTime $startedAt
@@ -247,6 +274,9 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param \DateTime $stoppedAt
@@ -273,11 +303,14 @@ class Job
     }
 
     /**
+     * Only JobProcessor is responsible to call this method.
+     * Do not call from the outside.
+     *
      * @internal
      *
      * @param Job[] $childJobs
      */
-    public function setChildJobs(array $childJobs)
+    public function setChildJobs($childJobs)
     {
         $this->childJobs = $childJobs;
     }

@@ -168,7 +168,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::CALCULATE_ROOT_JOB_STATUS, ['id' => 12345])
+            ->with(Topics::CALCULATE_ROOT_JOB_STATUS, ['jobId' => 12345])
         ;
 
         $processor = new JobProcessor($storage, $producer);

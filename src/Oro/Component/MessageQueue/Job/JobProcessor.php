@@ -98,7 +98,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'id' => $job->getId()
+            'jobId' => $job->getId()
         ]);
 
         return $job;
@@ -129,7 +129,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'id' => $job->getId()
+            'jobId' => $job->getId()
         ]);
     }
 
@@ -158,7 +158,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'id' => $job->getId()
+            'jobId' => $job->getId()
         ]);
     }
 
@@ -187,7 +187,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'id' => $job->getId()
+            'jobId' => $job->getId()
         ]);
     }
 
@@ -220,7 +220,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'id' => $job->getId()
+            'jobId' => $job->getId()
         ]);
     }
 
