@@ -92,7 +92,7 @@ class TraceableMessageProducerTest extends \PHPUnit_Framework_TestCase
         //guard
         $this->assertNotEmpty($messageProducer->getTraces());
 
-        $messageProducer->clearTraces();
+        $messageProducer->clear();
         $this->assertSame([], $messageProducer->getTraces());
     }
 

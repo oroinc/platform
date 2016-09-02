@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
@@ -13,11 +14,13 @@ use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
  */
 class SyncCommandTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     public function setUp()
     {
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
     }
 
     public function testShouldOutputHelpForTheCommand()
@@ -37,7 +40,7 @@ class SyncCommandTest extends WebTestCase
         $this->assertContains('Run sync for "Foo Integration" integration.', $result);
         $this->assertContains('Completed', $result);
 
-        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 
         $this->assertCount(1, $traces);
 
@@ -46,8 +49,8 @@ class SyncCommandTest extends WebTestCase
             'connector_parameters' => [],
             'connector' => null,
             'transport_batch_size' => 100,
-        ], $traces[0]['message']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
+        ], $traces[0]['message']->getBody());
+        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
     }
 
     public function testShouldSendSyncIntegrationWithCustomConnectorAndOptions()
@@ -65,7 +68,7 @@ class SyncCommandTest extends WebTestCase
         $this->assertContains('Run sync for "Foo Integration" integration.', $result);
         $this->assertContains('Completed', $result);
 
-        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 
         $this->assertCount(1, $traces);
 
@@ -77,8 +80,8 @@ class SyncCommandTest extends WebTestCase
             ],
             'connector' => 'theConnector',
             'transport_batch_size' => 100,
-        ], $traces[0]['message']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
+        ], $traces[0]['message']->getBody());
+        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
     }
 
     /**

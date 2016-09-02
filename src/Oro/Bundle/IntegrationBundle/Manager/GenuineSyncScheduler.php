@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
 use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -29,11 +30,15 @@ class GenuineSyncScheduler
      */
     public function schedule($integrationId, $connector = null, array $connectorParameters = [])
     {
-        $this->producer->send(Topics::SYNC_INTEGRATION, [
+        $message = new Message();
+        $message->setPriority(MessagePriority::VERY_LOW);
+        $message->setBody([
             'integration_id' => $integrationId,
             'connector_parameters' => $connectorParameters,
             'connector' => $connector,
             'transport_batch_size' => 100,
-        ], MessagePriority::VERY_LOW);
+        ]);
+
+        $this->producer->send(Topics::SYNC_INTEGRATION, $message);
     }
 }

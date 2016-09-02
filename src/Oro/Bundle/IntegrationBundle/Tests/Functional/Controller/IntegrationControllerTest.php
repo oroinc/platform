@@ -5,18 +5,20 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Symfony\Component\DomCrawler\Form;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 
 /**
  * @dbIsolation
  */
 class IntegrationControllerTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     /**
      * @var EntityManagerInterface
      */
@@ -162,7 +164,7 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertTrue($result['successful']);
 
-        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
         $this->assertCount(1, $traces);
     }
 

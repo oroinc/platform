@@ -5,6 +5,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -15,13 +16,15 @@ use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
  */
 class ChannelTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     public function setUp()
     {
         parent::setUp();
 
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
     }
 
     public function testShouldScheduleIntegrationSyncMessageOnCreate()
@@ -42,15 +45,15 @@ class ChannelTest extends WebTestCase
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 
-        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
         self::assertCount(1, $traces);
         self::assertEquals([
             'integration_id' => $integration->getId(),
             'connector_parameters' => [],
             'connector' => null,
             'transport_batch_size' => 100,
-        ], $traces[0]['message']);
-        self::assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
+        ], $traces[0]['message']->getBody());
+        self::assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
     }
 
     public function testShouldScheduleIntegrationSyncMessageWhenEnabledFieldIsChangedOnUpdate()
@@ -68,15 +71,15 @@ class ChannelTest extends WebTestCase
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 
-        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
         self::assertCount(1, $traces);
         self::assertEquals([
             'integration_id' => $integration->getId(),
             'connector_parameters' => [],
             'connector' => null,
             'transport_batch_size' => 100,
-        ], $traces[0]['message']);
-        self::assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
+        ], $traces[0]['message']->getBody());
+        self::assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
     }
 
     /**

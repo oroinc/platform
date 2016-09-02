@@ -3,9 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 
@@ -14,6 +14,8 @@ use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
  */
 class IntegrationControllerTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     /**
      * @var EntityManager
      */
@@ -21,16 +23,11 @@ class IntegrationControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        parent::setUp();
+
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->entityManager = $this->client->getContainer()->get('doctrine')
             ->getManagerForClass('OroIntegrationBundle:Channel');
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->resetClient();
     }
 
     public function testShouldActivateIntegration()
@@ -109,7 +106,7 @@ class IntegrationControllerTest extends WebTestCase
 
     public function testShouldSendSyncIntegrationMessageOnActivation()
     {
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $channel = $this->createChannel();
         $channel->setEnabled(true);
@@ -124,7 +121,7 @@ class IntegrationControllerTest extends WebTestCase
 
         $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
         
-        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
         
         $this->assertCount(1, $traces);
     }

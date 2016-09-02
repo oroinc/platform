@@ -55,6 +55,23 @@ class MessageCollector implements MessageProducerInterface
     }
 
     /**
+     * @param string $topic
+     *
+     * @return array
+     */
+    public function getTopicSentMessages($topic)
+    {
+        $topicTraces = [];
+        foreach ($this->getSentMessages() as $trace) {
+            if ($topic == $trace['topic']) {
+                $topicTraces[] = $trace;
+            }
+        }
+
+        return $topicTraces;
+    }
+
+    /**
      * Removes all collected messages.
      *
      * $return self
