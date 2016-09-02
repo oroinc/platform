@@ -17,12 +17,12 @@ interface IndexerInterface
     /**
      * Delete one or several entities from search index
      *
-     * @param array $entity
+     * @param object|array $entity
      * @param array $context
      *
      * @return bool
      */
-    public function delete(array $entity, array $context = []);
+    public function delete($entity, array $context = []);
 
     /**
      * Returns classes required to reindex for one or several classes
