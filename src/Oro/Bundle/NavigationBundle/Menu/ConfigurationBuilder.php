@@ -8,6 +8,8 @@ use Knp\Menu\ItemInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
+    const DEFAULT_AREA = 'default';
+
     /**
      * @var array $container
      */
@@ -54,10 +56,29 @@ class ConfigurationBuilder implements BuilderInterface
                         $menu->setExtra('type', $menuTreeElement['type']);
                     }
 
+                    $menu->setExtra('area', $this->getMenuArea($alias, $menuConfig['areas']));
+
                     $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
                 }
             }
         }
+    }
+
+    /**
+     * @param string $alias
+     * @param array $areasConfig
+     * @return string
+     * @throws \Exception
+     */
+    private function getMenuArea($alias, $areasConfig)
+    {
+        foreach ($areasConfig as $area => $menuAliases) {
+            if (in_array($alias, $menuAliases)) {
+                return $area;
+            }
+        }
+
+        return self::DEFAULT_AREA;
     }
 
     /**

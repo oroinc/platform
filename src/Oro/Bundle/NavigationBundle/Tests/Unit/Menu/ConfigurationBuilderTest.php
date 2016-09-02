@@ -59,12 +59,72 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider setAreaToExtraProvider
+     * @param array $options
+     * @param string $expectedArea
+     */
+    public function testSetAreaToExtra($options, $expectedArea)
+    {
+        $this->configurationBuilder->setConfiguration($options);
+
+        $menu = new MenuItem('navbar', $this->factory);
+        $this->configurationBuilder->build($menu, array(), 'navbar');
+
+        $this->assertEquals($expectedArea, $menu->getExtra('area'));
+    }
+
+    public function setAreaToExtraProvider()
+    {
+        $defaultConfig = array(
+            'areas' => array(),
+            'items' => array(
+                'homepage' => array(
+                    'name' => 'Home page 2',
+                    'label' => 'Home page title',
+                    'route' => 'oro_menu_index',
+                    'translateDomain' => 'SomeBundle',
+                    'translateParameters' => array(),
+                    'routeParameters' => array(),
+                    'extras' => array()
+                )
+            ),
+            'tree' => array(
+                'navbar' => array(
+                    'type' => 'navbar',
+                    'children' => array(
+                        'homepage' => array(
+                            'position' => 7,
+                            'children' => array()
+                        )
+                    )
+                )
+            )
+        );
+
+        return array(
+            'with no area specified' => array(
+                'options' => $defaultConfig,
+                'expectedArea' => ConfigurationBuilder::DEFAULT_AREA,
+            ),
+            'with area' => array(
+                'options' => array_merge($defaultConfig, array(
+                    'areas' => array(
+                        'frontend' => ['navbar']
+                    )
+                )),
+                'expectedArea' => 'frontend',
+            )
+        );
+    }
+
+    /**
      * @return array
      */
     public function menuStructureProvider()
     {
         return array(
             'full_menu' => array(array(
+                'areas' => array(),
                 'templates' => array(
                     'navbar' => array(
                         'template' => 'OroNavigationBundle:Menu:navbar.html.twig'
