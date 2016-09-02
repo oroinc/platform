@@ -6,7 +6,7 @@ getters `getSynchronizationSettings()` and `getMappingSettings()` respectively.
 
 _Note: doctrine2 will not update object type fields if values were changed by reference, due to this getters return **clonned** objects_
 
-In order to allow put configuration fields into integration creation form `integration_settings.yml` config file type was added.
+In order to allow put configuration fields into integration creation form `integrations.yml` config file type was added.
 Root node should be `integrations` and form configuration should be placed under `form` node.
 
 **Example**

@@ -15,7 +15,7 @@ Column Manager operates with columns' attributes:
 There's the option that allows to turn off Column Manager over `datagrids.yml` configuration:
 
 ```yaml
-datagrid:
+datagrids:
     my-grid:
         ...
         options:

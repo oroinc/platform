@@ -197,7 +197,7 @@ section `action_configuration` you should define a key that corresponds to opera
 `datagrids.yml`:
 
 ```
-datagrid:
+datagrids:
     your_datagrid_name:
         #... datagrid config sections
         action_configuration:

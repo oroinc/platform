@@ -20,7 +20,7 @@ By default, API for entities is disabled. To turn on API for some entity, you sh
 
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\ProductBundle\Product: ~
 ```
@@ -42,7 +42,7 @@ oro_entity:
 To override these rules in Data API you can use the following `Resources/config/oro/api.yml`:
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
             exclude: false # override exclude rule from entity.yml
@@ -70,7 +70,7 @@ For example, lets's change permissions for `delete` action. You can do at `Resou
 
 
 ```yaml
-oro_api:
+api:
     entities:
         Acme\Bundle\ProductBundle\Product:
             actions:
@@ -93,15 +93,16 @@ As result, the `VIEW` permission will be used instead of `DELETE` permission.
 Disable access checks for action
 --------------------------------
  
-You can disable access checks for some action by setting `null` as a value to `acl_resource` option in `Resources/config/oro/acl.yml`:
+You can disable access checks for some action by setting `null` as a value to `acl_resource` option in `Resources/config/oro/acls.yml`:
 
 ```yaml
-oro_api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            actions:
-                get_list:
-                    acl_resource: ~
+acls:
+    oro_api:
+        entities:
+            Acme\Bundle\ProductBundle\Product:
+                actions:
+                    get_list:
+                        acl_resource: ~
 ```
  
 Disable entity action
@@ -109,25 +110,27 @@ Disable entity action
 
 When you add an entity to the API, all the actions will be available by default.
 
-In case if an action should not be accessible, you can disable it in `Resources/config/oro/acl.yml`:
+In case if an action should not be accessible, you can disable it in `Resources/config/oro/acls.yml`:
 
 ```yaml
-oro_api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            actions:
-                delete:
-                    excluded: true
+acls:
+    oro_api:
+        entities:
+            Acme\Bundle\ProductBundle\Product:
+                actions:
+                    delete:
+                        excluded: true
 ```
 
 Also, you can use short syntax:
 
 ```yaml
-oro_api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            actions:
-                delete: false
+acls:
+    oro_api:
+        entities:
+            Acme\Bundle\ProductBundle\Product:
+                actions:
+                    delete: false
 ```
 
 Change delete handler for entity
@@ -135,13 +138,14 @@ Change delete handler for entity
 
 By default, entity deletion is processed by [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
 
-If your want to use another delete handler, you can set it by the `delete_handler` option in `Resources/config/oro/acl.yml`:
+If your want to use another delete handler, you can set it by the `delete_handler` option in `Resources/config/oro/acls.yml`:
 
 ```yaml
-oro_api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            delete_handler: acme.demo.product_delete_handler
+acls:
+    oro_api:
+        entities:
+            Acme\Bundle\ProductBundle\Product:
+                delete_handler: acme.demo.product_delete_handler
 ```
 
 Please note, that the value of `delete_handler` option is the service id.
@@ -153,24 +157,26 @@ Change the maximum number of entities that can be deleted by one request
 
 By default, the [delete_list](./actions.md#delete_list-action) action can delete not more than 100 entities. This limit is set by the [SetDeleteLimit](../../Processor/DeleteList/SetDeleteLimit.php) processor.
 
-If your want to use another limit, you can set it by the `max_results` option in `Resources/config/oro/acl.yml`:
+If your want to use another limit, you can set it by the `max_results` option in `Resources/config/oro/acls.yml`:
 
 ```yaml
-oro_api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            actions:
-                delete_list:
-                    max_results: 200
+acls:
+    oro_api:
+        entities:
+            Acme\Bundle\ProductBundle\Product:
+                actions:
+                    delete_list:
+                        max_results: 200
 ```
 
 Also you can remove the limit at all. To do this, set `-1` as a value for the `max_results` option:
 
 ```yaml
-oro_api:
-    entities:
-        Acme\Bundle\ProductBundle\Product:
-            actions:
-                delete_list:
-                    max_results: -1
+acls:
+    oro_api:
+        entities:
+            Acme\Bundle\ProductBundle\Product:
+                actions:
+                    delete_list:
+                        max_results: -1
 ```

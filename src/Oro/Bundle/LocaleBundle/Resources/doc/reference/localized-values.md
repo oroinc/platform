@@ -41,7 +41,7 @@ If current localization not detected, will be joined SQL relation to default fal
 
 ```yml
 # .../Resources/config/oro/datagrids.yml
-datagrid:
+datagrids:
     my-localizations-grid:
         source:
             type: orm

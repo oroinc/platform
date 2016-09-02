@@ -58,13 +58,14 @@ public function viewAction()
 ```
 This means that the view action is executable if VIEW premission is granted to MyEntity
 
- - Using acl.yml file from MyBundle/Resource/config/oro/acl.yml:
+ - Using acls.yml file from MyBundle/Resource/config/oro/acls.yml:
 
 ``` yml
-myentity_view:
-    type: entity
-    class: MyBundle:MyEntity
-    permission="VIEW"
+acls:
+    myentity_view:
+        type: entity
+        class: MyBundle:MyEntity
+        permission="VIEW"
 ```
 Than it can be used in @AclAncestor annotation
 ``` php
@@ -105,15 +106,16 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl; #required for Acl annotation
 public function somethingAction()
 ```
 
- - Using acl.yml file from MyBundle/Resource/config/oro/acl.yml:
+ - Using acls.yml file from MyBundle/Resource/config/oro/acls.yml:
 
 ``` yml
-can_do_something:
-    label: Do something
-    type: action
-    group_name: "Some Group"
-    category: "SomeCategory"
-    bindings: ~
+acls:
+    can_do_something:
+        label: Do something
+        type: action
+        group_name: "Some Group"
+        category: "SomeCategory"
+        bindings: ~
 ```
 
 Than it can be used in @AclAncestor annotation
