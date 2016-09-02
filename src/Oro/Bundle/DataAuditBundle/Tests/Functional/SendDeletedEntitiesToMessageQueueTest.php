@@ -59,7 +59,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
         
-        $deletedEntity = $message['entities_deleted'][0];
+        $deletedEntity = $message->getBody()['entities_deleted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $deletedEntity['entity_class']);
         $this->assertEquals($ownerId, $deletedEntity['entity_id']);
@@ -81,7 +81,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $deletedEntity = $message['entities_deleted'][0];
+        $deletedEntity = $message->getBody()['entities_deleted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $deletedEntity['entity_class']);
         $this->assertEquals($ownerId, $deletedEntity['entity_id']);
@@ -99,7 +99,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $child->setOwnerManyToOne($owner);
 
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $this->getEntityManager()->remove($child);
         $this->getEntityManager()->flush();
@@ -110,7 +110,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $deletedEntity = $message['entities_deleted'][0];
+        $deletedEntity = $message->getBody()['entities_deleted'][0];
 
         $this->assertEquals(TestAuditDataChild::class, $deletedEntity['entity_class']);
         $this->assertEquals($childId, $deletedEntity['entity_id']);

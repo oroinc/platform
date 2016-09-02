@@ -5,16 +5,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
 class AuditChangedEntitiesProcessorTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     protected function setUp()
     {
         parent::setUp();
@@ -85,23 +89,31 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_deleted' => [],
             'collections_updated' => [],
         ]);
-        $expectedMessage = json_decode($message->getBody(), true);
+        $expectedBody = json_decode($message->getBody(), true);
 
         /** @var AuditChangedEntitiesProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
 
         $processor->process($message, new NullSession());
         
-        $traces = $this->getMessageProducer()->getTraces();
+        $traces = $this->getMessageProducer()->getSentMessages();
         $this->assertCount(2, $traces);
         
         $this->assertEquals(Topics::ENTITIES_RELATIONS_CHANGED, $traces[0]['topic']);
-        $this->assertEquals($expectedMessage, $traces[0]['message']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
+
+        /** @var Message $message */
+        $message = $traces[0]['message'];
+        self::assertInstanceOf(Message::class, $message);
+        $this->assertEquals($expectedBody, $message->getBody());
+        $this->assertEquals(MessagePriority::VERY_LOW, $message->getPriority());
 
         $this->assertEquals(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $traces[1]['topic']);
-        $this->assertEquals($expectedMessage, $traces[1]['message']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[1]['priority']);
+
+        /** @var Message $message */
+        $message = $traces[1]['message'];
+        self::assertInstanceOf(Message::class, $message);
+        $this->assertEquals($expectedBody, $message->getBody());
+        $this->assertEquals(MessagePriority::VERY_LOW, $message->getPriority());
     }
 
     public function testShouldCreateAuditForInsertedEntity()
@@ -348,7 +360,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
     }
 
     /**
-     * @return TraceableMessageProducer
+     * @return MessageCollector
      */
     private function getMessageProducer()
     {

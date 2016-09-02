@@ -5,7 +5,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
+class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 {
     use SendChangedEntitiesToMessageQueueExtensionTrait;
     
@@ -45,7 +45,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(2, $message);
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
 
-        $updateCollection = $message['collections_updated'][0];
+        $updateCollection = $message->getBody()['collections_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
@@ -78,7 +78,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(1, $message);
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
 
-        $updateCollection = $message['collections_updated'][0];
+        $updateCollection = $message->getBody()['collections_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
@@ -110,7 +110,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updateCollection = $message['collections_updated'][0];
+        $updateCollection = $message->getBody()['collections_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
@@ -142,7 +142,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updateCollection = $message['collections_updated'][0];
+        $updateCollection = $message->getBody()['collections_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
@@ -167,7 +167,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $owner->getChildrenManyToMany()->add($child);
 
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $owner->getChildrenManyToMany()->removeElement($child);
         $this->getEntityManager()->flush();
@@ -178,7 +178,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updateCollection = $message['collections_updated'][0];
+        $updateCollection = $message->getBody()['collections_updated'][0];
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
         $this->assertEquals(['childrenManyToMany' => [null, [
@@ -191,7 +191,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
             ],
             'inserted' => [],
             'changed' => [],
-        ]],], $updateCollection['change_set']);
+        ]], ], $updateCollection['change_set']);
     }
 
     public function testShouldSendCollectionWhenOneChildRemovedFromCollectionAndRemovedItself()
@@ -203,7 +203,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $owner->getChildrenManyToMany()->add($child);
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $owner->getChildrenManyToMany()->removeElement($child);
         $this->getEntityManager()->remove($child);
@@ -215,7 +215,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updateCollection = $message['collections_updated'][0];
+        $updateCollection = $message->getBody()['collections_updated'][0];
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
         $this->assertEquals(['childrenManyToMany' => [null, [
@@ -251,7 +251,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updateCollection = $message['collections_updated'][0];
+        $updateCollection = $message->getBody()['collections_updated'][0];
         $this->assertEquals(TestAuditDataOwner::class, $updateCollection['entity_class']);
         $this->assertEquals($owner->getId(), $updateCollection['entity_id']);
         $this->assertEquals(['childrenManyToMany' => [null, [
@@ -264,7 +264,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
             ],
             'deleted' => [],
             'changed' => [],
-        ]],], $updateCollection['change_set']);
+        ]], ], $updateCollection['change_set']);
     }
 
     public function testShouldSendEntityInsertedWhenNewChildAddedToNewOwner()
@@ -285,9 +285,9 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
 
         // guard
-        $this->assertEquals(TestAuditDataOwner::class, $message['entities_inserted'][0]['entity_class']);
+        $this->assertEquals(TestAuditDataOwner::class, $message->getBody()['entities_inserted'][0]['entity_class']);
 
-        $insertedEntity = $message['entities_inserted'][1];
+        $insertedEntity = $message->getBody()['entities_inserted'][1];
         $this->assertEquals(TestAuditDataChild::class, $insertedEntity['entity_class']);
         $this->assertEquals($child->getId(), $insertedEntity['entity_id']);
         $this->assertEquals([
@@ -319,9 +319,9 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
         // guard
-        $this->assertEquals(TestAuditDataOwner::class, $message['entities_inserted'][0]['entity_class']);
+        $this->assertEquals(TestAuditDataOwner::class, $message->getBody()['entities_inserted'][0]['entity_class']);
 
-        $updatedEntity = $message['entities_updated'][0];
+        $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
         $this->assertEquals([
@@ -351,7 +351,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updatedEntity = $message['entities_updated'][0];
+        $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
         $this->assertEquals([
@@ -381,7 +381,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updatedEntity = $message['entities_updated'][0];
+        $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
         $this->assertEquals([
@@ -404,7 +404,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $owner->addChildrenOneToMany($child);
 
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $owner->removeChildrenOneToMany($child);
         $this->getEntityManager()->flush();
@@ -415,7 +415,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $updatedEntity = $message['entities_updated'][0];
+        $updatedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $updatedEntity['entity_class']);
         $this->assertEquals($child->getId(), $updatedEntity['entity_id']);
         $this->assertEquals([
@@ -439,7 +439,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $owner->addChildrenOneToMany($child);
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $owner->removeChildrenOneToMany($child);
         $this->getEntityManager()->remove($child);
@@ -451,7 +451,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(0, $message);
 
-        $deletedEntity = $message['entities_deleted'][0];
+        $deletedEntity = $message->getBody()['entities_deleted'][0];
         $this->assertEquals(TestAuditDataChild::class, $deletedEntity['entity_class']);
         $this->assertEquals($childId, $deletedEntity['entity_id']);
         $this->assertEquals([], $deletedEntity['change_set']);
@@ -466,7 +466,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $owner->addChildrenOneToMany($this->createChild());
         $owner->addChildrenOneToMany($this->createChild());
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $owner->getChildrenOneToMany()->clear();
         $owner->addChildrenOneToMany($child);
@@ -478,7 +478,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesInsertedInMessageCount(0, $message);
         $this->assertEntitiesUpdatedInMessageCount(1, $message);
 
-        $insertedEntity = $message['entities_updated'][0];
+        $insertedEntity = $message->getBody()['entities_updated'][0];
         $this->assertEquals(TestAuditDataChild::class, $insertedEntity['entity_class']);
         $this->assertEquals($child->getId(), $insertedEntity['entity_id']);
         $this->assertEquals([

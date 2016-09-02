@@ -39,7 +39,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
@@ -83,7 +83,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
@@ -107,7 +107,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
@@ -131,7 +131,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
@@ -155,7 +155,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
@@ -179,7 +179,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
@@ -196,7 +196,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $owner = new TestAuditDataOwner();
         $owner->setChild($child);
@@ -209,7 +209,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
         $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
@@ -235,7 +235,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         //guard
         $this->assertInstanceOf(Proxy::class, $childProxy);
 
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->clear();
 
         $owner = new TestAuditDataOwner();
         $owner->setChild($childProxy);
@@ -248,7 +248,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEntitiesDeletedInMessageCount(0, $message);
         $this->assertCollectionsUpdatedInMessageCount(0, $message);
 
-        $insertedEntity = $message['entities_inserted'][0];
+        $insertedEntity = $message->getBody()['entities_inserted'][0];
 
         $this->assertEquals([
             'child' => [null, [

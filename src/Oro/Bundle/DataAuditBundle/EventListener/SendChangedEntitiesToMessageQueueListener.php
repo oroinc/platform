@@ -15,6 +15,7 @@ use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -155,7 +156,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
         
         $em = $eventArgs->getEntityManager();
         try {
-            $message = [
+            $body = [
                 'timestamp' => time(),
                 'transaction_id' => uniqid().'-'.uniqid().'-'.uniqid(),
                 'entities_updated' => [],
@@ -169,14 +170,14 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
                 /** @var AbstractUser $user */
                 $user = $token->getUser();
 
-                $message['user_id'] = $user->getId();
-                $message['user_class'] = ClassUtils::getClass($user);
+                $body['user_id'] = $user->getId();
+                $body['user_class'] = ClassUtils::getClass($user);
             }
 
             if ($token instanceof OrganizationContextTokenInterface) {
                 $organization = $token->getOrganizationContext();
 
-                $message['organization_id'] = $organization->getId();
+                $body['organization_id'] = $organization->getId();
             }
 
             $toBeSend = false;
@@ -189,7 +190,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
                 $toBeSend = true;
 
                 $changeSet = $this->allInsertions[$em][$entity];
-                $message['entities_inserted'][] = $this->convertEntityToArray($em, $entity, $changeSet);
+                $body['entities_inserted'][] = $this->convertEntityToArray($em, $entity, $changeSet);
             }
 
             foreach ($this->allUpdates[$em] as $entity) {
@@ -200,7 +201,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
                 $toBeSend = true;
 
                 $changeSet = $this->allUpdates[$em][$entity];
-                $message['entities_updated'][] = $this->convertEntityToArray($em, $entity, $changeSet);
+                $body['entities_updated'][] = $this->convertEntityToArray($em, $entity, $changeSet);
             }
 
             foreach ($this->allDeletions[$em] as $entity) {
@@ -210,7 +211,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
 
                 $toBeSend = true;
 
-                $message['entities_deleted'][] = $this->allDeletions[$em][$entity];
+                $body['entities_deleted'][] = $this->allDeletions[$em][$entity];
             }
 
             foreach ($this->allCollectionUpdates[$em] as $collection) {
@@ -237,12 +238,16 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
                 if ($new['inserted'] || $new['deleted']) {
                     $toBeSend = true;
 
-                    $message['collections_updated'][] = $entityData;
+                    $body['collections_updated'][] = $entityData;
                 }
             }
 
             if ($toBeSend) {
-                $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message, MessagePriority::VERY_LOW);
+                $message = new Message();
+                $message->setPriority(MessagePriority::VERY_LOW);
+                $message->setBody($body);
+
+                $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message);
             }
         } finally {
             $this->allInsertions->detach($em);

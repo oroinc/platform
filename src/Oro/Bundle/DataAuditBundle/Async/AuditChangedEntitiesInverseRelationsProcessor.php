@@ -2,7 +2,6 @@
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -69,6 +68,24 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $body['collections_updated']
         );
 
+        $this->processManyToOneAndManyToManyAndOneToOneRelations($sourceEntitiesData, $map);
+        $this->processEntityFromCollectionUpdated($body['entities_updated'], $map);
+
+
+        $this->convertEntityChangesToAuditService->convert(
+            $map,
+            $transactionId,
+            $loggedAt,
+            null,
+            $user,
+            $organization
+        );
+
+        return self::ACK;
+    }
+
+    private function processManyToOneAndManyToManyAndOneToOneRelations(array $sourceEntitiesData, array &$map)
+    {
         foreach ($sourceEntitiesData as $sourceEntityData) {
             $sourceEntityClass = $sourceEntityData['entity_class'];
             $sourceEntityId = $sourceEntityData['entity_id'];
@@ -181,9 +198,12 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                 }
             }
         }
+    }
 
+    private function processEntityFromCollectionUpdated(array $sourceEntitiesData, array &$map)
+    {
         // many to one. updated entity is part of a collection on inversed side of relation.
-        foreach ($body['entities_updated'] as $sourceEntityData) {
+        foreach ($sourceEntitiesData as $sourceEntityData) {
             $sourceEntityClass = $sourceEntityData['entity_class'];
             $sourceEntityId = $sourceEntityData['entity_id'];
             /** @var EntityManagerInterface $sourceEntityManager */
@@ -229,17 +249,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                 }
             }
         }
-
-        $this->convertEntityChangesToAuditService->convert(
-            $map,
-            $transactionId,
-            $loggedAt,
-            null,
-            $user,
-            $organization
-        );
-
-        return self::ACK;
     }
 
     /**
