@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -176,11 +177,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origins.
      *
      * @param int[] $originIds
-     * @param bool $force
+     * @param SynchronizationProcessorSettings $settings
      *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds, $force = false)
+    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings)
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -195,7 +196,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
-                    $this->doSyncOrigin($origin, $force);
+                    $this->doSyncOrigin($origin, $settings);
                 } catch (SyncFolderTimeoutException $ex) {
                     break;
                 } catch (\Exception $ex) {
@@ -261,11 +262,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
-     * @param bool $force
+     * @param SynchronizationProcessorSettings $settings
      *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin, $force = false)
+    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -282,7 +283,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
-                $processor->setForceMode($force);
+                $processor->setSettings($settings);
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
