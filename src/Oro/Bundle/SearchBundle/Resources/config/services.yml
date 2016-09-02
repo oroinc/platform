@@ -189,14 +189,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
-    oro_search.event_listener.orm.website_fulltext_index_listener:
-        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
-        arguments:
-            - %database_driver%
-            - 'oro_website_search_text'
-        tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
-
     oro_search.provider.search_mapping:
         class: %oro_search.provider.search_mapping.class%
         arguments:
