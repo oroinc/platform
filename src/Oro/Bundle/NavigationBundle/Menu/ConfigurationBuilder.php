@@ -89,6 +89,13 @@ class ConfigurationBuilder implements BuilderInterface
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
 
                 if (!empty($itemData['children'])) {
+                    if ($this->issetMenuItem($itemCode, $itemData['children'])) {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Item key "%s" duplicated in tree menu "%s".',
+                            $itemCode,
+                            $menu->getName()
+                        ));
+                    }
                     $this->createFromArray($newMenuItem, $itemData['children'], $itemList, $options);
                 }
 
@@ -110,5 +117,26 @@ class ConfigurationBuilder implements BuilderInterface
             $menuItem['extras'][$optionName] = $menuItem[$optionName];
             unset($menuItem[$optionName]);
         }
+    }
+
+    /**
+     * @param $itemCode
+     * @param array $menu
+     * @return bool
+     */
+    private function issetMenuItem($itemCode, array $menu)
+    {
+        foreach ($menu as $key => $value) {
+
+            if ($key === $itemCode) {
+                return true;
+            }
+            if (is_array($value) && !empty($value['children'])) {
+                if ($this->issetMenuItem($itemCode, $value['children'])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
