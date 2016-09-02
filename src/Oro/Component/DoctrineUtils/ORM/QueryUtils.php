@@ -438,7 +438,7 @@ class QueryUtils
     public static function getDqlAliases($dql)
     {
         $matches = [];
-        preg_match_all('/(FROM|JOIN)\s+\S+\s(AS\s+)?+(\S+)/i', $dql, $matches);
+        preg_match_all('/(FROM|JOIN)\s+\S+\s+(AS\s+)?(\S+)/i', $dql, $matches);
 
         return $matches[3];
     }
