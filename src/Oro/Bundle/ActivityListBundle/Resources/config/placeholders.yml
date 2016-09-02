@@ -1,0 +1,20 @@
+placeholders:
+    view_content_data_activities:
+        items:
+            view_oro_activity_list: ~
+    update_content_data_activities:
+        items:
+            update_oro_activity_list: ~
+    segment_criteria_list:
+        items:
+            activity_condition: ~
+
+items:
+    view_oro_activity_list:
+        applicable: "@oro_activity_list.placeholder.filter->isApplicable($entity$, Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE)"
+        template: OroActivityListBundle:ActivityList:activities.html.twig
+    update_oro_activity_list:
+        applicable: "@oro_activity_list.placeholder.filter->isApplicable($entity$, Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE)"
+        template: OroActivityListBundle:ActivityList:activities.html.twig
+    activity_condition:
+        action: OroActivityListBundle:Segment:activityCondition

@@ -1,0 +1,27 @@
+oro_system_configuration:
+    groups:
+        google_imap_settings:
+            title: oro.imap.system_configuration.groups.google_imap_settings.title
+
+    fields:
+        oro_imap.enable_google_imap:
+            data_type: boolean
+            type: oro_config_google_imap_sync_checkbox
+            options:
+                label: oro.imap.system_configuration.fields.enable_google_imap.label
+                tooltip: oro.imap.system_configuration.fields.enable_google_imap.tooltip
+                required: false
+                resettable: false
+            priority: 10
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    integrations:
+                        children:
+                            google_settings:
+                                children:
+                                    google_imap_settings:
+                                        children:
+                                            - oro_imap.enable_google_imap

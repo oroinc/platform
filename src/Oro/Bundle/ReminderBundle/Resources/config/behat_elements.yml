@@ -1,0 +1,2 @@
+ReminderCollection:
+  class: Oro\Bundle\ReminderBundle\Tests\Behat\Element\ReminderCollection

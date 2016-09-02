@@ -1,0 +1,30 @@
+placeholders:
+    user_menu:
+        items:
+            menu_user:
+                order: 100
+
+items:
+    menu_user:
+        template: OroUserBundle:Menu:menuProfile.html.twig
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+
+    oro_user_password_change_button:
+        template: OroUserBundle:User:passwordChangeButton.html.twig
+        applicable: "@oro_user.placeholder.filter->isPasswordManageEnabled($entity$)"
+        acl: [password_management]
+
+    oro_user_password_change_link:
+        template: OroUserBundle:User:passwordChangeLink.html.twig
+        applicable: "@oro_user.placeholder.filter->isPasswordManageEnabled($entity$)"
+        acl: [password_management]
+
+    oro_user_password_reset_button:
+        template: OroUserBundle:User:passwordResetButton.html.twig
+        applicable: "@oro_user.placeholder.filter->isPasswordManageEnabled($entity$)"
+        acl: [password_management]
+
+    oro_user_password_reset_link:
+        template: OroUserBundle:User:passwordResetLink.html.twig
+        applicable: "@oro_user.placeholder.filter->isPasswordManageEnabled($entity$)"
+        acl: [password_management]

@@ -1,0 +1,21 @@
+oro_datagrid_gridview_view:
+    type: entity
+    class: OroDataGridBundle:GridView
+    permission: VIEW
+    group_name: ""
+
+oro_datagrid_gridview_publish:
+    label: oro.grid.action.gridview_create_public.label
+    description: oro.grid.action.gridview_create_public.description
+    type: action
+    group_name: ""
+    bindings: ~
+    category: "application"
+
+oro_datagrid_gridview_update_public:
+    label: oro.grid.action.gridview_edit_public.label
+    description: oro.grid.action.gridview_edit_public.description
+    type: action
+    group_name: ""
+    bindings: ~
+    category: "application"

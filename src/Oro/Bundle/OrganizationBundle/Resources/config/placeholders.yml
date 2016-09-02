@@ -1,0 +1,8 @@
+placeholders:
+    additional_owner_info:
+        items:
+            view_entity_owner_info: ~
+
+items:
+    view_entity_owner_info:
+        template: OroOrganizationBundle::viewOwnerInfo.html.twig

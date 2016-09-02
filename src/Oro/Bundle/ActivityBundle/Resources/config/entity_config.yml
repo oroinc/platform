@@ -1,0 +1,84 @@
+oro_entity_config:
+    activity:
+        entity:
+            items:
+                # the list of activities that can be assigned to the entity
+                activities: # array of class names
+                    options:
+                        require_schema_update: true
+                        priority:           250
+                    form:
+                        type:               oro_activity_multiple_association_choice
+                        options:
+                            block:          associations
+                            required:       false
+                            label:          oro.activity.activities
+                            association_class: activity
+                            tooltip:        oro.activity.entity_config.activity.entity.items.activities.tooltip
+
+                # target entity classes whose activities will be shown in current entity
+                # if entity one has relation with entity two and for both enabled activity
+                # we can configure entity one using this option for show activities from related entity two
+                inheritance_targets: # array of strings
+                    options: []
+
+                # this attribute can be used to prohibit changing activity state (no matter whether
+                # it is enabled or not) for the entity
+                # if TRUE than no one activity state can be changed
+                # also it can be an array with the list of class names of activities which state cannot be changed
+                immutable: # boolean or array
+                    options:
+                        auditable:          false
+
+                # the route name for the controller that can be used to render the list of this type of activities
+                # this controller must have $entityClass and $entityId parameters are used to pass the target entity
+                # this attribute must be defined for each activity entity (an entity included in 'activity' group,
+                # see 'grouping' scope)
+                route: # string
+                    options:
+                        auditable:          false
+
+                # the ACL ancestor that is used to check whether this type of activity is available
+                # in the current security context
+                acl: # string
+                    options:
+                        auditable:          false
+
+                # this attribute can be used to change the order of this type of activity on UI
+                priority: # integer
+                    options:
+                        auditable:          false
+
+                # the widget name of the activity action that is used for render a button
+                # this widget should be defined in placeholders.yml
+                # this attribute can be defined for activity entity
+                # please note that an activity should provide both action_link_widget and action_link_widget,
+                # because actions can be rendered as a button as a dropdown menu
+                action_button_widget: # string
+                    options:
+                        auditable:          false
+
+                # this attribute can be used to change page,
+                # which will display "activity list" and activity buttons.
+                # Possible values in \Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope
+                # Can be used as bitmask
+                show_on_page: # string
+                    options:
+                        default_value:      '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
+
+                # the widget name of the activity action that is used for render a link in dropdown menu
+                # this widget should be defined in placeholders.yml
+                # this attribute can be defined for activity entity
+                # please note that an activity should provide both action_link_widget and action_link_widget,
+                # because actions can be rendered as a button as a dropdown menu
+                action_link_widget: # string
+                    options:
+                        auditable:          false
+
+    grid:
+        entity:
+            items:
+                # grid name that used for rendering entity context
+                context: # string
+                    options:
+                        auditable:          false
