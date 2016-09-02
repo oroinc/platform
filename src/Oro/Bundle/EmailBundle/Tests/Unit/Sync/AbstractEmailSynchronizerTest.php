@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
 
@@ -152,7 +153,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo($now)
             );
 
-        $sync->callDoSyncOrigin($origin);
+        $sync->callDoSyncOrigin($origin, new SynchronizationProcessorSettings());
     }
 
     public function testDoSyncOriginForInProcessItem()
@@ -190,7 +191,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $processor->expects($this->never())
             ->method('process');
 
-        $sync->callDoSyncOrigin($origin);
+        $sync->callDoSyncOrigin($origin, new SynchronizationProcessorSettings());
     }
 
     /**
@@ -238,7 +239,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('changeOriginSyncState')
             ->with($this->identicalTo($origin), AbstractEmailSynchronizer::SYNC_CODE_FAILURE);
 
-        $sync->callDoSyncOrigin($origin);
+        $sync->callDoSyncOrigin($origin, new SynchronizationProcessorSettings());
     }
 
     /**
@@ -287,7 +288,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($origin), AbstractEmailSynchronizer::SYNC_CODE_FAILURE)
             ->will($this->throwException(new \Exception()));
 
-        $sync->callDoSyncOrigin($origin);
+        $sync->callDoSyncOrigin($origin,  new SynchronizationProcessorSettings());
     }
 
     /**

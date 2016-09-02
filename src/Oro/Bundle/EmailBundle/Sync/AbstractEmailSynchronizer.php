@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -18,6 +17,7 @@ use Psr\Log\NullLogger;
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 
@@ -155,7 +155,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
             $processedOrigins[$origin->getId()] = true;
             try {
-                $this->doSyncOrigin($origin);
+                $this->doSyncOrigin($origin, new SynchronizationProcessorSettings());
             } catch (SyncFolderTimeoutException $ex) {
                 break;
             } catch (\Exception $ex) {
