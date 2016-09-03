@@ -186,13 +186,19 @@ services:
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
+    oro_search.cache.mapping_configuration:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_search_mapping_configuration' ] ]
+
     oro_search.provider.search_mapping:
-        class: %oro_search.provider.search_mapping.class%
+        class: '%oro_search.provider.search_mapping.class%'
         arguments:
             - '@event_dispatcher'
-            - '@doctrine.orm.default_metadata_cache'
+            - '@oro_search.cache.mapping_configuration'
         calls:
-            - [setMappingConfig, [%oro_search.entities_config%]]
+            - [setMappingConfig, ['%oro_search.entities_config%']]
 
     oro_search.cache.doctrine_metadata:
         parent: oro.cache.abstract
@@ -214,6 +220,7 @@ services:
             - '@oro_search.provider.search_mapping'
         tags:
             - { name: kernel.cache_warmer }
+            - { name: kernel.cache_clearer }
 
     oro_search.resolver.entity_title.title_fields:
         public: false
