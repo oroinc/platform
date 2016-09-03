@@ -13,6 +13,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 
 class OrmDatasourceExtension extends AbstractExtension
 {
+    /** @deprecated since 1.10. Use config->getName() instead */
     const NAME_PATH = '[name]';
 
     /**
@@ -47,7 +48,7 @@ class OrmDatasourceExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $gridName = $config->offsetGetByPath(self::NAME_PATH);
+        $gridName = $config->getName();
         $parametersKey = md5(json_encode($this->parameters->all()));
 
         if (!empty($this->appliedFor[$gridName . $parametersKey])) {

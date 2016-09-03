@@ -64,10 +64,24 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     public function getName()
     {
         if (!isset($this[self::NAME_KEY])) {
-            throw new \LogicException("Trying to get name of unnamed object");
+            throw new \LogicException('Trying to get name of unnamed object');
         }
 
         return $this[self::NAME_KEY];
+    }
+
+    /**
+     * Set Object name
+     *
+     * $param string $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this[self::NAME_KEY] = $name;
+
+        return $this;
     }
 
     /**

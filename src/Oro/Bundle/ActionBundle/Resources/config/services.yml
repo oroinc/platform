@@ -148,7 +148,6 @@ services:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.extension.action.configure-actions.before, method: onConfigureActions }
-        lazy: true
 
     oro_action.datagrid.extension.delete_mass_action:
         class: Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension
