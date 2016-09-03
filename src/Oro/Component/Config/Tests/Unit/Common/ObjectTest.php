@@ -354,4 +354,58 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @param string $path
+     *
+     * @dataProvider getOffsetSetByPathWithDefaultValueDataProvider
+     */
+    public function testOffsetSetByPath($path)
+    {
+        $object = $this->getConfigObject();
+        $value = 'test';
+        $this->assertEquals($value, $object->offsetSetByPath($path, $value)->offsetGetByPath($path));
+    }
+
+    public function getOffsetSetByPathWithDefaultValueDataProvider()
+    {
+        return [
+            [
+                'path' => '[true]',
+            ],
+            [
+                'path' => '[false]',
+            ],
+            [
+                'path' => '[null]',
+            ],
+            [
+                'path' => '[unknown]',
+            ],
+            [
+                'path' => 'true',
+            ],
+            [
+                'path' => 'false',
+            ],
+            [
+                'path' => 'null',
+            ],
+            [
+                'path' => 'unknown',
+            ],
+            [
+                'path' => '[array][false]',
+            ],
+            [
+                'path' => '[array][true]',
+            ],
+            [
+                'path' => '[array][null]',
+            ],
+            [
+                'path' => '[array][unknown]',
+            ],
+        ];
+    }
 }
