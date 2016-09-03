@@ -59,7 +59,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      * throws exception if current object is unnamed
      *
      * @return string
-     * @throws LogicException
+     * @throws \LogicException
      */
     public function getName()
     {
@@ -147,11 +147,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
             return $default;
         }
 
-        if ($default === null && $value !== null) {
-            return $value;
-        }
-
-        return $value ? : $default;
+        return null !== $value ? $value : $default;
     }
 
     /**
