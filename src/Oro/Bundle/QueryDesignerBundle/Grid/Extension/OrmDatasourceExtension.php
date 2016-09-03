@@ -37,7 +37,8 @@ class OrmDatasourceExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->getDatasourceType() == OrmDatasource::TYPE
+        return
+            $config->getDatasourceType() === OrmDatasource::TYPE
             && $config->offsetGetByPath('[source][query_config][filters]');
     }
 
