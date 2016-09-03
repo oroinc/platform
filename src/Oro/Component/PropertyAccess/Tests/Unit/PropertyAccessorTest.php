@@ -89,7 +89,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      */
     public function testGetValueThrowsExceptionForInvalidPropertyPathType()
     {
@@ -196,7 +196,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      */
     public function testSetValueThrowsExceptionForInvalidPropertyPathType()
     {
@@ -327,7 +327,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      */
     public function testRemoveThrowsExceptionForInvalidPropertyPathType()
     {
