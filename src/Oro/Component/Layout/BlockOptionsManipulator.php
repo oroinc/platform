@@ -15,9 +15,6 @@ class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /** @var PropertyPath[] */
-    private $cache = [];
-
     public function __construct()
     {
         $this->propertyAccessor = new PropertyAccessor();
@@ -118,14 +115,7 @@ class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
      */
     protected function getPropertyPath($optionName)
     {
-        if (isset($this->cache[$optionName])) {
-            $propertyPath = $this->cache[$optionName];
-        } else {
-            $propertyPath             = new PropertyPath($optionName);
-            $this->cache[$optionName] = $propertyPath;
-        }
-
-        return $propertyPath;
+        return new PropertyPath($optionName);
     }
 
     /**
