@@ -395,18 +395,24 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $msg = 'Skip "%s" (UID: %d) email, because it is already synchronised.';
             $skipSync = true;
 
-            if ($this->getSettings()->isForceMode() && $this->getSettings()->needShowMessage()) {
-                $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+            if ($this->getSettings()->isForceMode()) {
+                $msg = null;
+                if ($this->getSettings()->needShowMessage()) {
+                    $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+                }
+
                 $skipSync = false;
             }
 
-            $this->logger->info(
-                sprintf(
-                    $msg,
-                    $email->getSubject(),
-                    $email->getId()->getUid()
-                )
-            );
+            if ($msg) {
+                $this->logger->info(
+                    sprintf(
+                        $msg,
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+            }
         }
 
         return $skipSync;
