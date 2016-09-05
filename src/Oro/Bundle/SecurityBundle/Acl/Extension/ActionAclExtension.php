@@ -33,7 +33,7 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevelNames($object)
+    public function getAccessLevelNames($object, $permissionName = null)
     {
         return array(
             AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
@@ -149,7 +149,7 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
         return array('EXECUTE');
     }

@@ -21,28 +21,30 @@ class FilterType extends AbstractType
             ->add('criterion', 'text', array('required' => true));
 
         $factory = $builder->getFormFactory();
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($factory) {
-                $form = $event->getForm();
+        if ($options['column_choice_type']) {
+            $builder->addEventListener(
+                FormEvents::PRE_SET_DATA,
+                function (FormEvent $event) use ($factory) {
+                    $form = $event->getForm();
 
-                $form->add(
-                    $factory->createNamed(
-                        'columnName',
-                        $form->getConfig()->getOption('column_choice_type'),
-                        null,
-                        array(
-                            'required'           => true,
-                            'entity'             => $form->getConfig()->getOption('entity'),
-                            'skip_load_entities' => true,
-                            'skip_load_data'     => true,
-                            'with_relations'     => true,
-                            'auto_initialize'    => false
+                    $form->add(
+                        $factory->createNamed(
+                            'columnName',
+                            $form->getConfig()->getOption('column_choice_type'),
+                            null,
+                            [
+                                'required'           => true,
+                                'entity'             => $form->getConfig()->getOption('entity'),
+                                'skip_load_entities' => true,
+                                'skip_load_data'     => true,
+                                'with_relations'     => true,
+                                'auto_initialize'    => false
+                            ]
                         )
-                    )
-                );
-            }
-        );
+                    );
+                }
+            );
+        }
     }
 
     /**
@@ -64,6 +66,14 @@ class FilterType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

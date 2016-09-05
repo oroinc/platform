@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -11,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +41,11 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $dispatcher;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
+     */
+    protected $securityFacade;
+
     protected function setUp()
     {
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
@@ -59,8 +66,134 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->extension = new DynamicFieldsExtension($this->configManager, $this->fieldTypeHelper, $this->dispatcher);
+        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+
+        $this->extension = new DynamicFieldsExtension(
+            $this->configManager,
+            $this->fieldTypeHelper,
+            $this->dispatcher,
+            $this->securityFacade
+        );
+    }
+
+    /**
+     * @param array $fields
+     * @param array $configValues
+     * @param array $expected
+     * @param array $nonAccessibleFields
+     *
+     * @dataProvider fieldsDataProviderWithNonAccessibleFields
+     */
+    public function testGetFieldsWithNonAccessibleFields(
+        array $fields,
+        array $configValues,
+        array $expected,
+        array $nonAccessibleFields
+    ) {
+        $entity = new \StdClass();
+        foreach ($fields as $field) {
+            /** @var ConfigInterface $field */
+            $fieldId = $field->getId();
+            /** @var FieldConfigId $fieldId */
+            $fieldName = $fieldId->getFieldName();
+            $entity->{$fieldName} = $fieldName;
+        }
+
+        $this->configProvider
+            ->expects($this->once())
+            ->method('filter')
+            ->will($this->returnValue($fields));
+
+        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+
+        $this->configProvider
+            ->expects($this->any())
+            ->method('getConfigById')
+            ->will($this->returnValue($config));
+
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->willReturnCallback(
+                function ($argument, FieldVote $field) use ($nonAccessibleFields) {
+                    return !in_array($field->getField(), $nonAccessibleFields);
+                }
+            );
+
+        foreach ($configValues as $key => $configValue) {
+            $config
+                ->expects($this->at(($key)))
+                ->method('get')
+                ->will(
+                    $this->returnCallback(
+                        function ($value, $strict, $default) use ($configValue) {
+                            if (!is_null($configValue)) {
+                                return $configValue;
+                            }
+
+                            return $default;
+                        }
+                    )
+                );
+        }
+
+        $rows = $this->extension->getFields($entity);
+
+        $this->assertEquals(json_encode($expected), json_encode($rows));
+    }
+
+    /**
+     * @return array
+     */
+    public function fieldsDataProviderWithNonAccessibleFields()
+    {
+        return [
+            'one field' => [
+                [$this->getFieldMock('field', 'type1')],
+                [],
+                [],
+                ['field']
+            ],
+            'two fields without sorting' => [
+                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
+                [],
+                [
+                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
+                ],
+                ['field1']
+            ],
+            'two sorted fields' => [
+                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
+                ['type1', 'field1', 10],
+                [
+                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
+                ],
+                ['field2']
+            ],
+            'full' => [
+                [
+                    $this->getFieldMock('field1', 'type1'),
+                    $this->getFieldMock('field2', 'type2'),
+                    $this->getFieldMock('field3', 'type3'),
+                    $this->getFieldMock('field4', 'type4'),
+                    $this->getFieldMock('field5', 'type5'),
+                ],
+                [
+                    'type1', 'field1', -10, 'type2', 'field2', -5,
+                    'type3', 'field3', null
+                ],
+                [
+                    'field3' => ['type' => 'type3', 'label' => 'field3', 'value' => 'field3'],
+                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
+                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
+                ],
+                ['field5', 'field4']
+            ]
+        ];
     }
 
     /**
@@ -92,6 +225,10 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getConfigById')
             ->will($this->returnValue($config));
+
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
 
         foreach ($configValues as $key => $configValue) {
             $config
@@ -228,6 +365,10 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipFieldIfNotVisible()
     {
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
+        
         $this->dispatcher->expects($this->any())
             ->method('dispatch')
             ->willReturnCallback(function ($eventName, $event) {

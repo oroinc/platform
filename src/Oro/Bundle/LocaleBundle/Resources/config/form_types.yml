@@ -116,3 +116,13 @@ services:
             - '@oro_locale.provider.localization_choices'
         tags:
             - { name: form.type, alias: oro_formatting_select }
+
+    oro_locale.form.type.localization_selection:
+        class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType'
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_locale.settings'
+            - '@oro_locale.manager.localization'
+            - '@oro_locale.provider.localization_choices'
+        tags:
+            - { name: form.type, alias: oro_locale_localization_selection }

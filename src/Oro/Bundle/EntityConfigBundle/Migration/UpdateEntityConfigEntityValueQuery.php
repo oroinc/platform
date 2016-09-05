@@ -73,6 +73,17 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
     public function execute(LoggerInterface $logger)
     {
         // update field itself
+        $this->updateEntityConfigIndexValue($logger);
+
+        // update entity config cached data
+        $this->updateEntityConfig($logger);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    protected function updateEntityConfigIndexValue(LoggerInterface $logger)
+    {
         $sql =
             "UPDATE oro_entity_config_index_value
             SET value = ?
@@ -88,8 +99,13 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $this->logQuery($logger, $sql, $parameters);
 
         $logger->debug($sql);
+    }
 
-        // update entity config cached data
+    /**
+     * @param LoggerInterface $logger
+     */
+    protected function updateEntityConfig(LoggerInterface $logger)
+    {
         $sql = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';
         $parameters = [$this->entityName];
         $data = $this->connection->fetchColumn($sql, $parameters);

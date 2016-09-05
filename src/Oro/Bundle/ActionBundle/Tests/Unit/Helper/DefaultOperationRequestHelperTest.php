@@ -109,4 +109,57 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @param Request $masterRequest
+     * @param string|null $executionRoute
+     * @param bool $expected
+     *
+     * @dataProvider isExecutionRouteRequestProvider
+     */
+    public function isExecutionRouteRequest(Request $masterRequest = null, $executionRoute = null, $expected = null)
+    {
+        $this->requestStack->expects($this->once())
+            ->method('getMasterRequest')
+            ->willReturn($masterRequest);
+
+        $this->applicationsHelper->expects($executionRoute ? $this->once() : $this->never())
+            ->method('getExecutionRoute')
+            ->willReturn($executionRoute);
+
+        $this->assertEquals($expected, $this->helper->isExecutionRouteRequest());
+    }
+
+    /**
+     * @return array
+     */
+    public function isExecutionRouteRequestProvider()
+    {
+        return [
+            'empty master request' => [
+                'masterRequest' => null,
+                'executionRoute' => null,
+                'expected' => false,
+            ],
+            'empty route name' => [
+                'masterRequest' => new Request(),
+                'executionRoute' => 'execution_route',
+                'expected' => false,
+            ],
+            'execution route name' => [
+                'masterRequest' => new Request([
+                    '_route' => 'execution_route',
+                ]),
+                'executionRoute' => 'execution_route',
+                'expected' => true,
+            ],
+            'exists route name' => [
+                'masterRequest' => new Request([
+                    '_route' => 'test_route',
+                ]),
+                'executionRoute' => 'execution_route',
+                'expected' => false,
+            ]
+        ];
+    }
 }

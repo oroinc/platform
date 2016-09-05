@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
 
-use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
@@ -43,11 +43,9 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidate()
     {
         $dataClass = 'testClass';
-        $entity = new File();
-        $file = new \Symfony\Component\HttpFoundation\File\File(
+        $file = new ComponentFile(
             realpath(__DIR__ . '/../Fixtures/testFile/test.txt')
         );
-        $entity->setFile($file);
         $fieldName = 'testField';
         $mimeTypes = "image/*\ntext/plain";
         $maxsize = 1; // 1Mb
@@ -83,7 +81,7 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->expects($this->once())
             ->method('validate')
             ->with(
-                $this->identicalTo($entity->getFile()),
+                $this->identicalTo($file),
                 [
                     new FileConstraint(
                         [
@@ -95,7 +93,7 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn($violationList);
 
-        $result = $this->configValidator->validate($dataClass, $entity, $fieldName);
+        $result = $this->configValidator->validate($file, $dataClass, $fieldName);
         $this->assertSame($violationList, $result);
     }
 }

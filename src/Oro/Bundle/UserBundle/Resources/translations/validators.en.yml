@@ -1,2 +1,7 @@
 You must select at least {{ limit }} role:  You must select at least {{ limit }} role.|You must select at least {{ limit }} roles.
 "The password fields must match.": "The password fields must match."
+
+oro:
+    user:
+        message:
+            invalid_username: The Email with same value id used by another customer. Please choose another Username.

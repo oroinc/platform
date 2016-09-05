@@ -11,6 +11,7 @@ config:
         'backgrid': 'bundles/orodatagrid/js/extend/backgrid.js'
 
         'orodatagrid/js/datagrid/action-launcher': 'bundles/orodatagrid/js/datagrid/action-launcher.js'
+        'orodatagrid/js/datagrid/dropdown-select-choice-launcher': 'bundles/orodatagrid/js/datagrid/dropdown-select-choice-launcher.js'
         'oro/datagrid/action/abstract-action': 'bundles/orodatagrid/js/datagrid/action/abstract-action.js'
         'oro/datagrid/action/delete-action': 'bundles/orodatagrid/js/datagrid/action/delete-action.js'
         'oro/datagrid/action/ajax-action': 'bundles/orodatagrid/js/datagrid/action/ajax-action.js'
@@ -26,6 +27,7 @@ config:
         'oro/datagrid/action/reset-collection-action': 'bundles/orodatagrid/js/datagrid/action/reset-collection-action.js'
         'oro/datagrid/action/export-action': 'bundles/orodatagrid/js/datagrid/action/export-action.js'
         'oro/datagrid/action/show-component-action': 'bundles/orodatagrid/js/datagrid/action/show-component-action.js'
+        'oro/datagrid/action/select-data-appearance-action': 'bundles/orodatagrid/js/datagrid/action/select-data-appearance-action.js'
         'orodatagrid/js/datagrid/actions-panel': 'bundles/orodatagrid/js/datagrid/actions-panel.js'
         'orodatagrid/js/datagrid/column/action-column': 'bundles/orodatagrid/js/datagrid/column/action-column.js'
         'orodatagrid/js/datagrid/body': 'bundles/orodatagrid/js/datagrid/body.js'
@@ -81,6 +83,16 @@ config:
         'orodatagrid/js/inline-editing/builder': 'bundles/orodatagrid/js/inline-editing/builder.js'
         'orodatagrid/js/app/plugins/grid/inline-editing-plugin': 'bundles/orodatagrid/js/app/plugins/grid/inline-editing-plugin.js'
         'orodatagrid/js/inline-editing/default-editors': 'bundles/orodatagrid/js/inline-editing/default-editors.js'
+
+        'orodatagrid/js/appearance/builder': 'bundles/orodatagrid/js/appearance/builder.js'
+        'orodatagrid/js/app/plugins/grid-component/board-appearance-plugin': 'bundles/orodatagrid/js/app/plugins/grid-component/board-appearance-plugin.js'
+        'orodatagrid/js/app/views/board/board-view': 'bundles/orodatagrid/js/app/views/board/board-view.js'
+        'orodatagrid/js/app/views/board/column-header-view': 'bundles/orodatagrid/js/app/views/board/column-header-view.js'
+        'orodatagrid/js/app/views/board/column-view': 'bundles/orodatagrid/js/app/views/board/column-view.js'
+        'orodatagrid/js/app/transitions/update-main-property-transition': 'bundles/orodatagrid/js/app/transitions/update-main-property-transition.js'
+        'orodatagrid/js/app/views/board/card-view': 'bundles/orodatagrid/js/app/views/board/card-view.js'
+        'orodatagrid/js/app/transitions/abstract-transition': 'bundles/orodatagrid/js/app/transitions/abstract-transition.js'
+
 build:
     paths:
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with

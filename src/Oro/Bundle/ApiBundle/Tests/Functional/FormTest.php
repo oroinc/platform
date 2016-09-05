@@ -234,7 +234,7 @@ class FormTest extends WebTestCase
     {
         $options['data_class'] = self::TEST_CLASS;
         $options['extra_fields_message'] = 'This form should not contain extra fields: "{{ extra_fields }}"';
-        $form = $this->getContainer()->get('form.factory')->create('form', null, $options);
+        $form = $this->getContainer()->get('form.factory')->create($this->getType(), null, $options);
 
         return $form;
     }
@@ -259,5 +259,17 @@ class FormTest extends WebTestCase
         $metadata->addField($titleField);
 
         return $metadata;
+    }
+
+    /**
+     * Provide backward compatibility between Symfony versions < 2.8 and 2.8+
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
+            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
+            : 'form';
     }
 }

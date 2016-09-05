@@ -71,9 +71,13 @@ class AclHelper
                             ? $condition[1]
                             : SearchListener::EMPTY_OWNER_ID;
 
-                        $ownerExpressions[] = (!is_array($owners) ||  count($owners) === 1)
-                            ? $expr->eq('integer.' . $ownerField, $owners)
-                            : $expr->in('integer.' . $ownerField, $owners);
+                        if (is_array($owners)) {
+                            $ownerExpressions[] = count($owners) == 1
+                                ? $expr->eq('integer.' . $ownerField, reset($owners))
+                                : $expr->in('integer.' . $ownerField, $owners);
+                        } else {
+                            $ownerExpressions[] = $expr->eq('integer.' . $ownerField, $owners);
+                        }
                     }
                 }
             }

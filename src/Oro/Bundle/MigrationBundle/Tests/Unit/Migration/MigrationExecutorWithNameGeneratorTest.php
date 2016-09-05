@@ -39,16 +39,16 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             new MigrationState($migration11)
         ];
 
-        $this->connection->expects($this->at(2))
+        $this->connection->expects($this->at(3))
             ->method('executeQuery')
             ->with('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
-        $this->connection->expects($this->at(3))
+        $this->connection->expects($this->at(4))
             ->method('executeQuery')
             ->with(
                 'CREATE TABLE test1table (id INT NOT NULL) DEFAULT CHARACTER SET utf8 '
                 . 'COLLATE utf8_unicode_ci ENGINE = InnoDB'
             );
-        $this->connection->expects($this->at(4))
+        $this->connection->expects($this->at(5))
             ->method('executeQuery')
             ->with('ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL');
 

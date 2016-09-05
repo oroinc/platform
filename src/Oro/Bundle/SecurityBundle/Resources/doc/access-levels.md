@@ -5,7 +5,7 @@ Access levels allow to protect database records.
 
 There are 6 access levels:
 
- - **System**: Allows to gives a user a permissions to access to all records within the system.
+ - **Global**: Allows to gives a user a permissions to access to all records within the global.
  - **Organization**: Allows to gives a user a permissions to access to all records within the organization, regardless of the business unit hierarchical level to which a record belongs or the user is assigned to.
  - **Division**: Allows to gives a user a permissions to access to records in all business units are assigned to the user and all business units subordinate to business units are assigned to the user.
  - **Business Unit**: Allows to gives a user a permissions to access to records in all business units are assigned to the user.
@@ -14,7 +14,7 @@ There are 6 access levels:
 
  All the records have additional owner parameter - organization. Then user log into the system, he works in scope of one organization.
 
- If the record was created in the scope of first organization, user can see this record only with system access level to this entity.
+ If the record was created in the scope of first organization, user can see this record only with global access level to this entity.
 
 [Examples](./examples.md)
   
@@ -60,6 +60,20 @@ $entity = $repository->findOneBy('id' => 10);
 
 if (!$this->securityFacade->isGranted('VIEW', $entity)) {
     throw new AccessDeniedException('Access denied');
+} else {
+    // access is granted
+}  
+```
+
+###Manual access check on object field.
+
+Developer can check access to the given entity record by using isGranted method of Security facade service:
+
+``` php
+$entity = $repository->findOneBy('id' => 10);
+
+if (!$this->securityFacade->isGranted('VIEW', new FieldVote($entity, '_field_name_'))) {
+    throw new AccessDeniedException('Access denided');
 } else {
     // access is granted
 }  

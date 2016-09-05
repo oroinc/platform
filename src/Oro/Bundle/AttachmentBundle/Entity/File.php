@@ -132,13 +132,6 @@ class File extends ExtendFile implements FileExtensionInterface
     protected $emptyFile;
 
     /**
-     * Indicates whether file is uploaded or created from other source (from email attachment for example)
-     *
-     * @var boolean
-     */
-    protected $uploaded = true;
-
-    /**
      * Get id
      *
      * @return integer
@@ -241,15 +234,15 @@ class File extends ExtendFile implements FileExtensionInterface
     }
 
     /**
-     * @param ComponentFile $file
+     * @param ComponentFile|null $file
      */
-    public function setFile(ComponentFile $file)
+    public function setFile(ComponentFile $file = null)
     {
         $this->file = $file;
     }
 
     /**
-     * @return ComponentFile
+     * @return ComponentFile|null
      */
     public function getFile()
     {
@@ -276,7 +269,7 @@ class File extends ExtendFile implements FileExtensionInterface
     }
 
     /**
-     * @param $emptyFile
+     * @param bool $emptyFile
      * @return $this
      */
     public function setEmptyFile($emptyFile)
@@ -376,21 +369,5 @@ class File extends ExtendFile implements FileExtensionInterface
     public function getOwner()
     {
         return $this->owner;
-    }
-
-    /**
-     * @param bool $uploaded
-     */
-    public function setUploaded($uploaded)
-    {
-        $this->uploaded = $uploaded;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUploaded()
-    {
-        return $this->uploaded;
     }
 }

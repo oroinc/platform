@@ -74,6 +74,9 @@ define([
         /** @property {String} */
         requestType: 'GET',
 
+        /** @property {Number} */
+        order: 500,
+
         /** @property {Object} */
         defaultMessages: {
             confirm_title: 'Execution Confirmation',
@@ -95,6 +98,7 @@ define([
             if (!options.datagrid) {
                 throw new TypeError('"datagrid" is required');
             }
+            this.order = options.order;
             this.subviews = [];
             this.datagrid = options.datagrid;
             // make own messages property from prototype
@@ -135,6 +139,8 @@ define([
             }
             _.defaults(options, this.launcherOptions);
             launcher = new (this.launcher)(options);
+            this.launcherInstanse = launcher;
+            // schedule dispose
             this.subviews.push(launcher);
             return launcher;
         },

@@ -159,7 +159,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         });
         $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function(e) {
-            $(e.target).parent().find('input[type=text]').first().focus();
+            var $focusTarget = $(e.target).parent().find('input[type=text]').first();
+            if (!$focusTarget.is(e.target)) {
+                $focusTarget.focus();
+            }
         }, 10));
 
         $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function(e) {
@@ -175,21 +178,20 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         });
 
-        $(document).on('focus', '.select2-focusser, .select2-input', function(e) {
-            $('.hasDatepicker').datepicker('hide');
-        });
-
-        var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
-        $('html').click(function(e) {
+        var openDropdownsSelector = '.dropdown.open, .dropdown .open, .dropup.open, .dropup .open, ' +
+            '.oro-drop.open, .oro-drop .open';
+        $('html')[0].addEventListener('click', function(e) {
             var $target = $(e.target);
             var clickingTarget = null;
-            if ($target.hasClass('dropdown') || $target.hasClass('oro-drop')) {
+            if ($target.is('.dropdown, .dropup, .oro-drop')) {
                 clickingTarget = $target;
             } else {
-                clickingTarget = $target.closest('.dropdown, .oro-drop');
+                clickingTarget = $target.closest('.dropdown, .dropup, .oro-drop');
             }
-            $(openDropdownsSelector).not(clickingTarget).trigger('tohide.bs.dropdown');
-        });
+            $(openDropdownsSelector).filter(function() {
+                return !$(this).has(document.activeElement).length;
+            }).not(clickingTarget).trigger('tohide.bs.dropdown');
+        }, true);
 
         $('#main-menu').mouseover(function() {
             $(openDropdownsSelector).trigger('tohide.bs.dropdown');
@@ -435,6 +437,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         });
         validateContainer($listContainer);
     });
+
+    //TODO: implement clone row
 
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();

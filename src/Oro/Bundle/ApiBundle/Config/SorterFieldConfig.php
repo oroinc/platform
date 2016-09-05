@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * Represents a sorter configuration for a field.
  */
@@ -37,6 +39,6 @@ class SorterFieldConfig implements FieldConfigInterface
      */
     public function __clone()
     {
-        $this->cloneItems();
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 }

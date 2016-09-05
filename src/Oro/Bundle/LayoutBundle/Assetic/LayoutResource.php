@@ -83,7 +83,7 @@ class LayoutResource implements ResourceInterface
      */
     protected function collectThemeAssets(Theme $theme)
     {
-        $assets = $theme->getDataByKey('assets', []);
+        $assets = $theme->getConfigByKey('assets', []);
 
         $parentTheme = $theme->getParentTheme();
         if ($parentTheme) {

@@ -14,6 +14,7 @@ parameters:
     oro_imap.email_flag_manager_loader.class:        Oro\Bundle\ImapBundle\Provider\ImapEmailFlagManagerLoader
     oro_imap.email_synchronizer.class:               Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer
     oro_imap.email_sync_processor_factory.class:     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory
+    oro_imap.imap_email_remove_manager.class:        Oro\Bundle\ImapBundle\Sync\ImapEmailRemoveManager
     oro_imap.imap_clear_manager.class:               Oro\Bundle\ImapBundle\Manager\ImapClearManager
     oro_imap.workflow.action.dependency_job.class:   Oro\Bundle\ImapBundle\Workflow\Action\DependencyJob
 
@@ -76,6 +77,8 @@ services:
             - '@oro_imap.connector.factory'
             - '@oro_security.encoder.mcrypt'
             - '@oro_imap.imap_email_google_oauth2_manager'
+        calls:
+            - [setJobManager, ['@oro_cron.job_manager']]
         tags:
             - { name: oro_email.email_synchronizer }
 
@@ -86,7 +89,14 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_email.email.entity.builder'
-            - '@oro_email.email.address.helper'
+            - '@oro_imap.imap_email_remove_manager'
+
+    oro_imap.imap_email_remove_manager:
+        class: %oro_imap.imap_email_remove_manager.class%
+        arguments:
+            - '@doctrine'
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_imap.form.type.configuration:
         class: %oro_imap.form.type.configuration.class%

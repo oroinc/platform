@@ -15,8 +15,6 @@ services:
         public: false
         arguments:
             - '@service_container'
-        calls:
-            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
     oro_layout.theme_factory:
         class:  %oro_layout.theme_factory.class%
@@ -74,14 +72,30 @@ services:
     oro_layout.theme_extension:
         class: %oro_layout.theme_extension.class%
         arguments:
-            - %oro_layout.theme_updates_resources%
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
             - '@oro_layout.loader.path_provider'
-            - '@oro_layout.imports_storage'
+            - '@oro_layout.theme_extension.resource_provider.theme'
+        calls:
+            - [addVisitor, ['@oro_layout.theme_extension.visitor.import']]
+
+    oro_layout.theme_extension.resource_provider.theme:
+        class: Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider
+        public: false
+        arguments:
+            - %oro_layout.theme_updates_resources%
+
+    oro_layout.theme_extension.visitor.import:
+        class: Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor
+        public: false
+        arguments:
+            - '@oro_layout.loader'
+            - '@oro_layout.dependency_initializer'
+            - '@oro_layout.theme_extension.resource_provider.theme'
+            - '@oro_layout.theme_manager'
 
     oro_layout.data_provider.theme:
-        class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider
+        class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider
         arguments:
             - '@oro_layout.theme_manager'
         tags:
@@ -110,10 +124,10 @@ services:
         public: false
 
     oro_layout.layout_update_generator.extension.config_conditions:
-        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension
         public: false
         arguments:
-            - '@oro_layout.expression.assembler'
+            - '@oro_layout.expression_language'
 
     oro_layout.layout_update_generator.extension.add_tree:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension

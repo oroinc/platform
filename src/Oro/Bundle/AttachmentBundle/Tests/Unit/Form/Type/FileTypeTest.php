@@ -18,7 +18,6 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
     public function testInterface()
     {
         $this->assertSame('oro_file', $this->type->getName());
-        $this->assertSame('form', $this->type->getParent());
     }
 
     public function testBuildForm()

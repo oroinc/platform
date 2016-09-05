@@ -38,7 +38,7 @@ define(function(require) {
                 var $input = $field.find('input');
                 var permissionName = $field.siblings('input').val();
                 var oid = $field.attr(self.options.objectIdentityAttribute);
-                var url = routing.generate(self.options.accessLevelRoute, {oid: oid.replace(/\\/g, '_')});
+                var url = routing.generate(self.options.accessLevelRoute, {oid: oid.replace(/\\/g, '_'), permission: permissionName});
                 $input.inputWidget('create', 'select2', {
                     initializeOptions: {
                         initSelection: function(element, callback) {

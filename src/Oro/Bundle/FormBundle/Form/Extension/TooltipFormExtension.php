@@ -9,9 +9,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class TooltipFormExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+
     const DEFAULT_TRANSLATE_DOMAIN = 'messages';
     const TOOLTIPS_TRANSLATE_DOMAIN = 'tooltips';
 
@@ -91,13 +94,5 @@ class TooltipFormExtension extends AbstractTypeExtension
                 $view->vars['tooltip'] = $tooltip;
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 }

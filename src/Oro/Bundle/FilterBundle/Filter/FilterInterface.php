@@ -52,4 +52,20 @@ interface FilterInterface
      * @return bool true if a filter successfully applied; otherwise, false.
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data);
+
+    /**
+     * Set state of filter
+     *
+     * @param $state
+     *
+     * @return $this
+     */
+    public function setFilterState($state);
+
+    /**
+     * Get state of filter
+     *
+     * @return mixed
+     */
+    public function getFilterState();
 }

@@ -66,7 +66,8 @@ define([
             contentContainer: '.row-fluid',
             contentClasses: [],
             allowEdit: false,
-            template: dashboardItemTpl
+            template: dashboardItemTpl,
+            configurationDialogOptions: {}
         }),
 
         /**

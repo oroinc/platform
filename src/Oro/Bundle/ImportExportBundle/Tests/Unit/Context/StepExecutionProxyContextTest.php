@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Akeneo\Bundle\BatchBundle\Entity\Warning;
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
 class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
@@ -209,5 +211,22 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
             ->method('getFailureExceptions')
             ->will($this->returnValue($exceptions));
         $this->assertEquals($expected, $this->context->getFailureExceptions());
+    }
+
+    public function testGetWarnings()
+    {
+        $warning =
+            $this
+                ->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\Warning')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $expected = new ArrayCollection();
+        $expected->add($warning);
+
+        $this->stepExecution->expects($this->once())
+            ->method('getWarnings')
+            ->will($this->returnValue($expected));
+
+        $this->assertEquals($expected, $this->context->getWarnings());
     }
 }

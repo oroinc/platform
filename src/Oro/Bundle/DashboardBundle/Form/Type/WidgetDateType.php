@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class WidgetDateType
@@ -17,6 +18,14 @@ class WidgetDateType extends AbstractType
      * {@inheritDoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }
@@ -35,13 +44,23 @@ class WidgetDateType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'date',
-            'oro_date',
-            [
-                'required' => false,
-                'label' => false
-            ]
-        );
+        if ($options['enable_date']) {
+            $builder->add(
+                'date',
+                'oro_date',
+                [
+                    'required' => false,
+                    'label' => false
+                ]
+            );
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefault('enable_date', true);
     }
 }

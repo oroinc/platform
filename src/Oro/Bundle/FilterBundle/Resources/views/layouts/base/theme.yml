@@ -1,5 +1,0 @@
-data:
-    assets:
-        styles:
-            inputs:
-                - 'bundles/orofilter/css/less/oro.filter.less'

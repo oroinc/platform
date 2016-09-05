@@ -6,8 +6,8 @@
     "homepage": "https://github.com/laboro/UIBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/framework-bundle": ">=2.1,<2.3-dev",
+        "php": ">=5.5.9",
+        "symfony/framework-bundle": "2.8.*",
         "kriswallsmith/assetic": "1.1.*@dev",
         "symfony/assetic-bundle": "2.1.*",
         "leafo/lessphp": "dev-master",

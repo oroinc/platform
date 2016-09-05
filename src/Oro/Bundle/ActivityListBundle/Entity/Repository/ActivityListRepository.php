@@ -16,8 +16,6 @@ class ActivityListRepository extends EntityRepository
      * @param array          $activityClasses Selected activity types
      * @param \DateTime|bool $dateFrom        Date from
      * @param \DateTime|bool $dateTo          Date to
-     * @param string         $orderField      Order by field
-     * @param string         $orderDirection  Order direction
      * @param boolean        $grouping        Do grouping
      *
      * @return QueryBuilder
@@ -28,11 +26,9 @@ class ActivityListRepository extends EntityRepository
         $activityClasses = [],
         $dateFrom = null,
         $dateTo = null,
-        $orderField = 'updatedAt',
-        $orderDirection = 'DESC',
         $grouping = false
     ) {
-        $qb = $this->getBaseActivityListQueryBuilder($entityClass, $entityId, $orderField, $orderDirection, $grouping);
+        $qb = $this->getBaseActivityListQueryBuilder($entityClass, $entityId, $grouping);
 
         if ($activityClasses) {
             $qb->andWhere($qb->expr()->in('activity.relatedActivityClass', ':activityClasses'))
@@ -55,8 +51,6 @@ class ActivityListRepository extends EntityRepository
     /**
      * @param string  $entityClass
      * @param integer|integer[] $entityIds
-     * @param string  $orderField
-     * @param string  $orderDirection
      * @param boolean $grouping
      *
      * @return QueryBuilder
@@ -64,8 +58,6 @@ class ActivityListRepository extends EntityRepository
     public function getBaseActivityListQueryBuilder(
         $entityClass,
         $entityIds,
-        $orderField = 'updatedAt',
-        $orderDirection = 'DESC',
         $grouping = false
     ) {
         if (is_scalar($entityIds)) {
@@ -83,9 +75,6 @@ class ActivityListRepository extends EntityRepository
                 ->where('r.id = :entityId')
                 ->setParameter('entityId', reset($entityIds));
         }
-        $queryBuilder
-            ->orderBy('activity.' . $orderField, $orderDirection)
-            ->groupBy('activity.id');
 
         if ($grouping) {
             $queryBuilder->andWhere('activity.head = true');

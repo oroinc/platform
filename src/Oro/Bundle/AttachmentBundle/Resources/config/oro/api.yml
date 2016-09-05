@@ -1,4 +1,16 @@
 oro_api:
     entities:
-        Oro\Bundle\AttachmentBundle\Entity\Attachment: ~
-        Oro\Bundle\AttachmentBundle\Entity\File: ~
+#        Oro\Bundle\AttachmentBundle\Entity\Attachment:
+#            fields:
+#                target:
+#                    data_type: association:manyToOne
+#        Oro\Bundle\AttachmentBundle\Entity\File:
+#            fields:
+#                filename:
+#                    exclude: true
+#                extension:
+#                    exclude: true
+#                content:
+#                    data_type: string
+#                    property_path: file
+#                    depends_on: [filename]

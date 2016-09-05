@@ -47,7 +47,7 @@ class EnumValueCollectionType extends AbstractType
                 'options'           => function (Options $options, $value) {
                     return array_replace(
                         ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],
-                        $value
+                        (array) $value
                     );
                 },
                 'allow_add'         => function (Options $options, $value) {
@@ -133,6 +133,14 @@ class EnumValueCollectionType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_entity_extend_enum_value_collection';
     }

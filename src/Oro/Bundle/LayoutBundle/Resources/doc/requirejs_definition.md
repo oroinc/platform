@@ -45,7 +45,7 @@ Your result is `web/js/layout/base/scripts.min.js`
 ## RequireJS config provider
 [RequireJSBundle](../../../RequireJSBundle/README.md) has its own config provider `oro_requirejs.provider.requirejs_config`
 and **used in theme by default** (`web/js/oro.min.js` minimized scripts by default).
-If you want use in theme your own minimized scripts you need to define block type `requires` with `provider_alias: { '@value': 'oro_layout_requirejs_config_provider' }`
+If you want use in theme your own minimized scripts you need to define block type `requires` with `provider_alias: 'oro_layout_requirejs_config_provider'`
 
 **Example:**
 
@@ -55,7 +55,7 @@ If you want use in theme your own minimized scripts you need to define block typ
 requirejs_scripts:
     blockType: requires
     options:
-        provider_alias: { '@value': 'oro_layout_requirejs_config_provider' }
+        provider_alias: 'oro_layout_requirejs_config_provider'
 ...
 ```
 

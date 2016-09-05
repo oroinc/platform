@@ -57,17 +57,6 @@ class DateRangeFilterTypeTest extends WebTestCase
                     'type'  => null,
                 ],
             ],
-            'edge months' => [
-                [
-                    'part'  => DateModifierInterface::PART_DOW,
-                    'value' => ['start' => 1, 'end' => 7],
-                ],
-                [
-                    'part'  => DateModifierInterface::PART_DOW,
-                    'value' => ['start' => 1, 'end' => 7],
-                    'type'  => null,
-                ],
-            ],
             'edge weeks' => [
                 [
                     'part'  => DateModifierInterface::PART_WEEK,

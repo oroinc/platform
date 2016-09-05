@@ -62,15 +62,7 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:EmailTemplate')
             ->willReturn($this->objectManager);
 
-        $this->configManager = $this->getMockForClass('Oro\Bundle\ConfigBundle\Config\ConfigManager');
-        $this->configManager->expects($this->any())
-            ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_notification.email_notification_sender_email', false, false, self::FROM_EMAIL],
-                    ['oro_notification.email_notification_sender_name', false, false, self::FROM_NAME]
-                ]
-            );
+        $this->setConfigManager();
 
         $this->renderer = $this->getMockForClass('Oro\Bundle\EmailBundle\Provider\EmailRenderer');
 
@@ -78,15 +70,36 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->mailer = $this->getMockForClass('\Swift_Mailer');
 
-        $this->mailProcessor = new BaseProcessor(
+        $this->mailProcessor = $this->setProcessor();
+
+        $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
+    }
+
+    protected function setConfigManager()
+    {
+        $this->configManager = $this->getMockForClass('Oro\Bundle\ConfigBundle\Config\ConfigManager');
+        $this->configManager->expects($this->any())
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['oro_notification.email_notification_sender_email', false, false, null, self::FROM_EMAIL],
+                    ['oro_notification.email_notification_sender_name', false, false, null, self::FROM_NAME]
+                ]
+            );
+    }
+    
+    /**
+     * @return BaseProcessor
+     */
+    protected function setProcessor()
+    {
+        return new BaseProcessor(
             $this->managerRegistry,
             $this->configManager,
             $this->renderer,
             $this->emailHolderHelper,
             $this->mailer
         );
-
-        $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
     }
 
     protected function tearDown()

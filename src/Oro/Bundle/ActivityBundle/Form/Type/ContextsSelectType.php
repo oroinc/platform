@@ -4,19 +4,19 @@ namespace Oro\Bundle\ActivityBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class ContextsSelectType extends AbstractType
 {
@@ -31,37 +31,37 @@ class ContextsSelectType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var ObjectMapper */
-    protected $mapper;
-
     /* @var TokenStorageInterface */
     protected $securityTokenStorage;
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
+    /** @var EntityTitleResolverInterface */
+    protected $entityTitleResolver;
+
     /**
      * @param EntityManager         $entityManager
      * @param ConfigManager         $configManager
      * @param TranslatorInterface   $translator
-     * @param ObjectMapper          $mapper
      * @param TokenStorageInterface $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
+     * @param EntityTitleResolverInterface $entityTitleResolver
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        ObjectMapper $mapper,
         TokenStorageInterface $securityTokenStorage,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        EntityTitleResolverInterface $entityTitleResolver
     ) {
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
         $this->translator           = $translator;
-        $this->mapper               = $mapper;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->dispatcher           = $dispatcher;
+        $this->entityTitleResolver  = $entityTitleResolver;
     }
 
     /**
@@ -75,9 +75,9 @@ class ContextsSelectType extends AbstractType
                 $this->entityManager,
                 $this->configManager,
                 $this->translator,
-                $this->mapper,
                 $this->securityTokenStorage,
-                $this->dispatcher
+                $this->dispatcher,
+                $this->entityTitleResolver
             )
         );
     }
@@ -131,6 +131,14 @@ class ContextsSelectType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -21,6 +25,9 @@ class InlineEditingExtension extends AbstractExtension
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
+    /** @var AuthorizationCheckerInterface */
+    protected $authChecker;
+
     /**
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
      * @param SecurityFacade $securityFacade
@@ -29,11 +36,13 @@ class InlineEditingExtension extends AbstractExtension
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
         SecurityFacade $securityFacade,
-        EntityClassNameHelper $entityClassNameHelper
+        EntityClassNameHelper $entityClassNameHelper,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->securityFacade = $securityFacade;
         $this->guesser = $inlineEditColumnOptionsGuesser;
         $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->authChecker = $authorizationChecker;
     }
 
     /**
@@ -87,6 +96,19 @@ class InlineEditingExtension extends AbstractExtension
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
+                // Check access to edit field in Class level.
+                // If access not granted - skip inline editing for such field.
+                $dadaFieldName = $this->getColummFieldName($columnName, $column);
+                if (!$this->authChecker->isGranted(
+                    'EDIT',
+                    new FieldVote(new ObjectIdentity('entity', $configItems['entity_name']), $dadaFieldName)
+                )
+                ) {
+                    if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)) {
+                        $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY] = false;
+                    }
+                    continue;
+                }
                 $newColumn = $this->guesser->getColumnOptions(
                     $columnName,
                     $configItems['entity_name'],
@@ -121,5 +143,33 @@ class InlineEditingExtension extends AbstractExtension
             Configuration::BASE_CONFIG_KEY,
             $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, [])
         );
+    }
+
+    /**
+     * Returns column data field name
+     *
+     * @param string $columnName
+     * @param array $column
+     *
+     * @return string
+     */
+    protected function getColummFieldName($columnName, $column)
+    {
+        $dadaFieldName = $columnName;
+        if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)
+            && isset($column[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY])
+            && isset(
+                $column[Configuration::BASE_CONFIG_KEY][Configuration::EDITOR_KEY][Configuration::VIEW_OPTIONS_KEY]
+            )
+            && isset(
+                $column[Configuration::BASE_CONFIG_KEY]
+                [Configuration::EDITOR_KEY][Configuration::VIEW_OPTIONS_KEY][Configuration::VALUE_FIELD_NAME_KEY]
+            )
+        ) {
+            $dadaFieldName = $column[Configuration::BASE_CONFIG_KEY]
+            [Configuration::EDITOR_KEY][Configuration::VIEW_OPTIONS_KEY][Configuration::VALUE_FIELD_NAME_KEY];
+        }
+
+        return $dadaFieldName;
     }
 }

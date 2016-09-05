@@ -85,18 +85,18 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->theme->getDescription());
     }
 
-    public function testDataMethods()
+    public function testConfigMethods()
     {
-        $data = [
+        $config = [
             'key' => 'value',
         ];
 
-        $this->assertEquals([], $this->theme->getData());
-        $this->theme->setData($data);
-        $this->assertEquals($data, $this->theme->getData());
-        $this->assertEquals($data['key'], $this->theme->getDataByKey('key'));
-        $this->assertEquals('default value', $this->theme->getDataByKey('unknown key', 'default value'));
-        $this->theme->setDataByKey('unknown key', 'unknown value');
-        $this->assertEquals('unknown value', $this->theme->getDataByKey('unknown key', 'default value'));
+        $this->assertEquals([], $this->theme->getConfig());
+        $this->theme->setConfig($config);
+        $this->assertEquals($config, $this->theme->getConfig());
+        $this->assertEquals($config['key'], $this->theme->getConfigByKey('key'));
+        $this->assertEquals('default value', $this->theme->getConfigByKey('unknown key', 'default value'));
+        $this->theme->setConfigByKey('unknown key', 'unknown value');
+        $this->assertEquals('unknown value', $this->theme->getConfigByKey('unknown key', 'default value'));
     }
 }

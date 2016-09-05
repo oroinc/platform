@@ -233,6 +233,9 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                     'id'        => 1,
                     'name'      => 'product_name',
                     'ownerName' => 'user_name',
+                    'owner'     => [
+                        'id' => 10
+                    ],
                     'category'  => [
                         'name' => 'category_label'
                     ],

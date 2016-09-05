@@ -14,6 +14,10 @@ define(function(require) {
         initialize: function(grid) {
             this.grid = grid;
             this.grid.on('shown', _.bind(this.onGridShown, this));
+            this.grid.on('changeAppearance', _.bind(function() {
+                // remove header height cache
+                delete this.headerHeight;
+            }, this));
 
             this.selectMode = _.bind(this.selectMode, this);
             this.checkLayout = _.bind(this.checkLayout, this);
@@ -34,7 +38,8 @@ define(function(require) {
             }
 
             this.setupCache();
-            this.headerHeight = this.domCache.theadTr.height();
+
+            this.$el.addClass('with-floating-header');
 
             this.isHeaderCellWidthFixed = false;
             this.rescrollCb = this.enableOtherScroll();
@@ -66,6 +71,9 @@ define(function(require) {
                 this.domCache.headerCells.attr('style', '');
                 this.domCache.firstRowCells.attr('style', '');
             }
+
+            this.$el.removeClass('with-floating-header');
+
             FloatingHeaderPlugin.__super__.disable.call(this);
         },
 
@@ -85,6 +93,9 @@ define(function(require) {
                 thead: this.$grid.find('thead:first'),
                 theadTr: this.$grid.find('thead:first tr:first')
             };
+            if (!this.headerHeight) {
+                this.headerHeight = this.domCache.theadTr.height();
+            }
         },
 
         supportDropdowns: function() {
@@ -158,10 +169,12 @@ define(function(require) {
             headerCells.each(function(i, headerCell) {
                 var cellWidth = widths[i] - widthDecrement;
                 headerCell.style.width = cellWidth + 'px';
+                headerCell.style.maxWidth = cellWidth + 'px';
                 headerCell.style.minWidth = cellWidth + 'px';
                 headerCell.style.boxSizing = 'border-box';
                 if (firstRowCells[i]) {
                     firstRowCells[i].style.width = cellWidth + 'px';
+                    firstRowCells[i].style.maxWidth = cellWidth + 'px';
                     firstRowCells[i].style.minWidth = cellWidth + 'px';
                     firstRowCells[i].style.boxSizing = 'border-box';
                 }

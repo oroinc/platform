@@ -18,10 +18,14 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
     DependentFixtureInterface,
     ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
+
+    /** @var User|null */
+    protected $adminUser;
+
+    /** @var Organization|null */
+    protected $organization;
 
     /**
      * {@inheritdoc}
@@ -46,17 +50,10 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
      */
     public function load(ObjectManager $manager)
     {
-        $adminUser = $this->getAdminUser($manager);
-        $organization = $this->getOrganization($manager);
-
         $emailTemplates = $this->getEmailTemplatesList($this->getEmailsDir());
 
         foreach ($emailTemplates as $fileName => $file) {
-            $template = file_get_contents($file['path']);
-            $emailTemplate = new EmailTemplate($fileName, $template, $file['format']);
-            $emailTemplate->setOwner($adminUser);
-            $emailTemplate->setOrganization($organization);
-            $manager->persist($emailTemplate);
+            $this->loadTemplate($manager, $fileName, $file);
         }
 
         $manager->flush();
@@ -96,11 +93,73 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
 
     /**
      * @param ObjectManager $manager
+     * @param string $fileName
+     * @param array $file
+     */
+    protected function loadTemplate(ObjectManager $manager, $fileName, array $file)
+    {
+        $template = file_get_contents($file['path']);
+        $parsedTemplate = EmailTemplate::parseContent($template);
+        $existingTemplate = $this->findExistingTemplate($manager, $parsedTemplate);
+
+        if ($existingTemplate) {
+            $this->updateExistingTemplate($existingTemplate, $parsedTemplate);
+        } else {
+            $this->loadNewTemplate($manager, $fileName, $file);
+        }
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @param string $fileName
+     * @param array $file
+     */
+    protected function loadNewTemplate(ObjectManager $manager, $fileName, $file)
+    {
+        $template = file_get_contents($file['path']);
+        $emailTemplate = new EmailTemplate($fileName, $template, $file['format']);
+        $emailTemplate->setOwner($this->getAdminUser($manager));
+        $emailTemplate->setOrganization($this->getOrganization($manager));
+        $manager->persist($emailTemplate);
+    }
+
+    /**
+     * @param EmailTemplate $emailTemplate
+     * @param array $template
+     */
+    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
+    {
+        $emailTemplate->setContent($template['content']);
+        foreach ($template['params'] as $param => $value) {
+            $setter = sprintf('set%s', ucfirst($param));
+            $emailTemplate->$setter($value);
+        }
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @param array $template
+     *
+     * @return EmailTemplate|null
+     */
+    protected function findExistingTemplate(ObjectManager $manager, array $template)
+    {
+        return null;
+    }
+
+    /**
+     * @param ObjectManager $manager
      * @return Organization
      */
     protected function getOrganization(ObjectManager $manager)
     {
-        return $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        if ($this->organization) {
+            return $this->organization;
+        }
+
+        $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+
+        return $this->organization;
     }
 
     /**
@@ -114,6 +173,10 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
      */
     protected function getAdminUser(ObjectManager $manager)
     {
+        if ($this->adminUser) {
+            return $this->adminUser;
+        }
+
         $repository = $manager->getRepository('OroUserBundle:Role');
         $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
@@ -129,7 +192,9 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
             );
         }
 
-        return $user;
+        $this->adminUser = $user;
+
+        return $this->adminUser;
     }
 
     /**

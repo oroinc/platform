@@ -91,30 +91,32 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
             return $this->isMatchScalarInArray($value, $contextValue, $name);
         }
 
-        $operator = key($value);
-        if (self::OPERATOR_NOT === $operator) {
-            $result = !$this->isMatchScalarInArray(current($value), $contextValue, $name);
-        } elseif (self::OPERATOR_AND === $operator) {
-            $result = true;
-            foreach (current($value) as $val) {
-                if (!$this->isMatchScalarWithArray($val, $contextValue, $name)) {
-                    $result = false;
-                    break;
+        switch (key($value)) {
+            case self::OPERATOR_NOT:
+                return !$this->isMatchScalarInArray(current($value), $contextValue, $name);
+            case self::OPERATOR_AND:
+                $result = true;
+                foreach (current($value) as $val) {
+                    if (!$this->isMatchScalarWithArray($val, $contextValue, $name)) {
+                        $result = false;
+                        break;
+                    }
                 }
-            }
-        } elseif (self::OPERATOR_OR === $operator) {
-            $result = false;
-            foreach (current($value) as $val) {
-                if ($this->isMatchScalarWithArray($val, $contextValue, $name)) {
-                    $result = true;
-                    break;
+
+                return $result;
+            case self::OPERATOR_OR:
+                $result = false;
+                foreach (current($value) as $val) {
+                    if ($this->isMatchScalarWithArray($val, $contextValue, $name)) {
+                        $result = true;
+                        break;
+                    }
                 }
-            }
-        } else {
-            $result = false;
+
+                return $result;
         }
 
-        return $result;
+        return false;
     }
 
     /**
@@ -160,30 +162,32 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
             return $this->isMatchScalars($value, $contextValue, $name);
         }
 
-        $operator = key($value);
-        if (self::OPERATOR_NOT === $operator) {
-            $result = !$this->isMatchScalars(current($value), $contextValue, $name);
-        } elseif (self::OPERATOR_AND === $operator) {
-            $result = true;
-            foreach (current($value) as $val) {
-                if (!$this->isMatchScalarWithScalar($val, $contextValue, $name)) {
-                    $result = false;
-                    break;
+        switch (key($value)) {
+            case self::OPERATOR_NOT:
+                return !$this->isMatchScalars(current($value), $contextValue, $name);
+            case self::OPERATOR_AND:
+                $result = true;
+                foreach (current($value) as $val) {
+                    if (!$this->isMatchScalarWithScalar($val, $contextValue, $name)) {
+                        $result = false;
+                        break;
+                    }
                 }
-            }
-        } elseif (self::OPERATOR_OR === $operator) {
-            $result = false;
-            foreach (current($value) as $val) {
-                if ($this->isMatchScalarWithScalar($val, $contextValue, $name)) {
-                    $result = true;
-                    break;
+
+                return $result;
+            case self::OPERATOR_OR:
+                $result = false;
+                foreach (current($value) as $val) {
+                    if ($this->isMatchScalarWithScalar($val, $contextValue, $name)) {
+                        $result = true;
+                        break;
+                    }
                 }
-            }
-        } else {
-            $result = false;
+
+                return $result;
         }
 
-        return $result;
+        return false;
     }
 
     /**

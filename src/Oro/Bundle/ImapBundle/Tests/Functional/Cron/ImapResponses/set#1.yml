@@ -1,0 +1,16 @@
+id: sync_all_origins_and_nothing_not_synced
+description: Sync all origins and nothing not synced
+params: []
+log_info:
+    - 'Resetting hanged email origins ...'
+    - 'Updated 0 row(s).'
+    - 'Finding an email origin ...'
+    - 'Found " ()" email origin. Id: '
+    - 'Get folders enabled for sync...'
+    - 'Got 0 folder(s)'
+    - 'Got 1 folder(s)'
+    - 'The folder "Folder 1" is selected.'
+    - 'Exit because all origins have been synchronised.'
+total: 0
+data: []
+errors: ~

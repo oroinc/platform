@@ -109,11 +109,6 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->extension->configureOptions($resolver);
     }
 
-    public function testGetExtendedType()
-    {
-        $this->assertEquals('form', $this->extension->getExtendedType());
-    }
-
     public function testBuildFormDataProvider()
     {
         return [

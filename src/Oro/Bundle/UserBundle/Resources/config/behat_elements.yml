@@ -1,6 +1,6 @@
 Login:
   selector: '#login-form'
-  class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
   options:
     mapping:
       Username: '_username'
@@ -8,15 +8,15 @@ Login:
 
 User:
   selector: 'div#container'
-  class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
   options:
     mapping:
-      Username: oro_user_user_form[username]
-      Password: oro_user_user_form[plainPassword][first]
-      Re-Enter Password: oro_user_user_form[plainPassword][second]
-      First Name: oro_user_user_form[firstName]
-      Last Name: oro_user_user_form[lastName]
-      Primary Email: oro_user_user_form[email]
+      Username: 'oro_user_user_form[username]'
+      Password: 'oro_user_user_form[plainPassword][first]'
+      Re-Enter Password: 'oro_user_user_form[plainPassword][second]'
+      First Name: 'oro_user_user_form[firstName]'
+      Last Name: 'oro_user_user_form[lastName]'
+      Primary Email: 'oro_user_user_form[email]'
 
 UserMenu:
   selector: {type: 'xpath', locator: '//li[@id="user-menu"]'}

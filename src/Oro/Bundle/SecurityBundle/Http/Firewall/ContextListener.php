@@ -5,8 +5,8 @@ namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 use Doctrine\ORM\NoResultException;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Security;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
@@ -15,7 +15,7 @@ use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 
 class ContextListener
 {
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     private $tokenStorage = false;
 
     /** @var OrganizationManager */
@@ -40,7 +40,7 @@ class ContextListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $token = $this->getTokenStorage()->getToken();
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token instanceof OrganizationContextTokenInterface && $token->getOrganizationContext()) {
             try {
                 $token->setOrganizationContext(
                     $this->getOrganizationManager()->getOrganizationById($token->getOrganizationContext()->getId())
@@ -61,7 +61,7 @@ class ContextListener
     }
 
     /**
-     * @return TokenStorage
+     * @return TokenStorageInterface
      */
     protected function getTokenStorage()
     {

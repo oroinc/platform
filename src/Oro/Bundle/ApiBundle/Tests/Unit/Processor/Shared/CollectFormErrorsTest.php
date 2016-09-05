@@ -2,18 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Validation;
-
-use Doctrine\Common\Annotations\AnnotationReader;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameValuePairType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
@@ -29,7 +24,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new CollectFormErrors();
+        $this->processor = new CollectFormErrors(new ConstraintTextExtractor());
     }
 
     public function testProcessWithoutForm()
@@ -338,22 +333,6 @@ class CollectFormErrorsTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
-    }
-
-    /**
-     * @return FormBuilder
-     */
-    protected function createFormBuilder()
-    {
-        $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(new AnnotationReader())
-            ->getValidator();
-        $formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions([new ValidatorExtension($validator)])
-            ->getFormFactory();
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
-        return new FormBuilder(null, null, $dispatcher, $formFactory);
     }
 
     /**

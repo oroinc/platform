@@ -41,10 +41,13 @@ class EntityMetadata implements ToArrayInterface
     public function __clone()
     {
         if (null !== $this->attributes) {
-            $attributes = ConfigUtil::cloneItems($this->attributes->toArray());
+            $attributes = $this->attributes->toArray();
             $this->attributes->clear();
-            foreach ($attributes as $key => $value) {
-                $this->attributes->set($key, $value);
+            foreach ($attributes as $key => $val) {
+                if (is_object($val)) {
+                    $val = clone $val;
+                }
+                $this->attributes->set($key, $val);
             }
         }
         $this->metaProperties = ConfigUtil::cloneObjects($this->metaProperties);
@@ -527,5 +530,31 @@ class EntityMetadata implements ToArrayInterface
         if (null !== $this->attributes) {
             $this->attributes->remove($attributeName);
         }
+    }
+
+    /**
+     * Checks whether the metadata contains only identifier fields(s).
+     *
+     * @return bool
+     */
+    public function hasIdentifierFieldsOnly()
+    {
+        $idFields = $this->getIdentifierFieldNames();
+        if (empty($idFields)) {
+            return false;
+        }
+
+        $fields = $this->getFields();
+        if (empty($fields)) {
+            return false;
+        }
+
+        if (count($this->getAssociations()) > 0) {
+            return false;
+        }
+
+        return
+            count($fields) === count($idFields)
+            && count(array_diff_key($fields, array_flip($idFields))) === 0;
     }
 }

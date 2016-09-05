@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\CalendarBundle\Manager;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
+use Oro\Bundle\CalendarBundle\Exception\CalendarEventRelatedAttendeeNotFoundException;
+use Oro\Bundle\CalendarBundle\Exception\StatusNotFoundException;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
@@ -62,6 +67,31 @@ class CalendarEventManager
         // @todo: check ACL here. will be done in BAP-6575
 
         return $calendars;
+    }
+
+    /**
+     * @param CalendarEvent $event
+     * @param string $newStatus
+     *
+     * @throws CalendarEventRelatedAttendeeNotFoundException
+     * @throws StatusNotFoundException
+     */
+    public function changeStatus(CalendarEvent $event, $newStatus)
+    {
+        $relatedAttendee = $event->getRelatedAttendee();
+        if (!$relatedAttendee) {
+            throw new CalendarEventRelatedAttendeeNotFoundException();
+        }
+
+        $statusEnum = $this->doctrineHelper
+            ->getEntityRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
+            ->find($newStatus);
+
+        if (!$statusEnum) {
+            throw new StatusNotFoundException(sprintf('Status "%s" does not exists', $newStatus));
+        }
+
+        $relatedAttendee->setStatus($statusEnum);
     }
 
     /**
@@ -174,5 +204,13 @@ class CalendarEventManager
     {
         return $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar')
             ->find($calendarId);
+    }
+
+    /**
+     * @param Recurrence $recurrence
+     */
+    public function removeRecurrence(Recurrence $recurrence)
+    {
+        $this->doctrineHelper->getEntityManager($recurrence)->remove($recurrence);
     }
 }

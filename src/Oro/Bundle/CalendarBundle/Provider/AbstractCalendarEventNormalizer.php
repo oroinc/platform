@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\AbstractQuery;
 
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 
 abstract class AbstractCalendarEventNormalizer
@@ -12,12 +13,17 @@ abstract class AbstractCalendarEventNormalizer
     /** @var ReminderManager */
     protected $reminderManager;
 
+    /** @var AttendeeManager */
+    protected $attendeeManager;
+
     /**
      * @param ReminderManager $reminderManager
+     * @param AttendeeManager $attendeeManager
      */
-    public function __construct(ReminderManager $reminderManager)
+    public function __construct(ReminderManager $reminderManager, AttendeeManager $attendeeManager)
     {
         $this->reminderManager = $reminderManager;
+        $this->attendeeManager = $attendeeManager;
     }
 
     /**
@@ -36,14 +42,35 @@ abstract class AbstractCalendarEventNormalizer
         foreach ($rawData as $rawDataItem) {
             $result[] = $this->transformEntity($rawDataItem);
         }
+
         $this->applyAdditionalData($result, $calendarId);
+
         foreach ($result as &$resultItem) {
             $this->applyPermissions($resultItem, $calendarId);
         }
 
+        $this->addAttendeesToCalendarEvents($result);
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
         return $result;
+    }
+
+    /**
+     * @param array $calendarEvents
+     */
+    protected function addAttendeesToCalendarEvents(array &$calendarEvents)
+    {
+        $calendarEventIds = array_map(
+            function ($calendarEvent) {
+                return $calendarEvent['id'];
+            },
+            $calendarEvents
+        );
+
+        $attendeeLists = $this->attendeeManager->getAttendeeListsByCalendarEventIds($calendarEventIds);
+        foreach ($calendarEvents as $key => $calendarEvent) {
+            $calendarEvents[$key]['attendees'] = $this->transformEntity($attendeeLists[$calendarEvent['id']]);
+        }
     }
 
     /**
@@ -75,6 +102,8 @@ abstract class AbstractCalendarEventNormalizer
             $value = (string)$value;
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
+        } elseif (is_array($value)) {
+            $value = $this->transformEntity($value);
         }
     }
 

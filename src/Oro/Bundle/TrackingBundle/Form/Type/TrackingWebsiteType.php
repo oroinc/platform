@@ -8,6 +8,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TrackingWebsiteType extends AbstractType
 {
+    const NAME = 'oro_tracking_website';
+
     /**
      * @var string
      */
@@ -69,6 +71,14 @@ class TrackingWebsiteType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_tracking_website';
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
+        return self::NAME;
     }
 }

@@ -39,8 +39,9 @@ class BigNumberProcessor
      * @param                 $providerAlias
      * @param                 $getterName
      * @param                 $dataType
-     * @param bool            $lessIsBetter
-     * @param bool            $lastWeek
+     * @param bool   $lessIsBetter
+     * @param bool   $lastWeek
+     * @param string $comparable
      * @return array
      */
     public function getBigNumberValues(
@@ -49,7 +50,8 @@ class BigNumberProcessor
         $getterName,
         $dataType,
         $lessIsBetter = false,
-        $lastWeek = false
+        $lastWeek = false,
+        $comparable = 'true'
     ) {
         $getter           = $this->getGetter($providerAlias, $getterName);
         $lessIsBetter     = (bool)$lessIsBetter;
@@ -58,15 +60,20 @@ class BigNumberProcessor
         $value            = call_user_func($getter, $dateRange, $owners);
         $previousInterval = $widgetOptions->get('usePreviousInterval', []);
         $previousData     = [];
+        $comparable       = $comparable == 'true' ? true : false;
 
         if (count($previousInterval)) {
-            if ($lastWeek) {
-                $previousInterval = $this->dateHelper->getLastWeekPeriod(-1);
+            if ($comparable) {
+                if ($lastWeek) {
+                    $previousInterval = $this->dateHelper->getLastWeekPeriod(-1);
+                }
+
+                $previousData['value']        = call_user_func($getter, $previousInterval);
+                $previousData['dateRange']    = $previousInterval;
+                $previousData['lessIsBetter'] = $lessIsBetter;
             }
 
-            $previousData['value']        = call_user_func($getter, $previousInterval);
-            $previousData['dateRange']    = $previousInterval;
-            $previousData['lessIsBetter'] = $lessIsBetter;
+            $previousData['comparable'] = $comparable;
         }
 
         return $this->bigNumberFormatter->formatResult($value, $dataType, $previousData);

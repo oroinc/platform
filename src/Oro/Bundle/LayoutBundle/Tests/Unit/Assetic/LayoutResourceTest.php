@@ -49,17 +49,17 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
         return [
             'without_assets' => [],
             'with_empty_assets' => [
-                'data' => ['assets' => []],
+                'config' => ['assets' => []],
             ],
             'with_one_asset' => [
-                'data' => [
+                'config' => [
                     'assets' => [
                         'first' => $asset,
                     ]
                 ],
             ],
             'with_two_asset' => [
-                'data' => [
+                'config' => [
                     'assets' => [
                         'first' => $asset,
                         'second' => $asset,
@@ -68,14 +68,14 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
             ],
             'with_parent' => [
                 'parent' => 'parent',
-                'data' => [
+                'config' => [
                     'assets' => [
                         'first' => $asset,
                     ]
                 ],
             ],
             'parent' => [
-                'data' => [
+                'config' => [
                     'assets' => [
                         'first' => ['inputs' => ['parent_styles.css']],
                     ]
@@ -99,13 +99,13 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
         $themes = $this->getThemes();
         $formulae = [];
         foreach ($themes as $themeName => $theme) {
-            if (!isset($theme['data']) || !isset($theme['data']['assets']) || empty($theme['data']['assets'])) {
+            if (!isset($theme['config']) || !isset($theme['config']['assets']) || empty($theme['config']['assets'])) {
                 continue;
             }
 
-            $assets = $theme['data']['assets'];
+            $assets = $theme['config']['assets'];
             if (isset($theme['parent'])) {
-                $assets = array_merge_recursive($themes[$theme['parent']]['data']['assets'], $assets);
+                $assets = array_merge_recursive($themes[$theme['parent']]['config']['assets'], $assets);
             }
             foreach ($assets as $assetKey => $asset) {
                 if (!isset($asset['output']) || empty($asset['inputs'])) {

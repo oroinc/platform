@@ -15,6 +15,10 @@ class GetAndDeleteRestPlainApiTest extends RestPlainApiTestCase
      */
     public function testRestRequests($entityClass, $excludedActions)
     {
+        if (in_array('get_list', $excludedActions, true)) {
+            return;
+        }
+
         $entityType = $this->getEntityType($entityClass);
 
         // test "get list" request

@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 class GridViewManagerTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = "Oro\\Bundle\\DataGridBundle\\Entity\\GridView";
+
     /** @var GridViewManager */
     protected $gridViewManager;
 
@@ -24,6 +25,9 @@ class GridViewManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $dataGridManager;
+
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $restrictionManager;
 
     /** @var  GridViewApiEntityManager */
     protected $gridViewApiEntityManager;
@@ -53,10 +57,16 @@ class GridViewManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->restrictionManager = $this
+            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->gridViewManager = new GridViewManager(
             $aclHelper,
             $registry,
-            $this->dataGridManager
+            $this->dataGridManager,
+            $this->restrictionManager
         );
     }
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -11,8 +10,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/role")
@@ -35,6 +35,42 @@ class RoleController extends Controller
     }
 
     /**
+     * @Route("/view/{id}", name="oro_user_role_view", requirements={"id"="\d+"})
+     * @Template
+     * @Acl(
+     *      id="oro_user_role_view",
+     *      type="entity",
+     *      class="OroUserBundle:Role",
+     *      permission="VIEW"
+     * )
+     *
+     * @param Role $role
+     *
+     * @return array
+     */
+    public function viewAction(Role $role)
+    {
+        return [
+            'entity' => $role,
+            'tabsOptions' => [
+                'data' => $this->getTabListOptions()
+            ],
+            'capabilitySetOptions' => [
+                'data' => $this->getRolePrivilegeCapabilityProvider()->getCapabilities($role),
+                'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabList(),
+                'readonly' => true
+            ],
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete a role and un-assign it from all users or reassign users to another role before
+            'allow_delete' =>
+                $role->getId() &&
+                !$this->get('doctrine.orm.entity_manager')
+                    ->getRepository('OroUserBundle:Role')
+                    ->hasAssignedUsers($role)
+        ];
+    }
+
+    /**
      * @Acl(
      *      id="oro_user_role_update",
      *      type="entity",
@@ -43,34 +79,14 @@ class RoleController extends Controller
      * )
      * @Route("/update/{id}", name="oro_user_role_update", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template
+     *
+     * @param Role $entity
+     *
+     * @return array
      */
     public function updateAction(Role $entity)
     {
         return $this->update($entity);
-    }
-
-    /**
-     * @Route(
-     *      "/clone/{id}",
-     *      name="oro_user_role_clone",
-     *      requirements={"id"="\d+"}
-     * )
-     * @AclAncestor("oro_user_role_create")
-     * @Template("OroUserBundle:Role:update.html.twig")
-     *
-     * @param Role $entity
-     * @return array
-     */
-    public function cloneAction(Role $entity)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $clonedLabel = $translator->trans('oro.user.role.clone.label', array('%name%' => $entity->getLabel()));
-
-        $clonedRole = clone $entity;
-        $clonedRole->setLabel($clonedLabel);
-
-        return $this->update($clonedRole);
     }
 
     /**
@@ -88,7 +104,7 @@ class RoleController extends Controller
      * )
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         return array(
             'entity_class' => $this->container->getParameter('oro_user.role.entity.class')
@@ -118,24 +134,16 @@ class RoleController extends Controller
         }
 
         $form = $aclRoleHandler->createView();
-        $tabs = array_map(function ($tab) {
-            /** @var PrivilegeCategory $tab */
-            return [
-                'id' => $tab->getId(),
-                'label' => $this->get('translator')->trans($tab->getLabel())
-            ];
-        }, $categoryProvider->getTabbedCategories());
+        $tabs = $categoryProvider->getTabs();
 
         return [
             'entity' => $role,
             'form' => $form,
             'tabsOptions' => [
-                'data' => array_values($tabs)
+                'data' => $tabs
             ],
-            'capabilitySetOptions' => [
-                'data' => $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilities($role),
-                'tabIds' => $categoryProvider->getTabList()
-            ],
+            'capabilitySetOptions' =>
+                $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilitySetOptions($role),
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before
@@ -145,5 +153,37 @@ class RoleController extends Controller
                     ->getRepository('OroUserBundle:Role')
                     ->hasAssignedUsers($role)
         ];
+    }
+
+    /**
+     * @return RolePrivilegeCategoryProvider
+     */
+    protected function getRolePrivilegeCategoryProvider()
+    {
+        return $this->get('oro_user.provider.role_privilege_category_provider');
+    }
+
+    /**
+     * @return RolePrivilegeCapabilityProvider
+     */
+    protected function getRolePrivilegeCapabilityProvider()
+    {
+        return $this->get('oro_user.provider.role_privilege_capability_provider');
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTabListOptions()
+    {
+        return array_map(
+            function (PrivilegeCategory $tab) {
+                return [
+                    'id' => $tab->getId(),
+                    'label' => $this->get('translator')->trans($tab->getLabel())
+                ];
+            },
+            $this->getRolePrivilegeCategoryProvider()->getTabbedCategories()
+        );
     }
 }

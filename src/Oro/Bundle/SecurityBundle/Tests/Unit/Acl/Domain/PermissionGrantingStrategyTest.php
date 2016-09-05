@@ -76,23 +76,21 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $this->ownerTree = new OwnerTree();
         $this->metadataProvider = new OwnershipMetadataProviderStub($this);
-        $objectIdAccessor = new ObjectIdAccessor();
+
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $objectIdAccessor = new ObjectIdAccessor($doctrineHelper);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProviderMock */
         $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
-        $treeProviderMock->expects($this->any())
-            ->method('getTree')
-            ->will($this->returnValue($this->ownerTree));
+        $treeProviderMock->expects($this->any())->method('getTree')->will($this->returnValue($this->ownerTree));
 
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider->expects($this->any())
-            ->method('hasConfig')
-            ->willReturn(false);
+            ->disableOriginalConstructor()->getMock();
+        $configProvider->expects($this->any())->method('hasConfig')->willReturn(false);
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
@@ -179,7 +177,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     public function testIsGrantedReturnsExceptionIfNoAceIsFound()
     {
         $acl = $this->getAcl();
-        $this->strategy->isGranted($acl, array(1), array($this->sid));
+        $this->strategy->isGranted($acl, [1], [$this->sid]);
     }
 
     public function testIsGrantedObjectAcesHavePriority()
@@ -187,14 +185,14 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl = $this->getAcl();
         $acl->insertClassAce($this->sid, 1);
         $acl->insertObjectAce($this->sid, 1, 0, false);
-        $this->assertFalse($this->strategy->isGranted($acl, array(1), array($this->sid)));
+        $this->assertFalse($this->strategy->isGranted($acl, [1], [$this->sid]));
     }
 
     public function testIsGrantedUsesClassAcesIfNoApplicableObjectAceWasFound()
     {
         $acl = $this->getAcl();
         $acl->insertClassAce($this->sid, 1);
-        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid)));
+        $this->assertTrue($this->strategy->isGranted($acl, [1], [$this->sid]));
     }
 
     public function testObjIsGrantedUsesClassAcesIfNoApplicableObjectAceWasFound()
@@ -209,10 +207,10 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $acl = $this->getAcl(ObjectIdentity::fromDomainObject($obj));
         $acl->insertClassAce($this->rsid, $aceMask);
-        $this->assertTrue($this->strategy->isGranted($acl, $masks, array($this->rsid)));
+        $this->assertTrue($this->strategy->isGranted($acl, $masks, [$this->rsid]));
 
         $this->metadataProvider->setMetadata(get_class($obj), $this->getOrganizationMetadata());
-        $this->assertFalse($this->strategy->isGranted($acl, $masks, array($this->rsid)));
+        $this->assertFalse($this->strategy->isGranted($acl, $masks, [$this->rsid]));
         $this->metadataProvider->setMetadata(get_class($obj), $this->getBusinessUnitMetadata());
         $this->metadataProvider->setMetadata(get_class($obj), $this->getUserMetadata());
     }
@@ -226,7 +224,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl->setParentAcl($parentAcl);
         $acl->insertClassAce($this->sid, 1);
 
-        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid)));
+        $this->assertTrue($this->strategy->isGranted($acl, [1], [$this->sid]));
     }
 
     public function testIsGrantedUsesParentAcesIfNoLocalAcesAreApplicable()
@@ -239,7 +237,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl->setParentAcl($parentAcl);
         $acl->insertClassAce($anotherSid, 1, 0, false);
 
-        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid)));
+        $this->assertTrue($this->strategy->isGranted($acl, [1], [$this->sid]));
     }
 
     /**
@@ -255,7 +253,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl->setParentAcl($parentAcl);
         $acl->insertClassAce($anotherSid, 1, 0, false);
 
-        $this->strategy->isGranted($acl, array(1), array($this->sid));
+        $this->strategy->isGranted($acl, [1], [$this->sid]);
     }
 
     public function testIsGrantedFirstApplicableEntryMakesUltimateDecisionForPermissionIdentityCombination()
@@ -267,11 +265,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $acl->insertClassAce($this->sid, 1, 1, false);
         $acl->insertClassAce($this->sid, 1, 2);
-        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl, [1], [$this->sid, $anotherSid]));
 
         $acl->insertObjectAce($this->sid, 1, 0, false);
         $acl->insertObjectAce($anotherSid, 1, 1);
-        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl, [1], [$this->sid, $anotherSid]));
 
         // change the order of ACEs should not change result
         $acl1 = $this->getAcl();
@@ -279,11 +277,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $acl1->insertClassAce($this->sid, 1, 1);
         $acl1->insertClassAce($this->sid, 1, 2, false);
-        $this->assertTrue($this->strategy->isGranted($acl1, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl1, [1], [$this->sid, $anotherSid]));
 
         $acl1->insertObjectAce($anotherSid, 1, 0);
         $acl1->insertObjectAce($this->sid, 1, 1, false);
-        $this->assertTrue($this->strategy->isGranted($acl1, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl1, [1], [$this->sid, $anotherSid]));
     }
 
     public function testIsGrantedCallsAuditLoggerOnGrant()
@@ -298,7 +296,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl->insertObjectAce($this->sid, 1);
         $acl->updateObjectAuditing(0, true, false);
 
-        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid)));
+        $this->assertTrue($this->strategy->isGranted($acl, [1], [$this->sid]));
     }
 
     public function testIsGrantedCallsAuditLoggerOnDeny()
@@ -313,42 +311,43 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl->insertObjectAce($this->sid, 1, 0, false);
         $acl->updateObjectAuditing(0, false, true);
 
-        $this->assertFalse($this->strategy->isGranted($acl, array(1), array($this->sid)));
+        $this->assertFalse($this->strategy->isGranted($acl, [1], [$this->sid]));
     }
 
     /**
      * @dataProvider getAllStrategyTests
      */
-    public function testIsGrantedStrategies($maskStrategy, $aceMask, $requiredMask, $result)
+    public function testIsGrantedStrategies($maskStrategy, $aceMask, $requiredMask, $result, $processException = true)
     {
         $acl = $this->getAcl();
         $acl->insertObjectAce($this->sid, $aceMask, 0, true, $maskStrategy);
 
-        if (false === $result) {
+        if (false === $result && $processException) {
             try {
-                $this->strategy->isGranted($acl, array($requiredMask), array($this->sid));
+                $this->strategy->isGranted($acl, [$requiredMask], [$this->sid]);
                 $this->fail('The ACE is not supposed to match.');
             } catch (NoAceFoundException $noAce) {
             }
         } else {
-            $this->assertTrue($this->strategy->isGranted($acl, array($requiredMask), array($this->sid)));
+            $this->assertEquals($result, $this->strategy->isGranted($acl, [$requiredMask], [$this->sid]));
         }
     }
 
     public function getAllStrategyTests()
     {
-        return array(
-            array('all', 1 << 0 | 1 << 1, 1 << 0, true),
-            array('all', 1 << 0 | 1 << 1, 1 << 2, false),
-            array('all', 1 << 0 | 1 << 10, 1 << 0 | 1 << 10, true),
-            array('all', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1 | 1 << 2, false),
-            array('any', 1 << 0 | 1 << 1, 1 << 0, true),
-            array('any', 1 << 0 | 1 << 1, 1 << 0 | 1 << 2, true),
-            array('any', 1 << 0 | 1 << 1, 1 << 2, false),
-            array('equal', 1 << 0 | 1 << 1, 1 << 0, false),
-            array('equal', 1 << 0 | 1 << 1, 1 << 1, false),
-            array('equal', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1, true),
-        );
+        return [
+            ['all', 1 << 0 | 1 << 1, 1 << 0, true],
+            ['all', 1 << 0 | 1 << 1, 1 << 2, false],
+            ['all', 1 << 5 | 1 << 6, 1 << 2, false, false],
+            ['all', 1 << 0 | 1 << 10, 1 << 0 | 1 << 10, true],
+            ['all', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1 | 1 << 2, false],
+            ['any', 1 << 0 | 1 << 1, 1 << 0, true],
+            ['any', 1 << 0 | 1 << 1, 1 << 0 | 1 << 2, true],
+            ['any', 1 << 0 | 1 << 1, 1 << 2, false],
+            ['equal', 1 << 0 | 1 << 1, 1 << 0, false],
+            ['equal', 1 << 0 | 1 << 1, 1 << 1, false],
+            ['equal', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1, true],
+        ];
     }
 
     protected function getAcl($oid = null, $entriesInheriting = true)
@@ -363,7 +362,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             $id++,
             $oid,
             $this->strategy,
-            array(),
+            [],
             $entriesInheriting
         );
     }
@@ -389,8 +388,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  string     $permission
-     * @param  object     $object
+     * @param  string $permission
+     * @param  object $object
+     *
      * @return array|null may return null if permission/object combination is not supported
      */
     private function getMasks($permission, $object)
@@ -399,8 +399,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  string      $permission
-     * @param  mixed       $object
+     * @param  string $permission
+     * @param  mixed  $object
+     *
      * @return MaskBuilder
      */
     private function getMaskBuilder($permission, $object)

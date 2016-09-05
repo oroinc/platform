@@ -20,7 +20,6 @@ If you want to add some data to the layout context you can use `data` method of 
 ```php
 $context->data()->set(
 	'widget_id',
-	'$request._wid',
 	$request->query->get('_wid')
 );
 ```
@@ -28,7 +27,6 @@ $context->data()->set(
 The `set` method has the following arguments:
 
 - `$name` - A string which can be used to access the data.
-- `$identifier` - An unique identifier of the data. Usually it is a url or a route used to get the data. But it can be some string, object, number or something else that uniquely identifies your data.
 - `$value` - The data. The data can be any type, for example an array, object or some scalar type.
 
 Also you can create a [layout context configurator](layout_context.md#context-configurators) to set default data:
@@ -36,7 +34,6 @@ Also you can create a [layout context configurator](layout_context.md#context-co
 ```php
 $context->data()->setDefault(
     'widget_id',
-    '$request._wid',
     function () {
         if (!$this->request) {
             throw new \BadMethodCallException('The request expected.');
@@ -50,63 +47,34 @@ $context->data()->setDefault(
 The `setDefault` method has the following arguments:
 
 - `$name` - A string which can be used to access the data.
-- `$identifier` - An unique identifier of the data. Usually it is a url or a route used to get the data. But it can be some string, object, number or something else that uniquely identifies your data. Also you can use the callback method to get the identifier. The callback definition: `function (array|\ArrayAccess $options) : mixed`, where where `$options` argument represents the context variables.
 - `$value` - The data. The data can be any type, for example an array, object or some scalar type. Also you can use the callback method to get the data. The callback definition: `function (array|\ArrayAccess $options) : mixed`, where where `$options` argument represents the context variables.
 
 
 Defining a data provider
 ------------------------
 
-Each data provider should implement [DataProviderInterface](../../../../Component/Layout/DataProviderInterface.php). This interface has only two methods:
-
-- `getIdentifier` - Returns an unique identifier of tied data. Usually it is a url or a route used to get the data. But it can be some string, object, number or something else that uniquely identifies your data. This method is used only if data is applied to a layout on a client side. So, if you use only server side rendering of layouts you can just raise `BadMethodCallException` exception here.
-- `getData` - Returns the data. The data can be any type, for example an array, object or some scalar type.
-
 As example, let's consider a data provider that returns product details:
 
 ```php
 namespace Acme\Bundle\ProductBundle\Layout\Extension;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataProviderInterface;
+use Acme\Bundle\ProductBundle\Entity\Product;
 
-use Acme\Bundle\ProductBundle\Entity\Repository\ProductRepository;
-
-class ProductDataProvider implements DataProviderInterface
+class ProductDataProvider
 {
-    /** @var ProductRepository */
-    protected $productRepository;
-
     /**
-     * @param ProductRepository $productRepository
+     * @param Product $product
      */
-    public function __construct(ProductRepository $productRepository)
+    public function getCode(Product $product)
     {
-        $this->productRepository = $productRepository;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifier()
-    {
-	    return [
-		    'route' => 'acme_api_get_product',
-		    'parameters' => ['id' => '$context.product_id']
-		];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getData(ContextInterface $context)
-    {
-        return $this->productRepository->find(
-	        $context->get('product_id')
-	    );
+        return $product->getId();
     }
 }
 ```
+
+Also you can implement [AbstractFormProvider](../../../../Component/Layout/DataProvider/AbstractFormProvider.php) if you use forms.
+
+**IMPORTANT:**  DataProvider provider method should begin with `get`, `has` or `is`.
 
 Registering a data provider
 ---------------------------
@@ -115,7 +83,7 @@ To make the layout engine aware of your data provider it should be registered as
 
 ```yaml
 acme_product.layout.data_provider.product:
-    class: Acme\Bundle\ProductBundle\Layout\Extension\ProductDataProvider
+    class: Acme\Bundle\ProductBundle\Layout\DataProvider\ProductProvider
     tags:
         - { name: layout.data_provider, alias: product }
 ```
@@ -142,7 +110,7 @@ There are few ways how data could be accessed. Most common ways are the followin
     }
    ```
    
- - Access data using [ConfigExpression component](../../../../Component/ConfigExpression/README.md) by providing 
+ - Access data using [Symfony expression component](http://symfony.com/doc/current/components/expression_language/introduction.html) by providing 
    expression as an option for some block.
    Example:
 
@@ -154,7 +122,7 @@ There are few ways how data could be accessed. Most common ways are the followin
             parent: product_details
             blockType: text
             options:
-                text: { @value: $data.product.code }
+                text: '=data["product"].getCode()'
    ```
 
 The way how you access the data does not depend on where the data are located, in the layout context or in the standalone data provider. But it is important to remember that standalone data providers have higher priority than data from the layout context. It means that if there are data with the same alias in both the layout context and a standalone data provider registry, the standalone data provider will be used.

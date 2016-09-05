@@ -80,7 +80,7 @@ class Configuration implements ConfigurationInterface
                 $jsExists->setEnv(array('PATH' => $_SERVER['PATH']));
             }
             $jsExists->run();
-            if ($jsExists->getErrorOutput() === null) {
+            if ($jsExists->getErrorOutput() === '') {
                 $availableJsEngines[] = $engine;
             }
         }

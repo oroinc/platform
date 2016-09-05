@@ -647,6 +647,7 @@ services:
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.security_facade'
             - '@oro_email.related_emails.provider'
+            - '@oro_email.tools.email_body_helper'
         tags:
             - { name: twig.extension }
 
@@ -677,6 +678,7 @@ services:
            - '@oro_email.mailbox.process_storage.link'
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
+           - '@oro_email.tools.email_body_helper'
         calls:
            - [ setSecurityContextLink, ['@security.context.link'] ]
         tags:
@@ -744,10 +746,8 @@ services:
     oro_email.manager.email_attachment_manager:
         class: %oro_email.manager.email_attachment_manager.class%
         arguments:
-            - '@knp_gaufrette.filesystem_map'
+            - '@oro_attachment.file_manager'
             - '@doctrine.orm.entity_manager'
-            - '@kernel'
-            - '@oro_security.security_facade.link'
             - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
@@ -781,8 +781,8 @@ services:
     oro_email.email_attachment_transformer:
         class: %oro_email.email_attachment_transformer.class%
         arguments:
-            - '@knp_gaufrette.filesystem_map'
             - '@oro_email.form.factory'
+            - '@oro_attachment.file_manager'
             - '@oro_attachment.manager'
             - '@oro_email.manager.email_attachment_manager'
 
@@ -862,6 +862,7 @@ services:
             - '@oro_ui.html_tag_helper'
             - '@router'
             - '@oro_entity_config.config_manager'
+            - '@oro_email.tools.email_body_helper'
 
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
@@ -911,6 +912,8 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: %oro_email.autocomplete.mailbox_user_search_handler.class%
@@ -1054,3 +1057,8 @@ services:
             - '@oro_email.email.activity.manager'
             - '@oro_email.provider.emailowners.provider'
             - '@oro_email.email.manager'
+
+    oro_email.tools.email_body_helper:
+        class: Oro\Bundle\EmailBundle\Tools\EmailBodyHelper
+        arguments:
+            - '@oro_ui.html_tag_helper'

@@ -95,7 +95,7 @@ class ConfigConverter
         if (!empty($config[ConfigUtil::HINTS])) {
             foreach ($config[ConfigUtil::HINTS] as $hint) {
                 if (is_array($hint)) {
-                    $result->addHint($hint['name'], $hint['value']);
+                    $result->addHint($hint['name'], array_key_exists('value', $hint) ? $hint['value'] : null);
                 } else {
                     $result->addHint($hint);
                 }

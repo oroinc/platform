@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
@@ -26,6 +27,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     /** @var NewEntitiesHelper */
     protected $newEntitiesHelper;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var array */
     protected $cachedEntities = [];
 
@@ -37,6 +41,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param ChainEntityClassNameProvider $chainEntityClassNameProvider
      * @param TranslatorInterface          $translator
      * @param NewEntitiesHelper            $newEntitiesHelper
+     * @param DoctrineHelper               $doctrineHelper
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -45,12 +50,14 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         DatabaseHelper $databaseHelper,
         ChainEntityClassNameProvider $chainEntityClassNameProvider,
         TranslatorInterface $translator,
-        NewEntitiesHelper $newEntitiesHelper
+        NewEntitiesHelper $newEntitiesHelper,
+        DoctrineHelper $doctrineHelper
     ) {
         parent::__construct($eventDispatcher, $strategyHelper, $fieldHelper, $databaseHelper);
         $this->chainEntityClassNameProvider = $chainEntityClassNameProvider;
         $this->translator                   = $translator;
         $this->newEntitiesHelper            = $newEntitiesHelper;
+        $this->doctrineHelper               = $doctrineHelper;
     }
 
 
@@ -290,6 +297,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+
+            $this->doctrineHelper->getEntityManager($entity)->detach($entity);
 
             return null;
         }

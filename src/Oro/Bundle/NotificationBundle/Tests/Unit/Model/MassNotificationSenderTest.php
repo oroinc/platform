@@ -98,10 +98,10 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $this->cm->expects($this->any())->method('get')->will(
             $this->returnValueMap(
                 [
-                    ['oro_notification.email_notification_sender_email', false, false, self::TEST_SENDER_EMAIL],
-                    ['oro_notification.email_notification_sender_name', false, false, self::TEST_SENDER_NAME],
-                    ['oro_notification.mass_notification_recipients', false, false, ''],
-                    ['oro_notification.mass_notification_template', false, false, self::TEMPLATE_NAME]
+                    ['oro_notification.email_notification_sender_email', false, false, null, self::TEST_SENDER_EMAIL],
+                    ['oro_notification.email_notification_sender_name', false, false, null, self::TEST_SENDER_NAME],
+                    ['oro_notification.mass_notification_recipients', false, false, null, ''],
+                    ['oro_notification.mass_notification_template', false, false, null, self::TEMPLATE_NAME]
                 ]
             )
         );
@@ -185,8 +185,8 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $this->cm->expects($this->any())->method('get')->will(
             $this->returnValueMap(
                 [
-                    ['oro_notification.mass_notification_recipients', false, false, $configRecipients],
-                    ['oro_notification.mass_notification_template', false, false, self::TEMPLATE_NAME]
+                    ['oro_notification.mass_notification_recipients', false, false, null, $configRecipients],
+                    ['oro_notification.mass_notification_template', false, false, null, self::TEMPLATE_NAME]
                 ]
             )
         );

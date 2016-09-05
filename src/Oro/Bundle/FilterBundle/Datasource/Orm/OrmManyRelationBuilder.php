@@ -42,8 +42,8 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
     ) {
         list($entity, $alias, $field) = $this->getFilterParts($ds, $fieldName);
 
-        $rootAlias = sprintf('filter_%s', $filterName);
-        $relAlias  = sprintf('filter_%s_rel', $filterName);
+        $rootAlias = sprintf('filter_%s', $ds->generateParameterName($filterName));
+        $relAlias  = sprintf('filter_%s_rel', $ds->generateParameterName($filterName));
 
         $qb = $this->createSubQueryBuilder($ds, $entity, $rootAlias, $field, $relAlias, 'INNER');
         $qb->where($ds->expr()->in($relAlias, $parameterName, true));

@@ -1,8 +1,6 @@
 parameters:
     oro_workflow.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
-    oro_workflow.datagrid.action.workflow_activate.class: Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction
-    oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
     oro_workflow.process_trigger.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
@@ -61,22 +59,42 @@ services:
         deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.context_accessor" instead
 
     oro_workflow.datagrid.action.workflow_activate:
-        class: %oro_workflow.datagrid.action.workflow_activate.class%
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction'
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
 
-    oro_workflow.entity_connector:
-        class: %oro_workflow.entity_connector.class%
+    oro_workflow.datagrid.action.workflow_deactivate:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowDeactivateAction'
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
 
-    oro_workflow.manager:
-        class: %oro_workflow.manager.class%
+    oro_workflow.entity_connector:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector
         arguments:
             - '@doctrine'
+
+    oro_workflow.manager:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
+        arguments:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.config_manager'
             - '@oro_workflow.changes.event.dispatcher'
+            - '@oro_workflow.entity_connector'
+        calls:
+            - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
+
+    oro_workflow.applicability_filter.exclusive_record_group:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter
+        arguments:
+            - '@oro_entity.doctrine_helper'
+
+    oro_workflow.abstract.workflow_aware_manager:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager
+        abstract: true
+        arguments:
+            - '@oro_workflow.manager'
 
     oro_workflow.process.process_factory:
         class: %oro_workflow.process.process_factory.class%
@@ -111,20 +129,27 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_entity_config.provider.workflow'
 
     oro_workflow.permission_registry:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.provider.workflow'
+            - '@oro_workflow.registry'
 
     oro_workflow.exclusion_provider.workflow_item_step:
         class: Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider
         public: false
         tags:
             - { name: oro_entity.exclusion_provider.api }
+
+    oro_workflow.provider.virtual_relation.workflow:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider'
+        arguments:
+            - '@oro_workflow.registry'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
     oro_workflow.handler.transition_helper:
         class: %oro_workflow.handler.transition_helper.class%
@@ -158,7 +183,7 @@ services:
         class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager
         public: false
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.changes.event.dispatcher:
@@ -235,7 +260,6 @@ services:
         arguments:
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.transition_schedule.query_factory'
-            - '@oro_workflow.entity_connector'
         calls:
             - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]

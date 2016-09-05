@@ -6,30 +6,20 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
 {
-    /**
-     * @var WorkflowAssembler
-     */
+    /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
     /**
-     * @var FieldGenerator
-     */
-    protected $fieldGenerator;
-
-    /**
      * @param WorkflowAssembler $workflowAssembler
-     * @param FieldGenerator $fieldGenerator
      */
-    public function __construct(WorkflowAssembler $workflowAssembler, FieldGenerator $fieldGenerator)
+    public function __construct(WorkflowAssembler $workflowAssembler)
     {
         $this->workflowAssembler = $workflowAssembler;
-        $this->fieldGenerator = $fieldGenerator;
     }
 
     /**
@@ -67,6 +57,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             'steps_display_ordered',
             false
         );
+        $groups = [
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => $this->getConfigurationOption(
+                $configuration,
+                WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
+                []
+            ),
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => $this->getConfigurationOption(
+                $configuration,
+                WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
+                []
+            ),
+        ];
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -75,7 +77,10 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setRelatedEntity($configuration['entity'])
             ->setStepsDisplayOrdered($stepsDisplayOrdered)
             ->setSystem($system)
+            ->setActive($configuration['defaults']['active'])
+            ->setPriority($configuration['priority'])
             ->setEntityAttributeName($entityAttributeName)
+            ->setGroups($groups)
             ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
@@ -85,8 +90,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
         $this->setEntityAcls($workflowDefinition, $workflow);
         $this->setEntityRestrictions($workflowDefinition, $workflow);
-
-        $this->fieldGenerator->generateWorkflowFields($workflowDefinition->getRelatedEntity());
 
         return $workflowDefinition;
     }
@@ -149,7 +152,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     protected function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $restrictions = $workflow->getRestrictions();
-        $workflowDefinition->getConfiguration();
         $workflowRestrictions = [];
         foreach ($restrictions as $restriction) {
             $workflowRestriction = new WorkflowRestriction();

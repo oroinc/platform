@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchAfter;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchBefore;
@@ -20,29 +21,44 @@ class AclPermissionController extends Controller
 {
     /**
      * @Route(
-     *  "/acl-access-levels/{oid}",
+     *  "/acl-access-levels/{oid}/{permission}",
      *  name="oro_security_access_levels",
-     *  requirements={"oid"="\w+:[\w\(\)]+"},
-     *  defaults={"_format"="json"}
+     *  requirements={"oid"="[\w]+:[\w\:\(\)]+", "permission"="[\w/]+"},
+     *  defaults={"_format"="json", "permission"=null}
      * )
      * @Template
      *
      * @param string $oid
+     * @param string $permission
      *
      * @return array
      */
-    public function aclAccessLevelsAction($oid)
+    public function aclAccessLevelsAction($oid, $permission = null)
     {
-        if (strpos($oid, 'entity:') === 0) {
-            $entity = substr($oid, 7);
+        if (ObjectIdentityHelper::getExtensionKeyFromIdentityString($oid) === 'entity') {
+            $entity = ObjectIdentityHelper::getClassFromIdentityString($oid);
             if ($entity !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-                $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass($entity);
+                if (ObjectIdentityHelper::isFieldEncodedKey($entity)) {
+                    list($className, $fieldName) = ObjectIdentityHelper::decodeEntityFieldInfo($entity);
+                    $oid = ObjectIdentityHelper::encodeIdentityString(
+                        'entity',
+                        ObjectIdentityHelper::encodeEntityFieldInfo(
+                            $this->get('oro_entity.routing_helper')->resolveEntityClass($className),
+                            $fieldName
+                        )
+                    );
+                } else {
+                    $oid = ObjectIdentityHelper::encodeIdentityString(
+                        'entity',
+                        $this->get('oro_entity.routing_helper')->resolveEntityClass($entity)
+                    );
+                }
             }
         }
 
         $levels = $this
             ->get('oro_security.acl.manager')
-            ->getAccessLevels($oid);
+            ->getAccessLevels($oid, $permission);
 
         return ['levels' => $levels];
     }

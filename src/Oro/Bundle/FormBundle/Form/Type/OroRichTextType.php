@@ -50,7 +50,7 @@ class OroRichTextType extends AbstractType
     /**
      * @var array
      */
-    public static $defaultPlugins = ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen'];
+    public static $defaultPlugins = ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste'];
 
     /**
      * @param ConfigManager   $configManager
@@ -174,6 +174,14 @@ class OroRichTextType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

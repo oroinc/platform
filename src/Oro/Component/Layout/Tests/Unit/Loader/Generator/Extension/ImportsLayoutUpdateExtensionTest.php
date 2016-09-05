@@ -86,7 +86,11 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareWithImportedLayoutUpdate()
     {
-        $filename = 'default/imports/import_name/filename.yml';
+        $filename = str_replace(
+            '/',
+            DIRECTORY_SEPARATOR,
+            'default/imports/import_name/filename.yml'
+        );
 
         $collection = $this->getMock(VisitorCollection::class);
         $collection->expects($this->once())
@@ -98,7 +102,11 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareWithNotImportedLayoutUpdate()
     {
-        $filename = 'default/not_imported/import_name/filename.yml';
+        $filename = str_replace(
+            '/',
+            DIRECTORY_SEPARATOR,
+            'default/not_imported/import_name/filename.yml'
+        );
 
         $collection = $this->getMock(VisitorCollection::class);
         $collection->expects($this->never())
@@ -110,7 +118,12 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareImportedLayoutUpdateWithImports()
     {
-        $filename = 'default/imports/import_name/filename.yml';
+        $filename = str_replace(
+            '/',
+            DIRECTORY_SEPARATOR,
+            'default/imports/import_name/filename.yml'
+        );
+
         $source = [
             ImportsLayoutUpdateExtension::NODE_IMPORTS => [
                 [

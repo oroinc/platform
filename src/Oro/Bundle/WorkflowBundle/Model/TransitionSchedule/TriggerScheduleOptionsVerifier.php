@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 
@@ -18,22 +17,14 @@ class TriggerScheduleOptionsVerifier
     /** @var TransitionQueryFactory */
     private $queryFactory;
 
-    /** @var EntityConnector */
-    private $entityConnector;
-
     /**
      * @param WorkflowAssembler $workflowAssembler
      * @param TransitionQueryFactory $queryFactory
-     * @param EntityConnector $entityConnector
      */
-    public function __construct(
-        WorkflowAssembler $workflowAssembler,
-        TransitionQueryFactory $queryFactory,
-        EntityConnector $entityConnector
-    ) {
+    public function __construct(WorkflowAssembler $workflowAssembler, TransitionQueryFactory $queryFactory)
+    {
         $this->workflowAssembler = $workflowAssembler;
         $this->queryFactory = $queryFactory;
-        $this->entityConnector = $entityConnector;
     }
 
     /**
@@ -89,21 +80,12 @@ class TriggerScheduleOptionsVerifier
      */
     protected function prepareExpressions(array $options, WorkflowDefinition $workflowDefinition, $transitionName)
     {
-        $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
-        $entity = $workflowDefinition->getRelatedEntity();
-        if (!$this->entityConnector->isWorkflowAware($entity)) {
-            unset($options['filter']);
-        }
-
         if (array_key_exists('filter', $options)) {
-            $steps = [];
-            foreach ($workflow->getStepManager()->getRelatedTransitionSteps($transitionName) as $step) {
-                $steps[] = $step->getName();
-            }
-
+            $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
+            
             $options['filter'] = $this->queryFactory->create(
-                $steps,
-                $entity,
+                $workflow,
+                $transitionName,
                 $options['filter']
             );
         }

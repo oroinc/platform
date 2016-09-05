@@ -14,6 +14,11 @@ class OrganizationRememberMeFactory extends RememberMeFactory
      */
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
+        /**
+         * Add compatibility with Symfony version below 2.8 and current version (2.8)
+         */
+        $secretKey = isset($config['secret']) ?  $config['secret'] : $config['key'];
+
         // authentication provider
         $authProviderId = 'oro_security.authentication.provider.organization_rememberme.' . $id;
         $container
@@ -21,7 +26,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
                 $authProviderId,
                 new DefinitionDecorator('oro_security.authentication.provider.organization_rememberme')
             )
-            ->addArgument($config['key'])
+            ->addArgument($secretKey)
             ->addArgument($id);
 
 
@@ -41,7 +46,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
         }
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
-        $rememberMeServices->replaceArgument(1, $config['key']);
+        $rememberMeServices->replaceArgument(1, $secretKey);
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {

@@ -66,7 +66,7 @@ class SubresourceConfig
      */
     public function __clone()
     {
-        $this->cloneItems();
+        $this->items = ConfigUtil::cloneItems($this->items);
         $this->actions = ConfigUtil::cloneObjects($this->actions);
     }
 }

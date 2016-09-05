@@ -35,14 +35,7 @@ parameters:
 
     oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
 
-    oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
-
 services:
-    oro_locale.cache:
-            parent: oro.cache.abstract
-            calls:
-                - [ setNamespace, [ 'oro_locale' ] ]
-
     oro_locale.settings:
         class: %oro_locale.settings.class%
         arguments:
@@ -56,11 +49,9 @@ services:
 
     oro_locale.helper.localization:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
-        public: false
         arguments:
-            - "@doctrine"
-        calls:
-            - [setEntityClass, ['%oro_locale.entity.localization.class%']]
+            - '@oro_locale.manager.localization'
+            - '@oro_locale.provider.current_localization'
 
     oro_locale.listener.orm.localization_listener:
         class: 'Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener'
@@ -70,6 +61,20 @@ services:
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postRemove }
+
+    oro_locale.datagrid.extension.localized_value:
+        class: 'Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_locale.datagird.formatter.localized_value_property:
+        class: 'Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty'
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: localized_value }
 
     oro_locale.translation.strategy.localization_fallback_strategy:
         class: 'Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy'
@@ -79,12 +84,6 @@ services:
             - '@oro_locale.cache.provider.tree_fallback_strategy'
         calls:
             - [setEntityClass, ['%oro_locale.entity.localization.class%']]
-
-    oro_locale.cache.provider.tree_fallback_strategy:
-        parent: oro.cache.abstract
-        public: false
-        calls:
-            - [ setNamespace, [ 'oro_locale_tree_fallback_strategy' ] ]
 
     # Calendar
     oro_locale.calendar:
@@ -234,6 +233,7 @@ services:
         arguments:
             - '@oro_locale.formatter.language_code'
             - '@oro_locale.formatter.formatting_code'
+            - '@oro_locale.helper.localization'
         tags:
             - { name: twig.extension }
 
@@ -275,6 +275,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_locale.localization_validator }
 
+    oro_locale.validator.default_localization:
+        class: 'Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator'
+        arguments:
+            - '@oro_locale.manager.localization'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_locale.default_localization_validator }
+
     oro_locale.acl.voter.localization:
         class: 'Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter'
         arguments:
@@ -293,10 +300,19 @@ services:
     oro_locale.provider.localization_choices:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
         arguments:
-            - '@oro_locale.repository.localization'
             - '@oro_config.manager'
             - '@oro_locale.formatter.language_code'
             - '@oro_locale.formatter.formatting_code'
+            - '@oro_locale.manager.localization'
+
+    oro_locale.manager.localization:
+        class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
+        arguments:
+            - '@oro_locale.repository.localization'
+            - '@oro_config.global'
+
+    oro_locale.provider.current_localization:
+        class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
 
     oro_locale.entity_generator.extension:
         class: %oro_locale.entity_generator.extension.class%
@@ -311,3 +327,10 @@ services:
             - [setConfigManager, ['@oro_config.global']]
         tags:
             - { name: twig.extension }
+
+    oro_locale.layout.data_provider.locale:
+        class: Oro\Bundle\LocaleBundle\Layout\LocaleProvider
+        arguments:
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: layout.data_provider, alias: locale }

@@ -37,9 +37,17 @@ class TagType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_tag_tag';
     }

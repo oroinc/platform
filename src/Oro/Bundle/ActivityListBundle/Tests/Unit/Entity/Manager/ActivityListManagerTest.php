@@ -25,9 +25,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     protected $entityNameResolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $pager;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $config;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -60,8 +57,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()->getMock();
-        $this->pager              = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
-            ->disableOriginalConstructor()->getMock();
         $this->config             = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
         $this->doctrineHelper     = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -88,7 +83,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityListManager = new ActivityListManager(
             $this->securityFacade,
             $this->entityNameResolver,
-            $this->pager,
             $this->config,
             $this->provider,
             $this->activityListFilterHelper,
@@ -102,60 +96,11 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRepository()
     {
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepository')->with('OroActivityListBundle:ActivityList');
+        $this->doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityRepository')
+            ->with('OroActivityListBundle:ActivityList');
         $this->activityListManager->getRepository();
-    }
-
-    public function testGetList()
-    {
-        $classMeta     = new ClassMetadata('Oro\Bundle\ActivityListBundle\Entity\ActivityList');
-        $repo          = new ActivityListRepository($this->em, $classMeta);
-        $testClass     = 'Acme\TestBundle\Entity\TestEntity';
-        $testId        = 12;
-        $page          = 2;
-        $filter        = [];
-        $configPerPare = 10;
-
-        $this->config->expects($this->any())->method('get')
-            ->willReturnCallback(
-                function ($configKey) {
-                    if ($configKey === 'oro_activity_list.per_page') {
-                        return 10;
-                    }
-                    if ($configKey === 'oro_activity_list.sorting_field') {
-                        return 'createdBy';
-                    }
-                    if ($configKey === 'oro_activity_list.grouping') {
-                        return false;
-                    }
-                    return 'ASC';
-                }
-            );
-
-        $this->aclHelper->expects($this->any())->method('applyAclCriteria')->willReturn('');
-
-        $qb = new QueryBuilder($this->em);
-        $this->em->expects($this->any())->method('createQueryBuilder')->willReturn($qb);
-        $this->doctrineHelper->expects($this->any())->method('getEntityRepository')->willReturn($repo);
-        $this->activityListFilterHelper->expects($this->once())->method('addFiltersToQuery')->with($qb, $filter);
-        $this->pager->expects($this->once())->method('setQueryBuilder')->with($qb);
-        $this->pager->expects($this->once())->method('setPage')->with($page);
-
-        $this->pager->expects($this->once())->method('setMaxPerPage')->with($configPerPare);
-        $this->pager->expects($this->once())->method('init');
-        $this->pager->expects($this->once())->method('getResults')->willReturn([]);
-
-        $this->provider->expects($this->once())->method('getProviders')->willReturn([]);
-
-        $this->activityListManager->getList($testClass, $testId, $filter, $page);
-
-        $expectedDQL = 'SELECT activity FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
-            . 'LEFT JOIN activity.test_entity_9d8125dd r LEFT JOIN activity.activityOwners ao '
-            . 'WHERE r.id = :entityId GROUP BY activity.id ORDER BY activity.createdBy ASC';
-
-        $this->assertEquals($expectedDQL, $qb->getDQL());
-        $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }
 
     public function testGetNonExistItem()

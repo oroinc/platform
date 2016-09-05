@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * Represents a field configuration inside "actions" section.
  */
@@ -41,6 +43,6 @@ class ActionFieldConfig implements FieldConfigInterface
      */
     public function __clone()
     {
-        $this->cloneItems();
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 }

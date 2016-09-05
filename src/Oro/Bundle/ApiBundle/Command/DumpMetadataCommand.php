@@ -63,7 +63,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
         $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
-        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
+        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
 
         $metadata = $this->getMetadata($entityClass, $version, $requestType, $action);
         $output->write(Yaml::dump($metadata, 100, 4, true, true));
@@ -93,8 +93,8 @@ class DumpMetadataCommand extends AbstractDebugCommand
             $entityClass,
             $version,
             $requestType,
-            [],
-            $config->getDefinition()
+            $config->getDefinition(),
+            []
         );
 
         return [

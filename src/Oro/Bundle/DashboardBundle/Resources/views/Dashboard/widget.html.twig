@@ -28,7 +28,12 @@
                     {% else %}
                         {% set label = configName %}
                     {% endif %}
-                    <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ config.value }}</div>
+                    {% if config.options is defined and config.options.choices is defined %}
+                        {% set value = config.options.choices[config.value]|trans %}
+                    {% else %}
+                        {% set value = config.value %}
+                    {% endif %}
+                    <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ value }}</div>
                 {% endif %}
             {% endif %}
         {% endfor %}

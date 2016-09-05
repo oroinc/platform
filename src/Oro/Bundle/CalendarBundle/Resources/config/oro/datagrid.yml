@@ -1,0 +1,561 @@
+datagrid:
+    calendar-event-grid:
+        acl_resource: oro_calendar_event_view
+        source:
+            type: orm
+            query:
+                select:
+                    - partial event.{ id, start, recurrence }
+                    - event.id
+                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
+                    - event.title
+                    - event.start
+                    - event.end
+                    - status.id as invitationStatus
+                    - parent.id as parentId
+                    - owner.id as ownerId
+                    - COUNT(children.id) as childrenCount
+                    - (CASE WHEN (recurrence.id IS NULL) THEN false ELSE true END) as is_recurrent
+                from:
+                    - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
+                join:
+                    left:
+                        - { join: event.parent, alias: parent }
+                        - { join:  %oro_calendar.calendar_event.entity.class%, alias: children, conditionType: WITH, condition: 'children.parent = event' }
+                        - { join: event.relatedAttendee, alias: ra }
+                        - { join: ra.status, alias: status }
+                        - { join: event.recurrence, alias: recurrence }
+                    inner:
+                        - { join: event.calendar, alias: calendar }
+                        - { join: calendar.owner, alias: owner }
+                        -
+                            join: %oro_calendar.calendar_property.entity.class%
+                            alias: connection
+                            conditionType: WITH
+                            condition: "connection.calendarAlias = 'user' AND connection.calendar = calendar.id AND connection.visible = true"
+                        - { join: connection.targetCalendar, alias: targetCalendar }
+                where:
+                    and:
+                        - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
+                        - event.cancelled = false
+                groupBy: event.id, calendar.name, owner.firstName, owner.lastName, parentId, ownerId
+        columns:
+            title:
+                label: oro.calendar.calendarevent.title.label
+            name:
+                label: oro.calendar.calendarevent.calendar.label
+            start:
+                label: oro.calendar.calendarevent.start.label
+                frontend_type: datetime
+            end:
+                label: oro.calendar.calendarevent.end.label
+                frontend_type: datetime
+            is_recurrent:
+                label: oro.calendar.calendarevent.recurrence.alias.recurrent
+                frontend_type: boolean
+            recurrence:
+                label: oro.calendar.calendarevent.recurrence.label
+                type: twig
+                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/recurrence.html.twig
+                frontend_type: html
+            invitationStatus:
+                label: oro.calendar.calendarevent.invitation_status.label
+                type: twig
+                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/status.html.twig
+                frontend_type: html
+        sorters:
+            columns:
+                title:
+                    data_name: event.title
+                name:
+                    data_name: name
+                start:
+                    data_name: event.start
+                end:
+                    data_name: event.end
+                invitationStatus:
+                    data_name: event.invitationStatus
+            default:
+                start: ASC
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: event.title
+                name:
+                    type: string
+                    data_name: name
+                start:
+                    type: datetime
+                    data_name: event.start
+                end:
+                    type: datetime
+                    data_name: event.end
+                is_recurrent:
+                    type: boolean
+                    data_name: is_recurrent
+                invitationStatus:
+                    type: enum
+                    enum_code: ce_attendee_status
+                    data_name: status.id
+        properties:
+            id: ~
+            view_link:
+                type:       url
+                route:      oro_calendar_event_view
+                params:     [ id ]
+            update_link:
+                type:       url
+                route:      oro_calendar_event_update
+                params:     [ id ]
+            delete_link:
+                type:     callback
+                callable: "@oro_calendar.datagrid.helper.calendar_event_grid->getDeleteLinkProperty"
+                route:    oro_calendar_event_delete
+                params:   [ id ]
+            accept_link:
+                type:       url
+                route:      oro_calendar_event_accepted
+                params:     [ id ]
+            tentatively_link:
+                type:       url
+                route:      oro_calendar_event_tentative
+                params:     [ id ]
+            decline_link:
+                type:       url
+                route:      oro_calendar_event_declined
+                params:     [ id ]
+        actions:
+            accept:
+                type:         ajax
+                label:        Accept
+                link:         accept_link
+                icon:         ok
+                acl_resource: oro_calendar_event_view
+            tentatively:
+                type:         ajax
+                label:        Tentative
+                link:         tentatively_link
+                icon:         question
+                acl_resource: oro_calendar_event_view
+            decline:
+                type:         ajax
+                label:        Decline
+                link:         decline_link
+                icon:         remove
+                acl_resource: oro_calendar_event_view
+            view:
+                type:         navigate
+                label:        View
+                link:         view_link
+                icon:         eye-open
+                acl_resource: oro_calendar_event_view
+                rowAction:    true
+            update:
+                type:          navigate
+                acl_resource:  oro_calendar_event_create
+                label:         Update
+                icon:          edit
+                link:          update_link
+            delete:
+                type:          delete
+                acl_resource:  oro_calendar_event_delete
+                label:         Delete
+                icon:          trash
+                link:          delete_link
+        action_configuration: ['@oro_calendar.datagrid.action_permission_provider', "getInvitationPermissions"]
+        options:
+            entityHint: calendar_events
+            entity_pagination: true
+
+    widget-base-calendar-event-grid:
+        acl_resource: oro_calendar_event_view
+        source:
+            type: orm
+            query:
+                select:
+                    - event.id
+                    - event.title
+                    - event.start
+                    - event.end
+                from:
+                    - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
+        columns:
+            title:
+                label: oro.calendar.calendarevent.title.label
+                type: twig
+                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/title.html.twig
+                frontend_type: html
+            start:
+                label: oro.calendar.calendarevent.start.label
+                frontend_type: datetime
+            end:
+                label: oro.calendar.calendarevent.end.label
+                frontend_type: datetime
+        sorters:
+            columns:
+                title:
+                    data_name: event.title
+                start:
+                    data_name: event.start
+                end:
+                    data_name: event.end
+            default:
+                start: ASC
+        properties:
+            id: ~
+        options:
+            entityHint: calendar_events
+
+    activity-calendar-event-grid:
+        extends: widget-base-calendar-event-grid
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: event.title
+                start:
+                    type: datetime
+                    data_name: event.start
+                end:
+                    type: datetime
+                    data_name: event.end
+
+    users-calendar-select-grid-exclude-owner:
+        acl_resource: oro_user_user_view
+        options:
+            entityHint: calendar
+        source:
+            type: orm
+            query:
+                select:
+                    - calendar.id as id
+                    - u.username
+                    - u.email
+                    - u.firstName
+                    - u.lastName
+                    - u.enabled
+                from:
+                    - { table: %oro_calendar.calendar.entity.class%, alias: calendar }
+                join:
+                    inner:
+                        - { join: calendar.owner, alias: u }
+                where:
+                    and:
+                        - u.id != @oro_security.security_facade->getLoggedUserId
+        columns:
+            username:
+                label: oro.user.username.label
+            email:
+                label: oro.user.email.label
+            firstName:
+                label: oro.user.first_name.label
+            lastName:
+                label: oro.user.last_name.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
+
+        properties:
+            id: ~
+        sorters:
+            columns:
+                username:
+                    data_name: u.username
+                email:
+                    data_name: u.email
+                firstName:
+                    data_name: u.firstName
+                lastName:
+                    data_name: u.lastName
+                enabled:
+                    data_name: u.enabled
+            default:
+                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        filters:
+            columns:
+                username:
+                    type: string
+                    data_name: u.username
+                email:
+                    type: string
+                    data_name: u.email
+                firstName:
+                    type: string
+                    data_name: u.firstName
+                lastName:
+                    type: string
+                    data_name: u.lastName
+                enabled:
+                    type: boolean
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                2: Inactive
+                                1: Active
+
+    base-system-calendar-event-grid:
+        source:
+            type: orm
+            skip_acl_apply: true
+            query:
+                select:
+                    - event.id
+                    - event.title
+                    - event.start
+                    - event.end
+                from:
+                    - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
+                join:
+                    inner:
+                        - { join: event.systemCalendar, alias: calendar }
+                where:
+                    and:
+                        - calendar.id = :calendarId
+            bind_parameters:
+                - calendarId
+        columns:
+            title:
+                label: oro.calendar.calendarevent.title.label
+            start:
+                label: oro.calendar.calendarevent.start.label
+                frontend_type: datetime
+            end:
+                label: oro.calendar.calendarevent.end.label
+                frontend_type: datetime
+        sorters:
+            columns:
+                title:
+                    data_name: event.title
+                start:
+                    data_name: event.start
+                end:
+                    data_name: event.end
+            default:
+                start: ASC
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: event.title
+                start:
+                    type: datetime
+                    data_name: event.start
+                end:
+                    type: datetime
+                    data_name: event.end
+        properties:
+            id: ~
+            view_link:
+                type:       url
+                route:      oro_system_calendar_event_view
+                params:     [ id ]
+            update_link:
+                type:       url
+                route:      oro_system_calendar_event_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_calendar_event_delete
+                params:     [ id ]
+        actions:
+            view:
+                type:         navigate
+                label:        View
+                link:         view_link
+                icon:         eye-open
+                acl_resource: oro_calendar_event_view
+                rowAction:    true
+            update:
+                type:          navigate
+                acl_resource:  oro_calendar_event_create
+                label:         Update
+                icon:          edit
+                link:          update_link
+            delete:
+                type:          delete
+                acl_resource:  oro_calendar_event_delete
+                label:         Delete
+                icon:          trash
+                link:          delete_link
+        options:
+            entityHint: calendar_events
+            entity_pagination: true
+
+    system-calendar-event-grid:
+        extends: base-system-calendar-event-grid
+        source:
+            query:
+                where:
+                    and:
+                        - calendar.public = false
+        action_configuration: "@oro_calendar.system_calendar_event.datagrid_helper->getSystemActionConfigurationClosure"
+
+    public-system-calendar-event-grid:
+        extends: base-system-calendar-event-grid
+        source:
+            query:
+                where:
+                    and:
+                        - calendar.public = true
+        action_configuration: "@oro_calendar.system_calendar_event.datagrid_helper->getPublicActionConfigurationClosure"
+
+    system-calendar-grid:
+        source:
+            type: orm
+            skip_acl_apply: true
+            query:
+                select:
+                    - sc.id
+                    - sc.name
+                    - sc.public
+                from:
+                    - { table: %oro_calendar.system_calendar.entity.class%, alias: sc }
+        columns:
+            name:
+                label: oro.calendar.systemcalendar.name.label
+            public:
+                label: oro.calendar.systemcalendar.public.label
+                frontend_type: select
+                choices:
+                    0: oro.calendar.systemcalendar.scope.organization
+                    1: oro.calendar.systemcalendar.scope.system
+        sorters:
+            columns:
+                name:
+                    data_name: sc.name
+                public:
+                    data_name: sc.public
+            default:
+                name: ASC
+        filters:
+            columns:
+                name:
+                    type:       string
+                    data_name:  sc.name
+                public:
+                    type:       choice
+                    data_name:  sc.public
+                    options:
+                        field_options:
+                            choices:
+                                0: oro.calendar.systemcalendar.scope.organization
+                                1: oro.calendar.systemcalendar.scope.system
+        properties:
+            id: ~
+            view_link:
+                type:       url
+                route:      oro_system_calendar_view
+                params:     [ id ]
+            update_link:
+                type:       url
+                route:      oro_system_calendar_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_api_delete_systemcalendar
+                params:     [ id ]
+        actions:
+            view:
+                type:         navigate
+                label:        View
+                link:         view_link
+                icon:         eye-open
+                rowAction:    true
+            update:
+                type:          navigate
+                label:         Update
+                icon:          edit
+                link:          update_link
+            delete:
+                type:          delete
+                label:         Delete
+                icon:          trash
+                link:          delete_link
+        action_configuration: "@oro_calendar.listener.datagrid.system_calendar->getActionConfigurationClosure"
+
+
+    calendar-event-for-context-grid:
+        extended_entity_name: %oro_calendar.calendar_event.entity.class%
+        acl_resource: oro_calendar_event_view
+        options:
+            entityHint: calendar_events
+            entity_pagination: true
+            toolbarOptions:
+                pageSize:
+                    default_per_page: 10
+            routerEnabled: false
+        source:
+            type: orm
+            query:
+                select:
+                    - event.id
+                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
+                    - event.title
+                    - event.start
+                    - event.end
+                    - parent.id as parentId
+                    - owner.id as ownerId
+                    - COUNT(children.id) as childrenCount
+                from:
+                    - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
+                join:
+                    left:
+                        - { join: event.parent, alias: parent }
+                        - { join:  %oro_calendar.calendar_event.entity.class%, alias: children, conditionType: WITH, condition: 'children.parent = event' }
+                    inner:
+                        - { join: event.calendar, alias: calendar }
+                        - { join: calendar.owner, alias: owner }
+                        -
+                            join: %oro_calendar.calendar_property.entity.class%
+                            alias: connection
+                            conditionType: WITH
+                            condition: "connection.calendarAlias = 'user' AND connection.calendar = calendar.id AND connection.visible = true"
+                        - { join: connection.targetCalendar, alias: targetCalendar }
+                where:
+                    and:
+                        - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
+                groupBy: event.id, calendar.name, owner.firstName, owner.lastName, parentId, ownerId
+        columns:
+            id:
+                label: oro.calendar.calendarevent.id.label
+            title:
+                label: oro.calendar.calendarevent.title.label
+            name:
+                label: oro.calendar.calendarevent.calendar.label
+            start:
+                label: oro.calendar.calendarevent.start.label
+                frontend_type: datetime
+            end:
+                label: oro.calendar.calendarevent.end.label
+                frontend_type: datetime
+        sorters:
+            columns:
+                title:
+                    data_name: event.title
+                name:
+                    data_name: name
+                start:
+                    data_name: event.start
+                end:
+                    data_name: event.end
+            default:
+                start: ASC
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: event.title
+                name:
+                    type: string
+                    data_name: name
+                start:
+                    type: datetime
+                    data_name: event.start
+                end:
+                    type: datetime
+                    data_name: event.end

@@ -5,8 +5,8 @@
     "keywords": ["BAP", "UI", "Note"],
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": "2.7.*",
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*",
         "liip/imagine-bundle": "0.17.*",
         "oro/ui-bundle": "dev-master",
         "oro/user-bundle": "dev-master",

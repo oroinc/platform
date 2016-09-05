@@ -334,23 +334,14 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                 $route->getMethods()
             );
             if ($existingRoute) {
-                // move existing route before the common route
-                $existingRouteName = $routes->getName($existingRoute);
-                $routes->remove($existingRouteName);
-                $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+                // move existing route before the current route
+                $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
             } else {
                 // add an additional strict route based on the common route and current entity
                 $strictRoute = $routes->cloneRoute($route);
-                $strictRoute->setPath(
-                    str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $strictRoute->getPath())
-                );
+                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $strictRoute->getPath()));
                 $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $pluralAlias);
-                $routes->insert(
-                    $routes->generateRouteName($routeName),
-                    $strictRoute,
-                    $routeName,
-                    true
-                );
+                $routes->insert($routes->generateRouteName($routeName), $strictRoute, $routeName, true);
             }
         }
     }

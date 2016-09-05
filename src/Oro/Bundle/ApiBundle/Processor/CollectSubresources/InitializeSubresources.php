@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -110,9 +111,12 @@ class InitializeSubresources implements ProcessorInterface
             $entityClass,
             $version,
             $requestType,
-            $metadataExtras,
-            $config->getDefinition()
+            $config->getDefinition(),
+            $metadataExtras
         );
+        if (null === $metadata) {
+            throw new RuntimeException(sprintf('A metadata for "%s" entity does not exist.', $entityClass));
+        }
 
         $resourceExcludedActions = $resource->getExcludedActions();
         $subresourceExcludedActions = !empty($resourceExcludedActions)

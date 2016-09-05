@@ -2,10 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 
 class RolePrivilegeCategoryProvider
 {
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @var PrivilegeCategoryProviderInterface[]
      */
@@ -15,6 +20,14 @@ class RolePrivilegeCategoryProvider
      * @var PrivilegeCategory[]
      */
     protected $categoryList = [];
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
     
     /**
      * Add provider to registry
@@ -154,5 +167,23 @@ class RolePrivilegeCategoryProvider
             /** @var PrivilegeCategory $category */
             return $category->isTab() ? $category->getId() : null;
         }, $this->getPermissionCategories()));
+    }
+
+    /**
+     * Get tabs
+     *
+     * @return array
+     */
+    public function getTabs()
+    {
+        return array_values(
+            array_map(function ($tab) {
+                /** @var PrivilegeCategory $tab */
+                return [
+                    'id' => $tab->getId(),
+                    'label' => $this->translator->trans($tab->getLabel())
+                ];
+            }, $this->getTabbedCategories())
+        );
     }
 }

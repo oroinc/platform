@@ -5,5 +5,5 @@ layout:
             parentId:  content
             blockType: embed_form_success
             options:
-                message: { '@value': $data.embedded_form_entity.successMessage }
-                form_id: { '@value': $data.embedded_form_entity.id }
+                message: '=data["embedded_form_entity"].getSuccessMessage()'
+                form_id: '=data["embedded_form_entity"].getId()'

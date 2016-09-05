@@ -27,7 +27,7 @@ layout:
                 form_css:
                     blockType:   style
                     options:
-                        content: { '@value': $data.embedded_form_entity.css }
+                        content: '=data["embedded_form_entity"].getCss()'
                 content:
                     blockType: body
             tree:
@@ -42,7 +42,5 @@ layout:
                     content: ~
         - '@setBlockTheme':
             themes: 'OroEmbeddedFormBundle:layouts:embedded_default/form.html.twig'
-    conditions:
-        '@eq':
-            - false
-            - $context.embedded_form_inline
+
+    conditions: 'context["embedded_form_inline"]==false'

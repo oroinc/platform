@@ -5,7 +5,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
@@ -154,8 +153,8 @@ class RendererTest extends LayoutTestCase
                 'head',
                 'style',
                 [
-                    'src' => ['@asset' => 'test.css'],
-                    'scoped' => new Condition\FalseCondition()
+                    'src' => '=data["asset"].getUrl("test.css")',
+                    'scoped' => '=false'
                 ]
             )
             ->add(
@@ -165,10 +164,15 @@ class RendererTest extends LayoutTestCase
                 [
                     'content' => 'alert(\'test\');',
                     'async'   => true,
-                    'defer'   => new Condition\FalseCondition()
+                    'defer'   => '=false'
                 ]
             )
-            ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
+            ->add(
+                'external_resource',
+                'head',
+                'external_resource',
+                ['href' => 'test_external.css', 'rel' => 'stylesheet']
+            )
             ->add(
                 'content',
                 'root',
@@ -177,7 +181,7 @@ class RendererTest extends LayoutTestCase
                     'class_prefix' => 'content',
                     'attr' => [
                         'class' => '{{ class_prefix }}-body',
-                        'data-json' => ['test1'],
+                        'data-json' => '{"0":"test1"}',
                     ],
                 ]
             )
@@ -270,7 +274,7 @@ class RendererTest extends LayoutTestCase
                 'invisible_by_expr_raw_container',
                 'root',
                 'head',
-                ['visible' => ['@false' => null]]
+                ['visible' => '=false']
             )
             ->add(
                 'invisible_by_expr_raw_child',
@@ -279,7 +283,7 @@ class RendererTest extends LayoutTestCase
                 ['charset' => 'invisible_by_expr_raw']
             )
             // test 'visible' option when its value is already assembled expression
-            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\FalseCondition()])
+            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => '=false'])
             ->add('invisible_by_expr_child', 'invisible_by_expr_container', 'meta', ['charset' => 'invisible_by_expr'])
             // test buttons
             ->add(
@@ -305,8 +309,8 @@ class RendererTest extends LayoutTestCase
                 'button'
             )
             // test manipulations of 'class' attribute
-            ->appendOption('content', 'attr.class', ['@join' => [' ', 'class1', 'class2']])
-            ->replaceOption('content', 'attr.class', 'class1', ['@value' => ['$context.body_class']])
+            ->appendOption('content', 'attr.class', '="class1"~" "~"class2"')
+            ->replaceOption('content', 'attr.class', 'class1', '=context["body_class"]')
             ->getLayout($context);
 
         return $layout;
@@ -363,7 +367,7 @@ class RendererTest extends LayoutTestCase
         <script type="text/javascript" async="async">
             alert('test');
         </script>
-        <link rel="stylesheet" href="test.css"/>
+        <link rel="stylesheet" href="test_external.css"/>
     </head>
 <body class="content-body test-body class2" data-json="{&quot;0&quot;:&quot;test1&quot;}">
     <button type="button" name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
@@ -429,7 +433,7 @@ HTML;
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
-                value=""/>
+                value="" checked="checked"/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
@@ -495,7 +499,7 @@ HTML;
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
-                value=""/>
+                value=""  checked="checked"/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"

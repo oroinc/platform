@@ -27,7 +27,6 @@ oro_menu_config:
 oro_titles:
     oro_process_definition_index:       ~
     oro_process_definition_view:        '%%process_definition.label%%'
-    oro_workflow_definition_clone:      '%%workflow_definition.label%% - Clone'
     oro_workflow_definition_create:     'Create Workflow'
     oro_workflow_definition_index:      ~
     oro_workflow_definition_update:     '%%workflow_definition.label%% - Edit'
@@ -40,4 +39,3 @@ oro_navigation_elements:
         routes:
             oro_workflow_definition_update: false
             oro_workflow_definition_create: false
-            oro_workflow_definition_clone:  false

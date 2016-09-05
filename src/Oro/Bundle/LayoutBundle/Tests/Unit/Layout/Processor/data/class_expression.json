@@ -1,0 +1,29 @@
+{
+  "expression": "context[\"css_class\"]",
+  "node": {
+    "Symfony\\Component\\ExpressionLanguage\\Node\\GetAttrNode": {
+      "attributes": {
+        "type": 3
+      },
+      "nodes": {
+        "node": {
+          "Symfony\\Component\\ExpressionLanguage\\Node\\NameNode": {
+            "attributes": {
+              "name": "context"
+            }
+          }
+        },
+        "attribute": {
+          "Symfony\\Component\\ExpressionLanguage\\Node\\ConstantNode": {
+            "attributes": {
+              "value": "css_class"
+            }
+          }
+        },
+        "arguments": [
+
+        ]
+      }
+    }
+  }
+}

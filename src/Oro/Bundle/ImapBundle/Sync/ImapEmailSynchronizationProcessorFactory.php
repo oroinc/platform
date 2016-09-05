@@ -17,35 +17,42 @@ class ImapEmailSynchronizationProcessorFactory
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
+    /** @var ImapEmailRemoveManager */
+    protected $removeManager;
+
     /**
-     * @param ManagerRegistry    $doctrine
+     * @param ManagerRegistry $doctrine
      * @param EmailEntityBuilder $emailEntityBuilder
+     * @param ImapEmailRemoveManager $removeManager
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        EmailEntityBuilder $emailEntityBuilder
+        EmailEntityBuilder $emailEntityBuilder,
+        ImapEmailRemoveManager $removeManager
     ) {
-        $this->doctrine           = $doctrine;
+        $this->doctrine = $doctrine;
         $this->emailEntityBuilder = $emailEntityBuilder;
+        $this->removeManager = $removeManager;
     }
 
     /**
      * Creates new instance of IMAP email synchronization processor
      *
-     * @param ImapEmailManager                  $emailManager
+     * @param ImapEmailManager $emailManager
      * @param KnownEmailAddressCheckerInterface $knownEmailAddressChecker
      *
      * @return ImapEmailSynchronizationProcessor
      */
     public function create(
-        ImapEmailManager $emailManager,
+        $emailManager,
         KnownEmailAddressCheckerInterface $knownEmailAddressChecker
     ) {
         return new ImapEmailSynchronizationProcessor(
             $this->getEntityManager(),
             $this->emailEntityBuilder,
             $knownEmailAddressChecker,
-            $emailManager
+            $emailManager,
+            $this->removeManager
         );
     }
 

@@ -20,13 +20,13 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        visible: { '@not_empty': $data.theme.icon }
-                        href: { '@asset': $data.theme.icon }
+                        visible: '=data["theme"].getIcon(context["theme"])!=null'
+                        href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
                         rel: shortcut icon
                 styles:
                     blockType: style
                     options:
-                        src: { '@asset': $data.theme.data.assets.styles.output }
+                        src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
                 body:
                     blockType: body
                 scripts_before:

@@ -2,9 +2,12 @@
 
 namespace Oro\Component\EntitySerializer;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+
+use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 
 /**
  * @todo: This is draft implementation of the entity serializer.
@@ -141,6 +144,9 @@ class EntitySerializer
     /** @var DataNormalizer */
     protected $dataNormalizer;
 
+    /** @var EntityAwareFilterInterface */
+    protected $fieldFilter;
+
     /**
      * @param DoctrineHelper           $doctrineHelper
      * @param DataAccessorInterface    $dataAccessor
@@ -168,6 +174,14 @@ class EntitySerializer
         $this->dataNormalizer   = $dataNormalizer;
 
         $this->configConverter = new ConfigConverter();
+    }
+
+    /**
+     * @param EntityAwareFilterInterface $filter
+     */
+    public function setFieldsFilter(EntityAwareFilterInterface $filter)
+    {
+        $this->fieldFilter = $filter;
     }
 
     /**
@@ -272,6 +286,9 @@ class EntitySerializer
      * @param EntityConfig $config
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function serializeItem($entity, $entityClass, EntityConfig $config)
     {
@@ -282,16 +299,31 @@ class EntitySerializer
         $result         = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $resultFields   = $this->fieldAccessor->getFieldsToSerialize($entityClass, $config);
+
         foreach ($resultFields as $field) {
+            $isFieldAllowed = $this->fieldFilter ?
+                $this->fieldFilter->checkField($entity, $entityClass, $field) :
+                EntityAwareFilterInterface::FILTER_NOTHING;
+
+            if (EntityAwareFilterInterface::FILTER_ALL === $isFieldAllowed) {
+                continue;
+            }
+
+            if (EntityAwareFilterInterface::FILTER_NOTHING !== $isFieldAllowed) {
+                // return field but without value
+                $result[$field] = null;
+                continue;
+            }
+
             $fieldConfig = $config->getField($field);
 
             $value = null;
             if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
-                if ($entityMetadata->isAssociation($field)) {
-                    if ($value !== null) {
+                if ($this->isAssociation($field, $entityMetadata, $fieldConfig)) {
+                    if (is_object($value)) {
                         $targetConfig = $this->getTargetEntity($config, $field);
                         if (null !== $targetConfig && !$targetConfig->isEmpty()) {
-                            $targetEntityClass = $entityMetadata->getAssociationTargetClass($field);
+                            $targetEntityClass = $this->getAssociationTargetClass($field, $entityMetadata, $value);
                             $targetEntityId    = $this->dataAccessor->getValue(
                                 $value,
                                 $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
@@ -327,6 +359,34 @@ class EntitySerializer
         }
 
         return $result;
+    }
+
+    /**
+     * @param string           $fieldName
+     * @param EntityMetadata   $entityMetadata
+     * @param FieldConfig|null $fieldConfig
+     *
+     * @return bool
+     */
+    protected function isAssociation($fieldName, EntityMetadata $entityMetadata, FieldConfig $fieldConfig = null)
+    {
+        return
+            $entityMetadata->isAssociation($fieldName)
+            || (null !== $fieldConfig && $fieldConfig->getTargetEntity());
+    }
+
+    /**
+     * @param string         $fieldName
+     * @param EntityMetadata $entityMetadata
+     * @param mixed          $value
+     *
+     * @return null|string
+     */
+    protected function getAssociationTargetClass($fieldName, EntityMetadata $entityMetadata, $value)
+    {
+        return $entityMetadata->isAssociation($fieldName)
+            ? $entityMetadata->getAssociationTargetClass($fieldName)
+            : ClassUtils::getClass($value);
     }
 
     /**

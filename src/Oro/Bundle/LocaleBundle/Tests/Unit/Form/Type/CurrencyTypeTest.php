@@ -29,7 +29,7 @@ class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'choices' => Intl::getCurrencyBundle()->getCurrencyNames('en'),
+                'choices' => array_flip(Intl::getCurrencyBundle()->getCurrencyNames('en')),
                 'restrict' => false
             ]);
         $resolver->expects($this->once())

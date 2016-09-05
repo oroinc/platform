@@ -324,4 +324,21 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->workflowItem->setRestrictionIdentities([]);
         $this->assertEmpty($this->workflowItem->getRestrictionIdentities()->toArray());
     }
+
+    public function testEntityClass()
+    {
+        $entityClass = new \stdClass();
+        $this->assertSame($this->workflowItem, $this->workflowItem->setEntityClass($entityClass));
+        $this->assertEquals(get_class($entityClass), $this->workflowItem->getEntityClass());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow item entity CLASS can not be changed
+     */
+    public function testSetEntityClassException()
+    {
+        $this->workflowItem->setEntityClass('stdClass');
+        $this->workflowItem->setEntityClass('test');
+    }
 }

@@ -32,13 +32,6 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
             ->addType(new Type\FormStartType())
             ->addType(new Type\FormEndType())
             ->addType(new Type\FormFieldType())
-            ->addType(new Type\TitleType())
-            ->addType(new Type\MetaType())
-            ->addType(new Type\ScriptType())
-            ->addType(new Type\StyleType())
-            ->addType(new Type\ExternalResourceType())
-            ->addType(new Type\LinkType())
-            ->addType(new Type\OrderedListType())
-            ->addType(new Type\InputType());
+            ->addType(new Type\TitleType());
     }
 }

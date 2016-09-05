@@ -55,7 +55,7 @@ class ImageTypeProvider
      */
     protected function extractImageTypes(Theme $theme)
     {
-        $config = $theme->getDataByKey('images', ['types' => []])['types'];
+        $config = $theme->getConfigByKey('images', ['types' => []])['types'];
         $types = [];
 
         foreach ($config as $name => $type) {

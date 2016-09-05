@@ -1,4 +1,6 @@
 Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
+    constraints:
+        - Oro\Bundle\CalendarBundle\Validator\Constraints\CalendarEvent: ~
     properties:
         title:
             - NotBlank:     ~
@@ -11,6 +13,10 @@ Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
         end:
             - DateTime:     ~
             - NotBlank:     ~
+        attendees:
+            - Valid: ~
+        recurrence:
+            - Valid: ~
 
 Oro\Bundle\CalendarBundle\Entity\CalendarProperty:
     properties:
@@ -32,3 +38,48 @@ Oro\Bundle\CalendarBundle\Entity\SystemCalendar:
             - NotBlank:     ~
             - Length:
                 max: 255
+
+Oro\Bundle\CalendarBundle\Entity\Attendee:
+    constraints:
+        - Oro\Bundle\CalendarBundle\Validator\Constraints\Attendee: ~
+    properties:
+        email:
+            - Email: ~
+            - Length:
+                max: 255
+        displayName:
+            - Length:
+                max: 255
+
+Oro\Bundle\CalendarBundle\Entity\Recurrence:
+    constraints:
+        - Oro\Bundle\CalendarBundle\Validator\Constraints\Recurrence: ~
+    properties:
+        interval:
+            - Range:
+                min: 1
+                max: 999
+        instance:
+            - Range:
+                min: 1
+                max: 5
+        dayOfMonth:
+            - Range:
+                min: 1
+                max: 31
+        monthOfYear:
+            - Range:
+                min: 1
+                max: 12
+        startTime:
+            - DateTime: ~
+            - NotBlank: ~
+        endTime:
+            - DateTime: ~
+        occurrences:
+            - Range:
+                min: 1
+                max: 999
+        timeZone:
+            - NotBlank: ~
+            - Choice: {callback: [\DateTimeZone, listIdentifiers]}

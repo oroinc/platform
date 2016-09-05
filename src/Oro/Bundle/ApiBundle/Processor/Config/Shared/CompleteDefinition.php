@@ -10,17 +10,22 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * Makes sure that identifier field names are set for ORM entities.
  * Updates configuration to ask the EntitySerializer that the entity class should be returned
  * together with related entity data in case if the entity implemented using Doctrine table inheritance.
+ * Completes configuration if extended associations (associations with data_type=association:...[:...]).
  * If "identifier_fields_only" config extra is not exist:
  * * Adds fields and associations which were not configured yet based on an entity metadata.
  * * Marks all not accessible fields and associations as excluded.
@@ -29,7 +34,12 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  * If "identifier_fields_only" config extra exists:
  * * Adds identifier fields which were not configured yet based on an entity metadata.
  * * Removes all other fields and association.
+ * Updates configuration of fields if other fields a linked to them using "property_path".
+ * Sets "exclusion_policy = all" for the entity. It means that the configuration
+ * of all fields and associations was completed.
  * By performance reasons all these actions are done in one processor.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CompleteDefinition implements ProcessorInterface
 {
@@ -42,19 +52,25 @@ class CompleteDefinition implements ProcessorInterface
     /** @var ConfigProvider */
     protected $configProvider;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
     /**
      * @param DoctrineHelper             $doctrineHelper
      * @param ExclusionProviderInterface $exclusionProvider
      * @param ConfigProvider             $configProvider
+     * @param AssociationManager         $associationManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ExclusionProviderInterface $exclusionProvider,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        AssociationManager $associationManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->exclusionProvider = $exclusionProvider;
         $this->configProvider = $configProvider;
+        $this->associationManager = $associationManager;
     }
 
     /**
@@ -77,14 +93,12 @@ class CompleteDefinition implements ProcessorInterface
             if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
                 $this->completeIdentifierFields($definition, $metadata, $existingFields);
             } else {
+                $version = $context->getVersion();
+                $requestType = $context->getRequestType();
+                $this->completeExtendedAssociations($definition, $metadata->name, $version, $requestType);
                 $this->completeFields($definition, $metadata, $existingFields);
-                $this->completeAssociations(
-                    $definition,
-                    $metadata,
-                    $existingFields,
-                    $context->getVersion(),
-                    $context->getRequestType()
-                );
+                $this->completeAssociations($definition, $metadata, $existingFields, $version, $requestType);
+                $this->completeDependentAssociations($definition, $metadata, $version, $requestType);
             }
             // make sure that identifier field names are set
             $idFieldNames = $definition->getIdentifierFieldNames();
@@ -102,6 +116,9 @@ class CompleteDefinition implements ProcessorInterface
                 $this->completeObjectAssociations($definition, $context->getVersion(), $context->getRequestType());
             }
         }
+
+        // mark the entity configuration as processed
+        $definition->setExcludeAll();
     }
 
     /**
@@ -142,7 +159,9 @@ class CompleteDefinition implements ProcessorInterface
     {
         $classNameField = $definition->findFieldNameByPropertyPath(ConfigUtil::CLASS_NAME);
         if (null === $classNameField) {
-            $definition->addField(ConfigUtil::CLASS_NAME);
+            $classNameField = $definition->addField(ConfigUtil::CLASS_NAME);
+            $classNameField->setMetaProperty(true);
+            $classNameField->setDataType(DataType::STRING);
         }
     }
 
@@ -169,6 +188,80 @@ class CompleteDefinition implements ProcessorInterface
                 $definition->addField($propertyPath);
             }
         }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param string                 $version
+     * @param RequestType            $requestType
+     */
+    protected function completeExtendedAssociations(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $version,
+        RequestType $requestType
+    ) {
+        if ($definition->hasFields()) {
+            $fields = $definition->getFields();
+            foreach ($fields as $fieldName => $field) {
+                $dataType = $field->getDataType();
+                if ($dataType && 0 === strpos($dataType, 'association:')) {
+                    list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
+                    $targetClass = $field->getTargetClass();
+                    if (!$targetClass) {
+                        $targetClass = EntityIdentifier::class;
+                        $field->setTargetClass($targetClass);
+                    }
+                    if (!$field->getTargetType()) {
+                        $field->setTargetType($this->getExtendedAssociationTargetType($associationType));
+                    }
+                    if (!$field->getDependsOn()) {
+                        $field->setDependsOn(
+                            $this->getExtendedAssociationTargetFields(
+                                $entityClass,
+                                $associationType,
+                                $associationKind
+                            )
+                        );
+                    }
+                    $this->completeAssociation($field, $targetClass, $version, $requestType);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $associationType
+     *
+     * @return string
+     */
+    protected function getExtendedAssociationTargetType($associationType)
+    {
+        $isCollection =
+            in_array($associationType, RelationType::$toManyRelations, true)
+            || RelationType::MULTIPLE_MANY_TO_ONE === $associationType;
+
+        return $isCollection ? 'to-many' : 'to-one';
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $associationType
+     * @param string $associationKind
+     *
+     * @return string[]
+     */
+    protected function getExtendedAssociationTargetFields($entityClass, $associationType, $associationKind)
+    {
+        $targets = $this->associationManager->getAssociationTargets(
+            $entityClass,
+            null,
+            $associationType,
+            $associationKind
+        );
+
+        return array_values($targets);
     }
 
     /**
@@ -236,11 +329,6 @@ class CompleteDefinition implements ProcessorInterface
         $version,
         RequestType $requestType
     ) {
-        $targetEntity = $field->getTargetEntity();
-        if ($targetEntity && $targetEntity->isExcludeAll()) {
-            return;
-        }
-
         $config = $this->configProvider->getConfig(
             $targetClass,
             $version,
@@ -248,20 +336,77 @@ class CompleteDefinition implements ProcessorInterface
             [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
         );
         if ($config->hasDefinition()) {
+            $targetDefinition = $config->getDefinition();
+
             if (!$field->getTargetClass()) {
                 $field->setTargetClass($targetClass);
             }
+
+            $targetEntity = $field->getTargetEntity();
+            $isExcludeAll = $targetEntity && $targetEntity->isExcludeAll();
             if (!$targetEntity) {
                 $targetEntity = $field->createAndSetTargetEntity();
             }
-            $targetEntity->setExcludeAll();
-            $targetDefinition = $config->getDefinition();
-            $targetFields = $targetDefinition->getFields();
-            foreach ($targetFields as $targetFieldName => $targetField) {
-                $targetEntity->addField($targetFieldName, $targetField);
-            }
             $targetEntity->setIdentifierFieldNames($targetDefinition->getIdentifierFieldNames());
-            $field->setCollapsed();
+            if (!$isExcludeAll) {
+                $targetEntity->setExcludeAll();
+                $targetFields = $targetDefinition->getFields();
+                foreach ($targetFields as $targetFieldName => $targetField) {
+                    $targetEntity->addField($targetFieldName, $targetField);
+                }
+                $field->setCollapsed();
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ClassMetadata          $metadata
+     * @param string                 $version
+     * @param RequestType            $requestType
+     */
+    protected function completeDependentAssociations(
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        $version,
+        RequestType $requestType
+    ) {
+        $fields = $definition->getFields();
+        foreach ($fields as $field) {
+            $propertyPath = $field->getPropertyPath();
+            if (!$propertyPath) {
+                continue;
+            }
+            $path = ConfigUtil::explodePropertyPath($propertyPath);
+            if (1 === count($path)) {
+                continue;
+            }
+
+            $targetDefinition = $definition;
+            $targetMetadata = $metadata;
+            foreach ($path as $targetFieldName) {
+                $isAssociation = $targetMetadata->hasAssociation($targetFieldName);
+                $targetField = $targetDefinition->getField($targetFieldName);
+                if (null === $targetField) {
+                    $targetField = $targetDefinition->addField($targetFieldName);
+                    $targetField->setExcluded();
+                    if ($isAssociation) {
+                        $this->completeAssociation(
+                            $targetField,
+                            $targetMetadata->getAssociationTargetClass($targetFieldName),
+                            $version,
+                            $requestType
+                        );
+                    }
+                }
+                if (!$isAssociation) {
+                    break;
+                }
+                $targetDefinition = $targetField->getOrCreateTargetEntity();
+                $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass(
+                    $targetMetadata->getAssociationTargetClass($targetFieldName)
+                );
+            }
         }
     }
 
@@ -273,7 +418,7 @@ class CompleteDefinition implements ProcessorInterface
         $idFieldNames = $definition->getIdentifierFieldNames();
         $fieldNames = array_keys($definition->getFields());
         foreach ($fieldNames as $fieldName) {
-            if (!in_array($fieldName, $idFieldNames, true)) {
+            if (!in_array($fieldName, $idFieldNames, true) && !ConfigUtil::isMetadataProperty($fieldName)) {
                 $definition->removeField($fieldName);
             }
         }

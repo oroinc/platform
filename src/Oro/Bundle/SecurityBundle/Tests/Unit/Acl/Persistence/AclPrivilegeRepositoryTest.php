@@ -69,6 +69,9 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->extensionSelector->expects($this->any())
             ->method('select')
             ->will($this->returnValue($this->extension));
+        $this->extensionSelector->expects($this->any())
+            ->method('selectByExtensionKey')
+            ->will($this->returnValue($this->extension));
 
         $this->aceProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper')
             ->disableOriginalConstructor()
@@ -99,10 +102,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
         $extensionKey = 'test';
         $permissions = array('VIEW', 'EDIT');
 
-        $this->manager->expects($this->once())
-            ->method('getRootOid')
-            ->with($this->equalTo($extensionKey))
-            ->will($this->returnValue(new ObjectIdentity($extensionKey, ObjectIdentityFactory::ROOT_IDENTITY_TYPE)));
         $this->extension->expects($this->once())
             ->method('getPermissions')
             ->will($this->returnValue($permissions));
@@ -121,22 +120,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
         $extensionKey2 = 'test2';
         $permissions2 = array('VIEW', 'CREATE');
 
-        $this->manager->expects($this->exactly(2))
-            ->method('getRootOid')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array(
-                            $extensionKey1,
-                            new ObjectIdentity($extensionKey1, ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
-                        ),
-                        array(
-                            $extensionKey2,
-                            new ObjectIdentity($extensionKey2, ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
-                        ),
-                    )
-                )
-            );
         $this->extension->expects($this->at(0))
             ->method('getPermissions')
             ->will($this->returnValue($permissions1));

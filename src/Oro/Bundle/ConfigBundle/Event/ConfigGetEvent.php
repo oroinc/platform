@@ -23,17 +23,24 @@ class ConfigGetEvent extends Event
     protected $full;
 
     /**
+     * @var int
+     */
+    protected $scopeId;
+
+    /**
      * @param ConfigManager $configManager
      * @param string $key
      * @param array|string $value
      * @param bool $full
+     * @param int $scopeId
      */
-    public function __construct(ConfigManager $configManager, $key, $value, $full)
+    public function __construct(ConfigManager $configManager, $key, $value, $full, $scopeId)
     {
         $this->configManager = $configManager;
         $this->key = $key;
         $this->value = $value;
         $this->full = $full;
+        $this->scopeId = $scopeId;
     }
 
     /**
@@ -74,5 +81,13 @@ class ConfigGetEvent extends Event
     public function isFull()
     {
         return $this->full;
+    }
+
+    /**
+     * @return int
+     */
+    public function getScopeId()
+    {
+        return $this->scopeId;
     }
 }

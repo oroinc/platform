@@ -345,4 +345,18 @@ class ValidateEntityIdExists implements ProcessorInterface
 }
 ```
 
-Please note that HTTP status code for all validation errors is `400 Bad Request`. Also the [Constraint](../../Request/Constraint.php) class that contains titles for different kind of validation errors. As you can see all titles end with **constraint** word. So, while adding own types please do the same. This is not a strict rule, but it allows to keep Data API consistency.
+Please note that by default the HTTP status code for validation errors is `400 Bad Request`. But, if needed, an another HTTP status code can be set, e.g. by passing it as a third argument of the `Error::createValidationError` method.
+
+Also there is the [Constraint](../../Request/Constraint.php) class that contains titles for different kind of validation errors. As you can see all titles end with **constraint** word. So, while adding own types please do the same. This is not a strict rule, but it allows to keep Data API consistency.
+
+Sometime you may need to use Data API logger directly in your processors. Actually all Data API logs are written into **api** channel. So, injecting the logger into your processor or other service can be done in a [common way](http://symfony.com/doc/current/reference/dic_tags.html#monolog-logger). For example:
+
+```yaml
+    acme.api.some_processor:
+        class: Acme\Bundle\AcmeBundle\Api\Processor\DoSomething
+        arguments:
+            - '@logger'
+        tags:
+            - { name: oro.api.processor, ... }
+            - { name: monolog.logger, channel: api }
+```

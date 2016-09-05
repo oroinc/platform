@@ -13,3 +13,15 @@ connector:
                         processor: oro_importexport.processor.export_delegate
                         writer:    oro_importexport.writer.csv
                     parameters: ~
+        datagrid_export_to_xlsx:
+            title: "Datagrid Export to XLSX"
+            type: export
+            steps:
+                export:
+                    title:     export
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_datagrid.importexport.export_connector
+                        processor: oro_importexport.processor.export_delegate
+                        writer:    oro_importexport.writer.xlsx
+                    parameters: ~

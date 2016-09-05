@@ -2,56 +2,29 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-
 class EntityWithWorkflow
 {
     /**
-     * @var WorkflowItem
+     * @var int
      */
-    protected $workflowItem;
+    protected $id;
 
     /**
-     * @var WorkflowStep
+     * @param $id
+     * @return $this
      */
-    protected $workflowStep;
-
-    /**
-     * @param WorkflowItem $workflowItem
-     * @return EntityWithWorkflow
-     */
-    public function setWorkflowItem($workflowItem)
+    public function setId($id)
     {
-        $this->workflowItem = $workflowItem;
+        $this->id = $id;
 
         return $this;
     }
 
     /**
-     * @return WorkflowItem
+     * @return int
      */
-    public function getWorkflowItem()
+    public function getId()
     {
-        return $this->workflowItem;
-    }
-
-    /**
-     * @param WorkflowStep $workflowStep
-     * @return EntityWithWorkflow
-     */
-    public function setWorkflowStep($workflowStep)
-    {
-        $this->workflowStep = $workflowStep;
-
-        return $this;
-    }
-
-    /**
-     * @return WorkflowStep
-     */
-    public function getWorkflowStep()
-    {
-        return $this->workflowStep;
+        return $this->id;
     }
 }

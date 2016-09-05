@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * Represents the response status code.
  */
@@ -38,6 +40,6 @@ class StatusCodeConfig
      */
     public function __clone()
     {
-        $this->cloneItems();
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 }

@@ -19,14 +19,22 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $errorCompleter;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->documentBuilder = $this->getMock('Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface');
         $this->errorCompleter = $this->getMock('Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface');
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
-        $this->processor = new BuildListResultDocument($this->documentBuilder, $this->errorCompleter);
+        $this->processor = new BuildListResultDocument(
+            $this->documentBuilder,
+            $this->errorCompleter,
+            $this->logger
+        );
     }
 
     public function testProcessContextWithoutErrorsOnEmptyResult()
@@ -90,6 +98,9 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
 
         $this->errorCompleter->expects($this->once())
             ->method('complete');
+
+        $this->logger->expects($this->once())
+            ->method('error');
 
         $this->context->setResult(null);
         $this->processor->process($this->context);

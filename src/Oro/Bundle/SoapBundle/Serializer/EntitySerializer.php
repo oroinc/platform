@@ -4,7 +4,6 @@ namespace Oro\Bundle\SoapBundle\Serializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\ConfigNormalizer;
 use Oro\Component\EntitySerializer\DataAccessorInterface as BaseDataAccessorInterface;
 use Oro\Component\EntitySerializer\DataNormalizer;
@@ -12,7 +11,6 @@ use Oro\Component\EntitySerializer\DataTransformerInterface as BaseDataTransform
 use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntitySerializer as BaseEntitySerializer;
 use Oro\Component\EntitySerializer\FieldAccessor;
-use Oro\Component\EntitySerializer\QueryFactory;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Serializer\ExtendEntityFieldFilter;
@@ -27,14 +25,14 @@ class EntitySerializer extends BaseEntitySerializer
      * @param ConfigManager                $configManager
      * @param BaseDataAccessorInterface    $dataAccessor
      * @param BaseDataTransformerInterface $dataTransformer
-     * @param QueryHintResolverInterface   $queryHintResolver
+     * @param AclProtectedQueryFactory     $queryFactory
      */
     public function __construct(
         ManagerRegistry $doctrine,
         ConfigManager $configManager,
         BaseDataAccessorInterface $dataAccessor,
         BaseDataTransformerInterface $dataTransformer,
-        QueryHintResolverInterface $queryHintResolver
+        AclProtectedQueryFactory $queryFactory
     ) {
         $doctrineHelper = new DoctrineHelper($doctrine);
         $fieldAccessor  = new FieldAccessor(
@@ -46,7 +44,7 @@ class EntitySerializer extends BaseEntitySerializer
             $doctrineHelper,
             $dataAccessor,
             $dataTransformer,
-            new QueryFactory($doctrineHelper, $queryHintResolver),
+            $queryFactory,
             $fieldAccessor,
             new ConfigNormalizer(),
             new DataNormalizer()

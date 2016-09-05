@@ -53,6 +53,7 @@ class Orm extends AbstractEngine
     protected function doSearch(Query $query)
     {
         $results       = [];
+
         $searchResults = $this->getIndexRepository()->search($query);
         if (($query->getCriteria()->getMaxResults() > 0 || $query->getCriteria()->getFirstResult() > 0)) {
             $recordsCount = $this->getIndexRepository()->getRecordsCount($query);
@@ -61,6 +62,7 @@ class Orm extends AbstractEngine
         }
         if ($searchResults) {
             foreach ($searchResults as $item) {
+                $originalItem = $item;
                 if (is_array($item)) {
                     $item = $item['item'];
                 }
@@ -80,6 +82,7 @@ class Orm extends AbstractEngine
                     $item['recordId'],
                     $item['title'],
                     null,
+                    $this->mapper->mapSelectedData($query, $originalItem),
                     $this->mapper->getEntityConfig($item['entity'])
                 );
             }

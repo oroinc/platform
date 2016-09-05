@@ -8,6 +8,8 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +34,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EmailBundle\Command\PurgeEmailAttachmentCommand;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
@@ -45,6 +48,32 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
  */
 class EmailController extends Controller
 {
+    /**
+     * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
+     * @AclAncestor("oro_config_system")
+     */
+    public function purgeEmailsAttachmentsAction()
+    {
+        $job = new Job(PurgeEmailAttachmentCommand::NAME);
+        $em = $this->getDoctrine()->getManagerForClass(Job::class);
+        $em->persist($job);
+        $em->flush();
+
+        return new JsonResponse([
+            'message'    => $this->get('translator')->trans(
+                'oro.email.controller.job_scheduled.message',
+                [
+                    '%link%' => sprintf(
+                        '<a href="%s" class="job-view-link">%s</a>',
+                        $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
+                        $this->get('translator')->trans('oro.email.controller.job_progress')
+                    )
+                ]
+            ),
+            'successful' => true,
+        ]);
+    }
+
     /**
      * @Route("/view/{id}", name="oro_email_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
@@ -329,35 +358,23 @@ class EmailController extends Controller
      */
     public function getResizedAttachmentImageAction(EmailAttachment $attachment, $width, $height)
     {
-        $fileSystemMap = $this->get('knp_gaufrette.filesystem_map');
-        $fileSystem = $fileSystemMap->get('attachments');
         $path = substr($this->getRequest()->getPathInfo(), 1);
-        if (!$fileSystem->has($path)) {
-            $filterName = 'attachment_' . $width . '_' . $height;
-            $this->get('liip_imagine.filter.configuration')->set(
-                $filterName,
-                [
-                    'filters' => [
-                        'thumbnail' => [
-                            'size' => [$width, $height]
-                        ]
-                    ]
-                ]
+        $fileManager = $this->get('oro_attachment.file_manager');
+        $content = $fileManager->getContent($path, false);
+        if (null === $content) {
+            $thumbnail = $this->get('oro_attachment.thumbnail_factory')->createThumbnail(
+                ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                ),
+                $width,
+                $height
             );
-            $content = ContentDecoder::decode(
-                $attachment->getContent()->getContent(),
-                $attachment->getContent()->getContentTransferEncoding()
-            );
-            $binary = $this->get('liip_imagine')->load($content);
-            $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
-            $fileSystem->write($path, $filteredBinary);
-        } else {
-            $filteredBinary = $fileSystem->read($path);
+            $content = (string)$thumbnail->getImage();
+            $fileManager->writeToStorage($content, $path);
         }
 
-        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getContentType()));
-
-        return $response;
+        return new Response($content, 200, ['Content-Type' => $attachment->getContentType()]);
     }
 
     /**
@@ -452,7 +469,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/user-emails", name="oro_email_user_emails")
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_user_view")
      * @Template
      */
     public function userEmailsAction()
@@ -470,7 +487,8 @@ class EmailController extends Controller
             $this->get('oro_email.email_synchronization_manager')->syncOrigins(
                 $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
                     $this->get('oro_security.security_facade')->getLoggedUserId()
-                )
+                ),
+                true
             );
         } catch (\Exception $e) {
             return new JsonResponse(

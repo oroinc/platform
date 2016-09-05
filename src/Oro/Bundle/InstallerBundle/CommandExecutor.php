@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\InstallerBundle;
 
+use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Application;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
-use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
-
-use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 
 class CommandExecutor
 {
@@ -40,6 +39,11 @@ class CommandExecutor
      * @var int
      */
     protected $lastCommandExitCode;
+
+    /**
+     * @var string
+     */
+    protected $lastCommandLine;
 
     /** @var array */
     protected $defaultOptions;
@@ -91,6 +95,9 @@ class CommandExecutor
      */
     public function runCommand($command, $params = [])
     {
+        $this->lastCommandLine = null;
+        $this->lastCommandExitCode = null;
+
         $params = $this->prepareParameters($command, $params);
 
         $ignoreErrors = false;
@@ -119,6 +126,8 @@ class CommandExecutor
                 ->inheritEnvironmentVariables(true)
                 ->getProcess();
 
+            $this->lastCommandLine = $process->getCommandLine();
+
             $output = $this->output;
             $process->run(
                 function ($type, $data) use ($output) {
@@ -135,6 +144,8 @@ class CommandExecutor
             if (array_key_exists('--process-timeout', $params)) {
                 unset($params['--process-timeout']);
             }
+
+            $this->lastCommandLine = '';
 
             $this->application->setAutoExit(false);
             $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
@@ -197,9 +208,11 @@ class CommandExecutor
                     )
                 );
             } else {
-                throw new \RuntimeException(
-                    sprintf('The command terminated with an exit code: %u.', $this->lastCommandExitCode)
-                );
+                throw new \RuntimeException(sprintf(
+                    'The command %s terminated with an exit code: %u.',
+                    $this->lastCommandLine,
+                    $this->lastCommandExitCode
+                ));
             }
         }
     }
@@ -258,7 +271,7 @@ class CommandExecutor
      */
     protected function addParameter(ProcessBuilder $pb, $name, $value = null)
     {
-        $parameters = array();
+        $parameters = [];
 
         if (null !== $value) {
             if (is_array($value)) {

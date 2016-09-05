@@ -68,6 +68,7 @@
                 $('input.key', header).val(headerKey);
                 $('input.value', header).val(headerValue);
             };
+
         $apiDocLink.after(
             '<div id="api_type" style="float: left; font-size: 1.2em; padding: 13px 16px;">type: ' +
             '<a href="' + apiDocHref + '">plain</a>' +
@@ -98,7 +99,7 @@
          * Disable the request format selector for JSON.API and new implementation of REST
          */
         if (apiType === 'rest_json_api' || apiType === 'rest_plain') {
-            $('#request_format').attr('disabled','disabled');
+            $('#request_format').attr('disabled', 'disabled');
         }
 
         /**
@@ -291,22 +292,48 @@
                     );
                 }
             }
+
+            /**
+             * Remove "Content-type" header if both "Content-type" and "Content-Type" headers exist
+             */
+            if (options.headers['Content-Type'] !== undefined && options.headers['Content-type'] !== undefined) {
+                delete options.headers['Content-type'];
+            }
         });
 
         /**
          * A handler to correct a result of the sandbox AJAX requests
          */
         $(document).ajaxComplete(function(event, jqXHR, options) {
-            if (options.type != 'GET' || options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
+            if (options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
                 return;
             }
+
+            var $result = $(
+                    '.pane.sandbox .result',
+                    $('#' + escapeSelector(options.headers['X-API-Sandbox-Operation-ID']))
+                );
+
+            delete options.headers['X-API-Sandbox-Operation-ID'];
 
             /**
              * Update "Request URL" section
              */
-            var operationId = escapeSelector(options.headers['X-API-Sandbox-Operation-ID']);
-            $('.pane.sandbox .result .url', $('#' + operationId)).text(
-                options.type + ' ' + decodeURIComponent(options.url)
+            if (options.type == 'GET') {
+                $('.url', $result).text(
+                    options.type + ' ' + decodeURIComponent(options.url)
+                );
+            }
+
+            /**
+             * Update "Curl Command Line" section
+             */
+            displayCurl(
+                options.type,
+                decodeURIComponent(options.url),
+                options.headers,
+                options.data,
+                $('.curl-command', $result)
             );
         });
     });

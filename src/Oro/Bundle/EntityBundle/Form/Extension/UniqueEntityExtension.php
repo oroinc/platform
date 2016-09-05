@@ -10,9 +10,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class UniqueEntityExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /** @var ValidatorInterface */
     protected $validator;
 
@@ -41,14 +44,6 @@ class UniqueEntityExtension extends AbstractTypeExtension
         $this->translator           = $translator;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->doctrineHelper       = $doctrineHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 
     /**

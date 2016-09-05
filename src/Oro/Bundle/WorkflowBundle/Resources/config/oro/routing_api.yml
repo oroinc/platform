@@ -129,7 +129,7 @@ oro_workflow_api_rest_workflow_activate: # a copy of oro_api_workflow_activate
         version:     latest|v1
 
 oro_workflow_api_rest_workflow_deactivate: # a copy of oro_api_workflow_deactivate
-    path:            /api/rest/{version}/workflow/deactivate/{entityClass}.{_format}
+    path:            /api/rest/{version}/workflow/deactivate/{workflowDefinition}.{_format}
     methods:         [GET]
     defaults:
         _controller: OroWorkflowBundle:Api\Rest\Workflow:deactivate

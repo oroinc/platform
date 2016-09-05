@@ -38,4 +38,7 @@ interface ViewInterface
 
     /** @return string */
     public function getGridName();
+
+    /** @return string */
+    public function getAppearanceTypeName();
 }

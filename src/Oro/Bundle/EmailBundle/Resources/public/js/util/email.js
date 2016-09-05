@@ -1,24 +1,32 @@
-define([], function() {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
 
     return {
         extractPureEmailAddress: function(fullEmailAddress) {
-            var atPos = fullEmailAddress.lastIndexOf('@');
-            if (atPos === -1) {
+            var atPos;
+            var words = fullEmailAddress.split(' ').reverse();
+            var rawEmail = _.find(words, function(word) {
+                atPos = word.lastIndexOf('@');
+                return atPos !== -1;
+            });
+
+            if (!rawEmail) {
                 return fullEmailAddress;
             }
 
-            var startPos = fullEmailAddress.lastIndexOf('<', atPos);
+            var startPos = rawEmail.lastIndexOf('<', atPos);
             if (startPos === -1) {
-                return fullEmailAddress;
+                return rawEmail;
             }
 
-            var endPos = fullEmailAddress.indexOf('>', atPos);
+            var endPos = rawEmail.indexOf('>', atPos);
             if (endPos === -1) {
-                return fullEmailAddress;
+                return rawEmail;
             }
 
-            return fullEmailAddress.substring(startPos + 1, endPos);
+            return rawEmail.substring(startPos + 1, endPos);
         }
     };
 });

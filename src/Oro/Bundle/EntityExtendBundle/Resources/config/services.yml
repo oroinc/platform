@@ -83,7 +83,7 @@ services:
             - "@translator"
             - "@oro_entity.doctrine_helper"
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_entity_extend.entity_generator:
         class: %oro_entity_extend.entity_generator.class%
@@ -208,6 +208,7 @@ services:
             - "@oro_platform.maintenance"
             - "@oro_entity_config.tools.command_executor"
             - "@logger"
+            - '@event_dispatcher'
             - '@?profiler'
 
     oro_entity_extend.extend.entity_proxy_generator:
@@ -309,6 +310,7 @@ services:
             - "@oro_entity_config.config_manager"
             - "@oro_entity_extend.extend.field_type_helper"
             - "@event_dispatcher"
+            - "@oro_security.security_facade"
         tags:
             - { name: twig.extension }
 

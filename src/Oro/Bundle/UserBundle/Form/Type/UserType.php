@@ -170,6 +170,14 @@ class UserType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_user_user';
     }
 
@@ -225,7 +233,6 @@ class UserType extends AbstractType
                 'oro_organizations_select',
                 [
                     'required' => false,
-                    'label' => 'oro.user.form.access_settings.label',
                 ]
             );
         }

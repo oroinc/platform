@@ -23,9 +23,12 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /** @var ConfigManager */
     protected $configManager;
 
@@ -205,14 +208,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 'dynamic_fields_disabled' => false,
             ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 
     /**

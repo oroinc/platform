@@ -108,6 +108,8 @@ datagrid:
                 frontend_type: number                    # needed for correct l10n (e.g. thousand, decimal separators etc)
 ``` 
 
+*Note: Since `%` is a reserved symbol for container parameters, you need to escape it by using `%%` instead.*
+
 ####Sorting
 After that you may want to make your columns sortable. Sorting configuration should be placed under `sorters` node.
  In basic sorter implementation, configuration takes `columns` and `default` keys.

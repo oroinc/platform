@@ -103,7 +103,6 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
             if ($existingRoute) {
                 // move existing route before the current route
                 $existingRouteName = $routes->getName($existingRoute);
-                $routes->remove($existingRouteName);
                 $routes->insert($existingRouteName, $existingRoute, $routeName, true);
                 // additional route for entities which has api, but it not recognize urls like
                 // /api/rest/latest/Oro_Bundle_AddressBundle_Entity_Country
@@ -121,16 +120,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
-                $strictRoute->setPath(
-                    str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $strictRoute->getPath())
-                );
+                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $strictRoute->getPath()));
                 $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $pluralAlias);
-                $routes->insert(
-                    $routes->generateRouteName($routeName),
-                    $strictRoute,
-                    $routeName,
-                    true
-                );
+                $routes->insert($routes->generateRouteName($routeName), $strictRoute, $routeName, true);
             }
         }
     }

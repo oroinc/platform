@@ -15,7 +15,7 @@
         </script>
     {% else %}
         <div class="form-container">
-            {{ form_start(form, {action: formAction}) }}
+            {{ form_start(form, {action: formAction, attr:{id: form.vars.id}}) }}
                 <fieldset class="form form-horizontal">
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
@@ -24,6 +24,7 @@
                     </div>
                 </fieldset>
             {{ form_end(form) }}
+            {{ oro_form_js_validation(form) }}
         </div>
     {% endif %}
 </div>

@@ -46,4 +46,18 @@ class DefaultOperationRequestHelper
 
         return $route !== $this->applicationsHelper->getExecutionRoute() ? $route : null;
     }
+
+    /**
+     * @return bool
+     */
+    public function isExecutionRouteRequest()
+    {
+        if (null === ($request = $this->requestStack->getMasterRequest())) {
+            return false;
+        }
+
+        $route = $request->get('_route');
+
+        return $route === $this->applicationsHelper->getExecutionRoute();
+    }
 }

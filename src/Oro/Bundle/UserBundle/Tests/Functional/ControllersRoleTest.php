@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
-use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -15,7 +14,7 @@ class ControllersRoleTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
     }
 
@@ -46,45 +45,11 @@ class ControllersRoleTest extends WebTestCase
     /**
      * @depends testCreate
      */
-    public function testClone()
-    {
-        $response = $this->client->requestGrid(
-            'roles-grid',
-            array('roles-grid[_filter][label][value]' => 'testRole')
-        );
-
-        $result = $this->getJsonResponseContent($response, 200);
-        $result = reset($result['data']);
-
-        /** @var Crawler $crawler */
-        $crawler = $this->client->request(
-            'GET',
-            $this->getUrl('oro_user_role_clone', array('id' => $result['id']))
-        );
-
-        $saveButton = $crawler->selectButton('Save and Close');
-        /** @var Form $form */
-        $form = $saveButton->form();
-        $form['oro_user_role_form[label]'] = 'clonedRole';
-
-        $this->client->followRedirects(true);
-        $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
-
-        $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Role saved", $crawler->html());
-        $this->assertContains("clonedRole", $crawler->html());
-        $this->assertContains("testRole", $crawler->html());
-    }
-
-    /**
-     * @depends testCreate
-     */
     public function testUpdate()
     {
         $response = $this->client->requestGrid(
             'roles-grid',
-            array('roles-grid[_filter][label][value]' => 'testRole')
+            ['roles-grid[_filter][label][value]' => 'testRole']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -93,13 +58,13 @@ class ControllersRoleTest extends WebTestCase
         /** @var Crawler $crawler */
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_user_role_update', array('id' => $result['id']))
+            $this->getUrl('oro_user_role_update', ['id' => $result['id']])
         );
 
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
-        $form['oro_user_role_form[label]'] = 'testRoleUpdated';
+        $form['oro_user_role_form[label]']       = 'testRoleUpdated';
         $form['oro_user_role_form[appendUsers]'] = 1;
 
         $this->client->followRedirects(true);
@@ -117,7 +82,7 @@ class ControllersRoleTest extends WebTestCase
     {
         $response = $this->client->requestGrid(
             'roles-grid',
-            array('roles-grid[_filter][label][value]' => 'testRoleUpdated')
+            ['roles-grid[_filter][label][value]' => 'testRoleUpdated']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -125,15 +90,40 @@ class ControllersRoleTest extends WebTestCase
 
         $response = $this->client->requestGrid(
             'role-users-grid',
-            array(
+            [
                 'role-users-grid[_filter][has_role][value]' => 1,
-                'role-users-grid[role_id]' => $result['id']
-            )
+                'role-users-grid[role_id]'                  => $result['id']
+            ]
         );
 
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $this->assertEquals(1, $result['id']);
+    }
+
+    /**
+     * @depends testUpdate
+     */
+    public function testView()
+    {
+        $response = $this->client->requestGrid(
+            'roles-grid',
+            ['roles-grid[_filter][label][value]' => 'testRoleUpdated']
+        );
+
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
+        /** @var Crawler $crawler */
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_role_view', ['id' => $result['id']])
+        );
+
+        self::assertContains('testRoleUpdated', $crawler->filter('.responsive-section')->first()->html());
+        self::assertContains('Clone', $crawler->filter('.navigation .title-buttons-container a')->eq(0)->html());
+        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->eq(1)->html());
+        self::assertContains('Delete', $crawler->filter('.navigation .title-buttons-container a')->eq(2)->html());
     }
 }

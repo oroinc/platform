@@ -42,6 +42,11 @@ define(function(require) {
         timezone: localeSettings.getTimeZone(),
 
         /**
+         * @type {string|function}
+         */
+        defaultTime: null,
+
+        /**
          * Returns supper prototype
          *
          * @returns {Object}
@@ -56,7 +61,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['timezone']));
+            _.extend(this, _.pick(options, ['timezone', 'defaultTime']));
             this._super().initialize.apply(this, arguments);
         },
 
@@ -193,16 +198,49 @@ define(function(require) {
 
             // just changed the date
             if (this.$frontDateField.is(target) && isValidDate && !time) {
-                // default time is beginning of the day
-                time = moment('00:00', 'HH:mm').format(this.getTimeFormat());
+                time = this.getDefaultTime();
                 this.$frontTimeField.val(time);
-
             // just changed the time
             } else if (this.$frontTimeField.is(target) && isValidTime && !date) {
                 // default day is today
                 date = moment().format(this.getDateFormat());
                 this.$frontDateField.val(date);
             }
+        },
+
+        /**
+         * Calculates default time to fill in a correspondent field if only date field was selected
+         *
+         * @returns {string}
+         */
+        getDefaultTime: function() {
+            var date;
+            var todayDate;
+            var currentTimeMoment;
+            var guessTimeMoment;
+            var time = _.result(this, 'defaultTime');
+            if (!time) {
+                date = this.$frontDateField.val();
+                todayDate = moment().tz(this.timezone).format(this.getDateFormat());
+                if (date === todayDate) {
+                    currentTimeMoment = moment().tz(this.timezone);
+                    // add 15 minutes to current time if it's today date
+                    guessTimeMoment = currentTimeMoment.clone().add(15, 'minutes');
+                    // round up till 5 minutes
+                    guessTimeMoment.add(5 - (guessTimeMoment.minute() % 5 || 5), 'minutes');
+                    if (guessTimeMoment.diff(currentTimeMoment.clone().set('hour', 23).set('minute', 59)) < 0) {
+                        // if it is still same date
+                        time = guessTimeMoment.format('HH:mm');
+                    } else {
+                        // set max available time for today
+                        time = '23:59';
+                    }
+                } else {
+                    // default time is beginning of the day
+                    time = '00:00';
+                }
+            }
+            return moment(time, 'HH:mm').format(this.getTimeFormat());
         },
 
         /**

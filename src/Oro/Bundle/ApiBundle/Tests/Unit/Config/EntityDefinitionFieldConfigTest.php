@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
 class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
@@ -194,6 +197,45 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testFormType()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getFormType());
+
+        $config->setFormType('test');
+        $this->assertEquals('test', $config->getFormType());
+        $this->assertEquals(['form_type' => 'test'], $config->toArray());
+
+        $config->setFormType(null);
+        $this->assertNull($config->getFormType());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testFormOptions()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getFormOptions());
+
+        $config->setFormOptions(['key' => 'val']);
+        $this->assertEquals(['key' => 'val'], $config->getFormOptions());
+        $this->assertEquals(['form_options' => ['key' => 'val']], $config->toArray());
+
+        $config->setFormOptions(null);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testAddFormConstraint()
+    {
+        $config = new EntityDefinitionFieldConfig();
+
+        $config->addFormConstraint(new NotNull());
+        $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+
+        $config->addFormConstraint(new NotBlank());
+        $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+    }
+
     public function testSetDataTransformers()
     {
         $config = new EntityDefinitionFieldConfig();
@@ -213,6 +255,20 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setDataTransformers([]);
         $this->assertFalse($config->hasDataTransformers());
         $this->assertEquals([], $config->getDataTransformers());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testDependsOn()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getDependsOn());
+
+        $config->setDependsOn(['field1']);
+        $this->assertEquals(['field1'], $config->getDependsOn());
+        $this->assertEquals(['depends_on' => ['field1']], $config->toArray());
+
+        $config->setDependsOn([]);
+        $this->assertNull($config->getDependsOn());
         $this->assertEquals([], $config->toArray());
     }
 }

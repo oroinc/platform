@@ -28,11 +28,11 @@ class MetadataProvider
     /**
      * Gets metadata for the given version of an entity.
      *
-     * @param string                      $className   The FQCN of an entity
-     * @param string                      $version     The version of a config
-     * @param RequestType                 $requestType The request type, for example "rest", "soap", etc.
-     * @param MetadataExtraInterface[]    $extras      Requests for additional metadata information
-     * @param EntityDefinitionConfig|null $config      The configuration of an entity
+     * @param string                   $className   The FQCN of an entity
+     * @param string                   $version     The version of a config
+     * @param RequestType              $requestType The request type, for example "rest", "soap", etc.
+     * @param EntityDefinitionConfig   $config      The configuration of an entity
+     * @param MetadataExtraInterface[] $extras      Requests for additional metadata information
      *
      * @return EntityMetadata|null
      */
@@ -40,18 +40,16 @@ class MetadataProvider
         $className,
         $version,
         RequestType $requestType,
-        array $extras = [],
-        EntityDefinitionConfig $config = null
+        EntityDefinitionConfig $config,
+        array $extras = []
     ) {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $configKey = $config
-            ? $config->getKey()
-            : 'no_config';
+        $configKey = $config->getKey();
         if (!$configKey) {
-            return $this->loadMetadata($className, $version, $requestType, $extras, $config);
+            return $this->loadMetadata($className, $version, $requestType, $config, $extras);
         }
         
         $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras, $configKey);
@@ -59,7 +57,7 @@ class MetadataProvider
             return clone $this->cache[$cacheKey];
         }
 
-        $metadata = $this->loadMetadata($className, $version, $requestType, $extras, $config);
+        $metadata = $this->loadMetadata($className, $version, $requestType, $config, $extras);
         $this->cache[$cacheKey] = $metadata;
 
         if (null === $metadata) {
@@ -70,11 +68,11 @@ class MetadataProvider
     }
 
     /**
-     * @param string                      $className
-     * @param string                      $version
-     * @param RequestType                 $requestType
-     * @param MetadataExtraInterface[]    $extras
-     * @param EntityDefinitionConfig|null $config
+     * @param string                   $className
+     * @param string                   $version
+     * @param RequestType              $requestType
+     * @param EntityDefinitionConfig   $config
+     * @param MetadataExtraInterface[] $extras
      *
      * @return EntityMetadata|null
      */
@@ -82,19 +80,17 @@ class MetadataProvider
         $className,
         $version,
         RequestType $requestType,
-        array $extras = [],
-        EntityDefinitionConfig $config = null
+        EntityDefinitionConfig $config,
+        array $extras
     ) {
         /** @var MetadataContext $context */
         $context = $this->processor->createContext();
         $context->setClassName($className);
         $context->setVersion($version);
         $context->getRequestType()->set($requestType);
+        $context->setConfig($config);
         if (!empty($extras)) {
             $context->setExtras($extras);
-        }
-        if (!empty($config)) {
-            $context->setConfig($config);
         }
 
         $this->processor->process($context);

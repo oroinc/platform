@@ -3,17 +3,22 @@ services:
         class: 'Oro\Component\MessageQueue\Client\Config'
         public: false
 
+    oro_message_queue.client.driver_factory:
+        class: 'Oro\Component\MessageQueue\Client\DriverFactory'
+        public: false
+        arguments:
+            - []
+
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
-        public: false
-        factory: ['Oro\Component\MessageQueue\Client\DriverFactory', 'create']
+        factory: ['@oro_message_queue.client.driver_factory', 'create']
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.client.config'
 
     oro_message_queue.client.message_producer:
         class: 'Oro\Component\MessageQueue\Client\MessageProducer'
-        factory: ['@oro_message_queue.client.driver', 'createProducer']
+        arguments: ['@oro_message_queue.client.driver']
 
     oro_message_queue.message_producer:
         alias: 'oro_message_queue.client.message_producer'
@@ -64,6 +69,15 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: 10 }
 
+    oro_message_queue.client.delay_redelivered_message_extension:
+        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\DelayRedeliveredMessageExtension'
+        public: false
+        arguments:
+            - '@oro_message_queue.client.driver'
+            - ~
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
     oro_message_queue.client.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         public: false
@@ -92,6 +106,15 @@ services:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationsCommand'
         arguments:
             - '@oro_message_queue.client.meta.destination_meta_registry'
+        tags:
+            - { name: 'console.command' }
+
+    oro_message_queue.client.create_queues_command:
+        class: 'Oro\Component\MessageQueue\Client\CreateQueuesCommand'
+        public: true
+        arguments:
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+            - '@oro_message_queue.client.driver'
         tags:
             - { name: 'console.command' }
 

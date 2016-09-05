@@ -105,7 +105,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                                     ],
                                 ],
                             ],
-                            'pre_conditions' => []
+                            'preconditions' => []
                         ],
                         'stpn__workflow_name__transition_three' => [
                             'label' => 'Scheduled transition "stpn__workflow_name__transition_three"',
@@ -125,7 +125,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                                     ]
                                 ]
                             ],
-                            'pre_conditions' => []
+                            'preconditions' => []
                         ]
                     ],
                     ProcessConfigurationProvider::NODE_TRIGGERS => [

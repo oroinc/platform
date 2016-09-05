@@ -20,11 +20,11 @@ define(['jquery'], function($) {
     }
 
     return {
-        show: function() {
+        show: function(zIndex) {
             if (!$mask) {
                 createMask();
             }
-            $mask.show();
+            $mask.css('zIndex', zIndex || '').show();
             return {
                 onhide: function(callback) {
                     onHide = callback;

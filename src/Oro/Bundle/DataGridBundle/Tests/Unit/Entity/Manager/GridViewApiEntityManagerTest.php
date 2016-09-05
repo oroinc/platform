@@ -65,10 +65,16 @@ class GridViewApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $restrictionManager = $this
+            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $gridViewManager = new GridViewManager(
             $aclHelper,
             $registry,
-            $dataGridManager
+            $dataGridManager,
+            $restrictionManager
         );
 
         $systemAllView = new View(GridViewsExtension::DEFAULT_VIEW_ID);

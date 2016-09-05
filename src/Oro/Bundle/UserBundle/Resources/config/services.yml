@@ -351,6 +351,8 @@ services:
 
     oro_user.provider.role_privilege_category_provider:
         class: %oro_user.provider.role_privilege_category_provider.class%
+        arguments:
+            - '@translator'
 
     oro_user.provider.privilege_category_provider:
         class: %oro_user.provider.privilege_category_provider.class%
@@ -382,6 +384,13 @@ services:
             - '@oro_security.security_facade'
         tags:
             - {name: oro_entity.custom_grid_field_validator, entity_name: Oro_Bundle_UserBundle_Entity_User }
+
+    oro_user.validator.user_authentication_fields:
+        class: Oro\Bundle\UserBundle\Validator\UserAuthenticationFieldsValidator
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.user_authentication_fields }
 
     # Dashboard
     oro_user.dashboard.owner_helper:

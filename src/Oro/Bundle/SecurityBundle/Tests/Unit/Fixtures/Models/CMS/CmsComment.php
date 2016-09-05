@@ -37,6 +37,16 @@ class CmsComment
      */
     public $organization;
 
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getIdentity()
+    {
+        return $this->id;
+    }
+
     public function setArticle(CmsArticle $article)
     {
         $this->article = $article;

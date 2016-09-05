@@ -5,14 +5,18 @@ namespace Oro\Bundle\AttachmentBundle\ImportExport;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 {
-    /** @var  AttachmentManager */
+    /** @var AttachmentManager */
     protected $attachmentManager;
+
+    /** @var FileManager */
+    protected $fileManager;
 
     /** @var ConfigFileValidator */
     protected $validator;
@@ -23,6 +27,14 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     public function setAttachmentManager(AttachmentManager $manager)
     {
         $this->attachmentManager = $manager;
+    }
+
+    /**
+     * @param FileManager $manager
+     */
+    public function setFileManager(FileManager $manager)
+    {
+        $this->fileManager = $manager;
     }
 
     /**
@@ -55,11 +67,14 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $result = null;
-        $entity = $this->attachmentManager->prepareRemoteFile($data);
+        $entity = $this->fileManager->createFileEntity($data);
         if ($entity) {
-            $violations = $this->validator->validate($context['entityName'], $entity, $context['fieldName']);
+            $violations = $this->validator->validate(
+                $entity->getFile(),
+                $context['entityName'],
+                $context['fieldName']
+            );
             if (!$violations->count()) {
-                $this->attachmentManager->upload($entity);
                 $result = $entity;
             }
         }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
 
 class ObjectLabelTypeTest extends \PHPUnit_Framework_TestCase
@@ -11,7 +12,9 @@ class ObjectLabelTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->formType = new ObjectLabelType();
+        $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+            ->disableOriginalConstructor()->getMock();
+        $this->formType = new ObjectLabelType(new EntityClassNameHelper($entityAliasResolver));
     }
 
     public function testGetName()

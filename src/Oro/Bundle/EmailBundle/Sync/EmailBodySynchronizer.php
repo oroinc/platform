@@ -12,7 +12,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
@@ -58,50 +60,34 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      * Syncs email body for one email
      *
      * @param Email $email
+     * @param bool $forceSync
+     *
+     * @throws LoadEmailBodyFailedException
      */
-    public function syncOneEmailBody(Email $email)
+    public function syncOneEmailBody(Email $email, $forceSync = false)
     {
-        if ($this->isBodyNotLoaded($email)) {
-            // body loader can load email from any folder
-            // todo: refactor to use correct emailuser and origin
-            // to use active origin and get correct folder from this origin
-            $emailUser = $email->getEmailUsers()->first();
-            $folder    = $emailUser->getFolders()->first();
-            $origin    = $emailUser->getOrigin();
-            if (!$origin) {
-                throw new LoadEmailBodyFailedException($email);
-            }
-
-            $loader    = $this->getBodyLoader($origin);
+        if ($this->isBodyNotLoaded($email, $forceSync)) {
+            // Body loader can load email body from any folder of any emailUser.
+            // Even if email body was not loaded, email will be marked as synced to prevent sync degradation in time.
+            $em = $this->getManager();
             $bodyLoaded = false;
-            try {
-                $em        = $this->getManager();
-                $emailBody = $loader->loadEmailBody($folder, $email, $em);
-                $em->refresh($email);
-                // double check
-                if ($this->isBodyNotLoaded($email)) {
-                    $email->setEmailBody($emailBody);
-                    $email->setBodySynced(true);
-                    $bodyLoaded = true;
-                    $em->persist($email);
-                    $em->flush($email);
+            foreach ($email->getEmailUsers() as $emailUser) {
+                if (($origin = $emailUser->getOrigin()) && $origin->isActive()) {
+                    foreach ($emailUser->getFolders() as $folder) {
+                        list($bodyLoaded, $emailBodyChanged) = $this->loadBody($email, $forceSync, $origin, $folder);
+                        if ($emailBodyChanged) {
+                            $event = new EmailBodyAdded($email);
+                            $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+                            break 2;
+                        }
+                    }
                 }
-            } catch (LoadEmailBodyException $loadEx) {
-                $this->logger->notice(
-                    sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
-                    ['exception' => $loadEx]
-                );
-                throw $loadEx;
-            } catch (\Exception $ex) {
-                $this->logger->warning(
-                    sprintf('Load email body failed. Email id: %d. Error: %s.', $email->getId(), $ex->getMessage()),
-                    ['exception' => $ex]
-                );
-                throw new LoadEmailBodyFailedException($email, $ex);
             }
-            if ($bodyLoaded) {
-                $event = new EmailBodyAdded($email);
-                $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+            $email->setBodySynced(true);
+            $em->persist($email);
+            $em->flush($email);
+            if (!$bodyLoaded) {
+                throw new LoadEmailBodyFailedException($email);
             }
         }
     }
@@ -188,11 +174,79 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
     /**
      * @param Email $email
+     * @param bool $forceSync
      *
      * @return bool
      */
-    protected function isBodyNotLoaded(Email $email)
+    protected function isBodyNotLoaded(Email $email, $forceSync)
     {
-        return $email->isBodySynced() !== true && $email->getEmailBody() === null;
+        return ($email->isBodySynced() !== true || $forceSync === true) && $email->getEmailBody() === null;
+    }
+
+    /**
+     * @param Email $email
+     * @param bool $forceSync
+     * @param EmailOrigin $origin
+     * @param EmailFolder $folder
+     *
+     * @return array
+     *
+     * @throws LoadEmailBodyFailedException
+     */
+    protected function loadBody(Email $email, $forceSync, $origin, $folder)
+    {
+        $bodyLoaded = false;
+        $emailBodyChanged = false;
+        $em = $this->getManager();
+        $loader = $this->getBodyLoader($origin);
+        try {
+            $emailBody = $loader->loadEmailBody($folder, $email, $em);
+            $bodyLoaded = true;
+            $em->refresh($email);
+            // double check
+            if ($this->isBodyNotLoaded($email, $forceSync)) {
+                $email->setEmailBody($emailBody);
+                $emailBodyChanged = true;
+            }
+        } catch (EmailBodyNotFoundException $e) {
+            $this->logger->notice(
+                sprintf(
+                    'Attempt to load email body failed. Email id: %d. Error: %s',
+                    $email->getId(),
+                    $e->getMessage()
+                ),
+                ['exception' => $e]
+            );
+        } catch (\Doctrine\ORM\NoResultException $e) {
+            $this->logger->notice(
+                sprintf(
+                    'Attempt to load email body failed. Email id: %d. Error: %s',
+                    $email->getId(),
+                    $e->getMessage()
+                ),
+                ['exception' => $e]
+            );
+        } catch (LoadEmailBodyException $loadEx) {
+            $this->logger->notice(
+                sprintf(
+                    'Load email body failed. Email id: %d. Error: %s',
+                    $email->getId(),
+                    $loadEx->getMessage()
+                ),
+                ['exception' => $loadEx]
+            );
+            throw $loadEx;
+        } catch (\Exception $ex) {
+            $this->logger->notice(
+                sprintf(
+                    'Load email body failed. Email id: %d. Error: %s.',
+                    $email->getId(),
+                    $ex->getMessage()
+                ),
+                ['exception' => $ex]
+            );
+        }
+
+        return [$bodyLoaded, $emailBodyChanged];
     }
 }

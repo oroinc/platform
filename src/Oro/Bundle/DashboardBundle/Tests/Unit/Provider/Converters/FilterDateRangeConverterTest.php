@@ -29,7 +29,7 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->converter = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
+        $this->dateCompiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -53,22 +53,30 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
 
         $this->converter = new FilterDateRangeConverter(
             $this->formatter,
-            $this->converter,
+            $this->dateCompiler,
             $this->translator,
             $this->dateHelper
         );
     }
 
-    public function testGetConvertedValueDefaultValues()
+    public function testGetConvertedValueDefaultValuesWithoutValueTypes()
     {
-        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $start       = clone $currentDate;
-        $start       = $start->sub(new \DateInterval('P1M'));
-
         $result = $this->converter->getConvertedValue([]);
 
-        $this->assertEquals($currentDate->format('M'), $result['end']->format('M'));
-        $this->assertEquals($start->format('M'), $result['start']->format('M'));
+        $this->assertNull($result['start']);
+        $this->assertNull($result['end']);
+    }
+
+    public function testGetConvertedValueDefaultValuesWithValueTypes()
+    {
+        $this->dateCompiler->expects($this->once())
+            ->method('compile')
+            ->with('{{4}}')
+            ->will($this->returnValue(new \DateTime('01-01-2016 00:00:00')));
+        $result = $this->converter->getConvertedValue([], null, ['options' => ['value_types' => true]]);
+
+        $this->assertEquals('2016-01-01 00:00:00', $result['start']->format('Y-m-d H:i:s'));
+        $this->assertEquals('2016-01-31 23:59:59', $result['end']->format('Y-m-d H:i:s'));
     }
 
     public function testGetConvertedValueBetween()

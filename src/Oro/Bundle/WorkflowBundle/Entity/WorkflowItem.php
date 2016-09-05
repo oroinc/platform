@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as Serializer;
@@ -48,6 +49,9 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  * )
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 {
@@ -74,10 +78,18 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     /**
      * @var int
      *
-     * @ORM\Column(name="entity_id", type="integer", nullable=true)
+     * @ORM\Column(name="entity_id", type="string", length=255, nullable=true)
      * @Serializer\Expose()
      */
     protected $entityId;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="entity_class", type="string", nullable=true)
+     * @Serializer\Expose()
+     */
+    protected $entityClass;
 
     /**
      * @var WorkflowStep
@@ -202,6 +214,9 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
      */
     protected $serializeFormat;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct()
     {
         parent::__construct();
@@ -279,9 +294,9 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     }
 
     /**
-     * This method should be called only from WorkflowDataSerializeSubscriber.
+     * This method should be called only from WorkflowItemListener.
      *
-     * @param int $entityId
+     * @param string $entityId
      * @return WorkflowItem
      * @throws WorkflowException
      */
@@ -297,13 +312,45 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     }
 
     /**
-     * This method should be called only from WorkflowDataSerializeSubscriber.
+     * This method should be called only from WorkflowDataSerializeListener.
      *
-     * @return int
+     * @return string
      */
     public function getEntityId()
     {
         return $this->entityId;
+    }
+
+    /**
+     * This method should be called only from WorkflowItemListener.
+     *
+     * @param string|object $entityClass
+     * @return WorkflowItem
+     * @throws WorkflowException
+     */
+    public function setEntityClass($entityClass)
+    {
+        if (is_object($entityClass)) {
+            $entityClass = ClassUtils::getClass($entityClass);
+        }
+
+        if ($this->entityClass !== null && $this->entityClass !== $entityClass) {
+            throw new WorkflowException('Workflow item entity CLASS can not be changed');
+        }
+
+        $this->entityClass = $entityClass;
+
+        return $this;
+    }
+
+    /**
+     * This method should be called only from WorkflowDataSerializeListener.
+     *
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
     }
 
     /**
@@ -332,7 +379,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     /**
      * Set serialized data.
      *
-     * This method should be called only from WorkflowDataSerializeSubscriber.
+     * This method should be called only from WorkflowDataSerializeListener.
      *
      * @param string $data
      * @return WorkflowItem
@@ -347,7 +394,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     /**
      * Get serialized data.
      *
-     * This method should be called only from WorkflowDataSerializeSubscriber.
+     * This method should be called only from WorkflowDataSerializeListener.
      *
      * @return string $data
      */
@@ -422,7 +469,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     /**
      * Set serializer.
      *
-     * This method should be called only from WorkflowDataSerializeSubscriber.
+     * This method should be called only from WorkflowDataSerializeListener.
      *
      * @param WorkflowAwareSerializer $serializer
      * @param string $format

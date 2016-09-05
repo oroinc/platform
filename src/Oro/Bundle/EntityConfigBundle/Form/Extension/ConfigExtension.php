@@ -5,8 +5,12 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Extension;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+
 class ConfigExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         // config_is_new is true if a new entity or field is created
@@ -21,10 +25,5 @@ class ConfigExtension extends AbstractTypeExtension
                 ]
             ]
         );
-    }
-
-    public function getExtendedType()
-    {
-        return 'form';
     }
 }

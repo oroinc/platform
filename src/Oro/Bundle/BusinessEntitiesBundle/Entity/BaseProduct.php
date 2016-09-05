@@ -33,7 +33,7 @@ class BaseProduct
     /**
      * @var string
      *
-     * @ORM\Column(name="sku", type="string", length=255, nullable=false)
+     * @ORM\Column(name="sku", type="string", length=255, nullable=true)
      */
     protected $sku;
 

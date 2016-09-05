@@ -701,3 +701,21 @@ invalid_field_form_options:
                 form_options: test
     expected: []
     error: 'Invalid type for path "entity.fields.field1.form_options". Expected array, but got string'
+
+field_depends_on:
+    config:
+        fields:
+            field1:
+                depends_on: [field2]
+    expected:
+        fields:
+            field1:
+                depends_on: [field2]
+
+invalid_field_depends_on:
+    config:
+        fields:
+            field1:
+                depends_on: field2
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.depends_on". Expected array, but got string'

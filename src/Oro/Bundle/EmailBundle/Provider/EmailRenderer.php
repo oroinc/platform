@@ -19,6 +19,11 @@ class EmailRenderer extends \Twig_Environment
 {
     const VARIABLE_NOT_FOUND = 'oro.email.variable.not.found';
 
+    /**
+     * @var array Map of filters to apply to template variables by default
+     */
+    public static $defaultVariableFilters = ['system.userSignature' => 'oro_html_sanitize'];
+
     /** @var VariablesProvider */
     protected $variablesProvider;
 
@@ -167,6 +172,8 @@ class EmailRenderer extends \Twig_Environment
     public function renderWithDefaultFilters($content, array $templateParams = [])
     {
         $templateParams['system'] = $this->getSystemVariableValues();
+        $content = $this->addDefaultVariableFilters($content);
+
         if (array_key_exists('entity', $templateParams)) {
             $content = $this->processDefaultFilters($content, $templateParams['entity']);
         }
@@ -195,6 +202,23 @@ class EmailRenderer extends \Twig_Environment
         }
 
         return $this->render('{% verbatim %}' . $content . '{% endverbatim %}', []);
+    }
+
+
+    /**
+     * Parses $template and appends filters to the variables defined in self::$defaultVariableFilters map
+     *
+     * @param string $template
+     *
+     * @return string
+     */
+    protected function addDefaultVariableFilters($template)
+    {
+        foreach (self::$defaultVariableFilters as $var => $filter) {
+            $template = preg_replace('/{{\s' . $var . '\s}}/u', sprintf('{{ %s|%s }}', $var, $filter), $template);
+        }
+
+        return $template;
     }
 
     /**

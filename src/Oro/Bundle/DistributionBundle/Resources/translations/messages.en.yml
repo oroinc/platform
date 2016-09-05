@@ -40,6 +40,8 @@ oro:
             not_writable: 'Following directories/files have to be writable by web user'
             enter_package_name: 'Please enter the package name'
             ajax_error: 'Ajax error'
+            ajax_500error: 'Cannot {{ action }} the package. Please check the memory limits or timeout option for web-server.'
+            perform_the_action_to: 'perform the action to'
         settings:
             repositories: Repositories
             add_repository: 'Add a repository'

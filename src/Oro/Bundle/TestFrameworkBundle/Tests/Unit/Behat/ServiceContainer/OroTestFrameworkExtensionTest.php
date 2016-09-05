@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtens
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
@@ -29,9 +30,12 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
             'database_driver',
             'pdo_mysql'
         );
+
         $config = [
             'shared_contexts' => $this->sharedContexts,
+            'application_suites' => [],
             'elements_namespace_suffix' => '\Tests\Behat\Page\Element',
+            'reference_initializer_class' => 'ReferenceRepositoryInitializer'
         ];
 
         $extension = $this
@@ -47,15 +51,19 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $containerBuilder = new ContainerBuilder();
+        $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
+        $applicableSuites = ['OroUserBundle'];
 
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, [
             'shared_contexts' => $sharedContexts,
+            'application_suites' => $applicableSuites,
+            'reference_initializer_class' => 'ReferenceRepositoryInitializer'
         ]);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
+        $this->assertEquals($applicableSuites, $containerBuilder->getParameter('oro_test.application_suites'));
     }
 
     public function testGetConfigKey()
@@ -169,6 +177,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
+        $containerBuilder->setDefinition('mink.listener.sessions', new Definition());
 
         return $containerBuilder;
     }

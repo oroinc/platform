@@ -40,11 +40,14 @@ define(function(require) {
         },
 
         render: function() {
+            this._deferredRender();
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
                 .validate();
-            this.initLayout();
+            this.initLayout().then(_.bind(function() {
+                this._resolveDeferredRender();
+            }, this));
             this.bindData();
 
             return this;

@@ -1,11 +1,12 @@
 define([
     'underscore',
+    'oroui/js/mediator',
     'backbone',
     'chaplin',
     'backgrid',
     './row',
     '../pageable-collection'
-], function(_, Backbone, Chaplin, Backgrid, Row, PageableCollection) {
+], function(_, mediator, Backbone, Chaplin, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -47,6 +48,9 @@ define([
         initialize: function(options) {
             _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
             this.rows = this.subviews;
+            if ('rowView' in options.themeOptions) {
+                this.itemView = options.themeOptions.rowView;
+            }
             Body.__super__.initialize.apply(this, arguments);
         },
 
@@ -61,6 +65,12 @@ define([
             delete this.filteredColumns;
 
             Body.__super__.dispose.call(this);
+        },
+
+        renderAllItems: function() {
+            var result = Body.__super__.renderAllItems.call(this, arguments);
+            mediator.trigger('layout:adjustHeight');
+            return result;
         },
 
         initItemView: function(model) {

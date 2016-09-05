@@ -14,7 +14,7 @@ class CurrencyType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices' => Intl::getCurrencyBundle()->getCurrencyNames('en'),
+            'choices' => array_flip(Intl::getCurrencyBundle()->getCurrencyNames('en')),
             'restrict' => false
         ]);
 
@@ -34,6 +34,14 @@ class CurrencyType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_currency';
     }

@@ -26,9 +26,9 @@ define([
         }
 
         var confirmReset = new Modal({
-            title:   __('Workflow reset'),
-            content: __('Attention: This action will reset workflow data for this record.'),
-            okText:  __('Yes, Reset')
+            title:   __('oro.workflow.workflowdefinition.reset'),
+            content: __('oro.workflow.workflowdefinition.reset_message'),
+            okText:  __('oro.workflow.workflowdefinition.reset_button_text')
         });
 
         confirmReset.on('ok', function() {

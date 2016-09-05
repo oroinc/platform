@@ -7,6 +7,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const XLSX_MAX_EXPORT_RECORDS = 10000;
+
     /**
      * {@inheritDoc}
      */
@@ -15,7 +17,18 @@ class Configuration implements ConfigurationInterface
         $builder = new TreeBuilder();
 
         $builder->root('export')
-            ->treatTrueLike(['csv' => ['label' => 'oro.grid.export.csv']])
+            ->treatTrueLike(
+                [
+                    'csv' => [
+                        'label' => 'oro.grid.export.csv'
+                    ],
+                    'xlsx' => [
+                        'label' => 'oro.grid.export.xlsx',
+                        'show_max_export_records_dialog' => true,
+                        'max_export_records' => self::XLSX_MAX_EXPORT_RECORDS
+                    ]
+                ]
+            )
             ->treatFalseLike([])
             ->treatNullLike([])
             ->useAttributeAsKey('name')
@@ -23,6 +36,10 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->scalarNode('label')
                         ->cannotBeEmpty()
+                    ->end()
+                    ->booleanNode('show_max_export_records_dialog')
+                    ->end()
+                    ->integerNode('max_export_records')
                     ->end()
                 ->end()
             ->end();

@@ -72,4 +72,17 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
 
         return $capabilitiesData;
     }
+
+    /**
+     * @param AbstractRole $role
+     *
+     * @return array
+     */
+    public function getCapabilitySetOptions(AbstractRole $role)
+    {
+        return [
+            'data' => $this->getCapabilities($role),
+            'tabIds' => $this->categoryProvider->getTabList()
+        ];
+    }
 }

@@ -295,6 +295,19 @@ field_target_type:
             field4:
                 target_type: to-many
 
+field_depends_on:
+    config:
+        fields:
+            field1:
+                depends_on: []
+            field2:
+                depends_on: [field1]
+    expected:
+        fields:
+            field1: ~
+            field2:
+                depends_on: [field1]
+
 field_with_extra_attributes:
     config:
         fields:

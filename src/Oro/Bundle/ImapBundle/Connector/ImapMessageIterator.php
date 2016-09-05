@@ -53,7 +53,8 @@ class ImapMessageIterator implements \Iterator, \Countable
     }
 
     /**
-     * Sets iteration order
+     * Sets iteration order. To avoid extra requests to IMAP server
+     * the rewind() method should be executed manually on demand.
      *
      * @param bool $reverse Determines the iteration order. By default from newest messages to oldest
      *                      true for from newest messages to oldest
@@ -62,7 +63,6 @@ class ImapMessageIterator implements \Iterator, \Countable
     public function setIterationOrder($reverse)
     {
         $this->reverse = $reverse;
-        $this->rewind();
     }
 
     /**

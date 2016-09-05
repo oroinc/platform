@@ -85,6 +85,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -140,6 +141,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -195,6 +197,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -251,6 +254,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -306,6 +310,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -364,6 +369,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
                 []
             )
             ->willReturn($resourceMetadata);
@@ -386,5 +392,44 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             ['Test\Class' => $expectedSubresources],
             $this->context->getResult()->toArray()
         );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage A metadata for "Test\Class" entity does not exist.
+     */
+    public function testProcessForAssociationWithoutTargetMetadata()
+    {
+        $resource = new ApiResource('Test\Class');
+        $resource->setExcludedActions(['update']);
+
+        $resourceConfig = new Config();
+        $resourceConfig->setDefinition(new EntityDefinitionConfig());
+
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setVersion('1.1');
+        $this->context->setResources([$resource]);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($resourceConfig);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
+                []
+            )
+            ->willReturn(null);
+
+        $this->processor->process($this->context);
     }
 }

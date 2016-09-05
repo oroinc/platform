@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Context;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class StepExecutionProxyContext implements ContextInterface
 {
@@ -40,6 +41,14 @@ class StepExecutionProxyContext implements ContextInterface
     public function getErrors()
     {
         return $this->stepExecution->getErrors();
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getWarnings()
+    {
+        return $this->stepExecution->getWarnings();
     }
 
     /**

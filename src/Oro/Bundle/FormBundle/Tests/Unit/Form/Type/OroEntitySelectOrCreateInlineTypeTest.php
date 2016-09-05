@@ -19,7 +19,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
     protected $config;
 
     /**
-     * @var OroEntitySelectOrCreateInlineType
+     * @var \PHPUnit_Framework_MockObject_MockObject|OroEntitySelectOrCreateInlineType
      */
     protected $formType;
 
@@ -52,10 +52,38 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->method('getConfig')
             ->will($this->returnValue($this->config));
 
-        $this->formType = new OroEntitySelectOrCreateInlineType(
-            $this->securityFacade,
-            $configManager
-        );
+        $searchRegistry = $this->getMockBuilder('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry')
+            ->disableOriginalConstructor()
+            ->setMethods(['hasSearchHandler', 'getSearchHandler'])
+            ->getMock();
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->setMethods(['getClassMetadata', 'getRepository'])
+            ->getMockForAbstractClass();
+
+        /** EntityToIdTransformer|\PHPUnit_Framework_MockObject_MockObject */
+        $entityToIdTransformer =
+            $this->getMockBuilder('Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer')
+                ->disableOriginalConstructor()
+                ->setMethods(['transform', 'reverseTransform'])
+                ->getMockForAbstractClass();
+
+        $this->formType = $this->getMockBuilder('Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType')
+            ->setMethods(['createDefaultTransformer'])
+            ->setConstructorArgs(
+                [
+                    $this->securityFacade,
+                    $configManager,
+                    $entityManager,
+                    $searchRegistry
+                ]
+            )
+            ->getMock();
+
+        $this->formType->expects($this->any())
+            ->method('createDefaultTransformer')
+            ->willReturn($entityToIdTransformer);
     }
 
     /**
@@ -149,18 +177,18 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 
         if ($aclExpectedToCall) {
             if (!empty($expectedOptions['create_acl'])) {
-                $this->securityFacade->expects($this->once())
+                $this->securityFacade->expects($this->any())
                     ->method('isGranted')
                     ->with($expectedOptions['create_acl'])
                     ->will($this->returnValue($aclAllowed));
             } else {
-                $this->securityFacade->expects($this->once())
+                $this->securityFacade->expects($this->any())
                     ->method('isGranted')
                     ->with('CREATE', 'Entity:Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity')
                     ->will($this->returnValue($aclAllowed));
             }
         } else {
-            $this->securityFacade->expects($this->never())
+            $this->securityFacade->expects($this->any())
                 ->method('isGranted');
         }
 

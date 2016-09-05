@@ -122,9 +122,10 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
                             'oro_tracking.dynamic_tracking_enabled',
                             false,
                             false,
+                            null,
                             array('value' => false, 'scope' => 'app')
                         ),
-                        array('oro_tracking.piwik_token_auth', false, false, 'TEST_DEFAULT')
+                        array('oro_tracking.piwik_token_auth', false, false, null, 'TEST_DEFAULT')
                     )
                 )
             );

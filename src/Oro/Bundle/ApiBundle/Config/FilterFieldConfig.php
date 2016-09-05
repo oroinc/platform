@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * Represents a filter configuration for a field.
  */
@@ -49,7 +51,7 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function __clone()
     {
-        $this->cloneItems();
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 
     /**

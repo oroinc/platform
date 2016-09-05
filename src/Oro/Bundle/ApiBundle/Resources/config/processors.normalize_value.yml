@@ -13,14 +13,14 @@ services:
     oro_api.normalize_value.entity_type:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType
         arguments:
-            - '@oro_entity.entity_alias_resolver'
+            - '@oro_api.entity_alias_resolver'
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: entityType, priority: -5 }
 
     oro_api.normalize_value.entity_class:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass
         arguments:
-            - '@oro_entity.entity_alias_resolver'
+            - '@oro_api.entity_alias_resolver'
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: entityClass, priority: -5 }
 

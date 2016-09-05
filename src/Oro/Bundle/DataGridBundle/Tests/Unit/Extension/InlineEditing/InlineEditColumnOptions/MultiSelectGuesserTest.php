@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEdi
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
  * Class MultiSelectGuesserTest
@@ -12,18 +11,21 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
  */
 class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclHelper */
-    protected $aclHelper;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $choiceHelper;
 
     /** @var MultiSelectGuesser */
     protected $guesser;
 
     public function setUp()
     {
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+        $this->choiceHelper = $this
+            ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -31,7 +33,7 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->guesser = new MultiSelectGuesser($this->doctrineHelper, $this->aclHelper);
+        $this->guesser = new MultiSelectGuesser($this->doctrineHelper, $this->choiceHelper);
     }
 
     public function testRelationGuessHasNotAssociation()
@@ -102,34 +104,8 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
                 ->method('getSingleIdentifierFieldName')
                 ->willReturn('key');
 
-            $metadata->expects($this->once())
-                ->method('getFieldNames')
-                ->willReturn(['test']);
-
-            $metadata->expects($this->once())
-                ->method('getTypeOfField')
-                ->willReturn('string');
-
-            $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-                ->setMethods(['getResult'])
-                ->disableOriginalConstructor()
-                ->getMock();
-            $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-            $this->aclHelper->expects($this->any())
-                ->method('apply')
-                ->willReturn($qb);
-            $em->expects($this->any())
-                ->method('getRepository')
-                ->willReturn($repo);
-            $repo->expects($this->any())
-                ->method('createQueryBuilder')
-                ->willReturn($qb);
-            $qb->expects($this->once())
-                ->method('getResult')
-                ->willReturn([['key' => 'a1', 'test' => 'A1'], ['key' => 'a2', 'test' => 'A2']]);
+            $this->choiceHelper->expects($this->once())->method('getChoices')
+                ->willReturn($expected['choices']);
         }
 
         $guessed = $this->guesser->guessColumnOptions('test', 'test', $column);

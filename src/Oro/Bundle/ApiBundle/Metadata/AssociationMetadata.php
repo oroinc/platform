@@ -18,6 +18,9 @@ class AssociationMetadata implements ToArrayInterface
     /** @var string[] */
     protected $acceptableTargetClasses = [];
 
+    /** @var string */
+    protected $associationType;
+
     /** @var bool */
     protected $collection = false;
 
@@ -61,6 +64,9 @@ class AssociationMetadata implements ToArrayInterface
         }
         if ($this->acceptableTargetClasses) {
             $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
+        }
+        if ($this->associationType) {
+            $result['association_type'] = $this->associationType;
         }
         if ($this->collection) {
             $result['collection'] = $this->collection;
@@ -199,6 +205,30 @@ class AssociationMetadata implements ToArrayInterface
             unset($this->acceptableTargetClasses[$key]);
             $this->acceptableTargetClasses = array_values($this->acceptableTargetClasses);
         }
+    }
+
+    /**
+     * Gets the type of the association.
+     * For example "manyToOne" or "manyToMany".
+     * @see Oro\Bundle\EntityExtendBundle\Extend\RelationType
+     *
+     * @return string
+     */
+    public function getAssociationType()
+    {
+        return $this->associationType;
+    }
+
+    /**
+     * Sets the type of the association.
+     * For example "manyToOne" or "manyToMany".
+     * @see Oro\Bundle\EntityExtendBundle\Extend\RelationType
+     *
+     * @param string $associationType
+     */
+    public function setAssociationType($associationType)
+    {
+        $this->associationType = $associationType;
     }
 
     /**

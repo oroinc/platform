@@ -8,15 +8,12 @@ use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $expressionAssembler;
-
     /** @var ConfigLayoutUpdateGenerator */
     protected $generator;
 
     protected function setUp()
     {
-        $this->generator = new ConfigLayoutUpdateGenerator($this->expressionAssembler);
+        $this->generator = new ConfigLayoutUpdateGenerator();
     }
 
     protected function tearDown()
@@ -118,6 +115,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 /**
  * Filename: testfilename.yml
  */
+
 class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
 {
     public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)

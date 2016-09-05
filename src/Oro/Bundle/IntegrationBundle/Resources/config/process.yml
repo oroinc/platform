@@ -4,7 +4,7 @@ definitions:
         enabled: true
         entity:  Oro\Bundle\IntegrationBundle\Entity\Channel
         order:   10
-        pre_conditions:
+        preconditions:
             '@equal': [$enabled, true]
         actions_configuration:
             - '@assign_constant_value':

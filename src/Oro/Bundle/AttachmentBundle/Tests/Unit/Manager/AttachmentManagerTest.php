@@ -2,11 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
-use Symfony\Component\HttpFoundation\File\File;
-
-use Gaufrette\Stream\InMemoryBuffer;
-use Gaufrette\StreamMode;
-
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
@@ -15,9 +10,6 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AttachmentManager  */
     protected $attachmentManager;
-
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
-    protected $filesystem;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
@@ -30,24 +22,11 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $filesystemMap = $this->getMockBuilder('Knp\Bundle\GaufretteBundle\FilesystemMap')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->filesystem = $this->getMockBuilder('Gaufrette\Filesystem')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMap->expects($this->once())
-            ->method('get')
-            ->with('attachments')
-            ->will($this->returnValue($this->filesystem));
-
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $ileIcons = [
+        $fileIcons = [
             'default' => 'icon_default',
             'txt' => 'icon_txt'
         ];
@@ -56,52 +35,16 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->attachment->setFilename('testFile.txt');
         $this->attachment->setOriginalFilename('testFile.txt');
 
-        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $serviceLink->expects($this->any())->method('getService')
-            ->will($this->returnValue($securityFacade));
-
-        $securityFacade->expects($this->any())->method('getLoggedUser')
-            ->will($this->returnValue(null));
-
         $this->associationManager = $this
             ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->attachmentManager = new AttachmentManager(
-            $filesystemMap,
             $this->router,
-            $serviceLink,
-            $ileIcons,
+            $fileIcons,
             $this->associationManager
         );
-    }
-
-    public function testGetContent()
-    {
-        $fileContent = 'test data';
-
-        $file = $this->getMockBuilder('Gaufrette\File')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->filesystem->expects($this->once())
-            ->method('get')
-            ->with('testFile.txt')
-            ->will($this->returnValue($file));
-
-        $file->expects($this->once())
-            ->method('getContent')
-            ->will($this->returnValue($fileContent));
-
-        $this->assertEquals($fileContent, $this->attachmentManager->getContent($this->attachment));
     }
 
     public function testGetFileUrl()
@@ -180,89 +123,11 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('icon_default', $this->attachmentManager->getAttachmentIconClass($this->attachment));
     }
 
-    public function testUpload()
-    {
-        $this->attachment->setEmptyFile(false);
-
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->setConstructorArgs([__DIR__.'/../Fixtures/testFile/test.txt'])
-            ->getMock();
-        $this->attachment->setFile($file);
-        $path = __DIR__ . '/../Fixtures/testFile/test.txt';
-        $file->expects($this->once())
-            ->method('getPathname')
-            ->will($this->returnValue(realpath($path)));
-
-        $file->expects($this->once())
-            ->method('isFile')
-            ->will($this->returnValue(true));
-
-        $memoryBuffer = new InMemoryBuffer($this->filesystem, 'test.txt');
-
-        $this->filesystem->expects($this->once())
-            ->method('createStream')
-            ->with($this->attachment->getFilename())
-            ->will($this->returnValue($memoryBuffer));
-
-        $this->attachmentManager->upload($this->attachment);
-        $memoryBuffer->open(new StreamMode('rb+'));
-        $memoryBuffer->seek(0);
-
-        $this->assertEquals('Test data', $memoryBuffer->read(100));
-    }
-
-    public function testPreUploadDeleteFile()
-    {
-        $this->attachment->setEmptyFile(true)
-            ->setFilename('test.doc')
-            ->setExtension('doc')
-            ->setOriginalFilename('test.doc');
-        $this->filesystem->expects($this->once())
-            ->method('has')
-            ->with($this->attachment->getFilename())
-            ->will($this->returnValue(true));
-        $this->filesystem->expects($this->once())
-            ->method('delete')
-            ->with($this->attachment->getFilename());
-
-        $this->attachmentManager->preUpload($this->attachment); // delete should be called
-        $this->attachmentManager->preUpload($this->attachment); // delete shouldn't be called
-
-        $this->assertNull($this->attachment->getFilename());
-        $this->assertNull($this->attachment->getExtension());
-        $this->assertNull($this->attachment->getOriginalFilename());
-    }
-
-    public function testPreUpload()
-    {
-        $file = new File(__DIR__.'/../Fixtures/testFile/test.txt');
-
-        $this->attachment
-            ->setEmptyFile(false)
-            ->setFile($file);
-
-        $adapter = $this->getMockBuilder('Gaufrette\Adapter\Cache')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->filesystem->expects($this->any())
-            ->method('getAdapter')
-            ->will($this->returnValue($adapter));
-        $adapter->expects($this->once())
-            ->method('setMetadata');
-
-        $this->attachmentManager->preUpload($this->attachment);
-
-        $this->assertEquals('test.txt', $this->attachment->getOriginalFilename());
-        $this->assertEquals('txt', $this->attachment->getExtension());
-        $this->assertEquals('text/plain', $this->attachment->getMimeType());
-        $this->assertEquals(9, $this->attachment->getFileSize());
-    }
-
     public function testGetFilteredImageUrl()
     {
         $this->attachment->setId(1);
         $filerName = 'testFilter';
-        $this->attachment->setOriginalFilename('test.doc');
+        $this->attachment->setFilename('test.doc');
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
@@ -321,58 +186,6 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     public function testParseInvalidFileKey()
     {
         $this->attachmentManager->parseFileKey('Invalid Key');
-    }
-
-    public function testCopyLocalFileToStorage()
-    {
-        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
-
-        $newFileName = 'test2.txt';
-
-        $resultStream = new InMemoryBuffer($this->filesystem, $newFileName);
-
-        $this->filesystem->expects($this->once())
-            ->method('createStream')
-            ->with($newFileName)
-            ->will($this->returnValue($resultStream));
-
-        $this->attachmentManager->copyLocalFileToStorage($localFilePath, $newFileName);
-        $resultStream->open(new StreamMode('rb+'));
-        $resultStream->seek(0);
-
-        $this->assertEquals('Test data', $resultStream->read(100));
-    }
-
-    public function testCopyAttachmentFile()
-    {
-        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
-
-        $sourceStream = new InMemoryBuffer($this->filesystem, $this->attachment->getFilename());
-        $sourceStream->open(new StreamMode('wb+'));
-        $sourceStream->write(file_get_contents($localFilePath));
-        $sourceStream->seek(0);
-        $sourceStream->close();
-
-        $resultStream = new InMemoryBuffer($this->filesystem, 'test2.txt');
-
-        $this->filesystem->expects($this->at(0))
-            ->method('createStream')
-            ->with($this->attachment->getFilename())
-            ->will($this->returnValue($sourceStream));
-
-        $this->filesystem->expects($this->at(1))
-            ->method('createStream')
-            ->with($this->anything())
-            ->will($this->returnValue($resultStream));
-
-        $newAttachment = $this->attachmentManager->copyAttachmentFile($this->attachment);
-
-        $this->assertEquals($this->attachment->getOriginalFilename(), $newAttachment->getOriginalFilename());
-        $this->assertNotEquals($this->attachment->getFilename(), $newAttachment->getFilename());
-
-        $resultStream->open(new StreamMode('rb+'));
-        $resultStream->seek(0);
-        $this->assertEquals('Test data', $resultStream->read(100));
     }
 
     public function testIsImageType()

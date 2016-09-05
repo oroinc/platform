@@ -22,7 +22,7 @@ class BaseType extends AbstractType
             'label_attr',
             'translation_domain',
             'class_prefix',
-            'additional_block_prefix'
+            'additional_block_prefixes'
         ]);
     }
 
@@ -71,16 +71,17 @@ class BaseType extends AbstractType
         // due to limitations of block names in TWIG
         $uniqueBlockPrefix = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $id);
         $blockPrefixes     = $block->getTypeHelper()->getTypeNames($name);
-        if (isset($options['additional_block_prefix'])) {
-            $blockPrefixes[] = $options['additional_block_prefix'];
+        if (isset($options['additional_block_prefixes'])) {
+            $blockPrefixes = array_merge($blockPrefixes, $options['additional_block_prefixes']);
         }
         $blockPrefixes[]   = $uniqueBlockPrefix;
 
-        $view->vars['id']                  = $id;
-        $view->vars['block_type']          = $name;
-        $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
-        $view->vars['block_prefixes']      = $blockPrefixes;
-        $view->vars['cache_key']           = sprintf('_%s_%s', $id, $name);
+        $view->vars['id']                   = $id;
+        $view->vars['block_type']           = $name;
+        $view->vars['block_type_widget_id'] = $name . '_widget';
+        $view->vars['unique_block_prefix']  = $uniqueBlockPrefix;
+        $view->vars['block_prefixes']       = $blockPrefixes;
+        $view->vars['cache_key']            = sprintf('_%s_%s', $id, $name);
     }
 
     /**

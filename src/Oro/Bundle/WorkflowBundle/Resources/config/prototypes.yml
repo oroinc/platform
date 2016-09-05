@@ -21,7 +21,7 @@ services:
         class: %oro_workflow.prototype.workflow.class%
         scope: prototype
         arguments:
-            - '@oro_workflow.entity_connector'
+            - '@oro_entity.doctrine_helper'
             - '@oro_workflow.security.acl.manager'
             - '@oro_workflow.restriction.manager'
             - '@oro_workflow.prototype.step_manager'

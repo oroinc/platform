@@ -195,6 +195,9 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
+            ->end()
+            ->arrayNode(EntityDefinitionFieldConfig::DEPENDS_ON)
+                ->prototype('scalar')->end()
             ->end();
     }
 
@@ -220,6 +223,9 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             }
         } elseif (!empty($config[EntityDefinitionFieldConfig::TARGET_CLASS])) {
             $config[EntityDefinitionFieldConfig::TARGET_TYPE] = 'to-one';
+        }
+        if (empty($config[EntityDefinitionFieldConfig::DEPENDS_ON])) {
+            unset($config[EntityDefinitionFieldConfig::DEPENDS_ON]);
         }
 
         return $config;

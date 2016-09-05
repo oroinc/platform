@@ -13,11 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
-/**
- * Load customers
- *
- * Execute with "php app/console doctrine:fixtures:load"
- */
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface
 {
     const COUNT = 9;

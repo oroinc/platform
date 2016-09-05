@@ -19,4 +19,7 @@ items:
     template_audit_condition_type_select:
         template: OroDataAuditBundle:js:audit-condition-type-select.html.twig
     data_audit_condition:
+        acl: oro_dataaudit_history
+        applicable:
+            - "@oro_dataaudit.segment_widget.context_checker->isApplicableInContext($params$)"
         template: OroDataAuditBundle:Segment:data_audit_condition.html.twig

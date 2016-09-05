@@ -279,16 +279,20 @@ services:
         arguments:
             - '@oro_api.rest.document_builder'
             - '@oro_api.rest.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest&!json_api, priority: -50 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get_list.json_api.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildListResultDocument
         arguments:
             - '@oro_api.json_api.document_builder'
             - '@oro_api.json_api.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -55 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get_list.rest.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors

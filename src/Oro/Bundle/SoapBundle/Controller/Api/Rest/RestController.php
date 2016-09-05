@@ -130,7 +130,7 @@ abstract class RestController extends RestGetController implements
             return $result;
         }
 
-        // some form handlers may return true/false rather that saved entity
+        // some form handlers may return true/false rather than saved entity
         return $result ? $entity : null;
     }
 

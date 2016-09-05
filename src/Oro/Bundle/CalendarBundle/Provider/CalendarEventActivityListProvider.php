@@ -65,7 +65,7 @@ class CalendarEventActivityListProvider implements
         return [
             'itemView'   => 'oro_calendar_event_widget_info',
             'itemEdit'   => 'oro_calendar_event_update',
-            'itemDelete' => 'oro_api_delete_calendarevent'
+            'itemDelete' => 'oro_calendar_event_delete'
         ];
     }
 
@@ -100,7 +100,7 @@ class CalendarEventActivityListProvider implements
     public function getDescription($entity)
     {
         /** @var $entity CalendarEvent */
-        return $entity->getDescription();
+        return trim(strip_tags($entity->getDescription()));
     }
 
     /**

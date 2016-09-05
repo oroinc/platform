@@ -149,7 +149,8 @@ define(function(require) {
                 'container': '#' + containerId,
                 'allowEdit': this.options.allowEdit,
                 'showConfig': this.options.allowEdit && !_.isEmpty(data.config.configuration),
-                'widgetName': data.name
+                'widgetName': data.name,
+                'configurationDialogOptions': data.config.configuration_dialog_options
             };
             var widget = new DashboardItemWidget(widgetParams);
             widget.render();

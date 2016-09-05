@@ -7,9 +7,11 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
@@ -40,13 +42,13 @@ class CalendarEventHandler
     protected $emailSendProcessor;
 
     /**
-     * @param FormInterface       $form
-     * @param Request             $request
-     * @param ObjectManager       $manager
-     * @param ActivityManager     $activityManager
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param SecurityFacade      $securityFacade
-     * @param EmailSendProcessor  $emailSendProcessor
+     * @param FormInterface               $form
+     * @param Request                     $request
+     * @param ObjectManager               $manager
+     * @param ActivityManager             $activityManager
+     * @param EntityRoutingHelper         $entityRoutingHelper
+     * @param SecurityFacade              $securityFacade
+     * @param EmailSendProcessor          $emailSendProcessor
      */
     public function __construct(
         FormInterface $form,
@@ -57,13 +59,13 @@ class CalendarEventHandler
         SecurityFacade $securityFacade,
         EmailSendProcessor $emailSendProcessor
     ) {
-        $this->form                = $form;
-        $this->request             = $request;
-        $this->manager             = $manager;
-        $this->activityManager     = $activityManager;
-        $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->securityFacade      = $securityFacade;
-        $this->emailSendProcessor  = $emailSendProcessor;
+        $this->form                        = $form;
+        $this->request                     = $request;
+        $this->manager                     = $manager;
+        $this->activityManager             = $activityManager;
+        $this->entityRoutingHelper         = $entityRoutingHelper;
+        $this->securityFacade              = $securityFacade;
+        $this->emailSendProcessor          = $emailSendProcessor;
     }
 
     /**
@@ -81,25 +83,26 @@ class CalendarEventHandler
      *
      * @param  CalendarEvent $entity
      *
-     * @throws \LogicException
+     * @return bool True on successful processing, false otherwise
      *
-     * @return bool  True on successful processing, false otherwise
+     * @throws AccessDeniedException
+     * @throws \LogicException
      */
     public function process(CalendarEvent $entity)
     {
+        $this->checkPermission($entity);
+
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $originalChildren = new ArrayCollection();
-            foreach ($entity->getChildEvents() as $childEvent) {
-                $originalChildren->add($childEvent);
-            }
+            // create array collection of attendees to have have original attendees at disposal later
+            $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
+
+            $this->ensureCalendarSet($entity);
 
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
-                $this->ensureCalendarSet($entity);
-
                 // TODO: should be refactored after finishing BAP-8722
                 // Contexts handling should be moved to common for activities form handler
                 if ($this->form->has('contexts')) {
@@ -136,10 +139,14 @@ class CalendarEventHandler
                     }
                 }
 
+                $notifyInvitedUsers = $this->form->has('notifyInvitedUsers')
+                    ? $this->form->get('notifyInvitedUsers')->getData() === 'true'
+                    : false;
+                
                 $this->onSuccess(
                     $entity,
-                    $originalChildren,
-                    $this->form->get('notifyInvitedUsers')->getData()
+                    $originalAttendees,
+                    $notifyInvitedUsers
                 );
 
                 return true;
@@ -176,11 +183,11 @@ class CalendarEventHandler
     /**
      * "Success" form handler
      *
-     * @param CalendarEvent   $entity
-     * @param ArrayCollection $originalChildren
-     * @param boolean         $notify
+     * @param CalendarEvent              $entity
+     * @param ArrayCollection|Attendee[] $originalAttendees
+     * @param boolean                    $notify
      */
-    protected function onSuccess(CalendarEvent $entity, ArrayCollection $originalChildren, $notify)
+    protected function onSuccess(CalendarEvent $entity, ArrayCollection $originalAttendees, $notify)
     {
         $new = $entity->getId() ? false : true;
         $this->manager->persist($entity);
@@ -191,9 +198,21 @@ class CalendarEventHandler
         } else {
             $this->emailSendProcessor->sendUpdateParentEventNotification(
                 $entity,
-                $originalChildren,
+                $originalAttendees,
                 $notify
             );
+        }
+    }
+
+    /**
+     * @param CalendarEvent $entity
+     *
+     * @throws AccessDeniedException
+     */
+    protected function checkPermission(CalendarEvent $entity)
+    {
+        if ($entity->getParent() !== null) {
+            throw new AccessDeniedException();
         }
     }
 }

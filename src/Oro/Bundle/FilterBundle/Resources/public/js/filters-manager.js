@@ -250,7 +250,7 @@ define(function(require) {
 
             var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
-                options.attr('selected', true);
+                options.prop('selected', true);
             }
 
             if (optionsSelectors.length) {
@@ -279,7 +279,7 @@ define(function(require) {
 
             var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
-                options.removeAttr('selected');
+                options.prop('selected', false);
             }
 
             if (optionsSelectors.length) {

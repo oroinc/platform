@@ -3,19 +3,17 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\UserBundle\Entity\User;
 
-class CalendarPropertyTest extends \PHPUnit_Framework_TestCase
+class CalendarPropertyTest extends AbstractEntityTest
 {
-    public function testIdGetter()
+    /**
+     * {@inheritDoc}
+     */
+    public function getEntityFQCN()
     {
-        $obj = new CalendarProperty();
-        ReflectionUtil::setId($obj, 1);
-        $this->assertEquals(1, $obj->getId());
+        return 'Oro\Bundle\CalendarBundle\Entity\CalendarProperty';
     }
 
     public function testPositionDefault()
@@ -30,30 +28,27 @@ class CalendarPropertyTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($obj->getVisible());
     }
 
-    /**
-     * @dataProvider propertiesDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     */
-    public function testSettersAndGetters($property, $value)
+    public function testToString()
     {
-        $obj = new CalendarProperty();
+        $calendarProperty = new CalendarProperty();
+        $this->assertEmpty((string) $calendarProperty);
+        ReflectionUtil::setId($calendarProperty, 1);
 
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $accessor->setValue($obj, $property, $value);
-        $this->assertEquals($value, $accessor->getValue($obj, $property));
+        $this->assertEquals(1, (string) $calendarProperty);
     }
 
-    public function propertiesDataProvider()
+    /**
+     * {@inheritDoc}
+     */
+    public function getSetDataProvider()
     {
-        return array(
-            array('targetCalendar', new Calendar()),
-            array('calendarAlias', 'testAlias'),
-            array('calendar', 123),
-            array('position', 100),
-            array('visible', false),
-            array('backgroundColor', '#FFFFFF'),
-        );
+        return [
+            ['targetCalendar', new Calendar(), new Calendar()],
+            ['calendarAlias', 'testAlias', 'testAlias'],
+            ['calendar', 123, 123],
+            ['position', 100, 100],
+            ['visible', false, false],
+            ['backgroundColor', '#FFFFFF', '#FFFFFF'],
+        ];
     }
 }

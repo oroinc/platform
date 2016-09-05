@@ -33,35 +33,6 @@ services:
         calls:
             - [addSimpleFormTypes, [['choice', 'datetime', 'date', 'time']]]
 
-    oro_layout.expression.extension:
-        public: false
-        class: Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension
-        arguments:
-            - '@service_container'
-            - {}
-
-    oro_layout.expression.context_accessor:
-        public: false
-        class: Oro\Component\ConfigExpression\ContextAccessor
-
-    oro_layout.expression.pass.property_path:
-        public: false
-        class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
-
-    oro_layout.expression.factory:
-        class: Oro\Component\ConfigExpression\ExpressionFactory
-        arguments:
-            - '@oro_layout.expression.context_accessor'
-        calls:
-            - [addExtension, ['@oro_layout.expression.extension']]
-
-    oro_layout.expression.assembler:
-        class: Oro\Component\ConfigExpression\ExpressionAssembler
-        arguments:
-            - '@oro_layout.expression.factory'
-        calls:
-            - [addConfigurationPass, ['@oro_layout.expression.pass.property_path']]
-
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper
         arguments:
@@ -98,8 +69,8 @@ services:
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
-    oro_layout.layout_context_configurator.config_expression:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionContextConfigurator
+    oro_layout.layout_context_configurator.expression:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ExpressionContextConfigurator
         tags:
             - { name: layout.context_configurator }
 
@@ -110,21 +81,26 @@ services:
         tags:
             - { name: layout.context_configurator }
 
-    oro_layout.block_type_extension.config_expression:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension
+    oro_layout.block_type_extension.expression:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ExpressionExtension
         arguments:
-            - '@oro_layout.processor.config_expression'
+            - '@oro_layout.processor.expression'
         tags:
             - { name: layout.block_type_extension, alias: block, priority: 255 }
 
     oro_layout.expression.encoder_registry:
-        class: Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry
+        class: Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry
         arguments:
             - '@service_container'
             - {}
 
+    oro_layout.expression_language.expression_manipulator:
+        class: Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator
+
     oro_layout.expression.json_encoder:
-        class: Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder
+        class: Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder
+        arguments:
+            - '@oro_layout.expression_language.expression_manipulator'
         tags:
             - { name: oro_layout.expression.encoder, format: json }
 
@@ -142,18 +118,11 @@ services:
         tags:
             - { name: assetic.formula_resource, loader: layout }
 
-    oro_layout.processor.config_expression:
-        class: Oro\Bundle\LayoutBundle\Layout\Processor\ConfigExpressionProcessor
+    oro_layout.processor.expression:
+        class: Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor
         arguments:
-            - '@oro_layout.expression.assembler'
+            - '@oro_layout.expression_language'
             - '@oro_layout.expression.encoder_registry'
-
-    oro_layout.config_expression.asset:
-        class: Oro\Bundle\LayoutBundle\ConfigExpression\Asset
-        arguments:
-            - '@assets.packages'
-        tags:
-            - { name: oro_layout.expression, alias: asset }
 
     oro_layout.provider.image_type:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
@@ -187,3 +156,27 @@ services:
 
     oro_layout.layout_context_holder:
         class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder
+
+    oro_layout.expression_language.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_layout_expression_language' ] ]
+
+    oro_layout.expression_language.parsed_cache:
+        class: Symfony\Bridge\Doctrine\ExpressionLanguage\DoctrineParserCache
+        arguments:
+            - @oro_layout.expression_language.cache
+
+    oro_layout.expression_language:
+        class: Symfony\Component\ExpressionLanguage\ExpressionLanguage
+        arguments:
+            - @oro_layout.expression_language.parsed_cache
+            - []
+
+    oro_layout.data_provider.asset:
+        class: Oro\Bundle\LayoutBundle\Layout\DataProvider\AssetProvider
+        arguments:
+            - '@assets.packages'
+        tags:
+            - { name: layout.data_provider, alias: asset }

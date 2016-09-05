@@ -104,6 +104,8 @@ define([
             var url = (typeof action === 'string') ? $.trim(action) : '';
             url = url || window.location.href || '';
             if (url) {
+                url += '?input_action=' + $(event.target).attr('data-action');
+
                 // clean url (don't include hash value)
                 url = (url.match(/^([^#]+)/) || [])[1];
             }
@@ -171,14 +173,23 @@ define([
                 return memo;
             }, {});
 
+            var identity = data.identityId;
+            var splittedIdentity = identity.split('::');
+            var field;
+            if (typeof splittedIdentity[1] !== 'undefined') {
+                identity = splittedIdentity[0];
+                field = splittedIdentity[1];
+            }
+
             var privelege;
-            if (data.identityId in knownIdentities) {
-                privelege = knownIdentities[data.identityId];
+            var fieldPrivelege;
+            if (identity in knownIdentities) {
+                privelege = knownIdentities[identity];
             } else {
                 // create privelege
                 privelege = {
                     identity: {
-                        id: data.identityId
+                        id: identity
                     },
                     permissions: {}
                 };
@@ -189,13 +200,24 @@ define([
                 }
             }
 
-            if (!(data.permissionName in privelege.permissions)) {
-                privelege.permissions[data.permissionName] = {
-                    name: data.permissionName
-                };
+            if (!field) {
+                if (!(data.permissionName in privelege.permissions)) {
+                    privelege.permissions[data.permissionName] = {
+                        name: data.permissionName
+                    };
+                }
+                var permission = privelege.permissions[data.permissionName];
+                permission.accessLevel = data.accessLevel;
+            } else {
+                var knownFieldIdentities = _.reduce(privelege.fields, function(memo, item) {
+                    memo[item.identity.id] = item;
+                    return memo;
+                }, {});
+
+                fieldPrivelege = knownFieldIdentities[data.identityId];
+                var fieldPermission = fieldPrivelege.permissions[data.permissionName];
+                fieldPermission.accessLevel = data.accessLevel;
             }
-            var permission = privelege.permissions[data.permissionName];
-            permission.accessLevel = data.accessLevel;
 
             this.$privileges.val(JSON.stringify(obj)).trigger('change');
         }

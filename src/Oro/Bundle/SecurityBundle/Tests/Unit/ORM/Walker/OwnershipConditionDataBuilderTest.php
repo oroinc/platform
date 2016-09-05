@@ -84,9 +84,13 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->builder = new OwnershipConditionDataBuilder(
             $securityContextLink,
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($doctrineHelper),
             $entityMetadataProvider,
             $this->metadataProvider,
             $treeProvider,

@@ -5,10 +5,10 @@
     "keywords": ["BAP"],
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": "2.7.*",
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*",
         "doctrine/orm": ">=2.3,<2.4-dev",
-        "a2lix/translation-form-bundle" : "1.*@dev",
+        "a2lix/translation-form-bundle" : "1.x-dev",
         "oro/attachment-bundle": "dev-master",
         "oro/user-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",

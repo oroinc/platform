@@ -42,7 +42,7 @@ interface LayoutRegistryInterface
      *
      * @param string $name The name of the data provider
      *
-     * @return DataProviderInterface|null
+     * @return object|null
      *
      * @throws Exception\UnexpectedTypeException if the passed name is not a string
      */

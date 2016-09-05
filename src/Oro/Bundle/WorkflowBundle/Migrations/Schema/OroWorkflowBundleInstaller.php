@@ -18,7 +18,7 @@ class OroWorkflowBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_13';
+        return 'v1_14';
     }
 
     /**
@@ -46,7 +46,7 @@ class OroWorkflowBundleInstaller implements Installation
         $this->addOroWorkflowEntityAclIdentForeignKeys($schema);
         $this->addOroWorkflowDefinitionForeignKeys($schema);
         $this->addOroWorkflowStepForeignKeys($schema);
-        
+
         CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
     }
 
@@ -61,7 +61,8 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('current_step_id', 'integer', ['notnull' => false]);
         $table->addColumn('workflow_name', 'string', ['length' => 255]);
-        $table->addColumn('entity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_id', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('created', 'datetime', []);
         $table->addColumn('updated', 'datetime', ['notnull' => false]);
         $table->addColumn('data', 'text', ['notnull' => false]);
@@ -191,7 +192,10 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('entity_attribute_name', 'string', ['length' => 255]);
         $table->addColumn('steps_display_ordered', 'boolean', []);
         $table->addColumn('system', 'boolean', []);
+        $table->addColumn('active', 'boolean', ['default' => false]);
+        $table->addColumn('priority', 'integer', ['default' => 0]);
         $table->addColumn('configuration', 'array', ['comment' => '(DC2Type:array)']);
+        $table->addColumn('groups', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addIndex(['start_step_id'], 'idx_6f737c368377424f', []);

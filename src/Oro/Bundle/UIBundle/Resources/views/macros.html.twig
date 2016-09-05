@@ -111,9 +111,11 @@
     Parameters:
         title - property title
         data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderProperty(title, data) %}
-    {{ _self.renderHtmlProperty(title, data|escape) }}
+{% macro renderProperty(title, data, entity = null, fieldName = null) %}
+    {{ _self.renderHtmlProperty(title, data|escape, entity, fieldName) }}
 {% endmacro %}
 
 {#
@@ -121,9 +123,14 @@
     Parameters:
         title - property title
         data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+{% macro renderHtmlProperty(title, data, entity = null, fieldName = null) %}
+    {% if entity is defined and fieldName is defined and not resource_granted('VIEW', entity, fieldName) %}
+    {% else %}
+        {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {% endif %}
 {% endmacro %}
 
 {#
@@ -722,7 +729,7 @@
 #}
 {% macro saveActionButton(parameters) %}
     {% set defaultParameters = {
-        'type': 'submit',
+        'type' : 'submit',
         'class': 'btn-success main-group',
         'label': 'Save'|trans,
     } %}
@@ -963,29 +970,31 @@
         {%- if entity %}
             {% set ownerType = oro_get_owner_type(entity) %}
             {%- if ownerType %}
-                {% set owner = oro_get_entity_owner(entity) %}
-                {% if owner %}
-                    {% if (ownerType == 'USER') %}
-                        {% set ownerPath = path('oro_user_view', {'id': owner.id}) %}
-                        {% set ownerName = owner|oro_format_name %}
-                    {% elseif (ownerType == 'BUSINESS_UNIT') %}
-                        {% set ownerPath = path('oro_business_unit_view', {'id': owner.id}) %}
-                        {% set ownerName = owner.name %}
-                    {% endif %}
-                    {% if ownerName is defined %}
-                        {% if renderLabel %}
-                            {% set entityClassName = oro_class_name(entity) %}
-                            {{ oro_field_config_value(
-                                    entityClassName,
-                                    oro_entity_config_value(entityClassName, 'owner_field_name', 'ownership'),
-                                    'label'
-                                )|trans
-                            }}:
+                {% if  resource_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
+                    {% set owner = oro_get_entity_owner(entity) %}
+                    {% if owner %}
+                        {% if (ownerType == 'USER') %}
+                            {% set ownerPath = path('oro_user_view', {'id': owner.id}) %}
+                            {% set ownerName = owner|oro_format_name %}
+                        {% elseif (ownerType == 'BUSINESS_UNIT') %}
+                            {% set ownerPath = path('oro_business_unit_view', {'id': owner.id}) %}
+                            {% set ownerName = owner.name %}
                         {% endif %}
-                        {% if ownerPath is defined and resource_granted('VIEW', owner) %}
-                            {{ _self.renderUrl(ownerPath, ownerName) }}
-                        {% else %}
-                            {{ ownerName }}
+                        {% if ownerName is defined %}
+                            {% if renderLabel %}
+                                {% set entityClassName = oro_class_name(entity) %}
+                                {{ oro_field_config_value(
+                                        entityClassName,
+                                        oro_entity_config_value(entityClassName, 'owner_field_name', 'ownership'),
+                                        'label'
+                                    )|trans
+                                }}:
+                            {% endif %}
+                            {% if ownerPath is defined and resource_granted('VIEW', owner) %}
+                                {{ _self.renderUrl(ownerPath, ownerName) }}
+                            {% else %}
+                                {{ ownerName }}
+                            {% endif %}
                         {% endif %}
                     {% endif %}
                 {% endif %}
@@ -1091,4 +1100,31 @@
         {% set links = links|merge([_self.entityViewLink(entity, attribute(entity, labelProperty), route, permission)]) %}
     {% endfor %}
     {{ _self.renderList(links) }}
+{%- endmacro -%}
+
+{#
+    Renders text that should be rendered instead of not accessable entity field
+    Parameters:
+        labelText - Text that should be rendered
+#}
+{%- macro renderDisabledLabel(labelText) -%}
+    <i>{{ labelText }}</i>
+{%- endmacro -%}
+
+{#
+    Renders entity label by it's field. In case if VIEW permission is notgranted, returns
+    the 'view entity_name' string in case if entityLabelIfNotGranted was set and empty string otherwise
+    Parameters:
+        entity - Entity whete field value should be takes
+        fieldName - Field name wich value should be rendered
+        entityLabelIfNotGranted - Entity label that should be rendered in case if user have no access to see field value
+#}
+{%- macro renderEntityViewLabel(entity, fieldName, entityLabelIfNotGranted = null) -%}
+    {% if entity is not null and resource_granted('VIEW', entity, fieldName) %}
+        {{ attribute(entity, fieldName) }}
+    {% else %}
+        {% if entityLabelIfNotGranted is not null %}
+            {{ 'view %entityName%'|trans({'%entityName%' : entityLabelIfNotGranted|trans}) }}
+        {% endif %}
+    {% endif %}
 {%- endmacro -%}

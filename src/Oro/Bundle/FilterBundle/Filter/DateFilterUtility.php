@@ -126,8 +126,8 @@ class DateFilterUtility
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
             $field = $this->getEnforcedTimezoneQuarter($field, $type);
         } elseif ($data['part'] === DateModifierInterface::PART_VALUE &&
-                  strpos($field, 'MONTH') === false &&
-                  $this->containsMonthVariable($data)
+              strpos($field, 'MONTH') === false &&
+              $this->containsMonthVariable($data)
         ) {
             $field              = $this->getEnforcedTimezoneFunction('MONTH', $field, $type);
             $data['date_start'] = $this->formatDate($data['date_start'], 'm');

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 class CustomizeLoadedDataContext extends ApiContext
 {
     /** FQCN of a root entity */
@@ -12,6 +15,9 @@ class CustomizeLoadedDataContext extends ApiContext
 
     /** FQCN of a customizing entity */
     const CLASS_NAME = 'class';
+
+    /** @var EntityDefinitionConfig */
+    protected $config;
 
     /**
      * Gets FQCN of a root entity.
@@ -71,5 +77,54 @@ class CustomizeLoadedDataContext extends ApiContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * Gets a configuration of a root entity.
+     *
+     * @return EntityDefinitionConfig|null
+     */
+    public function getRootConfig()
+    {
+        return $this->getPropertyPath()
+            ? $this->config
+            : null;
+    }
+
+    /**
+     * Gets a configuration of a customizing entity.
+     *
+     * @return EntityDefinitionConfig|null
+     */
+    public function getConfig()
+    {
+        $config = $this->config;
+        if (null !== $config) {
+            $propertyPath = $this->getPropertyPath();
+            if ($propertyPath) {
+                $path = ConfigUtil::explodePropertyPath($propertyPath);
+                foreach ($path as $fieldName) {
+                    $fieldConfig = $config->getField($fieldName);
+                    $config = null !== $fieldConfig
+                        ? $fieldConfig->getTargetEntity()
+                        : null;
+                    if (null === $config) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * Sets a configuration of a customizing entity.
+     *
+     * @param EntityDefinitionConfig|null $config
+     */
+    public function setConfig(EntityDefinitionConfig $config = null)
+    {
+        $this->config = $config;
     }
 }

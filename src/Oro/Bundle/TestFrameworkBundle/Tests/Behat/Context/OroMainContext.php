@@ -3,9 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -13,7 +11,6 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -33,22 +30,6 @@ class OroMainContext extends MinkContext implements
     use AssertTrait;
     use KernelDictionary, ElementFactoryDictionary;
 
-    /** @BeforeStep */
-    public function beforeStep(BeforeStepScope $scope)
-    {
-        $url = $this->getSession()->getCurrentUrl();
-
-        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
-            $this->getSession()->getDriver()->waitPageToLoad();
-
-            return;
-        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
-            return;
-        }
-
-        $this->getSession()->getDriver()->waitForAjax();
-    }
-
     /**
      * @BeforeScenario
      */
@@ -58,45 +39,40 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @AfterScenario
-     */
-    public function afterScenario(AfterScenarioScope $scope)
-    {
-        if ($scope->getTestResult()->isPassed()) {
-            return;
-        }
-
-        $screenshot = sprintf(
-            '%s/%s-%s-line.png',
-            $this->getKernel()->getLogDir(),
-            $scope->getFeature()->getTitle(),
-            $scope->getScenario()->getLine()
-        );
-
-        file_put_contents($screenshot, $this->getSession()->getScreenshot());
-    }
-
-    /**
-     * @Then /^(?:|I should )see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
     public function iShouldSeeFlashMessage($title)
     {
-        $this->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
+        $messageElement = $this->spin(function (MinkContext $context) {
+            return $context->getSession()->getPage()->find('css', '.flash-messages-holder div.alert');
+        });
+
+        self::assertNotFalse($messageElement, 'Flash message not found on page');
+        $flashMessage = $messageElement->getText();
+        $messageElement->find('css', 'button.close')->press();
+
+        self::assertContains($title, $flashMessage, sprintf(
+            'Expect that "%s" flash message contains "%s" string, but it isn\'t',
+            $flashMessage,
+            $title
+        ));
     }
 
     /**
-     * @Then /^(?:|I )click update schema$/
+     * {@inheritdoc}
      */
-    public function iClickUpdateSchema()
+    public function assertPageContainsText($text)
     {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-        $page = $this->getSession()->getPage();
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            $context->assertSession()->pageTextContains($this->fixStepArgument($text));
 
-        $page->clickLink('Update schema');
-        $driver->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $driver->waitForAjax(120000);
+            return true;
+        });
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was not found anywhere in the text of the current page.', $text)
+        );
     }
 
     /**
@@ -107,7 +83,69 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeErrorMessage($title)
     {
-        $this->assertSession()->elementTextContains('css', '.alert-error', $title);
+        $errorElement = $this->spin(function (MinkContext $context) {
+            return $context->getSession()->getPage()->find('css', '.alert-error');
+        });
+
+        self::assertNotFalse($errorElement, 'Error message not found on page');
+        $message = $errorElement->getText();
+        $errorElement->find('css', 'button.close')->press();
+
+        self::assertContains($title, $message, sprintf(
+            'Expect that "%s" error message contains "%s" string, but it isn\'t',
+            $message,
+            $title
+        ));
+    }
+
+    /**
+     * @param \Closure $lambda
+     * @return false|mixed Return false if closure throw error or return not true value.
+     *                     Return value that return closure
+     */
+    public function spin(\Closure $lambda)
+    {
+        $time = 6;
+
+        while ($time > 0) {
+            try {
+                if ($result = $lambda($this)) {
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+
+            usleep(250000);
+            $time -= 0.25;
+        }
+
+        return false;
+    }
+
+    /**
+     * @Then /^(?:|I )click update schema$/
+     */
+    public function iClickUpdateSchema()
+    {
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $page = $this->getPage();
+
+        $page->clickLink('Update schema');
+        $driver->waitForAjax();
+        $page->clickLink('Yes, Proceed');
+        $driver->waitForAjax(120000);
+    }
+
+    /**
+     * Close form error message
+     *
+     * @Then /^(?:|I )close error message$/
+     */
+    public function closeErrorMessage()
+    {
+        $this->createOroForm()->find('css', '.alert-error button.close')->press();
     }
 
     /**
@@ -187,25 +225,27 @@ class OroMainContext extends MinkContext implements
      *
      * @Given /^(?:|I )add new (?P<fieldSetLabel>[^"]+) with:$/
      */
-    public function addNewAddressWith($fieldSetLabel, TableNode $table)
+    public function addNewFieldSetWith($fieldSetLabel, TableNode $table)
     {
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
+        $this->getSession()->getDriver()->waitForAjax();
         $form = $fieldSet->getLastSet();
         $form->fill($table);
     }
 
     /**
      * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
+     * @Given /^(?:|I )login as administrator$/
      */
-    public function loginAsUserWithPassword($login, $password)
+    public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
     {
         $this->visit('user/login');
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
+
     }
 
     /**
@@ -232,7 +272,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
+     * @Then /^(?:|I )should see large image$/
+     */
+    public function iShouldSeeLargeImage()
+    {
+        $largeImage = $this->getSession()->getPage()->find('css', '.lg-image');
+        self::assertNotNull($largeImage, 'Large image not visible');
+    }
+
+    /**
+     * @Then /^(?:|I )close large image preview$/
+     */
+    public function closeLargeImagePreview()
+    {
+        $page = $this->getSession()->getPage();
+        $page->find('css', '.lg-image')->mouseOver();
+        $page->find('css', 'span.lg-close')->click();
+    }
+
+     /**
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      */
     public function pressButton($button)
     {
@@ -253,7 +312,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I go to System/ Channels
      * Example: And go to System/ User Management/ Users
      *
-     * @Given /^(?:|I )go to (?P<path>(?:(?!\d+ page of activity list)([^"]*)))$/
+     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)([^"]*)))$/
      */
     public function iOpenTheMenuAndClick($path)
     {
@@ -276,6 +335,22 @@ class OroMainContext extends MinkContext implements
     public function iSaveAndCloseForm()
     {
         $this->createOroForm()->saveAndClose();
+    }
+
+    /**
+     * @When /^(?:|I )save form$/
+     */
+    public function iSaveForm()
+    {
+        $this->createOroForm()->save();
+    }
+
+    /**
+     * @Given /^(?:|I |I'm )edit entity$/
+     */
+    public function iMEditEntity()
+    {
+        $this->createElement('Entity Edit Button')->click();
     }
 
     /**
@@ -307,6 +382,9 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Find and assert field value
+     * It's valid for entity edit or entity view page
+     *
      * @When /^([\w\s]*) field should have ([\w\s]*) value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
@@ -317,6 +395,13 @@ class OroMainContext extends MinkContext implements
         /** @var NodeElement $label */
         foreach ($labels as $label) {
             if (preg_match(sprintf('/%s/i', $fieldName), $label->getText())) {
+                if ($label->hasAttribute('for')) {
+                    return $this->getSession()
+                        ->getPage()
+                        ->find('css', '#'.$label->getAttribute('for'))
+                        ->getValue();
+                }
+
                 $value = $label->getParent()->find('css', 'div.control-label')->getText();
                 self::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
 
@@ -328,7 +413,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Assert text by label in page
+     * Assert text by label in page. Accept regexp as parameter to label
+     * Example: Then I should see call with:
+     *            | Subject             | Proposed Charlie to star in new film |
+     *            | Additional comments | Charlie was in a good mood           |
+     *            | Call date & time    | Aug 24, 2017,? 11:00 AM              |
+     *            | Phone number        | (310) 475-0859                       |
+     *            | Direction           | Outgoing                             |
+     *            | Duration            | 5:30                                 |
      *
      * @Then /^(?:|I )should see (?P<entity>[\w\s]+) with:$/
      */
@@ -345,7 +437,7 @@ class OroMainContext extends MinkContext implements
             foreach ($labels as $label) {
                 $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-                if (false !== stripos($text, $row[1])) {
+                if (false !== preg_match(sprintf('/%s/i', $row[1]), $text)) {
                     continue 2;
                 }
             }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -18,25 +18,14 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
     protected $attachmentManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $fileManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
 
     public function setUp()
     {
         $this->normalizer = new FileNormalizer();
-
-        $filesystemMap = $this->getMockBuilder('Knp\Bundle\GaufretteBundle\FilesystemMap')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystem = $this->getMockBuilder('Gaufrette\Filesystem')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystemMap->expects($this->any())->method('get')
-            ->will($this->returnValue($filesystem));
-
-        $filesystem->expects($this->any())->method('getAdapter')
-            ->will($this->returnValue(new \stdClass()));
 
         $router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()
@@ -62,8 +51,12 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
-            ->setConstructorArgs([$filesystemMap, $router, $serviceLink, [], $associationManager])
-            ->setMethods(['upload', 'getAttachment'])
+            ->setConstructorArgs([$router, [], $associationManager])
+            ->setMethods(['getAttachment'])
+            ->getMock();
+
+        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->validator = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator')
@@ -71,6 +64,7 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->normalizer->setAttachmentManager($this->attachmentManager);
+        $this->normalizer->setFileManager($this->fileManager);
         $this->normalizer->setValidator($this->validator);
     }
 
@@ -107,65 +101,66 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider denormalizationData
-     */
-    public function testDenormalize($data, $context, $violations, $upload, $expects)
+    public function testDenormalizeValidFile()
     {
-        if ($violations) {
-            $this->validator->expects($this->once())->method('validate')
-                ->with($context['entityName'])
-                ->will($this->returnValue($violations));
-        } else {
-            $this->validator->expects($this->never())->method('validate');
-        }
+        $data = 'http://example.com/test.txt';
+        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
+        $violations = new ConstraintViolationList();
 
-        if ($upload) {
-            $this->attachmentManager->expects($this->once())
-                ->method('upload');
-        }
+        $entity = new File();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
+        $entity->setFile($file);
+
+        $this->fileManager->expects($this->any())
+            ->method('createFileEntity')
+            ->with($data)
+            ->willReturn($entity);
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->identicalTo($file), $context['entityName'], $context['fieldName'])
+            ->will($this->returnValue($violations));
 
         $result = $this->normalizer->denormalize($data, '', '', $context);
-        if ($expects) {
-            $accessor = PropertyAccess::createPropertyAccessor();
-            foreach ($expects as $fieldName => $value) {
-                $this->assertEquals($value, $accessor->getValue($result, $fieldName));
-            }
-        } else {
-            $this->assertNull($result);
-        }
+        $this->assertSame($entity, $result);
     }
 
-    public function denormalizationData()
+    public function testDenormalizeNotExistingFile()
     {
-        return [
-            'correctData' => [
-                realpath(__DIR__ . '/../Fixtures/testFile/test.txt'),
-                ['entityName' => 'testEntity', 'fieldName' => 'testField'],
-                new ConstraintViolationList(),
-                true,
-                [
-                    'extension' => 'txt',
-                    'mimeType' => 'text/plain',
-                    'originalFilename' => 'test.txt',
-                    'fileSize' => 9
-                ]
-            ],
-            'wrongFIle' => [
-                realpath('test.txt'),
-                ['entityName' => 'testEntity', 'fieldName' => 'testField'],
-                null,
-                false,
-                []
-            ],
-            'notValidatedFile' => [
-                realpath(__DIR__ . '/../Fixtures/testFile/test.txt'),
-                ['entityName' => 'testEntity', 'fieldName' => 'testField'],
-                new ConstraintViolationList([new ConstraintViolation('', '', [], '', '', '')]),
-                false,
-                []
-            ],
-        ];
+        $data = 'http://example.com/test.txt';
+        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
+
+        $this->fileManager->expects($this->any())
+            ->method('createFileEntity')
+            ->with($data)
+            ->willReturn(null);
+        $this->validator->expects($this->never())
+            ->method('validate');
+
+        $result = $this->normalizer->denormalize($data, '', '', $context);
+        $this->assertNull($result);
+    }
+
+    public function testDenormalizeNotValidFile()
+    {
+        $data = 'http://example.com/test.txt';
+        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
+        $violations = new ConstraintViolationList([new ConstraintViolation('', '', [], '', '', '')]);
+
+        $entity = new File();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
+        $entity->setFile($file);
+
+        $this->fileManager->expects($this->any())
+            ->method('createFileEntity')
+            ->with($data)
+            ->willReturn($entity);
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->identicalTo($file), $context['entityName'], $context['fieldName'])
+            ->will($this->returnValue($violations));
+
+        $result = $this->normalizer->denormalize($data, '', '', $context);
+        $this->assertNull($result);
     }
 
     public function testNormalize()

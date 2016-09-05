@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider as Provider;
+use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 
 class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +25,9 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
 
     /** @var EntitySecurityMetadata */
     protected $entity;
@@ -53,7 +60,24 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             array('fetch', 'save', 'delete', 'deleteAll')
         );
 
-        $this->entity = new EntitySecurityMetadata(Provider::ACL_SECURITY_TYPE, 'SomeClass', 'SomeGroup', 'SomeLabel');
+        $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->entity = new EntitySecurityMetadata(
+            Provider::ACL_SECURITY_TYPE,
+            'SomeClass',
+            'SomeGroup',
+            'SomeLabel',
+            [],
+            '',
+            '',
+            [
+                'firstName' => new FieldSecurityMetadata('firstName', 'someclass.first_name.label', ['VIEW', 'CREATE']),
+                'lastName' => new FieldSecurityMetadata('lastName', 'someclass.last_name.label', []),
+                'cityName' => new FieldSecurityMetadata('cityName', 'someclass.city_name.label', [])
+            ]
+        );
 
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
@@ -71,6 +95,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
 
@@ -97,17 +122,17 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->with('SomeClass')
             ->will($this->returnValue($entityConfig));
 
-        $securityConfigId = new EntityConfigId('security', 'SomeClass');
-        $securityConfig = new Config($securityConfigId);
-        $securityConfig->set('type', Provider::ACL_SECURITY_TYPE);
-        $securityConfig->set('permissions', 'All');
-        $securityConfig->set('group_name', 'SomeGroup');
-        $securityConfig->set('category', '');
+        $this->setTestConfig();
 
-        $securityConfigs = array($securityConfig);
-        $this->securityConfigProvider->expects($this->any())
-            ->method('getConfigs')
-            ->will($this->returnValue($securityConfigs));
+        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+            ->disableOriginalConstructor()->getMock();
+        $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
+            ->disableOriginalConstructor()->getMock();
+        $manager->expects($this->any())->method('getMetadataFactory')->willReturn($metadataFactory);
+        $metadata = new ClassMetadata('SomeClass');
+        $metadata->identifier = ['id'];
+        $metadataFactory->expects($this->any())->method('getMetadataFor')->willReturn($metadata);
+        $this->doctrine->expects($this->any())->method('getManagerForClass')->willReturn($manager);
 
         $this->cache->expects($this->at(0))
             ->method('fetch')
@@ -125,6 +150,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
 
@@ -145,6 +171,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
         $result = $provider->getEntities();
@@ -165,10 +192,50 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
 
         $provider->clearCache('SomeType');
         $provider->clearCache();
+    }
+
+    protected function setTestConfig()
+    {
+        $securityConfigId = new EntityConfigId('security', 'SomeClass');
+        $securityConfig = new Config($securityConfigId);
+        $securityConfig->set('type', Provider::ACL_SECURITY_TYPE);
+        $securityConfig->set('permissions', 'All');
+        $securityConfig->set('group_name', 'SomeGroup');
+        $securityConfig->set('category', '');
+        $securityConfig->set('field_acl_supported', true);
+        $securityConfig->set('field_acl_enabled', true);
+
+        $securityConfigs = array($securityConfig);
+
+        $idFieldConfigId = new FieldConfigId('security', 'SomeClass', 'id');
+        $idFieldConfig = new Config($idFieldConfigId);
+
+        $firstNameConfigId = new FieldConfigId('security', 'SomeClass', 'firstName');
+        $firstNameFieldConfig = new Config($firstNameConfigId);
+        $firstNameFieldConfig->set('permissions', 'VIEW;CREATE');
+
+        $lastNameConfigId = new FieldConfigId('security', 'SomeClass', 'lastName');
+        $lastNameFieldConfig = new Config($lastNameConfigId);
+        $lastNameFieldConfig->set('permissions', 'All');
+
+        $cityNameConfigId = new FieldConfigId('security', 'SomeClass', 'cityName');
+        $cityNameFieldConfig = new Config($cityNameConfigId);
+
+        $fieldsConfig = [$idFieldConfig, $firstNameFieldConfig, $lastNameFieldConfig, $cityNameFieldConfig];
+
+        $this->securityConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->willReturnMap(
+                [
+                    [null, false, $securityConfigs],
+                    ['SomeClass', false, $fieldsConfig]
+                ]
+            );
     }
 }

@@ -20,6 +20,10 @@ define([
      * @extends Backbone.BootstrapModal
      */
     Modal = Backbone.BootstrapModal.extend({
+        events: _.extend(Backbone.BootstrapModal.prototype.events, {
+            'click [data-button-id]': 'onButtonClick'
+        }),
+
         defaults: {
             okText: __('OK'),
             cancelText: __('Cancel'),
@@ -47,6 +51,17 @@ define([
             if (this.options.content && this.options.content.trigger) {
                 this.options.content.trigger('close', this);
             }
+        },
+
+        /**
+         * Handler for button click
+         *
+         * @param {jQuery.Event} event
+         */
+        onButtonClick: function(event) {
+            event.preventDefault();
+            this.trigger('buttonClick', $(event.target).data('button-id'));
+            this.close();
         },
 
         /**
@@ -138,7 +153,15 @@ define([
 
             //Focus OK button
             if (self.options.focusOk) {
-                $el.find('.btn.ok').focus();
+                $el.find('.btn.ok')
+                    .one('focusin', function(e) {
+                        /*
+                         * Prevents jquery-ui from focusing different dialog
+                         * (which is happening when focusin is triggered on document
+                         */
+                        e.stopPropagation();
+                    })
+                    .focus();
             }
 
             return this;

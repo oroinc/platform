@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 /**
  * @Route("/workflowdefinition")
@@ -114,35 +116,6 @@ class WorkflowDefinitionController extends Controller
 
     /**
      * @Route(
-     *      "/clone/{name}",
-     *      name="oro_workflow_definition_clone"
-     * )
-     * @AclAncestor("oro_workflow_definition_create")
-     * @Template("OroWorkflowBundle:WorkflowDefinition:update.html.twig")
-     *
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
-     */
-    public function cloneAction(WorkflowDefinition $workflowDefinition)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $clonePrefix = $translator->trans('oro.workflow.workflowdefinition.clone_label_prefix');
-
-        $clonedDefinition = new WorkflowDefinition();
-        $clonedDefinition->import($workflowDefinition)
-            ->setName($workflowDefinition->getName() . uniqid('_clone_'))
-            ->setLabel($clonePrefix . $workflowDefinition->getLabel())
-            ->setSystem(false);
-
-        $response = $this->updateAction($clonedDefinition);
-        $response['delete_allowed'] = false;
-
-        return $response;
-    }
-
-    /**
-     * @Route(
      *      "/view/{name}",
      *      name="oro_workflow_definition_view"
      * )
@@ -176,6 +149,79 @@ class WorkflowDefinitionController extends Controller
     {
         return array(
             'entity' => $workflowDefinition
+        );
+    }
+
+    /**
+     * Activate WorkflowDefinition form
+     *
+     * @Route("/activate-form/{name}", name="oro_workflow_definition_activate_from_widget")
+     * @AclAncestor("oro_workflow_definition_update")
+     * @Template("OroWorkflowBundle:WorkflowDefinition:widget/activateForm.html.twig")
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    public function activateFormAction(WorkflowDefinition $workflowDefinition)
+    {
+        $form = $this->createForm(
+            WorkflowReplacementSelectType::NAME,
+            null,
+            ['workflow' => $workflowDefinition->getName()]
+        );
+
+        $workflowsToDeactivation = $this->getWorkflowsToDeactivation($workflowDefinition);
+
+        $response = $this->get('oro_form.model.update_handler')->update($workflowDefinition, $form, null);
+        $response['workflow'] = $workflowDefinition->getName();
+        $response['workflowsToDeactivation'] = $workflowsToDeactivation;
+
+        if ($form->isValid()) {
+            $workflowManager = $this->get('oro_workflow.manager');
+            $workflowNames = array_merge(
+                $form->getData(),
+                array_map(
+                    function (Workflow $workflow) {
+                        return $workflow->getName();
+                    },
+                    $workflowsToDeactivation
+                )
+            );
+            
+            $deactivated = [];
+            foreach ($workflowNames as $workflowName) {
+                if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
+                    $workflow = $workflowManager->getWorkflow($workflowName);
+
+                    $workflowManager->resetWorkflowData($workflow->getName());
+                    $workflowManager->deactivateWorkflow($workflow->getName());
+
+                    $deactivated[] = $workflow->getLabel();
+                }
+            }
+            
+            $response['deactivated'] = $deactivated;
+
+            $workflowManager->activateWorkflow($workflowDefinition->getName());
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array|Workflow[]
+     */
+    protected function getWorkflowsToDeactivation(WorkflowDefinition $workflowDefinition)
+    {
+        $workflows = $this->get('oro_workflow.registry')
+            ->getActiveWorkflowsByActiveGroups($workflowDefinition->getExclusiveActiveGroups());
+
+        return array_filter(
+            $workflows,
+            function (Workflow $workflow) use ($workflowDefinition) {
+                return $workflow->getName() !== $workflowDefinition->getName();
+            }
         );
     }
 }

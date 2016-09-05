@@ -16,6 +16,8 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
+    static protected $jobCommand = 'oro:cron:imap-sync';
+
     /** @var ImapEmailSynchronizationProcessorFactory */
     protected $syncProcessorFactory;
 
@@ -66,6 +68,14 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     protected function getEmailOriginClass()
     {
         return 'OroImapBundle:UserEmailOrigin';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportScheduleJob()
+    {
+        return true;
     }
 
     /**

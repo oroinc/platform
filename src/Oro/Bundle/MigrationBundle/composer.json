@@ -6,8 +6,8 @@
     "homepage": "https://github.com/laboro/MigrationBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/framework-bundle": "2.3.*",
+        "php": ">=5.5.9",
+        "symfony/framework-bundle": "2.8.*",
         "oro/log": "dev-master"
     },
     "autoload": {

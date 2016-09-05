@@ -27,8 +27,8 @@
 
 <% if (links) { %>
     <ul class="dropdown-menu">
-    <% _.each(links, function(item) { %>
-        <li><a href="<%= link %>" title="<%= item.label %>"
+    <% _.each(links, function(item, index) { %>
+        <li><a href="<%= link %>" data-index="<%= index %>" title="<%= item.label %>"
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             data-key="<%= item.key %>">
         <% if (item.icon) { %>

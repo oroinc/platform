@@ -784,8 +784,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $entityClass,
                 $version,
                 new RequestType([$requestType]),
-                $metadataExtras,
-                $config
+                $config,
+                $metadataExtras
             )
             ->willReturn($metadata);
 
@@ -847,8 +847,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
                 $entityClass,
                 $version,
                 new RequestType([$requestType]),
-                $metadataExtras,
-                $config
+                $config,
+                $metadataExtras
             )
             ->willThrowException($exception);
 

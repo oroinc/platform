@@ -181,6 +181,12 @@ Checking VIEW access to the entity by class name
 $this->securityFacade->isGranted('VIEW', 'Entity:MyBundle:MyEntity' );
 ```
 
+Checking VIEW access to the entity's field
+
+``` php
+$this->securityFacade->isGranted('VIEW', new FieldVote($entity, $fieldName) );
+```
+
 Checking ASSIGN access to the entity object
 
 ``` php

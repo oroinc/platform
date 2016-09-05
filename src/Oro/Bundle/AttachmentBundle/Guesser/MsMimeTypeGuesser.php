@@ -17,12 +17,16 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
         ],
     ];
 
+    /** @var array */
+    protected $files;
+
     /**
      * {@inheritdoc}
      */
     public function guess($path)
     {
-        if (!$extension = $this->getExtensionByPath($path)) {
+        $extension = $this->getExtensionByPath($path);
+        if (!$extension) {
             return null;
         }
 
@@ -48,10 +52,15 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
     private function getExtensionByPath($path)
     {
         $extension = null;
-        $uploadedFiles = $this->fetchUploadedFiles();
 
+        $uploadedFiles = $this->fetchUploadedFiles();
         if (isset($uploadedFiles[$path])) {
-            $extension = pathinfo($uploadedFiles[$path], PATHINFO_EXTENSION);
+            $path = $uploadedFiles[$path];
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        if ($extension) {
+            $extension = strtolower($extension);
         }
 
         return $extension;
@@ -62,19 +71,21 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
      */
     private function fetchUploadedFiles()
     {
-        $fileBagArray = (new FileBag($_FILES))->getIterator()->getArrayCopy();
-        $files = [];
+        if (null === $this->files) {
+            $this->files = [];
 
-        array_walk_recursive(
-            $fileBagArray,
-            function ($item) use (&$files) {
-                /** $item UploadedFile */
-                if ($item instanceof UploadedFile) {
-                    $files[$item->getRealPath()] = $item->getClientOriginalName();
+            $fileBagArray = (new FileBag($_FILES))->getIterator()->getArrayCopy();
+            array_walk_recursive(
+                $fileBagArray,
+                function ($item) {
+                    /** $item UploadedFile */
+                    if ($item instanceof UploadedFile) {
+                        $this->files[$item->getRealPath()] = $item->getClientOriginalName();
+                    }
                 }
-            }
-        );
+            );
+        }
 
-        return $files;
+        return $this->files;
     }
 }

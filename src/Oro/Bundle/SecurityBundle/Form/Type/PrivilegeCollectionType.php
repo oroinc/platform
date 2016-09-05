@@ -17,11 +17,6 @@ class PrivilegeCollectionType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['privileges_config'] = $options['options']['privileges_config'];
-
-        if ($key = array_search('SHARE', $view->vars['privileges_config']['permissions'], true)) {
-            unset($view->vars['privileges_config']['permissions'][$key]);
-        }
-
         $view->vars['page_component_module'] = $options['page_component_module'];
         $view->vars['page_component_options'] = $options['page_component_options'];
     }
@@ -41,6 +36,14 @@ class PrivilegeCollectionType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }

@@ -6,8 +6,8 @@
     "homepage": "https://github.com/laboro/WorkflowBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": ">=2.3",
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.2.*",
         "doctrine/data-fixtures": "@dev",
@@ -21,6 +21,7 @@
         "oro/ui-bundle": "@dev",
         "oro/security-bundle": "@dev",
         "oro/config-expression": "dev-master",
+        "oro/form-bundle": "@dev",
         "oro/jsplumb": "~1.7"
     },
     "autoload": {

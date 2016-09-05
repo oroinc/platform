@@ -1,4 +1,9 @@
 oro_api:
+    entity_aliases:
+        Test\Entity5:
+            alias: entity5
+            plural_alias: entity5_plural
+
     entities:
         Test\Entity1:
             exclude: true

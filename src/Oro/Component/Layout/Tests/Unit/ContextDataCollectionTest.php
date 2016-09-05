@@ -21,6 +21,8 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider valueDataProvider
+     *
+     * @param $value
      */
     public function testGetSetHasRemove($value)
     {
@@ -28,7 +30,7 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
             $this->collection->has('test'),
             'Failed asserting that data do not exist'
         );
-        $this->collection->set('test', 'data_id', $value);
+        $this->collection->set('test', $value);
         $this->assertTrue(
             $this->collection->has('test'),
             'Failed asserting that data exist'
@@ -38,11 +40,6 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
             $this->collection->get('test'),
             'Failed asserting that added data equal to the value returned by "get" method'
         );
-        $this->assertSame(
-            'data_id',
-            $this->collection->getIdentifier('test'),
-            'Failed asserting that data identifier is the same as passed to "set" method'
-        );
 
         $this->collection->remove('test');
         $this->assertFalse(
@@ -51,6 +48,9 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function valueDataProvider()
     {
         return [
@@ -65,14 +65,10 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefault()
     {
-        $this->context['data_id'] = 'dataId';
         $this->context['data']    = 'data';
 
         $this->collection->setDefault(
             'test',
-            function ($options) {
-                return $options['data_id'];
-            },
             function ($options) {
                 return $options['data'];
             }
@@ -92,13 +88,8 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
             $this->collection->get('test'),
             'Failed asserting that added data equal to the expected value'
         );
-        $this->assertSame(
-            'dataId',
-            $this->collection->getIdentifier('test'),
-            'Failed asserting that data identifier equals to the expected value'
-        );
 
-        $this->collection->set('test', 'updatedDataId', 'updatedData');
+        $this->collection->set('test', 'updatedData');
         $this->assertEquals(
             ['test'],
             $this->collection->getKnownValues(),
@@ -108,11 +99,6 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
             'updatedData',
             $this->collection->get('test'),
             'Failed asserting that added data equal to the value returned by "get" method'
-        );
-        $this->assertSame(
-            'updatedDataId',
-            $this->collection->getIdentifier('test'),
-            'Failed asserting that data identifier is the same as passed to "set" method'
         );
 
         $this->collection->remove('test');
@@ -125,20 +111,12 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
             $this->collection->get('test'),
             'Failed asserting that added data equal to the expected value after remove'
         );
-        $this->assertSame(
-            'dataId',
-            $this->collection->getIdentifier('test'),
-            'Failed asserting that data identifier equals to the expected value after remove'
-        );
     }
 
     public function testSetDefaultWhenDataCannotBeLoaded()
     {
         $this->collection->setDefault(
             'test',
-            function () {
-                return 'dataId';
-            },
             function () {
                 throw new \BadMethodCallException();
             }
@@ -149,27 +127,20 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultScalar()
     {
-        $this->collection->setDefault('test', 'dataId', 'data');
+        $this->collection->setDefault('test', 'data');
         $this->assertSame(
             'data',
             $this->collection->get('test'),
             'Failed asserting that added data equal to the expected value'
         );
-        $this->assertSame(
-            'dataId',
-            $this->collection->getIdentifier('test'),
-            'Failed asserting that data identifier equals to the expected value'
-        );
     }
 
     public function testSetDefaultCallable()
     {
-        $this->context['data_id'] = 'dataId';
         $this->context['data']    = 'data';
 
         $this->collection->setDefault(
             'test',
-            [$this, 'getTestDataIdentifier'],
             [$this, 'getTestDataValue']
         );
 
@@ -178,18 +149,12 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
             $this->collection->get('test'),
             'Failed asserting that added data equal to the expected value'
         );
-        $this->assertSame(
-            'dataId',
-            $this->collection->getIdentifier('test'),
-            'Failed asserting that data identifier equals to the expected value'
-        );
     }
 
-    public function getTestDataIdentifier($options)
-    {
-        return $options['data_id'];
-    }
-
+    /**
+     * @param $options
+     * @return mixed
+     */
     public function getTestDataValue($options)
     {
         return $options['data'];

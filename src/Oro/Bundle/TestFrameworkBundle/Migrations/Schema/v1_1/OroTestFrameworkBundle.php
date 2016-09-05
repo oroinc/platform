@@ -1,29 +1,22 @@
 <?php
+
 namespace Oro\Bundle\TestFrameworkBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\WorkflowBundle\Migrations\Schema\RemoveWorkflowFieldsTrait;
 
 class OroTestFrameworkBundle implements Migration
 {
+    use RemoveWorkflowFieldsTrait;
+
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->createTestSearchItem2Table($schema);
-    }
-
-    /**
-     * Create test_search_item2 table
-     *
-     * @param Schema $schema
-     */
-    protected function createTestSearchItem2Table(Schema $schema)
-    {
-        $table = $schema->createTable('test_search_item2');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->setPrimaryKey(['id']);
+        $this->removeWorkflowFields($schema->getTable('test_workflow_aware_entity'));
     }
 }

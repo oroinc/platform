@@ -1,0 +1,7 @@
+{% extends 'OroUserBundle:Role:update.html.twig' %}
+{% set entity = context.data %}
+{% set form = context.formView %}
+{% set privilegesConfig = context.privilegesConfig %}
+{% set allow_delete = false %}
+{% set tabsOptions = {'data': context.tabs} %}
+{% set capabilitySetOptions = context.capabilitySetOptions %}

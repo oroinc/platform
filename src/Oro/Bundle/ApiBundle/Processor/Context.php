@@ -762,8 +762,8 @@ class Context extends ApiContext implements ContextInterface
                 $entityClass,
                 $this->getVersion(),
                 $this->getRequestType(),
-                $this->getMetadataExtras(),
-                $this->getConfig()
+                $this->getConfig(),
+                $this->getMetadataExtras()
             );
             $this->processLoadedMetadata($metadata);
         } catch (\Exception $e) {

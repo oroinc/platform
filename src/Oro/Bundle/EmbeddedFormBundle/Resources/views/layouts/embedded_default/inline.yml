@@ -10,14 +10,12 @@ layout:
                 form_css:
                     blockType:   style
                     options:
-                        content: { '@value': $data.embedded_form_entity.css }
+                        content: '=data["embedded_form_entity"].getCss()'
                 content:
                     blockType: container
             tree:
                 root:
                     content:
                         form_css: ~
-    conditions:
-        '@eq':
-            - true
-            - $context.embedded_form_inline
+
+    conditions: 'context["embedded_form_inline"]==true'

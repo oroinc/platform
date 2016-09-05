@@ -4,9 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
+use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
 use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
 
 class EntityProcessor
@@ -24,20 +26,23 @@ class EntityProcessor
     protected $profiler;
 
     /**
-     * @param MaintenanceMode $maintenance
-     * @param CommandExecutor $commandExecutor
-     * @param LoggerInterface $logger
-     * @param Profiler        $profiler
+     * @param MaintenanceMode          $maintenance
+     * @param CommandExecutor          $commandExecutor
+     * @param LoggerInterface          $logger
+     * @param EventDispatcherInterface $dispatcher
+     * @param Profiler                 $profiler
      */
     public function __construct(
         MaintenanceMode $maintenance,
         CommandExecutor $commandExecutor,
         LoggerInterface $logger,
+        EventDispatcherInterface $dispatcher,
         Profiler $profiler = null
     ) {
         $this->maintenance     = $maintenance;
         $this->commandExecutor = $commandExecutor;
         $this->logger          = $logger;
+        $this->dispatcher      = $dispatcher;
         $this->profiler        = $profiler;
     }
 
@@ -87,7 +92,23 @@ class EntityProcessor
             );
         }
 
-        return $this->executeCommands($commands);
+        $result = $this->executeCommands($commands);
+        if ($result) {
+            try {
+                $this->dispatcher->dispatch(
+                    UpdateSchemaEvent::NAME,
+                    new UpdateSchemaEvent($this->commandExecutor, $this->logger)
+                );
+            } catch (\Exception $e) {
+                $result = false;
+                $this->logger->error(
+                    sprintf('The processing of "%s" event failed.', UpdateSchemaEvent::NAME),
+                    ['exception' => $e]
+                );
+            }
+        }
+
+        return $result;
     }
 
     /**

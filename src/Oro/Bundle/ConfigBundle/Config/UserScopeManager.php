@@ -56,11 +56,19 @@ class UserScopeManager extends AbstractScopeManager
     /**
      * {@inheritdoc}
      */
-    public function setScopeIdFromEntity($entity)
+    protected function isSupportedScopeEntity($entity)
     {
-        if ($entity instanceof User && $entity->getId()) {
-            $this->scopeId = $entity->getId();
-        }
+        return $entity instanceof User;
+    }
+
+    /**
+     * @param User $entity
+     *
+     * {@inheritdoc}
+     */
+    protected function getScopeIdByEntity($entity)
+    {
+        return $entity->getId();
     }
 
     /**

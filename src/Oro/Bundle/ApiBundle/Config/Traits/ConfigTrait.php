@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-
 /**
  * @property array $items
  */
@@ -87,13 +85,5 @@ trait ConfigTrait
         }
 
         return $result;
-    }
-
-    /**
-     * Makes a deep copy of the configuration options.
-     */
-    protected function cloneItems()
-    {
-        $this->items = ConfigUtil::cloneItems($this->items);
     }
 }

@@ -3,13 +3,13 @@
 namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 /**
@@ -127,6 +127,28 @@ class CalendarEventController extends Controller
     }
 
     /**
+     * Remove calendar event.
+     *
+     * @Route("/delete/{id}", name="oro_calendar_event_delete", requirements={"id"="\d+"})
+     *
+     * @Acl(
+     *      id="oro_calendar_event_delete",
+     *      type="entity",
+     *      class="OroCalendarBundle:CalendarEvent",
+     *      permission="DELETE",
+     *      group_name=""
+     * )
+     */
+    public function deleteAction(Request $request, $id)
+    {
+        return $this->forward(
+            'OroCalendarBundle:Api/Rest/CalendarEvent:delete',
+            ['id' => $id],
+            array_merge($request->query->all(), ['isCancelInsteadDelete' => true, '_format' => 'json'])
+        );
+    }
+
+    /**
      * @param CalendarEvent $entity
      * @param string        $formAction
      *
@@ -148,12 +170,12 @@ class CalendarEventController extends Controller
             $saved = true;
         }
 
-        return array(
+        return [
             'entity'     => $entity,
             'saved'      => $saved,
             'form'       => $this->get('oro_calendar.calendar_event.form.handler')->getForm()->createView(),
             'formAction' => $formAction
-        );
+        ];
     }
 
     /**

@@ -44,7 +44,7 @@ class Config implements \IteratorAggregate
      */
     public function __clone()
     {
-        $this->cloneItems();
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 
     /**

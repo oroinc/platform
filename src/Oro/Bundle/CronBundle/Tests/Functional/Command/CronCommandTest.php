@@ -6,6 +6,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 use Oro\Bundle\CronBundle\Command\CronCommand;
+use Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -31,20 +32,19 @@ class CronCommandTest extends WebTestCase
     public function testCheckRunDuplicateJob()
     {
         $this->mockCronHelper(true);
-        $command = $this->application->find('oro:cron');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
-            'command'      => $command->getName(),
-            '--skipCheckDaemon' => true,
-        ));
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['--skipCheckDaemon' => true]);
         $this->assertNotEmpty($result);
 
         $this->checkMessage('allJobNew', $result);
 
         $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->checkMessage('AllJobAdded', $result);
+
+        for ($i = 1; $i < EmailSyncCommand::MAX_JOBS_COUNT; $i++) {
+            $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+            $this->assertRegexp('/Processing command "oro:cron:imap-sync": added to job queue/', $result);
+        }
 
         $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->checkMessage('AllJobAlreadyExist', $result);

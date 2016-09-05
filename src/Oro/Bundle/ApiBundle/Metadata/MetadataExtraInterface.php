@@ -22,4 +22,11 @@ interface MetadataExtraInterface
      * @param MetadataContext $context
      */
     public function configureContext(MetadataContext $context);
+
+    /**
+     * Returns a string that should be added to a cache key used by the metadata provider.
+     *
+     * @return string|null
+     */
+    public function getCacheKeyPart();
 }

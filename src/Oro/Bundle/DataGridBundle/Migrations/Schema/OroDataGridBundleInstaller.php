@@ -14,7 +14,7 @@ class OroDataGridBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -22,8 +22,18 @@ class OroDataGridBundleInstaller implements Installation
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $this->createAppearanceTypeTable($schema);
         $this->createOroGridViewTable($schema);
         $this->createOroGridViewUserTable($schema);
+    }
+
+    protected function createAppearanceTypeTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_grid_appearance_type');
+        $table->addColumn('name', 'string', ['length' => 32]);
+        $table->addColumn('label', 'string', ['length' => 255]);
+        $table->addColumn('icon', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['name']);
     }
 
     /**
@@ -41,9 +51,19 @@ class OroDataGridBundleInstaller implements Installation
         $table->addColumn('sortersData', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('columnsData', 'array', ['comment' => '(DC2Type:array)', 'notnull' => false]);
         $table->addColumn('gridName', 'string', ['length' => 255]);
+        $table->addColumn('appearanceType', 'string', ['notnull' => false, 'length' => 32]);
+        $table->addColumn('appearanceData', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id'], 'IDX_5B73FBCB9EB185F9', []);
         $table->addIndex(['organization_id'], 'IDX_5B73FBCB32C8A3DE', []);
+        $table->addIndex(['appearanceType'], 'IDX_ORO_GRID_VIEW_APPEARANCE_TYPE', []);
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_grid_appearance_type'),
+            ['appearanceType'],
+            ['name'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),

@@ -208,9 +208,4 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->buildForm($this->builder, ['data_class' => self::ENTITY]);
     }
-
-    public function testGetExtendedType()
-    {
-        $this->assertEquals('form', $this->extension->getExtendedType());
-    }
 }

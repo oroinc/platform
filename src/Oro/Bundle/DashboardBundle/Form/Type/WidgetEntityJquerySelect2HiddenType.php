@@ -121,6 +121,14 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_widget_entity_jqueryselect2_hidden';
     }
 }
