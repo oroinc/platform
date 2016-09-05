@@ -298,6 +298,7 @@ datagrid:
                 select:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
+                    - eb.bodyContent AS body_content
                     - a
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
@@ -307,6 +308,9 @@ datagrid:
                         -
                             join: eu.email
                             alias: e
+                        -
+                            join: e.emailBody
+                            alias: eb
                     inner:
                         - { join: eu.folders, alias: f }
                         - { join: f.origin, alias: o }
