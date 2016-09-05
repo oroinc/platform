@@ -29,36 +29,25 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
     public function testRenderBlock()
     {
         $cacheKey = '_root_root';
+        $blockName = 'root';
+        $variables = ['id' => $blockName];
+        $template = $this->createTheme($blockName);
+        $resource = [$template, $blockName];
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
         $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
         $view->vars['cache_key'] = $cacheKey;
 
-        /** @var \Twig_Template|\PHPUnit_Framework_MockObject_MockObject $template */
-        $template = $this->getMock('\Twig_Template', [], [], '', false);
-
-        $blockName = 'root';
-        $variables = ['id' => $blockName];
-        $resource = [$template, $blockName];
-
-        $class = new \ReflectionClass(BaseTwigRendererEngine::class);
-        $property = $class->getProperty('template');
-        $property->setAccessible(true);
-        $property->setValue($this->engine, $template);
-
-        $property = $class->getProperty('resources');
-        $property->setAccessible(true);
-        $property->setValue($this->engine, [$cacheKey => $resource]);
-
-        $this->environment->expects($this->once())
+        $this->environment->expects($this->any())
             ->method('mergeGlobals')
-            ->with($variables)
             ->will($this->returnValue($variables));
 
         $template->expects($this->once())
             ->method('displayBlock')
-            ->with($blockName, $variables, $resource);
+            ->with($blockName, $variables, [$blockName => $resource]);
 
+        $this->engine->setTheme($view, [$template]);
+        $this->engine->getResourceForBlockName($view, $blockName);
         $this->engine->renderBlock($view, $resource, $blockName, $variables);
     }
 
