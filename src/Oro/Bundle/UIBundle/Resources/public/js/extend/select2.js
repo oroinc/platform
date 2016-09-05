@@ -1,5 +1,9 @@
-define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($, __, Select2) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var Select2 = require('jquery.select2');
+    require('oroui/js/select2-l10n');
 
     /**
      * An overload of populateResults method,
@@ -215,9 +219,4 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
             this.search.width(Math.floor($(this.search).width()) - 1);
         };
     }(Select2['class'].multi.prototype));
-
-    $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
-        formatSearching: function() { return __('Searching...'); },
-        formatNoMatches: function() { return __('No matches found'); }
-    });
 });
