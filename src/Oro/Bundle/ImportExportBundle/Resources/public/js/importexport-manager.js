@@ -114,8 +114,10 @@ define(function(require) {
                 throw new TypeError('"exportProcessor" is required');
             }
 
+            var exportUrl;
+
             if (this.options.isExportPopupRequired) {
-                var exportUrl = routing.generate(this.options.exportConfigRoute, $.extend({}, this.routeOptions, {
+                exportUrl = routing.generate(this.options.exportConfigRoute, $.extend({}, this.routeOptions, {
                     processorAlias: this.options.exportProcessor,
                     filePrefix: this.options.filePrefix
                 }));
@@ -125,7 +127,7 @@ define(function(require) {
                     title: this.options.exportTitle
                 });
             } else {
-                var exportUrl = routing.generate(this.options.exportRoute, $.extend({}, this.routeOptions, {
+                exportUrl = routing.generate(this.options.exportRoute, $.extend({}, this.routeOptions, {
                     processorAlias: this.options.exportProcessor,
                     filePrefix: this.options.filePrefix
                 }));
@@ -146,8 +148,10 @@ define(function(require) {
                 throw new TypeError('"exportTemplateProcessor" is required');
             }
 
+            var exportTemplateUrl;
+
             if (this.options.isExportTemplatePopupRequired) {
-                var exportTemplateUrl = routing.generate(
+                exportTemplateUrl = routing.generate(
                     this.options.exportTemplateConfigRoute,
                     $.extend({}, this.routeOptions, {
                         processorAlias: this.options.exportTemplateProcessor
@@ -159,7 +163,7 @@ define(function(require) {
                     title: this.options.exportTemplateTitle
                 });
             } else {
-                var exportTemplateUrl = routing.generate(
+                exportTemplateUrl = routing.generate(
                     this.options.exportTemplateRoute,
                     $.extend({}, this.routeOptions, {
                         processorAlias: this.options.exportTemplateProcessor
