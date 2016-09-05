@@ -3,14 +3,16 @@
 namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
+
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Schema\Column;
-use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\SqlSchemaUpdateMigrationQuery;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAwareInterface
@@ -55,11 +57,27 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
         $diff          = new TableDiff($table->getName());
         $diff->newName = $newTableName;
 
-        $renameQuery = new SqlMigrationQuery(
+        $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)
         );
-
         $queries->addQuery($renameQuery);
+
+        if ($this->platform->supportsSequences()) {
+            $primaryKey = $schema->getTable($oldTableName)->getPrimaryKeyColumns();
+            if (count($primaryKey) === 1) {
+                $primaryKey = reset($primaryKey);
+                $oldSequenceName = $this->platform->getIdentitySequenceName($oldTableName, $primaryKey);
+                if ($schema->hasSequence($oldSequenceName)) {
+                    $newSequenceName = $this->platform->getIdentitySequenceName($newTableName, $primaryKey);
+                    if ($this->platform instanceof PostgreSqlPlatform) {
+                        $renameSequenceQuery = new SqlSchemaUpdateMigrationQuery(
+                            "ALTER SEQUENCE $oldSequenceName RENAME TO $newSequenceName"
+                        );
+                        $queries->addQuery($renameSequenceQuery);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -78,10 +96,9 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
         $diff                 = new TableDiff($table->getName());
         $diff->renamedColumns = [$oldColumnName => $column];
 
-        $renameQuery = new SqlMigrationQuery(
+        $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)
         );
-
         $queries->addQuery($renameQuery);
     }
 
@@ -109,7 +126,7 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
         $diff               = new TableDiff($tableName);
         $diff->addedIndexes = [$indexName => $index];
 
-        $renameQuery = new SqlMigrationQuery(
+        $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)
         );
 
@@ -140,7 +157,7 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
         $diff               = new TableDiff($tableName);
         $diff->addedIndexes = [$indexName => $index];
 
-        $renameQuery = new SqlMigrationQuery(
+        $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)
         );
 
@@ -186,7 +203,7 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
         $diff                   = new TableDiff($tableName);
         $diff->addedForeignKeys = [$constraintName => $constraint];
 
-        $renameQuery = new SqlMigrationQuery(
+        $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)
         );
 

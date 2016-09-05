@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
+use Symfony\Component\DomCrawler\Crawler;
 
 class GridContext extends OroFeatureContext implements OroElementFactoryAware
 {
@@ -160,9 +161,11 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
      */
     public function sortGridBy($field)
     {
-        /** @var GridHeader $gridHeader */
-        $gridHeader = $this->elementFactory->createElement('GridHeader');
-        $gridHeader->getHeaderLink($field)->click();
+        $this->elementFactory
+            ->createElement('Grid')
+            ->getElement('GridHeader')
+            ->findElementContains('GridHeaderLink', $field)
+            ->click();
     }
 
     //@codingStandardsIgnoreStart
@@ -201,14 +204,21 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     public function assertRowValues($content, TableNode $table)
     {
         /** @var Grid $grid */
-        $grid = $this->elementFactory->createElement('Grid');
+        $grid = $this->elementFactory->findElementContains('Grid', $content);
         /** @var GridHeader $gridHeader */
-        $gridHeader = $this->elementFactory->createElement('GridHeader');
-        $columns = $grid->getRowByContent($content)->findAll('css', 'td');
+        $gridHeader = $grid->getElement('GridHeader');
+        $row = $grid->findElementContains('GridRow', $content);
+        self::assertTrue($row->isValid(), sprintf('Row with "%s" not found', $content));
+
+        $crawler = new Crawler($row->getHtml());
+        /** @var Crawler[] $columns */
+        $columns = $crawler->filter('td')->siblings()->each(function (Crawler $td) {
+            return $td;
+        });
 
         foreach ($table->getRows() as list($header, $value)) {
             $columnNumber = $gridHeader->getColumnNumber($header);
-            $actualValue = $columns[$columnNumber]->getText();
+            $actualValue = trim($columns[$columnNumber-1]->text());
 
             self::assertEquals(
                 $value,

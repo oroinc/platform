@@ -48,6 +48,16 @@ class ExtendOptionsManager
     }
 
     /**
+     * Removes table options from the options manager
+     *
+     * @param string $tableName
+     */
+    public function removeTableOptions($tableName)
+    {
+        unset($this->options[$tableName], $this->options[self::APPEND_SECTION][$tableName]);
+    }
+
+    /**
      * Sets column options
      *
      * @param string $tableName
@@ -92,8 +102,7 @@ class ExtendOptionsManager
     public function removeColumnOptions($tableName, $columnName)
     {
         $objectKey = sprintf('%s!%s', $tableName, $columnName);
-        unset($this->options[$objectKey]);
-        unset($this->options[self::APPEND_SECTION][$objectKey]);
+        unset($this->options[$objectKey], $this->options[self::APPEND_SECTION][$objectKey]);
     }
 
     /**
