@@ -277,6 +277,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         } catch (\Exception $ex) {
             $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
 
+            $this->setOriginSyncStateToFailed($origin);
+
             throw $ex;
         }
 
@@ -297,15 +299,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
             throw $ex;
         } catch (\Exception $ex) {
-            try {
-                $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
-            } catch (\Exception $innerEx) {
-                // ignore any exception here
-                $this->logger->error(
-                    sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
-                    ['exception' => $innerEx]
-                );
-            }
+            $this->setOriginSyncStateToFailed($origin);
 
             $this->logger->error(
                 sprintf('The synchronization failed. Error: %s', $ex->getMessage()),
@@ -413,6 +407,24 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $affectedRows = $qb->getQuery()->execute();
 
         return $affectedRows > 0;
+    }
+
+    /**
+     *  Attempts to sets the state of a given email origin to failed.
+     *
+     * @param EmailOrigin $origin
+     */
+    protected function setOriginSyncStateToFailed(EmailOrigin $origin)
+    {
+        try {
+            $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
+        } catch (\Exception $innerEx) {
+            // ignore any exception here
+            $this->logger->error(
+                sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
+                ['exception' => $innerEx]
+            );
+        }
     }
 
     /**
