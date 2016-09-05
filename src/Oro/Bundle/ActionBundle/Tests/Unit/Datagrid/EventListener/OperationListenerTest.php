@@ -250,7 +250,9 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'should not replace existing default action' => [
-                'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
+                'config' => DatagridConfiguration::create(
+                    ['name' => 'datagrid1', 'actions' => ['action3' => ['label' => 'default action3']]]
+                ),
                 'actions' => ['action3' => $this->createOperation(
                     'action3',
                     true,
@@ -304,7 +306,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 'groups' => ['group1'],
             ],
             '2 allowed actions' => [
-                'config' => DatagridConfiguration::create([]),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 2]),
                 'actions' => [
                     'action1' => $this->createOperation('operation1', true),
@@ -314,10 +316,10 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action2' => ['option1' => 'value1', 'option2' => 'value2'],
                 ],
-                'context' => ['entityClass' => null, 'datagrid' => null, 'group' => null],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
             '1 allowed action' => [
-                'config' => DatagridConfiguration::create([]),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 3]),
                 'actions' => [
                     'action1' => $this->createOperation('operation1', true),
@@ -327,7 +329,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false
                 ],
-                'context' => ['entityClass' => null, 'datagrid' => null, 'group' => null],
+                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
             '1 allowed action and array parent config' => [
                 'config' => DatagridConfiguration::create([
