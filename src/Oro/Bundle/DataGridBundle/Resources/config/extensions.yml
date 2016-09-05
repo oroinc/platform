@@ -24,7 +24,6 @@ services:
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
-        lazy: true
 
     oro_datagrid.extension.orm_pager:
         class: %oro_datagrid.extension.orm_pager.class%
