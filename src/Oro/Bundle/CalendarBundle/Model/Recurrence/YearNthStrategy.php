@@ -117,7 +117,8 @@ class YearNthStrategy extends AbstractStrategy
         $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
         $instanceRelativeValue = $this->getInstanceRelativeValue($instance);
-        $month = date('M', mktime(0, 0, 0, $monthOfYear));
+        //the 1st day is used to avoid situations like '31-06-2016' == '01-07-2016' (31 == current day by default)
+        $month = date('M', mktime(0, 0, 0, $monthOfYear, 1));
         $year = $occurrenceDate->format('Y');
         $time = $occurrenceDate->format('H:i:s.u');
         $nextDays = [];

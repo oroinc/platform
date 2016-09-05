@@ -20,19 +20,20 @@ class SelectorManipulator extends Manipulator
             throw new \InvalidArgumentException('Method "addContainsSuffix" support only css selectors');
         }
 
-        $variants = [
-            $text,
-            ucfirst($text),
-            ucfirst(strtolower($text)),
-            strtolower($text),
-            strtoupper($text),
-        ];
+        $text = trim(preg_replace('/\W/i', ' ', $text));
 
         $selector = implode(',', array_map(function ($variant) use ($locator) {
-            return sprintf('%s:contains("%s")', $locator, $variant);
-        }, array_unique($variants)));
+            $containsSuffix = implode(':', array_map([$this, 'getContainsFromString'], explode(' ', $variant)));
+
+            return $locator.':'.$containsSuffix;
+        }, self::getVariants($text)));
 
         return $selector;
+    }
+
+    public function getContainsFromString($text)
+    {
+        return sprintf('contains("%s")', $text);
     }
 
     /**
@@ -46,6 +47,21 @@ class SelectorManipulator extends Manipulator
         list($selectorType, $locator) = $this->parseSelector($selector);
 
         return $selectorsHandler->selectorToXpath($selectorType, $locator);
+    }
+
+    /**
+     * @param string $text
+     * @return array
+     */
+    protected static function getVariants($text)
+    {
+        return array_unique([
+            $text,
+            ucfirst($text),
+            ucfirst(strtolower($text)),
+            strtolower($text),
+            strtoupper($text),
+        ]);
     }
 
     /**

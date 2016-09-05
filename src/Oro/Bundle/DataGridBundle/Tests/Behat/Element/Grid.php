@@ -32,7 +32,7 @@ class Grid extends Element
     {
         $columns = $this->getRowByNumber($rowNumber)->findAll('css', 'td');
         /** @var GridHeader $gridHeader */
-        $gridHeader = $this->elementFactory->createElement('GridHeader');
+        $gridHeader = $this->getElement('GridHeader');
         $columnNumber = $gridHeader->getColumnNumber($header);
 
         return $this->normalizeValueByGuessingType($columns[$columnNumber]->getText());
@@ -62,19 +62,14 @@ class Grid extends Element
      * Get Element tr by row content
      *
      * @param string $content Any content that can identify row
-     * @return NodeElement tr element of grid
+     * @return Element tr element of grid
      */
     public function getRowByContent($content)
     {
-        $rows = $this->getRows();
+        $gridRow = $this->findElementContains('GridRow', $content);
+        self::assertNotNull($gridRow, sprintf('Grid has no record with "%s" content', $content));
 
-        foreach ($rows as $row) {
-            if (false !== strpos($row->getText(), $content)) {
-                return $row;
-            }
-        }
-
-        self::fail(sprintf('Grid has no record with "%s" content', $content));
+        return $gridRow;
     }
 
     /**

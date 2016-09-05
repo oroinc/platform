@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client\ConsumptionExtension;
 
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
@@ -13,7 +14,7 @@ class CreateQueueExtension extends AbstractExtension
     private $driver;
 
     /**
-     * @var bool
+     * @var bool[]
      */
     private $createdQueues = [];
 
