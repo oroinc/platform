@@ -89,17 +89,6 @@ abstract class AbstractMenuUpdate
     }
 
     /**
-     * @param int $id
-     * @return AbstractMenuUpdate
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getKey()
