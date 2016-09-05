@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Datasource;
 
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -13,6 +12,7 @@ use Oro\Bundle\SearchBundle\Event\SearchResultAfter;
 use Oro\Bundle\SearchBundle\Event\SearchResultBefore;
 use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class SearchDatasource implements DatasourceInterface
 {
@@ -65,7 +65,9 @@ class SearchDatasource implements DatasourceInterface
         $rows = [];
         foreach ($results as $result) {
             $resultRecord = new ResultRecord($result);
-            $resultRecord->addData($result->getSelectedData());
+            if ($result instanceof Item) {
+                $resultRecord->addData($result->getSelectedData());
+            }
             $rows[] = $resultRecord;
         }
 

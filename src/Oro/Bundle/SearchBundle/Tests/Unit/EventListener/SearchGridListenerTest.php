@@ -7,6 +7,7 @@ use Oro\Bundle\SearchBundle\EventListener\SearchGridListener;
 
 class SearchGridListenerTest extends \PHPUnit_Framework_TestCase
 {
+    const SELECT_TEST_VALUE = 'SELECT_TEST_VALUE';
     const FROM_TEST_VALUE = 'FROM_TEST_VALUE';
 
     /**
@@ -60,12 +61,13 @@ class SearchGridListenerTest extends \PHPUnit_Framework_TestCase
         $config = DatagridConfiguration::create([
             'source' => [
                 'query' => [
+                    'select' => self::SELECT_TEST_VALUE,
                     'from' => self::FROM_TEST_VALUE,
                 ]
             ]
         ]);
         $this->datagridMock
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getConfig')
             ->willReturn($config);
 
@@ -97,12 +99,12 @@ class SearchGridListenerTest extends \PHPUnit_Framework_TestCase
 
         $config = DatagridConfiguration::create([]);
         $this->datagridMock
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getConfig')
             ->willReturn($config);
 
         $this->datasourceMock
-            ->expects($this->never())
+            ->expects($this->once())
             ->method('getQuery');
 
         $this->listener->onBuildAfter($this->eventMock);

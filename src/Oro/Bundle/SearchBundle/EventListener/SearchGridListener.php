@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchGridListener
 {
@@ -21,16 +22,16 @@ class SearchGridListener
         $datasource = $grid->getDatasource();
 
         if ($datasource instanceof SearchDatasource) {
-            $select = $grid->getConfig()->offsetGetByPath(self::SELECT_PATH);
-            if (is_array($select)) {
-                foreach ($select as $field) {
-                    $datasource->getQuery()->addSelect($field);
-                }
+            $select = (array) $grid->getConfig()->offsetGetByPath(self::SELECT_PATH);
+            $query = $datasource->getQuery();
+            /** @var Query $query */
+            if (!empty($select)) {
+                $query->addSelect($select);
             }
 
             $from = $grid->getConfig()->offsetGetByPath(self::FROM_PATH);
             if (!empty($from)) {
-                $datasource->getQuery()->from($from);
+                $query->from($from);
             }
         }
     }
