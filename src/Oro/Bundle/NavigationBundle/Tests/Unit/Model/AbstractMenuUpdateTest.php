@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Model;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-use Oro\Bundle\NavigationBundle\Model\AbstractMenuUpdate;
+use Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate;
 
 class AbstractMenuUpdateTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +24,7 @@ class AbstractMenuUpdateTest extends \PHPUnit_Framework_TestCase
             ['priority', 1],
         ];
 
-        $model = $this->getMockForAbstractClass('Oro\Bundle\NavigationBundle\Model\AbstractMenuUpdate');
+        $model = $this->getMockForAbstractClass('Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate');
 
         $this->assertPropertyAccessors($model, $properties);
     }
