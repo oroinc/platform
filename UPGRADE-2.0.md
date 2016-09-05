@@ -190,7 +190,6 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Removed form `Oro\Bundle\TranslationBundle\Form\Type\AvailableTranslationsConfigurationType`.
 - Removed twig extension `Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension`.
 
-
 ####EntityExtendBundle
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
