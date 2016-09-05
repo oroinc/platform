@@ -182,34 +182,11 @@ class Query
     /**
      * {@inheritdoc}
      */
-    public function addSelect($fieldName, $enforcedFieldType = null)
+    public function addSelect($fieldNames, $enforcedFieldType = null)
     {
-        if (!$fieldName) {
-            return $this;
+        foreach ((array) $fieldNames as $fieldName) {
+            $this->addToSelect($fieldName, $enforcedFieldType);
         }
-
-        $fieldType = self::TYPE_TEXT;
-
-        list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
-
-        if (!empty($explodedType) && !empty($explodedName)) {
-            $fieldType = $explodedType;
-            $fieldName = $explodedName;
-        }
-
-        if ($enforcedFieldType !== null) {
-            $fieldType = $enforcedFieldType;
-        }
-
-        $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);
-
-        if (!is_string($field)) {
-            return $this;
-        }
-
-        $this->select[$field] = $field; // do not allow repeating fields
-
-        return $this;
     }
 
     /**
@@ -571,6 +548,42 @@ class Query
                . $limitString
                . $offsetString;
     }
+
+    /**
+     * @param $fieldName
+     * @param null $enforcedFieldType
+     * @return $this
+     */
+    private function addToSelect($fieldName, $enforcedFieldType = null)
+    {
+        if (!$fieldName) {
+            return $this;
+        }
+
+        $fieldType = self::TYPE_TEXT;
+
+        list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
+
+        if (!empty($explodedType) && !empty($explodedName)) {
+            $fieldType = $explodedType;
+            $fieldName = $explodedName;
+        }
+
+        if ($enforcedFieldType !== null) {
+            $fieldType = $enforcedFieldType;
+        }
+
+        $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);
+
+        if (!is_string($field)) {
+            return $this;
+        }
+
+        $this->select[$field] = $field; // do not allow repeating fields
+
+        return $this;
+    }
+
 
     /**
      * Returns the WHERE string part for getStringQuery.

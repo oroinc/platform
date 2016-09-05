@@ -163,6 +163,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(4, $query->getSelect());
     }
 
+    public function testAddSelectArray()
+    {
+        $query = new Query();
+        $query->addSelect([
+            'name',
+            'name', // testing handing doubles
+            'integer.number', // type guessing by prefix
+            'sku', // default type should be `text`
+        ]);
+
+        $this->assertEquals(
+            [
+                'text.name',
+                'integer.number',
+                'text.sku'
+            ],
+            $query->getSelect()
+        );
+
+        $query->addSelect('');
+        $this->assertCount(3, $query->getSelect());
+    }
+
     public function testStringQueryWithSelect()
     {
         $query = new Query();
