@@ -29,8 +29,6 @@ define(function(require) {
         /** @property */
         template: require('tpl!orodatagrid/templates/datagrid/sorting-dropdown.html'),
 
-        noWrap: false,
-
         /** @property */
         events: {
             'change select': 'onChangeSorting',
