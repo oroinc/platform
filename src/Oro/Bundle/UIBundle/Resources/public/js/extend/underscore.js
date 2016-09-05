@@ -52,12 +52,17 @@ define(['underscore', 'asap'], function(_, asap) {
     _.templateSettings.innerTempEnd = '#%>';
 
     _.template = _.wrap(_.template, function(original, text, settings, oldSettings) {
-        if (!settings && oldSettings) settings = oldSettings;
+        if (!settings && oldSettings) {
+            settings = oldSettings;
+        }
         settings = _.defaults({}, settings, _.templateSettings);
 
         var regexStart = new RegExp('^' + settings.innerTempStart);
         var regexEnd = new RegExp(settings.innerTempEnd + '$');
-        var innerTempEvaluate = new RegExp('(' + _.templateSettings.innerTempStart + ')|(' + _.templateSettings.innerTempEnd + ')', 'g');
+        var evaluateStart = '(' + _.templateSettings.innerTempStart + ')';
+        var evaluateEnd = '|(' + _.templateSettings.innerTempEnd + ')';
+
+        var innerTempEvaluate = new RegExp(evaluateStart + evaluateEnd, 'g');
 
         text = _.trim(text).replace(regexStart, '').replace(regexEnd, '');
 

@@ -34,7 +34,7 @@ define([
             _.templateSettings.innerTempEnd = '#}}';
 
             var innerTemplate = '{{# ' +
-                '<span>Listed price: ' + '<%= listedPrice %></span>'+
+                '<span>Listed price: ' + '<%= listedPrice %></span>' +
                 ' #}}';
             var template  = _.template(innerTemplate);
             var result = template({listedPrice: 100});
