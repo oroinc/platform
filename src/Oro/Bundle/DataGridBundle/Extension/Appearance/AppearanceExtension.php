@@ -40,14 +40,13 @@ class AppearanceExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
         $options = $config->offsetGetOr(static::APPEARANCE_CONFIG_PATH, []);
-        $hasOptions = count($options) > 0;
 
-        return $hasOptions;
+        return count($options) > 0;
     }
 
      /**

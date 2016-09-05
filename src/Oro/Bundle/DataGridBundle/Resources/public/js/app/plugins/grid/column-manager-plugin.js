@@ -29,7 +29,8 @@ define(function(require) {
                 launcherOptions: _.extend(config, {
                     componentConstructor: ColumnManagerComponent,
                     columns: this.main.columns,
-                    managedColumns: this.managedColumns
+                    managedColumns: this.managedColumns,
+                    addSorting: true
                 }, toolbarOptions.columnManager),
                 order: 600
             };
