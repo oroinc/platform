@@ -42,6 +42,13 @@ abstract class MenuUpdate
     /**
      * @var string
      *
+     * @ORM\Column(name="uri", type="string", length=255)
+     */
+    protected $uri;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="menu", type="string", length=100)
      */
     protected $menu;
@@ -152,6 +159,25 @@ abstract class MenuUpdate
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUri()
+    {
+        return $this->uri;
+    }
+
+    /**
+     * @param string $uri
+     * @return MenuUpdate
+     */
+    public function setUri($uri)
+    {
+        $this->uri = $uri;
 
         return $this;
     }
