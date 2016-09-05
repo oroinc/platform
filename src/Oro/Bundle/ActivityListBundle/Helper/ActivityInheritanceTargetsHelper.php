@@ -54,8 +54,9 @@ class ActivityInheritanceTargetsHelper
      * @param array        $inheritanceTarget
      * @param string       $aliasSuffix
      * @param string       $entityIdExpr
+     * @param bool         $head Head activity only
      */
-    public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr)
+    public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr, $head)
     {
         $alias = 'ta_' . $aliasSuffix;
         $qb->leftJoin('activity.' . $inheritanceTarget['targetClassAlias'], $alias);
@@ -68,6 +69,9 @@ class ActivityInheritanceTargetsHelper
                 $aliasSuffix
             )->getDQL()
         ));
+        if ($head) {
+            $qb->andWhere($qb->expr()->andX('activity.head = true'));
+        }
     }
 
     /**
