@@ -1,12 +1,16 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view',
-    'tpl!orodatagrid/templates/datagrid/sorting-dropdown.html'
-], function($, _, BaseView, template) {
+define(function(require) {
     'use strict';
 
     var SortingDropdown;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var Select2View = require('oroform/js/app/views/select2-view');
+    var module = require('module');
+    var config = _.defaults(module.config(), {
+        hasSortingOrderButton: true,
+        className: 'sorting-select-control',
+        dropdownClassName: 'sorting-select-control'
+    });
 
     /**
      * Datagrid page size widget
@@ -16,24 +20,33 @@ define([
      * @extends Backbone.View
      */
     SortingDropdown = BaseView.extend({
-        /** @property */
-        template: template,
+        SEARCH_CAPABILITY_GATE: 8,
 
-        noWrap: true,
+        VALUE_SEPARATOR: '-sep-',
+
+        DIRECTIONS: ['ascending', 'descending'],
+
+        /** @property */
+        template: require('tpl!orodatagrid/templates/datagrid/sorting-dropdown.html'),
 
         /** @property */
         events: {
-            'change select': 'onChangeSorting'
+            'change select': 'onChangeSorting',
+            'click [data-name=order-toggle]': 'onDirectionToggle'
         },
+
+        className: config.className,
+
+        dropdownClassName: config.dropdownClassName,
 
         /** @property */
         enabled: true,
 
+        hasSortingOrderButton:  config.hasSortingOrderButton,
+
         currentColumn: null,
 
         currentDirection: null,
-
-        VALUE_SEPARATOR: '-sep-',
 
         /**
          * Initializer.
@@ -53,8 +66,7 @@ define([
                 throw new TypeError('"collection" is required');
             }
 
-            this.columns = options.columns;
-            this.collection = options.collection;
+            _.extend(this, _.pick(options, ['columns', 'collection', 'hasSortingOrderButton']));
 
             this.listenTo(this.columns, 'change:direction', this._selectCurrentSortableColumn);
             this.listenTo(this.columns, 'change:renderable', this._columnRenderableChanged);
@@ -69,19 +81,22 @@ define([
             var keys = Object.keys(this.collection.state.sorters);
             if (keys.length) {
                 var columnName = keys[0];
-                var direction = null;
+                var direction;
                 var column = this.columns.find(function(column) {
                     return column.get('name') === columnName;
                 });
-                var intDirection = this.collection.state.sorters[columnName];
-                if (1 === parseInt(intDirection, 10)) {
-                    direction = 'descending';
-                } else if (-1 === parseInt(intDirection, 10)) {
-                    direction = 'ascending';
+                switch (parseInt(this.collection.state.sorters[columnName], 10)) {
+                    case -1:
+                        direction = this.DIRECTIONS[0];
+                        break;
+                    case 1:
+                        direction = this.DIRECTIONS[1];
+                        break;
+                    default:
+                        return;
                 }
-                if (direction) {
-                    this._selectCurrentSortableColumn(column, direction);
-                }
+                this.currentDirection = direction;
+                this.currentColumn = column;
             }
         },
 
@@ -92,9 +107,9 @@ define([
          */
         _selectCurrentSortableColumn: function(column, direction) {
             if (direction !== null) {
-                this.currentColumn = column;
                 this.currentDirection = direction;
-                this.$('select').val(this._getColumnValue(column, direction));
+                this.currentColumn = column;
+                this._updateDisplayValue();
             }
         },
 
@@ -125,42 +140,6 @@ define([
         },
 
         /**
-         * @param {Object} column
-         * @param {string} direction
-         * @returns {string}
-         * @private
-         */
-        _getColumnValue: function(column, direction) {
-            return column.get('name') + this.VALUE_SEPARATOR + direction;
-        },
-
-        /**
-         * @param {string} value
-         * @returns {*}
-         * @private
-         */
-        _getColumnByValue: function(value) {
-            var name = value.split(this.VALUE_SEPARATOR)[0];
-            for (var i = 0; i < this.columns.models.length; i++) {
-                if (this.columns.models[i].get('name') === name) {
-                    return this.columns.models[i];
-                }
-            }
-        },
-
-        /**
-         * @param {string} value
-         * @returns {*}
-         * @private
-         */
-        _getDirectionByValue: function(value) {
-            value = value.split(this.VALUE_SEPARATOR);
-            if (value.length === 2) {
-                return value[1];
-            }
-        },
-
-        /**
          * @return {*}
          */
         disable: function() {
@@ -178,45 +157,135 @@ define([
             return this;
         },
 
-        /**
-         * @param {Event} e
-         */
-        onChangeSorting: function(e) {
+        _getCurrentValue: function() {
+            if (!this.currentColumn) {
+                return null;
+            } else if (this.hasSortingOrderButton) {
+                return this.currentColumn.get('name');
+            } else {
+                return this.currentColumn.get('name') + this.VALUE_SEPARATOR + this.currentDirection;
+            }
+        },
+
+        _updateDisplayValue: function() {
+            this.$('select').select2('val', this._getCurrentValue());
+            if (this.hasSortingOrderButton) {
+                this._updateDisplayDirection();
+            }
+        },
+
+        _updateDisplayDirection: function() {
+            this.$('[data-name=order-toggle]')
+                .toggleClass('icon-sort-by-attributes', this.currentDirection === this.DIRECTIONS[0])
+                .toggleClass('icon-sort-by-attributes-alt', this.currentDirection === this.DIRECTIONS[1]);
+        },
+
+        onDirectionToggle: function() {
+            if (this.currentDirection === this.DIRECTIONS[1]) {
+                this.currentDirection = this.DIRECTIONS[0];
+            } else {
+                this.currentDirection = this.DIRECTIONS[1];
+            }
+            if (this.currentColumn) {
+                this.collection.trigger('backgrid:sort', this.currentColumn, this.currentDirection);
+            }
+            this._updateDisplayDirection();
+        },
+
+        onChangeSorting: function() {
             var column;
-            e.preventDefault();
-            var value = $(e.target).val();
-            if (value) {
-                column = this._getColumnByValue(value);
-                if (column) {
-                    this.collection.trigger('backgrid:sort', column, this._getDirectionByValue(value));
+            var columnName;
+            var newDirection;
+            var value = this.$('select').val();
+            if (this.hasSortingOrderButton) {
+                columnName = value;
+            } else {
+                value = value.split(this.VALUE_SEPARATOR);
+                columnName = value[0];
+                newDirection = value[1];
+            }
+            column = this.columns.findWhere({'name': columnName});
+            if (column) {
+                if (newDirection) {
+                    this.currentDirection = newDirection;
+                } else if (!this.currentDirection) {
+                    this.currentDirection = this.DIRECTIONS[0];
                 }
+                this.collection.trigger('backgrid:sort', column, this.currentDirection);
+            } else {
+                this.currentColumn = null;
+                this.currentDirection = null;
+            }
+            if (this.hasSortingOrderButton) {
+                this._updateDisplayDirection();
             }
         },
 
         getTemplateData: function() {
             var data = SortingDropdown.__super__.getTemplateData.apply(this, arguments);
             data = _.extend(data, {
-                columns: _.filter(this.columns.models, function(model) {
-                    return model.get('sortable') && model.get('renderable');
-                }),
-                currentColumn: this.currentColumn,
+                columns: this._getSelectOptionsData(),
+                selectedValue: this._getCurrentValue(),
                 currentDirection: this.currentDirection,
-                getColumnValue: _.bind(this._getColumnValue, this)
+                hasSortingOrderButton: this.hasSortingOrderButton
             });
             return data;
+        },
+
+        _getSelectOptionsData: function() {
+            var options = [];
+            _.each(_.where(this.columns.toJSON(), {sortable: true, renderable: true}), _.bind(function(column) {
+                if (this.hasSortingOrderButton) {
+                    options.push({
+                        label: column.label,
+                        value: column.name
+                    });
+                } else {
+                    _.each(this.DIRECTIONS, _.bind(function(direction) {
+                        options.push({
+                            label: column.label,
+                            sortingType: column.sortingType,
+                            directionValue: direction,
+                            value: column.name + this.VALUE_SEPARATOR + direction
+                        });
+                    }, this));
+                }
+            }, this));
+            return options;
         },
 
         /**
          * @returns {orodatagrid.datagrid.SortingDropdown}
          */
         render: function() {
+            this._initCurrentSortableColumn();
             if (!this.enabled) {
                 return this;
             }
             SortingDropdown.__super__.render.call(this);
 
+            var select2Config = {
+                dropdownCssClass: _.result(this, 'dropdownClassName'),
+                dropdownAutoWidth: true
+            };
+            var searchCapabilityGate =  this.SEARCH_CAPABILITY_GATE;
+            if (!this.hasSortingOrderButton) {
+                searchCapabilityGate = Math.floor(searchCapabilityGate / this.DIRECTIONS.length);
+            }
+
+            if (this.columns.where({sortable: true, renderable: true}).length < searchCapabilityGate) {
+                select2Config.minimumResultsForSearch = -1;
+            }
+
+            this.subview('select2', new Select2View({
+                el: this.$('select'),
+                select2Config: select2Config
+            }));
+
+            this._updateDisplayDirection();
+
             return this;
-        }
+        },
     });
 
     return SortingDropdown;

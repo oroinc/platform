@@ -167,3 +167,20 @@ Configuration files root node now changed to its plural form `datagrids: ...`.
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
 - Added layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator`.
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
+
+####EntityExtendBundle
+- `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
+    - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
+    - removed property `tableToClassMap` in favour of `tableToClassesMap`
+- `Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsBuilder
+    - construction signature was changed now it takes next arguments:
+        `EntityMetadataHelper` $entityMetadataHelper,
+        `FieldTypeHelper` $fieldTypeHelper,
+        `ConfigManager` $configManager
+    - removed property `tableToEntityMap` in favour of `tableToEntitiesMap`
+    - renamed method `getEntityClassName` in favour of `getEntityClassNames`
+- `Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser`
+    - construction signature was changed now it takes next arguments:
+        `EntityMetadataHelper` $entityMetadataHelper,
+        `FieldTypeHelper` $fieldTypeHelper,
+        `ConfigManager` $configManager
