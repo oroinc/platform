@@ -35,14 +35,14 @@ abstract class MenuUpdate
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=255)
+     * @ORM\Column(name="title", type="string", length=255, nullable=true)
      */
     protected $title;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="uri", type="string", length=255)
+     * @ORM\Column(name="uri", type="string", length=255, nullable=true)
      */
     protected $uri;
 
@@ -63,21 +63,21 @@ abstract class MenuUpdate
     /**
      * @var int
      *
-     * @ORM\Column(name="owner_id", type="integer")
+     * @ORM\Column(name="owner_id", type="integer", nullable=true)
      */
     protected $ownerId;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_active", type="boolean")
+     * @ORM\Column(name="is_active", type="boolean", nullable=true)
      */
     protected $isActive;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="priority", type="integer")
+     * @ORM\Column(name="priority", type="integer", nullable=true)
      */
     protected $priority;
 
