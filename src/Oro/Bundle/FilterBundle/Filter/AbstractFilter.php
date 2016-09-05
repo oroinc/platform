@@ -13,6 +13,10 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @todo refactor in BAP-11688
+ */
 abstract class AbstractFilter implements FilterInterface
 {
     /** @var FormFactoryInterface */
@@ -102,10 +106,25 @@ abstract class AbstractFilter implements FilterInterface
                 $subQb
                     ->resetDqlPart('orderBy')
                     ->select($fieldExpr)
-                    ->andWhere($comparisonExpr);
-                $dql = $this->createDQLWithReplacedAliases($ds, $subQb);
+                    ->andWhere($comparisonExpr)
+                    ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
+                $groupBy = implode(', ', $this->getSelectFieldFromGroupBy($qb));
+                if ($groupBy) {
+                    // replace aliases from SELECT by expressions, since SELECT clause is changed
+                    $subQb->groupBy($groupBy);
+                }
+                list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
+                list($fieldAlias, $field) = explode('.', $fieldExpr);
+                $replacedFieldExpr = sprintf('%s.%s', $replacements[$fieldAlias], $field);
+                $oldExpr = sprintf('%1$s = %1$s', $replacedFieldExpr);
+                $newExpr = sprintf('%s = %s', $replacedFieldExpr, $fieldExpr);
+                $dql = strtr($dql, [$oldExpr => $newExpr]);
 
-                $subExprs[] = $joinOperator ? $qb->expr()->notIn($fieldExpr, $dql) : $qb->expr()->in($fieldExpr, $dql);
+                $subExpr = $qb->expr()->exists($dql);
+                if ($joinOperator) {
+                    $subExpr = $qb->expr()->not($subExpr);
+                }
+                $subExprs[] = $subExpr;
             }
             $this->applyFilterToClause($ds, call_user_func_array([$qb->expr(), 'andX'], $subExprs));
         } else {
@@ -348,7 +367,7 @@ abstract class AbstractFilter implements FilterInterface
      * @param FilterDatasourceAdapterInterface $ds
      * @param QueryBuilder $qb
      *
-     * @return string
+     * @return [$dql, $replacedAliases]
      */
     protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
     {
@@ -359,20 +378,13 @@ abstract class AbstractFilter implements FilterInterface
                     $ds->generateParameterName($this->getName()),
                 ];
             },
-            $qb->getAllAliases()
+            QueryUtils::getDqlAliases($qb->getDQL())
         );
 
-        return array_reduce(
-            $replacements,
-            function ($carry, array $replacement) {
-                /*
-                 * Replaces old parameter names by newly generated parameter names, so that we don't have
-                 * conflicts in the query.
-                 */
-                return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
-            },
-            $qb->getDql()
-        );
+        return [
+            QueryUtils::replaceDqlAliases($qb->getDQL(), $replacements),
+            array_combine(array_column($replacements, 0), array_column($replacements, 1))
+        ];
     }
 
     /**
@@ -398,7 +410,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function createConditionFieldExprs(QueryBuilder $qb)
     {
-        $groupByFields = $this->getSelectFieldFromGroupBy($qb->getDqlPart('groupBy'));
+        $groupByFields = $this->getSelectFieldFromGroupBy($qb);
         if ($groupByFields) {
             return $groupByFields;
         }
@@ -415,37 +427,47 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * @param Expr\GroupBy[] $groupBy
+     * @param QueryBuilder $qb
      *
      * @return array
      */
-    protected function getSelectFieldFromGroupBy(array $groupBy)
+    protected function getSelectFieldFromGroupBy(QueryBuilder $qb)
     {
+        $groupBy = $qb->getDQLPart('groupBy');
+
         $expressions = [];
         foreach ($groupBy as $groupByPart) {
             foreach ($groupByPart->getParts() as $part) {
-                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($qb, $part));
             }
         }
 
-        return $expressions;
+        $fields = [];
+        foreach ($expressions as $expression) {
+            $fields[] = QueryUtils::getSelectExprByAlias($qb, $expression) ?: $expression;
+        }
+
+        return $fields;
     }
 
     /**
-     * @param string $groupByPart
+     * @param QueryBuilder $qb
+     * @param string       $groupByPart
      *
      * @return array
      */
-    protected function getSelectFieldFromGroupByPart($groupByPart)
+    protected function getSelectFieldFromGroupByPart(QueryBuilder $qb, $groupByPart)
     {
         $expressions = [];
         if (strpos($groupByPart, ',') !== false) {
             $groupByParts = explode(',', $groupByPart);
             foreach ($groupByParts as $part) {
-                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($qb, $part));
             }
         } else {
-            $expressions[] = trim($groupByPart);
+            $trimmedGroupByPart = trim($groupByPart);
+            $expr = QueryUtils::getSelectExprByAlias($qb, $groupByPart);
+            $expressions[] = $expr ?: $trimmedGroupByPart;
         }
 
         return $expressions;
