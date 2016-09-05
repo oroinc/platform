@@ -244,7 +244,7 @@ define(function(require) {
                     _.each(this.DIRECTIONS, _.bind(function(direction) {
                         options.push({
                             label: column.label,
-                            directionType: column.directionType,
+                            sortingType: column.sortingType,
                             directionValue: direction,
                             value: column.name + this.VALUE_SEPARATOR + direction
                         });
