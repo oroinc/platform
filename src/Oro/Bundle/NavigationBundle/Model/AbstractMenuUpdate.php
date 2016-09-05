@@ -28,7 +28,7 @@ abstract class AbstractMenuUpdate
     /**
      * @var string
      *
-     * @ORM\Column(name="parent_key", type="string", length=100)
+     * @ORM\Column(name="parent_key", type="string", length=100, nullable=true)
      */
     protected $parentKey;
 
@@ -63,9 +63,9 @@ abstract class AbstractMenuUpdate
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_active", type="boolean", nullable=true)
+     * @ORM\Column(name="is_active", type="boolean")
      */
-    protected $active;
+    protected $active = true;
 
     /**
      * @var int
