@@ -1,0 +1,37 @@
+placeholders:
+    placeholders:
+        test_block:
+            items:
+                item1:
+                    order: 10
+                item2: ~
+                item3: ~
+                item4:
+                    order: 10
+                item5:
+                    order: 20
+                item6:
+                    order: -10
+                item7:
+                    order: 20
+        test_merge_block: # for test merge placeholders without items attribute (also see in FooBundle)
+            items:
+                item1:
+                    order: 10
+        empty_block: ~
+
+    items:
+        item1:
+            template: TestBundle::test.html.twig
+        item2:
+            action: TestBundle:Test:test2
+        item3:
+            action: TestBundle:Test:test3
+        item4:
+            action: TestBundle:Test:test4
+        item5:
+            action: TestBundle:Test:test5
+        item6:
+            action: TestBundle:Test:test6
+        item7:
+            action: TestBundle:Test:test7

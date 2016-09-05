@@ -175,7 +175,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             'bad - undefined field in api_tree'        => array(
                 'filename'  => 'bad_undefined_field_in_api_tree.yml',
                 'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                'message'   => 'The field "some_field" is used in "system_configuration.section1.some_field",'
                     . ' but it is not defined in "fields" section.',
                 'method'    => 'getTree',
                 'arguments' => array()
@@ -183,7 +183,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             'bad - ui_only field in api_tree'          => array(
                 'filename'  => 'bad_ui_only_field_in_api_tree.yml',
                 'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                'message'   => 'The field "some_field" is used in "system_configuration.section1.some_field",'
                     . ' but "data_type" is not defined in "fields" section.',
                 'method'    => 'getTree',
                 'arguments' => array()

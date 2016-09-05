@@ -6,7 +6,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class BundleConfiguration extends AbstractConfiguration
 {
-    const CONFIG_ROOT_NODE = 'oro_help';
+    const CONFIG_ROOT_NODE = 'help';
 
     /**
      * {@inheritDoc}

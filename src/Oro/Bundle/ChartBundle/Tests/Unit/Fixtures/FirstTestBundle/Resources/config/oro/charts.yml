@@ -1,4 +1,4 @@
-oro_chart:
+charts:
     line_chart:
         label: Line Chart
         data_schema:

@@ -1,4 +1,4 @@
-oro_dashboard_config:
+dashboards:
     widgets:
         second_quick_launchpad:
             route:      second_quick_launchpad_test_route
