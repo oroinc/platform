@@ -4,7 +4,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     'oroui/js/tools/logger',
-    'oroform/js/optional-validation-handler',
+    'oroform/js/optional-validation-groups-handler',
     'jquery.validate'
 ], function($, _, __, tools, logger, validationHandler) {
     'use strict';

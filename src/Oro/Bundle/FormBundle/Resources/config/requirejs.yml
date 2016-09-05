@@ -53,6 +53,7 @@ config:
         'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
+        'oroform/js/optional-validation-groups-handler': 'bundles/oroform/js/optional-validation-groups-handler.js'
 
         #inline editing
         'oroform/js/tools/frontend-type-map': 'bundles/oroform/js/tools/frontend-type-map.js'
