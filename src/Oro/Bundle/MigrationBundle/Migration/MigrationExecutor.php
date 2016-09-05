@@ -14,7 +14,9 @@ use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
+
 use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
 class MigrationExecutor
@@ -85,13 +87,8 @@ class MigrationExecutor
      */
     public function executeUp(array $migrations, $dryRun = false)
     {
-        $platform    = $this->queryExecutor->getConnection()->getDatabasePlatform();
-        $sm          = $this->queryExecutor->getConnection()->getSchemaManager();
-        $schema      = $this->createSchemaObject(
-            $sm->listTables(),
-            $platform->supportsSequences() ? $sm->listSequences() : [],
-            $sm->createSchemaConfig()
-        );
+        $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $schema = $this->getActualSchema();
         $failedMigrations = false;
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
@@ -149,8 +146,19 @@ class MigrationExecutor
 
             $schema = $toSchema;
 
+            $isSchemaUpdateRequired = false;
             foreach ($queries as $query) {
                 $this->queryExecutor->execute($query, $dryRun);
+                if (is_object($query) && $query instanceof SchemaUpdateQuery) {
+                    // check if schema update required
+                    if (!$isSchemaUpdateRequired && $query->isUpdateRequired()) {
+                        $isSchemaUpdateRequired = true;
+                    }
+                }
+            }
+
+            if ($isSchemaUpdateRequired) {
+                $schema = $this->getActualSchema();
             }
         } catch (\Exception $ex) {
             $result = false;
@@ -320,5 +328,20 @@ class MigrationExecutor
         );
 
         return $table;
+    }
+
+    /**
+     * @return Schema
+     */
+    protected function getActualSchema()
+    {
+        $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $sm = $this->queryExecutor->getConnection()->getSchemaManager();
+
+        return $this->createSchemaObject(
+            $sm->listTables(),
+            $platform->supportsSequences() ? $sm->listSequences() : [],
+            $sm->createSchemaConfig()
+        );
     }
 }

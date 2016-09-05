@@ -1,0 +1,30 @@
+oro_menu_config:
+    items:
+        oro_message_queue_job:
+            label: 'oro.message_queue_job.menu.label'
+            route: 'oro_message_queue_root_jobs'
+            extras:
+                position:    60
+                description: 'Job queue'
+                routes:      ['oro_message_queue_*']
+
+        oro_message_queue_job_shortcut:
+            label: 'oro.message_queue_job.menu.shortcut.label'
+            route: 'oro_message_queue_root_jobs'
+            extras:
+                description: 'oro.message_queue_job.menu.shortcut.description'
+
+    tree:
+        application_menu:
+            children:
+                system_tab:
+                    children:
+                        oro_message_queue_job: ~
+
+        shortcuts:
+            children:
+                oro_message_queue_job_shortcut: ~
+
+oro_titles:
+    oro_message_queue_root_jobs: ~
+    oro_message_queue_child_jobs: 'Job "%%name%%"'
