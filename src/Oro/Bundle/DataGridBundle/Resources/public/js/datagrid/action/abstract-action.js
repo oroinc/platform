@@ -88,6 +88,9 @@ define([
             empty_selection: 'Please, select item to perform action.'
         },
 
+        /** @property {Object} */
+        configuration: {},
+
         /**
          * Initialize view
          *
@@ -98,8 +101,8 @@ define([
             if (!options.datagrid) {
                 throw new TypeError('"datagrid" is required');
             }
-            if (options.config) {
-                $.extend(true, this, options.config);
+            if (options.configuration) {
+                this.configuration = $.extend(true, {}, this.configuration, options.configuration);
             }
             if (options.order) {
                 this.order = options.order;

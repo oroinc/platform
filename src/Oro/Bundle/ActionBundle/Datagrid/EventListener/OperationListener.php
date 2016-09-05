@@ -215,7 +215,7 @@ class OperationListener
         $actionsConfig = $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []);
 
         foreach ($this->operations as $operationName => $operation) {
-            $actionsConfig[$operationName] = $this->getRowsActionsConfig($operation, $operationName);
+            $actionsConfig[$operationName] = $this->getRowsActionsConfig($operation);
         }
 
         $config->offsetSet(DatagridActionExtension::ACTION_KEY, $actionsConfig);
@@ -223,15 +223,14 @@ class OperationListener
 
     /**
      * @param Operation $operation
-     * @param string $operationName
      * @return array
      */
-    protected function getRowsActionsConfig(Operation $operation, $operationName)
+    protected function getRowsActionsConfig(Operation $operation)
     {
         $buttonOptions = $operation->getDefinition()->getButtonOptions();
         $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
 
-        $buttonOptions['data']['options']['operationName'] = $operationName;
+        $datagridOptions = $operation->getDefinition()->getDatagridOptions();
 
         $config = array_merge(
             [
@@ -241,7 +240,7 @@ class OperationListener
                 'link' => '#',
                 'icon' => $icon,
             ],
-            $buttonOptions['data']
+            $datagridOptions['data']
         );
 
         if ($operation->getDefinition()->getOrder()) {

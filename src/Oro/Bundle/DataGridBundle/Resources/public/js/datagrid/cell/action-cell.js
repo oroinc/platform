@@ -158,14 +158,14 @@ define([
          * Creates action
          *
          * @param {Function} Action
-         * @param {Object} config
+         * @param {Object} configuration
          * @protected
          */
-        createAction: function(Action, config) {
+        createAction: function(Action, configuration) {
             return new Action({
                 model: this.model,
                 datagrid: this.column.get('datagrid'),
-                config: config
+                configuration: configuration
             });
         },
 

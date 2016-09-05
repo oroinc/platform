@@ -88,17 +88,19 @@ operations:
             - oro-translation-language-grid
         label: oro.translation.action.import
         order: 20
-        button_options:
-            icon: download-alt
+        datagrid_options:
             data:
                 type: import
                 entity_class: 'Oro\Bundle\TranslationBundle\Entity\Translation'
                 importProcessor: 'oro_translation_translation'
                 importJob: 'language_translations_import_from_csv'
+        button_options:
+            icon: download-alt
+            data:
                 options:
                     refreshPageOnSuccess: $.isDefaultLanguage
                     importTitle: $.importTitle
-                    dataGridName: ~
+                    datagridName: ~
                     routeOptions:
                         language_code: $code
         preactions:
@@ -124,13 +126,15 @@ operations:
             - oro-translation-language-grid
         label: oro.translation.action.export
         order: 30
-        button_options:
-            icon: upload-alt
+        datagrid_options:
             data:
                 type: export
                 entity_class: 'Oro\Bundle\TranslationBundle\Entity\Translation'
                 exportProcessor: 'oro_translation_translation'
                 exportJob: 'language_translations_export_to_csv'
+        button_options:
+            icon: upload-alt
+            data:
                 options:
                     filePrefix: $.filePrefix
                     routeOptions:

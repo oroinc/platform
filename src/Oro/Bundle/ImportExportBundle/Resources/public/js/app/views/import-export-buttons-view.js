@@ -32,6 +32,7 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11701
             this.options = _.defaults(options || {}, this.options);
 
             this.$importButton = this.$el.find(this.options.selectors.importButton);

@@ -26,7 +26,7 @@ define(function(require) {
         initialize: function() {
             ActionWidgetAction.__super__.initialize.apply(this, arguments);
 
-            this.actionManager = new ActionManager(this);
+            this.actionManager = new ActionManager(this.configuration);
         },
 
         /**

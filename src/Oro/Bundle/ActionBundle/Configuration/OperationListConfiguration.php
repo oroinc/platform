@@ -238,6 +238,9 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
                 ->arrayNode('mass_action')
                     ->prototype('variable')->end()
                 ->end()
+                ->arrayNode('data')
+                    ->prototype('variable')->end()
+                ->end()
             ->end()
             ->validate()
                 ->always(function ($config) {

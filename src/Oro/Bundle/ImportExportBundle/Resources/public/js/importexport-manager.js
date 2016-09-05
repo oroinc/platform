@@ -39,7 +39,7 @@ define(function(require) {
             isExportTemplatePopupRequired: false,
 
             filePrefix: null,
-            dataGridName: null,
+            datagridName: null,
             afterRefreshPageMessage: null,
             refreshPageOnSuccess: false,
 
@@ -57,6 +57,7 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
             this.options = _.defaults(options || {}, this.options);
 
             if (this.options.isExportPopupRequired) {
@@ -79,7 +80,7 @@ define(function(require) {
             if (this.options.exportProcessor) {
                 this.exportUrl = this._generateUrl(this.options.exportRoute, routeOptions, {
                     processorAlias: this.options.exportProcessor,
-                    filePrefix: this.options.filePrefix,
+                    filePrefix: this.options.filePrefix
                 });
             }
 
@@ -87,7 +88,7 @@ define(function(require) {
 
             if (this.options.exportTemplateProcessor) {
                 this.exportTemplateUrl = this._generateUrl(this.options.exportTemplateRoute, routeOptions, {
-                    processorAlias: this.options.exportTemplateProcessor,
+                    processorAlias: this.options.exportTemplateProcessor
                 });
             }
         },
@@ -95,10 +96,10 @@ define(function(require) {
         handleImport: function() {
             var widget = this._renderDialogWidget({
                 url: this.importUrl,
-                title: this.options.importTitle,
+                title: this.options.importTitle
             });
 
-            if (!_.isEmpty(this.options.dataGridName) || this.options.refreshPageOnSuccess) {
+            if (!_.isEmpty(this.options.datagridName) || this.options.refreshPageOnSuccess) {
                 var self = this;
 
                 widget.on('importComplete', function(data) {
@@ -114,8 +115,8 @@ define(function(require) {
                                 });
                             }
                             mediator.execute('refreshPage');
-                        } else if (!_.isEmpty(self.options.dataGridName)) {
-                            mediator.trigger('datagrid:doRefresh:' + self.options.dataGridName);
+                        } else if (!_.isEmpty(self.options.datagridName)) {
+                            mediator.trigger('datagrid:doRefresh:' + self.options.datagridName);
                         }
                     }
                 });
@@ -126,9 +127,10 @@ define(function(require) {
             if (this.options.isExportPopupRequired) {
                 this._renderDialogWidget({
                     url: this.exportUrl,
-                    title: this.options.exportTitle,
+                    title: this.options.exportTitle
                 });
             } else {
+                // move this logic to exportHandler
                 var exportStartedMessage = exportHandler.startExportNotificationMessage();
                 $.getJSON(this.exportUrl, function(data) {
                     exportStartedMessage.close();

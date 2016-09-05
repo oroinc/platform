@@ -1,16 +1,17 @@
 define([
-    'underscore',
     'jquery',
-    './model-action',
+    '../model-action',
     'oroimportexport/js/importexport-manager'
-], function(_, $, ModelAction, ImportExportManager) {
+], function($, ModelAction, ImportExportManager) {
     'use strict';
 
     return ModelAction.extend({
         /** @property {Object} */
-        options: {
-            dataGridName: undefined,
-            routeOptions: {}
+        configuration: {
+            options: {
+                datagridName: undefined,
+                routeOptions: {}
+            }
         },
 
         /** @property {String} */
@@ -34,13 +35,14 @@ define([
          * @inheritDoc
          */
         initialize: function() {
+            // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11703
             ModelAction.__super__.initialize.apply(this, arguments);
 
-            if (this.options.dataGridName === null) {
-                this.options.dataGridName = this.datagrid.name;
+            if (this.configuration.options.datagridName === null) {
+                this.configuration.options.datagridName = this.datagrid.name;
             }
 
-            var options = $.extend(this.extractVars(this.options), {
+            var options = $.extend({}, this.configuration.options, {
                 entity: this.entity_class,
                 importProcessor: this.importProcessor,
                 importJob: this.importJob,
@@ -75,29 +77,6 @@ define([
             delete this.importExportManager;
 
             ModelAction.__super__.dispose.call(this);
-        },
-
-        /**
-         * @param {Object} opts
-         * @returns {Object}
-         */
-        extractVars: function(opts) {
-            var options = $.extend({}, opts);
-            _.each(options, function(value, key) {
-                switch (typeof value) {
-                    case 'string':
-                        var variable = value.substr(1);
-                        if ('$' === value[0] && this.model.has(variable)) {
-                            options[key] = this.model.get(variable);
-                        }
-                        break;
-                    case 'object':
-                        options[key] = this.extractVars(value);
-                        break;
-                }
-            }, this);
-
-            return options;
         }
     });
 });

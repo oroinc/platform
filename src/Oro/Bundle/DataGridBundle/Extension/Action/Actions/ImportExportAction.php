@@ -20,7 +20,7 @@ abstract class ImportExportAction extends AbstractAction
         $options = parent::getOptions();
 
         $options->merge([
-            'frontend_type' => 'importexport',
+            'frontend_type' => 'row/importexport',
             'type' => $this->getType(),
         ]);
 
