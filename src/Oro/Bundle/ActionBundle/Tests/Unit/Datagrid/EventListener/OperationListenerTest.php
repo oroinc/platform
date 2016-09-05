@@ -249,12 +249,13 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     true,
                     [
                         'getName' => 'action3',
-                        'getLabel' => 'Action 3 label'
+                        'getLabel' => 'Action 3 label',
+                        'getDatagridOptions' => ['data' => ['key1' => 'value1']]
                     ]
                 )],
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'actions' => ['action3' => $this->getRowActionConfig('action3', 'Action 3 label')],
+                    'actions' => ['action3' => $this->getRowActionConfig('Action 3 label', ['key1' => 'value1'])],
                 ]
             ],
             'should not replace existing default action' => [
@@ -277,7 +278,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 'expectedConfiguration' => [
                     'actions' => [
                         'action3' => ['label' => 'default action3'],
-                        'test_operation' => $this->getRowActionConfig('test_operation'),
+                        'test_operation' => $this->getRowActionConfig(),
                     ]
                 ]
             ],
@@ -385,22 +386,19 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $action
      * @param string $label
+     * @param array $data
      * @return array
      */
-    protected function getRowActionConfig($action, $label = null)
+    protected function getRowActionConfig($label = null, array $data = [])
     {
-        return [
+        return array_merge([
             'type' => 'action-widget',
             'label' => $label,
             'rowAction' => false,
             'link' => '#',
             'icon' => 'edit',
-            'options' => [
-                'operationName' => $action,
-            ]
-        ];
+        ], $data);
     }
 
     /**

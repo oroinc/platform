@@ -92,7 +92,8 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'data' => []
                         ],
                         'datagrid_options' => [
-                            'mass_action' => []
+                            'mass_action' => [],
+                            'data' => [],
                         ]
                     ]
                 ]
@@ -138,7 +139,10 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'datagrid_options' => [
                             'mass_action' => [
                                 'icon' => 'test'
-                            ]
+                            ],
+                            'data' => [
+                                'key1' => 'value1'
+                            ],
                         ],
                         'form_options' => [
                             'attribute_fields' => [
@@ -254,6 +258,9 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'datagrid_options' => [
                             'mass_action' => [
                                 'icon' => 'test'
+                            ],
+                            'data' => [
+                                'key1' => 'value1'
                             ]
                         ],
                     ]

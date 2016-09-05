@@ -22,7 +22,7 @@ class ImportActionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             ActionConfiguration::create([
-                'frontend_type' => 'importexport',
+                'frontend_type' => 'row/importexport',
                 'type' => ImportAction::TYPE_IMPORT,
             ]),
             $this->action->getOptions()

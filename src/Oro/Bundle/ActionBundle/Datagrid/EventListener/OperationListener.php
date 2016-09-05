@@ -240,7 +240,7 @@ class OperationListener
                 'link' => '#',
                 'icon' => $icon,
             ],
-            $datagridOptions['data']
+            isset($datagridOptions['data']) ? $datagridOptions['data'] : []
         );
 
         if ($operation->getDefinition()->getOrder()) {
