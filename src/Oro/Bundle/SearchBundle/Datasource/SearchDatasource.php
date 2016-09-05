@@ -12,6 +12,7 @@ use Oro\Bundle\SearchBundle\Event\SearchResultAfter;
 use Oro\Bundle\SearchBundle\Event\SearchResultBefore;
 use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class SearchDatasource implements DatasourceInterface
 {
@@ -56,13 +57,18 @@ class SearchDatasource implements DatasourceInterface
     public function getResults()
     {
         $results = $this->query->execute();
+        /** @var Item[] $results */
 
         $event = new SearchResultBefore($this->datagrid, $this->query);
         $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
 
         $rows = [];
         foreach ($results as $result) {
-            $rows[] = new ResultRecord($result);
+            $resultRecord = new ResultRecord($result);
+            if ($result instanceof Item) {
+                $resultRecord->addData($result->getSelectedData());
+            }
+            $rows[] = $resultRecord;
         }
 
         $event = new SearchResultAfter($this->datagrid, $rows, $this->query);

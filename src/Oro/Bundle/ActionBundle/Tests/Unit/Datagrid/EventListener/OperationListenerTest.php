@@ -12,6 +12,7 @@ use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
@@ -207,7 +208,12 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'configure with provider' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['test_operation' => $this->createOperation(
                     'test_operation',
                     true,
@@ -221,7 +227,12 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'configure with single mass action' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['test_operation' => $this->createOperation(
                     'test_operation',
                     true,
@@ -235,7 +246,12 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'configure with single action' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['action3' => $this->createOperation(
                     'action3',
                     true,
@@ -250,7 +266,16 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'should not replace existing default action' => [
-                'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
+                'config' => DatagridConfiguration::create([
+                    'actions' => [
+                        'action3' => [
+                            'label' => 'default action3'
+                        ]
+                    ],
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['action3' => $this->createOperation(
                     'action3',
                     true,
@@ -274,7 +299,12 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'not configure' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => [],
                 'expected' => false
             ]
@@ -336,6 +366,9 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'view' => ['key1' => 'value1'],
                         'update' => false,
                     ],
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => [
@@ -359,6 +392,9 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                             'update' => true,
                         ];
                     },
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => [
