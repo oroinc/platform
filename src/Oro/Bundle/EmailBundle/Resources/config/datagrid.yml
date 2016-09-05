@@ -78,10 +78,6 @@ datagrid:
         acl_resource: oro_email_email_user_view
         source:
             type: orm
-            count_query:
-                select:
-                    - DISTINCT(eu.id)
-                groupBy: ~
             query:
                 select:
                     - partial eu.{id, email}
@@ -131,15 +127,8 @@ datagrid:
                             alias: eb
                 where:
                     and:
-                        - >
-                            EXISTS(
-                                SELECT 1
-                                FROM OroEmailBundle:EmailOrigin _eo
-                                JOIN _eo.folders _f
-                                JOIN _f.emailUsers _eu
-                                WHERE _eo.isActive = true AND _eu.id = eu.id
-                            )
-                groupBy: eu.id
+                        - o.isActive = true
+                groupBy: e.sentAt, eu.id
 
         columns:
             contacts:
