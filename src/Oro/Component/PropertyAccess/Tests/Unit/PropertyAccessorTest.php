@@ -14,6 +14,7 @@ use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Ticket5775Object;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
