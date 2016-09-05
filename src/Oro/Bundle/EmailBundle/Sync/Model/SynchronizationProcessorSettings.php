@@ -10,6 +10,10 @@ class SynchronizationProcessorSettings
     /** @var bool Allows to define show or hide log messages during resync of emails */
     protected $showMessage = false;
 
+    /**
+     * @param bool $forceMode
+     * @param bool $showMessage
+     */
     public function __construct($forceMode = false, $showMessage = false)
     {
         $this->forceMode = $forceMode;
