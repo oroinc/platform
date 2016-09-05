@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Model;
+namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-abstract class MenuUpdate
+abstract class AbstractMenuUpdate
 {
     const OWNERSHIP_GLOBAL        = 1;
     const OWNERSHIP_ORGANIZATION  = 2;
@@ -28,16 +28,9 @@ abstract class MenuUpdate
     /**
      * @var string
      *
-     * @ORM\Column(name="parent_id", type="string", length=100)
+     * @ORM\Column(name="parent_key", type="string", length=100, nullable=true)
      */
-    protected $parentId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="title", type="string", length=255, nullable=true)
-     */
-    protected $title;
+    protected $parentKey;
 
     /**
      * @var string
@@ -70,9 +63,9 @@ abstract class MenuUpdate
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_active", type="boolean", nullable=true)
+     * @ORM\Column(name="is_active", type="boolean")
      */
-    protected $isActive;
+    protected $active = true;
 
     /**
      * @var int
@@ -82,7 +75,7 @@ abstract class MenuUpdate
     protected $priority;
 
     /**
-     * Get array of extra data that is not declared in MenuUpdate model
+     * Get array of extra data that is not declared in AbstractMenuUpdate model
      * @return array
      */
     abstract public function getExtras();
@@ -96,17 +89,6 @@ abstract class MenuUpdate
     }
 
     /**
-     * @param int $id
-     * @return MenuUpdate
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getKey()
@@ -116,7 +98,7 @@ abstract class MenuUpdate
 
     /**
      * @param string $key
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setKey($key)
     {
@@ -128,37 +110,18 @@ abstract class MenuUpdate
     /**
      * @return string
      */
-    public function getParentId()
+    public function getParentKey()
     {
-        return $this->parentId;
+        return $this->parentKey;
     }
 
     /**
-     * @param string $parentId
-     * @return MenuUpdate
+     * @param string $parentKey
+     * @return AbstractMenuUpdate
      */
-    public function setParentId($parentId)
+    public function setParentKey($parentKey)
     {
-        $this->parentId = $parentId;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * @param string $title
-     * @return MenuUpdate
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
+        $this->parentKey = $parentKey;
 
         return $this;
     }
@@ -173,7 +136,7 @@ abstract class MenuUpdate
 
     /**
      * @param string $uri
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setUri($uri)
     {
@@ -192,7 +155,7 @@ abstract class MenuUpdate
 
     /**
      * @param string $menu
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setMenu($menu)
     {
@@ -211,7 +174,7 @@ abstract class MenuUpdate
 
     /**
      * @param int $ownershipType
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setOwnershipType($ownershipType)
     {
@@ -230,7 +193,7 @@ abstract class MenuUpdate
 
     /**
      * @param int $ownerId
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setOwnerId($ownerId)
     {
@@ -242,18 +205,18 @@ abstract class MenuUpdate
     /**
      * @return boolean
      */
-    public function isIsActive()
+    public function isActive()
     {
-        return $this->isActive;
+        return $this->active;
     }
 
     /**
-     * @param boolean $isActive
-     * @return MenuUpdate
+     * @param boolean $active
+     * @return AbstractMenuUpdate
      */
-    public function setIsActive($isActive)
+    public function setActive($active)
     {
-        $this->isActive = $isActive;
+        $this->active = $active;
 
         return $this;
     }
@@ -268,7 +231,7 @@ abstract class MenuUpdate
 
     /**
      * @param int $priority
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setPriority($priority)
     {
