@@ -76,13 +76,13 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->once())
             ->method('add')
             ->with(
-                'parent_import_namespace_import_namespace_id',
-                'parent_import_namespace_import_namespace_parentId',
+                'import_namespace_id',
+                'import_namespace_parentId',
                 'block',
                 [
                     'additional_block_prefixes' => ['__import_id__id', '__parent_import_id__id']
                 ],
-                'parent_import_namespace_import_namespace_siblingId'
+                'import_namespace_siblingId'
             );
 
         $this->importLayoutManipulator->add('__id', '__parentId', 'block', [], '__siblingId');
@@ -125,7 +125,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('remove')
-            ->with('parent_import_namespace_import_namespace_id');
+            ->with('import_namespace_id');
 
         $this->importLayoutManipulator->remove('__id');
     }
@@ -169,9 +169,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->once())
             ->method('move')
             ->with(
-                'parent_import_namespace_import_namespace_id',
-                'parent_import_namespace_import_namespace_parentId',
-                'parent_import_namespace_import_namespace_siblingId'
+                'import_namespace_id',
+                'import_namespace_parentId',
+                'import_namespace_siblingId'
             );
 
         $this->importLayoutManipulator->move('__id', '__parentId', '__siblingId');
@@ -214,7 +214,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('addAlias')
-            ->with('parent_import_namespace_import_namespace_alias', 'parent_import_namespace_import_namespace_id');
+            ->with('import_namespace_alias', 'import_namespace_id');
 
         $this->importLayoutManipulator->addAlias('__alias', '__id');
     }
@@ -256,7 +256,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('removeAlias')
-            ->with('parent_import_namespace_import_namespace_alias');
+            ->with('import_namespace_alias');
 
         $this->importLayoutManipulator->removeAlias('__alias');
     }
@@ -298,7 +298,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('setOption')
-            ->with('parent_import_namespace_import_namespace_id', 'optionName', 'optionValue');
+            ->with('import_namespace_id', 'optionName', 'optionValue');
 
         $this->importLayoutManipulator->setOption('__id', 'optionName', 'optionValue');
     }
@@ -340,7 +340,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('appendOption')
-            ->with('parent_import_namespace_import_namespace_id', 'optionName', 'optionValue');
+            ->with('import_namespace_id', 'optionName', 'optionValue');
 
         $this->importLayoutManipulator->appendOption('__id', 'optionName', 'optionValue');
     }
@@ -382,7 +382,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('subtractOption')
-            ->with('parent_import_namespace_import_namespace_id', 'optionName', 'optionValue');
+            ->with('import_namespace_id', 'optionName', 'optionValue');
 
         $this->importLayoutManipulator->subtractOption('__id', 'optionName', 'optionValue');
     }
@@ -424,7 +424,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('replaceOption')
-            ->with('parent_import_namespace_import_namespace_id', 'optionName', 'optionValue', 'newOptionValue');
+            ->with('import_namespace_id', 'optionName', 'optionValue', 'newOptionValue');
 
         $this->importLayoutManipulator->replaceOption('__id', 'optionName', 'optionValue', 'newOptionValue');
     }
@@ -466,7 +466,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('removeOption')
-            ->with('parent_import_namespace_import_namespace_id', 'optionName');
+            ->with('import_namespace_id', 'optionName');
 
         $this->importLayoutManipulator->removeOption('__id', 'optionName');
     }
@@ -508,7 +508,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('changeBlockType')
-            ->with('parent_import_namespace_import_namespace_id', 'optionName', 'optionValue');
+            ->with('import_namespace_id', 'optionName', 'optionValue');
 
         $this->importLayoutManipulator->changeBlockType('__id', 'optionName', 'optionValue');
     }
@@ -550,7 +550,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $this->layoutManipulator->expects($this->once())
             ->method('setBlockTheme')
-            ->with('block_theme', 'parent_import_namespace_import_namespace_id');
+            ->with('block_theme', 'import_namespace_id');
 
         $this->importLayoutManipulator->setBlockTheme('block_theme', '__id');
     }
