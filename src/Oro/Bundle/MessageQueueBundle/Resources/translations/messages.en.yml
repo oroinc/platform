@@ -1,0 +1,40 @@
+oro:
+    message_queue_job:
+        rest:
+            job_interrupted: Job interrupted
+        action:
+            job_management: Access job queue
+
+        grid:
+            action:
+                interrupt: Interrupt
+            columns:
+                id: ID
+                name: Name
+                status: Status
+                unique: Unique
+                interrupted: Interrupted
+                createdAt: Created At
+                startedAt: Started At
+                stoppedAt: Stopped At
+
+        menu:
+            label: Job Queue
+            shortcut.label: Jobs List
+            shortcut.description: List of jobs
+
+        header:
+            root_jobs: Jobs List
+            child_jobs: Child Jobs List
+            startedAt: Started At
+            stoppedAt: Stopped At
+            unique: Unique
+            interrupted: Interrupted
+            name: Job "%name%"
+
+        status:
+            new: New
+            cancelled: Cancelled
+            running: Running
+            success: Success
+            failed: Failed
