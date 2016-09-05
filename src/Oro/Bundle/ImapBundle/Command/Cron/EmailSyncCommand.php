@@ -102,7 +102,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
                 'vvv',
                 null,
                 InputOption::VALUE_NONE,
-                'THis option allows show the log messages during resync email'
+                'This option allows show the log messages during resync email'
             );
     }
 
