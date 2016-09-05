@@ -51,6 +51,7 @@ oro.translation:
         tooltip:
             translation_completeness: "Translation coverage indicator relates to translation package volume. Some bundles may still not be translated."
 
+# TODO: ImportExport doesn't support customize prefixes for processor labels https://magecore.atlassian.net/browse/BAP-11704
 oro.importexport:
     import:
         oro_translation_translation:

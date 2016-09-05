@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var ImportExportManager = require('oroimportexport/js/importexport-manager');
 
+    // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11701
     ImportExportButtonsView = BaseView.extend({
         /**
          * @property {Object}
@@ -32,7 +33,6 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11701
             this.options = _.defaults(options || {}, this.options);
 
             this.$importButton = this.$el.find(this.options.selectors.importButton);

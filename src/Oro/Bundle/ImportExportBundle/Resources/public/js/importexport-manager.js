@@ -10,6 +10,7 @@ define(function(require) {
     var DialogWidget = require('oro/dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
 
+    // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
     var ImportExportManager = function(options) {
         this.initialize(options);
     };
@@ -23,6 +24,8 @@ define(function(require) {
 
             importTitle: 'Import',
             importRoute: 'oro_importexport_import_form',
+            importJob: null,
+            importValidateJob: null,
 
             exportTitle: 'Export',
             exportProcessor: null,
@@ -43,32 +46,30 @@ define(function(require) {
             afterRefreshPageMessage: null,
             refreshPageOnSuccess: false,
 
-            routeOptions: {}
+            routeOptions: {},
+
+            dialogOptions: {
+                stateEnabled: false,
+                incrementalPosition: false,
+                dialogOptions: {
+                    width: 650,
+                    autoResize: true,
+                    modal: true,
+                    minHeight: 100
+                }
+            }
         },
 
-        /** @property {String} */
-        importUrl: null,
-        /** @property {String} */
-        exportUrl: null,
-        /** @property {String} */
-        exportTemplateUrl: null,
+        /** @property {Object} */
+        routeOptions: {},
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
             this.options = _.defaults(options || {}, this.options);
 
-            if (this.options.isExportPopupRequired) {
-                this.options.exportRoute = this.options.exportConfigRoute;
-            }
-
-            if (this.options.isExportTemplatePopupRequired) {
-                this.options.exportTemplateRoute = this.options.exportTemplateConfigRoute;
-            }
-
-            var routeOptions = {
+            this.routeOptions = {
                 options: this.options.routeOptions,
                 entity: this.options.entity,
                 importJob: this.options.importJob,
@@ -76,26 +77,11 @@ define(function(require) {
                 exportJob: this.options.exportJob,
                 exportTemplateJob: this.options.exportTemplateJob
             };
-
-            if (this.options.exportProcessor) {
-                this.exportUrl = this._generateUrl(this.options.exportRoute, routeOptions, {
-                    processorAlias: this.options.exportProcessor,
-                    filePrefix: this.options.filePrefix
-                });
-            }
-
-            this.importUrl = this._generateUrl(this.options.importRoute, routeOptions, {});
-
-            if (this.options.exportTemplateProcessor) {
-                this.exportTemplateUrl = this._generateUrl(this.options.exportTemplateRoute, routeOptions, {
-                    processorAlias: this.options.exportTemplateProcessor
-                });
-            }
         },
 
         handleImport: function() {
             var widget = this._renderDialogWidget({
-                url: this.importUrl,
+                url: routing.generate(this.options.importRoute, $.extend({}, this.routeOptions)),
                 title: this.options.importTitle
             });
 
@@ -124,40 +110,64 @@ define(function(require) {
         },
 
         handleExport: function() {
+            if (!this.options.exportProcessor) {
+                throw new TypeError('"exportProcessor" is required');
+            }
+
             if (this.options.isExportPopupRequired) {
+                var exportUrl = routing.generate(this.options.exportConfigRoute, $.extend({}, this.routeOptions, {
+                    processorAlias: this.options.exportProcessor,
+                    filePrefix: this.options.filePrefix
+                }));
+
                 this._renderDialogWidget({
-                    url: this.exportUrl,
+                    url: exportUrl,
                     title: this.options.exportTitle
                 });
             } else {
-                // move this logic to exportHandler
+                var exportUrl = routing.generate(this.options.exportRoute, $.extend({}, this.routeOptions, {
+                    processorAlias: this.options.exportProcessor,
+                    filePrefix: this.options.filePrefix
+                }));
+
                 var exportStartedMessage = exportHandler.startExportNotificationMessage();
-                $.getJSON(this.exportUrl, function(data) {
-                    exportStartedMessage.close();
-                    exportHandler.handleExportResponse(data);
-                });
+                $.getJSON(
+                    exportUrl,
+                    function(data) {
+                        exportStartedMessage.close();
+                        exportHandler.handleExportResponse(data);
+                    }
+                );
             }
         },
 
         handleTemplate: function() {
+            if (!this.options.exportTemplateProcessor) {
+                throw new TypeError('"exportTemplateProcessor" is required');
+            }
+
             if (this.options.isExportTemplatePopupRequired) {
+                var exportTemplateUrl = routing.generate(
+                    this.options.exportTemplateConfigRoute,
+                    $.extend({}, this.routeOptions, {
+                        processorAlias: this.options.exportTemplateProcessor
+                    })
+                );
+
                 this._renderDialogWidget({
-                    url: this.exportTemplateUrl,
+                    url: exportTemplateUrl,
                     title: this.options.exportTemplateTitle
                 });
             } else {
-                window.open(this.exportTemplateUrl);
-            }
-        },
+                var exportTemplateUrl = routing.generate(
+                    this.options.exportTemplateRoute,
+                    $.extend({}, this.routeOptions, {
+                        processorAlias: this.options.exportTemplateProcessor
+                    })
+                );
 
-        /**
-         * @param {String} route
-         * @param {Object} defaultOptions
-         * @param {Object} options
-         * @returns {String}
-         */
-        _generateUrl: function(route, defaultOptions, options) {
-            return routing.generate(route, $.extend({}, defaultOptions, options));
+                window.open(exportTemplateUrl);
+            }
         },
 
         /**
@@ -165,16 +175,7 @@ define(function(require) {
          * @returns {DialogWidget}
          */
         _renderDialogWidget: function(options) {
-            var opts = _.defaults({
-                stateEnabled: false,
-                incrementalPosition: false,
-                dialogOptions: {
-                    width: 650,
-                    autoResize: true,
-                    modal: true,
-                    minHeight: 100
-                }
-            }, options);
+            var opts = $.extend({}, this.options.dialogOptions, options);
 
             var widget = new DialogWidget(opts);
 

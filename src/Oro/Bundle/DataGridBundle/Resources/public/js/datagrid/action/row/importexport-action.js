@@ -5,7 +5,8 @@ define([
 ], function($, ModelAction, ImportExportManager) {
     'use strict';
 
-    return ModelAction.extend({
+    // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11703
+    var ImportExportAction = ModelAction.extend({
         /** @property {Object} */
         configuration: {
             options: {
@@ -35,8 +36,7 @@ define([
          * @inheritDoc
          */
         initialize: function() {
-            // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11703
-            ModelAction.__super__.initialize.apply(this, arguments);
+            ImportExportAction.__super__.initialize.apply(this, arguments);
 
             if (this.configuration.options.datagridName === null) {
                 this.configuration.options.datagridName = this.datagrid.name;
@@ -76,7 +76,9 @@ define([
 
             delete this.importExportManager;
 
-            ModelAction.__super__.dispose.call(this);
+            ImportExportAction.__super__.dispose.call(this);
         }
     });
+
+    return ImportExportAction;
 });
