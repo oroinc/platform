@@ -138,4 +138,37 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($testString, $result);
     }
+
+    public function testAddingSelect()
+    {
+        $query = new Query();
+        $query->addSelect('name', Query::TYPE_TEXT);
+        $query->addSelect('name', Query::TYPE_TEXT); // testing handing doubles
+        $query->addSelect('datetime.date', Query::TYPE_DECIMAL); // enforced type
+        $query->addSelect('integer.number'); // type guessing by prefix
+        $query->addSelect('sku'); // default type should be `text`
+
+        $this->assertCount(4, $query->getSelect());
+        $this->assertEquals(
+            [
+                'text.name',
+                'decimal.date',
+                'integer.number',
+                'text.sku'
+            ],
+            $query->getSelect()
+        );
+    }
+
+    public function testStringQueryWithSelect()
+    {
+        $query = new Query();
+        $this->assertEquals('', $query->getStringQuery());
+        $query->from('*');
+        $this->assertEquals('from *', $query->getStringQuery());
+        $query->select('language');
+        $this->assertEquals('select text.language from *', $query->getStringQuery());
+        $query->addSelect('organization', 'integer');
+        $this->assertEquals('select (text.language, integer.organization) from *', $query->getStringQuery());
+    }
 }

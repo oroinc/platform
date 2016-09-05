@@ -40,27 +40,34 @@ response:
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item3@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item4@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item5@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item6@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item7@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item8@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item9@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []

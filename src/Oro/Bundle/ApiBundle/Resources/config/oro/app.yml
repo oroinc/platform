@@ -68,6 +68,7 @@ oro_api:
         - form.type_extension.form.validator
         - form.type_extension.repeated.validator
         - form.type_extension.form.data_collector
+        - oro_security.form.extension.aclprotected_fields_type
 
     form_type_guessers:
         - form.type_guesser.validator

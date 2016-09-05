@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Update\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateRequestData as BaseProcessor;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Validates that the request data contains valid JSON.API object.

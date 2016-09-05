@@ -12,7 +12,6 @@ parameters:
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
     oro_action.layout.data_provider.actions_data_rpovider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsProvider
@@ -137,8 +136,8 @@ services:
             - ''
             - '@doctrine.orm.entity_manager'
 
-    oro_action.datagrid.extension.operation:
-        class: %oro_action.datagrid.operation_extension.class%
+    oro_action.datagrid.event_listener.operation:
+        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\OperationListener'
         arguments:
             - '@oro_action.operation_manager'
             - '@oro_action.helper.context'
@@ -148,7 +147,7 @@ services:
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
-            - { name: oro_datagrid.extension }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.extension.action.configure-actions.before, method: onConfigureActions }
         lazy: true
 
     oro_action.datagrid.extension.delete_mass_action:

@@ -36,7 +36,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
     public function isVirtualRelation($className, $fieldName)
     {
         return in_array($fieldName, [self::ITEMS_RELATION_NAME, self::STEPS_RELATION_NAME], true)
-            && $this->workflowRegistry->getActiveWorkflowsByEntityClass($className)->isEmpty() === false;
+            && $this->workflowRegistry->hasActiveWorkflowsByEntityClass($className);
     }
 
     /**
@@ -44,7 +44,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
      */
     public function getVirtualRelations($className)
     {
-        if ($this->workflowRegistry->getActiveWorkflowsByEntityClass($className)->isEmpty()) {
+        if (!$this->workflowRegistry->hasActiveWorkflowsByEntityClass($className)) {
             return [];
         }
 

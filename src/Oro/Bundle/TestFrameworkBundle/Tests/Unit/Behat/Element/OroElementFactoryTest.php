@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Element;
 
 use Behat\Mink\Mink;
+use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 
@@ -42,7 +43,7 @@ class OroElementFactoryTest extends \PHPUnit_Framework_TestCase
         );
         $mink = new Mink(['default' => $session]);
         $mink->setDefaultSessionName('default');
-        $factory = new OroElementFactory($mink, $configuration);
+        $factory = new OroElementFactory($mink, new SelectorsHandler(), $configuration);
 
         return $factory;
     }
