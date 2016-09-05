@@ -1,0 +1,15 @@
+{% set job = record.rootEntity %}
+
+{% if job.status is constant('STATUS_RUNNING', job) %}
+    {% set class = 'label-info' %}
+{% elseif job.status is constant('STATUS_SUCCESS', job) %}
+    {% set class = 'label-success' %}
+{% elseif job.status is constant('STATUS_FAILED', job) %}
+    {% set class = 'label-warning' %}
+{% elseif job.status is constant('STATUS_CANCELLED', job) %}
+    {% set class = 'label-inverse' %}
+{% else %}
+    {% set class = '' %}
+{% endif %}
+
+<span class="label {{ class }}">{{ job.status|trans }}</span>
