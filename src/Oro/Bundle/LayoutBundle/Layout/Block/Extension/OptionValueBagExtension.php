@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
+use Symfony\Component\Finder\Expression\Expression;
+
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ArrayOptionValueBuilder;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
@@ -31,9 +34,9 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data)
+    public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-        if ($options['resolve_value_bags'] && false === $context->getOr('expressions_evaluate_deferred')) {
+        if ($options['resolve_value_bags']) {
             $this->resolveValueBags($options);
         }
     }
@@ -41,21 +44,25 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if ($options['resolve_value_bags'] && true === $block->getContext()->getOr('expressions_evaluate_deferred')) {
+        $exprEvaluate = $block->getContext()->getOr('expressions_evaluate');
+        if ($options['resolve_value_bags'] && $exprEvaluate) {
             $this->resolveValueBags($view->vars);
         }
     }
 
     /**
-     * @param array $options
-     * @return array
+     * @param Options $options
+     * @return Options
      */
-    protected function resolveValueBags(array &$options)
+    protected function resolveValueBags(Options $options)
     {
         foreach ($options as $key => $value) {
-            if (is_array($value)) {
+            if ($value instanceof Expression) {
+                continue;
+            }
+            if ($value instanceof Options) {
                 $options[$key] = $this->resolveValueBags($value);
             } elseif ($value instanceof OptionValueBag) {
                 $options[$key] = $value->buildValue($this->getOptionsBuilder($value, $options));
@@ -67,10 +74,10 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
 
     /**
      * @param OptionValueBag $valueBag
-     * @param array $options
+     * @param Options $options
      * @return OptionValueBuilderInterface
      */
-    protected function getOptionsBuilder(OptionValueBag $valueBag, array $options)
+    protected function getOptionsBuilder(OptionValueBag $valueBag, Options $options)
     {
         $isArray = false;
 

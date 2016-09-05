@@ -28,4 +28,12 @@ trait ElementFactoryDictionary
     {
         return $this->elementFactory->createElement($name);
     }
+
+    /**
+     * @return OroElement
+     */
+    public function getPage()
+    {
+        return $this->elementFactory->getPage();
+    }
 }

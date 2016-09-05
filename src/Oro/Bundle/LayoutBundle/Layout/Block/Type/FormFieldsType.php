@@ -10,6 +10,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options as LayoutOptions;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
@@ -77,10 +78,10 @@ class FormFieldsType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, LayoutOptions $options)
     {
-        $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
         if ($options['split_to_fields']) {
+            $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
             $this->formLayoutBuilder->build($formAccessor, $builder, $options);
         }
     }
@@ -88,9 +89,9 @@ class FormFieldsType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
-        $view->vars['form_data'] = isset($options['form_data']) ? $options['form_data'] : null;
+        $view->vars['form_data'] = $options['form_data'];
 
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
         if ($formAccessor instanceof ConfigurableFormAccessorInterface) {
@@ -109,7 +110,7 @@ class FormFieldsType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
         if (!$options['split_to_fields']) {
             return;

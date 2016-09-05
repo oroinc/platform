@@ -16,3 +16,4 @@ response:
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item5@mail.com
                 recordUrl: http://localhost/search/
+                selectedData: []

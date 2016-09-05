@@ -6,6 +6,7 @@ use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Layout\Templating\TextHelper;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
@@ -101,7 +102,7 @@ class LayoutExtension extends \Twig_Extension
      */
     public function mergeContext(BlockView $view, array $context)
     {
-        $view->vars = array_merge($view->vars, $context);
+        $view->vars = new Options(array_merge($view->vars->toArray(), $context));
 
         foreach ($view->children as $child) {
             $this->mergeContext($child, $context);

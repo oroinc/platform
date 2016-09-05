@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
@@ -32,30 +33,22 @@ class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(BaseType::NAME, $this->extension->getExtendedType());
     }
 
-    /**
-     * @dataProvider deferredDataProvider
-     * @param bool $deferred
-     */
-    public function testNormalizeOptions($deferred)
+    public function testNormalizeOptions()
     {
-        $context = $this->getContextMock($deferred);
+        $context = $this->getContextMock();
         $data = $this->getDataAccessorMock();
-        $options = [];
+        $options = new Options();
 
-        $this->processor->expects($deferred ? $this->never() : $this->once())
+        $this->processor->expects($this->once())
             ->method('processExpressions')
-            ->with($options, $context, $data, true, 'json');
+            ->with($options, $context, null, true, null);
 
         $this->extension->normalizeOptions($options, $context, $data);
     }
 
-    /**
-     * @dataProvider deferredDataProvider
-     * @param bool $deferred
-     */
-    public function testFinishView($deferred)
+    public function testFinishView()
     {
-        $context = $this->getContextMock($deferred);
+        $context = $this->getContextMock();
         $data = $this->getDataAccessorMock();
 
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
@@ -66,34 +59,21 @@ class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($data));
         $view = new BlockView();
-        $view->vars = ['test'];
+        $view->vars[] = 'test';
 
-        $this->processor->expects($deferred ? $this->once(): $this->never())
+        $this->processor->expects($this->once())
             ->method('processExpressions')
             ->with($view->vars, $context, $data, true, 'json');
 
-        $this->extension->finishView($view, $block, []);
+        $this->extension->finishView($view, $block, new Options());
     }
 
     /**
-     * @return array
-     */
-    public function deferredDataProvider()
-    {
-        return [
-            ['expressions_evaluate_deferred' => true],
-            ['expressions_evaluate_deferred' => false]
-        ];
-    }
-
-    /**
-     * @param bool $evaluateDeferred
      * @return LayoutContext
      */
-    protected function getContextMock($evaluateDeferred)
+    protected function getContextMock()
     {
         $context = new LayoutContext();
-        $context->set('expressions_evaluate_deferred', $evaluateDeferred);
         $context->set('expressions_evaluate', true);
         $context->set('expressions_encoding', 'json');
 

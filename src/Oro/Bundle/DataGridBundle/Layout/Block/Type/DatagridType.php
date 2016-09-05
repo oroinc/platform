@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\Options;
-
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -43,7 +42,7 @@ class DatagridType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $view->vars['grid_name'] = $options['grid_name'];
         $view->vars['grid_parameters'] = $options['grid_parameters'];

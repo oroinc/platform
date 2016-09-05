@@ -9,6 +9,7 @@ use Oro\Component\Layout\Block\Type\Options;
 /**
  * @method BlockView getParent()
  * @property BlockView[] children
+ * @property Options vars
  */
 class BlockView extends FormView
 {
@@ -25,6 +26,7 @@ class BlockView extends FormView
     public function __construct(BlockView $parent = null)
     {
         parent::__construct($parent);
+
         unset($this->vars['value']);
         $this->vars = new Options($this->vars);
     }

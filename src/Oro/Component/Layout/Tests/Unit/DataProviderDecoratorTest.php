@@ -40,4 +40,13 @@ class DataProviderDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->decorator->getFlags();
     }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage In the data provider "ArrayObject" does not exist method "offsetFlags".
+     */
+    public function testCallNotExistMethodCallException()
+    {
+        $this->decorator->offsetFlags();
+    }
 }

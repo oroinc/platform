@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit\Block\Type;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 class ContainerTypeTest extends BaseBlockTypeTestCase
@@ -17,7 +18,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
 
         $this->assertBlockView(
             [
-                'vars' => [
+                'vars' => new Options([
                     'id'                   => 'container_id',
                     'block_type'           => 'container',
                     'block_type_widget_id' => 'container_widget',
@@ -29,7 +30,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
                     ],
                     'cache_key'            => '_container_id_container',
                     'translation_domain'   => 'messages'
-                ]
+                ])
             ],
             $view,
             false
@@ -53,7 +54,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
 
         $this->assertBlockView(
             [
-                'vars' => [
+                'vars' => new Options([
                     'id'                   => 'container_id',
                     'block_type'           => 'container',
                     'block_type_widget_id' => 'container_widget',
@@ -68,7 +69,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
                     'attr'                 => ['test_attr' => 'test_attr_val'],
                     'label'                => 'Test Label',
                     'label_attr'           => ['test_label_attr' => 'test_label_attr_val']
-                ]
+                ])
             ],
             $view,
             false

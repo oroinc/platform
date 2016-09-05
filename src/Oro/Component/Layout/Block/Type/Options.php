@@ -4,40 +4,42 @@ namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 
-class Options implements \ArrayAccess
+class Options implements \ArrayAccess, \Iterator
 {
-    /** @var Options */
-    private $options;
+    /** @var array */
+    private $options = [];
 
     /**
-     * @param $options
+     * @param array $data
      */
-    public function __construct($options)
+    public function __construct(array $data = [])
     {
-        $this->options = $options;
+        foreach ($data as $key => $value) {
+            $this[$key] = $value;
+        }
     }
 
     /**
-     * @param $optionName
+     * @param string $offset
      * @param boolean $shouldBeEvaluated
      *
      * @return mixed
      *
      * @throws \OutOfBoundsException
      */
-    public function get($optionName, $shouldBeEvaluated = true)
+    public function get($offset, $shouldBeEvaluated = true)
     {
-        if (isset($this->options[$optionName])) {
-            $option = $this->options[$optionName];
+        if (array_key_exists($offset, $this->options)) {
+            $option = $this->options[$offset];
             if ($shouldBeEvaluated && $option instanceof Expression) {
                 throw new \InvalidArgumentException(
-                    sprintf('Option "%s" can`t be expression.', $optionName)
+                    sprintf('Option "%s" should be evaluated but expression now.', $offset)
                 );
             }
             return $option;
         }
 
-        throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $optionName));
+        throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $offset));
     }
 
     /**
@@ -45,7 +47,7 @@ class Options implements \ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return isset($this->options[$offset]);
+        return array_key_exists($offset, $this->options);
     }
 
     /**
@@ -53,7 +55,7 @@ class Options implements \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return $this->get($offset);
+        return $this->offsetExists($offset) ? $this->get($offset) : null;
     }
 
     /**
@@ -61,6 +63,9 @@ class Options implements \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
+        if (is_array($value)) {
+            $value = new self($value);
+        }
         if ($offset === null) {
             $this->options[] = $value;
         } else {
@@ -73,10 +78,8 @@ class Options implements \ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        if (isset($this->options[$offset])) {
+        if (array_key_exists($offset, $this->options)) {
             unset($this->options[$offset]);
-        } else {
-            throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $offset));
         }
     }
 
@@ -87,5 +90,70 @@ class Options implements \ArrayAccess
     public function getAll()
     {
         return $this->options;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        $data = $this->options;
+        foreach ($data as $key => $value) {
+            if ($value instanceof self) {
+                $data[$key] = $value->toArray();
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $offset
+     *
+     * @return boolean
+     */
+    public function isExistsAndNotEmpty($offset)
+    {
+        return $this->offsetExists($offset) && $this->offsetGet($offset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind()
+    {
+        return reset($this->options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function current()
+    {
+        return current($this->options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function key()
+    {
+        return key($this->options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next()
+    {
+        return next($this->options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valid()
+    {
+        return key($this->options) !== null;
     }
 }

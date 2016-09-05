@@ -14,11 +14,13 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Validator\ConstraintViolation;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 {
@@ -71,7 +73,9 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'form';
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
+            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
+            : 'form';
     }
 
     /**
@@ -144,6 +148,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         };
 
         foreach ($this->disabledFields as $field) {
+            /** @var Form $fieldInstance */
             $fieldInstance = $form->get($field);
             // Clear all other validation errors
             if ($fieldInstance->getErrors()->count()) {
@@ -152,13 +157,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             }
 
             // add Field ACL validation error
-            $fieldInstance->addError(
-                new FormError(
-                    sprintf('You are not allowed to modify \'%s\' field.', $field)
-                    // do not use message template and 'message parameters' params here
-                    // they are not processed in SOAP responses, only message will be used
-                )
-            );
+            $fieldInstance->addError($this->getFieldForbiddenFormError());
         }
     }
 
@@ -279,7 +278,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      * @param FormView      $view
      * @param FormInterface $form
      */
-    protected function processHiddenFieldsWithErrors($hiddenFieldsWithErrors, FormView $view, FormInterface $form)
+    protected function processHiddenFieldsWithErrors(array $hiddenFieldsWithErrors, FormView $view, FormInterface $form)
     {
         if (count($hiddenFieldsWithErrors)) {
             $viewErrors = array_key_exists('errors', $view->vars) ? $view->vars['errors'] : [];
@@ -306,5 +305,29 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 );
             }
         }
+    }
+
+    /**
+     * Get Form Error with FieldAccessGranted constraint
+     *
+     * @return FormError
+     */
+    protected function getFieldForbiddenFormError()
+    {
+        $constraint = new FieldAccessGranted();
+        $message = $constraint->message;
+        $violation = new ConstraintViolation(
+            $message,
+            $message,
+            [],
+            '',
+            '',
+            '',
+            null,
+            null,
+            $constraint
+        );
+
+        return new FormError($message, $message, [], null, $violation);
     }
 }

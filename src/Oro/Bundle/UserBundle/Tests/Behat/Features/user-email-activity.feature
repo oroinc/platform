@@ -81,4 +81,4 @@ Scenario: Add contexts
   Then I should see "The context has been added" flash message
   When I go to System/User Management/Users
   And click view Charlie in grid
-  Then I should see "Work for you" email in activity list
+  Then I should see "Fwd: Re: Work for you" email in activity list

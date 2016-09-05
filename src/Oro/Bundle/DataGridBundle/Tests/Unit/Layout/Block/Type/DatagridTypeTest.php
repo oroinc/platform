@@ -40,8 +40,8 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals('test-grid', $view->vars['grid_name']);
         $this->assertEquals('test-grid-test-scope', $view->vars['grid_full_name']);
         $this->assertEquals('test-scope', $view->vars['grid_scope']);
-        $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
-        $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
+        $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']->toArray());
+        $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']->toArray());
     }
 
     public function testBuildViewWithoutScope()
@@ -61,8 +61,8 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals('test-grid', $view->vars['grid_name']);
         $this->assertEquals('test-grid', $view->vars['grid_full_name']);
         $this->assertFalse(isset($view->vars['grid_scope']));
-        $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
-        $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
+        $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']->toArray());
+        $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']->toArray());
     }
 
     public function testBuildViewWithParamsOverwrite()
@@ -74,8 +74,8 @@ class DatagridTypeTest extends BlockTypeTestCase
                 'grid_parameters' => ['enableFullScreenLayout' => false]
             ]
         );
-        $this->assertEquals(['enableFullScreenLayout' => false], $view->vars['grid_parameters']);
-        $this->assertEquals([], $view->vars['grid_render_parameters']);
+        $this->assertEquals(['enableFullScreenLayout' => false], $view->vars['grid_parameters']->toArray());
+        $this->assertEquals([], $view->vars['grid_render_parameters']->toArray());
     }
 
     /**

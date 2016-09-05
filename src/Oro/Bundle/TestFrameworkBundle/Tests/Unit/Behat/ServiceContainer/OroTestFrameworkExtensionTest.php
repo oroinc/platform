@@ -30,10 +30,12 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
             'database_driver',
             'pdo_mysql'
         );
+
         $config = [
             'shared_contexts' => $this->sharedContexts,
             'application_suites' => [],
             'elements_namespace_suffix' => '\Tests\Behat\Page\Element',
+            'reference_initializer_class' => 'ReferenceRepositoryInitializer'
         ];
 
         $extension = $this
@@ -57,6 +59,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->load($containerBuilder, [
             'shared_contexts' => $sharedContexts,
             'application_suites' => $applicableSuites,
+            'reference_initializer_class' => 'ReferenceRepositoryInitializer'
         ]);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));

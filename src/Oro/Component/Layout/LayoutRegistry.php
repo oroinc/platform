@@ -126,7 +126,7 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function normalizeOptions(
         $name,
-        Options &$options,
+        Options $options,
         ContextInterface $context,
         DataAccessorInterface $data
     ) {

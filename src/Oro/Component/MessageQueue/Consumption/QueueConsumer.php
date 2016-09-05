@@ -5,7 +5,6 @@ use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedExcep
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Util\VarExport;
-
 use Psr\Log\NullLogger;
 
 /**
@@ -170,7 +169,7 @@ class QueueConsumer
             throw new ConsumptionInterruptedException();
         }
 
-        if (false == $context->isExecutionInterrupted() && $message = $messageConsumer->receive($timeout = 1)) {
+        if ($message = $messageConsumer->receive($timeout = 1)) {
             $logger->info('Message received');
             $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
             $logger->debug('Properties: {properties}', ['properties' => new VarExport($message->getProperties())]);

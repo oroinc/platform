@@ -14,6 +14,14 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * @var string
+     */
+    protected $oroRelativeFilePath = null;
+
+    /** @var array  */
+    protected $relativePaths = [];
+
+    /**
+     * @var string
      *
      * not serializable. it sets in setRelativeFilePath method
      */
@@ -45,6 +53,16 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     }
 
     /**
+     * Gets relative path to a resource file in oro subfolder
+     *
+     * @return string
+     */
+    public function getOroRelativeFilePath()
+    {
+        return $this->oroRelativeFilePath;
+    }
+
+    /**
      * Sets relative path to a resource file
      *
      * @param string $relativeFilePath The relative path to a resource file starts from bundle folder
@@ -57,16 +75,25 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
             false === $delim ? $relativeFilePath : substr($relativeFilePath, $delim + 1),
             PATHINFO_FILENAME
         );
+        $oroRelativeFilePath = sprintf(
+            '%s/oro%s',
+            substr($relativeFilePath, 0, $delim),
+            substr($relativeFilePath, $delim)
+        );
         $path               = DIRECTORY_SEPARATOR === '/'
             ? $relativeFilePath
             : str_replace('/', DIRECTORY_SEPARATOR, $relativeFilePath);
         if (strpos($relativeFilePath, '/') === 0) {
-            $this->resource         = substr($relativeFilePath, 1);
-            $this->relativeFilePath = $path;
+            $this->resource            = substr($relativeFilePath, 1);
+            $this->relativeFilePath    = $path;
+            $this->oroRelativeFilePath = $oroRelativeFilePath;
         } else {
-            $this->resource         = $relativeFilePath;
-            $this->relativeFilePath = DIRECTORY_SEPARATOR . $path;
+            $this->resource            = $relativeFilePath;
+            $this->relativeFilePath    = DIRECTORY_SEPARATOR . $path;
+            $this->oroRelativeFilePath = DIRECTORY_SEPARATOR . $oroRelativeFilePath;
         }
+
+        $this->relativePaths = [$this->oroRelativeFilePath, $this->relativeFilePath];
     }
 
     /**
@@ -160,9 +187,12 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     protected function getBundleResourcePath($bundleDir)
     {
-        $path = $bundleDir . $this->relativeFilePath;
-        if (is_file($path)) {
-            return realpath($path);
+        $path = null;
+        foreach ($this->relativePaths as $relativePath) {
+            $path = $bundleDir . $relativePath;
+            if (is_file($path)) {
+                return realpath($path);
+            }
         }
 
         return null;
@@ -189,6 +219,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
+        $path = null;
         if (is_dir($bundleAppDir)) {
             $path = $this->normalizeBundleAppDir($bundleAppDir);
             if ($resource->isFound($bundleClass, $path)) {
@@ -201,10 +232,12 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
             }
         }
 
-        $path = $bundleDir . $this->relativeFilePath;
-        if ($resource->isFound($bundleClass, $path)) {
-            // check exists and removed resource
-            return is_file($path) && filemtime($path) < $timestamp;
+        foreach ($this->relativePaths as $relativePath) {
+            $path = $bundleDir . $relativePath;
+            if ($resource->isFound($bundleClass, $path)) {
+                // check exists and removed resource
+                return is_file($path) && filemtime($path) < $timestamp;
+            }
         }
 
         // check new resource
@@ -243,8 +276,13 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     protected function normalizeBundleAppDir($bundleAppDir)
     {
-        return
-            $bundleAppDir
-            . preg_replace('/Resources\\' . DIRECTORY_SEPARATOR . '/', '', $this->relativeFilePath, 1);
+        $path = null;
+        foreach ($this->relativePaths as $relativePath) {
+            if (!is_file($path)) {
+                $path = $bundleAppDir . str_replace('/Resources', '', $relativePath);
+            }
+        }
+
+        return $path;
     }
 }

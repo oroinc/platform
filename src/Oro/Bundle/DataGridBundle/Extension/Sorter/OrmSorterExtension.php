@@ -252,6 +252,12 @@ class OrmSorterExtension extends AbstractExtension
         switch (true) {
             case in_array($direction, [self::DIRECTION_ASC, self::DIRECTION_DESC], true):
                 break;
+            case ($direction === 1):
+                $direction = self::DIRECTION_DESC;
+                break;
+            case ($direction === -1):
+                $direction = self::DIRECTION_ASC;
+                break;
             case ($direction === false):
                 $direction = self::DIRECTION_DESC;
                 break;
