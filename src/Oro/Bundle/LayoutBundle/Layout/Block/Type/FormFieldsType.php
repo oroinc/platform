@@ -80,8 +80,8 @@ class FormFieldsType extends AbstractFormType
      */
     public function buildBlock(BlockBuilderInterface $builder, LayoutOptions $options)
     {
-        $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
         if ($options['split_to_fields']) {
+            $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
             $this->formLayoutBuilder->build($formAccessor, $builder, $options);
         }
     }

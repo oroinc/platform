@@ -92,7 +92,7 @@ class ExpressionProcessor
         $key,
         $value,
         ContextInterface $context,
-        DataAccessorInterface $data,
+        DataAccessorInterface $data = null,
         $evaluate,
         $encoding
     ) {
