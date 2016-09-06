@@ -114,7 +114,7 @@ class CountQueryBuilderOptimizer
             $fieldsToSelect = $this->getFieldsToSelect($originalQueryParts);
         }
         if ($originalQueryParts['join']) {
-            $this->addJoins($optimizedQueryBuilder, $originalQueryParts, $this->useNonSymetricJoins($fieldsToSelect));
+            $this->addJoins($optimizedQueryBuilder, $originalQueryParts, $this->useNonSymmetricJoins($fieldsToSelect));
         }
 
         if ($originalQueryParts['where']) {
@@ -130,13 +130,13 @@ class CountQueryBuilderOptimizer
     }
 
     /**
-     * Method to check if using of non symetric joins is required (if they will affect number of rows or not).
+     * Method to check if using of non symmetric joins is required (if they will affect number of rows or not).
      *
      * @param array $fieldsToSelect
      *
      * @return bool
      */
-    protected function useNonSymetricJoins(array $fieldsToSelect)
+    protected function useNonSymmetricJoins(array $fieldsToSelect)
     {
         return count($fieldsToSelect) !== 1 || stripos(reset($fieldsToSelect), 'DISTINCT(') !== 0;
     }
@@ -146,12 +146,12 @@ class CountQueryBuilderOptimizer
      *
      * @param QueryBuilder $optimizedQueryBuilder
      * @param array        $originalQueryParts
-     * @param bool         $useNonSymetricJoins
+     * @param bool         $useNonSymmetricJoins
      */
     protected function addJoins(
         QueryBuilder $optimizedQueryBuilder,
         array $originalQueryParts,
-        $useNonSymetricJoins = true
+        $useNonSymmetricJoins = true
     ) {
         // Collect list of tables which should be added to new query
         $whereAliases   = $this->qbTools->getUsedTableAliases($originalQueryParts['where']);
@@ -163,7 +163,7 @@ class CountQueryBuilderOptimizer
         // this joins cannot be removed outside of this class
         $requiredJoinAliases = $joinAliases;
 
-        if ($useNonSymetricJoins) {
+        if ($useNonSymmetricJoins) {
             $joinAliases = array_merge(
                 $joinAliases,
                 $this->getNonSymmetricJoinAliases(
