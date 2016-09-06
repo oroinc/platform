@@ -306,7 +306,7 @@ abstract class AbstractScopeManager
     public function getScopeIdFromEntity($entity)
     {
         if ($this->isSupportedScopeEntity($entity)) {
-            return $this->getScopeIdByEntity($entity);
+            return $this->getScopeEntityIdValue($entity);
         }
 
         return $this->getScopeId();
@@ -339,7 +339,7 @@ abstract class AbstractScopeManager
      * @param object $entity
      * @return mixed
      */
-    protected function getScopeIdByEntity($entity)
+    protected function getScopeEntityIdValue($entity)
     {
         return null;
     }
@@ -420,7 +420,7 @@ abstract class AbstractScopeManager
     public function resolveIdentifier($identifier)
     {
         if (is_object($identifier)) {
-            $identifier = $this->getScopeIdByEntity($identifier);
+            $identifier = $this->getScopeIdFromEntity($identifier);
         }
         if (null === $identifier) {
             $identifier = $this->getScopeId();

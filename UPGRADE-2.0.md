@@ -7,7 +7,7 @@ UPGRADE FROM 1.10 to 2.0
 - Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
 
 ####WorkflowBundle
-- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` 
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
     - construction signature was changed now it takes next arguments:
         - `WorkflowRegistry` $workflowRegistry,
         - `DoctrineHelper` $doctrineHelper,
@@ -25,7 +25,7 @@ UPGRADE FROM 1.10 to 2.0
         - now the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_DEACTIVATED` if workflow was deactivated.
     - method `resetWorkflowData` was added with `WorkflowDefinition $workflowDefinition` as single argument. It removes from database all workflow items related to corresponding workflow.
     - method `resetWorkflowItem` was removed
-- Entity configuration (`@Config()` annotation) sub-node `workflow.active_workflow` was removed in favor of `WorkflowDefinition` field `active`. Now for proper workflow activation through configuration you should use `defaults.active: true` in corresponded workflow YAML config. 
+- Entity configuration (`@Config()` annotation) sub-node `workflow.active_workflow` was removed in favor of `WorkflowDefinition` field `active`. Now for proper workflow activation through configuration you should use `defaults.active: true` in corresponded workflow YAML config.
 - Class `Oro\Bundle\WorkflowBundle\Model\Workflow` changed constructor signature. First argument `EntityConnector` was replaced by `DoctrineHelper`
     - method `resetWorkflowData` was removed - use `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::resetWorkflowData` instead.
 - Repository `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository` signature was changed for method `resetWorkflowData` :
@@ -40,11 +40,11 @@ UPGRADE FROM 1.10 to 2.0
 - Service `oro_workflow.entity_connector` (`Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector`) was added with purpose to check whether entity can be used in workflow as related.
 - Now entity can have more than one active workflows.
 - Activation of workflows now provided through `WorkflowManager::activateWorkflow` and `WorkflowManager::deactivateWorkflow` methods as well as with workflow YAML configuration boolean node `defaults.active` to load default activation state from configuration.
-    
+
     **NOTE**: Please pay attention to make activations only through corresponded `WorkflowManager` methods.
-            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter. 
+            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter.
             As `WorkflowManager` is responsive for activation events emitting described above.
-     
+
 - Added trait `Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait` with methods:
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder through optionally specified workflowItem alias
@@ -98,7 +98,7 @@ UPGRADE FROM 1.10 to 2.0
 * Added `actions` to transition definition for use instead of `post_actions`
 * Definitions `pre_conditions`, `init_actions`, `post_actions` marked as deprecated
 - Added workflow definition configuration node `exclusive_active_groups` to determine exclusiveness of active state in case with conflicting workflows in system.
-- Added workflow definition configuration node `exclusive_record_groups` to determine exclusiveness of currently running workflow for an related entity by named group.  
+- Added workflow definition configuration node `exclusive_record_groups` to determine exclusiveness of currently running workflow for an related entity by named group.
 - Added `WorkflowDefinition` property with workflow YAML configuration node `priority` to be able regulate order of workflow acceptance in cases with cross-functionality.
     For example `workflow_record_group` with two workflows in one group and auto start transition will be sorted by priority and started only one with higher priority value.
 * Removed service `@oro_workflow.manager.system_config` and its class `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` as now there no entity configuration for active workflows. Activation and deactivation of a workflow now should be managed through WorkflowManager (`Oro\Bundle\WorkflowBundle\Model\WorkflowManager`- `@@oro_workflow.manager`)
@@ -108,11 +108,10 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Added `priority` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` and workflow configuration to be able configure priorities in workflow applications.
 * Added `isActive` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instead of EntityConfig
 * Added `groups` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` that contains `WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE` and `WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD` nodes of array with corresponded groups that `WorkflowDefintiion` is belongs to.
-* Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` 
+* Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * `getName`, `getLabel` and `isActive` methods of `Oro\Bundle\WorkflowBundle\Model\Workflow` now are proxy methods to its `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instance.
 * Removed method `getStartTransitions` from `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` -  `$workflow->getTransitionManager()->getStartTransitions()` can be used instead
 * Entity config `workflow.active_workflows` was removed. Use workfow configuration boolean node `defaults.active` instead.
-* Configuration files for workflows now loads from `Resources/config/oro/workflows.yml` file instead of `Resources/config/workflow.yml`.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
@@ -151,7 +150,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
 
 ####DatagridBundle:
-- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php` 
+- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
     - construction signature was changed now it takes next arguments:
         - `SystemAwareResolver` $resolver,
         - `CacheProvider` $cache
@@ -160,8 +159,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - method `getDatagridConfigurationLoader` was added to get loader for datagrid.yml files.
     - method `ensureConfigurationLoaded` was added to check if datagrid config need to be loaded to cache.
     - You can find example of refreshing datagrid cache in `Oro/Bundle/DataGridBundle/EventListener/ContainerListener.php`
-Configuration files for datagrids now loads from `Resources/config/oro/datagrids.yml` file instead of `Resources/config/datagrid.yml`.
-Configuration files root node now changed to its plural form `datagrids: ...`.
+- Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts.
+- Configuration files for datagrids now loads from `Resources/config/oro/datagrids.yml` file instead of `Resources/config/datagrid.yml`.
+- Configuration files root node now changed to its plural form `datagrids: ...`.
   
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
