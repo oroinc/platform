@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action\Actions;
 
-abstract class ImportExportAction extends AbstractAction
+abstract class AbstractImportExportAction extends AbstractAction
 {
     const TYPE_IMPORT = 'import';
     const TYPE_EXPORT = 'export';

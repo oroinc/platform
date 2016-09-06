@@ -83,6 +83,7 @@ class LanguageOperationsTest extends ActionTestCase
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
         ]);
 
+        // temporary file would be removed automatically
         copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
 
         $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');
@@ -116,6 +117,7 @@ class LanguageOperationsTest extends ActionTestCase
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
         ]);
 
+        // temporary file would be removed automatically
         copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
 
         $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');

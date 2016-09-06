@@ -12,7 +12,8 @@ oro.translation:
         export: 'Export'
         add: 'Add Language'
         translation_completeness.label: 'Translation Completeness:'
-        install.title: 'Install %language% language'
+        install.title: 'Install "%language%" language'
+        update.title: 'Update "%language%" language'
 
     language:
         entity_label: 'Language'

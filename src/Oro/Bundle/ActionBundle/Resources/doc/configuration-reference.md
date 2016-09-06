@@ -260,7 +260,7 @@ Button Options configuration has next options:
     Should be extended from `OroActionBundle:Operation:button.html.twig`
 * **data**
     *array*
-    This option provide possibility to add data-attributes to the button tag.
+    This option provide possibility to add data-attributes to the button tag or dynamic attributes for datagrid action.
 * **page_component_module**
     *string*
     Name of js-component module for the operation-button  (attribute *data-page-component-module*).
@@ -281,6 +281,7 @@ operations:
             template: OroActionBundle:Operation:button.html.twig
             data:
                 param: value
+                customTitle: $.customTitle
             page_component_module: acmedemo/js/app/components/demo-component
             page_component_options:
                 component_name: '[name$="[component]"]'
@@ -421,6 +422,9 @@ operation.
 * **mass_action**
     *array*
     Mass action configuration. See datagrid documentation.
+* **data**
+    *array*
+    This option provide possibility to add static attributes to datagrid action. See datagrid documentation.
 
 **Notice**
 It must be used only one parameter "mass_action_provider" or "mass_action".
@@ -445,6 +449,10 @@ operations:
                     dialogOptions:
                         modal: true
                         ...
+            data:
+                type: import
+                importProcessor: 'acme_import_processor'
+                importJob: 'acme_import_from_csv'
 ```
 
 Form Options Configuration

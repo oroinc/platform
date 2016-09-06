@@ -53,7 +53,7 @@ class LocalizationExtension extends \Twig_Extension
             ),
             new \Twig_SimpleFilter(
                 'oro_locale_code_title',
-                [$this, 'getLocaleTitleByCode'],
+                [$this->languageCodeFormatter, 'formatLocale'],
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
@@ -76,15 +76,6 @@ class LocalizationExtension extends \Twig_Extension
     public function getLanguageTitleByCode($code)
     {
         return $this->languageCodeFormatter->format($code);
-    }
-
-    /**
-     * @param string $code
-     * @return string
-     */
-    public function getLocaleTitleByCode($code)
-    {
-        return $this->languageCodeFormatter->formatLocale($code);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action\Actions;
 
-class ExportAction extends ImportExportAction
+class ExportAction extends AbstractImportExportAction
 {
     /**
      * @var array

@@ -42,9 +42,9 @@ UPGRADE FROM 1.10 to 2.0
 - Activation of workflows now provided through `WorkflowManager::activateWorkflow` and `WorkflowManager::deactivateWorkflow` methods as well as with workflow YAML configuration boolean node `defaults.active` to load default activation state from configuration.
 
     **NOTE**: Please pay attention to make activations only through corresponded `WorkflowManager` methods.
-            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter.
+            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter. 
             As `WorkflowManager` is responsive for activation events emitting described above.
-    
+     
 - Added trait `Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait` with methods:
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder through optionally specified workflowItem alias
@@ -157,10 +157,10 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 ####ConfigBundle
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
 - Class `Oro\Bundle\ConfigBundle\Config\ConfigManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `get`, `getInfo`, `set`, `reset`, `flush`, `save`, `calculateChangeSet`, `reload`, `getValue`, `buildChangeSet`
-- Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']` 
+- Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
 
 ####DatagridBundle:
-- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
+- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php` 
     - construction signature was changed now it takes next arguments:
         - `SystemAwareResolver` $resolver,
         - `CacheProvider` $cache
@@ -170,6 +170,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - method `ensureConfigurationLoaded` was added to check if datagrid config need to be loaded to cache.
     - You can find example of refreshing datagrid cache in `Oro/Bundle/DataGridBundle/EventListener/ContainerListener.php`
 - Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts.
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ExportAction`
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ImportAction`
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\AbstractImportExportAction`
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.

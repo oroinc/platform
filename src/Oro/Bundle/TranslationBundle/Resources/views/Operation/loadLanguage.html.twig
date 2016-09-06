@@ -27,12 +27,3 @@
     </div>
     {{ form_widget(form) }}
 {% endblock %}
-
-{% block form_actions %}
-    <div class="widget-actions form-actions">
-        {% block form_actions_inner %}
-            <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-            <button class="btn btn-success" type="submit">{{ 'oro.translation.action.install'|trans }}</button>
-        {% endblock %}
-    </div>
-{% endblock %}

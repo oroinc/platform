@@ -153,6 +153,8 @@ operations:
             template: 'OroTranslationBundle:Operation:loadLanguage.html.twig'
             options:
                 height: 100
+            title_parameters:
+                '%%language%%': $.languageName
         attributes:
             language_code:
                 label: 'Language code'
@@ -161,7 +163,7 @@ operations:
             - '@call_service_method':
                 service: oro_translation.helper.language
                 method: getLanguageStatistic
-                method_parameters: [$.data.code]
+                method_parameters: [$code]
                 attribute: $.stat
         form_options:
             attribute_fields:
@@ -170,7 +172,13 @@ operations:
                     options:
                         required: true
             attribute_default_values:
-                language_code: $.data.code
+                language_code: $code
+        preactions:
+            - '@call_service_method':
+                service: oro_locale.formatter.language_code
+                method: formatLocale
+                method_parameters: [$code]
+                attribute: $.languageName
         actions:
             - '@call_service_method':
                 service: oro_translation.helper.language
@@ -214,8 +222,8 @@ operations:
             icon: icon-cloud-download
         frontend_options:
             title: oro.translation.action.install.title
-            title_parameters:
-                '%%language%%': $.languageName
+            options:
+                okText: oro.translation.action.install
         preactions:
             - '@assign_value': [$.successMessage, 'oro.translation.language.message.installed']
             - '@assign_value': [$.errorMessage, 'oro.translation.language.error.install']
@@ -224,11 +232,6 @@ operations:
                 method: isAvailableInstallTranslates
                 method_parameters: [$.data]
                 attribute: $.isAvailableInstall
-            - '@call_service_method':
-                service: oro_locale.formatter.language_code
-                method: formatLocale
-                method_parameters: [$.data.code]
-                attribute: $.languageName
         preconditions:
             '@equal': [$.isAvailableInstall, true]
 
@@ -239,14 +242,18 @@ operations:
         label: oro.translation.action.update
         button_options:
             icon: icon-cloud-download
+        frontend_options:
+            title: oro.translation.action.update.title
+            options:
+                okText: oro.translation.action.update
         preactions:
+            - '@assign_value': [$.successMessage, 'oro.translation.language.message.updated']
+            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.update']
             - '@call_service_method':
                 service: oro_translation.helper.language
                 method: isAvailableUpdateTranslates
                 method_parameters: [$.data]
                 attribute: $.isAvailableUpdate
-            - '@assign_value': [$.successMessage, 'oro.translation.language.message.updated']
-            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.update']
         preconditions:
             '@equal': [$.isAvailableUpdate, true]
 
