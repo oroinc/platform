@@ -1,4 +1,4 @@
-oro_api:
+api:
     entities:
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             delete_handler: oro_organization.business_unit.handler.delete
