@@ -1,22 +1,24 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Form\RendererEngine;
+namespace Oro\Bundle\LayoutBundle\Form;
 
-use Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine as BaseEngine;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Templating\EngineInterface;
-
-use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 
 /**
- * Extends Templating Renderer Engine to add possibility for changing default themes after container was locked
+ * Extends TwigRendererEngine to add possability to render parent blocks without "extend"
  */
-class TemplatingRendererEngine extends BaseEngine implements FormRendererEngineInterface
+class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererEngineInterface
 {
     /**
-     * @var EngineInterface
+     * @var \Twig_Environment
      */
-    private $engine;
+    protected $environment;
+
+    /**
+     * @var \Twig_Template
+     */
+    private $template;
 
     /**
      * @var array
@@ -53,11 +55,10 @@ class TemplatingRendererEngine extends BaseEngine implements FormRendererEngineI
     /**
      * {@inheritdoc}
      */
-    public function __construct(EngineInterface $engine, array $defaultThemes = [])
+    public function setEnvironment(\Twig_Environment $environment)
     {
-        parent::__construct($engine, $defaultThemes);
-
-        $this->engine = $engine;
+        parent::setEnvironment($environment);
+        $this->environment = $environment;
     }
 
     /**
@@ -73,11 +74,46 @@ class TemplatingRendererEngine extends BaseEngine implements FormRendererEngineI
     /**
      * {@inheritdoc}
      */
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
+    {
+        $cacheKey = $view->vars[self::CACHE_KEY_VAR];
+
+        $context = $this->environment->mergeGlobals($variables);
+
+        ob_start();
+
+        // By contract,This method can only be called after getting the resource
+        // (which is passed to the method). Getting a resource for the first time
+        // (with an empty cache) is guaranteed to invoke loadResourcesFromTheme(),
+        // where the property $template is initialized.
+
+        // We do not call renderBlock here to avoid too many nested level calls
+        // (XDebug limits the level to 100 by default)
+        if (array_key_exists($cacheKey, $this->overrideResources)) {
+            $resource = $this->overrideResources[$cacheKey];
+        } else {
+            $resource = $this->resources[$cacheKey];
+        }
+
+        $this->template->displayBlock($blockName, $context, $resource);
+
+        unset(
+            $this->parentResourceOffsets[$cacheKey],
+            $this->parentResourceHierarchyLevels[$cacheKey],
+            $this->overrideResources[$cacheKey]
+        );
+
+        return ob_get_clean();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResourceForBlockName(FormView $view, $blockName)
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
-        if (isset($this->overrideResources[$cacheKey][$blockName])) {
+        if (array_key_exists($cacheKey, $this->overrideResources)) {
             return $this->overrideResources[$cacheKey][$blockName];
         }
 
@@ -87,40 +123,36 @@ class TemplatingRendererEngine extends BaseEngine implements FormRendererEngineI
     /**
      * {@inheritdoc}
      */
-    protected function loadResourceFromTheme($cacheKey, $blockName, $theme)
+    protected function loadResourcesFromTheme($cacheKey, &$theme)
     {
-        parent::loadResourceFromTheme($cacheKey, $blockName, $theme);
+        parent::loadResourcesFromTheme($cacheKey, $theme);
 
-        if ($this->engine->exists($templateName = $theme.':'.$blockName.'.html.php')) {
-            $this->resources[$cacheKey][$blockName] = $templateName;
-
-            if (array_key_exists($cacheKey, $this->themes)) {
-                for ($i = count($this->themes[$cacheKey]) - 1; $i >= 0; $i--) {
-                    $templateName = $this->themes[$cacheKey][$i] . ':' . $blockName . '.html.php';
-                    if ($this->engine->exists($templateName)) {
-                        if (!array_key_exists($blockName, $this->resourcesHierarchy)) {
-                            $this->resourcesHierarchy[$blockName] = [$templateName];
-                        } else {
-                            array_unshift($this->resourcesHierarchy[$blockName], $templateName);
-                        }
-                    }
-                }
-            }
-
-            for ($i = count($this->defaultThemes) - 1; $i >= 0; $i--) {
-                if ($this->engine->exists($templateName = $this->defaultThemes[$i].':'.$blockName.'.html.php')) {
-                    if (!array_key_exists($blockName, $this->resourcesHierarchy)) {
-                        $this->resourcesHierarchy[$blockName] = [$templateName];
-                    } else {
-                        array_unshift($this->resourcesHierarchy[$blockName], $templateName);
-                    }
-                }
-            }
-
-            return true;
+        if (null === $this->template) {
+            // Store the first \Twig_Template instance that we find so that
+            // we can call displayBlock() later on. It doesn't matter *which*
+            // template we use for that, since we pass the used blocks manually
+            // anyway.
+            $this->template = $theme;
         }
 
-        return false;
+        // Use a separate variable for the inheritance traversal, because
+        // theme is a reference and we don't want to change it.
+        $currentTheme = $theme;
+
+        $context = $this->environment->mergeGlobals([]);
+
+        // The do loop takes care of template inheritance.
+        // Add blocks from all templates including parent resources in the inheritance tree.
+        do {
+            foreach ($currentTheme->getBlocks() as $block => $blockData) {
+                if (!array_key_exists($block, $this->resourcesHierarchy)) {
+                    $this->resources[$cacheKey][$block] = $blockData;
+                    $this->resourcesHierarchy[$block] = [$blockData];
+                } else {
+                    array_unshift($this->resourcesHierarchy[$block], $blockData);
+                }
+            }
+        } while (false !== $currentTheme = $currentTheme->getParent($context));
     }
 
     /**
