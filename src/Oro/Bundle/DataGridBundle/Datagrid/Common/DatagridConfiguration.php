@@ -40,11 +40,6 @@ class DatagridConfiguration extends ConfigObject
     const DATASOURCE_ACL_APPLY_PERMISSION_PATH = '[source][acl_apply_permission]';
 
     /**
-     * This option makes it possible to modify query before it's modified to get total number of rows
-     */
-    const DATASOURCE_COUNT_QUERY_PATH = '[source][count_query]';
-
-    /**
      * @return string
      */
     public function getDatasourceType()
@@ -94,14 +89,6 @@ class DatagridConfiguration extends ConfigObject
     public function getDatasourceAclApplyPermission()
     {
         return $this->offsetGetByPath(self::DATASOURCE_ACL_APPLY_PERMISSION_PATH, 'VIEW');
-    }
-
-    /**
-     * @return array
-     */
-    public function getDatasourceCountQuery()
-    {
-        return $this->offsetGetByPath(self::DATASOURCE_COUNT_QUERY_PATH, []);
     }
 
     /**

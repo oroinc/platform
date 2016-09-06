@@ -37,9 +37,6 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var string */
     protected $aclPermission = 'VIEW';
 
-    /** @var array */
-    protected $countQuery = [];
-
     public function __construct(
         AclHelper $aclHelper,
         CountQueryBuilderOptimizer $countQueryOptimizer,
@@ -81,7 +78,7 @@ class Pager extends AbstractPager implements PagerInterface
      */
     public function computeNbResult()
     {
-        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder(), $this->countQuery);
+        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
         $query = $countQb->getQuery();
         if (!$this->skipAclCheck) {
             $query = $this->aclHelper->apply($query, $this->aclPermission);
@@ -241,14 +238,6 @@ class Pager extends AbstractPager implements PagerInterface
     public function setAclPermission($permission)
     {
         $this->aclPermission = $permission;
-    }
-
-    /**
-     * @param array $countQuery
-     */
-    public function setCountQuery(array $countQuery)
-    {
-        $this->countQuery = $countQuery;
     }
 
     /**

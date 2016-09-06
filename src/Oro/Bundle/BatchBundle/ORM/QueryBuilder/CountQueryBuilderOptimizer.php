@@ -48,25 +48,12 @@ class CountQueryBuilderOptimizer
      * Get optimized query builder for count calculation.
      *
      * @param QueryBuilder $queryBuilder
-     * @param array        $countQuery
      * @return QueryBuilder
      * @throws \Exception
      */
-    public function getCountQueryBuilder(QueryBuilder $queryBuilder, array $countQuery = [])
+    public function getCountQueryBuilder(QueryBuilder $queryBuilder)
     {
-        $originalQueryBuilder = $countQuery ? clone $queryBuilder : $queryBuilder;
-        if (isset($countQuery['select'])) {
-            $originalQueryBuilder->resetDQLPart('select');
-            foreach ($countQuery['select'] as $selectExpr) {
-                $originalQueryBuilder->addSelect($selectExpr);
-            }
-        }
-
-        if (array_key_exists('groupBy', $countQuery) && !$countQuery['groupBy']) {
-            $originalQueryBuilder->resetDQLPart('groupBy');
-        }
-
-        $this->context = new QueryOptimizationContext($originalQueryBuilder, $this->qbTools);
+        $this->context = new QueryOptimizationContext($queryBuilder, $this->qbTools);
         try {
             $qb = $this->buildCountQueryBuilder();
             // remove a link to the context

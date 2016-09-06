@@ -60,6 +60,10 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
      */
     protected function sanitize($value)
     {
+        if (!$value) {
+            return $value;
+        }
+
         if (!$this->htmlPurifier) {
             $config = \HTMLPurifier_Config::createDefault();
             $this->fillAllowedElementsConfig($config);
