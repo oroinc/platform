@@ -76,7 +76,7 @@ class EmailGridListener
     {
         $this->qb = $event->getQueryBuilder();
 
-        $selectParts = $this->qb->getDqlPart('select');
+        $selectParts = $this->qb->getDQLPart('select');
         $stringSelectParts = [];
         foreach ($selectParts as $selectPart) {
             $stringSelectParts[] = (string) $selectPart;
@@ -103,7 +103,7 @@ class EmailGridListener
 
         $this->qb
             ->select($this->select)
-            ->resetDqlPart('groupBy')
+            ->resetDQLPart('groupBy')
             ->where($this->qb->expr()->in('eu.id', ':ids'))
             ->setMaxResults(null)
             ->setFirstResult(null)
