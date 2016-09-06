@@ -29,7 +29,6 @@ class HtmlTagExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter('oro_tag_filter', [$this, 'tagFilter'], ['is_safe' => ['all']]),
             new \Twig_SimpleFilter('oro_html_purify', [$this, 'htmlPurify']),
-            new \Twig_SimpleFilter('oro_simple_html_purify', [$this, 'simpleHtmlPurify']),
             new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
         ];
     }
@@ -42,20 +41,6 @@ class HtmlTagExtension extends \Twig_Extension
     public function tagFilter($string)
     {
         return $this->htmlTagHelper->stripTags($string);
-    }
-
-    /**
-     * Can be used before stripping html tags to remove content of <script> and <style> tags
-     * so that what's left is text without some styling or scripting stuff which can be read
-     * easilly.
-     *
-     * @param string $string
-     *
-     * @return string
-     */
-    public function simpleHtmlPurify($string)
-    {
-        return preg_replace('/<(style|script).*?>.*?<\/\1>/s', '', $string);
     }
 
     /**
