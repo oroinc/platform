@@ -13,18 +13,19 @@ class MenuUpdateTest extends \PHPUnit_Framework_TestCase
     public function testProperties()
     {
         $properties = [
-            ['id', 42],
-            ['key', 'page_wrapper'],
-            ['parentId', 'page_container'],
-            ['title', 'title'],
-            ['uri', 'uri'],
-            ['menu', 'main_menu'],
-            ['ownershipType', MenuUpdate::OWNERSHIP_GLOBAL],
-            ['ownerId', 3],
-            ['isActive', true],
-            ['priority', 1],
+            ['title', 'test title'],
         ];
 
         $this->assertPropertyAccessors(new MenuUpdate(), $properties);
+    }
+
+    public function testGetExtras()
+    {
+        $title = 'test title';
+
+        $update = new MenuUpdate();
+        $update->setTitle($title);
+
+        $this->assertEquals(['title' => $title], $update->getExtras());
     }
 }
