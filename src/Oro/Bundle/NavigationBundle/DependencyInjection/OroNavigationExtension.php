@@ -35,7 +35,6 @@ class OroNavigationExtension extends Extension
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
-
             // Merge menu from bundle configuration
             if (isset($resource->data[self::NAVIGATION_CONFIG_ROOT][self::MENU_CONFIG_KEY])) {
                 $this->mergeMenuConfig(
