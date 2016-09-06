@@ -123,4 +123,47 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             ))
         );
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Item key "user_user_show" duplicated in tree menu "navbar".
+     */
+    public function testBuildDiblicatedItemTreeCallException()
+    {
+        $options = [
+            'items' => [
+                'user_registration_register' => [
+                    'route' => 'oro_menu_submenu',
+                    'extras' => []
+                ],
+                'user_user_show' => [
+                    'translateDomain' => 'SomeBundle',
+                    'extras' => []
+                ],
+            ],
+            'tree' => [
+                'navbar' => [
+                    'type' => 'navbar',
+                    'extras' => [],
+                    'children' => [
+                        'user_user_show' => [
+                            'position' => '10',
+                            'children' => [
+                            'user_registration_register' => [
+                                'children' => [
+                                    'user_user_show' => [
+                                        'children' => []
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $this->configurationBuilder->setConfiguration($options);
+        $menu = new MenuItem('navbar', $this->factory);
+        $this->configurationBuilder->build($menu, [], 'navbar');
+    }
 }
