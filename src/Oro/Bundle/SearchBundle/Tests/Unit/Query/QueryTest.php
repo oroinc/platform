@@ -197,4 +197,24 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $query->addSelect('organization', 'integer');
         $this->assertEquals('select (text.language, integer.organization) from *', $query->getStringQuery());
     }
+
+    public function testSelectingWithAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+
+        $reflectionObject = new \ReflectionObject($query);
+
+        $selectFieldsProperty = $reflectionObject->getProperty('select');
+        $selectFieldsProperty->setAccessible(true);
+
+        $aliasesProperty = $reflectionObject->getProperty('fieldsAliases');
+        $aliasesProperty->setAccessible(true);
+
+        $fields = $selectFieldsProperty->getValue($query);
+        $aliases = $aliasesProperty->getValue($query);
+
+        $this->assertContains('text.foo', $fields);
+        $this->assertContains('bar', $aliases);
+    }
 }

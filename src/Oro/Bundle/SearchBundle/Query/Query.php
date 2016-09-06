@@ -59,6 +59,9 @@ class Query
     /** @var array */
     protected $fields;
 
+    /** @var array */
+    protected $fieldsAliases = [];
+
     /** @var Criteria */
     protected $criteria;
 
@@ -185,6 +188,8 @@ class Query
     public function addSelect($fieldNames, $enforcedFieldType = null)
     {
         foreach ((array) $fieldNames as $fieldName) {
+            $fieldName = $this->parseFieldAliasing($fieldName);
+
             $this->addToSelect($fieldName, $enforcedFieldType);
         }
     }
@@ -332,7 +337,7 @@ class Query
      */
     public function getOptions()
     {
-        throw new \Exception('Method getOptions is depricated for Query class. Please use getCriteria method');
+        throw new \Exception('Method getOptions is deprecated for Query class. Please use getCriteria method');
     }
 
     /**
@@ -659,5 +664,24 @@ class Query
         }
 
         return $fields;
+    }
+
+    /**
+     * Parse field name and check if there is an alias declared in it.
+     *
+     * @param $field
+     * @return string
+     */
+    private function parseFieldAliasing($field)
+    {
+        if (!strstr($field, ' as ')) {
+            return $field;
+        }
+
+        $field = explode(' as ', $field);
+
+        $this->fieldsAliases[$field[0]] = $field[1];
+
+        return $field[0];
     }
 }
