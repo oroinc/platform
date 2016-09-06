@@ -32,6 +32,7 @@ class InlineEditingExtension extends AbstractExtension
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
      * @param SecurityFacade $securityFacade
      * @param EntityClassNameHelper $entityClassNameHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
@@ -93,6 +94,7 @@ class InlineEditingExtension extends AbstractExtension
         $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
         $blackList = $configuration->getBlackList();
         $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
+        $objectIdentity = new ObjectIdentity('entity', $configItems['entity_name']);
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
@@ -101,7 +103,7 @@ class InlineEditingExtension extends AbstractExtension
                 $dadaFieldName = $this->getColummFieldName($columnName, $column);
                 if (!$this->authChecker->isGranted(
                     'EDIT',
-                    new FieldVote(new ObjectIdentity('entity', $configItems['entity_name']), $dadaFieldName)
+                    new FieldVote($objectIdentity, $dadaFieldName)
                 )
                 ) {
                     if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)) {

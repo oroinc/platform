@@ -4,8 +4,9 @@ define([
     'chaplin',
     'backbone',
     'oroui/js/tools',
+    '../app/components/column-renderer-component',
     './util'
-], function($, _, Chaplin, Backbone, tools, util) {
+], function($, _, Chaplin, Backbone, tools, ColumnRendererComponent, util) {
     'use strict';
 
     var Row;
@@ -100,6 +101,8 @@ define([
             this.listenTo(this.cellEvents, 'change', this.delegateEvents);
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
+
+            this.columnRenderer = new ColumnRendererComponent(options);
 
             Row.__super__.initialize.apply(this, arguments);
             this.cells = this.subviews;
@@ -316,10 +319,30 @@ define([
         },
 
         renderCustomTemplate: function() {
+            var self = this;
             var $checkbox;
             this.$el.html(this.template({
                 model: this.model ? this.model.attributes : {},
-                themeOptions: this.themeOptions ? this.themeOptions : {}
+                themeOptions: this.themeOptions ? this.themeOptions : {},
+                render: function(columnName) {
+                    var columnModel = _.find(self.columns.models, function(model) {
+                        return model.get('name') === columnName;
+                    });
+                    if (columnModel) {
+                        return self.columnRenderer.getHtml(self.renderItem(columnModel).$el);
+                    }
+                    return '';
+                },
+                attributes: function(columnName, additionalAttributes) {
+                    var attributes = additionalAttributes || {};
+                    var columnModel = _.find(self.columns.models, function(model) {
+                        return model.get('name') === columnName;
+                    });
+                    if (columnModel) {
+                        return self.columnRenderer.getRawAttributes(self.renderItem(columnModel).$el, attributes);
+                    }
+                    return '';
+                }
             }));
             $checkbox = this.$('[data-role=select-row]:checkbox');
             if ($checkbox.length) {

@@ -8,11 +8,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
@@ -63,9 +64,9 @@ class WorkflowAttributesType extends AbstractType
     protected $dispatcher;
 
     /**
-     * @var AuthorizationCheckerInterface
+     * @var PropertyPathSecurityHelper
      */
-    protected $authorizationChecker;
+    protected $propertyPathSecurityHelper;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
@@ -85,7 +86,7 @@ class WorkflowAttributesType extends AbstractType
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor,
         EventDispatcherInterface $dispatcher,
-        AuthorizationCheckerInterface $authorizationChecker
+        PropertyPathSecurityHelper $propertyPathSecurityHelper
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
@@ -94,7 +95,7 @@ class WorkflowAttributesType extends AbstractType
         $this->requiredAttributesListener = $requiredAttributesListener;
         $this->contextAccessor = $contextAccessor;
         $this->dispatcher = $dispatcher;
-        $this->authorizationChecker = $authorizationChecker;
+        $this->propertyPathSecurityHelper = $propertyPathSecurityHelper;
     }
 
     /**
@@ -147,6 +148,11 @@ class WorkflowAttributesType extends AbstractType
     {
         /** @var Workflow $workflow */
         $workflow = $options['workflow'];
+        $attributes = [];
+        $config = $workflow->getDefinition()->getConfiguration();
+        if (isset($config['attributes'])) {
+            $attributes = $workflow->getDefinition()->getConfiguration()['attributes'];
+        }
         $entity = null;
         if (isset($options['data'])) {
             /** @var WorkflowData $data */
@@ -168,7 +174,16 @@ class WorkflowAttributesType extends AbstractType
             if (null === $attributeOptions) {
                 $attributeOptions = array();
             }
-            if (!$entity || $this->isEditableField($entity, $attribute->getName())) {
+            $fieldName = $attribute->getName();
+            if (isset($attributes[$fieldName])) {
+                $attributeConfiguration = $attributes[$fieldName];
+                if (array_key_exists('property_path', $attributeConfiguration)
+                    && $attributeConfiguration['property_path']
+                ) {
+                    $fieldName = $attributeConfiguration['property_path'];
+                }
+            }
+            if (!$entity || $this->isEditableField($entity, $fieldName)) {
                 $this->addAttributeField($builder, $attribute, $attributeOptions, $options);
             }
         }
@@ -182,9 +197,17 @@ class WorkflowAttributesType extends AbstractType
      */
     protected function isEditableField($entity, $fieldName)
     {
-        return $this->authorizationChecker->isGranted(
-            'EDIT',
-            new FieldVote($entity, $fieldName)
+        $propertyPath = new PropertyPath($fieldName);
+        $pathElements = array_values($propertyPath->getElements());
+        if ($propertyPath->getLength() >= 2) {
+            array_shift($pathElements);
+            $fieldName = implode('.', $pathElements);
+        }
+
+        return $this->propertyPathSecurityHelper->isGrantedByPropertyPath(
+            $entity,
+            $fieldName,
+            'EDIT'
         );
     }
 
