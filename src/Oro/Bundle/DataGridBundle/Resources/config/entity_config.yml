@@ -1,0 +1,8 @@
+oro_entity_config:
+    grid:
+        entity:
+            items:
+                # default grid name for the entity
+                default: # string
+                    options:
+                        auditable:          false

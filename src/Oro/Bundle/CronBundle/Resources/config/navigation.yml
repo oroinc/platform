@@ -1,0 +1,40 @@
+oro_menu_config:
+    items:
+        oro_cron_job:
+            label: 'oro.cron.menu.cron_job.label'
+            route: 'oro_cron_job_index'
+            extras:
+                position:    60
+                description: 'Cron job queue'
+                routes:      ['oro_cron_job_*']
+
+        oro_cron_schedule:
+            label: 'oro.cron.menu.cron_schedule.label'
+            route: 'oro_cron_schedule_index'
+            extras:
+                position:    70
+                description: 'oro.cron.menu.cron_schedule.description'
+                routes:      ['oro_cron_schedule_index']
+
+        oro_cron_job_shortcut:
+            label: 'oro.cron.menu.cron_job_shortcut.label'
+            route: 'oro_cron_job_index'
+            extras:
+                description: 'oro.cron.menu.cron_job_shortcut.description'
+
+    tree:
+        application_menu:
+            children:
+                system_tab:
+                    children:
+                        oro_cron_job: ~
+                        oro_cron_schedule: ~
+
+        shortcuts:
+            children:
+                oro_cron_job_shortcut: ~
+
+oro_titles:
+    oro_cron_job_index: ~
+    oro_cron_job_view: 'Job %%command%% (ID: %%id%%)'
+    oro_cron_schedule_index: ~

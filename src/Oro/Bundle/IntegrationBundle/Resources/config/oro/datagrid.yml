@@ -1,0 +1,192 @@
+datagrid:
+    oro-integration-grid:
+        acl_resource: oro_integration_view
+        source:
+            type: orm
+            query:
+                select:
+                    - c.id
+                    - c.name
+                    - c.type
+                    - c.editMode
+                    - CASE WHEN c.enabled = true THEN 'enabled' ELSE 'disabled' END as enabled
+                from:
+                    - { table: %oro_integration.entity.class%, alias: c }
+        columns:
+            name:
+                label:          oro.integration.integration.name.label
+            type:
+                label:          oro.integration.integration.type.label
+                type:           twig
+                template:       OroIntegrationBundle:Integration:Datagrid/type.html.twig
+                frontend_type:  html
+                context:
+                    choices:  "@oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()"
+                    registry: "@oro_integration.manager.types_registry"
+            enabled:
+                label:          oro.integration.integration.enabled.label
+                frontend_type:  select
+                choices:
+                    enabled:  oro.integration.integration.enabled.active.label
+                    disabled: oro.integration.integration.enabled.inactive.label
+        properties:
+            id: ~
+            update_link:
+                type:    url
+                route:   oro_integration_update
+                params:  [ id ]
+            delete_link:
+                type:    url
+                route:   oro_api_delete_integration
+                params:  [ id ]
+            schedule_link:
+                type:    url
+                route:   oro_integration_schedule
+                params:  [ id ]
+            activate_link:
+                type:       url
+                route:      oro_api_activate_integration
+                params:     [ id ]
+            deactivate_link:
+                type:       url
+                route:      oro_api_deactivate_integration
+                params:     [ id ]
+        sorters:
+            columns:
+                name:    { data_name: c.name }
+                type:    { data_name: c.type }
+                enabled: { data_name: c.enabled }
+        filters:
+            columns:
+                name:
+                    data_name: c.name
+                    type: string
+                type:
+                    data_name: c.type
+                    type: choice
+                    options:
+                        field_options:
+                            choices: "@oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList"
+                enabled:
+                    data_name: c.enabled
+                    type:      choice
+                    options:
+                        field_options:
+                            choices:
+                                - oro.integration.integration.enabled.inactive.label
+                                - oro.integration.integration.enabled.active.label
+        actions:
+            update:
+                type:         navigate
+                link:         update_link
+                acl_resource: oro_integration_update
+                icon:         edit
+                label:        oro.grid.action.update
+                rowAction:    true
+            schedule:
+                type:         schedule-sync
+                link:         schedule_link
+                acl_resource: oro_integration_update
+                icon:         refresh
+                label:        oro.integration.datagrid.action.schedule_sync
+            activate:
+                type:         ajax
+                acl_resource: oro_integration_update
+                label:        oro.integration.datagrid.action.activate
+                icon:         ok
+                link:         activate_link
+            deactivate:
+                type:         ajax
+                acl_resource: oro_integration_update
+                label:        oro.integration.datagrid.action.deactivate
+                icon:         remove
+                link:         deactivate_link
+            delete:
+                type:         delete
+                link:         delete_link
+                acl_resource: oro_integration_delete
+                icon:         trash
+                label:        oro.grid.action.delete
+                defaultMessages:
+                    confirm_content: oro.integration.delete_sync_integration_window.content
+                    confirm_ok:      oro.integration.delete_sync_integration_window.button_ok
+                    confirm_title:   oro.integration.delete_sync_integration_window.title
+                    success:         oro.integration.delete_sync_integration_window.success
+        action_configuration: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration::getIsSyncAvailableCondition()
+        options:
+            entityHint: channel
+            entity_pagination: true
+    oro-integration-status-grid:
+        acl_resource: oro_integration_view
+        source:
+            type: orm
+            query:
+                select:
+                    - s.code
+                    - s.date
+                    - s.connector
+                    - s.message
+                    - i.type as integrationType
+                from:
+                    - { table: OroIntegrationBundle:Status, alias: s }
+                join:
+                    left:
+                        - { join: s.channel, alias: i }
+                where:
+                    and:
+                      - s.channel = :integrationId
+        columns:
+            code:
+                label:          oro.integration.integration_status.code.label
+                frontend_type:  select
+                choices:
+                    1:  oro.integration.integration_status.competed.label
+                    2:  oro.integration.integration_status.failed.label
+            connector:
+                type:     callback
+                label:    oro.integration.integration_status.connector.label
+                callable: "@oro_integration.datagrid.status_grid_helper->connectorCodeProperty()"
+            message:
+                label:          oro.integration.integration_status.message.label
+                type:           twig
+                template:       OroIntegrationBundle:Integration:Datagrid/message.html.twig
+                frontend_type:  html
+            date:
+                label:         oro.ui.created_at
+                frontend_type: datetime
+        sorters:
+            columns:
+                code:       { data_name: s.code }
+                date:       { data_name: s.date }
+                connector:  { data_name: s.connector }
+            default:
+                date: DESC
+
+        properties:
+            id: ~
+        filters:
+            columns:
+                code:
+                    data_name: s.code
+                    type:      choice
+                    options:
+                        field_options:
+                            choices:
+                                1:  oro.integration.integration_status.competed.label
+                                2:  oro.integration.integration_status.failed.label
+                connector:
+                    type:      choice
+                    data_name: s.connector
+                    options:
+                        field_options:
+                            choices: []
+                message:
+                    type:      string
+                    data_name: s.message
+                date:
+                    type:      datetime
+                    data_name: s.date
+        options:
+            toolbarOptions:
+                pageSize:
+                    default_per_page: 10

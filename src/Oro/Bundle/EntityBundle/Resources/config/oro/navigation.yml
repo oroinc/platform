@@ -1,5 +1,0 @@
-navigation:
-    titles:
-        oro_entity_index: %%entityName%% - Entities - System
-        oro_entity_view: %%recordName%% - %%entityName%% - Entities - System
-        oro_entity_update: %%entityName%% - Entities - System

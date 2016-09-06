@@ -1,0 +1,62 @@
+placeholders:
+    scripts_before:
+        items:
+            dot_menu_js:
+                order: 100
+            pinbar_js:
+                order: 200
+    scripts_after:
+        items:
+            navigationItem:
+                order: 100
+    navbar:
+        items:
+            shortcuts:
+                order: 100
+    application_menu:
+        items:
+            application_menu:
+                order: 100
+    dots_menu:
+        items:
+            dots_menu:
+                order: 100
+
+    pin_tabs_list:
+        items:
+            pin_tabs_list:
+                order: 100
+
+    after_navigation: ~
+
+    pin_button:
+        items:
+            pin_button:
+                order: 100
+    requirejs_config_extend:
+        items:
+            routing_requirejs_config:
+                order: 100
+
+items:
+   dot_menu_js:
+        template: OroNavigationBundle:Js:dot.menu.js.twig
+   pinbar_js:
+        template: OroNavigationBundle:Js:pinbar.js.twig
+   routing_requirejs_config:
+        template: OroNavigationBundle:Js:requirejs.config.js.twig
+   shortcuts:
+        template: OroNavigationBundle:Shortcut:shortcuts.html.twig
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+   application_menu:
+        template: OroNavigationBundle:ApplicationMenu:applicationMenu.html.twig
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+   dots_menu:
+        template: OroNavigationBundle:ApplicationMenu:dotsMenu.html.twig
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+   pin_tabs_list:
+        template: OroNavigationBundle:Menu:pin_tabs_list.html.twig
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+   pin_button:
+        template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
