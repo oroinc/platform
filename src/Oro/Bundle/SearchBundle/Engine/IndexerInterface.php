@@ -18,7 +18,7 @@ interface IndexerInterface
      * Delete one or several entities from search index
      *
      * @param object|array $entity
-     * @param array        $context
+     * @param array $context
      *
      * @return bool
      */

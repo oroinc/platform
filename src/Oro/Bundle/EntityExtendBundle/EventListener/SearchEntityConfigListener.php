@@ -54,7 +54,7 @@ class SearchEntityConfigListener
         /**
          * On any configuration changes related to search the search mapping cache should be cleaned.
          */
-        $this->searchMappingProvider->clearMappingCache();
+        $this->searchMappingProvider->clearCache();
 
         $className    = $config->getId()->getClassName();
         $extendConfig = $configManager->getProvider('extend')->getConfig($className);
