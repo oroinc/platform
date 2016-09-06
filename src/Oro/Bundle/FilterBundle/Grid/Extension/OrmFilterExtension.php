@@ -20,7 +20,7 @@ class OrmFilterExtension extends AbstractFilterExtension
             return false;
         }
 
-        return $config->getDatasourceType() == OrmDatasource::TYPE;
+        return $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
     /**

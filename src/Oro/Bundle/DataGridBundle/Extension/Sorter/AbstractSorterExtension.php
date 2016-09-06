@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -35,7 +34,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
      * @param $direction
      * @param DatasourceInterface $datasource
      */
-    abstract protected function addSorterToDasource(array $sorter, $direction, DatasourceInterface $datasource);
+    abstract protected function addSorterToDatasource(array $sorter, $direction, DatasourceInterface $datasource);
 
     /**
      * {@inheritdoc}
@@ -47,7 +46,18 @@ abstract class AbstractSorterExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public function processConfigs(DatagridConfiguration $config)
+    {
+        $this->validateConfiguration(
+            new Configuration(),
+            ['sorters' => $config->offsetGetByPath(Configuration::SORTERS_PATH)]
+        );
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
@@ -61,7 +71,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
             if (isset($sorter['apply_callback']) && is_callable($sorter['apply_callback'])) {
                 $sorter['apply_callback']($datasource, $sortKey, $direction);
             } else {
-                $this->addSorterToDasource($sorter, $direction, $datasource);
+                $this->addSorterToDatasource($sorter, $direction, $datasource);
             }
         }
     }
