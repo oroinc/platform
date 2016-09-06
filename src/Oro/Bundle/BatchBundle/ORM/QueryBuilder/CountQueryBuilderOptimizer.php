@@ -56,14 +56,14 @@ class CountQueryBuilderOptimizer
     {
         $originalQueryBuilder = $countQuery ? clone $queryBuilder : $queryBuilder;
         if (isset($countQuery['select'])) {
-            $originalQueryBuilder->resetDqlPart('select');
+            $originalQueryBuilder->resetDQLPart('select');
             foreach ($countQuery['select'] as $selectExpr) {
                 $originalQueryBuilder->addSelect($selectExpr);
             }
         }
 
         if (array_key_exists('groupBy', $countQuery) && !$countQuery['groupBy']) {
-            $originalQueryBuilder->resetDqlPart('groupBy');
+            $originalQueryBuilder->resetDQLPart('groupBy');
         }
 
         $this->context = new QueryOptimizationContext($originalQueryBuilder, $this->qbTools);
