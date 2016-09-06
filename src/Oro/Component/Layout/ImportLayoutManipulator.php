@@ -263,7 +263,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
             if ($rootId === self::ROOT_PLACEHOLDER) {
                 $rootId = $this->getRootId($import->getParent());
             } else {
-                $this->replaceNamespace($rootId, $this->getNamespace($import->getParent()));
+                $this->replaceNamespace($rootId, $import->getParent()->getNamespace());
             }
         }
         return $rootId;
@@ -293,10 +293,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
                 $namespace = $this->getNamespace($this->import);
             }
             if ($namespace) {
-                $replacement = $namespace;
-                if ($id !== self::NAMESPACE_PLACEHOLDER) {
-                    $replacement .= self::NAMESPACE_SUFFIX;
-                }
+                $replacement = $namespace.self::NAMESPACE_SUFFIX;
             }
 
             $id = substr_replace($id, $replacement, 0, strlen(self::NAMESPACE_PLACEHOLDER));
@@ -316,7 +313,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         if ($import->getParent()) {
             $parentNamespace = $this->getNamespace($import->getParent());
             if ($namespace && $parentNamespace) {
-                $this->replaceNamespace($namespace, $parentNamespace);
+                $namespace = $parentNamespace.self::NAMESPACE_SUFFIX.$namespace;
             } elseif ($parentNamespace) {
                 $namespace = $parentNamespace;
             }
