@@ -685,7 +685,11 @@ class Query
         $part = strrev(trim($field));
         $part = preg_split('/ sa /im', $part, 2);
         if (count($part) > 1) {
-            $field = strrev($part[1]);
+            // splitting with ' ' and taking first word as a field name - does not allow spaces in field name
+            $rev = strrev($part[1]);
+            $rev = explode(' ', $rev);
+            $field = array_shift($rev);
+
             $alias = strrev($part[0]);
 
             $this->fieldsAliases[$field] = $alias;
