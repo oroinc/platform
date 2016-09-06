@@ -24,7 +24,6 @@ parameters:
     oro_search.provider.search_mapping.class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
 
     oro_search.cache.search_mapping_cache.class: Oro\Bundle\SearchBundle\Cache\SearchMappingCache
-    oro_search.event_listener.search_mapping_change_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchMappingChangeListener
 
     # services used only for ORM search engine
     oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager

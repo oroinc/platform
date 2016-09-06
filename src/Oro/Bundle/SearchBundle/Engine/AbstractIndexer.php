@@ -2,12 +2,12 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Query\Mode;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 abstract class AbstractIndexer implements IndexerInterface
 {
@@ -22,22 +22,31 @@ abstract class AbstractIndexer implements IndexerInterface
     /** @var ObjectMapper */
     protected $mapper;
 
+    /** @var EntityTitleResolverInterface */
+    protected $entityTitleResolver;
+
     /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ObjectMapper    $mapper
+     * @param ManagerRegistry              $registry
+     * @param DoctrineHelper               $doctrineHelper
+     * @param ObjectMapper                 $mapper
+     * @param EntityTitleResolverInterface $entityTitleResolver
      */
-    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper, ObjectMapper $mapper)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        DoctrineHelper $doctrineHelper,
+        ObjectMapper $mapper,
+        EntityTitleResolverInterface $entityTitleResolver
+    ) {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->mapper = $mapper;
+        $this->entityTitleResolver = $entityTitleResolver;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getClassesForReindex($class = null)
+    public function getClassesForReindex($class = null, $context = [])
     {
         if (false == $class) {
             return $this->mapper->getEntities([Mode::NORMAL, Mode::WITH_DESCENDANTS]);
@@ -59,7 +68,7 @@ abstract class AbstractIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function reindex($class = null)
+    public function reindex($class = null, $context = [])
     {
         if (false == $class) {
             $this->resetIndex();
@@ -141,18 +150,7 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     protected function getEntityTitle($entity)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        $fields      = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
-        if ($fields) {
-            $title = [];
-            foreach ($fields as $field) {
-                $title[] = $this->mapper->getFieldValue($entity, $field);
-            }
-        } else {
-            $title = [(string) $entity];
-        }
-
-        return implode(' ', $title);
+        return $this->entityTitleResolver->resolve($entity);
     }
 
     /**

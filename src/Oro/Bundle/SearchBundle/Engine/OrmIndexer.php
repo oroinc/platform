@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class OrmIndexer extends AbstractIndexer
 {
@@ -19,13 +20,18 @@ class OrmIndexer extends AbstractIndexer
     private $indexManager;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ObjectMapper    $mapper
+     * @param ManagerRegistry              $registry
+     * @param DoctrineHelper               $doctrineHelper
+     * @param ObjectMapper                 $mapper
+     * @param EntityTitleResolverInterface $entityTitleResolver
      */
-    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper, ObjectMapper $mapper)
-    {
-        parent::__construct($registry, $doctrineHelper, $mapper);
+    public function __construct(
+        ManagerRegistry $registry,
+        DoctrineHelper $doctrineHelper,
+        ObjectMapper $mapper,
+        EntityTitleResolverInterface $entityTitleResolver
+    ) {
+        parent::__construct($registry, $doctrineHelper, $mapper, $entityTitleResolver);
     }
 
     /**
@@ -39,7 +45,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function save($entity)
+    public function save($entity, $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
         if (false == $entities) {
@@ -58,7 +64,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function delete($entity)
+    public function delete($entity, $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
         if (!$entities) {
@@ -84,7 +90,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function resetIndex($class = null)
+    public function resetIndex($class = null, $context = [])
     {
         if (false == $class) {
             $this->clearAllSearchIndexes();
