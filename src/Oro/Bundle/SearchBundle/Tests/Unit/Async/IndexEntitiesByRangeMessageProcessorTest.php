@@ -45,6 +45,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $producer = $this->createSearchIndexerMock();
 
         $message = new NullMessage();
+        $message->setBody('');
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $logger);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));

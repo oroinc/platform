@@ -44,6 +44,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
 
         $message = new NullMessage();
+        $message->setBody('');
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 

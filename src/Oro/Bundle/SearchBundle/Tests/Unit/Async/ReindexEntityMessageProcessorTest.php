@@ -44,6 +44,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
+        $message->setBody('');
 
         $processor = new ReindexEntityMessageProcessor($indexer, $producer);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
