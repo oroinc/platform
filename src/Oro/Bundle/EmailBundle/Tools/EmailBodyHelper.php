@@ -53,6 +53,6 @@ class EmailBodyHelper
         // clear `script` tags from content
         $body = preg_replace('/<script\b[^>]*>(.*?)<\/script>/si', '', $body);
 
-        return preg_replace(['/\s\s+/', '/\n+/'], [' ', ' '], $this->htmlTagHelper->stripTags($body));
+        return utf8_encode(preg_replace(['/\s\s+/', '/\n+/'], [' ', ' '], $this->htmlTagHelper->stripTags($body)));
     }
 }

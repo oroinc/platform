@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
-use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -13,8 +12,6 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
-use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
@@ -59,7 +56,7 @@ class OrmFilterExtension extends AbstractExtension
             return false;
         }
 
-        return $config->getDatasourceType() == OrmDatasource::TYPE;
+        return $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
     /**
