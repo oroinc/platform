@@ -222,5 +222,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('bar', $aliases);
 
         $this->assertTrue(count($aliases) < 2);
+
+        foreach ($selectFieldsProperty as $field) {
+            $this->assertNotTrue(strpos($field, ' ') > 0);
+        }
     }
 }
