@@ -6,9 +6,8 @@ use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 
 use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
-use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
 
-class UpdateSchemaListener
+class ApiSourceListener
 {
     /** @var ResourcesCache */
     protected $resourcesCache;
@@ -34,10 +33,7 @@ class UpdateSchemaListener
         $this->apiDocViews = $apiDocViews;
     }
 
-    /**
-     * @param UpdateSchemaEvent $event
-     */
-    public function onSchemaUpdate(UpdateSchemaEvent $event)
+    public function clearCache()
     {
         // clear the cache for API resources
         $this->resourcesCache->clear();
