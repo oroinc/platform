@@ -79,6 +79,11 @@ abstract class AbstractTagsExtension extends AbstractExtension
         return $this->entityClassName;
     }
 
+    /**
+     * @param string $entityClass
+     * @param array $ids
+     * @return mixed
+     */
     protected function getTagsForEntityClass($entityClass, array $ids)
     {
         return array_reduce(
