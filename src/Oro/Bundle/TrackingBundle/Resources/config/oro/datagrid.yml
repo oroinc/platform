@@ -1,4 +1,4 @@
-datagrid:
+datagrids:
     website-grid:
         extended_entity_name: %oro_tracking.tracking_website.class%
         acl_resource: oro_tracking_website_view
