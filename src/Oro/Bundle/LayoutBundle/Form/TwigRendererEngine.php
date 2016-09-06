@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Form;
 
-use Symfony\Bridge\Twig\Form\TwigRendererEngine as BaseEngine;
 use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
-use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
-
-class TwigRendererEngine extends BaseEngine
+class TwigRendererEngine extends BaseTwigRendererEngine
 {
     /**
      * @var LayoutHelper
