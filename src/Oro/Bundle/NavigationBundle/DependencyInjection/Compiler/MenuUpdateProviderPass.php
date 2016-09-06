@@ -20,6 +20,10 @@ class MenuUpdateProviderPass implements CompilerPassInterface
         }
 
         $providers = $container->findTaggedServiceIds(self::TAG);
+        if (!$providers) {
+            return;
+        }
+
         $service = $container->getDefinition(self::BUILDER_SERVICE_ID);
 
         foreach ($providers as $id => $tags) {
