@@ -34,6 +34,11 @@ abstract class AbstractMenuUpdate
 
     /**
      * @var string
+     */
+    protected $title;
+
+    /**
+     * @var string
      *
      * @ORM\Column(name="uri", type="string", length=255, nullable=true)
      */
@@ -122,6 +127,25 @@ abstract class AbstractMenuUpdate
     public function setParentKey($parentKey)
     {
         $this->parentKey = $parentKey;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return AbstractMenuUpdate
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
 
         return $this;
     }
