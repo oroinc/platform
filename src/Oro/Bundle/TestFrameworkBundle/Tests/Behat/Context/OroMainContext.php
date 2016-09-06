@@ -230,7 +230,7 @@ class OroMainContext extends MinkContext implements
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
-        $this->getSession()->getDriver()->waitForAjax();
+        $this->waitForAjax();
         $form = $fieldSet->getLastSet();
         $form->fill($table);
     }
@@ -241,7 +241,8 @@ class OroMainContext extends MinkContext implements
      */
     public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
     {
-        $this->visit('user/login');
+        $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
+        $this->visit($uri);
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
@@ -482,5 +483,13 @@ class OroMainContext extends MinkContext implements
             default:
                 return (int) $count;
         }
+    }
+
+    /**
+     * @param int $time
+     */
+    protected function waitForAjax($time = 60000)
+    {
+        return $this->getSession()->getDriver()->waitForAjax($time);
     }
 }
