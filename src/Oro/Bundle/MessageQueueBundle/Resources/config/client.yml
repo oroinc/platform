@@ -84,6 +84,7 @@ services:
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
+            - '%message_queue_idle_microsec%'
 
     oro_message_queue.client.consume_messages_command:
         class: 'Oro\Component\MessageQueue\Client\ConsumeMessagesCommand'
