@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\AbstractQuery;
 
 use Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
@@ -27,6 +28,9 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $originRepository;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AbstractQuery */
+    protected $originQuery;
+
     /** @var OriginFolderFilterProvider */
     protected $originFolderFilterProvider;
 
@@ -35,10 +39,38 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
         $this->mailboxRepository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->originQuery = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+
+        $originQb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $originQb->expects($this->any())
+            ->method('select')
+            ->will($this->returnSelf());
+        $originQb->expects($this->any())
+            ->method('leftJoin')
+            ->will($this->returnSelf());
+        $originQb->expects($this->any())
+            ->method('andWhere')
+            ->will($this->returnSelf());
+        $originQb->expects($this->any())
+            ->method('setParameters')
+            ->will($this->returnSelf());
+        $originQb->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnValue($this->originQuery));
+
         $this->originRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
-            ->setMethods(['findBy', 'findAvailableMailboxes'])
+            ->setMethods(['createQueryBuilder', 'findAvailableMailboxes'])
             ->getMock();
+        $this->originRepository->expects($this->any())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($originQb));
 
         $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
@@ -60,9 +92,10 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($this->originRepository));
 
-        $this->originRepository->expects($this->once())
-            ->method('findBy')
+        $this->originQuery->expects($this->once())
+            ->method('getResult')
             ->willReturn([]);
+
         $this->originRepository->expects($this->once())
             ->method('findAvailableMailboxes')
             ->willReturn([]);
@@ -100,9 +133,10 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($this->originRepository));
 
-        $this->originRepository->expects($this->once())
-            ->method('findBy')
+        $this->originQuery->expects($this->once())
+            ->method('getResult')
             ->willReturn([$origin1, $origin2]);
+
         $this->originRepository->expects($this->once())
             ->method('findAvailableMailboxes')
             ->willReturn([]);
@@ -154,9 +188,10 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($this->originRepository));
 
-        $this->originRepository->expects($this->once())
-            ->method('findBy')
+        $this->originQuery->expects($this->once())
+            ->method('getResult')
             ->willReturn([]);
+
         $this->originRepository->expects($this->once())
             ->method('findAvailableMailboxes')
             ->willReturn([$mailbox1, $mailbox2]);

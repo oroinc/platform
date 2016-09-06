@@ -12,17 +12,21 @@ class OverrideServiceCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $this->changeService(
-            $container,
-            'twig.form.engine',
-            'oro_layout.twig.form.engine'
-        );
+        if ($container->has('oro_layout.twig.form.engine')) {
+            $this->changeService(
+                $container,
+                'twig.form.engine',
+                'oro_layout.twig.form.engine'
+            );
+        }
 
-        $this->changeService(
-            $container,
-            'templating.form.engine',
-            'oro_layout.templating.form.engine'
-        );
+        if ($container->has('oro_layout.templating.form.engine')) {
+            $this->changeService(
+                $container,
+                'templating.form.engine',
+                'oro_layout.templating.form.engine'
+            );
+        }
     }
 
     /**
