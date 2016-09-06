@@ -555,6 +555,14 @@ class Query
     }
 
     /**
+     * @return array
+     */
+    public function getSelectAliases()
+    {
+        return $this->fieldsAliases;
+    }
+
+    /**
      * @param $fieldName
      * @param null $enforcedFieldType
      * @return $this

@@ -217,4 +217,26 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('text.foo', $fields);
         $this->assertContains('bar', $aliases);
     }
+
+    public function testGetSelectWithAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.faa as bor');
+
+        $select = $query->getSelect();
+
+        $this->assertSame(['text.foo', 'text.faa'], $select);
+    }
+
+    public function testGetAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.faa as bor');
+
+        $aliases = $query->getSelectAliases();
+
+        $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $aliases);
+    }
 }
