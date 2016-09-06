@@ -26,18 +26,19 @@ class IndexListenerTest extends WebTestCase
     public function testShouldCreateSearchIndexForEntityIfItWasCreated()
     {
         $em = $this->getDoctrine()->getManagerForClass(Item::class);
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->enable();
+        $this->getMessageProducer()->clear();
 
         // test
         $item = new Item();
         $em->persist($item);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getTraces();
+        $messages = $this->getMessageProducer()->getSentMessages();
 
         $this->assertNotNull($item->getId());
-        $this->assertCount(1, $traces);
-        $this->assertEquals(Topics::INDEX_ENTITIES, $traces[0]['topic']);
+        $this->assertCount(1, $messages);
+        $this->assertEquals(Topics::INDEX_ENTITIES, $messages[0]['topic']);
 
         $expectedMessage = [
             [
@@ -46,7 +47,7 @@ class IndexListenerTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals($expectedMessage, $traces[0]['message']);
+        $this->assertEquals($expectedMessage, $messages[0]['message']);
     }
 
     public function testShouldUpdateSearchIndexForEntityIfItWasUpdated()
@@ -56,17 +57,18 @@ class IndexListenerTest extends WebTestCase
         $item = new Item();
         $em->persist($item);
         $em->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->enable();
+        $this->getMessageProducer()->clear();
 
         // test
         $item->stringValue = 'value';
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getTraces();
+        $messages = $this->getMessageProducer()->getSentMessages();
 
         $this->assertNotEmpty($item->getId());
-        $this->assertCount(1, $traces);
-        $this->assertEquals(Topics::INDEX_ENTITIES, $traces[0]['topic']);
+        $this->assertCount(1, $messages);
+        $this->assertEquals(Topics::INDEX_ENTITIES, $messages[0]['topic']);
 
         $expectedMessage = [
             [
@@ -75,7 +77,7 @@ class IndexListenerTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals($expectedMessage, $traces[0]['message']);
+        $this->assertEquals($expectedMessage, $messages[0]['message']);
     }
 
     public function testShouldDeleteSearchIndexForEntityIfItWasDeleted()
@@ -85,7 +87,8 @@ class IndexListenerTest extends WebTestCase
         $item = new Item();
         $em->persist($item);
         $em->flush();
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->enable();
+        $this->getMessageProducer()->clear();
 
         $itemId = $item->getId();
         $this->assertNotNull($itemId);
@@ -94,10 +97,10 @@ class IndexListenerTest extends WebTestCase
         $em->remove($item);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getTraces();
+        $messages = $this->getMessageProducer()->getSentMessages();
 
-        $this->assertCount(1, $traces);
-        $this->assertEquals(Topics::INDEX_ENTITIES, $traces[0]['topic']);
+        $this->assertCount(1, $messages);
+        $this->assertEquals(Topics::INDEX_ENTITIES, $messages[0]['topic']);
 
         $expectedMessage = [
             [
@@ -106,7 +109,7 @@ class IndexListenerTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals($expectedMessage, $traces[0]['message']);
+        $this->assertEquals($expectedMessage, $messages[0]['message']);
     }
 
     /**
@@ -118,7 +121,7 @@ class IndexListenerTest extends WebTestCase
     }
 
     /**
-     * @return \Oro\Component\MessageQueue\Client\MessageProducer
+     * @return \Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
      */
     private function getMessageProducer()
     {

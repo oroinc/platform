@@ -49,11 +49,12 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         $message->setBody(Item::class);
 
         $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->getMessageProducer()->clearTraces();
+        $this->getMessageProducer()->enable();
+        $this->getMessageProducer()->clear();
 
         $this->getIndexEntitiesByTypeMessageProcessor()->process($message, $this->createQueueSessionMock());
 
-        $traces = $this->getMessageProducer()->getTraces();
+        $messages = $this->getMessageProducer()->getSentMessages();
 
         $expectedMessage = [
             'class' => Item::class,
@@ -61,13 +62,13 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
             'limit' => 1000,
         ];
 
-        $this->assertCount(1, $traces);
-        $this->assertEquals(Topics::INDEX_ENTITY_BY_RANGE, $traces[0]['topic']);
-        $this->assertEquals($expectedMessage, $traces[0]['message']);
+        $this->assertCount(1, $messages);
+        $this->assertEquals(Topics::INDEX_ENTITY_BY_RANGE, $messages[0]['topic']);
+        $this->assertEquals($expectedMessage, $messages[0]['message']);
     }
 
     /**
-     * @return \Oro\Component\MessageQueue\Client\TraceableMessageProducer
+     * @return \Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
      */
     protected function getMessageProducer()
     {
