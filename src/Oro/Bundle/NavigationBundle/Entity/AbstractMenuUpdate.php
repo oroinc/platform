@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Model;
+namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-abstract class MenuUpdate
+abstract class AbstractMenuUpdate
 {
     const OWNERSHIP_GLOBAL        = 1;
     const OWNERSHIP_ORGANIZATION  = 2;
@@ -28,16 +28,16 @@ abstract class MenuUpdate
     /**
      * @var string
      *
-     * @ORM\Column(name="parent_id", type="string", length=100)
+     * @ORM\Column(name="parent_key", type="string", length=100, nullable=true)
      */
-    protected $parentId;
+    protected $parentKey;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=255)
+     * @ORM\Column(name="uri", type="string", length=255, nullable=true)
      */
-    protected $title;
+    protected $uri;
 
     /**
      * @var string
@@ -56,7 +56,7 @@ abstract class MenuUpdate
     /**
      * @var int
      *
-     * @ORM\Column(name="owner_id", type="integer")
+     * @ORM\Column(name="owner_id", type="integer", nullable=true)
      */
     protected $ownerId;
 
@@ -65,17 +65,17 @@ abstract class MenuUpdate
      *
      * @ORM\Column(name="is_active", type="boolean")
      */
-    protected $isActive;
+    protected $active = true;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="priority", type="integer")
+     * @ORM\Column(name="priority", type="integer", nullable=true)
      */
     protected $priority;
 
     /**
-     * Get array of extra data that is not declared in MenuUpdate model
+     * Get array of extra data that is not declared in AbstractMenuUpdate model
      * @return array
      */
     abstract public function getExtras();
@@ -89,17 +89,6 @@ abstract class MenuUpdate
     }
 
     /**
-     * @param int $id
-     * @return MenuUpdate
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getKey()
@@ -109,7 +98,7 @@ abstract class MenuUpdate
 
     /**
      * @param string $key
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setKey($key)
     {
@@ -121,18 +110,18 @@ abstract class MenuUpdate
     /**
      * @return string
      */
-    public function getParentId()
+    public function getParentKey()
     {
-        return $this->parentId;
+        return $this->parentKey;
     }
 
     /**
-     * @param string $parentId
-     * @return MenuUpdate
+     * @param string $parentKey
+     * @return AbstractMenuUpdate
      */
-    public function setParentId($parentId)
+    public function setParentKey($parentKey)
     {
-        $this->parentId = $parentId;
+        $this->parentKey = $parentKey;
 
         return $this;
     }
@@ -140,18 +129,18 @@ abstract class MenuUpdate
     /**
      * @return string
      */
-    public function getTitle()
+    public function getUri()
     {
-        return $this->title;
+        return $this->uri;
     }
 
     /**
-     * @param string $title
-     * @return MenuUpdate
+     * @param string $uri
+     * @return AbstractMenuUpdate
      */
-    public function setTitle($title)
+    public function setUri($uri)
     {
-        $this->title = $title;
+        $this->uri = $uri;
 
         return $this;
     }
@@ -166,7 +155,7 @@ abstract class MenuUpdate
 
     /**
      * @param string $menu
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setMenu($menu)
     {
@@ -185,7 +174,7 @@ abstract class MenuUpdate
 
     /**
      * @param int $ownershipType
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setOwnershipType($ownershipType)
     {
@@ -204,7 +193,7 @@ abstract class MenuUpdate
 
     /**
      * @param int $ownerId
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setOwnerId($ownerId)
     {
@@ -216,18 +205,18 @@ abstract class MenuUpdate
     /**
      * @return boolean
      */
-    public function isIsActive()
+    public function isActive()
     {
-        return $this->isActive;
+        return $this->active;
     }
 
     /**
-     * @param boolean $isActive
-     * @return MenuUpdate
+     * @param boolean $active
+     * @return AbstractMenuUpdate
      */
-    public function setIsActive($isActive)
+    public function setActive($active)
     {
-        $this->isActive = $isActive;
+        $this->active = $active;
 
         return $this;
     }
@@ -242,7 +231,7 @@ abstract class MenuUpdate
 
     /**
      * @param int $priority
-     * @return MenuUpdate
+     * @return AbstractMenuUpdate
      */
     public function setPriority($priority)
     {

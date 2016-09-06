@@ -86,13 +86,28 @@ class ConfigurationBuilder implements BuilderInterface
      * @param array         $data
      * @param array         $itemList
      * @param array         $options
+     * @param array         $itemCodes
      *
      * @return \Knp\Menu\ItemInterface
      */
-    private function createFromArray(ItemInterface $menu, array $data, array &$itemList, array $options = array())
-    {
+    private function createFromArray(
+        ItemInterface $menu,
+        array $data,
+        array &$itemList,
+        array $options = [],
+        array $itemCodes = []
+    ) {
         $isAllowed = false;
         foreach ($data as $itemCode => $itemData) {
+            if (in_array($itemCode, $itemCodes)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Item key "%s" duplicated in tree menu "%s".',
+                    $itemCode,
+                    $menu->getRoot()->getName()
+                ));
+            }
+            $itemCodes[] = $itemCode;
+
             $itemData = $this->resolver->resolve($itemData);
             if (!empty($itemList[$itemCode])) {
                 $itemOptions = $itemList[$itemCode];
@@ -110,7 +125,7 @@ class ConfigurationBuilder implements BuilderInterface
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
 
                 if (!empty($itemData['children'])) {
-                    $this->createFromArray($newMenuItem, $itemData['children'], $itemList, $options);
+                    $this->createFromArray($newMenuItem, $itemData['children'], $itemList, $options, $itemCodes);
                 }
 
                 $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
