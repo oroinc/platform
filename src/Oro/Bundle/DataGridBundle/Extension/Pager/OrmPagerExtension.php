@@ -53,8 +53,6 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
-
         if ($datasource instanceof OrmDatasource) {
             $this->pager->setQueryBuilder($datasource->getQueryBuilder());
             $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
@@ -64,15 +62,24 @@ class OrmPagerExtension extends AbstractExtension
             );
         }
 
-        if ($config->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false) ||
-            $config->offsetGetByPath(ModeExtension::MODE_OPTION_PATH) === ModeExtension::MODE_CLIENT
-        ) {
+        $onePage = $config->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false);
+        $mode = $config->offsetGetByPath(ModeExtension::MODE_OPTION_PATH);
+        $perPageLimit = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH);
+        $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
+        $perPageCount = $this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage);
+
+        if ((!$perPageLimit && $onePage) || $mode === ModeExtension::MODE_CLIENT) {
             // no restrictions applied
             $this->pager->setPage(0);
             $this->pager->setMaxPerPage(0);
+        } elseif ($onePage && $perPageLimit) {
+            // one page with limit
+            $this->pager->setPage(0);
+            $this->pager->adjustTotalCount($perPageCount);
+            $this->pager->setMaxPerPage($perPageCount);
         } else {
             $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
-            $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
+            $this->pager->setMaxPerPage($perPageCount);
         }
         $this->tryAdjustTotalCount();
         $this->pager->init();
