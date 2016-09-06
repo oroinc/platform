@@ -1,0 +1,14 @@
+layout:
+    imports:
+         -
+             id: datagrid_toolbar
+             root: __root
+
+    actions:
+        - '@addTree':
+            items:
+                __datagrid:
+                    blockType: datagrid
+            tree:
+                __root:
+                    __datagrid: ~
