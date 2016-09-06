@@ -107,6 +107,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             ->will($this->returnValue($qb));
 
         $config = DatagridConfiguration::create($source);
+        $config->setName('test_grid');
 
         $extension->visitDatasource($config, $datasource);
         $result  = $qb->getDQL();

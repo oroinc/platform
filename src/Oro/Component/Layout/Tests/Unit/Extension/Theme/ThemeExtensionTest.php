@@ -3,9 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
 use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
-use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
-use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\LayoutContext;
@@ -32,23 +30,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|DependencyInitializer */
     protected $dependencyInitializer;
 
-    /** @var ResourceProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceProviderInterface */
     protected $resourceProvider;
-
-    /** @var array */
-    protected static $resources = [
-        'oro-default' => [
-            'resource1.yml',
-            'resource2.xml',
-            'resource3.php'
-        ],
-        'oro-gold' => [
-            'resource-gold.yml',
-            'index' => [
-                'resource-update.yml'
-            ]
-        ],
-    ];
 
     protected function setUp()
     {
@@ -56,18 +39,20 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
         $this->yamlDriver = $this
             ->getMockBuilder('Oro\Component\Layout\Loader\Driver\DriverInterface')
-            ->setMethods(['supports', 'load'])
+            ->setMethods(['load', 'getUpdateFilenamePattern'])
             ->getMock();
         $this->phpDriver = $this
             ->getMockBuilder('Oro\Component\Layout\Loader\Driver\DriverInterface')
-            ->setMethods(['supports', 'load'])
+            ->setMethods(['load', 'getUpdateFilenamePattern'])
             ->getMock();
 
         $this->dependencyInitializer = $this
             ->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->resourceProvider = new ThemeResourceProvider(self::$resources);
+        $this->resourceProvider = $this
+            ->getMock('Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface');
 
         $loader = new LayoutUpdateLoader();
         $loader->addDriver('yml', $this->yamlDriver);
@@ -81,51 +66,23 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testThemeWithoutUpdatesTheme()
+    public function testGetLayoutUpdates()
     {
         $themeName = 'my-theme';
         $this->pathProvider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
+
+        $this->resourceProvider
+            ->expects($this->any())
+            ->method('findApplicableResources')
+            ->with([$themeName])
+            ->will($this->returnValue([
+                'oro-default/resource1.yml',
+                'oro-default/page/resource2.yml',
+                'oro-default/page/resource3.php'
+            ]));
+
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertEquals([], $result);
-    }
-
-    public function testThemeYamlUpdateFound()
-    {
-        $themeName = 'oro-gold';
-        $this->pathProvider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
-
-        $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
-
-        $this->yamlDriver->expects($this->once())->method('load')
-            ->with('resource-gold.yml')
-            ->willReturn($updateMock);
-
-        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
-        $this->assertContains($updateMock, $result);
-    }
-
-    public function testUpdatesFoundBasedOnMultiplePaths()
-    {
-        $themeName = 'oro-gold';
-        $this->pathProvider->expects($this->once())->method('getPaths')->willReturn(
-            [
-                $themeName,
-                $themeName.PathProviderInterface::DELIMITER.'index',
-            ]
-        );
-
-        $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
-
-        $this->yamlDriver->expects($this->at(0))->method('load')
-            ->with('resource-gold.yml')
-            ->willReturn($updateMock);
-
-        $this->yamlDriver->expects($this->at(1))->method('load')
-            ->with('resource-update.yml')
-            ->willReturn($updateMock);
-
-        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
-        $this->assertContains($updateMock, $result);
     }
 
     public function testThemeUpdatesFoundWithOneSkipped()
@@ -133,14 +90,23 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $themeName = 'oro-default';
         $this->pathProvider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
 
+        $this->resourceProvider
+            ->expects($this->any())
+            ->method('findApplicableResources')
+            ->with([$themeName])
+            ->will($this->returnValue([
+                'oro-default/resource1.yml',
+                'oro-default/page/resource3.php'
+            ]));
+
         $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $update2Mock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->yamlDriver->expects($this->once())->method('load')
-            ->with('resource1.yml')
+            ->with('oro-default/resource1.yml')
             ->willReturn($updateMock);
         $this->phpDriver->expects($this->once())->method('load')
-            ->with('resource3.php')
+            ->with('oro-default/page/resource3.php')
             ->willReturn($update2Mock);
 
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
@@ -154,6 +120,14 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $update = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $this->pathProvider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
 
+        $this->resourceProvider
+            ->expects($this->any())
+            ->method('findApplicableResources')
+            ->with([$themeName])
+            ->will($this->returnValue([
+                'oro-default/resource1.yml'
+            ]));
+
         $this->yamlDriver->expects($this->once())->method('load')->willReturn($update);
 
         $this->dependencyInitializer->expects($this->once())->method('initialize')->with($this->identicalTo($update));
@@ -165,6 +139,16 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $themeName = 'my-theme';
         $this->pathProvider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
+
+        $this->resourceProvider
+            ->expects($this->any())
+            ->method('findApplicableResources')
+            ->with([$themeName])
+            ->will($this->returnValue([
+                'oro-default/resource1.yml',
+                'oro-default/page/resource2.yml',
+                'oro-default/page/resource3.php'
+            ]));
 
         $this->pathProvider->expects($this->once())->method('setContext');
 

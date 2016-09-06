@@ -82,8 +82,9 @@ define(['jquery'], function($) {
          * @constructor
          */
         initialize: function(formElement) {
-            var groups = formElement.find('[data-validation-optional-group]');
             var self = this;
+
+            var groups = formElement.find('[data-validation-optional-group]');
             var labels = groups.find('label[data-required]');
 
             labels.find('em').hide().html('*');
