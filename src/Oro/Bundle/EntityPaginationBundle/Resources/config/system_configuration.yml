@@ -1,0 +1,50 @@
+oro_system_configuration:
+    fields:
+        oro_entity_pagination.enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 100
+            options:
+                label: oro.entity_pagination.system_configuration.fields.enabled.label
+                tooltip: oro.entity_pagination.system_configuration.fields.enabled.tooltip
+                required: true
+        oro_entity_pagination.limit:
+            data_type: integer
+            type: text
+            priority: 90
+            options:
+                label: oro.entity_pagination.system_configuration.fields.limit.label
+                tooltip: oro.entity_pagination.system_configuration.fields.limit.tooltip
+                required: true
+                constraints:
+                    - NotBlank: ~
+                    - Range:
+                        min: 1
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    grid_settings:
+                                        children:
+                                            - oro_entity_pagination.enabled
+                                            - oro_entity_pagination.limit
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    grid_settings:
+                                        children:
+                                            - oro_entity_pagination.enabled
+                                            - oro_entity_pagination.limit
+
+    api_tree:
+        look-and-feel:
+            oro_entity_pagination.enabled: ~

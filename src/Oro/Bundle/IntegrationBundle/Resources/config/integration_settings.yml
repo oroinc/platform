@@ -1,0 +1,19 @@
+oro_integration:
+    form:
+        synchronization_settings:
+            isTwoWaySyncEnabled:
+                type: checkbox
+                options:
+                    label:    oro.integration.integration.is_two_way_sync_enabled.label
+                    required: false
+                applicable: "@oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)"
+            syncPriority:
+                type:  choice
+                options:
+                    label:    oro.integration.integration.sync_priority.label
+                    tooltip:  oro.integration.integration.sync_priority.tooltip
+                    required: true
+                    choices:
+                        remote: oro.integration.integration.remote_wins.label
+                        local:  oro.integration.integration.local_wins.label
+                applicable: "@oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)"

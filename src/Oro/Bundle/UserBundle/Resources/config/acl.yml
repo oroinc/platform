@@ -1,0 +1,18 @@
+password_management:
+    label: oro.user.action.password_management.label
+    description: oro.user.action.password_management.description
+    type: action
+    group_name: ""
+    category: "application"
+update_own_profile:
+    label: oro.user.action.update_profile.label
+    description: oro.user.action.update_profile.description
+    type: action
+    group_name: ""
+    category: "application"
+update_own_configuration:
+    label: oro.user.action.update_configuration.label
+    description: oro.user.action.update_configuration.description
+    type: action
+    group_name: ""
+    category: "application"

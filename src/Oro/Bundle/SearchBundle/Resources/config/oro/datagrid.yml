@@ -1,0 +1,13 @@
+datagrid:
+    search-grid:
+        source:
+            type: search
+        columns:
+            entity:
+                label: Item
+                type: search-result
+                template: ~
+                frontend_type: html
+        properties: ~
+        sorters: ~
+        filters: ~

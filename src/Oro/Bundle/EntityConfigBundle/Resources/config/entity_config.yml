@@ -1,0 +1,32 @@
+oro_entity_config:
+    entity_config:
+        entity:
+            items:
+                entity_name:
+                    options:
+                        priority: 200
+                        indexed: true
+                    grid:
+                        type:               string
+                        label:              oro.entity_config.entity_config.entity_name.label
+                        filter_type:        string
+                        required:           true
+                        sortable:           true
+                        filterable:         true
+                        show_filter:        true
+                module_name:
+                    options:
+                        priority: 210
+                        indexed: true
+                    grid:
+                        type:               string
+                        label:              oro.entity_config.entity_config.module_name.label
+                        filter_type:        choice
+                        filter_options:
+                            field_options:
+                                multiple: true
+                                choices: "@oro_entity_config.event_listener.entityconfig_grid_listener->getModuleChoices"
+                        required:           true
+                        sortable:           true
+                        filterable:         true
+                        show_filter:        true

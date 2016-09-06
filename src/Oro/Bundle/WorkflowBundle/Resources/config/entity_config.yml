@@ -1,0 +1,18 @@
+oro_entity_config:
+    workflow:
+        entity:
+            items:
+                show_step_in_grid:
+                    options:
+                        priority:           250
+                        default_value:      true
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.workflow.entity_config.show_step_in_grid.label
+                            required:       false
+                            choices:
+                                false:      oro.workflow.entity_config.show_step_in_grid.choice.hide
+                                true:       oro.workflow.entity_config.show_step_in_grid.choice.show
+                            empty_value:    false
+                            block:          other

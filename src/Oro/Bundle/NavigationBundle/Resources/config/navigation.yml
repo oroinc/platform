@@ -1,0 +1,78 @@
+oro_menu_config:
+    templates:
+        application_menu:
+            template: 'OroNavigationBundle:Menu:application_menu.html.twig'
+            currentClass: 'active'
+            ancestorClass: 'active'
+            allow_safe_labels: true
+            rootClass: 'nav nav-multilevel main-menu'
+        dots_menu:
+            template: 'OroNavigationBundle:Menu:dots_menu.html.twig'
+        shortcuts:
+            template: 'OroNavigationBundle:Menu:shortcuts.html.twig'
+        navbar:
+            template: 'OroNavigationBundle:Menu:navbar.html.twig'
+        dropdown:
+            template: 'OroNavigationBundle:Menu:dropdown.html.twig'
+        horizontal_tabs:
+            template: 'OroNavigationBundle:Menu:horizontal_tabs.html.twig'
+        pinbar:
+            template: 'OroNavigationBundle:Menu:pinbar.html.twig'
+        favorite:
+            template: 'OroNavigationBundle:Menu:favorites.html.twig'
+        mostviewed:
+            template: 'OroNavigationBundle:Menu:mostviewed.html.twig'
+            rootClass: 'extra-list'
+        history:
+            template: 'OroNavigationBundle:Menu:history.html.twig'
+            rootClass: 'extra-list'
+            currentAsLink: false
+
+    items:
+        pinbar:
+            label: 'oro.navigation.menu.pinbar.label'
+            extras:
+                icon: 'icon-folder-close'
+                maxItems: 10
+            uri: '#'
+        history:
+            label: 'oro.navigation.menu.history.label'
+            extras:
+                icon: 'icon-time'
+                activeIfFirstIsEmpty: true
+            uri: '#'
+        favorite:
+            label: 'oro.navigation.menu.favorite.label'
+            extras:
+                icon: 'icon-star-empty'
+            uri: '#'
+        mostviewed:
+            label: 'oro.navigation.menu.mostviewed.label'
+            extras:
+                icon: 'icon-flag'
+            uri: '#'
+
+    tree:
+        application_menu:
+            type: application_menu
+
+        dots_menu:
+            type: dots_menu
+            children:
+                history: ~
+                favorite: ~
+                mostviewed: ~
+
+        shortcuts:
+            type: shortcuts
+
+oro_titles:
+    oro_shortcut_actionslist: 'Shortcut Actions List'
+    oro_pinbar_help: 'How To Use Pinbar'
+
+oro_navigation_elements:
+    pinButton:
+        default: true
+
+    favoriteButton:
+        default: true

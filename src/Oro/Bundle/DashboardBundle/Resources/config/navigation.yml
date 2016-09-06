@@ -1,0 +1,41 @@
+oro_menu_config:
+    items:
+        dashboard_tab:
+            label: 'oro.dashboard.menu.dashboards_tab.label'
+            uri: '#'
+            extras:
+                position: 0
+                icon: icon-bar-chart
+            attributes:
+                class: 'only-icon'
+        oro_dashboard_index:
+            label: 'oro.dashboard.menu.dashboards_list.label'
+            route: 'oro_dashboard_index'
+            extras:
+                position: 10
+                routes: ['oro_dashboard_update', 'oro_dashboard_create', 'oro_dashboard_view']
+
+    tree:
+        application_menu:
+            children:
+                dashboard_tab:
+                    children:
+                        oro_dashboard_index: ~
+
+oro_titles:
+    oro_dashboard_index: ~
+    oro_dashboard_quick_launchpad: oro.dashboard.title.quick_launchpad
+    oro_dashboard_update: '%%label%% - Edit'
+    oro_dashboard_create: oro.ui.create_entity
+    oro_dashboard_view: '%%name%%'
+
+oro_navigation_elements:
+    pinButton:
+        routes:
+            oro_default:        false
+            oro_dashboard_view: false
+
+    favoriteButton:
+        routes:
+            oro_default:        false
+            oro_dashboard_view: false
