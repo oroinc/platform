@@ -102,26 +102,4 @@ class JSONTest extends \PHPUnit_Framework_TestCase
 
         JSON::encode($resource);
     }
-
-    public function testShouldReturnNullIfInputIsEmptyString()
-    {
-        $this->assertNull(JSON::decode(''));
-    }
-
-    public function testShouldReturnNullIfInputIsNull()
-    {
-        $this->assertNull(JSON::decode(null));
-    }
-
-    public function testShouldDecodeZeroAsZero()
-    {
-        $this->assertSame(0, JSON::decode('0'));
-    }
-
-    public function testShouldThrowExceptionIfInputIsObject()
-    {
-        $this->setExpectedException(\InvalidArgumentException::class, 'Object is not valid json. class: "stdClass"');
-
-        $this->assertSame(0, JSON::decode(new \stdClass()));
-    }
 }
