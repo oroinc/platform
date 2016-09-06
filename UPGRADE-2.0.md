@@ -42,9 +42,9 @@ UPGRADE FROM 1.10 to 2.0
 - Activation of workflows now provided through `WorkflowManager::activateWorkflow` and `WorkflowManager::deactivateWorkflow` methods as well as with workflow YAML configuration boolean node `defaults.active` to load default activation state from configuration.
 
     **NOTE**: Please pay attention to make activations only through corresponded `WorkflowManager` methods.
-            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter. 
+            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter.
             As `WorkflowManager` is responsive for activation events emitting described above.
-     
+
 - Added trait `Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait` with methods:
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder through optionally specified workflowItem alias
@@ -160,7 +160,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
 
 ####DatagridBundle:
-- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php` 
+- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
     - construction signature was changed now it takes next arguments:
         - `SystemAwareResolver` $resolver,
         - `CacheProvider` $cache

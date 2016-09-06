@@ -113,7 +113,7 @@ class LanguageOperationsTest extends ActionTestCase
         $crawler = $client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
         $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
 
-        $form = $crawler->selectButton('Install')->form([
+        $form = $crawler->selectButton('Update')->form([
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
         ]);
 

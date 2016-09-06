@@ -35,8 +35,8 @@ class LanguageRepositoryTest extends WebTestCase
 
     public function testGetAvailableLanguageCodes()
     {
-        $this->assertEmpty(
-            array_diff([
+        $this->assertEmpty(array_diff(
+            [
                 LoadLanguages::LANGUAGE1,
                 LoadLanguages::LANGUAGE2,
             ],
@@ -46,8 +46,8 @@ class LanguageRepositoryTest extends WebTestCase
 
     public function testGetEnabledAvailableLanguageCodes()
     {
-        $this->assertEmpty(
-            array_diff([
+        $this->assertEmpty(array_diff(
+            [
                 LoadLanguages::LANGUAGE2,
             ],
             $this->repository->getAvailableLanguageCodes(true)
