@@ -81,6 +81,27 @@ datagrids:
             query:
                 select:
                     - partial eu.{id, email}
+                    - e
+                    - partial f.{id, type}
+                    - eb.bodyContent AS body_content
+                    - r_to
+                    - >
+                        (SELECT COUNT(_ec.id)
+                        FROM OroEmailBundle:Email _ec
+                        WHERE _ec.thread = e.thread) AS thread_email_count
+                    - >
+                        CASE
+                            WHEN e.thread IS NULL THEN eb.hasAttachments
+                            WHEN EXISTS(
+                                SELECT 1
+                                FROM OroEmailBundle:EmailAttachment _ea
+                                JOIN _ea.emailBody _eb
+                                JOIN _eb.email _e
+                                JOIN _e.thread _t
+                                WHERE _t = e.thread
+                            ) THEN true
+                            ELSE false
+                        END AS has_attachments
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
@@ -101,10 +122,14 @@ datagrids:
                         -
                             join: f.origin
                             alias: o
+                        -
+                            join: e.emailBody
+                            alias: eb
                 where:
                     and:
                         - o.isActive = true
-                groupBy: eu.id, e.sentAt
+                groupBy: e.sentAt, eu.id
+
         columns:
             contacts:
                 data_name: email.contacts
@@ -119,7 +144,7 @@ datagrids:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
             attachments:
-                data_name: email.attachments
+                data_name: has_attachments
                 type: twig
                 label:
                 frontend_type: html
@@ -273,6 +298,7 @@ datagrids:
                 select:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
+                    - eb.bodyContent AS body_content
                     - a
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
@@ -282,6 +308,9 @@ datagrids:
                         -
                             join: eu.email
                             alias: e
+                        -
+                            join: e.emailBody
+                            alias: eb
                     inner:
                         - { join: eu.folders, alias: f }
                         - { join: f.origin, alias: o }
