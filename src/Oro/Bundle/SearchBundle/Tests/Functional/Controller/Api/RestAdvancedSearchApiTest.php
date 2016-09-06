@@ -7,6 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\SearchExtensionTrait;
 
+/**
+ * @dbIsolationPerTest
+ */
 class RestAdvancedSearchApiTest extends WebTestCase
 {
     use SearchExtensionTrait;
@@ -16,16 +19,8 @@ class RestAdvancedSearchApiTest extends WebTestCase
         parent::setUp();
 
         $this->initClient([], $this->generateWsseAuthHeader(), true);
-        $this->startTransaction();
         $this->loadFixtures([LoadSearchItemData::class], true);
         $this->getSearchIndexer()->reindex(Item::class);
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
     }
 
     /**

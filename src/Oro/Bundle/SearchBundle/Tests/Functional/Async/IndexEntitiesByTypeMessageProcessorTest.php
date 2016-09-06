@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\SearchExtensionTrait;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 
+/**
+ * @dbIsolationPerTest
+ */
 class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 {
     use SearchExtensionTrait;

@@ -8,6 +8,9 @@ use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
+/**
+ * @dbIsolationPerTest
+ */
 class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 {
     protected function setUp()

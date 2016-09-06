@@ -4,6 +4,9 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 use Oro\Bundle\SearchBundle\Async\IndexEntityMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class IndexEntityMessageProcessorTest extends WebTestCase
 {
     protected function setUp()
