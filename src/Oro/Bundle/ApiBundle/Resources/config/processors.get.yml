@@ -95,6 +95,13 @@ services:
     # if you add a new processor in this group, it should be added in the "security_check" group of
     # actions that execute this action, e.g. look at "security_check" group of "create" or "update" actions
 
+    oro_api.get.entity_type_feature_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro.api.processor, action: get, group: security_check, priority: 20 }
+
     oro_api.get.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:

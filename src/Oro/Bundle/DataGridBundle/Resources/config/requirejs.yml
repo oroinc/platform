@@ -79,6 +79,7 @@ config:
         'orodatagrid/js/pageable-collection': 'bundles/orodatagrid/js/pageable-collection.js'
 
         'orodatagrid/js/app/components/datagrid-component': 'bundles/orodatagrid/js/app/components/datagrid-component.js'
+        'orodatagrid/js/app/components/column-renderer-component': 'bundles/orodatagrid/js/app/components/column-renderer-component.js'
 
         'orodatagrid/js/inline-editing/builder': 'bundles/orodatagrid/js/inline-editing/builder.js'
         'orodatagrid/js/app/plugins/grid/inline-editing-plugin': 'bundles/orodatagrid/js/app/plugins/grid/inline-editing-plugin.js'

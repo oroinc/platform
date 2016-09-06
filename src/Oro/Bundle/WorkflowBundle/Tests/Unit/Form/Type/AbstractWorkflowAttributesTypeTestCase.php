@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -129,7 +130,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         FormInitListener $formInitListener = null,
         RequiredAttributesListener $requiredAttributesListener = null,
         EventDispatcherInterface $dispatcher = null,
-        AuthorizationCheckerInterface $authorizationChecker = null
+        PropertyPathSecurityHelper $propertyPathSecurityHelper = null
     ) {
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createWorkflowRegistryMock();
@@ -149,8 +150,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         if (!$dispatcher) {
             $dispatcher = $this->createDispatcherMock();
         }
-        if (!$authorizationChecker) {
-            $authorizationChecker = $this->createAuthorizationCheckerMock();
+        if (!$propertyPathSecurityHelper) {
+            $propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
         }
 
         return new WorkflowAttributesType(
@@ -161,7 +162,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             $requiredAttributesListener,
             new ContextAccessor(),
             $dispatcher,
-            $authorizationChecker
+            $propertyPathSecurityHelper
         );
     }
 
@@ -219,8 +220,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             ->getMock();
     }
 
-    protected function createAuthorizationCheckerMock()
+    protected function createPropertyPathSecurityHelper()
     {
-        return $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+        return $this->getMockBuilder('Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

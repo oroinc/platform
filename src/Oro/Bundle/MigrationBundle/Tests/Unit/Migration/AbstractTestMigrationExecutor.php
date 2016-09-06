@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
@@ -37,7 +38,7 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
         $this->connection->expects($this->atLeastOnce())
             ->method('getSchemaManager')
             ->will($this->returnValue($sm));
-        $this->connection->expects($this->once())
+        $this->connection->expects($this->atLeastOnce())
             ->method('getDatabasePlatform')
             ->will($this->returnValue($platform));
 
