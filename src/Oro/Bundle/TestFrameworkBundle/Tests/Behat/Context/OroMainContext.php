@@ -105,7 +105,7 @@ class OroMainContext extends MinkContext implements
      */
     public function spin(\Closure $lambda)
     {
-        $time = 6;
+        $time = 60;
 
         while ($time > 0) {
             try {
