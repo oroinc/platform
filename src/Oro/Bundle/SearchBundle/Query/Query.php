@@ -682,14 +682,15 @@ class Query
      */
     private function parseFieldAliasing($field)
     {
-        if (!strstr($field, ' as ')) {
-            return $field;
+        $part = strrev(trim($field));
+        $part = preg_split('/ sa /im', $part, 2);
+        if (count($part) > 1) {
+            $field = strrev($part[1]);
+            $alias = strrev($part[0]);
+
+            $this->fieldsAliases[$field] = $alias;
         }
 
-        $field = explode(' as ', $field);
-
-        $this->fieldsAliases[$field[0]] = $field[1];
-
-        return $field[0];
+        return $field;
     }
 }

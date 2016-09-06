@@ -202,6 +202,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Query();
         $query->addSelect('text.foo as bar');
+        $query->addSelect('text.fooNoAlias');
+        $query->addSelect('text.foo bar as  ');
+        $query->addSelect('  as bar');
 
         $reflectionObject = new \ReflectionObject($query);
 
@@ -215,7 +218,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $aliases = $aliasesProperty->getValue($query);
 
         $this->assertContains('text.foo', $fields);
+        $this->assertContains('text.fooNoAlias', $fields);
         $this->assertContains('bar', $aliases);
+
+        $this->assertTrue(count($aliases) < 2);
     }
 
     public function testGetSelectWithAliases()
