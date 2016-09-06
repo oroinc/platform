@@ -26,9 +26,9 @@ class MessageConsumer
     private $destinationMetaRegistry;
 
     /**
-     * @var ChainExtension
+     * @var array
      */
-    private $runtimeExtension = [];
+    private $runtimeExtensions = [];
 
     /**
      * @var bool
@@ -45,7 +45,6 @@ class MessageConsumer
         DelegateMessageProcessor $processor,
         DestinationMetaRegistry $destinationMetaRegistry
     ) {
-        $this->runtimeExtension = new ChainExtension([]);
         $this->consumer = $consumer;
         $this->processor = $processor;
         $this->destinationMetaRegistry = $destinationMetaRegistry;
@@ -56,7 +55,7 @@ class MessageConsumer
     {
         $this->init();
         try {
-            $this->consumer->consume($this->runtimeExtension);
+            $this->consumer->consume(new ChainExtension($this->runtimeExtensions));
         } finally {
             $this->consumer->getConnection()->close();
         }
@@ -80,6 +79,6 @@ class MessageConsumer
      */
     public function addExtension(ExtensionInterface $runtimeExtension)
     {
-        $this->runtimeExtension = new ChainExtension([$this->runtimeExtension, $runtimeExtension]);
+        $this->runtimeExtensions[] = $runtimeExtension;
     }
 }

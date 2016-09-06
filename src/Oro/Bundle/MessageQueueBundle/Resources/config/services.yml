@@ -1,3 +1,6 @@
+parameters:
+    message_queue_idle_microsec: 100000
+
 services:
     oro_message_queue.consumption.extensions:
         class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
