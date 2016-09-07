@@ -236,6 +236,7 @@ services:
             - '@doctrine'
 
     oro_workflow.repository.workflow_item:
+        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_workflow.workflow_item.entity.class%'

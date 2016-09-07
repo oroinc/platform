@@ -188,12 +188,14 @@ services:
             - [ setNamespace, [ 'doctrine_metadata_search' ] ]
 
     oro_search.entity.repository.search_index:
-        parent: oro_entity.abstract_repository
+        class: %oro_search.entity.repository.search_index.class%
+        factory: ["@doctrine", getRepository]
         arguments:
             - %oro_search.entity.item.class%
             - 'search'
         calls:
             - [setRegistry,  ['@doctrine']]
+        lazy: true
 
     oro_search.cache.search_mapping_cache:
         class: %oro_search.cache.search_mapping_cache.class%
