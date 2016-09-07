@@ -142,7 +142,7 @@ define([
         createActions: function() {
             var result = [];
             var actions = this.column.get('actions');
-            var config = this.model.get('action_configuration');
+            var config = this.model.get('action_configuration') || {};
 
             _.each(actions, function(action, name) {
                 // filter available actions for current row
