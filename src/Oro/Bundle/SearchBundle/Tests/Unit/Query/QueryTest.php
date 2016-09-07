@@ -158,6 +158,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ],
             $query->getSelect()
         );
+
+        $query->addSelect('');
+        $this->assertCount(4, $query->getSelect());
+    }
+
+    public function testAddSelectArray()
+    {
+        $query = new Query();
+        $query->addSelect([
+            'name',
+            'name', // testing handing doubles
+            'integer.number', // type guessing by prefix
+            'sku', // default type should be `text`
+        ]);
+
+        $this->assertEquals(
+            [
+                'text.name',
+                'integer.number',
+                'text.sku'
+            ],
+            $query->getSelect()
+        );
+
+        $query->addSelect('');
+        $this->assertCount(3, $query->getSelect());
     }
 
     public function testStringQueryWithSelect()
@@ -170,5 +196,57 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('select text.language from *', $query->getStringQuery());
         $query->addSelect('organization', 'integer');
         $this->assertEquals('select (text.language, integer.organization) from *', $query->getStringQuery());
+    }
+
+    public function testSelectingWithAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.fooNoAlias');
+        $query->addSelect('text.foo bar as  ');
+        $query->addSelect('  as bar');
+
+        $reflectionObject = new \ReflectionObject($query);
+
+        $selectFieldsProperty = $reflectionObject->getProperty('select');
+        $selectFieldsProperty->setAccessible(true);
+
+        $aliasesProperty = $reflectionObject->getProperty('fieldsAliases');
+        $aliasesProperty->setAccessible(true);
+
+        $fields = $selectFieldsProperty->getValue($query);
+        $aliases = $aliasesProperty->getValue($query);
+
+        $this->assertContains('text.foo', $fields);
+        $this->assertContains('text.fooNoAlias', $fields);
+        $this->assertContains('bar', $aliases);
+
+        $this->assertTrue(count($aliases) < 2);
+
+        foreach ($selectFieldsProperty as $field) {
+            $this->assertNotTrue(strpos($field, ' ') > 0);
+        }
+    }
+
+    public function testGetSelectWithAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.faa as bor');
+
+        $select = $query->getSelect();
+
+        $this->assertSame(['text.foo', 'text.faa'], $select);
+    }
+
+    public function testGetAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.faa as bor');
+
+        $aliases = $query->getSelectAliases();
+
+        $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $aliases);
     }
 }

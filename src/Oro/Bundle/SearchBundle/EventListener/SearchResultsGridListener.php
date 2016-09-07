@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchResultsGridListener

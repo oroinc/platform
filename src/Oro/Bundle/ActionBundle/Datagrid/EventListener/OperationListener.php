@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
@@ -75,6 +76,11 @@ class OperationListener
     public function onConfigureActions(ConfigureActionsBefore $event)
     {
         $config = $event->getConfig();
+
+        // datasource type other than ORM is not handled
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return;
+        }
 
         $this->datagridContext = $this->getDatagridContext($config);
         $this->operations = $this->getOperations(

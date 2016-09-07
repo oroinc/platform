@@ -23,10 +23,13 @@ class FilterTypesPass implements CompilerPassInterface
         if ($extension) {
             $filters = $container->findTaggedServiceIds(self::TAG_NAME);
             foreach ($filters as $serviceId => $tags) {
+                $tagAttrs = reset($tags);
+                if (isset($tagAttrs['datasource']) && 'orm' !== $tagAttrs['datasource']) {
+                    continue;
+                }
                 if ($container->hasDefinition($serviceId)) {
                     $container->getDefinition($serviceId)->setPublic(false);
                 }
-                $tagAttrs = reset($tags);
                 $extension->addMethodCall('addFilter', array($tagAttrs['type'], new Reference($serviceId)));
             }
         }
