@@ -16,6 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -51,8 +52,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /** @var OrganizationInterface */
     protected $currentOrganization;
 
-    /** @var  bool In this mode all emails will be re-synced again for checked folders */
-    protected $forceMode = false;
+    /** @var SynchronizationProcessorSettings */
+    protected $settings;
 
     /**
      * Constructor
@@ -69,6 +70,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         $this->em                       = $em;
         $this->emailEntityBuilder       = $emailEntityBuilder;
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
+        $this->settings = new SynchronizationProcessorSettings();
     }
 
     /**
@@ -456,24 +458,18 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
-     * Set force mode.
-     *
-     * @param bool $mode
-     *
-     * @return $this
+     * @param SynchronizationProcessorSettings $settings
      */
-    public function setForceMode($mode)
+    public function setSettings(SynchronizationProcessorSettings $settings)
     {
-        $this->forceMode = $mode;
-
-        return $this;
+        $this->settings = $settings;
     }
 
     /**
-     * Check is force mode enabled.
+     * @return SynchronizationProcessorSettings
      */
-    public function isForceMode()
+    public function getSettings()
     {
-        return $this->forceMode === true;
+        return $this->settings;
     }
 }

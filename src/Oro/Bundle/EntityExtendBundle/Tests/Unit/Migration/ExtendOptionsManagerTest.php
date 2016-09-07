@@ -234,6 +234,49 @@ class ExtendOptionsManagerTest extends \PHPUnit_Framework_TestCase
         return $result;
     }
 
+    public function testRemoveTableOptions()
+    {
+        $tableName = 'test_table';
+
+        $this->manager->setTableOptions(
+            $tableName,
+            ['key' => ['value' => 1], '_append' => ['appended' => ['data']]]
+        );
+        $this->assertEquals(
+            [
+                $tableName => ['key' => ['value' => 1]],
+                '_append' => [$tableName => ['appended' => ['data']]]
+            ],
+            $this->manager->getExtendOptions()
+        );
+
+        $this->manager->removeTableOptions($tableName);
+        $this->assertEquals(['_append' => []], $this->manager->getExtendOptions());
+    }
+
+    public function testRemoveColumnOptions()
+    {
+        $tableName = 'test_table';
+        $columnName = 'test_column';
+        $combinedName = sprintf('%s!%s', $tableName, $columnName);
+
+        $this->manager->setColumnOptions(
+            $tableName,
+            $columnName,
+            ['key' => ['value' => 1], '_append' => ['appended' => ['data']]]
+        );
+        $this->assertEquals(
+            [
+                $combinedName => ['key' => ['value' => 1]],
+                '_append' => [$combinedName => ['appended' => ['data']]]
+            ],
+            $this->manager->getExtendOptions()
+        );
+
+        $this->manager->removeColumnOptions($tableName, $columnName);
+        $this->assertEquals(['_append' => []], $this->manager->getExtendOptions());
+    }
+
     /**
      * @param string      $testName
      * @param array       $data

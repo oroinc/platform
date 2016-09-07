@@ -248,11 +248,11 @@ class ConfigManager
 
         list($updated, $removed) = $this->getScopeManager()->save($event->getSettings(), $scopeIdentifier);
 
-        $event = new ConfigUpdateEvent($this->buildChangeSet($updated, $removed, $oldValues));
-        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
-
         // clear a local cache
         $this->localCache->clear();
+
+        $event = new ConfigUpdateEvent($this->buildChangeSet($updated, $removed, $oldValues));
+        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
     }
 
     /**

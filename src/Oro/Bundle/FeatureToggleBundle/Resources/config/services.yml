@@ -1,0 +1,96 @@
+services:
+    oro_featuretoggle.cache.provider.features:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_featuretoggle_features' ] ]
+
+    oro_featuretoggle.expression.feature_enabled:
+        class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_action.condition, alias: feature_enabled }
+            - { name: oro_workflow.condition, alias: feature_enabled }
+
+    oro_featuretoggle.expression.feature_resource_enabled:
+        class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureResourceEnabled'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_action.condition, alias: feature_resource_enabled }
+            - { name: oro_workflow.condition, alias: feature_resource_enabled }
+
+    oro_featuretoggle.configuration.provider:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
+        arguments:
+            - []
+            - '%kernel.bundles%'
+            - '@oro_featuretoggle.configuration'
+            - '@oro_featuretoggle.cache.provider.features'
+
+    oro_featuretoggle.configuration.manager:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+
+    oro_featuretoggle.cache.clearer:
+        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheClearer'
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_featuretoggle.cache.warmer:
+        class: 'Oro\Bundle\FeatureToggleBundle\Cache\CacheWarmer'
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_featuretoggle.configuration:
+        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
+
+    oro_featuretoggle.twig.feature_extension:
+        class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: twig.extension }
+
+    oro_featuretoggle.checker.feature_checker:
+        class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
+        arguments:
+            - '@oro_featuretoggle.configuration.manager'
+            - []
+
+    oro_featuretoggle.layout.data_provider.feature_provider:
+        class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: layout.data_provider, alias: feature }
+
+    oro_featuretoggle.voter.config_voter:
+        class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter'
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_featuretoggle.configuration.manager'
+        tags:
+            - { name: oro_featuretogle.voter }
+
+    oro_featuretoggle.event_listener.request:
+        class: 'Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest }
+
+    oro_featuretoggle.event_listener.system_config:
+        class: 'Oro\Bundle\FeatureToggleBundle\EventListener\ConfigListener'
+        arguments:
+            - '@event_dispatcher'
+            - '@oro_featuretoggle.configuration.manager'
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onSettingsSaveBefore }
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }

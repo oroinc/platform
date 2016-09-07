@@ -354,9 +354,10 @@ services:
     oro_security.acl.annotation.metadata.dumper:
         class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
         public: false
-        lazy: true
-        arguments: [ %kernel.cache_dir%, %kernel.debug%, 'oro_acl_annotation' ]
-
+        arguments:
+            - %kernel.cache_dir%
+            - %kernel.debug%
+            - 'oro_acl_annotation'
 
     oro_security.acl.config_loader:
         public: false
@@ -727,3 +728,10 @@ services:
             - '@oro_security.entity_security_metadata_provider'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
+
+    oro_security.helper.property_path_helper:
+        class: Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper
+        arguments:
+            - '@security.authorization_checker'
+            - '@doctrine'
+            - '@oro_entity_config.provider.entity'
