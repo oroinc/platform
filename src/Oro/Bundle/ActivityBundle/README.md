@@ -316,9 +316,9 @@ datagrid:
                 column_name: contexts  # optional, column identifier, default is `contexts`
                 entity_name: ~         # optional, set the FQCN of the grid base entity if auto detection fails
 ```
-This will create a column named `contexts` and will try to automatically detect the activity class name. If for some reason it fails you can specify a FQCN in the `entity_name` option
+This will create a column named `contexts` and will try to automatically detect the activity class name. If for some reason it fails you can specify a FQCN in the `entity_name` option.
 
-If you wish to configure the column, you are able to do it if you add a section with the name specified in the `column_name` option.
+If you wish to configure the column, you are able to do it if you add a section with the name specified in the `column_name` option:
 ``` yml
 datagrid:
     tasks-grid:
