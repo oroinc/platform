@@ -172,7 +172,7 @@ operations for entities:
   If Default Operations are suppose to be used in not default application - e.g. `commerce` - routes will be retrieved
 from `routeCommerceUpdate` and `routeCommerceDelete` options.
 
-  Configs for default operations placed in `Resources/config/action.yml` file under **Oro Action Bundle** directory.
+  Configs for default operations placed in `Resources/config/oro/action.yml` file under **Oro Action Bundle** directory.
 
 ### Questions and Answers
 
@@ -194,10 +194,10 @@ So that default operation `DELETE` will not be matched for your entity and will 
   Yes. There are two ways to do that. **The first**: you can disable operation by updating datagrid configuration in its
 section `action_configuration` you should define a key that corresponds to operation name with value `false`.
 
-`datagrid.yml`:
+`datagrids.yml`:
 
 ```
-datagrid:
+datagrids:
     your_datagrid_name:
         #... datagrid config sections
         action_configuration:

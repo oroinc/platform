@@ -43,8 +43,8 @@ Structure of configuration is declared in class Oro\Bundle\ActionBundle\Configur
 Configuration File
 ==================
 
-Configuration must be placed in a file named Resources/config/actions.yml. For example
-Acme/Bundle/DemoBundle/Resources/config/actions.yml.
+Configuration must be placed in a file named Resources/config/oro/actions.yml. For example
+Acme/Bundle/DemoBundle/Resources/config/oro/actions.yml.
 
 **Example - actions.yml**
 ```
