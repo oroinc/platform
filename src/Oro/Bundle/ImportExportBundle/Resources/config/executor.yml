@@ -10,3 +10,5 @@ services:
             - '@oro_importexport.context_registry'
             - '@doctrine'
         lazy: true
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
