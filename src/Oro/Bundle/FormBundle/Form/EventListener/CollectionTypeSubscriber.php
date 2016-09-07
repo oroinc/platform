@@ -76,7 +76,7 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
         $items = $notEmptyItems;
 
         // Set first non empty item for new item as primary
-        if ($items && !$hasPrimary && $this->isParentFormDataNew($event->getForm()) || count($items) == 1) {
+        if ($items && !$hasPrimary) {
             $items[current(array_keys($items))]['primary'] = true;
         }
 
@@ -102,22 +102,6 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
         }
 
         return true;
-    }
-
-    protected function isParentFormDataNew(FormInterface $form)
-    {
-        $result = false;
-        $parent = $form->getParent();
-        if ($parent) {
-            $data = $parent->getData();
-            if (is_object($data)) {
-                if (method_exists($data, 'getId')) {
-                    $result = !$data->getId();
-                }
-            }
-        }
-        return $result;
-
     }
 
     /**
