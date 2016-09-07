@@ -191,6 +191,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildDiblicatedItemTreeCallException()
     {
         $options = [
+            'areas' => [],
             'items' => [
                 'user_registration_register' => [
                     'route' => 'oro_menu_submenu',
