@@ -123,6 +123,10 @@ class LayoutResource implements ResourceInterface
         }
 
         $inputs = [];
+
+        // Merge .less files first, than -> .scss into cumulative .css for theme
+        ksort($inputsByExtension);
+
         foreach ($inputsByExtension as $extension => $extensionInputs) {
             if ($extension === 'css' || count($extensionInputs) === 1) {
                 $inputs = array_merge($inputs, $extensionInputs);
