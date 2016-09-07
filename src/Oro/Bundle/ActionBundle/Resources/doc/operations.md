@@ -172,7 +172,7 @@ operations for entities:
   If Default Operations are suppose to be used in not default application - e.g. `commerce` - routes will be retrieved
 from `routeCommerceUpdate` and `routeCommerceDelete` options.
 
-  Configs for default operations placed in `Resources/config/action.yml` file under **Oro Action Bundle** directory.
+  Configs for default operations placed in `Resources/config/oro/action.yml` file under **Oro Action Bundle** directory.
 
 ### Questions and Answers
 
