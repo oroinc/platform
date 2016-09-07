@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
@@ -333,37 +334,26 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadingOfDynamicResources()
     {
-        $locale        = 'en';
-        $translate     = [
+        $locale = 'en';
+        $translate = [
             ['locale' => $locale, 'domain' => 'domain1'],
             ['locale' => $locale, 'domain' => 'domain2'],
             ['locale' => $locale, 'domain' => 'domain3'],
         ];
 
-        $container     = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $doctrine      = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $em            = $this->getMock('Doctrine\ORM\EntityManagerInterface');
-        $connection    = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['tablesExist'])
-            ->getMockForAbstractClass();
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository    = $this
-            ->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
         $databaseCache = $this
             ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
             ->disableOriginalConstructor()
             ->getMock();
-        $translator    = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+        $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->setConstructorArgs([$container, new MessageSelector()])
             ->setMethods(['addResource'])
+            ->getMock();
+        $translationManager = $this
+            ->getMockBuilder(TranslationManager::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $translator->setLocale($locale);
@@ -371,8 +361,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
         $valueMap = [
-            ['doctrine', $exceptionFlag, $doctrine],
-            ['oro_translation.strategy.provider', $exceptionFlag, $this->getStrategyProvider()]
+            ['oro_translation.strategy.provider', $exceptionFlag, $this->getStrategyProvider()],
+            ['oro_translation.translation.manager', $exceptionFlag, $translationManager],
         ];
 
         $container
@@ -389,17 +379,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('get')
             ->willReturnMap($valueMap);
-        $doctrine
-            ->expects($this->any())
-            ->method('getManagerForClass')
-            ->with(Translation::ENTITY_NAME)
-            ->willReturn($em);
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(Translation::ENTITY_NAME)
-            ->willReturn($repository);
-        $repository
+
+        $translationManager
             ->expects($this->once())
             ->method('findAvailableDomainsForLocales')
             ->willReturn($translate);

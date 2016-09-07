@@ -2,21 +2,29 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DatabasePersister */
     protected $persister;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
+
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $repo;
+    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var DynamicTranslationMetadataCache|\PHPUnit_Framework_MockObject_MockObject */
     protected $metadataCache;
 
     /** @var array */
@@ -37,20 +45,34 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->repo          = $this->getMockBuilder(
-            'Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository'
-        )
-            ->disableOriginalConstructor()->getMock();
+        $this->registry = $this->getMockBuilder(Registry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->em = $this->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->metadataCache = $this
-            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
-            ->disableOriginalConstructor()->getMock();
+            ->getMockBuilder(DynamicTranslationMetadataCache::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $this->translationManager = $this
+            ->getMockBuilder(TranslationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->em->expects($this->any())->method('getRepository')->with($this->equalTo(Translation::ENTITY_NAME))
-            ->will($this->returnValue($this->repo));
-        $this->persister = new DatabasePersister($this->em, $this->metadataCache);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($this->equalTo(Translation::ENTITY_NAME))
+            ->will($this->returnValue($this->em));
+
+        $this->persister = new DatabasePersister(
+            $this->registry,
+            $this->translationManager,
+            $this->metadataCache
+        );
 
         // set batch size to 2
         $reflection = new \ReflectionProperty(get_class($this->persister), 'batchSize');
@@ -60,7 +82,13 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->em, $this->persister, $this->repo);
+        unset(
+            $this->em,
+            $this->persister,
+            $this->translationManager,
+            $this->metadataCache,
+            $this->registry
+        );
     }
 
     public function testPersist()
@@ -83,7 +111,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $existsTranslation = new Translation();
         $existsTranslation->setValue($testValue);
 
-        $this->repo->expects($this->any())->method('findValue')
+        $this->translationManager->expects($this->any())->method('findValue')
             ->will(
                 $this->returnValueMap(
                     [

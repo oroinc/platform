@@ -159,6 +159,6 @@ services:
     oro_entity_config.translation.helper:
         class: %oro_entity_config.translation.helper.class%
         arguments:
-            - '@doctrine'
             - '@translator.default'
             - '@oro_translation.database_translation.metadata.cache'
+            - '@oro_translation.translation.manager'

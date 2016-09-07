@@ -10,22 +10,27 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class OrmTranslationLoader implements LoaderInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var TranslationManager */
+    protected $translationManager;
+
     /** @var bool|null */
     protected $dbCheck;
 
     /**
      * @param ManagerRegistry $doctrine
+     * @param TranslationManager $translationManager
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, TranslationManager $translationManager)
     {
         $this->doctrine = $doctrine;
+        $this->translationManager = $translationManager;
     }
 
     /**
@@ -38,10 +43,8 @@ class OrmTranslationLoader implements LoaderInterface
 
         if ($this->checkDatabase()) {
             $messages = [];
-            /** @var TranslationRepository $translationRepo */
-            $translationRepo = $this->getEntityManager()->getRepository(Translation::ENTITY_NAME);
             /** @var Translation[] $translations */
-            $translations = $translationRepo->findValues($locale, $domain);
+            $translations = $this->translationManager->findValues($locale, $domain);
             foreach ($translations as $translation) {
                 // UI scope should override SYSTEM values if exist
                 if (!isset($messages[$translation->getKey()]) || $translation->getScope() == Translation::SCOPE_UI) {

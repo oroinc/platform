@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class DatabasePersister
 {
@@ -19,21 +20,27 @@ class DatabasePersister
     /** @var DynamicTranslationMetadataCache */
     private $metadataCache;
 
-    /** @var TranslationRepository */
-    private $repository;
+    /** @var TranslationManager */
+    private $translationManager;
 
     /** @var array */
     private $toWrite = [];
 
     /**
-     * @param EntityManager                   $em
+     * @param Registry $registry
+     * @param TranslationManager $translationManager
      * @param DynamicTranslationMetadataCache $metadataCache
+     *
+     * @internal param \Doctrine\ORM\EntityManager $em
      */
-    public function __construct(EntityManager $em, DynamicTranslationMetadataCache $metadataCache)
-    {
-        $this->em            = $em;
+    public function __construct(
+        Registry $registry,
+        TranslationManager $translationManager,
+        DynamicTranslationMetadataCache $metadataCache
+    ) {
+        $this->em = $registry->getManagerForClass(Translation::ENTITY_NAME);
+        $this->translationManager = $translationManager;
         $this->metadataCache = $metadataCache;
-        $this->repository    = $em->getRepository(Translation::ENTITY_NAME);
     }
 
     /**
@@ -106,7 +113,7 @@ class DatabasePersister
      */
     private function getTranslationObject($key, $locale, $domain, $value)
     {
-        $object = $this->repository->findValue($key, $locale, $domain);
+        $object = $this->translationManager->findValue($key, $locale, $domain);
         if (null === $object) {
             $object = new Translation();
             $object->setScope(Translation::SCOPE_SYSTEM);

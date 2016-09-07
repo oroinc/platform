@@ -101,13 +101,15 @@ services:
     oro_translation.database_translation.persister:
         class: %oro_translation.database_translation.persister.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
+            - '@oro_translation.translation.manager'
             - '@oro_translation.database_translation.metadata.cache'
 
     oro_translation.database_translation.loader:
         class: %oro_translation.database_translation.loader.class%
         arguments:
             - '@doctrine'
+            - '@oro_translation.translation.manager'
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 
@@ -225,3 +227,8 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Form\Type\TranslationImportType'
         tags:
             - { name: form.type, alias: oro_translation_import }
+
+    oro_translation.translation.manager:
+        class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
+        arguments:
+            - '@doctrine'

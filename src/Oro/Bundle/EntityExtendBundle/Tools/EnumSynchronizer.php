@@ -17,6 +17,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 /**
@@ -36,22 +37,28 @@ class EnumSynchronizer
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
+    /** @var DynamicTranslationMetadataCache */
+    protected $translationManager;
+
     /**
-     * @param ConfigManager                   $configManager
-     * @param ManagerRegistry                 $doctrine
-     * @param TranslatorInterface             $translator
+     * @param ConfigManager $configManager
+     * @param ManagerRegistry $doctrine
+     * @param TranslatorInterface $translator
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
+     * @param TranslationManager $translationManager
      */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
-        DynamicTranslationMetadataCache $dbTranslationMetadataCache
+        DynamicTranslationMetadataCache $dbTranslationMetadataCache,
+        TranslationManager $translationManager
     ) {
-        $this->configManager              = $configManager;
-        $this->doctrine                   = $doctrine;
-        $this->translator                 = $translator;
+        $this->configManager = $configManager;
+        $this->doctrine = $doctrine;
+        $this->translator = $translator;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
+        $this->translationManager = $translationManager;
     }
 
     /**
@@ -151,14 +158,10 @@ class EnumSynchronizer
             $labelsToBeUpdated[$pluralLabelKey] = $enumName;
         }
         if (!empty($labelsToBeUpdated)) {
-            /** @var EntityManager $em */
-            $em = $this->doctrine->getManagerForClass(Translation::ENTITY_NAME);
-            /** @var TranslationRepository $translationRepo */
-            $translationRepo = $em->getRepository(Translation::ENTITY_NAME);
             $transValues     = [];
             foreach ($labelsToBeUpdated as $labelKey => $labelText) {
                 // save into translation table
-                $transValues[] = $translationRepo->saveValue(
+                $transValues[] = $this->translationManager->saveValue(
                     $labelKey,
                     $labelText,
                     $locale,
@@ -167,7 +170,7 @@ class EnumSynchronizer
                 );
             }
             // flush translations to db
-            $em->flush($transValues);
+            $this->translationManager->flush($transValues);
             // mark translation cache dirty
             $this->dbTranslationMetadataCache->updateTimestamp($locale);
         }

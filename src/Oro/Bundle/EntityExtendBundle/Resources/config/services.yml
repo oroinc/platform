@@ -303,6 +303,7 @@ services:
             - "@doctrine"
             - "@translator"
             - "@oro_translation.database_translation.metadata.cache"
+            - "@oro_translation.translation.manager"
 
     oro_entity_extend.twig.extension.dynamic_fields:
         class: %oro_entity_extend.twig.extension.dynamic_fields.class%

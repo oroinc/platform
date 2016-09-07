@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\ImportExport\Strategy;
 
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class TranslationResetStrategy extends TranslationImportStrategy
 {
@@ -11,6 +12,19 @@ class TranslationResetStrategy extends TranslationImportStrategy
      * @var array
      */
     protected $processedLanguages = [];
+
+    /**
+     * @var TranslationManager
+     */
+    protected $translationManager;
+
+    /**
+     * @param TranslationManager $translationManager
+     */
+    public function setTranslationManager(TranslationManager $translationManager)
+    {
+        $this->translationManager = $translationManager;
+    }
 
     /**
      * @param Translation $entity

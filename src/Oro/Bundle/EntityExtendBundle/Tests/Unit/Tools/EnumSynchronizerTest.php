@@ -14,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,28 +30,37 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dbTranslationMetadataCache;
 
+    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationManager;
+
     /** @var EnumSynchronizer */
     protected $synchronizer;
 
     public function setUp()
     {
-        $this->configManager              = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrine                   = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator                 = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $this->dbTranslationMetadataCache =
             $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
                 ->disableOriginalConstructor()
                 ->getMock();
 
+        $this->translationManager = $this
+            ->getMockBuilder(TranslationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->synchronizer = new EnumSynchronizer(
             $this->configManager,
             $this->doctrine,
             $this->translator,
-            $this->dbTranslationMetadataCache
+            $this->dbTranslationMetadataCache,
+            $this->translationManager
         );
     }
 
@@ -109,7 +119,8 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 $this->configManager,
                 $this->doctrine,
                 $this->translator,
-                $this->dbTranslationMetadataCache
+                $this->dbTranslationMetadataCache,
+                $this->translationManager,
             ]
         );
 
@@ -166,7 +177,8 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 $this->configManager,
                 $this->doctrine,
                 $this->translator,
-                $this->dbTranslationMetadataCache
+                $this->dbTranslationMetadataCache,
+                $this->translationManager,
             ]
         );
 
@@ -244,7 +256,8 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 $this->configManager,
                 $this->doctrine,
                 $this->translator,
-                $this->dbTranslationMetadataCache
+                $this->dbTranslationMetadataCache,
+                $this->translationManager,
             ]
         );
 
@@ -340,25 +353,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($oldEnumName));
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Translation::ENTITY_NAME)
-            ->will($this->returnValue($em));
-        $transRepo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with(Translation::ENTITY_NAME)
-            ->will($this->returnValue($transRepo));
-
         $transLabelObj       = new \stdClass();
         $transPluralLabelObj = new \stdClass();
 
-        $transRepo->expects($this->at(0))
+        $this->translationManager->expects($this->at(0))
             ->method('saveValue')
             ->with(
                 ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -368,7 +366,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 Translation::SCOPE_UI
             )
             ->will($this->returnValue($transLabelObj));
-        $transRepo->expects($this->at(1))
+        $this->translationManager->expects($this->at(1))
             ->method('saveValue')
             ->with(
                 ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
@@ -379,9 +377,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($transPluralLabelObj));
 
-        $em->expects($this->once())
+        $this->translationManager->expects($this->once())
             ->method('flush')
             ->with($this->identicalTo([$transLabelObj, $transPluralLabelObj]));
+
         $this->dbTranslationMetadataCache->expects($this->once())
             ->method('updateTimestamp')
             ->with($locale);
@@ -405,25 +404,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue(ExtendHelper::getEnumTranslationKey('label', $enumCode)));
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Translation::ENTITY_NAME)
-            ->will($this->returnValue($em));
-        $transRepo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with(Translation::ENTITY_NAME)
-            ->will($this->returnValue($transRepo));
-
         $transLabelObj       = new \stdClass();
         $transPluralLabelObj = new \stdClass();
 
-        $transRepo->expects($this->at(0))
+        $this->translationManager->expects($this->at(0))
             ->method('saveValue')
             ->with(
                 ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -433,7 +417,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 Translation::SCOPE_UI
             )
             ->will($this->returnValue($transLabelObj));
-        $transRepo->expects($this->at(1))
+        $this->translationManager->expects($this->at(1))
             ->method('saveValue')
             ->with(
                 ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
@@ -444,9 +428,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($transPluralLabelObj));
 
-        $em->expects($this->once())
+        $this->translationManager->expects($this->once())
             ->method('flush')
             ->with($this->identicalTo([$transLabelObj, $transPluralLabelObj]));
+
         $this->dbTranslationMetadataCache->expects($this->once())
             ->method('updateTimestamp')
             ->with($locale);
@@ -470,26 +455,12 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue(ExtendHelper::getEnumTranslationKey('label', $enumCode)));
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Translation::ENTITY_NAME)
-            ->will($this->returnValue($em));
-        $transRepo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with(Translation::ENTITY_NAME)
-            ->will($this->returnValue($transRepo));
 
         $transLabelObj       = new \stdClass();
         $transPluralLabelObj = new \stdClass();
         $transDescriptionObj = new \stdClass();
 
-        $transRepo->expects($this->at(0))
+        $this->translationManager->expects($this->at(0))
             ->method('saveValue')
             ->with(
                 ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -499,7 +470,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 Translation::SCOPE_UI
             )
             ->will($this->returnValue($transLabelObj));
-        $transRepo->expects($this->at(1))
+        $this->translationManager->expects($this->at(1))
             ->method('saveValue')
             ->with(
                 ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
@@ -509,7 +480,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 Translation::SCOPE_UI
             )
             ->will($this->returnValue($transPluralLabelObj));
-        $transRepo->expects($this->at(2))
+        $this->translationManager->expects($this->at(2))
             ->method('saveValue')
             ->with(
                 ExtendHelper::getEnumTranslationKey('description', $enumCode),
@@ -520,9 +491,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($transDescriptionObj));
 
-        $em->expects($this->once())
+        $this->translationManager->expects($this->once())
             ->method('flush')
             ->with($this->identicalTo([$transLabelObj, $transPluralLabelObj, $transDescriptionObj]));
+
         $this->dbTranslationMetadataCache->expects($this->once())
             ->method('updateTimestamp')
             ->with($locale);

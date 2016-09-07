@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -18,8 +19,8 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigType extends AbstractType
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var TranslationManager */
+    protected $translationManager;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -31,20 +32,20 @@ class ConfigType extends AbstractType
     protected $dbTranslationMetadataCache;
 
     /**
-     * @param ManagerRegistry                 $doctrine
-     * @param ConfigManager                   $configManager
-     * @param Translator                      $translator
+     * @param TranslationManager $translationManager
+     * @param ConfigManager $configManager
+     * @param Translator $translator
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
-        ManagerRegistry $doctrine,
+        TranslationManager $translationManager,
         ConfigManager $configManager,
         Translator $translator,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
-        $this->doctrine                   = $doctrine;
-        $this->configManager              = $configManager;
-        $this->translator                 = $translator;
+        $this->translationManager = $translationManager;
+        $this->configManager = $configManager;
+        $this->translator = $translator;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
@@ -117,7 +118,7 @@ class ConfigType extends AbstractType
 
         $builder->addEventSubscriber(
             new ConfigSubscriber(
-                $this->doctrine,
+                $this->translationManager,
                 $this->configManager,
                 $this->translator,
                 $this->dbTranslationMetadataCache
