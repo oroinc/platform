@@ -2,8 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\Form\FormRendererInterface;
-
+use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
 class LayoutRenderer implements LayoutRendererInterface

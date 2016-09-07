@@ -14,4 +14,11 @@ interface LayoutUpdateLoaderInterface
      * @return LayoutUpdateInterface|null
      */
     public function load($file);
+
+    /**
+     * Get layout update filename patterns from all drivers
+     *
+     * @return array
+     */
+    public function getUpdateFileNamePatterns();
 }

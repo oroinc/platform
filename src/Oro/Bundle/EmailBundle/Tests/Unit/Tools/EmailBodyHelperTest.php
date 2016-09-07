@@ -52,7 +52,8 @@ HTMLTEXT;
                 '<script type="text/javascript"> document.write (\'some text\'); </script> another text',
                 'another text'
             ],
-            'text with body tag' => [$htmlTest, 'The body text']
+            'text with body tag' => [$htmlTest, 'The body text'],
+            'text with non printed symbols' => ["some\ntext with\tsymbols", 'some text with symbols']
         ];
     }
 }

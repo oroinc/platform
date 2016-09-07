@@ -3,8 +3,8 @@
 namespace Oro\Component\Layout\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Form\FormRendererInterface;
 
+use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
@@ -86,6 +86,19 @@ class LayoutHelper extends Helper
     public function widget(BlockView $view, array $variables = [])
     {
         return $this->renderer->searchAndRenderBlock($view, 'widget', $variables);
+    }
+
+    /**
+     * Renders the parent block widget defined in other resources on all levels of block prefix hierarchy
+     *
+     * @param BlockView $view
+     * @param array $variables
+     *
+     * @return string
+     */
+    public function parentBlockWidget(BlockView $view, array $variables = [])
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'widget', $variables, true);
     }
 
     /**

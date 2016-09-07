@@ -24,15 +24,16 @@ class GridResultAfter extends Event implements GridEventInterface
     protected $records;
 
     /**
-     * @var mixed
+     * @var AbstractQuery
      */
     protected $query;
 
     /**
      * @param DatagridInterface $datagrid
      * @param array             $records
+     * @param AbstractQuery     $query
      */
-    public function __construct(DatagridInterface $datagrid, array $records = array(), $query = null)
+    public function __construct(DatagridInterface $datagrid, array $records = array(), AbstractQuery $query = null)
     {
         $this->datagrid = $datagrid;
         $this->records  = $records;
@@ -56,7 +57,15 @@ class GridResultAfter extends Event implements GridEventInterface
     }
 
     /**
-     * @return mixed
+     * @param array $records
+     */
+    public function setRecords(array $records)
+    {
+        $this->records = $records;
+    }
+
+    /**
+     * @return AbstractQuery
      */
     public function getQuery()
     {
