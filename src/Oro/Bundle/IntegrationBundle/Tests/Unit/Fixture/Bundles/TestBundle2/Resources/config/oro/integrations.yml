@@ -1,4 +1,4 @@
-oro_integration:
+integrations:
     form:
         synchronization_settings:
             schedule:

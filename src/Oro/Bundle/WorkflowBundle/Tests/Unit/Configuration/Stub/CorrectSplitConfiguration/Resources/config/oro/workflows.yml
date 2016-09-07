@@ -1,5 +1,5 @@
 imports:
-    - {resource: 'workflow/first_workflow.yml'}
+    - {resource: 'workflows/first_workflow.yml'}
 
 workflows:
     second_workflow:

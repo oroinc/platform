@@ -51,8 +51,6 @@ UPGRADE FROM 1.10 to 2.0
         Note: `joinWorkflowStep` internally checks for workflowItem alias join to be already present in QueryBuilder instance to use it or creates new one otherwise.
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
 * Now entity can have more than one active workflows.
-* Entity config for `workflow.active_workflow` node were changed to `workflow.active_workflows` array as it now supports multiple active workflows.
-* Added single point of workflow activation/deactivation through `@oro_workflow.manager.system_config` (`Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager`) that emits corresponding events (`'oro.workflow.activated'`, `'oro.workflow.deactivated'`).
 * Activation or deactivation of workflow now triggers removal for all data in affected entity flows. So when workflow is deactivated or reactivated - WorkflowItems will be removed from storage.
 * Controllers methods (REST as well) for activation/deactivation now takes `workflowName` as `WorkflowDefinition` identifier instead of related entity class string.
 * Steps retrieval for an entity now returns steps for all currently active workflows for related entity with `workflow` node in each as name of corresponding workflow for steps in `stepsData`. Example: `{"workflowName":{"workflow": "workflowName", "steps":["step1", "step2"], "currentStep": "step1"}}`
@@ -111,7 +109,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * `getName`, `getLabel` and `isActive` methods of `Oro\Bundle\WorkflowBundle\Model\Workflow` now are proxy methods to its `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instance.
 * Removed method `getStartTransitions` from `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` -  `$workflow->getTransitionManager()->getStartTransitions()` can be used instead
-* Entity config `workflow.active_workflows` was removed. Use workfow configuration boolean node `defaults.active` instead.
+* Entity config `workflow.active_workflows` was removed. Use workflows configuration boolean node `defaults.active` instead.
+* Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
+* Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
@@ -150,6 +150,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added method `getUpdateFileNamePatterns` to `Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface`.
 - Added method `getUpdateFilenamePattern` to `Oro\Component\Layout\Loader\Driver\DriverInterface`.
 
+
 ####LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
 - Added class `Oro\Bundle\LayoutBundle\EventListener\ContainerListener`, register event `onKernelRequest` that helps to warm cache for layout updates resources.
@@ -169,6 +170,8 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
 - Class `Oro\Bundle\ConfigBundle\Config\ConfigManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `get`, `getInfo`, `set`, `reset`, `flush`, `save`, `calculateChangeSet`, `reload`, `getValue`, `buildChangeSet`
 - Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
+- System configuration now loads from `Resources/config/oro/system_configuration.yml` instead of `Resources/config/system_configuration.yml` file.
+- Root node for system configuration in `Resources/config/oro/system_configuration.yml` file were changed from `oro_system_configuration` to `system_configuration`.
 
 ####DatagridBundle:
 - Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
@@ -181,6 +184,8 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - method `ensureConfigurationLoaded` was added to check if datagrid config need to be loaded to cache.
     - You can find example of refreshing datagrid cache in `Oro/Bundle/DataGridBundle/EventListener/ContainerListener.php`
 - Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts.
+- Configuration files for datagrids now loads from `Resources/config/oro/datagrids.yml` file instead of `Resources/config/datagrid.yml`.
+- Configuration files root node now changed to its plural form `datagrids: ...`.
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ExportAction`
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ImportAction`
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\AbstractImportExportAction`
@@ -189,6 +194,8 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
 - Added layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator`.
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
+- ACLs configuration file now loads from `Resources/config/oro/acls.yml` file instead of `Resources/config/oro/acls.yml` file
+- ACLs configuration file now has root node in their structure named `acls`. So all ACLs should be placed under the root.
 
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
@@ -228,3 +235,58 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
         `EntityMetadataHelper` $entityMetadataHelper,
         `FieldTypeHelper` $fieldTypeHelper,
         `ConfigManager` $configManager
+- Entity extend configuration now loads from `Resources/conig/oro/entity_extend.yml` file instead of `Resources/config/entity_extend.yml`
+- Root node for entity extend configuration in file `Resources/conig/oro/entity_extend.yml` were changed from `oro_entity_extend` to `entity_extend`
+
+####ApiBundle:
+- API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
+- `Resources/config/oro/api.yml` root node were renamed from `oro_api` to `api`.
+
+####QueryDesignerBundle:
+- YAML Configuration for query designer now loads from `Resources/config/oro/query_designer.yml` file instead of `Resources/config/query_designer.yml`.
+
+####TestFrameworkBundle:
+- Behat elements now loads from `Resources/config/oro/behat_elements.yml` file instead of `Resources/config/behat_elements.yml`.
+
+####ChartBundle:
+- Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
+- Root node for charts configuration in `Resources/config/oro/charts.yml` file were changed from `oro_chart` to `charts`.
+
+####IntegrationBundle:
+- Integration configuration file now loads from `Resources/config/oro/integrations.yml` file instead of `Resources/config/integration_settings.yml`.
+- Root node for integration config file `Resources/config/oro/integrations.yml` were changed from `oro_integration` to `integrations`.
+
+####EntityConfigBundle:
+- Entity configuration now loads from `Resources/config/oro/entity_config.yml` file instead of `Resources/config/entity_config.yml`.
+- Root node for entity configuration in file `Resources/config/oro/entity_config.yml` were changed from `oro_entity_config` to `entity_config`.
+
+####HelpBundle:
+- Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
+- Root node `help` were added for help configuration in `Resources/config/oro/help.yml` file.
+ 
+####SearchBundle:
+- Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
+- Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
+
+####UiBundle:
+- Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
+- Additional common root node `placeholders` were added for placeholders configurations in `Resources/config/oro/placeholders.yml` file.
+   *Please node* that your configuration now should have two `placeholders` nodes (one nested in other) instead of single one.
+```YAML
+placeholders:
+    placeholders: ...
+    items: ...
+```
+
+####DashboardBundle:
+- Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
+- Root node for dashboards configuration in `Resources/config/oro/dashboards.yml` file were changed from `oro_dashboard_config` to `dashboards`.
+
+####NavigationBundle:
+- Navigation configuration now loads form `Resources/config/oro/navigation.yml` instead of `Resources/config/navigation.yml` file.
+- Configuration nodes in `Resources/config/oro/navigation.yml` were nested under single root node `navigation`.
+- Configuration nodes in `Resources/config/oro/navigation.yml` were renamed:
+    * `oro_titles` to `titles`
+    * `oro_menu_config` to `menu_config`
+    * `oro_navigation_elements` to `navigation_elements`
+    

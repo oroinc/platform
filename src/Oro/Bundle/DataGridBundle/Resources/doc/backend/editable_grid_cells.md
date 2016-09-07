@@ -18,7 +18,7 @@ Step 1. Mark editable some fields in datagrid config and add cellSelection
 
 Example of grid configuration:
 ``` yml
-datagrid:
+datagrids:
     customer-product-visibility-grid:
         source:
             acl_resource:      acme_product_view

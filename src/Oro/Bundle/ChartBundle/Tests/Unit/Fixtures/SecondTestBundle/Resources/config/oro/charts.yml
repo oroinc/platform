@@ -1,4 +1,4 @@
-oro_chart:
+charts:
     advanced_chart:
         label: Advanced Chart (overridden)
         default_settings:

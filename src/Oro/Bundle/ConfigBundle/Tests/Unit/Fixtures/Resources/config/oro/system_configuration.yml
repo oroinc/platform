@@ -1,4 +1,4 @@
-oro_system_configuration:
+system_configuration:
     fields:
         test_bundle.some_field:
             data_type: string
