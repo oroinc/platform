@@ -46,9 +46,3 @@ services:
             - '@oro_user.manager'
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
-
-    oro_test.item.event_listener.website_search_index:
-        class: Oro\Bundle\TestFrameworkBundle\EventListener\WebsiteSearchItemIndexerListener
-        arguments:
-            - '@oro_entity.doctrine_helper'
-            - '@oro_locale.helper.localization'
