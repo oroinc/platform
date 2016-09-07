@@ -3,8 +3,7 @@
         &:focus {
             ~ .custom-checkbox__icon {
                 &:before {
-                    outline: 2px solid transparentize(get-color('ui', 'normal'), .45);
-                    outline-offset: -2px;
+                    color: transparentize(get-color('ui', 'normal'), .45);
                 }
             }
         }
