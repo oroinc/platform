@@ -213,6 +213,7 @@ services:
         class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor'
         arguments:
             - '@doctrine'
+            - '@oro_message_queue.job.runner'
             - '@oro_message_queue.client.message_producer'
             - '@monolog.logger'
         tags:
@@ -223,6 +224,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_search.search.engine.indexer'
+            - '@oro_message_queue.job.runner'
             - '@monolog.logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -231,6 +233,7 @@ services:
         class: 'Oro\Bundle\SearchBundle\Async\ReindexEntityMessageProcessor'
         arguments:
             - '@oro_search.search.engine.indexer'
+            - '@oro_message_queue.job.runner'
             - '@oro_message_queue.client.message_producer'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

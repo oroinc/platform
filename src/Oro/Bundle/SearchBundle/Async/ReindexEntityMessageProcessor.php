@@ -5,6 +5,8 @@ use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -14,20 +16,27 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
     /**
      * @var IndexerInterface
      */
-    protected $indexer;
+    private $indexer;
+
+    /**
+     * @var JobRunner
+     */
+    private $jobRunner;
 
     /**
      * @var MessageProducerInterface
      */
-    protected $producer;
+    private $producer;
 
     /**
-     * @param IndexerInterface         $indexer
+     * @param IndexerInterface $indexer
+     * @param JobRunner $jobRunner
      * @param MessageProducerInterface $producer
      */
-    public function __construct(IndexerInterface $indexer, MessageProducerInterface $producer)
+    public function __construct(IndexerInterface $indexer, JobRunner $jobRunner, MessageProducerInterface $producer)
     {
         $this->indexer = $indexer;
+        $this->jobRunner = $jobRunner;
         $this->producer = $producer;
     }
 
@@ -38,29 +47,45 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
     {
         $classes = JSON::decode($message->getBody());
 
-        if (false == $classes) {
-            $this->indexer->resetIndex();
-            $entityNames = $this->indexer->getClassesForReindex();
-        } else {
-            $classes = is_array($classes) ? $classes : [$classes];
+        $result = $this->jobRunner->runUnique(
+            $message->getMessageId(),
+            Topics::REINDEX,
+            function (JobRunner $jobRunner) use ($classes) {
+                if (false == $classes) {
+                    $this->indexer->resetIndex();
+                    $entityClasses = $this->indexer->getClassesForReindex();
+                } else {
+                    $classes = is_array($classes) ? $classes : [$classes];
 
-            $entityNames = [];
-            foreach ($classes as $class) {
-                $entityNames = array_merge($entityNames, $this->indexer->getClassesForReindex($class));
+                    $entityClasses = [];
+                    foreach ($classes as $class) {
+                        $entityClasses = array_merge($entityClasses, $this->indexer->getClassesForReindex($class));
+                    }
+
+                    $entityClasses = array_unique($entityClasses);
+
+                    foreach ($entityClasses as $entityClass) {
+                        $this->indexer->resetIndex($entityClass);
+                    }
+                }
+
+                foreach ($entityClasses as $entityClass) {
+                    $jobRunner->createDelayed(
+                        sprintf('%s:%s', Topics::INDEX_ENTITY_TYPE, $entityClass),
+                        function (JobRunner $jobRunner, Job $child) use ($entityClass) {
+                            $this->producer->send(Topics::INDEX_ENTITY_TYPE, [
+                                'entityClass' => $entityClass,
+                                'jobId' => $child->getId(),
+                            ]);
+                        }
+                    );
+                }
+
+                return true;
             }
+        );
 
-            $entityNames = array_unique($entityNames);
-
-            foreach ($entityNames as $entityName) {
-                $this->indexer->resetIndex($entityName);
-            }
-        }
-
-        foreach ($entityNames as $entityName) {
-            $this->producer->send(Topics::INDEX_ENTITY_TYPE, $entityName);
-        }
-
-        return self::ACK;
+        return $result ? self::ACK : self::REJECT;
     }
 
     /**
