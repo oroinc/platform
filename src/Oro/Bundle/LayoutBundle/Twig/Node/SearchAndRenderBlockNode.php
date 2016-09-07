@@ -23,7 +23,12 @@ class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
         $label           = null;
         $arguments       = iterator_to_array($this->getNode('arguments'));
 
-        if (isset($arguments[0])) {
+        if ($name == 'parent_block_widget') {
+            $compiler->raw('$context[\'block\']');
+            $compiler->raw(', \'' . $blockNameSuffix . '\'');
+            $compiler->raw(', $context');
+            $compiler->raw(', true');
+        } elseif (isset($arguments[0])) {
             $compiler->subcompile($arguments[0]);
             $compiler->raw(', \'' . $blockNameSuffix . '\'');
 

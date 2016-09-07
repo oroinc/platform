@@ -1,5 +1,5 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
-{% set emailBody = record.getValue('email.emailBody') %}
+{% set emailBody = {bodyContent: record.getValue('body_content')} %}
 {% set isNew = record.getValue('is_new') %}
 {% set valueToShow = value ? value : 'oro.email.subject.no_subject.label'|trans %}
 

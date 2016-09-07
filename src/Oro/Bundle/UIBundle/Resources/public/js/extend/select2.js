@@ -1,5 +1,10 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'], function($, _, __, Select2) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Select2 = require('jquery.select2');
+    require('oroui/js/select2-l10n');
 
     /**
      * An overload of populateResults method,
@@ -456,9 +461,4 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
 
     }(Select2['class'].multi.prototype));
-
-    $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
-        formatSearching: function() { return __('Searching...'); },
-        formatNoMatches: function() { return __('No matches found'); }
-    });
 });
