@@ -6,6 +6,10 @@ operations:
             - oro_translation_language_index
         button_options:
             icon: icon-plus
+        frontend_options:
+            options:
+                height: 50
+                okText: oro.translation.action.add
         acl_resource: ['CREATE', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
 
         attributes:
@@ -83,6 +87,69 @@ operations:
                 type: 'success'
             - '@refresh_grid': oro-translation-language-grid
 
+    oro_translation_language_import:
+        datagrids:
+            - oro-translation-language-grid
+        label: oro.translation.action.import
+        order: 20
+        datagrid_options:
+            data:
+                type: import
+                entity_class: 'Oro\Bundle\TranslationBundle\Entity\Translation'
+                importProcessor: 'oro_translation_translation'
+                importJob: 'language_translations_import_from_csv'
+        button_options:
+            icon: download-alt
+            data:
+                options:
+                    refreshPageOnSuccess: $.isDefaultLanguage
+                    importTitle: $.importTitle
+                    datagridName: ~
+                    routeOptions:
+                        language_code: $code
+        preactions:
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isDefaultLanguage
+                method_parameters: [$.data]
+                attribute: $.isDefaultLanguage
+            - '@trans':
+                attribute: $.entityLabel
+                id: 'oro.translation.language.entity_label'
+            - '@trans':
+                attribute: $.importTitle
+                id: 'oro.importexport.import.entity'
+            - '@format_string':
+                attribute: $.importTitle
+                string: $.importTitle
+                arguments:
+                    entityName: $.entityLabel
+
+    oro_translation_language_export:
+        datagrids:
+            - oro-translation-language-grid
+        label: oro.translation.action.export
+        order: 30
+        datagrid_options:
+            data:
+                type: export
+                entity_class: 'Oro\Bundle\TranslationBundle\Entity\Translation'
+                exportProcessor: 'oro_translation_translation'
+                exportJob: 'language_translations_export_to_csv'
+        button_options:
+            icon: upload-alt
+            data:
+                options:
+                    filePrefix: $.filePrefix
+                    routeOptions:
+                        language_code: $code
+        preactions:
+            - '@format_string':
+                attribute: $.filePrefix
+                string: 'translations-%%lang%%'
+                arguments:
+                    lang: $code
+
     oro_translation_language_load_base:
         label: oro.translation.action.install
         acl_resource: [EDIT, $.data]
@@ -90,6 +157,11 @@ operations:
             template: 'OroTranslationBundle:Operation:loadLanguage.html.twig'
             options:
                 height: 100
+            title_parameters:
+                '%%language%%': $.languageName
+        button_options:
+            data:
+                fullRedirect: true
         attributes:
             language_code:
                 label: 'Language code'
@@ -98,7 +170,7 @@ operations:
             - '@call_service_method':
                 service: oro_translation.helper.language
                 method: getLanguageStatistic
-                method_parameters: [$.data.code]
+                method_parameters: [$code]
                 attribute: $.stat
         form_options:
             attribute_fields:
@@ -107,7 +179,18 @@ operations:
                     options:
                         required: true
             attribute_default_values:
-                language_code: $.data.code
+                language_code: $code
+        preactions:
+            - '@call_service_method':
+                service: oro_locale.formatter.language_code
+                method: formatLocale
+                method_parameters: [$code]
+                attribute: $.languageName
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isDefaultLanguage
+                method_parameters: [$.data]
+                attribute: $.isDefaultLanguage
         actions:
             - '@call_service_method':
                 service: oro_translation.helper.language
@@ -140,7 +223,11 @@ operations:
                     - '@flash_message':
                         message: $.errorMessage
                         type: 'error'
-            - '@refresh_grid': oro-translation-language-grid
+            - '@refresh_grid': 
+                conditions: 
+                    '@equal': [$.isDefaultLanguage, false]
+                parameters: 
+                    - oro-translation-language-grid
 
     oro_translation_language_install:
         extends: oro_translation_language_load_base
@@ -151,8 +238,8 @@ operations:
             icon: icon-cloud-download
         frontend_options:
             title: oro.translation.action.install.title
-            title_parameters:
-                '%%language%%': $.languageName
+            options:
+                okText: oro.translation.action.install
         preactions:
             - '@assign_value': [$.successMessage, 'oro.translation.language.message.installed']
             - '@assign_value': [$.errorMessage, 'oro.translation.language.error.install']
@@ -161,11 +248,6 @@ operations:
                 method: isAvailableInstallTranslates
                 method_parameters: [$.data]
                 attribute: $.isAvailableInstall
-            - '@call_service_method':
-                service: oro_locale.formatter.language_code
-                method: formatLocale
-                method_parameters: [$.data.code]
-                attribute: $.languageName
         preconditions:
             '@equal': [$.isAvailableInstall, true]
 
@@ -176,14 +258,18 @@ operations:
         label: oro.translation.action.update
         button_options:
             icon: icon-cloud-download
+        frontend_options:
+            title: oro.translation.action.update.title
+            options:
+                okText: oro.translation.action.update
         preactions:
+            - '@assign_value': [$.successMessage, 'oro.translation.language.message.updated']
+            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.update']
             - '@call_service_method':
                 service: oro_translation.helper.language
                 method: isAvailableUpdateTranslates
                 method_parameters: [$.data]
                 attribute: $.isAvailableUpdate
-            - '@assign_value': [$.successMessage, 'oro.translation.language.message.updated']
-            - '@assign_value': [$.errorMessage, 'oro.translation.language.error.update']
         preconditions:
             '@equal': [$.isAvailableUpdate, true]
 

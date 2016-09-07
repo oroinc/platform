@@ -1,8 +1,0 @@
-{% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
-    entity_class: 'Oro\\Bundle\\TranslationBundle\\Entity\\Translation',
-    importProcessor: 'oro_translation_translation',
-    importJob: 'language_translations_import_from_csv',
-    importTitle: 'oro.importexport.import.entity'|trans({'%entityName%': 'oro.translation.language.entity_label'|trans}),
-    dataGridName: 'oro-translation-language-grid',
-    options: {'language_code': record.getValue('code')}
-} %}

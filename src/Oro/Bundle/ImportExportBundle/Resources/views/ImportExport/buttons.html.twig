@@ -20,53 +20,39 @@
 
 {% set exportTemplateLabel = exportTemplatelabel|default('oro.importexport.export_template.label'|trans) %}
 
-{% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 {% if exportAllowed or importAllowed %}
-    {% if options is not defined %}
-        {% set options = {} %}
-    {% endif %}
-
-    {% set defaultRouteParams = {'options': options} %}
-
-    {% if importJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'importJob': importJob}) %}
-    {% endif %}
-    {% if importValidateJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'importValidateJob': importValidateJob}) %}
-    {% endif %}
-    {% if exportJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'exportJob': exportJob}) %}
-    {% endif %}
-    {% if exportTemplateJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'exportTemplateJob': exportTemplateJob}) %}
-    {% endif %}
-
     <span class="pull-left"
         data-page-component-module="oroui/js/app/components/view-component"
         data-page-component-options="{{ {
             view: 'oroimportexport/js/app/views/import-export-buttons-view',
-            importTitle: importTitle|default(importLabel),
-            exportTitle: exportTitle|default(exportLabel),
-            templateTitle: exportTemplateLabel|default(exportLabel),
-            gridname: dataGridName is defined ? dataGridName : null,
-            afterRefreshPageMessage: afterRefreshPageMessage is defined ? afterRefreshPageMessage : null,
-            refreshPageOnSuccess: refreshPageOnSuccess,
-            isExportPopupRequired: isExportPopupRequired is defined ? isExportPopupRequired : false
+            data: {
+                entity: entity_class,
+                routeOptions: options|default({}),
+
+                importTitle: importTitle|default(importLabel),
+                importJob: importJob|default(null),
+                importValidateJob: importValidateJob|default(null),
+
+                exportTitle: exportTitle|default(exportLabel),
+                exportJob: exportJob|default(null),
+                exportProcessor: exportProcessor|default(null),
+                isExportPopupRequired: isExportPopupRequired|default(false),
+
+                exportTemplateTitle: exportTemplateLabel|default(exportLabel),
+                exportTemplateJob: exportTemplateJob|default(null),
+                exportTemplateProcessor: exportTemplateProcessor|default(null),
+                isExportTemplatePopupRequired: isExportTemplatePopupRequired|default(false),
+
+                filePrefix: filePrefix|default(null),
+                dataGridName: dataGridName|default(null),
+                afterRefreshPageMessage: afterRefreshPageMessage|default(null),
+                refreshPageOnSuccess: refreshPageOnSuccess|default(false),
+            }
         }|json_encode }}"
     >
     {% if exportAllowed %}
-        {% set exportRoute = isExportPopupRequired ? 'oro_importexport_export_config' : 'oro_importexport_export_instant' %}
-        {% set exportRouteParams = defaultRouteParams|merge({'processorAlias': exportProcessor, 'entity': entity_class, 'filePrefix': filePrefix|default(null)}) %}
-
-        {% set exportRouteFilePrefix = filePrefix|default(null) %}
-        {% if exportRouteFilePrefix %}
-            {% set exportRouteParams = exportRouteParams|merge({'filePrefix': exportRouteFilePrefix}) %}
-        {% endif %}
-
         <div class="btn-group">
-            <a type="button"
-               class="btn export-btn icons-holder-text no-hash"
-               href="{{ path(exportRoute, exportRouteParams) }}">
+            <a type="button" class="btn export-btn icons-holder-text no-hash" href="#">
                 <i class="icon-upload-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
@@ -75,17 +61,11 @@
     {% if importAllowed %}
         <div class="btn-group">
             {% set buttonsHtml %}
-                <a type="button"
-                   class="btn import-btn icons-holder-text no-hash"
-                   href="{{ path(importRoute|default('oro_importexport_import_form'), defaultRouteParams|merge({'entity': entity_class})) }}">
+                <a type="button" class="btn import-btn icons-holder-text no-hash" href="#">
                     <i class="icon-download-alt hide-text">{{ importLabel }}</i>{{ importLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}
-                    {% set exportTemplateRoute = isExportTemplatePopupRequired ? 'oro_importexport_export_template_config' : 'oro_importexport_export_template' %}
-                    <a type="button"
-                       class="btn template-btn icons-holder-text no-hash"
-                       {% if not isExportTemplatePopupRequired %}target="_blank" {% endif %}
-                       href="{{ path(exportTemplateRoute, defaultRouteParams|merge({'processorAlias': exportTemplateProcessor, 'entity': entity_class})) }}">
+                    <a type="button" class="btn template-btn icons-holder-text no-hash" href="#">
                         <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
                     </a>
                 {% endif %}

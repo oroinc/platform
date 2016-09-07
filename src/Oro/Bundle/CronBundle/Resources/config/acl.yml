@@ -1,6 +1,0 @@
-oro_jobs:
-    label: oro.cron.action.jobs_management
-    type: action
-    group_name: ""
-    bindings: ~
-    category: "application"

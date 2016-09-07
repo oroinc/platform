@@ -30,3 +30,4 @@ Table of content
     - [Datagrid Render](./Resources/doc/frontend/datagrid_render.md)
     - [Datagrid Widget](./Resources/doc/frontend/datagrid_widget.md)
     - [Column Manager](./Resources/doc/frontend/column_manager.md)
+    - [Grid customization through layouts](./Resources/doc/frontend/grid_customization.md)

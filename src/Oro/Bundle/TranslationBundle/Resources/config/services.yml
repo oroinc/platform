@@ -176,7 +176,7 @@ services:
         lazy: true
         arguments:
             - '@oro_translation.database_translation.metadata.cache'
-            - 'language_translations_import_from_csv'
+            - 'import.language_translations_import_from_csv'
         tags:
             - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterImportTranslations}
 

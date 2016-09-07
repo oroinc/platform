@@ -56,7 +56,7 @@ class LanguageOperationsTest extends ActionTestCase
 
         $this->assertTrue($language->isEnabled());
         $crawler = $this->assertOperationForm('oro_translation_add_language', $language->getId(), Language::class);
-        $form = $crawler->selectButton('Submit')->form([
+        $form = $crawler->selectButton('Add Language')->form([
             'oro_action_operation[language_code]' => 'en_US',
         ]);
         $this->assertOperationFormSubmitted($form, 'Language has been added');
@@ -83,6 +83,7 @@ class LanguageOperationsTest extends ActionTestCase
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
         ]);
 
+        // temporary file would be removed automatically
         copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
 
         $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');
@@ -112,10 +113,11 @@ class LanguageOperationsTest extends ActionTestCase
         $crawler = $client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
         $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
 
-        $form = $crawler->selectButton('Install')->form([
+        $form = $crawler->selectButton('Update')->form([
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
         ]);
 
+        // temporary file would be removed automatically
         copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
 
         $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');

@@ -2,9 +2,10 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\Form\FormRendererEngineInterface;
-use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
+
+use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Oro\Component\Layout\Form\FormRendererInterface;
 
 /**
  * Heavily inspired by FormRenderer class
@@ -127,10 +128,17 @@ class Renderer implements FormRendererInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * {@inheritdoc}
      */
-    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = [])
-    {
+    public function searchAndRenderBlock(
+        FormView $view,
+        $blockNameSuffix,
+        array $variables = [],
+        $renderParentBlock = false
+    ) {
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
         $viewAndSuffixCacheKey = $viewCacheKey . $blockNameSuffix;
 
@@ -174,6 +182,9 @@ class Renderer implements FormRendererInterface
 
         // Load the resource where this block can be found
         $resource = $this->engine->getResourceForBlockNameHierarchy($view, $blockNameHierarchy, $hierarchyLevel);
+        if ($renderParentBlock) {
+            $resource = $this->engine->switchToNextParentResource($view, $blockNameHierarchy);
+        }
 
         // Update the current hierarchy level to the one at which the resource was found
         $hierarchyLevel = $this->engine->getResourceHierarchyLevel($view, $blockNameHierarchy, $hierarchyLevel);

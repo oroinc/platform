@@ -119,8 +119,8 @@ class JobExecutor
     }
 
     /**
-     * @param JobExecution $jobExecution
      * @param JobInstance $jobInstance
+     * @param JobExecution $jobExecution
      * @return JobResult
      */
     protected function doJob(JobInstance $jobInstance, JobExecution $jobExecution)

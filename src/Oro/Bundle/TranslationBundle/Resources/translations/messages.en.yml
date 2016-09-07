@@ -8,9 +8,12 @@ oro.translation:
         download: 'Download'
         install: 'Install'
         update: 'Update'
+        import: 'Import'
+        export: 'Export'
         add: 'Add Language'
         translation_completeness.label: 'Translation Completeness:'
-        install.title: 'Install %language% language'
+        install.title: 'Install "%language%" language'
+        update.title: 'Update "%language%" language'
 
     language:
         entity_label: 'Language'
@@ -20,6 +23,7 @@ oro.translation:
         code.label: 'Code'
         enabled.label: 'Status'
         installed_build_date.label: 'Installed Build Date'
+        owner.label: 'Owner'
         organization.label: 'Organization'
         status:
             enabled: 'Enabled'
@@ -47,3 +51,10 @@ oro.translation:
     form:
         tooltip:
             translation_completeness: "Translation coverage indicator relates to translation package volume. Some bundles may still not be translated."
+
+# TODO: ImportExport doesn't support customize prefixes for processor labels https://magecore.atlassian.net/browse/BAP-11704
+oro.importexport:
+    import:
+        oro_translation_translation:
+            add_or_replace: 'Add and Replace'
+            reset: 'Reset and Add'
