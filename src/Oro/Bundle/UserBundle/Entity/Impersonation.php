@@ -48,6 +48,12 @@ class Impersonation
      */
     protected $loginAt;
 
+    public function __construct()
+    {
+        $this->token = bin2hex(hash('sha1', uniqid(mt_rand(), true), true));
+        $this->expireAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
     /**
      * Get id
      *
@@ -75,17 +81,6 @@ class Impersonation
     public function getUser()
     {
         return $this->user;
-    }
-
-    /**
-     * @param string $token
-     * @return $this
-     */
-    public function setToken($token)
-    {
-        $this->token = $token;
-
-        return $this;
     }
 
     /**

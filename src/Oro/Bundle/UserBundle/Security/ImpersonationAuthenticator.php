@@ -20,6 +20,8 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 
 class ImpersonationAuthenticator implements GuardAuthenticatorInterface
 {
+    const TOKEN_PARAMETER = '_impersonation_token';
+
     /**
      * @var EntityManager
      */
@@ -45,7 +47,7 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function getCredentials(Request $request)
     {
-        return $request->query->get('_impersonation_token');
+        return $request->query->get(static::TOKEN_PARAMETER);
     }
 
     /**
