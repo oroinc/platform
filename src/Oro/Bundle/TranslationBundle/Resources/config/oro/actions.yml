@@ -6,6 +6,10 @@ operations:
             - oro_translation_language_index
         button_options:
             icon: icon-plus
+        frontend_options:
+            options:
+                height: 50
+                okText: oro.translation.action.add
         acl_resource: ['CREATE', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
 
         attributes:
@@ -155,6 +159,9 @@ operations:
                 height: 100
             title_parameters:
                 '%%language%%': $.languageName
+        button_options:
+            data:
+                fullRedirect: true
         attributes:
             language_code:
                 label: 'Language code'
@@ -179,6 +186,11 @@ operations:
                 method: formatLocale
                 method_parameters: [$code]
                 attribute: $.languageName
+            - '@call_service_method':
+                service: oro_translation.helper.language
+                method: isDefaultLanguage
+                method_parameters: [$.data]
+                attribute: $.isDefaultLanguage
         actions:
             - '@call_service_method':
                 service: oro_translation.helper.language
@@ -211,7 +223,11 @@ operations:
                     - '@flash_message':
                         message: $.errorMessage
                         type: 'error'
-            - '@refresh_grid': oro-translation-language-grid
+            - '@refresh_grid': 
+                conditions: 
+                    '@equal': [$.isDefaultLanguage, false]
+                parameters: 
+                    - oro-translation-language-grid
 
     oro_translation_language_install:
         extends: oro_translation_language_load_base
