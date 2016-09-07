@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form\RendererEngine;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
