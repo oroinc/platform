@@ -21,9 +21,16 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *   Parts are rounded up (to int). All PHP string-to-int conversion rules apply.
  *    Invalid numbers result to 0's (1a:b2:3.5m => 1:0:4). Missing leading zeros are also valid (1: => 0:1:0).
  * In both styles time parts are cumulative, so '1m 119.5s' (or '1:119.5') becomes 3 min.
+ *
+ * Supports "," and "." as decimal delimiter
  */
 class DurationToStringTransformer implements DataTransformerInterface
 {
+    const DURATION_JIRA_REGEX = '/^
+                                (?:(?:(\d+(?:[\.,]\d{0,2})?)?)h
+                                (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)m
+                                (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)s)?
+                                $/ix';
     /**
      * {@inheritdoc}
      */
@@ -80,17 +87,11 @@ class DurationToStringTransformer implements DataTransformerInterface
         $time = trim((string)$time);
 
         // matches JIRA style string
-        $regex = '/^' .
-                 '(?:(?:(\d+(?:\.\d)?)?)h(?:[\s]*|$))?' .
-                 '(?:(?:(\d+(?:\.\d)?)?)m(?:[\s]*|$))?' .
-                 '(?:(?:(\d+(?:\.\d)?)?)s)?' .
-                 '$/i';
-
-        if (preg_match_all($regex, $time, $matches)) {
+        if (preg_match_all(self::DURATION_JIRA_REGEX, $time, $matches)) {
             return [
-                'h' => $matches[1][0],
-                'm' => $matches[2][0],
-                's' => $matches[3][0],
+                'h' => $this->getFloat($matches[1][0]),
+                'm' => $this->getFloat($matches[2][0]),
+                's' => $this->getFloat($matches[3][0]),
             ];
         }
 
@@ -99,10 +100,22 @@ class DurationToStringTransformer implements DataTransformerInterface
         $parts = array_pad(explode(':', $time), -3, 0);
 
         return [
-            'h' => (float)$parts[0],
-            'm' => (float)$parts[1],
-            's' => round($parts[2]),
+            'h' => $this->getFloat($parts[0]),
+            'm' => $this->getFloat($parts[1]),
+            's' => round($this->getFloat($parts[2])),
         ];
+    }
+
+    /**
+     * Returns float from a string. Supports either ',' or '.' as decimal delimiter.
+     *
+     * @param string $string
+     *
+     * @return float
+     */
+    private function getFloat($string)
+    {
+        return (float) str_replace(',', '.', $string);
     }
 
     /**

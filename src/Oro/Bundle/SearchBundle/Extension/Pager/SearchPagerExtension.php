@@ -27,8 +27,7 @@ class SearchPagerExtension extends OrmPagerExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        // enabled by default for search datasource
-        return $config->getDatasourceType() == SearchDatasource::TYPE;
+        return $config->getDatasourceType() === SearchDatasource::TYPE;
     }
 
     /**
