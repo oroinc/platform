@@ -124,6 +124,8 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             //phone
             $item->phone = sprintf($ind % 2 ? '123-456-%s00' : '%s00987654', $ind);
 
+            $this->addReference(sprintf('searchItem%s', $ind), $item);
+
             $items[] = $item;
         }
 
