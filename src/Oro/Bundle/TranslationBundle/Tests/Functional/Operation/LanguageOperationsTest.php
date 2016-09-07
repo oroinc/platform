@@ -56,7 +56,7 @@ class LanguageOperationsTest extends ActionTestCase
 
         $this->assertTrue($language->isEnabled());
         $crawler = $this->assertOperationForm('oro_translation_add_language', $language->getId(), Language::class);
-        $form = $crawler->selectButton('Submit')->form([
+        $form = $crawler->selectButton('Add Language')->form([
             'oro_action_operation[language_code]' => 'en_US',
         ]);
         $this->assertOperationFormSubmitted($form, 'Language has been added');
