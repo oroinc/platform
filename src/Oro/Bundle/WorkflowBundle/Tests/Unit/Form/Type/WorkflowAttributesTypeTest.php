@@ -48,7 +48,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $authorizationChecker;
+    protected $propertyPathSecurityHelper;
 
     protected function setUp()
     {
@@ -60,7 +60,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->formInitListener = $this->createFormInitListenerMock();
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
         $this->dispatcher = $this->createDispatcherMock();
-        $this->authorizationChecker = $this->createAuthorizationCheckerMock();
+        $this->propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
 
         $this->type = $this->createWorkflowAttributesType(
             $this->workflowRegistry,
@@ -69,7 +69,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->formInitListener,
             $this->requiredAttributesListener,
             $this->dispatcher,
-            $this->authorizationChecker
+            $this->propertyPathSecurityHelper
         );
     }
 
@@ -401,13 +401,13 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             )
         );
 
-        $this->authorizationChecker->expects($this->at(0))
-            ->method('isGranted')
-            ->with('EDIT', new FieldVote($entity, 'first'))
+        $this->propertyPathSecurityHelper->expects($this->at(0))
+            ->method('isGrantedByPropertyPath')
+            ->with($entity, 'first', 'EDIT')
             ->willReturn(true);
-        $this->authorizationChecker->expects($this->at(1))
-            ->method('isGranted')
-            ->with('EDIT', new FieldVote($entity, 'second'))
+        $this->propertyPathSecurityHelper->expects($this->at(1))
+            ->method('isGrantedByPropertyPath')
+            ->with($entity, 'second', 'EDIT')
             ->willReturn(false);
 
         $form = $this->factory->create($this->type, $formData, $formOptions);

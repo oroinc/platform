@@ -80,4 +80,11 @@ final class Events
      * Can be used to modify result after conversion ends.
      */
     const AFTER_IMPORT_FORMAT_CONVERSION = 'oro.import_export.after_import_format_conversion';
+
+    /**
+     * This event occurs after processing some job.
+     *
+     * Can be used to do some staff after job. For example, clean cache.
+     */
+    const AFTER_JOB_EXECUTION = 'oro.import_export.after_job_execution';
 }

@@ -6,13 +6,15 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class BundleConfiguration extends AbstractConfiguration
 {
+    const CONFIG_ROOT_NODE = 'help';
+
     /**
      * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('resources');
+        $rootNode = $treeBuilder->root(self::CONFIG_ROOT_NODE);
 
         $nodeBuilder = $rootNode->children();
 

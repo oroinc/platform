@@ -1,0 +1,47 @@
+services:
+    oro_datagrid.block_type.datagrid:
+        class: Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType
+        arguments:
+            - '@oro_datagrid.datagrid.name_strategy'
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_security.security_facade'
+        tags:
+            - { name: layout.block_type, alias: datagrid }
+
+    oro_datagrid.block_type.datagrid_header_row:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['datagrid_header_row']]
+        tags:
+            - { name: layout.block_type, alias: datagrid_header_row }
+
+    oro_datagrid.block_type.datagrid_header_cell:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{column_name: {required: true}}]]
+            - [setName, ['datagrid_header_cell']]
+        tags:
+            - { name: layout.block_type, alias: datagrid_header_cell }
+
+    oro_datagrid.block_type.datagrid_row:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['datagrid_row']]
+        tags:
+            - { name: layout.block_type, alias: datagrid_row }
+
+    oro_datagrid.block_type.datagrid_cell:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{column_name: {required: true}}]]
+            - [setName, ['datagrid_cell']]
+        tags:
+            - { name: layout.block_type, alias: datagrid_cell }
+
+    oro_datagrid.block_type.datagrid_cell_value:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{column_name: {required: true}}]]
+            - [setName, ['datagrid_cell_value']]
+        tags:
+            - { name: layout.block_type, alias: datagrid_cell_value }

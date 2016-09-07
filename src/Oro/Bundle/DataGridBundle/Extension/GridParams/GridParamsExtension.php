@@ -17,7 +17,7 @@ class GridParamsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->getDatasourceType() == OrmDatasource::TYPE;
+        return $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
     /**

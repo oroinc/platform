@@ -98,16 +98,16 @@ class ImportVisitor implements VisitorInterface
                     $update->setParentUpdate($parentUpdate);
                 }
 
-                if ($update instanceof ImportsAwareLayoutUpdateInterface) {
-                    $this->loadImportUpdate($update, $context);
-                }
-
                 $el = $update instanceof ElementDependentLayoutUpdateInterface
                     ? $update->getElement()
                     : 'root';
                 $this->updates[$el][] = $update;
 
                 $this->dependencyInitializer->initialize($update);
+
+                if ($update instanceof ImportsAwareLayoutUpdateInterface) {
+                    $this->loadImportUpdate($update, $context);
+                }
             }
         }
     }

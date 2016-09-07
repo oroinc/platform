@@ -52,13 +52,21 @@ class OriginFolderFilterProvider
      */
     protected function getOrigins()
     {
-        $criteria = [
-            'owner' => $this->securityFacade->getLoggedUser(),
-            'organization' => $this->securityFacade->getOrganization(),
-            'isActive' => true,
-        ];
-
-        return $this->doctrine->getRepository(self::EMAIL_ORIGIN)->findBy($criteria);
+        return $this->doctrine->getRepository(self::EMAIL_ORIGIN)
+                ->createQueryBuilder('eo')
+                ->select('eo, f, m')
+                ->leftJoin('eo.folders', 'f')
+                ->leftJoin('eo.mailbox', 'm')
+                ->andWhere('eo.owner = :owner')
+                ->andWhere('eo.organization = :organization')
+                ->andWhere('eo.isActive = :isActive')
+                ->setParameters([
+                    'owner' => $this->securityFacade->getLoggedUser(),
+                    'organization' => $this->securityFacade->getOrganization(),
+                    'isActive' => true,
+                ])
+                ->getQuery()
+                ->getResult();
     }
 
     /**
