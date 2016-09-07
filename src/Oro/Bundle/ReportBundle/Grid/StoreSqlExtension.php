@@ -34,7 +34,8 @@ class StoreSqlExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->getDatasourceType() == OrmDatasource::TYPE &&
+        return
+            $config->getDatasourceType() === OrmDatasource::TYPE &&
             $this->getParameters()->get(self::DISPLAY_SQL_QUERY, false) &&
             $this->securityFacade->getLoggedUser() &&
             $this->securityFacade->isGranted('oro_report_view_sql');
