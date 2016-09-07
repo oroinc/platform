@@ -298,12 +298,12 @@ This option is used to recognize grid for entity with higher priority than `defa
 In cases if these options (`context` or `default`) are not defined for entity, it won`t appear in the context dialog.
 
 
-How to enable 'contexts' column in activity entity grids
+How to enable contexts column in activity entity grids
 --------------------------------------------------------
 
 For any activity entity grid you are able to include a column that includes all context entities
 
-To do so use the following configuration for *datagrid.yml*:
+To do so see the following example of tasks configuration in *datagrid.yml*:
 
 ``` yml
 datagrid:
@@ -317,7 +317,7 @@ datagrid:
 ```
 This will create a column named `contexts` and will try to automatically detect the activity class name. If for some reason it fails you can specify a FQCN in the `entity_name` option
 
-If you wish to configure the column you are able to do it if you add a section with the name specified in the `column_name` option
+If you wish to configure the column, you are able to do it if you add a section with the name specified in the `column_name` option.
 ``` yml
 datagrid:
     tasks-grid:
@@ -329,7 +329,7 @@ datagrid:
                 ...
 ```
 
-Column type is `twig` so you are also able to specify a template. 
+Column type is `twig` (unchangeable), so you are also able to specify a `template`.
 
 Default is [OroActivityBundle:Grid:Column/contexts.html.twig](./Resources/views/Grid/Column/contexts.html.twig)
 
