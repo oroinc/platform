@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Table(name="test_search_item")
- * @ORM\Entity(repositoryClass="Oro\Bundle\TestFrameworkBundle\Entity\Repository\ItemRepository")
+ * @ORM\Entity
  * @Config(
  *      routeName="oro_test_item_index",
  *      routeView="oro_test_item_view",
