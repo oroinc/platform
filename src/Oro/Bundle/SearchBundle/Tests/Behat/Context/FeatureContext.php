@@ -90,7 +90,7 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     public function iFilterResultByEntityType($type)
     {
         $typeLink = $this->getPage()->find('css', ".search-entity-types-column ul li a:contains('$type')");
-        self::assertNotNull($type, "Columt type '$type' not found");
+        self::assertNotNull($typeLink, "Columt type '$type' not found");
 
         $typeLink->click();
     }
