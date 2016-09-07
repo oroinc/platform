@@ -3043,6 +3043,9 @@ span.validation-failed {
   .popover-content {
     padding: 13px 30px 13px 15px;
     height: 100%;
+    &.popover-no-close-button {
+      padding-right: 15px;
+    }
   }
   .oro-popover-content {
     overflow-y: auto;
@@ -3171,10 +3174,12 @@ label .popover-content {
   }
 }
 
-.entity-create-or-select-container .entity-create-btn {
-  padding: 0 6px;
-  margin-left: 3px;
-  height: 30px;
+.entity-create-or-select-container {
+  .entity-create-btn, .entity-create-btn[disabled], .entity-create-btn[disabled]:active {
+    padding: 0 6px;
+    margin-left: 3px;
+    height: 30px;
+  }
 }
 
 .entity-create-enabled .input-prepend .select2-container,

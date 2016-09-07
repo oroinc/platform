@@ -70,12 +70,27 @@ class Process
     protected function getPreCondition()
     {
         if ($this->preCondition === null) {
-            $this->preCondition = false;
+            $featureResourceDefinition = [
+                '@feature_resource_enabled' => [
+                    'resource' => $this->processDefinition->getName(),
+                    'resource_type' => 'processes'
+                ]
+            ];
+
             $conditionConfiguration = $this->processDefinition->getPreConditionsConfiguration();
             if ($conditionConfiguration) {
-                $this->preCondition = $this->conditionFactory
-                    ->create(ConfigurableCondition::ALIAS, $conditionConfiguration);
+                $conditionConfiguration = [
+                    '@and' => [
+                        $featureResourceDefinition,
+                        $conditionConfiguration
+                    ]
+                ];
+            } else {
+                $conditionConfiguration = $featureResourceDefinition;
             }
+
+            $this->preCondition = $this->conditionFactory
+                ->create(ConfigurableCondition::ALIAS, $conditionConfiguration);
         }
 
         return $this->preCondition;

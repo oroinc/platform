@@ -4,24 +4,17 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
+use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
 
-/**
- * Class InlineEditColumnOptionsGuesser
- * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing
- */
 class InlineEditColumnOptionsGuesser
 {
-    /**
-     * @var ValidatorInterface
-     */
+    /** @var ValidatorInterface */
     protected $validator;
 
-    /**
-     * @var GuesserInterface[]
-     */
+    /** @var GuesserInterface[] */
     protected $guessers;
 
     /**
@@ -51,7 +44,7 @@ class InlineEditColumnOptionsGuesser
      */
     public function getColumnOptions($columnName, $entityName, $column, $behaviour)
     {
-        /** @var ValidatorInterface $validatorMetadata */
+        /** @var ClassMetadataInterface $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($entityName);
         $isEnabledInline =
             isset($column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY]) &&
@@ -93,6 +86,7 @@ class InlineEditColumnOptionsGuesser
      */
     protected function getValidationRules($validatorMetadata, $columnName)
     {
+        /** @var PropertyMetadataInterface $metadata */
         $metadata = $validatorMetadata->getPropertyMetadata($columnName);
         $metadata = is_array($metadata) && isset($metadata[0]) ? $metadata[0] : $metadata;
 

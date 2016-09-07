@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -45,6 +46,9 @@ class EmailExtension extends Twig_Extension
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
 
+    /** @var EmailBodyHelper */
+    protected $emailBodyHelper;
+
     /**
      * @param EmailHolderHelper      $emailHolderHelper
      * @param EmailAddressHelper     $emailAddressHelper
@@ -53,6 +57,7 @@ class EmailExtension extends Twig_Extension
      * @param MailboxProcessStorage  $mailboxProcessStorage
      * @param SecurityFacade         $securityFacade
      * @param RelatedEmailsProvider  $relatedEmailsProvider
+     * @param EmailBodyHelper        $emailBodyHelper
      */
     public function __construct(
         EmailHolderHelper $emailHolderHelper,
@@ -61,7 +66,8 @@ class EmailExtension extends Twig_Extension
         EntityManager $em,
         MailboxProcessStorage $mailboxProcessStorage,
         SecurityFacade $securityFacade,
-        RelatedEmailsProvider $relatedEmailsProvider
+        RelatedEmailsProvider $relatedEmailsProvider,
+        EmailBodyHelper $emailBodyHelper
     ) {
         $this->emailHolderHelper = $emailHolderHelper;
         $this->emailAddressHelper = $emailAddressHelper;
@@ -70,6 +76,7 @@ class EmailExtension extends Twig_Extension
         $this->mailboxProcessStorage = $mailboxProcessStorage;
         $this->securityFacade = $securityFacade;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
+        $this->emailBodyHelper = $emailBodyHelper;
     }
 
     /**
@@ -88,6 +95,28 @@ class EmailExtension extends Twig_Extension
             new Twig_SimpleFunction('oro_get_email_clank_event', [$this, 'getEmailClankEvent']),
             new Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount'])
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFilters()
+    {
+        return [
+            new \Twig_SimpleFilter('oro_cleanup_email_body', [$this, 'getCleanEmailBody'])
+        ];
+    }
+
+    /**
+     * Returns clean text representation without tags
+     *
+     * @param string $emailBodyText
+     *
+     * @return string
+     */
+    public function getCleanEmailBody($emailBodyText)
+    {
+        return $this->emailBodyHelper->getClearBody($emailBodyText);
     }
 
     /**

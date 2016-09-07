@@ -353,7 +353,7 @@ class ArrayUtil
             return [];
         }
 
-        if (empty($columnKey)) {
+        if (!isset($columnKey)) {
             throw new \InvalidArgumentException('Column key is empty');
         }
 

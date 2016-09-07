@@ -1,4 +1,4 @@
-oro_api:
+api:
     entity_aliases:
         Test\Entity4:
             alias: entity4
