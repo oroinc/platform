@@ -14,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityMetadataBuilderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
@@ -81,6 +82,7 @@ class OroEntityExtendBundle extends Bundle
             )
         );
         $container->addCompilerPass(new ExtensionPass());
+        $container->addCompilerPass(new WarmerPass());
     }
 
     private function ensureInitialized()
