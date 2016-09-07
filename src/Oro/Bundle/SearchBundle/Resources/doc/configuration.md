@@ -53,7 +53,7 @@ configuration for each entity.
 Example
 -------
 
-Acme\Bundle\DemoBundle\Resources\config\search.yml:
+Acme\Bundle\DemoBundle\Resources\config\oro\search.yml:
 
 ```yml
 Acme\Bundle\DemoBundle\Entity\Tag:

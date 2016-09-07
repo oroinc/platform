@@ -17,6 +17,10 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
  */
 class OroUIExtension extends Extension
 {
+    const PLACEHOLDERS_CONFIG_ROOT_NODE = 'placeholders';
+    const PLACEHOLDERS_NODE = 'placeholders';
+    const PLACEHOLDERS_ITEMS_NODE = 'items';
+
     /**
      * {@inheritDoc}
      */
@@ -41,7 +45,7 @@ class OroUIExtension extends Extension
             'oro_ui.placeholders',
             [
                 'placeholders' => $config['placeholders'],
-                'items'        => $config['placeholder_items']
+                'items' => $config['placeholder_items']
             ]
         );
 
@@ -59,25 +63,34 @@ class OroUIExtension extends Extension
     protected function loadPlaceholdersConfigs(ContainerBuilder $container)
     {
         $placeholders = [];
-        $items        = [];
+        $items = [];
 
         $configLoader = new CumulativeConfigLoader(
             'oro_placeholders',
-            new YamlCumulativeFileLoader('Resources/config/placeholders.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/placeholders.yml')
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load($container);
+
         foreach ($resources as $resource) {
-            if (isset($resource->data['placeholders'])) {
-                $this->ensurePlaceholdersCompleted($resource->data['placeholders']);
-                $placeholders = array_replace_recursive($placeholders, $resource->data['placeholders']);
+            if (!isset($resource->data[self::PLACEHOLDERS_CONFIG_ROOT_NODE])
+                || !is_array($resource->data[self::PLACEHOLDERS_CONFIG_ROOT_NODE])
+            ) {
+                continue;
             }
-            if (isset($resource->data['items'])) {
-                $items = array_replace_recursive($items, $resource->data['items']);
+
+            $config = &$resource->data[self::PLACEHOLDERS_CONFIG_ROOT_NODE];
+
+            if (isset($config[self::PLACEHOLDERS_NODE])) {
+                $this->ensurePlaceholdersCompleted($config[self::PLACEHOLDERS_NODE]);
+                $placeholders = array_replace_recursive($placeholders, $config[self::PLACEHOLDERS_NODE]);
+            }
+            if (isset($config[self::PLACEHOLDERS_ITEMS_NODE])) {
+                $items = array_replace_recursive($items, $config[self::PLACEHOLDERS_ITEMS_NODE]);
             }
         }
 
         return [
-            'placeholders'      => $placeholders,
+            'placeholders' => $placeholders,
             'placeholder_items' => $items
         ];
     }

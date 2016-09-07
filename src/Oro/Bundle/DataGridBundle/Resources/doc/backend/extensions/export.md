@@ -7,7 +7,7 @@ Configuration
 To enable export functionality you just need to add `export` option to a configuration of your grid. For example:
 
 ``` yaml
-datagrid:
+datagrids:
     accounts-grid:
         ...
         options:
@@ -19,7 +19,7 @@ After that `Export` button will be displayed on the top left corner of a grid. T
 If you need allow to export grid data in other formats you need to configure your grid properly. For example to allow export data in CSV and PDF formats you can use the following configuration:
 
 ``` yaml
-datagrid:
+datagrids:
     my-grid:
         ...
         options:

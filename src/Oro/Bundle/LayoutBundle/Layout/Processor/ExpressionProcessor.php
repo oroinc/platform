@@ -130,7 +130,6 @@ class ExpressionProcessor
                     $value = substr($value, 1);
                     break;
             }
-
         } elseif (is_array($value)) {
             foreach ($value as &$item) {
                 $this->processValue($item, $context, $data, $evaluate, $encoding);

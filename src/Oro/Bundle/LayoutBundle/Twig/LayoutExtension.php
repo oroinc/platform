@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Layout\BlockView;
 
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
 class LayoutExtension extends \Twig_Extension
@@ -71,6 +70,11 @@ class LayoutExtension extends \Twig_Extension
             ),
             new \Twig_SimpleFunction(
                 'block_row',
+                null,
+                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFunction(
+                'parent_block_widget',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),

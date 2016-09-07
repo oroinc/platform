@@ -182,6 +182,7 @@ class Builder
                 $acceptor->addExtension($extension);
             }
         }
+        $acceptor->sortExtensionsByPriority();
 
         return $acceptor;
     }

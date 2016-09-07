@@ -393,6 +393,15 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * @param string $referenceUID
+     * @return bool
+     */
+    protected function hasReference($referenceUID)
+    {
+        return $this->getReferenceRepository()->hasReference($referenceUID);
+    }
+
+    /**
      * @return ReferenceRepository|null
      */
     protected function getReferenceRepository()
