@@ -65,7 +65,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
-            ->with($this->equalTo(Translation::ENTITY_NAME))
+            ->with($this->equalTo(Translation::class))
             ->will($this->returnValue($this->em));
 
         $this->persister = new DatabasePersister(

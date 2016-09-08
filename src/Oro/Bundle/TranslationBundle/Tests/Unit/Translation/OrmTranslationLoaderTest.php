@@ -47,7 +47,7 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
 
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->with(Translation::ENTITY_NAME)
+            ->with(Translation::class)
             ->willReturn($this->em);
 
         $this->translationManager = $this
@@ -78,7 +78,7 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($translationTable);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
-            ->with(Translation::ENTITY_NAME)
+            ->with(Translation::class)
             ->willReturn($metadata);
 
         $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
@@ -157,7 +157,7 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($translationTable);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
-            ->with(Translation::ENTITY_NAME)
+            ->with(Translation::class)
             ->willReturn($metadata);
 
         $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')

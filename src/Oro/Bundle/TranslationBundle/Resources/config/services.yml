@@ -6,7 +6,6 @@ parameters:
     oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
     oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
-    oro_translation.database_translation.loader.class:          Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
     oro_translation.empty_array.loader.class:                   Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader
 
     oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
@@ -102,10 +101,9 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_translation.translation.manager'
-            - '@oro_translation.database_translation.metadata.cache'
 
     oro_translation.database_translation.loader:
-        class: %oro_translation.database_translation.loader.class%
+        class: 'Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader'
         arguments:
             - '@doctrine'
             - '@oro_translation.translation.manager'

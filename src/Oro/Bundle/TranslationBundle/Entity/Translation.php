@@ -13,8 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Translation
 {
-    const ENTITY_NAME = 'OroTranslationBundle:Translation';
-
     const DEFAULT_LOCALE = 'en';
 
     const SCOPE_SYSTEM = 1;

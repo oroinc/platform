@@ -20,9 +20,6 @@ class DatabasePersister
     /** @var Registry */
     private $registry;
 
-    /** @var DynamicTranslationMetadataCache */
-    private $metadataCache;
-
     /** @var TranslationManager */
     private $translationManager;
 
@@ -32,16 +29,13 @@ class DatabasePersister
     /**
      * @param Registry $registry
      * @param TranslationManager $translationManager
-     * @param DynamicTranslationMetadataCache $metadataCache
      */
     public function __construct(
         Registry $registry,
-        TranslationManager $translationManager,
-        DynamicTranslationMetadataCache $metadataCache
+        TranslationManager $translationManager
     ) {
         $this->registry = $registry;
         $this->translationManager = $translationManager;
-        $this->metadataCache = $metadataCache;
     }
 
     /**
@@ -50,7 +44,7 @@ class DatabasePersister
     protected function getEntityManager()
     {
         if (null === $this->em) {
-            $this->em = $this->registry->getManagerForClass(Translation::ENTITY_NAME);
+            $this->em = $this->registry->getManagerForClass(Translation::class);
         }
 
         return $this->em;
@@ -97,7 +91,7 @@ class DatabasePersister
         }
 
         // update timestamp in case when persist succeed
-        $this->metadataCache->updateTimestamp($locale);
+        $this->translationManager->invalidateCache($locale);
     }
 
     /**
