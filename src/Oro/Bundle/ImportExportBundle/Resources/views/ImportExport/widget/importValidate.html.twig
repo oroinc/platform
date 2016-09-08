@@ -175,8 +175,8 @@
                                 var link = '<a href="' + data.errorsUrl + '" class="no-hash" target="_blank">' + __('Download error log') + '</a>';
                                 message += ' ' + link;
                             }
-                            Messenger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);
-                            if (data.importInfo !== undefined) {
+                            Messenger.notificationFlashMessage(data.success ? 'success' : 'error', message);
+                            if (data.importInfo !== undefined && data.importInfo) {
                                 Messenger.notificationMessage('info', data.importInfo);
                             }
                             widget.remove();

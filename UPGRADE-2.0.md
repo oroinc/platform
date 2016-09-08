@@ -124,6 +124,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added ExpressionFunction `localized_value` to `Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider` - can be used in Layouts
 - Added Localization Settings page in System configuration
 - Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values
+- Changed signature of constructor of `Oro\Bundle\LocaleBundle\Form\Type\LanguageType` - now it takes following arguments:
+    - `ConfigManager $cm`,
+    - `LanguageProvider $languageProvider`.
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
@@ -183,15 +186,40 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts.
 - Configuration files for datagrids now loads from `Resources/config/oro/datagrids.yml` file instead of `Resources/config/datagrid.yml`.
 - Configuration files root node now changed to its plural form `datagrids: ...`.
-  
-####SecurityBundle:
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ExportAction`
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ImportAction`
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\AbstractImportExportAction`
+
+####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
 - Added layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator`.
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
 - ACLs configuration file now loads from `Resources/config/oro/acls.yml` file instead of `Resources/config/oro/acls.yml` file
 - ACLs configuration file now has root node in their structure named `acls`. So all ACLs should be placed under the root.
 
-####EntityExtendBundle:
+####ImportExportBundle
+- Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
+- For `Oro\Bundle\ImportExportBundle\Job\JobExecutor` added new public method `setEventDispatcher` for setting Event Dispatcher.
+
+####TranslationBundle
+- Added controller `Oro\Bundle\TranslationBundle\Controller\LanguageController` for manage Languages.
+- Removed controller `Oro\Bundle\TranslationBundle\Controller\ServiceController`.
+- Added entity `Oro\Bundle\TranslationBundle\Entity\Language`.
+- Added import and export features for translations.
+- Added class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` for getting available and enabled languages.
+- Added class `Oro\Bundle\TranslationBundle\Helper\LanguageHelper` with helpers-methods for managing Languages.
+- Class `Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider`:
+    - In method `download` removed argument `$toApply` and the class accepts following arguments now:
+        - `string $pathToSave`,
+        - `array $projects`,
+        - `string $locale (default null)`.
+    - Added method `loadTranslatesFromFile` for loading translations from file. Arguments:
+        - `string $pathToSave`,
+        - `string $locale (default null)`.
+- Removed form `Oro\Bundle\TranslationBundle\Form\Type\AvailableTranslationsConfigurationType`.
+- Removed twig extension `Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension`.
+
+####EntityExtendBundle
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
     - removed property `tableToClassMap` in favour of `tableToClassesMap`
@@ -262,3 +290,7 @@ placeholders:
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
     
+####EmailBundle
+- Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
+- Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
+- Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` changed. Added `ConfigManager $configManager` as last argument.
