@@ -32,18 +32,13 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFilters()
     {
-        $filters = $this->extension->getFilters();
-
-        $this->assertTrue(is_array($filters));
-        $this->assertEquals(3, sizeof($filters));
-
-        $filter = $filters[0];
-        $this->assertInstanceOf('\Twig_SimpleFilter', $filter);
-        $this->assertEquals($filter->getName(), 'oro_tag_filter');
-        $callable = $filter->getCallable();
-        $this->assertTrue(is_array($callable));
-        $this->assertEquals(2, sizeof($callable));
-        $this->assertEquals($callable[0], $this->extension);
-        $this->assertEquals($callable[1], 'tagFilter');
+        $this->assertEquals(
+            [
+                new \Twig_SimpleFilter('oro_tag_filter', [$this->extension, 'tagFilter'], ['is_safe' => ['all']]),
+                new \Twig_SimpleFilter('oro_html_purify', [$this->extension, 'htmlPurify']),
+                new \Twig_SimpleFilter('oro_html_sanitize', [$this->extension, 'htmlSanitize'], ['is_safe' => ['html']])
+            ],
+            $this->extension->getFilters()
+        );
     }
 }

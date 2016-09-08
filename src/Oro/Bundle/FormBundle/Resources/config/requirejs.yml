@@ -9,6 +9,9 @@ config:
         'tinymce/plugins/bdesk_photo/plugin.min.js':
             deps:
                 - 'tinymce/tinymce.min'
+        'tinymce/plugins/fullpage/plugin.min.js':
+            deps:
+                - 'tinymce/tinymce.min'
         'tinymce/plugins/code/plugin.min':
             deps:
                 - 'tinymce/tinymce.min'
@@ -49,6 +52,7 @@ config:
         'oroform/js/validator/time': 'bundles/oroform/js/validator/time.js'
         'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
+        'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
 
         #inline editing
         'oroform/js/tools/frontend-type-map': 'bundles/oroform/js/tools/frontend-type-map.js'

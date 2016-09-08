@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType;
 
-class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateApiTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var EmailTemplateApiType
@@ -61,10 +61,12 @@ class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->any())
             ->method('get')
-            ->with('oro_locale.languages')
-            ->will($this->returnValue(['en', 'fr_FR']));
+            ->will($this->returnValueMap([
+                ['oro_locale.languages', false, false, ['en', 'fr_FR']],
+                ['oro_email.sanitize_html', false, false, true]
+            ]));
 
         $this->localeSettings->expects($this->exactly(3))
             ->method('getLanguage')
