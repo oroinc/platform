@@ -6,6 +6,8 @@ use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
@@ -13,7 +15,11 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new ReindexEntityMessageProcessor($this->createIndexerMock(), $this->createMessageProducerMock());
+        new ReindexEntityMessageProcessor(
+            $this->createIndexerMock(),
+            $this->createJobRunnerMock(),
+            $this->createMessageProducerMock()
+        );
     }
 
     public function testShouldReturnSubscribedTopics()
@@ -40,13 +46,37 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITY_TYPE, 'class-name')
+            ->with(Topics::INDEX_ENTITY_TYPE, ['entityClass' => 'class-name', 'jobId' => 12345])
+        ;
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runUnique')
+            ->with('message-id', Topics::REINDEX)
+            ->will($this->returnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+                $callback($jobRunner);
+
+                return true;
+            }))
+        ;
+        $jobRunner
+            ->expects($this->once())
+            ->method('createDelayed')
+            ->with('oro.search.index_entity_type:class-name')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(12345);
+
+                $callback($jobRunner, $job);
+            }))
         ;
 
         $message = new NullMessage();
+        $message->setMessageId('message-id');
         $message->setBody('');
 
-        $processor = new ReindexEntityMessageProcessor($indexer, $producer);
+        $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, $producer);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
@@ -71,15 +101,39 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITY_TYPE, 'class-name')
+            ->with(Topics::INDEX_ENTITY_TYPE, ['entityClass' => 'class-name', 'jobId' => 12345])
+        ;
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runUnique')
+            ->with('message-id', Topics::REINDEX)
+            ->will($this->returnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+                $callback($jobRunner);
+
+                return true;
+            }))
+        ;
+        $jobRunner
+            ->expects($this->once())
+            ->method('createDelayed')
+            ->with('oro.search.index_entity_type:class-name')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(12345);
+
+                $callback($jobRunner, $job);
+            }))
         ;
 
         $message = new NullMessage();
+        $message->setMessageId('message-id');
         $message->setBody(json_encode(
             'class-name'
         ));
 
-        $processor = new ReindexEntityMessageProcessor($indexer, $producer);
+        $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, $producer);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
@@ -104,24 +158,56 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITY_TYPE, 'class-name')
+            ->with(Topics::INDEX_ENTITY_TYPE, ['entityClass' => 'class-name', 'jobId' => 12345])
+        ;
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runUnique')
+            ->with('message-id', Topics::REINDEX)
+            ->will($this->returnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+                $callback($jobRunner);
+
+                return true;
+            }))
+        ;
+        $jobRunner
+            ->expects($this->once())
+            ->method('createDelayed')
+            ->with('oro.search.index_entity_type:class-name')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(12345);
+
+                $callback($jobRunner, $job);
+            }))
         ;
 
         $message = new NullMessage();
+        $message->setMessageId('message-id');
         $message->setBody(json_encode(
             ['class-name']
         ));
 
-        $processor = new ReindexEntityMessageProcessor($indexer, $producer);
+        $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, $producer);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducer
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
      */
-    public function createMessageProducerMock()
+    private function createJobRunnerMock()
+    {
+        return $this->getMock(JobRunner::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     */
+    private function createMessageProducerMock()
     {
         return $this->getMock(MessageProducerInterface::class, [], [], '', false);
     }
@@ -129,7 +215,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|IndexerInterface
      */
-    public function createIndexerMock()
+    private function createIndexerMock()
     {
         return $this->getMock(IndexerInterface::class);
     }

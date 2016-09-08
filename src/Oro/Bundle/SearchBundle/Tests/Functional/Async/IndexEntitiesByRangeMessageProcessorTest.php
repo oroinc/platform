@@ -39,6 +39,9 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
         $itemManager->persist($item);
         $itemManager->flush();
 
+        $rootJob = $this->getJobProcessor()->findOrCreateRootJob('ownerid', 'jobname');
+        $childJob = $this->getJobProcessor()->findOrCreateChildJob('jobname', $rootJob);
+
         // guard
         $itemIndex = $indexItemRepository->findOneBy(['entity' => Item::class, 'recordId' => $item->getId()]);
         $this->assertEmpty($itemIndex);
@@ -46,9 +49,10 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
         // test
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'class' => Item::class,
+            'entityClass' => Item::class,
             'offset' => 0,
             'limit' => 1000,
+            'jobId' => $childJob->getId(),
         ]));
 
         $this->getIndexEntitiesByRangeMessageProcessor()->process($message, $this->createQueueSessionMock());
@@ -69,6 +73,9 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
         $itemManager->persist($item);
         $itemManager->flush();
 
+        $rootJob = $this->getJobProcessor()->findOrCreateRootJob('ownerid', 'jobname');
+        $childJob = $this->getJobProcessor()->findOrCreateChildJob('jobname', $rootJob);
+
         // guard
         $itemIndex = $indexItemRepository->findOneBy(['entity' => Item::class, 'recordId' => $item->getId()]);
         $this->assertEmpty($itemIndex);
@@ -79,6 +86,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
             'class' => Item::class,
             'offset' => 100000,
             'limit' => 1000,
+            'jobId' => $childJob->getId(),
         ]));
 
         $this->getIndexEntitiesByRangeMessageProcessor()->process($message, $this->createQueueSessionMock());
@@ -88,9 +96,17 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
     }
 
     /**
+     * @return \Oro\Component\MessageQueue\Job\JobProcessor
+     */
+    private function getJobProcessor()
+    {
+        return $this->getContainer()->get('oro_message_queue.job.processor');
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
-    protected function createQueueSessionMock()
+    private function createQueueSessionMock()
     {
         return $this->getMock(SessionInterface::class);
     }
@@ -98,7 +114,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
     /**
      * @return \Doctrine\Bundle\DoctrineBundle\Registry
      */
-    protected function getDoctrine()
+    private function getDoctrine()
     {
         return $this->getContainer()->get('doctrine');
     }
@@ -106,7 +122,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
     /**
      * @return IndexEntitiesByRangeMessageProcessor
      */
-    protected function getIndexEntitiesByRangeMessageProcessor()
+    private function getIndexEntitiesByRangeMessageProcessor()
     {
         return $this->getContainer()->get('oro_search.async.message_processor.index_entities_by_range');
     }

@@ -5,8 +5,10 @@ use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Job\Topics as JobTopics;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\SearchExtensionTrait;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 
@@ -43,13 +45,19 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         $itemManager->persist($item);
         $itemManager->flush();
 
+        $rootJob = $this->getJobProcessor()->findOrCreateRootJob('ownerid', 'jobname');
+        $childJob = $this->getJobProcessor()->findOrCreateChildJob('jobname', $rootJob);
+
         // guard
         $itemIndex = $indexItemRepository->findOneBy(['entity' => Item::class, 'recordId' => $item->getId()]);
         $this->assertEmpty($itemIndex);
 
         // test
         $message = new NullMessage();
-        $message->setBody(Item::class);
+        $message->setBody(JSON::encode([
+            'entityClass' => Item::class,
+            'jobId' => $childJob->getId(),
+        ]));
 
         $this->getSearchIndexer()->resetIndex(Item::class);
         $this->getMessageProducer()->enable();
@@ -59,21 +67,31 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 
         $messages = $this->getMessageProducer()->getSentMessages();
 
-        $expectedMessage = [
-            'class' => Item::class,
-            'offset' => 0,
-            'limit' => 1000,
-        ];
+        $this->assertCount(4, $messages);
+        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[0]['topic']);
+        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[1]['topic']);
+        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[3]['topic']);
 
-        $this->assertCount(1, $messages);
-        $this->assertEquals(Topics::INDEX_ENTITY_BY_RANGE, $messages[0]['topic']);
-        $this->assertEquals($expectedMessage, $messages[0]['message']);
+        $this->assertEquals(Topics::INDEX_ENTITY_BY_RANGE, $messages[2]['topic']);
+
+        $this->assertEquals(Item::class, $messages[2]['message']['entityClass']);
+        $this->assertEquals(0, $messages[2]['message']['offset']);
+        $this->assertEquals(1000, $messages[2]['message']['limit']);
+        $this->assertInternalType('integer', $messages[2]['message']['jobId']);
+    }
+
+    /**
+     * @return \Oro\Component\MessageQueue\Job\JobProcessor
+     */
+    private function getJobProcessor()
+    {
+        return $this->getContainer()->get('oro_message_queue.job.processor');
     }
 
     /**
      * @return \Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
      */
-    protected function getMessageProducer()
+    private function getMessageProducer()
     {
         return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
@@ -81,7 +99,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
-    protected function createQueueSessionMock()
+    private function createQueueSessionMock()
     {
         return $this->getMock(SessionInterface::class);
     }
@@ -89,7 +107,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
     /**
      * @return \Doctrine\Bundle\DoctrineBundle\Registry
      */
-    protected function getDoctrine()
+    private function getDoctrine()
     {
         return $this->getContainer()->get('doctrine');
     }
