@@ -51,23 +51,7 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
             $message->getMessageId(),
             Topics::REINDEX,
             function (JobRunner $jobRunner) use ($classes) {
-                if (false == $classes) {
-                    $this->indexer->resetIndex();
-                    $entityClasses = $this->indexer->getClassesForReindex();
-                } else {
-                    $classes = is_array($classes) ? $classes : [$classes];
-
-                    $entityClasses = [];
-                    foreach ($classes as $class) {
-                        $entityClasses = array_merge($entityClasses, $this->indexer->getClassesForReindex($class));
-                    }
-
-                    $entityClasses = array_unique($entityClasses);
-
-                    foreach ($entityClasses as $entityClass) {
-                        $this->indexer->resetIndex($entityClass);
-                    }
-                }
+                $entityClasses = $this->getClassesForReindex($classes);
 
                 foreach ($entityClasses as $entityClass) {
                     $jobRunner->createDelayed(
@@ -86,6 +70,34 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
         );
 
         return $result ? self::ACK : self::REJECT;
+    }
+
+    /**
+     * @param null|string|string[] $classes
+     *
+     * @return string[]
+     */
+    public function getClassesForReindex($classes)
+    {
+        if (! $classes) {
+            $this->indexer->resetIndex();
+            return $this->indexer->getClassesForReindex();
+        }
+
+        $classes = is_array($classes) ? $classes : [$classes];
+
+        $entityClasses = [];
+        foreach ($classes as $class) {
+            $entityClasses = array_merge($entityClasses, $this->indexer->getClassesForReindex($class));
+        }
+
+        $entityClasses = array_unique($entityClasses);
+
+        foreach ($entityClasses as $entityClass) {
+            $this->indexer->resetIndex($entityClass);
+        }
+
+        return $entityClasses;
     }
 
     /**
