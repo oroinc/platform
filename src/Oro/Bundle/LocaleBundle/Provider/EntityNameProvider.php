@@ -3,9 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class EntityNameProvider implements EntityNameProviderInterface
 {
@@ -52,21 +52,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         /** @var DQLNameFormatter $dqlNameFormatter */
         $dqlNameFormatter = $this->dqlNameFormatterLink->getService();
 
-        $nameDQL = $dqlNameFormatter->getFormattedNameDQL($alias, $className, $locale);
-
-        $subSelects = [];
-
-        foreach ($this->getSubSelectsMap() as $class => $template) {
-            if (is_a($className, $class, true)) {
-                $subSelects[] = 'CAST((' . sprintf($template, $alias, $className) . ') AS string)';
-            }
-        }
-
-        if (count($subSelects) > 0) {
-            $nameDQL = sprintf('COALESCE(NULLIF(%s, \'\'), %s)', $nameDQL, join(', ', $subSelects));
-        }
-
-        return $nameDQL;
+        return $dqlNameFormatter->getFormattedNameDQL($alias, $className, $locale);
     }
 
     /**
@@ -93,26 +79,5 @@ class EntityNameProvider implements EntityNameProviderInterface
         }
 
         return false;
-    }
-
-    /**
-     * Returns a map of classes and getNameDQL subQuery templates
-     * SubQueries will be added as fallback for entities that implement/extend any of the listed classes
-     * %1$s is the entity alias, %2$s is className of the entity
-     *
-     * @return array
-     */
-    protected function getSubSelectsMap()
-    {
-        return [
-            'Oro\Bundle\AddressBundle\Entity\EmailCollectionInterface' =>
-                'SELECT %1$s_emails.email FROM %2$s %1$s_emails_base' .
-                ' LEFT JOIN %1$s_emails_base.emails %1$s_emails' .
-                ' WHERE %1$s_emails.primary = true AND %1$s_emails_base = %1$s',
-            'Oro\Bundle\AddressBundle\Entity\PhoneCollectionInterface' =>
-                'SELECT %1$s_phones.phone FROM %2$s %1$s_phones_base' .
-                ' LEFT JOIN %1$s_phones_base.phones %1$s_phones' .
-                ' WHERE %1$s_phones.primary = true AND %1$s_phones_base = %1$s',
-        ];
     }
 }
