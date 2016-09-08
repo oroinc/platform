@@ -76,7 +76,7 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
         $items = $notEmptyItems;
 
         // Set first non empty item for new item as primary
-        if ($items && !$hasPrimary) {
+        if ($items && !$hasPrimary && count($items) == 1) {
             $items[current(array_keys($items))]['primary'] = true;
         }
 
