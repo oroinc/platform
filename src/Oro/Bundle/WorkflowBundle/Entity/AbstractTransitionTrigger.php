@@ -54,7 +54,7 @@ abstract class AbstractTransitionTrigger
     protected $entityClass;
 
     /**
-     * Whether process should be queued or processed immediately
+     * Whether transition should be queued or done immediately
      *
      * @var boolean
      *
