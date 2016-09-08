@@ -121,7 +121,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $processSpentTime = time() - $processStartTime;
 
-            if (false === $this->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+            if (false === $this->getSettings()->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
                 break;
             }
         }
@@ -284,8 +284,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     }
                 }
 
-                if (false === $this->isForceMode()
-                    || (true  === $this->isForceMode() && count($relatedExistingImapEmails) === 0)
+                if (false === $this->getSettings()->isForceMode()
+                    || (true  === $this->getSettings()->isForceMode() && count($relatedExistingImapEmails) === 0)
                 ) {
                     $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
                     $newImapEmails[] = $imapEmail;
@@ -395,18 +395,24 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $msg = 'Skip "%s" (UID: %d) email, because it is already synchronised.';
             $skipSync = true;
 
-            if ($this->isForceMode()) {
-                $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+            if ($this->getSettings()->isForceMode()) {
+                $msg = null;
+                if ($this->getSettings()->needShowMessage()) {
+                    $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+                }
+
                 $skipSync = false;
             }
 
-            $this->logger->info(
-                sprintf(
-                    $msg,
-                    $email->getSubject(),
-                    $email->getId()->getUid()
-                )
-            );
+            if ($msg) {
+                $this->logger->info(
+                    sprintf(
+                        $msg,
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+            }
         }
 
         return $skipSync;
@@ -511,7 +517,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         EmailFolder $folder
     ) {
         $lastUid = null;
-        if (false === $this->isForceMode()) {
+        if (false === $this->getSettings()->isForceMode()) {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
         }
 

@@ -24,9 +24,11 @@
 
     {{ form_widget(form, attr) }}
     {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
+    {% set regionView = regionView|default('oroaddress/js/region/view') %}
+    {% set regionCollection = regionCollection|default('oroaddress/js/region/collection') %}
 
     <script type="text/javascript">
-        require(['jquery', 'oroaddress/js/region/view', 'oroaddress/js/region/collection'],
+        require(['jquery', '{{ regionView }}', '{{ regionCollection }}'],
         function($, RegionView, RegionCollection){
             $(function() {
                 /** @type oro.region.View */

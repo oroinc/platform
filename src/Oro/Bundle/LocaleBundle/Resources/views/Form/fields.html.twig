@@ -76,3 +76,19 @@
     {{ form_widget(form.ids) }}
     {{ form_errors(form.ids) }}
 {% endblock %}
+
+{% block _language_settings_oro_locale___language_value_widget %}
+    <span data-page-component-module="oroui/js/app/components/view-component"
+       data-page-component-options="{{ {view: 'orolocale/js/app/views/language-select-view'}|json_encode }}"
+    >
+        {{ form_widget(form) }}
+    </span>
+{% endblock %}
+
+{% block _language_settings_oro_locale___languages_value_widget %}
+    <span data-page-component-module="oroui/js/app/components/view-component"
+          data-page-component-options="{{ {view: 'orolocale/js/app/views/languages-select-view'}|json_encode }}"
+    >
+        {{ form_widget(form) }}
+    </span>
+{% endblock %}
