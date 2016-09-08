@@ -35,6 +35,9 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $table->addColumn('priority', 'integer', ['default' => 0]);
         $table->addColumn('groups', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
 
+        $this->createOroWorkflowTransitionTriggerTable($schema);
+        $this->addOroWorkflowTransitionTriggerForeignKeys($schema);
+
         foreach ($this->getSchemaDiff($schema, $preSchema) as $query) {
             $queries->addQuery($query);
         }
@@ -92,5 +95,46 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $comparator = new Comparator();
 
         return $comparator->compare($schema, $toSchema)->toSql($this->platform);
+    }
+
+    /**
+     * Create oro_workflow_trans_trigger table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroWorkflowTransTriggerTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_workflow_trans_trigger');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('workflow_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('entity_class', 'string', ['length' => 255]);
+        $table->addColumn('queued', 'boolean', []);
+        $table->addColumn('transition_name', 'string', ['length' => 255]);
+        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('type', 'string', ['length' => 255]);
+        $table->addColumn('cron', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('filter', 'text', ['notnull' => false, 'length' => 65535]);
+        $table->addColumn('event', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('field', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('require', 'text', ['notnull' => false, 'length' => 65535]);
+        $table->addColumn('relation', 'text', ['notnull' => false, 'length' => 65535]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Add oro_workflow_trans_trigger foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroWorkflowTransTriggerForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_workflow_trans_trigger');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_workflow_definition'),
+            ['workflow_name'],
+            ['name'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
     }
 }
