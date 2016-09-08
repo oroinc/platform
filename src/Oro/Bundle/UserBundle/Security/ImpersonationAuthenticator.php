@@ -17,10 +17,12 @@ use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\UserBundle\Mailer\Processor as MailProcessor;
 
 class ImpersonationAuthenticator implements GuardAuthenticatorInterface
 {
     const TOKEN_PARAMETER = '_impersonation_token';
+    const NOTIFY_PARAMETER = '_impersonation_notify';
 
     /**
      * @var EntityManager
@@ -33,13 +35,23 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     protected $tokenFactory;
 
     /**
+     * @var MailProcessor
+     */
+    protected $mailProcessor;
+
+    /**
      * @param EntityManager $em
      * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
+     * @param MailProcessor $mailProcessor
      */
-    public function __construct(EntityManager $em, UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
-    {
+    public function __construct(
+        EntityManager $em,
+        UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
+        MailProcessor $mailProcessor
+    ) {
         $this->em = $em;
         $this->tokenFactory = $tokenFactory;
+        $this->mailProcessor = $mailProcessor;
     }
 
     /**
@@ -73,6 +85,10 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        if ($request->query->get(static::NOTIFY_PARAMETER)) {
+            $this->mailProcessor->sendImpersonateEmail($token->getUser());
+        }
+
         return null;
     }
 

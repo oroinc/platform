@@ -143,6 +143,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.token.factory.username_password_organization'
+            - '@oro_user.mailer.processor'
 
     # Autocomplete acl user search handler
     oro_user.autocomplete.user.search_acl_handler.abstract:

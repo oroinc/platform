@@ -26,6 +26,7 @@ class ImpersonateUserCommand extends ContainerAwareCommand
             ->addArgument('username', InputArgument::REQUIRED, 'The username of the user.')
             ->addOption('lifetime', 't', InputOption::VALUE_REQUIRED, 'Token lifetime (strtotime format)', '1 day')
             ->addOption('route', 'r', InputOption::VALUE_REQUIRED, 'The route of generated URL', 'oro_default')
+            ->addOption('notify', 'f', InputOption::VALUE_NONE, 'Send notification to impersonated user')
         ;
     }
 
@@ -36,7 +37,11 @@ class ImpersonateUserCommand extends ContainerAwareCommand
     {
         $user = $this->findUser($input->getArgument('username'));
         $impersonation = $this->createImpersonation($user, $input->getOption('lifetime'));
-        $url = $this->generateUrl($input->getOption('route'), $impersonation->getToken());
+        $url = $this->generateUrl(
+            $input->getOption('route'),
+            $impersonation->getToken(),
+            $input->getOption('notify')
+        );
 
         $output->writeln(sprintf(
             '<info>To login as user "%s" open the following URL:</info>',
@@ -96,16 +101,20 @@ class ImpersonateUserCommand extends ContainerAwareCommand
     /**
      * @param  string $route
      * @param  string $token
+     * @param  bool   $notify
      * @return string
      */
-    protected function generateUrl($route, $token)
+    protected function generateUrl($route, $token, $notify)
     {
         $router = $this->getContainer()->get('router');
         $applicationUrl = $this->getContainer()->get('oro_config.manager')->get('oro_ui.application_url');
 
         return $applicationUrl . $router->generate(
             $route,
-            [ImpersonationAuthenticator::TOKEN_PARAMETER => $token]
+            [
+                ImpersonationAuthenticator::TOKEN_PARAMETER => $token,
+                ImpersonationAuthenticator::NOTIFY_PARAMETER => $notify,
+            ]
         );
     }
 }
