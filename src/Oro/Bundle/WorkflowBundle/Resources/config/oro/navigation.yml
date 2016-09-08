@@ -1,0 +1,42 @@
+navigation:
+    menu_config:
+        items:
+            process_definition_list:
+                label: 'oro.workflow.processdefinition.entity_plural_label'
+                extras:
+                    position:    105
+                    description: 'oro.workflow.menu.process_definition_list.description'
+                    routes:      ['/^oro_process_definition/']
+                route: 'oro_process_definition_index'
+
+            workflow_definition_list:
+                label: 'oro.workflow.workflowdefinition.entity_plural_label'
+                extras:
+                    position:    100
+                    description: 'oro.workflow.menu.workflow_definition_list.description'
+                    routes:      ['/^oro_workflow_definition/']
+                route: 'oro_workflow_definition_index'
+
+        tree:
+            application_menu:
+                children:
+                    system_tab:
+                        children:
+                            process_definition_list:  ~
+                            workflow_definition_list: ~
+
+    titles:
+        oro_process_definition_index:       ~
+        oro_process_definition_view:        '%%process_definition.label%%'
+        oro_workflow_definition_create:     'Create Workflow'
+        oro_workflow_definition_index:      ~
+        oro_workflow_definition_update:     '%%workflow_definition.label%% - Edit'
+        oro_workflow_definition_view:       '%%workflow_definition.label%%'
+        oro_workflow_start_transition_form: '%%workflow_title%%'
+        oro_workflow_transition_form:       '%%workflow_title%%'
+
+    navigation_elements:
+        pinButton:
+            routes:
+                oro_workflow_definition_update: false
+                oro_workflow_definition_create: false

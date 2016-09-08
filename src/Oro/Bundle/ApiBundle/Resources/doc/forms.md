@@ -35,7 +35,7 @@ And as result all Data API form types, extensions and guessers should be registe
 To register new form elements using application configuration file you can add *Resources/config/oro/app.yml* in any bundle or use *app/config/config.yml* of your application. The following example shows how it can be done:
 
 ```yaml
-oro_api:
+api:
     form_types:
         - form.type.date # service id of "date" form type
     form_type_extensions:

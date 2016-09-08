@@ -15,6 +15,9 @@ class HtmlTagHelper
     /** @var string */
     protected $cacheDir;
 
+    /** @var SanitizeHTMLTransformer|null */
+    protected $purifyTransformer;
+
     /**
      * @param HtmlTagProvider $htmlTagProvider
      * @param string|null $cacheDir
@@ -48,9 +51,11 @@ class HtmlTagHelper
      */
     public function purify($string)
     {
-        $transformer = new SanitizeHTMLTransformer(null, $this->cacheDir);
+        if (!$this->purifyTransformer) {
+            $this->purifyTransformer = new SanitizeHTMLTransformer(null, $this->cacheDir);
+        }
 
-        return trim($transformer->transform($string));
+        return trim($this->purifyTransformer->transform($string));
     }
 
     /**
