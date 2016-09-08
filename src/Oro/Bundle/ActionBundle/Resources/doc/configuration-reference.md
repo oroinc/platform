@@ -260,7 +260,7 @@ Button Options configuration has next options:
     Should be extended from `OroActionBundle:Operation:button.html.twig`
 * **data**
     *array*
-    This option provide possibility to add data-attributes to the button tag.
+    This option provide possibility to add data-attributes to the button tag or dynamic attributes for datagrid action.
 * **page_component_module**
     *string*
     Name of js-component module for the operation-button  (attribute *data-page-component-module*).
@@ -281,6 +281,7 @@ operations:
             template: OroActionBundle:Operation:button.html.twig
             data:
                 param: value
+                customTitle: $.customTitle
             page_component_module: acmedemo/js/app/components/demo-component
             page_component_options:
                 component_name: '[name$="[component]"]'
@@ -301,6 +302,9 @@ Frontend Options configuration has next options:
 * **title**
     *string*
     Custom title of operation dialog window.
+* **title_parameters**
+    *array*
+    Parameter for replace placeholders from title. Operation data can be used.
 * **options**
     *array*
     Parameters related to widget component. Can be specified next options: *allowMaximize*, *allowMinimize*, *dblclick*,
@@ -324,6 +328,8 @@ operations:
             confirmation: aсme.demo.operations.operation_perform_confirm
             template: OroActionBundle:Operation:form.html.twig
             title: aсme.demo.operations.dialog.title
+            title_parameters:
+                %%some_param%%: $.paramValue
             options:
                 allowMaximize: true
                 allowMinimize: true
@@ -416,6 +422,9 @@ operation.
 * **mass_action**
     *array*
     Mass action configuration. See datagrid documentation.
+* **data**
+    *array*
+    This option provide possibility to add static attributes to datagrid action. See datagrid documentation.
 
 **Notice**
 It must be used only one parameter "mass_action_provider" or "mass_action".
@@ -440,6 +449,10 @@ operations:
                     dialogOptions:
                         modal: true
                         ...
+            data:
+                type: import
+                importProcessor: 'acme_import_processor'
+                importJob: 'acme_import_from_csv'
 ```
 
 Form Options Configuration

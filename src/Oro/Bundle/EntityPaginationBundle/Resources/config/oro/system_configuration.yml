@@ -7,7 +7,7 @@ system_configuration:
             options:
                 label: oro.entity_pagination.system_configuration.fields.enabled.label
                 tooltip: oro.entity_pagination.system_configuration.fields.enabled.tooltip
-                required: true
+                required: false
         oro_entity_pagination.limit:
             data_type: integer
             type: text

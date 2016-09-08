@@ -3,7 +3,6 @@ system_configuration:
         localization:
             title: oro.locale.system_configuration.groups.localization.title
             icon:  'icon-flag'
-            page_reload: false
         language_settings:
             title: oro.locale.system_configuration.groups.language_settings.title
             icon:  'icon-font'
@@ -47,7 +46,7 @@ system_configuration:
             options:
                 label: oro.locale.system_configuration.fields.format_address_by_address_country.label
                 tooltip: oro.locale.form.tooltip.format_address_by_address_country
-                required: true
+                required: false
 
         oro_locale.language:
             data_type: string
@@ -69,6 +68,7 @@ system_configuration:
                 tooltip: oro.locale.form.tooltip.languages
                 required: true
                 multiple: true
+                show_all: true
                 constraints:
                     - NotBlank: ~
 
