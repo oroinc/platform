@@ -153,12 +153,12 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
             throw new CustomUserMessageAuthenticationException('Token is already used.');
         }
 
-        $now = new \DateTime();
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
         if ($impersonation->getExpireAt() <= $now) {
             throw new CustomUserMessageAuthenticationException('Token has expired.');
         }
 
-        $impersonation->setLoginAt(new \DateTime());
+        $impersonation->setLoginAt($now);
 
         return $impersonation;
     }
