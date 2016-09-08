@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Extension;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
@@ -32,23 +33,47 @@ class JsValidationExtension extends AbstractTypeExtension
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $this->addDataValidationOptionalGroupAttribute($view, $options);
+        $this->addDataValidationOptionalGroupAttributes($view, $options);
         $this->addDataValidationAttribute($view, $form);
     }
 
     /**
-     * Adds "data-validation-optional-group" attribute to embedded form.
+     * Adds "data-validation-optional-group" attributes to embedded form.
      *
      * Validation will run only if one of the children is filled in.
      *
      * @param FormView $view
      * @param array $options
      */
-    protected function addDataValidationOptionalGroupAttribute(FormView $view, array $options)
+    protected function addDataValidationOptionalGroupAttributes(FormView $view, array $options)
     {
-        if ($this->isOptionalEmbeddedFormView($view, $options)) {
+        /**
+         * Provide a way to enable "optional validation" on frontend by option.
+         * Can be helpful in case if form has no actual children's but optional validation should be enabled
+         */
+        $isOptionalValidationEnabled = $options['optional-validation-enabled'];
+        if ($this->isOptionalEmbeddedFormView($view, $options) || $isOptionalValidationEnabled) {
             $view->vars['attr']['data-validation-optional-group'] = null;
+            if ($options['optional-validation-handler']) {
+                $view->vars['attr']['data-validation-optional-group-handler'] = $options['optional-validation-handler'];
+            }
         }
+    }
+
+    /**
+     * Configures the options for this type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                //requirejs module id
+                'optional-validation-handler' => null,
+                'optional-validation-enabled' => false
+            ]
+        );
     }
 
     /**
