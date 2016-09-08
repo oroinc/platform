@@ -4,7 +4,10 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 /**
+ * @Config()
  * @ORM\Entity()
  * @ORM\Table(name="oro_user_impersonation")
  * @ORM\Table(name="oro_user_impersonation", indexes = {
