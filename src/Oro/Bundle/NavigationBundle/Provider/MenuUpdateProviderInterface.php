@@ -9,7 +9,9 @@ interface MenuUpdateProviderInterface
     /**
      * Retrieve list of menu updates
      *
+     * @param string $menu
+     *
      * @return AbstractMenuUpdate[]
      */
-    public function getUpdates();
+    public function getUpdates($menu);
 }
