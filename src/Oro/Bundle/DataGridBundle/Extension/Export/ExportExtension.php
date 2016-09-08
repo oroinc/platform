@@ -5,9 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Export;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 class ExportExtension extends AbstractExtension
 {
@@ -27,7 +25,7 @@ class ExportExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {

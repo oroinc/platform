@@ -14,4 +14,13 @@ interface DriverInterface
      * @return LayoutUpdateInterface
      */
     public function load($file);
+
+    /**
+     * Return pattern of layout update filename
+     *
+     * @param string $fileExtension
+     *
+     * @return string
+     */
+    public function getUpdateFilenamePattern($fileExtension);
 }

@@ -1,4 +1,4 @@
-oro_entity_config:
+entity_config:
     datagrid:
         entity:
             grid_action:

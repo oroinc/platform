@@ -96,7 +96,7 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
     {
         return [
             ContextHelper::ENTITY_CLASS_PARAM => $this->gridConfigurationHelper->getEntity($config),
-            ContextHelper::DATAGRID_PARAM => $config->offsetGetByPath('[name]'),
+            ContextHelper::DATAGRID_PARAM => $config->getName(),
             ContextHelper::GROUP_PARAM => $this->groups,
         ];
     }

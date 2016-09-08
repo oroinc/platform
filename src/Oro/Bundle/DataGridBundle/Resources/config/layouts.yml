@@ -1,11 +1,4 @@
 services:
-    oro_datagrid.block_type.datagrid:
-        class: Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType
-        arguments:
-            - '@oro_datagrid.datagrid.name_strategy'
-        tags:
-             - { name: layout.block_type, alias: datagrid }
-
     oro_datagrid.block_type_extension.taggable_datagrid:
         class: Oro\Bundle\DataGridBundle\Layout\Block\Extension\TaggableDatagridExtension
         tags:
