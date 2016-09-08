@@ -112,7 +112,7 @@ class LayoutExtension extends \Twig_Extension
     }
 
     /**
-     * @param array $attr
+     * @param array|\Traversable $attr
      * @param array $defaultAttr
      * @return array
      */
@@ -133,10 +133,6 @@ class LayoutExtension extends \Twig_Extension
                 $attr[$key] = $value;
             }
         }
-//      todo Andrey
-//        if(is_array($attr)) {
-//            $attr = new Options($attr);
-//        }
 
         return $attr;
     }

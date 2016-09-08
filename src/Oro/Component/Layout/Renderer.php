@@ -6,6 +6,8 @@ use Symfony\Component\Form\FormRendererEngineInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 
+use Oro\Component\Layout\Block\Type\Options;
+
 /**
  * Heavily inspired by FormRenderer class
  *
@@ -191,12 +193,16 @@ class Renderer implements FormRendererInterface
 
         // Merge the passed with the existing attributes
         if (isset($variables['attr'], $scopeVariables['attr'])) {
-            $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']->toArray());
+            $variables['attr'] = $variables['attr'] instanceof Options ? $variables['attr']->toArray(
+            ) : $variables['attr'];
+            $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']);
         }
 
         // Merge the passed with the exist *label* attributes
         if (isset($variables['label_attr'], $scopeVariables['label_attr'])) {
-            $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']->toArray());
+            $variables['label_attr'] = $variables['label_attr'] instanceof Options ? $variables['label_attr']->toArray(
+            ) : $variables['label_attr'];
+            $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']);
         }
 
         // Do not use array_replace_recursive(), otherwise array variables
