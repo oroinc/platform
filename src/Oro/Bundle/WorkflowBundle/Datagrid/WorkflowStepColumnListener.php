@@ -10,7 +10,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -87,6 +87,11 @@ class WorkflowStepColumnListener
     {
         $config = $event->getConfig();
 
+        // datasource type other than ORM is not supported yet
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return;
+        }
+
         // get root entity
         list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
 
@@ -132,9 +137,9 @@ class WorkflowStepColumnListener
     }
 
     /**
-     * @param OrmResultAfter $event
+     * @param GridResultAfter $event
      */
-    public function onResultAfter(OrmResultAfter $event)
+    public function onResultAfter(GridResultAfter $event)
     {
         $config = $event->getDatagrid()->getConfig();
 

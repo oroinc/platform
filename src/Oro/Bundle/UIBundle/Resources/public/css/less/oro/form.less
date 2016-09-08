@@ -23,6 +23,27 @@ input[type=text].hasDatepicker.ui-datepicker-dialog-is-below:focus,
     #floating-validation-message();
   }
 }
+.loading > .input-append {
+  position: relative;
+  & .btn:focus {
+    outline: 0 none;
+  }
+  .select2-container-active .select2-choice {
+    border: 0 none;
+    box-shadow: none;
+  }
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    opacity: 0.7;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: url("../../../orodatagrid/images/preloader.gif") repeat;
+  }
+}
 
 .timepicker-dialog-is-below.timepicker-error + span.validation-failed:after {
   left: 128px;

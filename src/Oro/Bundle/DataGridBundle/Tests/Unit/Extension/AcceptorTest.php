@@ -39,7 +39,10 @@ class AcceptorTest extends \PHPUnit_Framework_TestCase
         $extMock1->expects($this->any())->method('getPriority')->will($this->returnValue(-100));
         $extMock2->expects($this->any())->method('getPriority')->will($this->returnValue(250));
 
-        $this->acceptor->addExtension($extMock1)->addExtension($extMock2);
+        $this->acceptor
+            ->addExtension($extMock1)
+            ->addExtension($extMock2)
+            ->sortExtensionsByPriority();
 
         $results = $this->acceptor->getExtensions();
 

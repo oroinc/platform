@@ -18,6 +18,7 @@ class OroDataGridExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('block_types.yml');
         $loader->load('services.yml');
         $loader->load('extensions.yml');
         $loader->load('data_sources.yml');

@@ -142,4 +142,12 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         return $this->query->from($entities);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSelectAliases()
+    {
+        return $this->query->getSelectAliases();
+    }
 }

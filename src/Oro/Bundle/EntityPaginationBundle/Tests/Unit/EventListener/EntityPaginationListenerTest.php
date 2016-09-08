@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 
 class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,7 +58,7 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
         $this->paginationManager->expects($this->never())
             ->method('isDatagridApplicable');
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
+        $this->listener->onResultAfter(new GridResultAfter($this->createGridMock()));
     }
 
     public function testOnResultAfterGridNotApplicable()
@@ -72,7 +72,7 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
         $this->storage->expects($this->never())
             ->method('clearData');
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
+        $this->listener->onResultAfter(new GridResultAfter($this->createGridMock()));
     }
 
     public function testOnResultClearData()
@@ -87,7 +87,7 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('clearData')
             ->with(self::ENTITY_NAME);
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
+        $this->listener->onResultAfter(new GridResultAfter($this->createGridMock()));
     }
 
     /**
