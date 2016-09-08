@@ -37,12 +37,13 @@ class PdoPgsql extends BaseDriver
      * Sql plain query to create fulltext index for Postgresql.
      *
      * @param string $tableName
+     * @param string $indexName
      *
      * @return string
      */
-    public static function getPlainSql($tableName = 'oro_search_index_text')
+    public static function getPlainSql($tableName = 'oro_search_index_text', $indexName = 'value')
     {
-        return "CREATE INDEX value ON $tableName USING gin(to_tsvector('english', 'value'))";
+        return sprintf('CREATE INDEX %s ON %s USING gin(to_tsvector(\'english\', value))', $indexName, $tableName);
     }
 
     /**

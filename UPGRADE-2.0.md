@@ -128,7 +128,8 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 ####SearchBundle
 - Changed all `private` fields and accessors to `protected` in `Oro/Bundle/SearchBundle/Entity/IndexDecimal`, `Oro/Bundle/SearchBundle/Entity/IndexInteger`,
 `Oro/Bundle/SearchBundle/Entity/IndexText`, `Oro/Bundle/SearchBundle/Entity/Item`
-- Constructor of class `Oro/Bundle/Engine/FulltextIndexManager` was changed, new optional $tableName argument is added.
+- Constructor of class `Oro/Bundle/Engine/FulltextIndexManager` was changed. New optional arguments `$tableName` and `$indexName` was added.
+- Methods `PdoMysql::getPlainSql` and `PdoPgsql::getPlainSql` were changed. New optional arguments `$tableName` and `$indexName` was added
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
