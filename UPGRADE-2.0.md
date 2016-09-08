@@ -290,3 +290,7 @@ placeholders:
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
     
+####EmailBundle
+- Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
+- Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
+- Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` changed. Added `ConfigManager $configManager` as last argument.

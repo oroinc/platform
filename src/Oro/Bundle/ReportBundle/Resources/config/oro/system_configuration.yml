@@ -9,7 +9,7 @@ system_configuration:
             options:
                 label: oro.report.system_configuration.fields.display_sql_query.label
                 tooltip: oro.report.system_configuration.fields.display_sql_query.tooltip
-                required: true
+                required: false
                 resettable: true
 
     tree:

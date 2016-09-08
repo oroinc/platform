@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType;
 
-class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateApiTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EmailTemplateType
+     * @var EmailTemplateApiType
      */
     protected $type;
 
@@ -25,7 +25,7 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->type = new EmailTemplateType(
+        $this->type = new EmailTemplateApiType(
             $this->configManager,
             $this->localeSettings
         );
@@ -48,7 +48,7 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_email_emailtemplate', $this->type->getName());
+        $this->assertEquals('oro_email_emailtemplate_api', $this->type->getName());
     }
 
     public function testBuildForm()
@@ -57,12 +57,23 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $builder->expects($this->exactly(6))
-            ->method('add');
+        $builder->expects($this->once())
+            ->method('addEventSubscriber')
+            ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->any())
             ->method('get')
-            ->with('oro_locale.languages')
+            ->will($this->returnValueMap([
+                ['oro_locale.languages', false, false, null, ['en', 'fr_FR']],
+                ['oro_email.sanitize_html', false, false, null, true]
+            ]));
+
+        $this->localeSettings->expects($this->exactly(3))
+            ->method('getLanguage')
+            ->will($this->returnValue('ru_UA'));
+
+        $this->localeSettings->expects($this->once())
+            ->method('getLocalesByCodes')
             ->will($this->returnValue(['en', 'fr_FR']));
 
         $this->type->buildForm($builder, array());
