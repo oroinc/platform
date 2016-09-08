@@ -21,7 +21,7 @@ abstract class AbstractMenuUpdate
     /**
      * @var string
      *
-     * @ORM\Column(name="key", type="string", length=100)
+     * @ORM\Column(name="`key`", type="string", length=100)
      */
     protected $key;
 
