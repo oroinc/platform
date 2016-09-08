@@ -125,9 +125,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         if ($flush) {
             // update changed labels if any
-            if (!empty($labelsToBeUpdated)) {
-                $this->translationHelper->saveTranslations($labelsToBeUpdated);
-            }
+            $this->translationHelper->saveTranslations($labelsToBeUpdated);
 
             $this->configManager->flush();
         }

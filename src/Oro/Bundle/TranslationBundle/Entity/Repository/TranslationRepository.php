@@ -6,8 +6,6 @@ use Doctrine\ORM\EntityRepository;
 
 class TranslationRepository extends EntityRepository
 {
-    const DEFAULT_DOMAIN = 'messages';
-
     /**
      * Returns the list of all existing in the database translation domains for the given locales.
      *
