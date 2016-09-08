@@ -398,3 +398,8 @@ services:
             - '@oro_navigation.content.tag_generator_chain'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+
+    oro_navigation.menu_update.builder:
+        class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+        tags:
+            - { name: oro_menu.builder }
