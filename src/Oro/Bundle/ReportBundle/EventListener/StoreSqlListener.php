@@ -5,7 +5,7 @@ namespace Oro\Bundle\ReportBundle\EventListener;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
+use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\ReportBundle\Grid\StoreSqlExtension;
 
 class StoreSqlListener
@@ -14,9 +14,9 @@ class StoreSqlListener
      * Gets prepared SQL and parameters from executed query
      * and stores them in DataGrid config object
      *
-     * @param GridResultAfter $event
+     * @param OrmResultAfter $event
      */
-    public function onResultAfter(GridResultAfter $event)
+    public function onResultAfter(OrmResultAfter $event)
     {
         $config = $event->getDatagrid()->getConfig();
         $path   = sprintf('%s[%s]', MetadataObject::OPTIONS_KEY, StoreSqlExtension::STORE_SQL);
