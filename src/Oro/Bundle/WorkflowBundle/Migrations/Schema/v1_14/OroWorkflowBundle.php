@@ -35,8 +35,8 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $table->addColumn('priority', 'integer', ['default' => 0]);
         $table->addColumn('groups', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
 
-        $this->createOroWorkflowTransitionTriggerTable($schema);
-        $this->addOroWorkflowTransitionTriggerForeignKeys($schema);
+        $this->createOroWorkflowTransTriggerTable($schema);
+        $this->addOroWorkflowTransTriggerForeignKeys($schema);
 
         foreach ($this->getSchemaDiff($schema, $preSchema) as $query) {
             $queries->addQuery($query);

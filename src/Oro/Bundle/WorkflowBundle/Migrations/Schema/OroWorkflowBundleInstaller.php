@@ -36,7 +36,7 @@ class OroWorkflowBundleInstaller implements Installation
         $this->createOroWorkflowDefinitionTable($schema);
         $this->createOroProcessDefinitionTable($schema);
         $this->createOroWorkflowStepTable($schema);
-        $this->createOroWorkflowTransitionTriggerTable($schema);
+        $this->createOroWorkflowTransTriggerTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroWorkflowItemForeignKeys($schema);
@@ -47,7 +47,7 @@ class OroWorkflowBundleInstaller implements Installation
         $this->addOroWorkflowEntityAclIdentForeignKeys($schema);
         $this->addOroWorkflowDefinitionForeignKeys($schema);
         $this->addOroWorkflowStepForeignKeys($schema);
-        $this->addOroWorkflowTransitionTriggerForeignKeys($schema);
+        $this->addOroWorkflowTransTriggerForeignKeys($schema);
 
         CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
     }
