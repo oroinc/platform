@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType;
 
-class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var EmailTemplateType
@@ -60,10 +60,12 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->exactly(6))
             ->method('add');
 
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->any())
             ->method('get')
-            ->with('oro_locale.languages')
-            ->will($this->returnValue(['en', 'fr_FR']));
+            ->will($this->returnValueMap([
+                ['oro_locale.languages', false, false, ['en', 'fr_FR']],
+                ['oro_email.sanitize_html', false, false, true]
+            ]));
 
         $this->type->buildForm($builder, array());
     }
