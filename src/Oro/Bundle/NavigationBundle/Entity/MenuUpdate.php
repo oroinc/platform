@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
  * @ORM\Table(name="oro_navigation_menu_update")
  * @Config(
  *      defaultValues={

@@ -398,3 +398,11 @@ services:
             - '@oro_navigation.content.tag_generator_chain'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+
+    oro_navigation.default_menu_update_provider:
+        class: Oro\Bundle\NavigationBundle\Menu\DefaultMenuUpdateProvider
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_navigation.configuration_provider, area: default }
