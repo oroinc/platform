@@ -5,10 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Translation;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,9 +18,6 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DynamicTranslationMetadataCache */
-    protected $translationCache;
-
     /** @var ConfigTranslationHelper */
     protected $helper;
 
@@ -30,20 +25,14 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->translationCache = $this
-            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->translationManager = $this
             ->getMockBuilder(TranslationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->helper = new ConfigTranslationHelper(
-            $this->translator,
-            $this->translationCache,
-            $this->translationManager
+            $this->translationManager,
+            $this->translator
         );
     }
 
@@ -51,8 +40,6 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->translator,
-            $this->translationCache,
-            $this->repository,
             $this->helper,
             $this->translationManager
         );
@@ -97,6 +84,23 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testInvalidateCache()
+    {
+        $this->translationManager->expects($this->once())
+            ->method('invalidateCache');
+
+        $this->helper->invalidateCache();
+    }
+
+    public function testInvalidateCacheWithLocale()
+    {
+        $this->translationManager->expects($this->once())
+            ->method('invalidateCache')
+            ->with('test_locale');
+
+        $this->helper->invalidateCache('test_locale');
+    }
+
     /**
      * @dataProvider saveTranslationsDataProvider
      *
@@ -111,7 +115,7 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
             $this->assertTranslationServicesCalled();
         } else {
             $this->translationManager->expects($this->never())->method($this->anything());
-            $this->translationCache->expects($this->never())->method($this->anything());
+            $this->translationManager->expects($this->never())->method($this->anything());
         }
 
         $this->helper->saveTranslations($translations);
@@ -147,8 +151,12 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->translationManager->expects($this->once())
             ->method('saveValue')
-            ->with($key, $value, self::LOCALE, TranslationRepository::DEFAULT_DOMAIN, Translation::SCOPE_UI)
+            ->with($key, $value, self::LOCALE, TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI)
             ->willReturn($trans);
+
+        $this->translationManager->expects($this->once())
+            ->method('invalidateCache')
+            ->with(self::LOCALE);
 
         $this->translationManager->expects($this->once())
             ->method('flush')
@@ -160,9 +168,5 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->once())
             ->method('getLocale')
             ->willReturn(self::LOCALE);
-
-        $this->translationCache->expects($this->once())
-            ->method('updateTimestamp')
-            ->with(self::LOCALE);
     }
 }

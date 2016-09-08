@@ -297,7 +297,7 @@ class Translator extends BaseTranslator
                 array_unshift($locales, $locale);
                 $locales = array_unique($locales);
 
-                $availableDomainsData = $this->container->get('oro_translation.translation.manager')
+                $availableDomainsData = $this->container->get('oro_translation.manager.translation')
                     ->findAvailableDomainsForLocales($locales);
                 foreach ($availableDomainsData as $item) {
                     $item['resource'] = new OrmTranslationResource(

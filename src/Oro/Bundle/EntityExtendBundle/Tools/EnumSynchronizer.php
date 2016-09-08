@@ -16,10 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -42,7 +39,6 @@ class EnumSynchronizer
      * @param ConfigManager $configManager
      * @param ManagerRegistry $doctrine
      * @param TranslatorInterface $translator
-     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      * @param ConfigTranslationHelper $translationHelper
      */
     public function __construct(

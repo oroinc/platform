@@ -100,13 +100,13 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Translation\DatabasePersister'
         arguments:
             - '@doctrine'
-            - '@oro_translation.translation.manager'
+            - '@oro_translation.manager.translation'
 
     oro_translation.database_translation.loader:
         class: 'Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader'
         arguments:
             - '@doctrine'
-            - '@oro_translation.translation.manager'
+            - '@oro_translation.manager.translation'
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 
@@ -225,7 +225,7 @@ services:
         tags:
             - { name: form.type, alias: oro_translation_import }
 
-    oro_translation.translation.manager:
+    oro_translation.manager.translation:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
         arguments:
             - '@doctrine'

@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,9 +22,6 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 
     /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationManager;
-
-    /** @var DynamicTranslationMetadataCache|\PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataCache;
 
     /** @var array */
     protected $testData = [
@@ -53,11 +49,6 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->metadataCache = $this
-            ->getMockBuilder(DynamicTranslationMetadataCache::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->translationManager = $this
             ->getMockBuilder(TranslationManager::class)
             ->disableOriginalConstructor()
@@ -70,8 +61,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 
         $this->persister = new DatabasePersister(
             $this->registry,
-            $this->translationManager,
-            $this->metadataCache
+            $this->translationManager
         );
 
         // set batch size to 2
@@ -86,7 +76,6 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->persister,
             $this->translationManager,
-            $this->metadataCache,
             $this->registry
         );
     }
@@ -100,7 +89,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit');
         $this->em->expects($this->never())->method('rollback');
 
-        $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
+        $this->translationManager->expects($this->once())->method('invalidateCache')->with($this->testLocale);
 
         $this->persister->persist($this->testLocale, $this->testData);
     }
@@ -131,7 +120,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit');
         $this->em->expects($this->never())->method('rollback');
 
-        $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
+        $this->translationManager->expects($this->once())->method('invalidateCache')->with($this->testLocale);
 
         $this->persister->persist($this->testLocale, $this->testData);
 
@@ -152,7 +141,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
         $this->em->expects($this->once())->method('rollback');
 
-        $this->metadataCache->expects($this->never())->method('updateTimestamp');
+        $this->translationManager->expects($this->never())->method('invalidateCache');
 
         $this->persister->persist($this->testLocale, $this->testData);
     }

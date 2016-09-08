@@ -14,11 +14,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
@@ -29,11 +26,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /** @var DynamicTranslationMetadataCache|\PHPUnit_Framework_MockObject_MockObject */
-    protected $dbTranslationMetadataCache;
-
-    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $translationManager;
+    /** @var ConfigTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationHelper;
 
     /** @var ConfigSubscriber */
     protected $subscriber;
@@ -46,18 +40,14 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->dbTranslationMetadataCache = $this->getMockBuilder(DynamicTranslationMetadataCache::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
+        $this->translationHelper = $this->getMockBuilder(ConfigTranslationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->subscriber = new ConfigSubscriber(
+            $this->translationHelper,
             $this->configManager,
-            $this->translator,
-            $this->dbTranslationMetadataCache,
-            $this->translationManager
+            $this->translator
         );
     }
 
@@ -245,42 +235,16 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue($isValid));
-        if (null === $expectedTrans) {
-            $this->translator->expects($this->never())
-                ->method('getLocale');
-            $this->dbTranslationMetadataCache->expects($this->never())
-                ->method('updateTimestamp');
-        } else {
-            $translationEm = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $translationValue = new Translation();
 
-            $this->translator->expects($this->once())
-                ->method('getLocale')
-                ->will($this->returnValue('testLocale'));
-            $this->dbTranslationMetadataCache->expects($this->once())
-                ->method('updateTimestamp')
-                ->with('testLocale');
-            $this->translationManager->expects($this->once())
-                ->method('saveValue')
-                ->with(
-                    $expectedTrans[0],
-                    $expectedTrans[1],
-                    $expectedTrans[2],
-                    TranslationRepository::DEFAULT_DOMAIN,
-                    Translation::SCOPE_UI
-                )
-                ->willReturn($translationValue);
-
-            $this->translationManager->expects($this->once())
-                ->method('flush')
-                ->with([$translationValue]);
-        }
         if ($isValid) {
+            $this->translationHelper->expects($this->once())
+                ->method('saveTranslations')
+                ->with($expectedTrans);
             $this->configManager->expects($this->once())
                 ->method('flush');
         } else {
+            $this->translationHelper->expects($this->never())
+                ->method('saveTranslations');
             $this->configManager->expects($this->never())
                 ->method('flush');
         }
@@ -474,7 +438,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                 new EntityConfigModel('Entity\Test'),
                 [],
                 null,
-                null
+                []
             ],
             'new model without trans (isValid=false)'            => [
                 [
@@ -490,7 +454,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label_key',
                     'icon'  => 'testIcon'
                 ],
-                null
+                []
             ],
             'new model without trans (isValid=true)'             => [
                 [
@@ -507,9 +471,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     'icon'  => 'testIcon'
                 ],
                 [
-                    'label_key',
-                    'translated label',
-                    'testLocale'
+                    'label_key' => 'translated label',
                 ]
             ],
             'existing model without trans (isValid=true)'        => [
@@ -527,9 +489,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     'icon'  => 'testIcon'
                 ],
                 [
-                    'label_key',
-                    'translated label',
-                    'testLocale'
+                    'label_key' => 'translated label',
                 ]
             ],
             'new model with trans (isValid=true)'                => [
@@ -549,9 +509,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     'icon'  => 'testIcon'
                 ],
                 [
-                    'label_key',
-                    'translated label',
-                    'testLocale'
+                    'label_key' => 'translated label',
                 ]
             ],
             'existing model with trans (isValid=true)'           => [
@@ -570,7 +528,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label_key',
                     'icon'  => 'testIcon'
                 ],
-                null
+                []
             ],
             'existing model with different trans (isValid=true)' => [
                 [
@@ -589,9 +547,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     'icon'  => 'testIcon',
                 ],
                 [
-                    'label_key',
-                    'translated label',
-                    'testLocale'
+                    'label_key' => 'translated label',
                 ]
             ],
         ];
