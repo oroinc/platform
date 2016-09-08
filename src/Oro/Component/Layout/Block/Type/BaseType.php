@@ -74,7 +74,7 @@ class BaseType extends AbstractType
         $uniqueBlockPrefix = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $id);
         $blockPrefixes     = $block->getTypeHelper()->getTypeNames($name);
         if (isset($options['additional_block_prefixes'])) {
-            $blockPrefixes = array_merge($blockPrefixes, $options['additional_block_prefixes']);
+            $blockPrefixes = array_merge($blockPrefixes, $options['additional_block_prefixes']->toArray());
         }
         $blockPrefixes[]   = $uniqueBlockPrefix;
 
@@ -93,7 +93,7 @@ class BaseType extends AbstractType
     {
         $vars = $view->vars->toArray();
         if (isset($vars['attr']['id']) && !isset($vars['label_attr']['for'])) {
-            $view->vars['label_attr']['for'] = $vars['attr']['id'];
+//          todo Andrey  $view->vars['label_attr']['for'] = $vars['attr']['id'];
         }
 
         $view->vars['blocks'] = $view->blocks;

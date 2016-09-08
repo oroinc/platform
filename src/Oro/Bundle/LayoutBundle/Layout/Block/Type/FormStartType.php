@@ -30,12 +30,10 @@ class FormStartType extends AbstractFormType
 
     /**
      * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
 
         // form action
         if (isset($options['form_action'])) {
@@ -80,14 +78,6 @@ class FormStartType extends AbstractFormType
         if ($enctype) {
             $view->vars['enctype'] = $enctype;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
-    {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         $view->vars['form'] = $formAccessor->getView();
 

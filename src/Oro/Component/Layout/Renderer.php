@@ -162,7 +162,7 @@ class Renderer implements FormRendererInterface
 
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
-            $scopeVariables = $view->vars;
+            $scopeVariables = $view->vars->toArray();
 
             $varInit = true;
         } else {
@@ -184,19 +184,19 @@ class Renderer implements FormRendererInterface
         // Escape if no resource exists for this block
         if (!$resource) {
             throw new \LogicException(sprintf(
-                'Unable to render the form as none of the following blocks exist: "%s".',
+                'Unable to render the layout as none of the following blocks exist: "%s".',
                 implode('", "', array_reverse($blockNameHierarchy))
             ));
         }
 
         // Merge the passed with the existing attributes
         if (isset($variables['attr'], $scopeVariables['attr'])) {
-            $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']);
+            $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']->toArray());
         }
 
         // Merge the passed with the exist *label* attributes
         if (isset($variables['label_attr'], $scopeVariables['label_attr'])) {
-            $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']);
+            $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']->toArray());
         }
 
         // Do not use array_replace_recursive(), otherwise array variables

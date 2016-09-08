@@ -47,8 +47,9 @@ trait OptionsConfigTrait
                 continue;
             }
             $define = is_array($settings) && (!empty($settings['required']) || array_key_exists('default', $settings));
-            if ($define || !is_null($options[$name])) {
-                $view->vars[$name] = $options[$name];
+            $value = $options->get($name, false);
+            if ($define || !is_null($value)) {
+                $view->vars[$name] = $value;
             }
         }
     }

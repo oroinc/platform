@@ -89,11 +89,11 @@ class FormFieldsType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
+    public function finishView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
         $view->vars['form_data'] = $options['form_data'];
 
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
         if ($formAccessor instanceof ConfigurableFormAccessorInterface) {
             $formAccessor->setFormData($view->vars['form_data']);
         }
@@ -105,13 +105,7 @@ class FormFieldsType extends AbstractFormType
         $view->vars['form'] = $formView;
 
         $view->vars['split_to_fields'] = $options['split_to_fields'];
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(BlockView $view, BlockInterface $block, LayoutOptions $options)
-    {
         if (!$options['split_to_fields']) {
             return;
         }

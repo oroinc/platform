@@ -116,7 +116,7 @@ class LayoutExtension extends \Twig_Extension
      * @param array $defaultAttr
      * @return array
      */
-    public function defaultAttributes(array $attr, array $defaultAttr)
+    public function defaultAttributes($attr, array $defaultAttr)
     {
         foreach ($defaultAttr as $key => $value) {
             if (strpos($key, '~') === 0) {
@@ -133,6 +133,10 @@ class LayoutExtension extends \Twig_Extension
                 $attr[$key] = $value;
             }
         }
+//      todo Andrey
+//        if(is_array($attr)) {
+//            $attr = new Options($attr);
+//        }
 
         return $attr;
     }

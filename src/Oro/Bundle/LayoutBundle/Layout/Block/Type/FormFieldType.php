@@ -25,18 +25,12 @@ class FormFieldType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, Options $options)
-    {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
-
-        $view->vars['form'] = $formAccessor->getView($options['field_path']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
+        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
+
+        $view->vars['form'] = $formAccessor->getView($options['field_path']);
+
         // prevent the form field rendering by form_rest() method,
         // if the corresponding layout block is invisible
         if ($view->vars['visible'] === false) {

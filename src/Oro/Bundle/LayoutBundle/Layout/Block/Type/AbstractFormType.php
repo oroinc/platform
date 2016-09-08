@@ -3,6 +3,8 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
@@ -24,6 +26,17 @@ abstract class AbstractFormType extends AbstractType
                     'form_name' => 'form',
                 ]
             );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    {
+        $view->vars['form'] = $options->get('form', false);
+        $view->vars['form_name'] = $options->get('form_name', false);
     }
 
     /**

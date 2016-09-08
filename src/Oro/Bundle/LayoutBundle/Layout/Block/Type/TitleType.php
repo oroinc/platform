@@ -33,7 +33,7 @@ class TitleType extends AbstractType
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         foreach (['value', 'separator', 'reverse'] as $optionName) {
-            $view->vars[$optionName] = $options[$optionName];
+            $view->vars[$optionName] = $options->get($optionName, false);
         }
     }
 

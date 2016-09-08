@@ -86,11 +86,10 @@ class ExpressionProcessor
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
      * @param bool                  $encoding
-     * @return mixed
      */
     protected function processRootValue(
         $key,
-        $value,
+        &$value,
         ContextInterface $context,
         DataAccessorInterface $data = null,
         $evaluate,
@@ -100,8 +99,6 @@ class ExpressionProcessor
         $this->processValue($value, $context, $data, $evaluate, $encoding);
         $this->processedValues[$key] = $value;
         unset($this->processingValues[$key]);
-
-        return $value;
     }
 
     /**
