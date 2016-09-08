@@ -4,4 +4,3 @@ config:
             exports: 'Translator'
     paths:
         'translator': 'bundles/orotranslation/lib/translator.js'
-        'orotranslation/js/translator': 'bundles/orotranslation/js/translator.js'
