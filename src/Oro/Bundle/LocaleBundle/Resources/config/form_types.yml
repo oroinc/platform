@@ -34,6 +34,7 @@ services:
         class: '%oro_locale.form.type.language.class%'
         arguments:
             - '@oro_config.global'
+            - '@oro_translation.provider.language'
         tags:
             - { name: form.type, alias: oro_language }
 

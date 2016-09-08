@@ -67,6 +67,22 @@ class GroupByHelperTest extends \PHPUnit_Framework_TestCase
                 'groupBy' => 'alias.field2',
                 'expected' => ['alias.field2', 'alias.field', 'c1', 'someAlias3'],
             ],
+            'without subselect without group by' => [
+                'selects' => [
+                    'alias.field',
+                    'COUNT(alias.field2)',
+                ],
+                'groupBy' => null,
+                'expected' => ['alias.field'],
+            ],
+            'with subselect without group by' => [
+                'selects' => [
+                    'alias.field',
+                    '(SELECT COUNT(1) FROM Namespace:Entity e) AS e_count',
+                ],
+                'groupBy' => null,
+                'expected' => [],
+            ],
             'without group by' => [
                 'selects' => ['t1.f0', 't10.F19 as agF1', 'alias.matchedFields AS c1'],
                 'groupBy' => null,

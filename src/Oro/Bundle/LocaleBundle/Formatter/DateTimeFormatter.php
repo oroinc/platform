@@ -17,6 +17,12 @@ class DateTimeFormatter
     /** @var TranslatorInterface */
     private $translator;
 
+    /** @var \IntlDateFormatter[] */
+    protected $cachedFormatters = [];
+
+    /** @var string[] */
+    protected $cachedPatterns = [];
+
     /**
      * @param LocaleSettings      $localeSettings
      * @param TranslatorInterface $translator
@@ -170,8 +176,14 @@ class DateTimeFormatter
         $dateType = $this->parseDateType($dateType);
         $timeType = $this->parseDateType($timeType);
 
-        $localeFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
-        return $localeFormatter->getPattern();
+        $key = md5(serialize([$dateType, $timeType, $locale]));
+        if (!isset($this->cachedPatterns[$key])) {
+            $this->cachedPatterns[$key] =
+                (new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN))
+                    ->getPattern();
+        }
+
+        return $this->cachedPatterns[$key];
     }
 
     /**
@@ -191,14 +203,20 @@ class DateTimeFormatter
         if (!$pattern) {
             $pattern = $this->getPattern($dateType, $timeType, $locale, $value);
         }
-        return new \IntlDateFormatter(
-            $this->localeSettings->getLanguage(),
-            null,
-            null,
-            $timeZone,
-            \IntlDateFormatter::GREGORIAN,
-            $pattern
-        );
+
+        $key = md5(serialize([$timeZone, $pattern]));
+        if (!isset($this->cachedFormatters[$key])) {
+            $this->cachedFormatters[$key] = new \IntlDateFormatter(
+                $this->localeSettings->getLanguage(),
+                null,
+                null,
+                $timeZone,
+                \IntlDateFormatter::GREGORIAN,
+                $pattern
+            );
+        }
+
+        return $this->cachedFormatters[$key];
     }
 
     /**

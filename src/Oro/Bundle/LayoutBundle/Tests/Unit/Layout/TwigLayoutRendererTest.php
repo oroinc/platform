@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-
-use Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
+use Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer;
 
 class TwigLayoutRendererTest extends \PHPUnit_Framework_TestCase
 {
     public function testEnvironmentSet()
     {
         /** @var TwigRendererInterface|\PHPUnit_Framework_MockObject_MockObject $innerRenderer */
-        $innerRenderer = $this->getMock('Symfony\Bridge\Twig\Form\TwigRendererInterface');
+        $innerRenderer = $this->getMock('Oro\Bundle\LayoutBundle\Form\TwigRendererInterface');
         /** @var \Twig_Environment $environment */
         $environment   = $this->getMockBuilder('\Twig_Environment')->getMock();
 
