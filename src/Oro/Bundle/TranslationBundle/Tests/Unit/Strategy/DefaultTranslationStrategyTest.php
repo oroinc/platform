@@ -44,7 +44,7 @@ class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'en' => [
+                Configuration::DEFAULT_LOCALE => [
                     'fr' => [],
                     'ua' => [],
                 ],
