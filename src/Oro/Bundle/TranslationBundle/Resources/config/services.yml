@@ -182,7 +182,7 @@ services:
         class: '%oro_translation.strategy.default.class%'
         public: false
         arguments:
-            - '@oro_locale.settings'
+            - '@oro_config.global'
             - '%installed%'
 
     oro_translation.strategy.provider:
