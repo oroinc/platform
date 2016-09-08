@@ -1,4 +1,9 @@
 oro_menu_config:
+    areas:
+        default:
+            - application_menu
+        frontend:
+            - shortcuts
     tree:
         application_menu:
             type: application_menu
