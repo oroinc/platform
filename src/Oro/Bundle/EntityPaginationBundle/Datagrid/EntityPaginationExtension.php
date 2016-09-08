@@ -22,7 +22,7 @@ class EntityPaginationExtension extends AbstractExtension
             return false;
         }
 
-        return $config->getDatasourceType() == OrmDatasource::TYPE;
+        return $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
     /**

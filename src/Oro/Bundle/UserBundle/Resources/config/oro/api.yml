@@ -1,4 +1,4 @@
-oro_api:
+api:
     entities:
         Oro\Bundle\UserBundle\Entity\Email: ~
         Oro\Bundle\UserBundle\Entity\Group: ~

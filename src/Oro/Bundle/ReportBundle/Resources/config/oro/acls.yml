@@ -1,0 +1,7 @@
+acls:
+    oro_report_view_sql:
+        label: oro.report.action.view_sql.label
+        type: action
+        group_name: ""
+        bindings: ~
+        category: "application"

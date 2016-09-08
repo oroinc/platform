@@ -222,7 +222,7 @@ class MyConfigExtension extends AbstractConfigExtension
 An example of usage created configuration section:
 
 ```yaml
-oro_api:
+api:
     ...
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
@@ -234,7 +234,7 @@ To check that you configuration section was added correctly run `php app/console
 
 ```yaml
 # The structure of "Resources/config/oro/api.yml"
-oro_api:
+api:
     ...
     entities:
         name:

@@ -533,6 +533,44 @@
 {% block oro_entity_create_or_select_inline_widget %}
     {% set isButtonsEnabled = not disabled and not read_only %}
     <div id="{{ id }}-el"
+            {% if configs.extra_config is not defined or not configs.extra_config %}
+                {% if form.vars.configs.async_dialogs|default(false) is sameas(true) %}
+                    {% set asyncNameSegment = 'async-' %}
+                {% endif %}
+                {% set urlParts = {
+                    grid: {
+                        route: form.vars.grid_widget_route|default('oro_datagrid_widget'),
+                        gridWidgetView: form.vars.grid_view_widget_route|default('oro_datagrid_widget'),
+                        parameters: {
+                            gridName     : form.vars.grid_name,
+                            params       : form.vars.grid_parameters,
+                            renderParams : form.vars.grid_render_parameters
+                        }
+                    }
+                } %}
+
+                {% if form.vars.create_enabled|default(false) is sameas(true) %}
+                    {% set urlParts = urlParts|merge({
+                        create: {
+                            route:      form.vars.create_form_route,
+                            parameters: form.vars.create_form_route_parameters
+                        }
+                    }) %}
+                {% endif %}
+                {% import 'OroUIBundle::macros.html.twig' as UI %}
+                {{ UI.renderPageComponentAttributes({
+                    module: 'oroform/js/app/components/select-create-inline-type-' ~ asyncNameSegment|default('') ~ 'component',
+                    options: {
+                        inputSelector: '#'~id,
+                        entityLabel: label|trans,
+                        urlParts: urlParts,
+                        existingEntityGridId: form.vars.existing_entity_grid_id|default('id'),
+                        createEnabled: form.vars.create_enabled|default(false)
+                        }
+                    }) }}
+            {% else %}
+                {% set _block = block('oro_entity_create_or_select_inline_js_' ~ configs.extra_config) %}
+            {% endif %}
         {% if isButtonsEnabled %}class="entity-create-or-select-container {% if form.vars.create_enabled %}entity-create-enabled{% endif %}"{% endif %}>
         <div {% if isButtonsEnabled %}class="input-append"{% endif %}>
             {{ form_widget(form) }}
@@ -547,49 +585,8 @@
         </div>
     </div>
 
-    {% set _block = false %}
-    {% if configs.extra_config is defined and configs.extra_config %}
-        {% set _block = block('oro_entity_create_or_select_inline_js_' ~ configs.extra_config) %}
-    {% endif %}
-    {% if _block is not empty %}
+    {% if _block is defined and _block is not empty %}
         {{ _block|raw }}
-    {% else %}
-        <script type="text/javascript">
-            require(['jquery', 'oroform/js/select-create-inline-type-handler'],
-            function ($, handler) {
-                $(function() {
-                    {% set urlParts = {
-                        grid: {
-                            route: form.vars.grid_widget_route|default('oro_datagrid_widget'),
-                            gridWidgetView: form.vars.grid_view_widget_route|default('oro_datagrid_widget'),
-                            parameters: {
-                                gridName     : form.vars.grid_name,
-                                params       : form.vars.grid_parameters,
-                                renderParams : form.vars.grid_render_parameters
-                            }
-                        }
-                    } %}
-
-                    {% if form.vars.create_enabled|default(false) is sameas(true) %}
-                        {% set urlParts = urlParts|merge({
-                            create: {
-                                route:      form.vars.create_form_route,
-                                parameters: form.vars.create_form_route_parameters
-                            }
-                        }) %}
-                    {% endif %}
-
-                    handler(
-                        $('#{{ id }}-el'),
-                        $('#{{ id }}'),
-                        {{ label|trans|json_encode|raw }},
-                        {{ urlParts|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
-                        {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
-                        {{ form.vars.create_enabled|default(false)|json_encode|raw }}
-                    );
-                });
-            });
-        </script>
     {% endif %}
 {% endblock %}
 

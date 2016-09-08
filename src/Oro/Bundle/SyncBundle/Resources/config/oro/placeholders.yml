@@ -1,0 +1,15 @@
+placeholders:
+    placeholders:
+        scripts_after:
+            items:
+                sync_js:
+                    order: 310
+                maintenance_js:
+                    order: 220
+
+    items:
+        sync_js:
+            template: OroSyncBundle::sync_js.html.twig
+            applicable: "@oro_security.security_facade->hasLoggedUser()"
+        maintenance_js:
+            template: OroSyncBundle::maintenance_js.html.twig

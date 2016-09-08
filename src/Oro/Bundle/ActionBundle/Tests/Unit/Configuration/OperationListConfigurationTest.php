@@ -84,14 +84,16 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'attributes' => [],
                         'frontend_options' => [
                             'options' => [],
-                            'show_dialog' => true
+                            'show_dialog' => true,
+                            'title_parameters' => []
                         ],
                         'button_options' => [
                             'page_component_options' => [],
                             'data' => []
                         ],
                         'datagrid_options' => [
-                            'mass_action' => []
+                            'mass_action' => [],
+                            'data' => [],
                         ]
                     ]
                 ]
@@ -116,6 +118,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'frontend_options' => [
                             'template' => 'template',
                             'title' => 'dialog title',
+                            'title_parameters' => ['param' => 'value'],
                             'options' => ['width' => 400],
                             'confirmation' => 'Confirmation message',
                             'show_dialog' => false
@@ -136,7 +139,10 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'datagrid_options' => [
                             'mass_action' => [
                                 'icon' => 'test'
-                            ]
+                            ],
+                            'data' => [
+                                'key1' => 'value1'
+                            ],
                         ],
                         'form_options' => [
                             'attribute_fields' => [
@@ -216,6 +222,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'frontend_options' => [
                             'template' => 'template',
                             'title' => 'dialog title',
+                            'title_parameters' => ['param' => 'value'],
                             'options' => ['width' => 400],
                             'confirmation' => [
                                 'message' => 'Confirmation message',
@@ -251,6 +258,9 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'datagrid_options' => [
                             'mass_action' => [
                                 'icon' => 'test'
+                            ],
+                            'data' => [
+                                'key1' => 'value1'
                             ]
                         ],
                     ]

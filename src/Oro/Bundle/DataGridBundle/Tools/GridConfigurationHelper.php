@@ -25,7 +25,7 @@ class GridConfigurationHelper
      */
     public function getEntity(DatagridConfiguration $config)
     {
-        $entityClassName = $config->offsetGetByPath('[extended_entity_name]');
+        $entityClassName = $config->offsetGetOr('extended_entity_name');
         if ($entityClassName) {
             return $entityClassName;
         }
