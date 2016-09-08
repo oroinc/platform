@@ -13,3 +13,13 @@
     } %}
     {{ block_widget(block) }}
 {% endblock %}
+
+{% block body_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' body'
+    }) %}
+
+    <body {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </body>
+{% endblock %}
