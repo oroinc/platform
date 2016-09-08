@@ -39,11 +39,21 @@ class DataProviderDecorator
     /**
      * @param string $name
      * @param array $arguments
+     * @return mixed
      * @throws \BadMethodCallException
      */
     public function __call($name, $arguments)
     {
         if (preg_match(sprintf('/^(%s)(.+)$/i', implode('|', $this->methodPrefixes)), $name, $matches)) {
+            if (!method_exists($this->dataProvider, $name)) {
+                throw new \BadMethodCallException(
+                    sprintf(
+                        'In the data provider "%s" does not exist method "%s".',
+                        get_class($this->dataProvider),
+                        $name
+                    )
+                );
+            }
             return call_user_func_array([$this->dataProvider, $name], $arguments);
         } else {
             throw new \BadMethodCallException(

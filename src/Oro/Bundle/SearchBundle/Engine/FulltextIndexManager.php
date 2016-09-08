@@ -25,15 +25,26 @@ class FulltextIndexManager
     protected $tableName;
 
     /**
-     * @param Connection $connection
-     * @param array      $configClasses
-     * @param string     $tableName
+     * @var string
      */
-    public function __construct(Connection $connection, array $configClasses, $tableName = 'oro_search_index_text')
-    {
+    protected $indexName;
+
+    /**
+     * @param Connection $connection
+     * @param array $configClasses
+     * @param string $tableName
+     * @param string $indexName
+     */
+    public function __construct(
+        Connection $connection,
+        array $configClasses,
+        $tableName = 'oro_search_index_text',
+        $indexName = 'value'
+    ) {
         $this->connection    = $connection;
         $this->configClasses = $configClasses;
         $this->tableName     = $tableName;
+        $this->indexName     = $indexName;
     }
 
     /**
@@ -60,12 +71,12 @@ class FulltextIndexManager
         $driver = $config['driver'];
 
         if (!isset($this->configClasses[$driver])) {
-            throw new \RuntimeException('Driver "%s" not found');
+            throw new \RuntimeException(sprintf('Driver "%s" not found', $driver));
         }
 
         /** @var PdoMysql $className */
         $className = $this->configClasses[$driver];
 
-        return $className::getPlainSql($this->tableName);
+        return $className::getPlainSql($this->tableName, $this->indexName);
     }
 }

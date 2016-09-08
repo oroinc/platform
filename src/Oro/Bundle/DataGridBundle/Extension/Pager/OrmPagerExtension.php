@@ -9,9 +9,6 @@ use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 /**
- * Class OrmPagerExtension
- * @package Oro\Bundle\DataGridBundle\Extension\Pager
- *
  * Responsibility of this extension is to apply pagination on query for ORM datasource
  */
 class OrmPagerExtension extends AbstractPagerExtension
@@ -21,11 +18,10 @@ class OrmPagerExtension extends AbstractPagerExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        // enabled by default for ORM datasource
-        $disabled = $this->getOr(PagerInterface::DISABLED_PARAM, false)
-            || $config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
-
-        return !$disabled && $config->getDatasourceType() == OrmDatasource::TYPE;
+        return
+            $config->getDatasourceType() === OrmDatasource::TYPE
+            && !$this->getOr(PagerInterface::DISABLED_PARAM, false)
+            && !$config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -14,8 +15,11 @@ class ExtendOptionsBuilder
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var array */
-    protected $tableToEntityMap = [];
+    protected $tableToEntitiesMap = [];
 
     /** @var array */
     protected $result = [];
@@ -23,13 +27,16 @@ class ExtendOptionsBuilder
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
      * @param FieldTypeHelper      $fieldTypeHelper
+     * @param ConfigManager        $configManager
      */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
-        FieldTypeHelper $fieldTypeHelper
+        FieldTypeHelper $fieldTypeHelper,
+        ConfigManager $configManager
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
         $this->fieldTypeHelper      = $fieldTypeHelper;
+        $this->configManager        = $configManager;
     }
 
     /**
@@ -47,18 +54,22 @@ class ExtendOptionsBuilder
     public function addTableOptions($tableName, array $options)
     {
         $customEntityClassName = $this->getAndRemoveOption($options, ExtendOptionsManager::ENTITY_CLASS_OPTION);
-        $entityClassName       = $this->getEntityClassName($tableName, $customEntityClassName, false);
-        if (!$entityClassName) {
+        $entityClassNames      = $this->getEntityClassNames($tableName, $customEntityClassName, false);
+        if (!$entityClassNames) {
             return;
         }
 
         $tableMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
         if (!empty($options)) {
-            $this->result[$entityClassName]['configs'] = $options;
+            foreach ($entityClassNames as $entityClassName) {
+                $this->result[$entityClassName]['configs'] = $options;
+            }
         }
         if ($tableMode) {
-            $this->result[$entityClassName]['mode'] = $tableMode;
+            foreach ($entityClassNames as $entityClassName) {
+                $this->result[$entityClassName]['mode'] = $tableMode;
+            }
         }
     }
 
@@ -72,17 +83,19 @@ class ExtendOptionsBuilder
      */
     public function addColumnOptions($tableName, $columnName, $options)
     {
-        $entityClassName = $this->getEntityClassName($tableName, null, false);
-        if (!$entityClassName) {
+        $entityClassNames = $this->getEntityClassNames($tableName, null, false);
+        if (!$entityClassNames) {
             return;
         }
 
         $newColumnName = $this->getAndRemoveOption($options, ExtendOptionsManager::NEW_NAME_OPTION);
         if ($newColumnName) {
-            $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName][$columnName] = $newColumnName;
+            foreach ($entityClassNames as $entityClassName) {
+                $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName][$columnName] = $newColumnName;
+            }
             if (empty($options)) {
                 return;
-            };
+            }
         }
 
         $fieldName = $this->getAndRemoveOption($options, ExtendOptionsManager::FIELD_NAME_OPTION);
@@ -101,7 +114,15 @@ class ExtendOptionsBuilder
             foreach ($target as $optionName => $optionValue) {
                 switch ($optionName) {
                     case 'table_name':
-                        $options['extend']['target_entity'] = $this->getEntityClassName($optionValue);
+                        $targetEntityNames = $this->getEntityClassNames($optionValue);
+                        if (count($targetEntityNames) > 1) {
+                            throw new \LogicException(sprintf(
+                                'Table "%s" is expected to be related with 1 entity, but %d entities found',
+                                $optionValue,
+                                count($entityClassNames)
+                            ));
+                        }
+                        $options['extend']['target_entity'] = reset($targetEntityNames);
                         break;
                     case 'column':
                         $options['extend']['target_field'] = $this->getFieldName($target['table_name'], $optionValue);
@@ -122,8 +143,15 @@ class ExtendOptionsBuilder
             }
 
             if (!isset($options['extend']['relation_key'])) {
+                if (count($entityClassNames) > 1) {
+                    throw new \LogicException(sprintf(
+                        'Table "%s" is expected to be related with 1 entity, but %d entities found',
+                        $tableName,
+                        count($entityClassNames)
+                    ));
+                }
                 $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
-                    $entityClassName,
+                    reset($entityClassNames),
                     $fieldName,
                     $columnUnderlyingType,
                     $options['extend']['target_entity']
@@ -131,15 +159,17 @@ class ExtendOptionsBuilder
             }
         }
 
-        $this->result[$entityClassName]['fields'][$fieldName] = [];
-        if (!empty($options)) {
-            $this->result[$entityClassName]['fields'][$fieldName]['configs'] = $options;
-        }
-        if ($columnType) {
-            $this->result[$entityClassName]['fields'][$fieldName]['type'] = $columnType;
-        }
-        if ($columnMode) {
-            $this->result[$entityClassName]['fields'][$fieldName]['mode'] = $columnMode;
+        foreach ($entityClassNames as $entityClassName) {
+            $this->result[$entityClassName]['fields'][$fieldName] = [];
+            if (!empty($options)) {
+                $this->result[$entityClassName]['fields'][$fieldName]['configs'] = $options;
+            }
+            if ($columnType) {
+                $this->result[$entityClassName]['fields'][$fieldName]['type'] = $columnType;
+            }
+            if ($columnMode) {
+                $this->result[$entityClassName]['fields'][$fieldName]['mode'] = $columnMode;
+            }
         }
     }
 
@@ -150,12 +180,14 @@ class ExtendOptionsBuilder
      */
     public function addTableAuxiliaryOptions($configType, $tableName, $options)
     {
-        $entityClassName = $this->getEntityClassName($tableName, null, false);
-        if (!$entityClassName) {
+        $entityClassNames = $this->getEntityClassNames($tableName, null, false);
+        if (!$entityClassNames) {
             return;
         }
 
-        $this->result[$configType][$entityClassName]['configs'] = $options;
+        foreach ($entityClassNames as $entityClassName) {
+            $this->result[$configType][$entityClassName]['configs'] = $options;
+        }
     }
 
     /**
@@ -166,14 +198,16 @@ class ExtendOptionsBuilder
      */
     public function addColumnAuxiliaryOptions($configType, $tableName, $columnName, $options)
     {
-        $entityClassName = $this->getEntityClassName($tableName, null, false);
-        if (!$entityClassName) {
+        $entityClassNames = $this->getEntityClassNames($tableName, null, false);
+        if (!$entityClassNames) {
             return;
         }
 
         $fieldName = $this->getFieldName($tableName, $columnName);
 
-        $this->result[$configType][$entityClassName]['fields'][$fieldName] = $options;
+        foreach ($entityClassNames as $entityClassName) {
+            $this->result[$configType][$entityClassName]['fields'][$fieldName] = $options;
+        }
     }
 
     /**
@@ -200,23 +234,26 @@ class ExtendOptionsBuilder
      * @param string $customEntityClassName The name of a custom entity
      * @param bool   $throwExceptionIfNotFound
      *
-     * @return string|null
+     * @return string[]
      *
      * @throws \RuntimeException if an entity class name was not found and $throwExceptionIfNotFound = TRUE
      */
-    protected function getEntityClassName($tableName, $customEntityClassName = null, $throwExceptionIfNotFound = true)
+    protected function getEntityClassNames($tableName, $customEntityClassName = null, $throwExceptionIfNotFound = true)
     {
-        if (!isset($this->tableToEntityMap[$tableName])) {
-            $entityClassName = !empty($customEntityClassName)
-                ? $customEntityClassName
-                : $this->entityMetadataHelper->getEntityClassByTableName($tableName);
-            if ($throwExceptionIfNotFound && empty($entityClassName)) {
-                throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
+        if (!isset($this->tableToEntitiesMap[$tableName])) {
+            $entityClassNames = !empty($customEntityClassName)
+                ? [$customEntityClassName]
+                : array_filter(
+                    $this->entityMetadataHelper->getEntityClassesByTableName($tableName),
+                    [$this->configManager, 'hasConfig']
+                );
+            if ($throwExceptionIfNotFound && empty($entityClassNames)) {
+                throw new \RuntimeException(sprintf('Cannot find configurable entity for "%s" table.', $tableName));
             }
-            $this->tableToEntityMap[$tableName] = $entityClassName;
+            $this->tableToEntitiesMap[$tableName] = $entityClassNames;
         }
 
-        $result = $this->tableToEntityMap[$tableName];
+        $result = $this->tableToEntitiesMap[$tableName];
         if ($throwExceptionIfNotFound && empty($result)) {
             throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
         }

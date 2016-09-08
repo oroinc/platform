@@ -24,17 +24,24 @@ class ExtendOptionsParserTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
 
         $this->entityMetadataHelper->expects($this->any())
-            ->method('getEntityClassByTableName')
+            ->method('getEntityClassesByTableName')
             ->willReturnMap(
                 [
-                    ['table1', 'Test\Entity1'],
-                    ['table2', 'Test\Entity2'],
+                    ['table1', ['Test\Entity1']],
+                    ['table2', ['Test\Entity2']],
                 ]
             );
 
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->any())
+            ->method('hasConfig')
+            ->will($this->returnValue(true));
         $this->extendOptionsParser = new ExtendOptionsParser(
             $this->entityMetadataHelper,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
+            $configManager
         );
     }
 

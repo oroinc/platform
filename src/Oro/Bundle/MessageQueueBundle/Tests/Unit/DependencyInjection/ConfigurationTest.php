@@ -176,7 +176,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ],
             'client' => [
                 'prefix' => 'oro',
-                'router_processor' => null,
+                'router_processor' => 'oro_message_queue.client.route_message_processor',
                 'router_destination' => 'default',
                 'default_destination' => 'default',
                 'traceable_producer' => false,

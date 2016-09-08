@@ -1,0 +1,5 @@
+oro_entity:
+    entity_aliases:
+        Oro\Bundle\MessageQueueBundle\Entity\Job:
+            alias: oro_message_queue_job
+            plural_alias: oro_message_queue_jobs

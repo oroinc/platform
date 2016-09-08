@@ -111,4 +111,9 @@ interface SearchQueryInterface
      * @return SearchQueryInterface
      */
     public function from($entities);
+
+    /**
+     * @return array
+     */
+    public function getSelectAliases();
 }

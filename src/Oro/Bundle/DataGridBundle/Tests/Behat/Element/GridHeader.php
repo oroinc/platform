@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Symfony\Component\DomCrawler\Crawler;
 
 class GridHeader extends Element
 {
@@ -14,71 +15,19 @@ class GridHeader extends Element
      */
     public function getColumnNumber($headerText)
     {
-        $header = $this->tryGuessHeaderLink($headerText);
+        $crawler = new Crawler($this->getHtml());
 
-        self::assertNotNull($header, sprintf('Can\'t find link with "%s" header', $headerText));
+        $i = 1;
 
-        $headerText = $header->getText();
-        $headers = $this->getHeaders();
-
-        for ($i = 1, $max = count($headers); $i <= $max; $i++) {
-            if ($headers[$i]->getText() == $headerText) {
+        /** @var \DOMElement $th */
+        foreach ($crawler->filter('th')->siblings() as $th) {
+            if (false !== stripos($th->textContent, $headerText)) {
                 return $i;
             }
+
+            $i++;
         }
 
         self::fail(sprintf('Can\'t find link with "%s" header', $headerText));
-    }
-
-    /**
-     * @param string $header
-     * @return Element
-     */
-    public function getHeaderLink($header)
-    {
-        if ($link = $this->tryGuessHeaderLink($header)) {
-            return $link;
-        }
-
-        self::fail(sprintf('Can\'t find link with "%s" header', $header));
-    }
-
-    /**
-     * @param string $header
-     * @return null|Element
-     */
-    public function tryGuessHeaderLink($header)
-    {
-        if ($link = $this->findHeaderLink($header)) {
-            return $link;
-        }
-
-        if ($link = $this->findHeaderLink(ucwords(strtolower($header)))) {
-            return $link;
-        }
-
-        if ($link = $this->findHeaderLink(ucfirst(strtolower($header)))) {
-            return $link;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $header
-     * @return Element|null
-     */
-    protected function findHeaderLink($header)
-    {
-        if ($link = $this->find('css', sprintf('th a:contains("%s")', $header))) {
-            return $link;
-        }
-
-        return null;
-    }
-
-    protected function getHeaders()
-    {
-        return $this->findAll('css', 'th.grid-cell');
     }
 }

@@ -12,6 +12,7 @@ use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 class SearchSorterExtension extends AbstractSorterExtension
 {
     // data type mapping from configuration type to search engine type
+    /** @var array */
     protected static $typeMapping = [
         'string'  => 'text',
         'integer' => 'integer',
@@ -28,12 +29,11 @@ class SearchSorterExtension extends AbstractSorterExtension
     /**
      * {@inheritdoc}
      */
-    protected function addSorterToDasource(array $sorter, $direction, DatasourceInterface $datasource)
+    protected function addSorterToDatasource(array $sorter, $direction, DatasourceInterface $datasource)
     {
-        /* @var  $datasource SearchDatasource */
-
         $sortKey = $sorter['data_name'];
 
+        /* @var $datasource SearchDatasource */
         if (array_key_exists(PropertyInterface::TYPE_KEY, $sorter)) {
             // pass type if specified
             $type = $this->mapType($sorter[PropertyInterface::TYPE_KEY]);

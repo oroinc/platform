@@ -141,7 +141,7 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->processConfigs($config);
 
-        $this->assertEquals($expectedConfig, $config);
+        $this->assertEquals($expectedConfig->toArray(), $config->toArray());
     }
 
     public function testVisitDatasourceWithCurrentLocalization()

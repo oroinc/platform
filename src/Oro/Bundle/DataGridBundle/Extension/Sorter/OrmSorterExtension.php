@@ -19,7 +19,7 @@ class OrmSorterExtension extends AbstractSorterExtension
     /**
      * {@inheritdoc}
      */
-    protected function addSorterToDasource(array $sorter, $direction, DatasourceInterface $datasource)
+    protected function addSorterToDatasource(array $sorter, $direction, DatasourceInterface $datasource)
     {
         /* @var $datasource OrmDatasource */
         $datasource->getQueryBuilder()->addOrderBy($sorter['data_name'], $direction);

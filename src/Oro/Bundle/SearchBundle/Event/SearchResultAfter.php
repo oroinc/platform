@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 
-class SearchResultAfter extends Event
+class SearchResultAfter extends GridResultAfter
 {
     const NAME = 'oro_datagrid.search_datasource.result.after';
 }

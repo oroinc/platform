@@ -66,7 +66,7 @@ class UserScopeManager extends AbstractScopeManager
      *
      * {@inheritdoc}
      */
-    protected function getScopeIdByEntity($entity)
+    protected function getScopeEntityIdValue($entity)
     {
         return $entity->getId();
     }
