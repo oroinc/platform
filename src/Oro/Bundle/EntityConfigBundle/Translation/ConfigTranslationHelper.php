@@ -4,35 +4,25 @@ namespace Oro\Bundle\EntityConfigBundle\Translation;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigTranslationHelper
 {
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var DynamicTranslationMetadataCache */
-    protected $translationCache;
-
     /** @var TranslationManager */
     protected $translationManager;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
-     * @param TranslatorInterface $translator
-     * @param DynamicTranslationMetadataCache $translationCache
      * @param TranslationManager $translationManager
+     * @param TranslatorInterface $translator
      */
-    public function __construct(
-        TranslatorInterface $translator,
-        DynamicTranslationMetadataCache $translationCache,
-        TranslationManager $translationManager
-    ) {
-        $this->translator = $translator;
-        $this->translationCache = $translationCache;
+    public function __construct(TranslationManager $translationManager, TranslatorInterface $translator)
+    {
         $this->translationManager = $translationManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -70,7 +60,7 @@ class ConfigTranslationHelper
         }
 
         // mark translation cache dirty
-        $this->translationCache->updateTimestamp($locale);
+        $this->translationManager->invalidateCache($locale);
 
         $this->translationManager->flush($entities);
     }
@@ -87,7 +77,7 @@ class ConfigTranslationHelper
             $key,
             $value,
             $locale,
-            TranslationRepository::DEFAULT_DOMAIN,
+            TranslationManager::DEFAULT_DOMAIN,
             Translation::SCOPE_UI
         );
     }

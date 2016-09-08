@@ -232,3 +232,4 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
         arguments:
             - '@doctrine'
+            - '@oro_translation.database_translation.metadata.cache'

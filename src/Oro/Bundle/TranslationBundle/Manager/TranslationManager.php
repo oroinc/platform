@@ -9,22 +9,26 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\Constraints\Language;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class TranslationManager
 {
     const DEFAULT_DOMAIN = 'messages';
 
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     protected $registry;
+
+    /** @var DynamicTranslationMetadataCache */
+    protected $dbTranslationMetadataCache;
 
     /**
      * @param Registry $registry
+     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
-    public function __construct(Registry $registry)
+    public function __construct(Registry $registry, DynamicTranslationMetadataCache $dbTranslationMetadataCache)
     {
         $this->registry = $registry;
+        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
     /**
@@ -128,6 +132,14 @@ class TranslationManager
     }
 
     /**
+     * @param string|null $locale
+     */
+    public function invalidateCache($locale = null)
+    {
+        $this->dbTranslationMetadataCache->updateTimestamp($locale);
+    }
+
+    /**
      * Returns the list of all existing in the database translation domains for the given locales.
      *
      * @param string[] $locales
@@ -137,6 +149,16 @@ class TranslationManager
     public function findAvailableDomainsForLocales(array $locales)
     {
         return $this->getEntityRepository(Translation::class)->findAvailableDomainsForLocales($locales);
+    }
+
+    /**
+     * @param $code
+     *
+     * @return Language|null
+     */
+    protected function getLanguageByCode($code)
+    {
+        return $this->getEntityRepository(Language::class)->findOneBy(['code' => $code]);
     }
 
     /**
@@ -157,15 +179,5 @@ class TranslationManager
     protected function getEntityRepository($class)
     {
         return $this->getEntityManager($class)->getRepository($class);
-    }
-
-    /**
-     * @param $code
-     *
-     * @return Language|null
-     */
-    protected function getLanguageByCode($code)
-    {
-        return $this->getEntityRepository(Language::class)->findOneBy(['code' => $code]);
     }
 }

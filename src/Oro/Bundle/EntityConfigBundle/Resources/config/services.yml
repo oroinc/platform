@@ -8,7 +8,6 @@ parameters:
     oro_entity_config.event_listener.entityfields_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
     oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
     oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
-    oro_entity_config.translation.helper.class: Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper
     oro_entity_config.helper.entity_config.class:               Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper
 
 services:
@@ -157,8 +156,7 @@ services:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: warmUpCache, priority: -255 }
 
     oro_entity_config.translation.helper:
-        class: %oro_entity_config.translation.helper.class%
+        class: 'Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper'
         arguments:
-            - '@translator.default'
-            - '@oro_translation.database_translation.metadata.cache'
             - '@oro_translation.translation.manager'
+            - '@translator.default'
