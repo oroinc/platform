@@ -40,7 +40,7 @@ class ExpressionExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $context = $block->getContext();
         $data = $block->getData();

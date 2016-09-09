@@ -31,11 +31,11 @@ class ClassAttributeExtension extends BaseClassAttributeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $context = $block->getContext();
         if ($context->getOr('expressions_evaluate')) {
-            parent::finishView($view, $block, $options);
+            parent::finishView($view, $block);
         } else {
             $encoding = $context->getOr('expressions_encoding');
             if ($encoding !== null) {

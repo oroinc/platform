@@ -24,7 +24,7 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
     }
 

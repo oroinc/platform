@@ -46,7 +46,7 @@ interface BlockTypeExtensionInterface
      * @param BlockInterface $block
      * @param Options        $options
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options);
+    public function finishView(BlockView $view, BlockInterface $block);
 
     /**
      * Overrides the default options from the extended type.

@@ -41,13 +41,18 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
         }
     }
 
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    {
+        $view->vars['resolve_value_bags'] = $options->get('resolve_value_bags', false);
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $exprEvaluate = $block->getContext()->getOr('expressions_evaluate');
-        if ($options['resolve_value_bags'] && $exprEvaluate) {
+        if ($view->vars['resolve_value_bags'] && $exprEvaluate) {
             $this->resolveValueBags($view->vars);
         }
     }

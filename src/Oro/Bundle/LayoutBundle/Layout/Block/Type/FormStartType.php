@@ -28,25 +28,36 @@ class FormStartType extends AbstractFormType
         );
     }
 
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    {
+        $view->vars['form_action'] = $options->getOr('form_action');
+        $view->vars['form_route_name'] = $options->getOr('form_route_name');
+        $view->vars['form_route_parameters'] = $options->getOr('form_route_parameters');
+        $view->vars['form_method'] = $options->getOr('form_method');
+        $view->vars['form_enctype'] = $options->getOr('form_enctype');
+
+        parent::buildView($view, $block, $options);
+    }
+    
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
 
         // form action
-        if (isset($options['form_action'])) {
-            $path = $options['form_action'];
+        if (isset($view->vars['form_action'])) {
+            $path = $view->vars['form_action'];
             if ($path) {
                 $view->vars['action_path'] = $path;
             }
-        } elseif (isset($options['form_route_name'])) {
-            $routeName = $options['form_route_name'];
+        } elseif (isset($view->vars['form_route_name'])) {
+            $routeName = $view->vars['form_route_name'];
             if ($routeName) {
                 $view->vars['action_route_name']       = $routeName;
-                $view->vars['action_route_parameters'] = isset($options['form_route_parameters'])
-                    ? $options['form_route_parameters']
+                $view->vars['action_route_parameters'] = isset($view->vars['form_route_parameters'])
+                    ? $view->vars['form_route_parameters']
                     : [];
             }
         } else {
@@ -64,16 +75,16 @@ class FormStartType extends AbstractFormType
         }
 
         // form method
-        $method = isset($options['form_method'])
-            ? strtoupper($options['form_method'])
+        $method = $view->vars['form_method']
+            ? strtoupper($view->vars['form_method'])
             : $formAccessor->getMethod();
         if ($method) {
             $view->vars['method'] = $method;
         }
 
         // form enctype
-        $enctype = isset($options['form_enctype'])
-            ? $options['form_enctype']
+        $enctype = isset($view->vars['form_enctype'])
+            ? $view->vars['form_enctype']
             : $formAccessor->getEnctype();
         if ($enctype) {
             $view->vars['enctype'] = $enctype;

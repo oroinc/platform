@@ -89,7 +89,7 @@ class BaseType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $vars = $view->vars->toArray();
         if (isset($vars['attr']['id']) && !isset($vars['label_attr']['for'])) {

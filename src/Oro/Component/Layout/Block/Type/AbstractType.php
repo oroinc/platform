@@ -28,7 +28,7 @@ abstract class AbstractType implements BlockTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
     }
 

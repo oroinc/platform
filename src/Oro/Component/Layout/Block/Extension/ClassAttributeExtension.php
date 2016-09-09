@@ -19,7 +19,7 @@ class ClassAttributeExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $this->normalizeClassAttribute($view, 'attr');
         $this->normalizeClassAttribute($view, 'label_attr');

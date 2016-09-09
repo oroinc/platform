@@ -20,15 +20,20 @@ class FormEndType extends AbstractFormType
         $resolver->setDefaults(['render_rest' => true]);
     }
 
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    {
+        $view->vars['render_rest'] = $options->get('render_rest', false);
+        parent::buildView($view, $block, $options);
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
 
         $view->vars['form'] = $formAccessor->getView();
-        $view->vars['render_rest'] = $options['render_rest'];
     }
 
     /**
