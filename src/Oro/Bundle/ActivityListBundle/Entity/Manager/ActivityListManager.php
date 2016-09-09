@@ -255,7 +255,8 @@ class ActivityListManager
                 $inheritanceQb,
                 $inheritanceTarget,
                 $key,
-                ':entityId'
+                ':entityId',
+                $this->config->get('oro_activity_list.grouping')
             );
 
             $this->activityListFilterHelper->addFiltersToQuery($inheritanceQb, $filter);

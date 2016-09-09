@@ -1,0 +1,14 @@
+dashboards:
+    widgets:
+        second_quick_launchpad:
+            route:      second_quick_launchpad_test_route
+            route_parameters: { bundle: SecondTestBundle, name: secondQuickLaunchpad }
+            isNew: true
+        quick_launchpad:
+            route:      alternative_quick_lanchpad_route
+
+    dashboards:
+        alternative_dashboard:
+            twig: OroDashboardBundle:Index:default.html.twig
+        empty_board:
+            twig: OroDashboardBundle:Index:default.html.twig

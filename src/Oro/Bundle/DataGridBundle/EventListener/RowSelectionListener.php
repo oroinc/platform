@@ -13,7 +13,7 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
  *
  * Datasource query should implement filtering of data based on selection data. Example of grid configuration:
  *
- * datagrid:
+ * datagrids:
  *   bu-update-users-grid:
  *     extends: user-relation-grid
  *     source:

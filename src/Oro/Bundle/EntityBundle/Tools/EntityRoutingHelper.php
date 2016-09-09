@@ -223,7 +223,7 @@ class EntityRoutingHelper
         }
         if (!$entity) {
             throw new RecordNotFoundException(
-                sprintf("Record doesn't found.")
+                sprintf("Record doesn't exist")
             );
         }
 
