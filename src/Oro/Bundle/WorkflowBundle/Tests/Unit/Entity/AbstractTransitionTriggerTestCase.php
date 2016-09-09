@@ -26,9 +26,24 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit_Framework_Test
         $this->assertPropertyAccessors($this->entity, [
             ['id', 1],
             ['queued', false, true],
-            ['entityClass', 'test_entity'],
             ['workflowDefinition', new WorkflowDefinition()],
         ]);
+    }
+
+    protected function setDataToTrigger(AbstractTransitionTrigger $trigger)
+    {
+        return $trigger->setTransitionName('test_transition')
+            ->setQueued(false)
+            ->setWorkflowDefinition(new WorkflowDefinition());
+    }
+
+    protected function assertImportData()
+    {
+        $trigger = $this->getEntity();
+        $this->setDataToTrigger($trigger);
+        $this->assertEquals($trigger->getTransitionName(), $this->entity->getTransitionName());
+        $this->assertEquals($trigger->getWorkflowDefinition(), $this->entity->getWorkflowDefinition());
+        $this->assertEquals($trigger->isQueued(), $this->entity->isQueued());
     }
 
     /**

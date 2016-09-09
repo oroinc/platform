@@ -50,13 +50,6 @@ abstract class AbstractTransitionTrigger
     protected $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_class", type="string", length=255)
-     */
-    protected $entityClass;
-
-    /**
      * Whether transition should be queued or done immediately
      *
      * @var boolean
@@ -95,25 +88,6 @@ abstract class AbstractTransitionTrigger
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityClass()
-    {
-        return $this->entityClass;
-    }
-
-    /**
-     * @param string $entityClass
-     * @return $this
-     */
-    public function setEntityClass($entityClass)
-    {
-        $this->entityClass = $entityClass;
 
         return $this;
     }
@@ -178,9 +152,10 @@ abstract class AbstractTransitionTrigger
     /**
      * @param AbstractTransitionTrigger $trigger
      */
-    protected function importData(AbstractTransitionTrigger $trigger)
+    protected function importMainData(AbstractTransitionTrigger $trigger)
     {
         $this->setQueued($trigger->isQueued())
+            ->setTransitionName($trigger->getTransitionName())
             ->setWorkflowDefinition($trigger->getWorkflowDefinition());
     }
 }

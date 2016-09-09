@@ -16,6 +16,20 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
         ]);
     }
 
+    public function testImport()
+    {
+        $trigger = $this->getEntity();
+        /** @var TransitionTriggerCron $entity */
+        $entity = $this->entity;
+        $this->setDataToTrigger($trigger);
+        $trigger->setCron('test_cron')
+            ->setFilter('test_filter');
+        $entity->import($trigger);
+        $this->assertImportData();
+        $this->assertEquals($trigger->getCron(), $entity->getCron());
+        $this->assertEquals($trigger->getFilter(), $entity->getFilter());
+    }
+
     /**
      * {@inheritdoc}
      */
