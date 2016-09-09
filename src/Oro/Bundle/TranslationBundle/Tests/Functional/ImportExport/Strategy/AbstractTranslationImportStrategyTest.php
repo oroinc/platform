@@ -47,7 +47,9 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
      */
     protected function getTranslationsByLocaleCount($locale)
     {
-        return count($this->getEntityManager()->getRepository(Translation::class)->findBy(['locale' => $locale]));
+        $language = $this->getReference($locale);
+
+        return count($this->getEntityManager()->getRepository(Translation::class)->findBy(['language' => $language]));
     }
 
     /**

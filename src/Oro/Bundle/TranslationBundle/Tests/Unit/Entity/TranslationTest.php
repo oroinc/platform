@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Tests\Entity;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -21,7 +21,7 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->translation->getKey());
         $this->assertNull($this->translation->getValue());
         $this->assertNull($this->translation->getLanguage());
-        $this->assertEquals(Translation::DEFAULT_DOMAIN,$this->translation->getDomain());
+        $this->assertNull($this->translation->getDomain());
         $this->assertEquals(Translation::SCOPE_SYSTEM, $this->translation->getScope());
 
         $language = new Language();

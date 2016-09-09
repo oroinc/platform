@@ -53,3 +53,5 @@ services:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer'
         tags:
             - { name: oro_importexport.normalizer }
+        arguments:
+            - '@oro_translation.manager.translation'

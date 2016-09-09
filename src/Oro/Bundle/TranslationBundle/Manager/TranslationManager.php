@@ -72,6 +72,33 @@ class TranslationManager
     }
 
     /**
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     * @param string $domain
+     * @param int $scope
+     *
+     * @return Translation
+     */
+    public function createValue(
+        $key,
+        $value,
+        $locale,
+        $domain = self::DEFAULT_DOMAIN,
+        $scope = Translation::SCOPE_SYSTEM
+    ) {
+        $translationValue = new Translation();
+        $translationValue
+            ->setKey($key)
+            ->setLanguage($this->getLanguageByCode($locale))
+            ->setDomain($domain)
+            ->setScope($scope)
+            ->setValue($value);
+
+        return $translationValue;
+    }
+
+    /**
      * Update existing translation value or create new one if it does not exist
      *
      * @param string $key
@@ -84,14 +111,8 @@ class TranslationManager
      */
     public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
-        $translationValue = $this->findValue($key, $locale, $domain, $scope);
-        if (!$translationValue) {
-            $translationValue = new Translation();
-            $translationValue
-                ->setKey($key)
-                ->setLanguage($this->getLanguageByCode($locale))
-                ->setDomain($domain)
-                ->setScope($scope);
+        if (null === ($translationValue = $this->findValue($key, $locale, $domain, $scope))) {
+            $translationValue = $this->createValue($key, $value, $locale, $domain, $scope);
         }
 
         $translationValue->setValue($value);
@@ -102,26 +123,21 @@ class TranslationManager
     }
 
     /**
-     * @param string $locale
+     * @param Language $language
      *
      * @return int
      */
-    public function getCountByLocale($locale)
+    public function getCountByLanguage(Language $language)
     {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-
-        return $repo->getCountByLanguage($this->getLanguageByCode($locale));
+        return $this->getEntityRepository(Translation::class)->getCountByLanguage($language);
     }
 
     /**
-     * @param string $locale
+     * @param Language $language
      */
-    public function deleteByLocale($locale)
+    public function deleteByLanguage(Language $language)
     {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-        $repo->deleteByLocale($locale);
+        return $this->getEntityRepository(Translation::class)->deleteByLanguage($language);
     }
 
     /**
@@ -156,11 +172,11 @@ class TranslationManager
     }
 
     /**
-     * @param $code
+     * @param string $code
      *
      * @return Language|null
      */
-    protected function getLanguageByCode($code)
+    public function getLanguageByCode($code)
     {
         /** @var LanguageRepository $repo */
         $repo = $this->getEntityRepository(Language::class);
@@ -205,7 +221,7 @@ class TranslationManager
     }
 
     /**
-     * @param $class
+     * @param string $class
      *
      * @return ObjectRepository
      */

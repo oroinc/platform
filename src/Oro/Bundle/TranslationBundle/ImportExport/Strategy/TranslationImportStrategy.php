@@ -29,7 +29,7 @@ class TranslationImportStrategy extends ConfigurableAddOrReplaceStrategy
     {
         return $this->translationManager->findValue(
             $entity->getKey(),
-            $entity->getLocale(),
+            $entity->getLanguage()->getCode(),
             $entity->getDomain()
         );
     }
