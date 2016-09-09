@@ -270,7 +270,7 @@ class Translator extends BaseTranslator
     {
         foreach ($this->dynamicResources as $items) {
             foreach ($items as $item) {
-                $this->addResource($item['format'], $item['resource'], $item['locale'], $item['domain']);
+                $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
             }
         }
     }

@@ -2,33 +2,51 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\ImportExport\Serializer;
 
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationManager;
+
     /** @var TranslationNormalizer */
     protected $normalizer;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->normalizer = new TranslationNormalizer();
+        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->normalizer = new TranslationNormalizer($this->translationManager);
     }
 
     public function testDenormalize()
     {
+        $language = (new Language())->setCode('test_code');
+
         $data = [
-            'locale' => 'test_locale',
             'domain' => 'test_domain',
             'key' => 'test_key',
             'value' => 'test_value',
         ];
-        $context = ['language_code' => 'test_locale'];
+        $context = ['language_code' => 'test_code'];
+
+        $this->translationManager->expects($this->once())
+            ->method('getLanguageByCode')
+            ->with('test_code')
+            ->willReturn($language);
 
         $result = $this->normalizer->denormalize($data, Translation::class, null, $context);
         $translation = new Translation();
         $translation
-            ->setLocale($data['locale'])
+            ->setLanguage($language)
             ->setDomain($data['domain'])
             ->setValue($data['value'])
             ->setKey($data['key']);

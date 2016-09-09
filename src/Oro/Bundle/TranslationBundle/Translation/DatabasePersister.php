@@ -120,13 +120,8 @@ class DatabasePersister
      */
     private function getTranslationObject($key, $locale, $domain, $value)
     {
-        $object = $this->translationManager->findValue($key, $locale, $domain);
-        if (null === $object) {
-            $object = new Translation();
-            $object->setScope(Translation::SCOPE_SYSTEM);
-            $object->setLocale($locale);
-            $object->setDomain($domain);
-            $object->setKey($key);
+        if (null === ($object = $this->translationManager->findValue($key, $locale, $domain))) {
+            $object = $this->translationManager->createValue($key, $value, $locale, $domain);
         }
 
         $object->setValue($value);

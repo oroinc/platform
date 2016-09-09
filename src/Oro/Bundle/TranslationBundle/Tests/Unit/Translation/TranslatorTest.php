@@ -335,9 +335,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $locale = 'en';
         $translate = [
-            ['locale' => $locale, 'domain' => 'domain1'],
-            ['locale' => $locale, 'domain' => 'domain2'],
-            ['locale' => $locale, 'domain' => 'domain3'],
+            ['code' => $locale, 'domain' => 'domain1'],
+            ['code' => $locale, 'domain' => 'domain2'],
+            ['code' => $locale, 'domain' => 'domain3'],
         ];
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
