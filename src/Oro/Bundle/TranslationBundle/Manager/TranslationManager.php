@@ -86,8 +86,7 @@ class TranslationManager
         $locale,
         $domain = self::DEFAULT_DOMAIN,
         $scope = Translation::SCOPE_SYSTEM
-    )
-    {
+    ) {
         $translationValue = $this->findValue($key, $locale, $domain, $scope);
         if (!$translationValue) {
             $translationValue = new Translation();
