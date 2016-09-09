@@ -3,13 +3,12 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
 use CG\Generator\PhpMethod;
-use CG\Generator\PhpProperty;
+use CG\Generator\PhpParameter;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\Layout\Loader\Generator\VisitContext;
-use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
 class ExpressionConditionVisitor implements VisitorInterface
@@ -39,24 +38,28 @@ class ExpressionConditionVisitor implements VisitorInterface
         $class  = $visitContext->getClass();
         $class->addInterfaceName('Oro\Component\Layout\IsApplicableLayoutUpdateInterface');
 
-        $factoryProperty = PhpProperty::create('applicable');
-        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
-        $factoryProperty->setDefaultValue(false);
-        $class->setProperty($factoryProperty);
         $setFactoryMethod = PhpMethod::create('isApplicable');
-        $setFactoryMethod->setBody($writer->reset()->write('return $this->applicable;')->getContent());
+        $setFactoryMethod->addParameter(
+            PhpParameter::create('context')
+                ->setType('\Oro\Component\Layout\ContextInterface')
+        );
+        $setFactoryMethod->setBody($writer->reset()
+            ->write(
+                sprintf('return %s;', $this->expressionLanguage->compile($this->expression))
+            )
+            ->getContent()
+        );
         $class->setMethod($setFactoryMethod);
 
+        $updateMethodBody = $visitContext->getUpdateMethodWriter()->getContent();
         $visitContext->getUpdateMethodWriter()
-            ->writeln(
-                sprintf(
-                    '$context = $%s->getContext();',
-                    LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM
-                )
-            )
-            ->writeln(sprintf('if (%s) {', $this->expressionLanguage->compile($this->expression)))
+            ->reset()
+            ->writeln('if (!$this->isApplicable($item->getContext())) {')
             ->indent()
-            ->writeln('$this->applicable = true;');
+            ->writeln('return;')
+            ->outdent()
+            ->writeln('}')
+            ->write($updateMethodBody);
     }
 
     /**
@@ -64,8 +67,5 @@ class ExpressionConditionVisitor implements VisitorInterface
      */
     public function endVisit(VisitContext $visitContext)
     {
-        $visitContext->getUpdateMethodWriter()
-            ->outdent()
-            ->writeln('}');
     }
 }

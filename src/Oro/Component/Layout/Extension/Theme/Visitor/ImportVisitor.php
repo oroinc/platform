@@ -31,7 +31,7 @@ class ImportVisitor implements VisitorInterface
     /** @var ThemeManager */
     private $themeManager;
 
-    /** @var LayoutUpdateInterface[] */
+    /** @var array */
     private $updates = [];
 
     /**
@@ -98,10 +98,7 @@ class ImportVisitor implements VisitorInterface
                     $update->setParentUpdate($parentUpdate);
                 }
 
-                $el = $update instanceof ElementDependentLayoutUpdateInterface
-                    ? $update->getElement()
-                    : 'root';
-                $this->updates[$el][] = $update;
+                $this->insertUpdate($parentUpdate, $update);
 
                 $this->dependencyInitializer->initialize($update);
 
@@ -110,6 +107,27 @@ class ImportVisitor implements VisitorInterface
                 }
             }
         }
+    }
+
+    /**
+     * Insert import update right after its parent update
+     *
+     * @param ImportsAwareLayoutUpdateInterface $parentUpdate
+     * @param LayoutUpdateImportInterface $update
+     */
+    private function insertUpdate($parentUpdate, $update)
+    {
+        $el = $update instanceof ElementDependentLayoutUpdateInterface
+            ? $update->getElement()
+            : 'root';
+
+        $parentUpdateIndex = array_search($parentUpdate, $this->updates[$el]);
+
+        $this->updates[$el] = array_merge(
+            array_slice($this->updates[$el], 0, $parentUpdateIndex + 1, true),
+            [$update],
+            array_slice($this->updates[$el], $parentUpdateIndex + 1, NULL, true)
+        );
     }
 
     /**
