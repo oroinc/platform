@@ -6,9 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
- * @ORM\Table(name="oro_translation", indexes={
- *      @ORM\Index(name="MESSAGE_IDX", columns={"`key`"}),
- *      @ORM\Index(name="MESSAGES_IDX", columns={"language_id", "domain"})
+ * @ORM\Table(name="oro_translation", uniqueConstraints={
+ *      @ORM\UniqueConstraint(name="UNIQ_TRANS_LANG_KEY", columns={"language_id", "key_id"})
  * })
  */
 class Translation
@@ -26,7 +25,10 @@ class Translation
     protected $id;
 
     /**
-     * @ORM\Column(name="`key`", type="string", length=255)
+     * @var TranslationKey
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\TranslationKey")
+     * @ORM\JoinColumn(name="key_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $key;
 
@@ -44,11 +46,6 @@ class Translation
     protected $language;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $domain;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="scope", type="smallint")
@@ -64,7 +61,7 @@ class Translation
     }
 
     /**
-     * @param mixed $key
+     * @param TranslationKey $key
      * @return $this
      */
     public function setKey($key)
@@ -75,7 +72,7 @@ class Translation
     }
 
     /**
-     * @return mixed
+     * @return TranslationKey
      */
     public function getKey()
     {
@@ -99,25 +96,6 @@ class Translation
     public function getValue()
     {
         return $this->value;
-    }
-
-    /**
-     * @param mixed $domain
-     * @return $this
-     */
-    public function setDomain($domain)
-    {
-        $this->domain = $domain;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDomain()
-    {
-        return $this->domain;
     }
 
     /**

@@ -18,8 +18,9 @@ class TranslationRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('t')
             ->distinct(true)
-            ->select('l.code', 't.domain')
-            ->join('t.language', 'l');
+            ->select('l.code', 'k.domain')
+            ->join('t.language', 'l')
+            ->join('t.key', 'k');
 
         $qb->where($qb->expr()->in('l.code', $languages));
 

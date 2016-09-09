@@ -141,10 +141,10 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $localized = (new LocalizedFallbackValue())->setString('some string');
 
         if (!$default) {
-            $localization = new Localization();
-            $localization->setDefaultTitle($localization);
+            $localizationNew = new Localization();
+            $localizationNew->setDefaultTitle($localization);
 
-            $localized->setLocalization($localization);
+            $localized->setLocalization($localizationNew);
         }
 
         return $localized;

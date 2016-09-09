@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
@@ -11,6 +10,7 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class TranslationManager
@@ -166,6 +166,32 @@ class TranslationManager
         $repo = $this->getEntityRepository(Language::class);
 
         return $repo->findOneBy(['code' => $code]);
+    }
+
+    /**
+     * Tries to find Translation key and if not found creates new one
+     *
+     * @param string $key
+     * @param string $domain
+     *
+     * @return TranslationKey
+     */
+    protected function findTranslationKey($key, $domain = self::DEFAULT_DOMAIN)
+    {
+        /** @var ObjectRepository $repo */
+        $repo = $this->getEntityRepository(TranslationKey::class);
+
+        $translationKey = $repo->findOneBy(['key' => $key, 'domain' => $domain]);
+
+        if (!$translationKey) {
+            $translationKey = new TranslationKey();
+            $translationKey->setKey($key);
+            $translationKey->setDomain($key);
+            $this->getEntityManager(TranslationKey::class)->persist($translationKey);
+            $this->getEntityManager(TranslationKey::class)->flush($translationKey);
+        }
+
+        return $translationKey;
     }
 
     /**

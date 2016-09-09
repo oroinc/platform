@@ -25,6 +25,7 @@ class OroTranslationBundleInstaller implements Installation
         /** Tables generation **/
         $this->createOroLanguageTable($schema);
         $this->createOroTranslationTable($schema);
+        $this->createOroTranslationKeyTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroLanguageForeignKeys($schema);
@@ -60,15 +61,27 @@ class OroTranslationBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_translation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('key_id', 'integer', ['notnull' => false]);
         $table->addColumn('language_id', 'integer', ['notnull' => false]);
-        $table->addColumn('key', 'string', ['length' => 255]);
         $table->addColumn('value', 'text', ['notnull' => false]);
-        $table->addColumn('domain', 'string', ['length' => 255]);
         $table->addColumn('scope', 'smallint', []);
-        $table->addIndex(['key'], 'message_idx', []);
-        $table->addIndex(['language_id']);
-        $table->addIndex(['language_id', 'domain'], 'messages_idx', []);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['language_id', 'key_id'], 'UNIQ_TRANS_LANG_KEY');
+    }
+
+    /**
+     * Create oro_translation_key table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroTranslationKeyTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_translation_key');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('key', 'string', ['length' => 255]);
+        $table->addColumn('domain', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['key', 'domain'], 'UNIQ_TRANS_KEY');
     }
 
     /**
@@ -102,10 +115,16 @@ class OroTranslationBundleInstaller implements Installation
     {
         $table = $schema->getTable('oro_translation');
         $table->addForeignKeyConstraint(
+            $schema->getTable('oro_translation_key'),
+            ['key_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
             $schema->getTable('oro_language'),
             ['language_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }
