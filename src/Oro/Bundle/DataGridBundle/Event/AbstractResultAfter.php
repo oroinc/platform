@@ -31,7 +31,7 @@ abstract class AbstractResultAfter extends Event implements GridEventInterface
      * @param array             $records
      * @param AbstractQuery     $query
      */
-    public function __construct(DatagridInterface $datagrid, array $records = array(), AbstractQuery $query = null)
+    public function __construct(DatagridInterface $datagrid, array $records = array(), $query = null)
     {
         $this->datagrid = $datagrid;
         $this->records  = $records;

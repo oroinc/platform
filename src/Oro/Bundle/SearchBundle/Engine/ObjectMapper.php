@@ -169,11 +169,18 @@ class ObjectMapper extends AbstractMapper
         }
 
         $result = [];
+        $selectAliases = $query->getSelectAliases();
 
-        foreach ($selects as $select) {
+        foreach ($selects as $key => $select) {
             list ($type, $name) = Criteria::explodeFieldTypeName($select);
 
-            $result[$name] = '';
+            if (isset($selectAliases[$select])) {
+                $resultName = $selectAliases[$select];
+            } else {
+                $resultName = $name;
+            }
+
+            $result[$resultName] = '';
 
             if (isset($item[$name])) {
                 $value = $item[$name];
@@ -181,7 +188,7 @@ class ObjectMapper extends AbstractMapper
                     $value = array_shift($value);
                 }
 
-                $result[$name] = $value;
+                $result[$resultName] = $value;
             }
         }
 

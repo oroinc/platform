@@ -84,8 +84,8 @@ class Item
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
-        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
         $this->selectedData = is_array($selectedData) ? $selectedData : [];
+        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
 
         $this->propertyAccessor = new PropertyAccessor();
     }
