@@ -316,9 +316,7 @@
     {% endif %}
     <div
         data-content="{{ name }}"
-        {% if form.vars.attr['data-validation-optional-group'] is defined %}
-            data-validation-optional-group
-        {% endif %}
+        data-validation-optional-group
         {% if form.vars.attr['data-validation-optional-group-handler'] is defined %}
             data-validation-optional-group-handler="{{ form.vars.attr['data-validation-optional-group-handler'] }}"
         {% endif %}
