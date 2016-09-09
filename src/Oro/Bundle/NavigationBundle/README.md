@@ -126,7 +126,7 @@ Configuration builder reads all menu.yaml and merges its to one menu configurati
 replace any menu item from his bundles. Developers can prioritize loading and rewriting of menu's configuration
 options via sorting bundles in AppKernel.php.
 
-<a name="rendering-menus"></a>
+**IMPORTANT:**  Don't use duplicated item keys in tree, this keys must be unique.
 
 ### Page Titles
 

@@ -164,3 +164,17 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
 - Added layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator`.
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
+
+####NavigationBundle
+- Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
+- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
+- Added `areas` node to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
+- Added abstract classes `Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate` and `Oro\Bundle\NavigationBundle\Provider\AbstractMenuUpdateProvider`.
+- Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate`.
+- Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+
+####FrontendNavigationBundle
+- Create FrontendNavigationBundle with priority `12`.
+- Added entity `Oro\Bundle\FrontendNavigationBundle\Entity\MenuUpdate`.
+- Added class `Oro\Bundle\FrontendNavigationBundle\DependencyInjection\OroFrontendNavigationExtension` that extends `Symfony\Component\HttpKernel\DependencyInjection\Extension`.
+- Added class `Oro\Bundle\FrontendNavigationBundle\Provider\MenuUpdateProvider` that extend `Oro\Bundle\NavigationBundle\Provider\AbstractMenuUpdateProvider`.
