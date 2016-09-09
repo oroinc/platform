@@ -20,12 +20,12 @@ class TranslationKey
     protected $id;
 
     /**
-     * @ORM\Column(name="`key`", type="string", length=255)
+     * @ORM\Column(name="`key`", type="string", length=255, nullable=false)
      */
     protected $key;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=false, options={"default"="messages"})
      */
     protected $domain;
 
