@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 /**
- * @ORM\MappedSuperClass
+ * @ORM\MappedSuperclass
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractItem
