@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Reference;
@@ -7,7 +8,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class MenuUpdateProviderPass implements CompilerPassInterface
 {
-    const BUILDER_SERVICE_ID = 'oro_navigation.menu_update_builder';
+    const BUILDER_SERVICE_ID = 'oro_navigation.menu_update.builder';
     const TAG = 'oro_navigation.menu_update_provider';
 
     /**
