@@ -222,6 +222,8 @@ services:
             - '@oro_api.entity_alias_loader'
             - '@oro_api.entity_alias_cache'
             - %kernel.debug%
+        calls:
+            - [ setLogger, [ '@logger' ] ]
         lazy: true
 
     oro_api.entity_alias_cache:
