@@ -20,9 +20,9 @@ class MenuUpdateBuilder implements BuilderInterface
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $provider = $this->getProvider($menu->getExtra('area'));
-
-        foreach ($provider->getUpdates() as $update) {
-            if ($update->getMenu() == $menu->getName()) {
+        $menuName = $menu->getName();
+        foreach ($provider->getUpdates($menuName) as $update) {
+            if ($update->getMenu() == $menuName) {
                 $this->applyUpdate($menu, $update);
             }
         }
