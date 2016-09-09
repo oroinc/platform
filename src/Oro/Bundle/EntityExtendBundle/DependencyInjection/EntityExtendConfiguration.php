@@ -10,13 +10,14 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class EntityExtendConfiguration implements ConfigurationInterface
 {
+    const ROOT_NODE = 'oro_entity_extend';
     /**
      * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_entity_extend')
+        $treeBuilder->root(self::ROOT_NODE)
             ->children()
                 ->arrayNode('underlying_types')
                     ->useAttributeAsKey('name')

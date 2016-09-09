@@ -6,6 +6,9 @@ use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @deprecated since 1.9. Removing classes breaks doctrine metadata functionality
+ */
 class EntityCacheClearer implements CacheClearerInterface
 {
     /**

@@ -5,7 +5,7 @@ To add board appearance on a grid, do the following actions:
 - Go to the datagrid yml
 - Add the following lines into the datagrid configuration
 ``` yml
-datagrid:
+datagrids:
     {grid-uid}:
         # <grid configuration> goes here
         appearances:

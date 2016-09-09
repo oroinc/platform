@@ -279,6 +279,8 @@ services:
             - '@oro_entity.entity_alias_loader'
             - '@oro_entity.entity_alias_cache'
             - %kernel.debug%
+        calls:
+            - [ setLogger, [ '@logger' ] ]
         lazy: true
 
     oro_entity.entity_alias_cache:
@@ -375,6 +377,8 @@ services:
             - '@oro_entity.dictionary_value_list_provider'
             - '@oro_entity.entity_alias_resolver'
             - '@oro_entity.entity_class_name_helper'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: routing.options_resolver }
 

@@ -65,10 +65,11 @@
                         {% endblock %}
 
                         {% block form_actions %}
+                            {% set options = operation.definition.frontendOptions.options|default({}) %}
                             <div class="widget-actions form-actions">
                                 {% block form_actions_inner %}
-                                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                                    <button class="btn btn-success" type="submit">{{ 'Submit'|trans }}</button>
+                                    <button class="btn" type="reset">{{ (options.cancelText|default('Cancel'))|trans }}</button>
+                                    <button class="btn btn-success" type="submit">{{ (options.okText|default('Submit'))|trans }}</button>
                                 {% endblock %}
                             </div>
                         {% endblock %}
