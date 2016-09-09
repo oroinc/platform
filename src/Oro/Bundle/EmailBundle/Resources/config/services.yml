@@ -151,14 +151,14 @@ services:
             - '@kernel'
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
+            - { name: oro_entity_extend.warmer }
 
     oro_email.entity.cache.clearer:
         class: %oro_email.entity.cache.clearer.class%
+        deprecated: ~
         arguments:
             - %oro_email.entity.cache_dir%
             - %oro_email.entity.proxy_name_template%
-        tags:
-            - { name: kernel.cache_clearer }
 
     oro_email.email.cache.manager:
         class: %oro_email.email.cache.manager.class%
@@ -184,9 +184,7 @@ services:
         class: %oro_email.email_flag_manager_loader_selector.class%
 
     oro_email.email_address.entity_manager:
-        public: false
-        class: Doctrine\ORM\EntityManager
-        factory: ['@doctrine', getManagerForClass]
+        parent: oro_entity.abstract_entity_manager
         arguments:
             - 'OroEmailBundle:EmailAddress'
 
@@ -560,6 +558,8 @@ services:
             - '@oro_email.datagrid_query_factory'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before_query.base-email-grid, method: onResultBeforeQuery, priority: -255 }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.base-email-grid, method: onResultAfter, priority: 255 }
 
     oro_email.listener.datagrid.activity:
         class: %oro_email.listener.datagrid.activity.class%

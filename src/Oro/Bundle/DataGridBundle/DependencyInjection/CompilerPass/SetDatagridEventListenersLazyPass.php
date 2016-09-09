@@ -29,7 +29,7 @@ class SetDatagridEventListenersLazyPass implements CompilerPassInterface
             DatagridEvent\BuildAfter::NAME,
             DatagridEvent\BuildBefore::NAME,
             DatagridEvent\OrmResultBefore::NAME,
-            DatagridEvent\GridResultAfter::NAME,
+            DatagridEvent\OrmResultAfter::NAME,
             DatagridEvent\GridViewsLoadEvent::EVENT_NAME
         ];
 

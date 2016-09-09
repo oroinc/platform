@@ -26,6 +26,7 @@ config:
         'oro/datagrid/action/refresh-collection-action': 'bundles/orodatagrid/js/datagrid/action/refresh-collection-action.js'
         'oro/datagrid/action/reset-collection-action': 'bundles/orodatagrid/js/datagrid/action/reset-collection-action.js'
         'oro/datagrid/action/export-action': 'bundles/orodatagrid/js/datagrid/action/export-action.js'
+        'oro/datagrid/action/row/importexport-action': 'bundles/orodatagrid/js/datagrid/action/row/importexport-action.js'
         'oro/datagrid/action/show-component-action': 'bundles/orodatagrid/js/datagrid/action/show-component-action.js'
         'oro/datagrid/action/select-data-appearance-action': 'bundles/orodatagrid/js/datagrid/action/select-data-appearance-action.js'
         'orodatagrid/js/datagrid/actions-panel': 'bundles/orodatagrid/js/datagrid/actions-panel.js'
