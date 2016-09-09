@@ -102,6 +102,25 @@ class Translation
     }
 
     /**
+     * @param Language $language
+     * @return $this
+     */
+    public function setLanguage(Language $language)
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * @return Language
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
      * @param mixed $domain
      * @return $this
      */
@@ -138,24 +157,5 @@ class Translation
     public function getScope()
     {
         return $this->scope;
-    }
-
-    /**
-     * @param Language $language
-     * @return $this
-     */
-    public function setLanguage(Language $language)
-    {
-        $this->language = $language;
-
-        return $this;
-    }
-
-    /**
-     * @return Language
-     */
-    public function getLanguage()
-    {
-        return $this->language;
     }
 }
