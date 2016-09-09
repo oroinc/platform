@@ -28,7 +28,6 @@ parameters:
     oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
     oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
-    oro_entity_extend.enum_synchronizer.class:                Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer
     oro_entity_extend.twig.extension.dynamic_fields.class:    Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension
     oro_entity_extend.twig.extension.enum.class:              Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
     oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
@@ -298,13 +297,12 @@ services:
             - "@oro_entity_extend.relation_builder"
 
     oro_entity_extend.enum_synchronizer:
-        class: %oro_entity_extend.enum_synchronizer.class%
+        class: 'Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer'
         arguments:
             - "@oro_entity_config.config_manager"
             - "@doctrine"
             - "@translator"
-            - "@oro_translation.database_translation.metadata.cache"
-            - "@oro_translation.translation.manager"
+            - "@oro_entity_config.translation.helper"
 
     oro_entity_extend.twig.extension.dynamic_fields:
         class: %oro_entity_extend.twig.extension.dynamic_fields.class%

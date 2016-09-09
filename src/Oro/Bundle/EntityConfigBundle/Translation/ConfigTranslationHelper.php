@@ -44,6 +44,14 @@ class ConfigTranslationHelper
     }
 
     /**
+     * @param string|null $locale
+     */
+    public function invalidateCache($locale = null)
+    {
+        $this->translationManager->invalidateCache($locale);
+    }
+
+    /**
      * @param array $translations
      */
     public function saveTranslations(array $translations)

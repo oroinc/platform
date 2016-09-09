@@ -8,7 +8,6 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
 class Translator extends BaseTranslator
@@ -298,7 +297,7 @@ class Translator extends BaseTranslator
                 array_unshift($locales, $locale);
                 $locales = array_unique($locales);
 
-                $availableDomainsData = $this->container->get('oro_translation.translation.manager')
+                $availableDomainsData = $this->container->get('oro_translation.manager.translation')
                     ->findAvailableDomainsForLocales($locales);
                 foreach ($availableDomainsData as $item) {
                     $item['resource'] = new OrmTranslationResource(

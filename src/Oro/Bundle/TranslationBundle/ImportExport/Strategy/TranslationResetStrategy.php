@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\ImportExport\Strategy;
 
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class TranslationResetStrategy extends TranslationImportStrategy
 {
@@ -12,19 +10,6 @@ class TranslationResetStrategy extends TranslationImportStrategy
      * @var array
      */
     protected $processedLanguages = [];
-
-    /**
-     * @var TranslationManager
-     */
-    protected $translationManager;
-
-    /**
-     * @param TranslationManager $translationManager
-     */
-    public function setTranslationManager(TranslationManager $translationManager)
-    {
-        $this->translationManager = $translationManager;
-    }
 
     /**
      * @param Translation $entity
@@ -36,13 +21,11 @@ class TranslationResetStrategy extends TranslationImportStrategy
         if ($entity instanceof Translation) {
             $locale = $entity->getLocale();
             if ($locale && empty($this->processedLanguages[$locale])) {
-                /** @var TranslationRepository $repository */
-                $repository = $this->doctrineHelper->getEntityRepositoryForClass($this->entityName);
                 $this->context->incrementDeleteCount(
-                    $repository->getCountByLocale($locale)
+                    $this->translationManager->getCountByLocale($locale)
                 );
 
-                $repository->deleteByLocale($locale);
+                $this->translationManager->deleteByLocale($locale);
 
                 $this->processedLanguages[$locale] = true;
             }

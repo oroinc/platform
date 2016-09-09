@@ -42,7 +42,7 @@ class OroTranslationResetCommand extends ContainerAwareCommand
     {
         $locale                = $this->getContainer()->getParameter('kernel.default_locale');
         $container             = $this->getContainer();
-        $translationRepository = $this->getEntityManager()->getRepository(Translation::ENTITY_NAME);
+        $translationRepository = $this->getEntityManager()->getRepository(Translation::class);
         /**
          * disable database loader to not get translations from database
          */

@@ -158,5 +158,5 @@ services:
     oro_entity_config.translation.helper:
         class: 'Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper'
         arguments:
-            - '@oro_translation.translation.manager'
+            - '@oro_translation.manager.translation'
             - '@translator.default'

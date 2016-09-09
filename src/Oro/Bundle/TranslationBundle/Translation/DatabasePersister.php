@@ -17,8 +17,8 @@ class DatabasePersister
     /** @var EntityManager */
     private $em;
 
-    /** @var DynamicTranslationMetadataCache */
-    private $metadataCache;
+    /** @var Registry */
+    private $registry;
 
     /** @var TranslationManager */
     private $translationManager;
@@ -29,18 +29,25 @@ class DatabasePersister
     /**
      * @param Registry $registry
      * @param TranslationManager $translationManager
-     * @param DynamicTranslationMetadataCache $metadataCache
-     *
-     * @internal param \Doctrine\ORM\EntityManager $em
      */
     public function __construct(
         Registry $registry,
-        TranslationManager $translationManager,
-        DynamicTranslationMetadataCache $metadataCache
+        TranslationManager $translationManager
     ) {
-        $this->em = $registry->getManagerForClass(Translation::ENTITY_NAME);
+        $this->registry = $registry;
         $this->translationManager = $translationManager;
-        $this->metadataCache = $metadataCache;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        if (null === $this->em) {
+            $this->em = $this->registry->getManagerForClass(Translation::class);
+        }
+
+        return $this->em;
     }
 
     /**
@@ -55,7 +62,7 @@ class DatabasePersister
     {
         $writeCount = 0;
         try {
-            $this->em->beginTransaction();
+            $this->getEntityManager()->beginTransaction();
             foreach ($data as $domain => $domainData) {
                 foreach ($domainData as $key => $translation) {
                     if (strlen($key) > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
@@ -76,15 +83,15 @@ class DatabasePersister
                 $this->write($this->toWrite);
             }
 
-            $this->em->commit();
+            $this->getEntityManager()->commit();
         } catch (\Exception $exception) {
-            $this->em->rollback();
+            $this->getEntityManager()->rollback();
 
             throw $exception;
         }
 
         // update timestamp in case when persist succeed
-        $this->metadataCache->updateTimestamp($locale);
+        $this->translationManager->invalidateCache($locale);
     }
 
     /**
@@ -95,10 +102,10 @@ class DatabasePersister
     private function write(array $items)
     {
         foreach ($items as $item) {
-            $this->em->persist($item);
+            $this->getEntityManager()->persist($item);
         }
-        $this->em->flush();
-        $this->em->clear();
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
     }
 
     /**

@@ -8,7 +8,6 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\MessageCatalogue;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
@@ -362,7 +361,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
         $valueMap = [
             ['oro_translation.strategy.provider', $exceptionFlag, $this->getStrategyProvider()],
-            ['oro_translation.translation.manager', $exceptionFlag, $translationManager],
+            ['oro_translation.manager.translation', $exceptionFlag, $translationManager],
         ];
 
         $container

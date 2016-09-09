@@ -68,7 +68,7 @@ class OrmTranslationLoader implements LoaderInterface
         if (null === $this->dbCheck) {
             $this->dbCheck = SafeDatabaseChecker::tablesExist(
                 $this->getEntityManager()->getConnection(),
-                SafeDatabaseChecker::getTableName($this->doctrine, Translation::ENTITY_NAME)
+                SafeDatabaseChecker::getTableName($this->doctrine, Translation::class)
             );
         }
 
@@ -80,6 +80,6 @@ class OrmTranslationLoader implements LoaderInterface
      */
     protected function getEntityManager()
     {
-        return $this->doctrine->getManagerForClass(Translation::ENTITY_NAME);
+        return $this->doctrine->getManagerForClass(Translation::class);
     }
 }
