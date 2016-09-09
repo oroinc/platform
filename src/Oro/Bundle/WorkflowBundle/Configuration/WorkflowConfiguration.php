@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Cron\CronExpression;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
@@ -247,15 +249,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode('acl_message')
                         ->defaultNull()
                     ->end()
-                    ->arrayNode('schedule')
-                        ->children()
-                            ->scalarNode('cron')->end()
-                            ->scalarNode('filter')->end()
-                            ->booleanNode('check_conditions_before_job_creation')
-                                ->defaultFalse()
-                            ->end()
-                        ->end()
-                    ->end()
                     ->scalarNode('message')
                         ->defaultNull()
                     ->end()
@@ -290,6 +283,92 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode('dialog_template')
                         ->defaultNull()
                     ->end()
+                    ->arrayNode('triggers')
+                        ->prototype('array')
+                            ->children()
+                                ->enumNode('event')
+                                    ->defaultNull()
+                                    ->values(TransitionTriggerEvent::getAllowedEvents())
+                                ->end()
+                                ->scalarNode('field')
+                                    ->defaultNull()
+                                ->end()
+                                ->scalarNode('require')
+                                    ->defaultNull()
+                                ->end()
+                                ->booleanNode('queued')
+                                    ->defaultNull()
+                                ->end()
+                                ->scalarNode('entity_class')
+                                    ->defaultNull()
+                                ->end()
+                                ->scalarNode('relation')
+                                    ->defaultNull()
+                                ->end()
+                                ->scalarNode('cron')
+                                    ->defaultNull()
+                                    ->validate()
+                                    ->always(
+                                        function ($value) {
+                                            if ($value !== null) {
+                                                // validate expression string
+                                                CronExpression::factory($value);
+                                            }
+                                            return $value;
+                                        }
+                                    )
+                                    ->end()
+                                ->end()
+                                ->scalarNode('filter')
+                                    ->info('DQL "where" part to filter entities that match for cron trigger.')
+                                    ->defaultNull()
+                                ->end()
+                            ->end()
+                            ->validate()
+                                ->ifTrue(
+                                    function ($data) {
+
+                                        return $data['event'] && $data['cron'];
+                                    }
+                                )
+                                ->thenInvalid('Only one child node "event" or "cron" must be configured.')
+                            ->end()
+                            ->validate()
+                                ->always(
+                                    function ($data) {
+                                        $eventFields = ['relation', 'field', 'queued', 'entity_class', 'require'];
+                                        if ($data['cron']) {
+                                            foreach ($eventFields as $field) {
+                                                if ($data[$field]) {
+                                                    throw new \LogicException(
+                                                        sprintf('Field "%s" only allowed for event node', $field)
+                                                    );
+                                                }
+                                            }
+                                        }
+                                    }
+                                )
+                            ->end()
+                            ->validate()
+                                ->ifTrue(
+                                    function ($data) {
+
+                                        return $data['field'] &&
+                                        $data['event'] !== TransitionTriggerEvent::EVENT_UPDATE;
+                                    }
+                                )->thenInvalid('The "field" option is only allowed for update event.')
+                            ->end()
+                            ->validate()
+                                ->ifTrue(
+                                    function ($data) {
+
+                                        return $data['relation'] && !$data['entity_class'];
+                                    }
+                                )
+                                ->thenInvalid('Field `entity_class` is mandatory for custom (non-workflow related) entity.')
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
                 ->validate()
                     ->always(
@@ -308,6 +387,101 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         return $rootNode;
     }
 
+    /**
+     * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|NodeDefinition
+     */
+    protected function addTransitionTriggers()
+    {
+        $builder = new TreeBuilder();
+        $triggersNode = $builder->root('triggers');
+        $triggersNode
+            ->prototype('array')
+                ->children()
+                    ->enumNode('event')
+                        ->defaultNull()
+                        ->values(TransitionTriggerEvent::getAllowedEvents())
+                    ->end()
+                    ->scalarNode('field')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('require')
+                        ->defaultNull()
+                    ->end()
+                    ->booleanNode('queued')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('entity_class')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('relation')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('cron')
+                        ->defaultNull()
+                        ->validate()
+                        ->always(
+                            function ($value) {
+                                if ($value !== null) {
+                                    // validate expression string
+                                    CronExpression::factory($value);
+                                }
+                                return $value;
+                            }
+                        )
+                        ->end()
+                    ->end()
+                    ->scalarNode('filter')
+                        ->info('DQL "where" part to filter entities that match for cron trigger.')
+                        ->defaultNull()
+                    ->end()
+                ->end()
+                ->validate()
+                    ->ifTrue(
+                        function ($data) {
+
+                            return $data['event'] && $data['cron'];
+                        }
+                    )
+                    ->thenInvalid('Only one child node "event" or "cron" must be configured.')
+                ->end()
+                ->validate()
+                    ->always(
+                        function ($data) {
+                            $eventFields = ['relation', 'field', 'queued', 'entity_class', 'require'];
+                            if ($data['cron']) {
+                                foreach ($eventFields as $field) {
+                                    if ($data[$field]) {
+                                        throw new \LogicException(
+                                            sprintf('Field "%s" only allowed for event node', $field)
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    )
+                ->end()
+                ->validate()
+                    ->ifTrue(
+                        function ($data) {
+
+                            return $data['field'] &&
+                            $data['event'] !== TransitionTriggerEvent::EVENT_UPDATE;
+                        }
+                    )->thenInvalid('The "field" option is only allowed for update event.')
+                ->end()
+                ->validate()
+                    ->ifTrue(
+                        function ($data) {
+
+                            return $data['relation'] && !$data['entity_class'];
+                        }
+                    )
+                    ->thenInvalid('Field `entity_class` is mandatory for custom (non-workflow related) entity.')
+                ->end()
+                ->end()
+            ->end();
+        return $triggersNode;
+    }
     /**
      * @return NodeDefinition
      */

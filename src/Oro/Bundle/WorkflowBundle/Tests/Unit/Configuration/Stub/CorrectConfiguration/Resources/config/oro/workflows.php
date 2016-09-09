@@ -78,10 +78,29 @@ return array(
                         )
                     )
                 ),
-                'schedule' => [
-                    'cron' => '1 * * * *',
-                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')",
-                    'check_conditions_before_job_creation' => true,
+                'triggers' => [
+                    [
+                        'event' => 'create',
+                        'entity_class' => 'Other\Entity',
+                        'relation' => 'firstEntity',
+                        'require' => 'entity.firstEntity.id === main_entity.id',
+                        'queued' => true
+                    ],
+                    [
+                        'event' => 'update',
+                        'field' => 'description',
+                        'require' => 'entity === main_entity'
+                    ],
+                    [
+                        'event' => 'delete',
+                        'entity_class' => 'Other\Entity',
+                        'relation' => 'firstEntity',
+                        'require' => 'not empty(entity.firstEntity) && attributes["first_attribute"] == "ok"'
+                    ],
+                    [
+                        'cron' => '1 * * * *',
+                        'filter' => 'e.text = "string"'
+                    ]
                 ]
             )
         ),
