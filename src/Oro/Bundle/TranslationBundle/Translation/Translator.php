@@ -25,7 +25,7 @@ class Translator extends BaseTranslator
      *          [
      *              'resource' => DynamicResourceInterface,
      *              'format'   => string,
-     *              'locale'   => string,
+     *              'code'     => string,
      *              'domain'   => string
      *          ],
      *          ...
