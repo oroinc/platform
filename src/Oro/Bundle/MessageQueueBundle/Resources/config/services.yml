@@ -32,8 +32,6 @@ services:
 
     oro_message_queue.consumption.extension.limit_consumption_empty_queue_extension:
         class: Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionEmptyQueueExtension
-        tags:
-            - { name: oro_message_queue.consumption.extension }
 
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
