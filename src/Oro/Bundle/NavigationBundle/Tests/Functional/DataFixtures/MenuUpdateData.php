@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -36,14 +37,14 @@ class MenuUpdateData extends AbstractFixture
 
         $updatesData = [
             [
-                'ownershipType' => MenuUpdate::OWNERSHIP_ORGANIZATION,
-                'ownerId' => $this->getReference(self::ORGANIZATION)->getId(),
-                'key' => 'product'
-            ],
-            [
                 'ownershipType' => MenuUpdate::OWNERSHIP_GLOBAL,
                 'ownerId' => null,
                 'key' => 'activity'
+            ],
+            [
+                'ownershipType' => MenuUpdate::OWNERSHIP_ORGANIZATION,
+                'ownerId' => $this->getReference(self::ORGANIZATION)->getId(),
+                'key' => 'product'
             ],
             [
                 'ownershipType' => MenuUpdate::OWNERSHIP_BUSINESS_UNIT,

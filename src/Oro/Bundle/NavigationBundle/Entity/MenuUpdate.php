@@ -26,7 +26,7 @@ class MenuUpdate extends ExtendMenuUpdate
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=100)
+     * @ORM\Column(name="title", type="string", nullable=true)
      */
     protected $title;
 

@@ -24,6 +24,7 @@ oro:
             button.title: Pin/unpin the page
         menuupdate:
             entity_label: Menu Update
+            entity_plural_label: Menu Update
             id.label: Id
             key.label: Key
             parent_key.label: Parent Key

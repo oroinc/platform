@@ -1,23 +1,23 @@
 <?php
-namespace Oro\Bundle\NavigationBundle\Menu;
+
+namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class DefaultMenuUpdateProvider implements MenuUpdateProviderInterface
 {
     /** @var SecurityFacade  */
-    protected $securityFacade;
+    private $securityFacade;
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
-     * DefaultMenuUpdateProvider constructor.
      * @param SecurityFacade $securityFacade
      * @param DoctrineHelper $doctrineHelper
      */
@@ -36,11 +36,25 @@ class DefaultMenuUpdateProvider implements MenuUpdateProviderInterface
     {
         /** @var MenuUpdateRepository $repository */
         $repository = $this->doctrineHelper->getEntityRepository('OroNavigationBundle:MenuUpdate');
-        $organization = $this->securityFacade->getOrganization();
-        $currentUser = $this->getCurrentUser();
-        $currentBusinessUnit = $this->getCurrentBusinessUnit($organization);
 
-        $repository->getMenuUpdates($menu, $organization, $currentBusinessUnit, $currentUser);
+        $organization = $this->getCurrentOrganization();
+        $businessUnit = $this->getCurrentBusinessUnit($organization);
+        $user = $this->getCurrentUser();
+
+        $repository->getMenuUpdates($menu, $organization, $businessUnit, $user);
+    }
+
+    /**
+     * @return null|Organization
+     */
+    private function getCurrentOrganization()
+    {
+        $organization = $this->securityFacade->getOrganization();
+        if (!is_bool($organization)) {
+            return $organization;
+        }
+
+        return null;
     }
 
     /**
@@ -48,7 +62,7 @@ class DefaultMenuUpdateProvider implements MenuUpdateProviderInterface
      *
      * @return null|BusinessUnit
      */
-    protected function getCurrentBusinessUnit(Organization $organization)
+    private function getCurrentBusinessUnit(Organization $organization)
     {
         $user = $this->getCurrentUser();
         if (!$user) {
@@ -65,7 +79,7 @@ class DefaultMenuUpdateProvider implements MenuUpdateProviderInterface
     /**
      * @return null|User
      */
-    protected function getCurrentUser()
+    private function getCurrentUser()
     {
         $user = $this->securityFacade->getLoggedUser();
         if ($user instanceof User) {
