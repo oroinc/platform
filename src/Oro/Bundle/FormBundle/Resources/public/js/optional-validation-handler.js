@@ -3,70 +3,91 @@ define(['jquery'], function($) {
 
     /**
      * @export  oroform/js/optional-validation-handler
-     * @class   oroform.optionalValidationHandler
+     * @class   OptionalValidationHandler
      */
     return {
         /**
-         * @constructor
+         * @param  {jQuery}  $group Optional validation elements group
+         *
+         * @return {boolean}        Should be bubbled
          */
-        initialize: function(optionalValidationGroup) {
+        initialize: function($group) {
             var self = this;
 
-            var labels = optionalValidationGroup.find('label[data-required]');
-            labels.find('em').hide().html('*');
+            var labels = $group.find('label[data-required]');
             labels.addClass('required');
 
-            optionalValidationGroup.on('change', 'input', function() {
-                self.inputHandler($(this));
-            });
-            optionalValidationGroup.on('change', 'select', function() {
-                self.selectHandler($(this));
-            });
-
-            if (self.hasNotEmptyInput(optionalValidationGroup) || self.hasNotEmptySelect(optionalValidationGroup)) {
-                optionalValidationGroup.find('label[data-required] em').show();
+            var labelAsterisk = labels.find('em');
+            labelAsterisk.hide().html('*');
+            if (self.hasNotEmptyInput($group) || self.hasNotEmptySelect($group)) {
+                labelAsterisk.show();
             }
+
+            return true;
         },
 
         /**
-         * @param {jQuery} element
+         * @param  {jQuery}  $group   Optional validation elements group
+         * @param  {jQuery}  $element Changed Element
+         *
+         * @return {boolean}          Should be bubbled
          */
-        inputHandler: function(element) {
-            this.handleGroupRequire(element, element.val());
+        handle: function($group, $element) {
+            var tagName = $element.prop('tagName').toLowerCase();
+
+            switch (tagName) {
+                case 'select':
+                    this.selectHandler($group, $element);
+                    break;
+                case 'input':
+                    this.inputHandler($group, $element);
+                    break;
+            }
+
+            return true;
         },
 
         /**
-         * @param {jQuery} element
+         * @param {jQuery} $group   Optional validation elements group
+         * @param {jQuery} $element Changed Element
          */
-        selectHandler: function(element) {
-            this.handleGroupRequire(element, element.find('option:selected').val());
+        inputHandler: function($group, $element) {
+            this.handleGroupRequire($group, $element.val());
         },
 
         /**
-         * @param {jQuery} element
-         * @param {string|undefined} value
+         * @param {jQuery} $group   Optional validation elements group
+         * @param {jQuery} $element Changed Element
          */
-        handleGroupRequire: function(element, value) {
-            var group = element.parents('[data-validation-optional-group]');
+        selectHandler: function($group, $element) {
+            this.handleGroupRequire($group, $element.find('option:selected').val());
+        },
 
+        /**
+         * @param {jQuery}           $group Optional validation elements group
+         * @param {string|undefined} value  Changed Element value
+         */
+        handleGroupRequire: function($group, value) {
             if (this.isValueEmpty(value)) {
-                if (!this.hasNotEmptyInput(group) && !this.hasNotEmptySelect(group)) {
-                    group.find('label[data-required] em').hide();
+                if (!this.hasNotEmptyInput($group) && !this.hasNotEmptySelect($group)) {
+                    $group.find('label[data-required] em').hide();
+                    this.clearValidationErrors($group);
                 }
             } else {
-                group.find('label[data-required] em').show();
+                $group.find('label[data-required] em').show();
+                $group.find('input, select').data('ignore-validation', false);
             }
         },
 
         /**
-         * @param {jQuery} group
+         * @param {jQuery} $group
          * @returns {boolean}
          */
-        hasNotEmptyInput: function(group) {
+        hasNotEmptyInput: function($group) {
             var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
                 ' input[type="radio"][data-required]:checked,' +
                 ' input[type="checkbox"][data-required]:checked';
-            var checkedElements = group.find(elementsSelector);
+            var checkedElements = $group.find(elementsSelector);
             for (var i = 0; i < checkedElements.length; i++) {
                 if (!this.isValueEmpty($(checkedElements[i]).val())) {
                     return true;
@@ -77,11 +98,11 @@ define(['jquery'], function($) {
         },
 
         /**
-         * @param {jQuery} group
+         * @param {jQuery} $group
          * @returns {boolean}
          */
-        hasNotEmptySelect: function(group) {
-            var elements = group.find('select[data-required]');
+        hasNotEmptySelect: function($group) {
+            var elements = $group.find('select[data-required]');
             for (var i = 0; i < elements.length; i++) {
                 if (!this.isValueEmpty($(elements[i]).find('option:selected').val())) {
                     return true;
@@ -98,6 +119,20 @@ define(['jquery'], function($) {
         isValueEmpty: function(value) {
             value = value ? $.trim(value) : '';
             return !value;
-        }
+        },
+
+        /**
+         * @param {jQuery} $group
+         */
+        clearValidationErrors: function($group) {
+            var validator = $group.validate();
+            var inputs = $group
+                .find('input, select');
+
+            inputs.data('ignore-validation', true);
+            inputs.each(function(key, element) {
+                    validator.hideElementErrors($(element));
+                });
+        },
     };
 });

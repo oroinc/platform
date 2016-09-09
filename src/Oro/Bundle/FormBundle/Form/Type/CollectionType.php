@@ -69,14 +69,6 @@ class CollectionType extends AbstractType
         $resolver->setNormalizer('show_form_when_empty', function (Options $options, $value) {
             return !$options['allow_add'] ? false : $value;
         });
-        $resolver->setNormalizer('entry_options', function (Options $options, $value) {
-            $value = is_array($value) ? $value : [];
-            if (!array_key_exists('optional-validation-enabled', $value)) {
-                $value['optional-validation-enabled'] = true;
-            }
-
-            return $value;
-        });
     }
 
     /**
