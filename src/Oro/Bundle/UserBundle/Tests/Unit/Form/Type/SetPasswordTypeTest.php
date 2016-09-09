@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
+use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -12,9 +14,15 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
     /** @var SetPasswordType */
     protected $formType;
 
+    /** @var PasswordTooltipProvider */
+    protected $tooltipProvider;
+
     protected function setUp()
     {
-        $this->formType = new SetPasswordType();
+        $this->tooltipProvider = $this->getMockBuilder(PasswordTooltipProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->formType = new SetPasswordType($this->tooltipProvider);
     }
 
     public function testBuildForm()
@@ -27,9 +35,10 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
             ->with('password', 'password', [
                 'required'      => true,
                 'label'         => 'oro.user.new_password.label',
+                'tooltip'       => null,
                 'constraints'   => [
                     new NotBlank(),
-                    new Length(['min' => 2]),
+                    new PasswordComplexity(),
                 ],
             ]);
         $this->formType->buildForm($builder, array());

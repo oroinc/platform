@@ -392,6 +392,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_user.validator.user_authentication_fields }
 
+    oro_user.validator.password_complexity_validator:
+        class: Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator
+        arguments:
+            - '@oro_config.user'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
+
     # Dashboard
     oro_user.dashboard.owner_helper:
         class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper

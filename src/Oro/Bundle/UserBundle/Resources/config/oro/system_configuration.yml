@@ -1,0 +1,63 @@
+system_configuration:
+    groups:
+        security:
+            title: oro.user.system_configuration.groups.security.title
+
+        password_complexity:
+            icon:  icon-key
+            title: oro.user.system_configuration.groups.password_complexity.title
+
+        password_complexity_rules:
+            icon:  icon-usd
+            title: oro.user.system_configuration.groups.password_complexity_rules.title
+
+    fields:
+        oro_user.password_min_length:
+            data_type: integer
+            type: integer
+            priority: 40
+            options:
+                label:  oro.user.system_configuration.fields.password_min_length.label
+                constraints:
+                    - Range:
+                        min: 1
+
+        oro_user.password_numbers:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 30
+            options:
+                label: oro.user.system_configuration.fields.password_numbers.label
+                required: false
+
+        oro_user.password_upper_case:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 20
+            options:
+                label: oro.user.system_configuration.fields.password_upper_case.label
+                required: false
+
+        oro_user.password_special_chars:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 10
+            options:
+                label: oro.user.system_configuration.fields.password_special_chars.label
+                required: false
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            password_complexity:
+                                priority: 100
+                                children:
+                                    password_complexity_rules:
+                                        children:
+                                            - oro_user.password_min_length
+                                            - oro_user.password_numbers
+                                            - oro_user.password_upper_case
+                                            - oro_user.password_special_chars

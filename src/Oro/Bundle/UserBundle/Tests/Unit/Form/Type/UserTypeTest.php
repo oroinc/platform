@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\UserType;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 
 class UserTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,12 +24,18 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityFacade;
 
+    /** @var PasswordTooltipProvider */
+    protected $tooltipProvider;
+
     protected function setUp()
     {
         $this->securityInterface   = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->tooltipProvider = $this->getMockBuilder(PasswordTooltipProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -126,7 +133,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
-        $type = new UserType($this->securityInterface, $this->securityFacade, $request);
+        $type = new UserType($this->securityInterface, $this->securityFacade, $request, $this->tooltipProvider);
         $type->buildForm($builder, []);
     }
 
@@ -227,7 +234,8 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $type = new UserType(
             $this->securityInterface,
             $this->securityFacade,
-            new Request()
+            new Request(),
+            $this->tooltipProvider
         );
         $type->setDefaultOptions($resolver);
     }

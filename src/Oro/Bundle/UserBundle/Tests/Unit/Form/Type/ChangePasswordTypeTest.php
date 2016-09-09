@@ -4,10 +4,11 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 
 class ChangePasswordTypeTest extends FormIntegrationTestCase
 {
@@ -17,6 +18,9 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     /** @var ChangePasswordType */
     protected $type;
 
+    /** @var PasswordTooltipProvider */
+    protected $tooltipProvider;
+
     protected function setUp()
     {
         parent::setUp();
@@ -24,8 +28,11 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->tooltipProvider = $this->getMockBuilder(PasswordTooltipProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->type = new ChangePasswordType($this->subscriber);
+        $this->type = new ChangePasswordType($this->subscriber, $this->tooltipProvider);
     }
 
     protected function tearDown()
@@ -44,6 +51,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
             'current_password_label' => 'label',
             'plain_password_invalid_message' => 'label',
             'first_options_label' => 'label',
+            'first_options_tooltip' => 'label',
             'second_options_label' => 'label'
         ];
 
@@ -63,8 +71,8 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
      */
     public function testSetDefaultOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolverInterface $resolver */
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver $resolver */
+        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -73,10 +81,11 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
                     $this->arrayHasKey('current_password_label'),
                     $this->arrayHasKey('plain_password_invalid_message'),
                     $this->arrayHasKey('first_options_label'),
+                    $this->arrayHasKey('first_options_tooltip'),
                     $this->arrayHasKey('second_options_label')
                 )
             );
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     /**

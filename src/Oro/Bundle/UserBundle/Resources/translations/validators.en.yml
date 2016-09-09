@@ -5,3 +5,7 @@ oro:
     user:
         message:
             invalid_username: The Email with same value id used by another customer. Please choose another Username.
+            password_min_length:     The password must be at least {{ length }} characters long.
+            password_upper_case:     The password must contain at least one upper case letter.
+            password_numbers:        The password must contain at least one number.
+            password_special_chars:  The password must contain at least one special (non-alphanumeric) character.

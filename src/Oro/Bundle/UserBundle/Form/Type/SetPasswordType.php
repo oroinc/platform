@@ -5,11 +5,21 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+
+use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 
 class SetPasswordType extends AbstractType
 {
+    /** @var PasswordTooltipProvider */
+    protected $passwordTooltip;
+
+    public function __construct(PasswordTooltipProvider $passwordTooltip)
+    {
+        $this->passwordTooltip = $passwordTooltip;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -18,9 +28,10 @@ class SetPasswordType extends AbstractType
         $builder->add('password', 'password', [
             'required'      => true,
             'label'         => 'oro.user.new_password.label',
+            'tooltip'       => $this->passwordTooltip->getTooltip(),
             'constraints'   => [
                 new NotBlank(),
-                new Length(['min' => 2]),
+                new PasswordComplexity(),
             ],
         ]);
     }

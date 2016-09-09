@@ -190,6 +190,20 @@ oro:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
+
+        password_complexity:
+            validator:
+                min_length:     The password must be at least {{ length }} characters long.
+                upper_case:     The password must contain at least one upper case letter.
+                numbers:        The password must contain at least one number.
+                special_chars:  The password must contain at least one special (non-alphanumeric) character.
+            tooltip:
+                prefix:         Password must include:
+                min_length:     at least {{ value }} characters
+                upper_case:     an upper case letter
+                numbers:        a number
+                special_chars:  a special character
+
         action:
             password_management:
                 label: Manage passwords
@@ -222,3 +236,14 @@ oro:
             all_owners: All owners
             business_unit: Business Unit
             current_user: Current User
+
+        system_configuration:
+            groups:
+                security.title: Security
+                password_complexity.title: Password complexity
+                password_complexity_rules.title: Rules
+            fields:
+                password_min_length.label: Reqiuire minimal length
+                password_numbers.label: Require numbers
+                password_upper_case.label: Require upper case
+                password_special_chars.label: Require special chars

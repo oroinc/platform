@@ -4,9 +4,6 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -15,9 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserType extends AbstractType
@@ -31,20 +28,26 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
+    /** @var PasswordTooltipProvider */
+    private $passwordTooltip;
+
     /**
      * @param SecurityContextInterface $security Security context
-     * @param SecurityFacade           $securityFacade
-     * @param Request                  $request Request
+     * @param SecurityFacade $securityFacade
+     * @param Request $request                   Request
+     * @param PasswordTooltipProvider $passwordTooltip
      */
     public function __construct(
         SecurityContextInterface $security,
         SecurityFacade           $securityFacade,
-        Request                  $request
+        Request $request,
+        PasswordTooltipProvider $passwordTooltip
     ) {
         $this->security          = $security;
         $this->securityFacade    = $securityFacade;
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
+        $this->passwordTooltip = $passwordTooltip;
     }
 
     /**
@@ -113,7 +116,10 @@ class UserType extends AbstractType
                     'label'          => 'oro.user.password.label',
                     'type'           => 'password',
                     'required'       => true,
-                    'first_options'  => ['label' => 'oro.user.password.label'],
+                    'first_options' => [
+                        'label' => 'oro.user.password.label',
+                        'tooltip' => $this->passwordTooltip->getTooltip(),
+                    ],
                     'second_options' => ['label' => 'oro.user.password_re.label'],
                 ]
             )
@@ -129,8 +135,8 @@ class UserType extends AbstractType
                     'prototype'      => true,
                     'prototype_name' => 'tag__name__'
                 ]
-            );
-        $builder->add('change_password', ChangePasswordType::NAME)
+            )
+            ->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);
