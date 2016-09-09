@@ -399,11 +399,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
 
-    oro_navigation.menu_update.builder:
-        class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
-        tags:
-            - { name: oro_menu.builder }
-
     oro_navigation.menu_update_provider.default:
         class: Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider
         arguments:

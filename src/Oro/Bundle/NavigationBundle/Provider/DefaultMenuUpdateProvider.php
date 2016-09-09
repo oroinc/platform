@@ -2,33 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class DefaultMenuUpdateProvider implements MenuUpdateProviderInterface
+class DefaultMenuUpdateProvider extends AbstractMenuUpdateProvider
 {
-    /** @var SecurityFacade  */
-    private $securityFacade;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /**
-     * @param SecurityFacade $securityFacade
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(
-        SecurityFacade $securityFacade,
-        DoctrineHelper $doctrineHelper
-    ) {
-        $this->securityFacade = $securityFacade;
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -45,19 +25,6 @@ class DefaultMenuUpdateProvider implements MenuUpdateProviderInterface
     }
 
     /**
-     * @return null|Organization
-     */
-    private function getCurrentOrganization()
-    {
-        $organization = $this->securityFacade->getOrganization();
-        if (!is_bool($organization)) {
-            return $organization;
-        }
-
-        return null;
-    }
-
-    /**
      * @param Organization $organization
      *
      * @return null|BusinessUnit
@@ -65,7 +32,7 @@ class DefaultMenuUpdateProvider implements MenuUpdateProviderInterface
     private function getCurrentBusinessUnit(Organization $organization)
     {
         $user = $this->getCurrentUser();
-        if (!$user) {
+        if (!$user || !$organization) {
             return null;
         }
 
