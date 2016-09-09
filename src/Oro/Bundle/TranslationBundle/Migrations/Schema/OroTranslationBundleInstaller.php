@@ -66,7 +66,7 @@ class OroTranslationBundleInstaller implements Installation
         $table->addColumn('value', 'text', ['notnull' => false]);
         $table->addColumn('scope', 'smallint', []);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['language_id', 'key_id'], 'UNIQ_TRANS_LANG_KEY');
+        $table->addUniqueIndex(['language_id', 'key_id'], 'language_key_uniq');
     }
 
     /**
@@ -81,7 +81,7 @@ class OroTranslationBundleInstaller implements Installation
         $table->addColumn('key', 'string', ['length' => 255]);
         $table->addColumn('domain', 'string', ['default' => 'messages', 'length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['key', 'domain'], 'UNIQ_TRANS_KEY');
+        $table->addUniqueIndex(['key', 'domain'], 'key_domain_uniq');
     }
 
     /**

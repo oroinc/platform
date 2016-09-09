@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
  * @ORM\Table(name="oro_translation", uniqueConstraints={
- *      @ORM\UniqueConstraint(name="UNIQ_TRANS_LANG_KEY", columns={"language_id", "key_id"})
+ *      @ORM\UniqueConstraint(name="language_key_uniq", columns={"language_id", "key_id"})
  * })
  */
 class Translation
