@@ -6,13 +6,14 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ProcessConfigurationProvider extends AbstractConfigurationProvider
 {
+    const NODE_ROOT = 'processes';
     const NODE_DEFINITIONS = 'definitions';
     const NODE_TRIGGERS = 'triggers';
 
     /**
      * @var string
      */
-    protected $configFilePattern = 'process.yml';
+    protected $configFilePattern = 'processes.yml';
 
     /**
      * @var ProcessDefinitionListConfiguration
@@ -52,13 +53,13 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
     ) {
         $finder = $this->getConfigFinder((array)$usedDirectories);
 
-        $definitions = array();
-        $triggers = array();
+        $definitions = [];
+        $triggers = [];
 
         /** @var $file \SplFileInfo */
         foreach ($finder as $file) {
             $realPathName = $file->getRealPath();
-            $configData = $this->loadConfigFile($file) ? : [];
+            $configData = $this->loadConfigFile($file) ?: [];
 
             list($definitionsData, $triggersData) = $this->parseConfiguration($configData, $realPathName);
 
@@ -78,17 +79,17 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
                 }
 
                 if (!isset($triggers[$definitionName])) {
-                    $triggers[$definitionName] = array();
+                    $triggers[$definitionName] = [];
                 }
 
                 $triggers[$definitionName] = array_merge($triggers[$definitionName], $triggersConfiguration);
             }
         }
 
-        return array(
+        return [
             self::NODE_DEFINITIONS => $definitions,
             self::NODE_TRIGGERS => $triggers
-        );
+        ];
     }
 
     /**
@@ -99,18 +100,38 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
      */
     protected function parseConfiguration(array $configuration, $fileName)
     {
+        if (array_key_exists(self::NODE_ROOT, $configuration) && is_array($configuration)) {
+            $nodes = $configuration[self::NODE_ROOT];
+            unset($configuration[self::NODE_ROOT]);
+        } else {
+            $nodes = [];
+        }
+
+        if (count($configuration) !== 0) {
+            throw new InvalidConfigurationException(
+                sprintf(
+                    'Can\'t load process configuration from file `%s`. Malformed file structure.' .
+                    'All configuration nodes should be placed under root node `%s`. Got unknown root node%s: "%s"',
+                    $fileName,
+                    self::NODE_ROOT,
+                    count($configuration) > 1 ? 's' : '',
+                    implode('", "', array_keys($configuration))
+                )
+            );
+        }
+
         try {
-            $definitionsData = array();
-            if (!empty($configuration[self::NODE_DEFINITIONS])) {
+            $definitionsData = [];
+            if (!empty($nodes[self::NODE_DEFINITIONS])) {
                 $definitionsData = $this->definitionConfiguration->processConfiguration(
-                    $configuration[self::NODE_DEFINITIONS]
+                    $nodes[self::NODE_DEFINITIONS]
                 );
             }
 
-            $triggersData = array();
-            if (!empty($configuration[self::NODE_TRIGGERS])) {
+            $triggersData = [];
+            if (!empty($nodes[self::NODE_TRIGGERS])) {
                 $triggersData = $this->triggerConfiguration->processConfiguration(
-                    $configuration[self::NODE_TRIGGERS]
+                    $nodes[self::NODE_TRIGGERS]
                 );
             }
         } catch (InvalidConfigurationException $exception) {
@@ -122,7 +143,7 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
             throw new InvalidConfigurationException($message);
         }
 
-        return array($definitionsData, $triggersData);
+        return [$definitionsData, $triggersData];
     }
 
     /**

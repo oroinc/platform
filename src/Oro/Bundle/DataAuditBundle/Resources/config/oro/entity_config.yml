@@ -1,0 +1,58 @@
+entity_config:
+    dataaudit:
+        entity:
+            items:
+                auditable:
+                    options:
+                        priority:           60
+                        default_value:      false
+                        indexed:            true
+                    grid:
+                        type:               boolean
+                        label:              oro.dataaudit.entity_config.entity.items.auditable
+                        filter_type:        boolean
+                        required:           true
+                        sortable:           true
+                        filterable:         true
+                        show_filter:        false
+                    form:
+                        type:               oro_entity_config_choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          oro.dataaudit.entity_config.entity.items.auditable
+
+                    # this attribute can be used to prohibit changing the auditable state (no matter whether
+                    # it is enabled or not) for the entity
+                    # if TRUE than the current state cannot be changed
+                    immutable: # boolean
+                        options:
+                            auditable: false
+        field:
+            items:
+                auditable:
+                    options:
+                        value_type:         boolean
+                        priority:           60
+                        default_value:      false
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, array, simple_array, json_array, ref-many, ref-one]
+                    grid:
+                        type:               boolean
+                        label:              oro.dataaudit.entity_config.field.items.auditable
+                        required:           true
+                        sortable:           true
+                    form:
+                        type:               oro_entity_config_choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          oro.dataaudit.entity_config.field.items.auditable
+
+                    # this attribute can be used to prohibit changing the auditable state (no matter whether
+                    # it is enabled or not) for the entity field
+                    # if TRUE than the current state cannot be changed
+                    immutable: # boolean
+                        options:
+                            auditable: false

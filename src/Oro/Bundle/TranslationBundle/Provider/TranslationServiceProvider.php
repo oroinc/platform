@@ -70,7 +70,7 @@ class TranslationServiceProvider
         $pathToSave = $targetDir . DIRECTORY_SEPARATOR . 'update';
         $targetDir  = $targetDir . DIRECTORY_SEPARATOR . self::DEFAULT_SOURCE_LOCALE . DIRECTORY_SEPARATOR;
 
-        $isDownloaded = $this->download($pathToSave, [], self::DEFAULT_SOURCE_LOCALE, false);
+        $isDownloaded = $this->download($pathToSave, [], self::DEFAULT_SOURCE_LOCALE);
         if (!$isDownloaded) {
             return false;
         }
@@ -133,24 +133,36 @@ class TranslationServiceProvider
      * @param string      $pathToSave path to save translations
      * @param array       $projects   project names
      * @param null|string $locale
-     * @param bool        $toApply    whether apply download packs or not
      *
      * @throws \RuntimeException
      * @return bool
      */
-    public function download($pathToSave, array $projects, $locale = null, $toApply = true)
+    public function download($pathToSave, array $projects, $locale = null)
     {
-        $pathToSave = $pathToSave . self::FILE_NAME_SUFFIX;
+        $pathToSave .= self::FILE_NAME_SUFFIX;
         $targetDir  = dirname($pathToSave);
         $this->cleanup($targetDir);
 
-        $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
+        return $this->adapter->download($pathToSave, $projects, $locale);
+    }
+    /**
+     * @param string      $pathToSave path to save translations
+     * @param null|string $locale
+     *
+     * @throws \RuntimeException
+     * @return bool
+     */
+    public function loadTranslatesFromFile($pathToSave, $locale = null)
+    {
+        $pathToSave .= self::FILE_NAME_SUFFIX;
+        $targetDir = dirname($pathToSave);
+
         $isExtracted  = $this->unzip(
             $pathToSave,
             is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
         );
 
-        if ($locale == 'en') {
+        if ($locale === 'en') {
             // check and fix exported file names, replace $locale_XX locale in file names to $locale
             $this->renameFiles('.en_US.', '.en.', $targetDir);
         }
@@ -159,14 +171,14 @@ class TranslationServiceProvider
             unlink($pathToSave);
         }
 
-        if ($toApply && $isExtracted) {
+        if ($isExtracted) {
             $this->apply($locale, $targetDir);
 
             $this->cleanup($targetDir);
             $this->jsTranslationDumper->dumpTranslations([$locale]);
         }
 
-        return $isExtracted && $isDownloaded;
+        return $isExtracted;
     }
 
     /**

@@ -20,7 +20,7 @@ class OrmEntityClassProviderTest extends \PHPUnit_Framework_TestCase
 
         $doctrineHelper->expects($this->once())
             ->method('getAllShortMetadata')
-            ->with($this->identicalTo($em), false)
+            ->with($this->identicalTo($em))
             ->willReturn(
                 [
                     new ShortClassMetadata('Test\Entity1'),
