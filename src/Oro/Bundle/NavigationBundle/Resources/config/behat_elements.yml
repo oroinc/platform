@@ -1,3 +1,7 @@
 MainMenu:
   selector: 'div#main-menu'
   class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
+
+PinBarLink:
+  selector: '#pinbar div.list-bar .pin-holder a'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

@@ -44,10 +44,11 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
 
     /**
      * @Given number of records should be :number
+     * @Given /^there (are|is) (?P<number>(?:|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number)
     {
-        self::assertEquals((int) $number, $this->getGridPaginator()->getTotalRecordsCount());
+        self::assertEquals($this->getCount($number), $this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**

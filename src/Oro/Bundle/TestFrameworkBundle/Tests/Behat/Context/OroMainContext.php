@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -20,7 +19,8 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 
 /**
- * Defines application features from the specific context.
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
@@ -33,7 +33,7 @@ class OroMainContext extends MinkContext implements
     /**
      * @BeforeScenario
      */
-    public function beforeScenario(BeforeScenarioScope $scope)
+    public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
     }
@@ -186,6 +186,23 @@ class OroMainContext extends MinkContext implements
         /** @var Form $form */
         $form = $this->createElement($formName);
         $form->fill($table);
+    }
+
+    /**
+     * Assert form fields values
+     * Example: And "User" form must contains values:
+     *            | Username          | charlie           |
+     *            | First Name        | Charlie           |
+     *            | Last Name         | Sheen             |
+     *            | Primary Email     | charlie@sheen.com |
+     *
+     * @Then /^"(?P<formName>(?:[^"]|\\")*)" form must contains values:$/
+     */
+    public function formMustContainsValues($formName, TableNode $table)
+    {
+        /** @var Form $form */
+        $form = $this->createElement($formName);
+        $form->assertFields($table);
     }
 
     /**

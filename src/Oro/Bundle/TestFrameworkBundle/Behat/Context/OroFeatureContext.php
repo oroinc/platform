@@ -41,4 +41,22 @@ class OroFeatureContext extends RawMinkContext
         $driver = $this->getSession()->getDriver();
         $driver->waitForAjax($time);
     }
+
+    /**
+     * @param int|string $count
+     * @return int
+     */
+    protected function getCount($count)
+    {
+        switch (trim($count)) {
+            case '':
+                return 1;
+            case 'one':
+                return 1;
+            case 'two':
+                return 2;
+            default:
+                return (int) $count;
+        }
+    }
 }

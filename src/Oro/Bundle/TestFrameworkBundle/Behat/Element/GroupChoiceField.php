@@ -37,6 +37,19 @@ class GroupChoiceField extends Element
     }
 
     /**
+     * Return array labels that was checked
+     *
+     * @return array
+     */
+    public function getValue()
+    {
+        return array_keys(array_filter($this->findChoices(), function (NodeElement $element) {
+            return $element->isChecked();
+        }));
+
+    }
+
+    /**
      * Find all checkboxes and return them with label as array like:
      * array('Label Name' => NodeElement)
      * @return NodeElement[]

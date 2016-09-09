@@ -22,6 +22,17 @@ class Form extends Element
         }
     }
 
+    public function assertFields(TableNode $table)
+    {
+        foreach ($table->getRows() as $row) {
+            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
+            $expectedValue = $this->normalizeValue($row[1]);
+            $fieldValue = $this->normalizeValue($this->findField($locator)->getValue());
+
+            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
+        }
+    }
+
     /**
      * Find last embed form in collection of fieldset
      * See collection address in Contact (CRM) form for example
@@ -148,11 +159,19 @@ class Form extends Element
     }
 
     /**
-     * @param string $value
+     * @param array|string $value
      * @return array|string
      */
     protected function normalizeValue($value)
     {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->normalizeValue($item);
+            }
+
+            return $value;
+        }
+
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
