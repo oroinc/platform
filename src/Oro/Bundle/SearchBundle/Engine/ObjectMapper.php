@@ -171,7 +171,7 @@ class ObjectMapper extends AbstractMapper
         $result = [];
         $selectAliases = $query->getSelectAliases();
 
-        foreach ($selects as $key => $select) {
+        foreach ($selects as $select) {
             list ($type, $name) = Criteria::explodeFieldTypeName($select);
 
             if (isset($selectAliases[$select])) {
