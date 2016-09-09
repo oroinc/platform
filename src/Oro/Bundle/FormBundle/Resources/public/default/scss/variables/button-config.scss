@@ -1,0 +1,8 @@
+// Hover
+$button-border-color-hover-state: get-color('primary', 'light');
+
+// Focus
+$button-border-color-focus-state: $button-border-color-hover-state;
+
+// Error
+$button-border-color-error-state: get-color('ui', 'error-dark');
