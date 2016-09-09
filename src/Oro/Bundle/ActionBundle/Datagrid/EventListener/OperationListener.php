@@ -198,7 +198,7 @@ class OperationListener
 
         $frontendOptions = $this->optionsHelper->getFrontendOptions($operation, $context);
 
-        return $frontendOptions['options'];
+        return array_merge($frontendOptions['options'], $frontendOptions['data']);
     }
 
     /**
@@ -221,7 +221,7 @@ class OperationListener
         $actionsConfig = $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []);
 
         foreach ($this->operations as $operationName => $operation) {
-            $actionsConfig[$operationName] = $this->getRowsActionsConfig($operation, $operationName);
+            $actionsConfig[$operationName] = $this->getRowsActionsConfig($operation);
         }
 
         $config->offsetSet(DatagridActionExtension::ACTION_KEY, $actionsConfig);
@@ -229,24 +229,31 @@ class OperationListener
 
     /**
      * @param Operation $operation
-     * @param string $operationName
      * @return array
      */
-    protected function getRowsActionsConfig(Operation $operation, $operationName)
+    protected function getRowsActionsConfig(Operation $operation)
     {
         $buttonOptions = $operation->getDefinition()->getButtonOptions();
         $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
 
-        return [
-            'type' => 'action-widget',
-            'label' => $operation->getDefinition()->getLabel(),
-            'rowAction' => false,
-            'link' => '#',
-            'icon' => $icon,
-            'options' => [
-                'operationName' => $operationName,
-            ]
-        ];
+        $datagridOptions = $operation->getDefinition()->getDatagridOptions();
+
+        $config = array_merge(
+            [
+                'type' => 'action-widget',
+                'label' => $operation->getDefinition()->getLabel(),
+                'rowAction' => false,
+                'link' => '#',
+                'icon' => $icon,
+            ],
+            isset($datagridOptions['data']) ? $datagridOptions['data'] : []
+        );
+
+        if ($operation->getDefinition()->getOrder()) {
+            $config['order'] = $operation->getDefinition()->getOrder();
+        }
+
+        return $config;
     }
 
     /**

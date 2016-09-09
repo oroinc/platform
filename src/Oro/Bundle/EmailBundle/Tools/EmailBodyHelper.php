@@ -40,19 +40,16 @@ class EmailBodyHelper
             $tidy = new \tidy();
             $body = $tidy->repairString($bodyContent, $config, 'UTF8');
         } else {
-            $bodyText = $bodyContent;
+            $body = $bodyContent;
             // get `body` content in case of html text
-            if (preg_match('~<body[^>]*>(.*?)</body>~si', $bodyContent, $body)) {
-                $bodyText = $body[1];
+            if (preg_match('~<body[^>]*>(.*?)</body>~si', $bodyContent, $bodyText)) {
+                $body = $bodyText[1];
             }
-
-             //  clear `style` tags from content
-            $body = preg_replace('/<style\b[^>]*>(.*?)<\/style>/si', '', $bodyText);
         }
 
-        // clear `script` tags from content
-        $body = preg_replace('/<script\b[^>]*>(.*?)<\/script>/si', '', $body);
+        // clear `script` and `style` tags from content
+        $body = preg_replace('/<(style|script).*?>.*?<\/\1>/s', '', $body);
 
-        return utf8_encode(preg_replace(['/\s\s+/', '/\n+/'], [' ', ' '], $this->htmlTagHelper->stripTags($body)));
+        return preg_replace('/(\s\s+|\n+|[^[:print:]])/', ' ', $this->htmlTagHelper->stripTags($body));
     }
 }

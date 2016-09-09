@@ -31,6 +31,7 @@ class GridResultAfter extends Event implements GridEventInterface
     /**
      * @param DatagridInterface $datagrid
      * @param array             $records
+     * @param mixed             $query
      */
     public function __construct(DatagridInterface $datagrid, array $records = array(), $query = null)
     {
@@ -53,6 +54,14 @@ class GridResultAfter extends Event implements GridEventInterface
     public function getRecords()
     {
         return $this->records;
+    }
+
+    /**
+     * @param array $records
+     */
+    public function setRecords(array $records)
+    {
+        $this->records = $records;
     }
 
     /**

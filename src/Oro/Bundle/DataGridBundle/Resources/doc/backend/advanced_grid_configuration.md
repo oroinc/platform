@@ -23,7 +23,7 @@ of "oro_datagrid.datagrid.build.after" event automatically if you will specify "
 configuration:
 
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         source:
             type: orm
@@ -46,7 +46,7 @@ For example "_grid should show users for group that currently editing and user s
 #### Solution:
 For solving this problem we have to modify query. We'll add additional field that will show value of "assigned state".
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         source:
             type: orm
@@ -89,7 +89,7 @@ For example fields are:
 Last step: need to set "rowSelection" option, it will add behavior of selecting rows on frontend and handle binding
 of "data_in" and "data_not_in" parameters to datasource:
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # previous configuration
         options:
@@ -114,7 +114,7 @@ For example fields are:
 
 Next step: modify query. We'll add additional field `enabled` that user will be able to change.
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         source:
             type: orm
@@ -149,7 +149,7 @@ Currently supported ``select tag``, ``select tag (with multiple attribute)`` and
 Example for radio buttons:
 
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         columns:
@@ -169,7 +169,7 @@ By default ``expanded`` and ``multiple`` are ``false`` and their presence in con
 
 Last step: need to set "cellSelection" option, it will add behavior of selecting rows on frontend:
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # previous configuration
         options:
@@ -193,7 +193,7 @@ instead of choice array using
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         columns:
@@ -213,7 +213,7 @@ Any builders could be passed under gridconfig[options][requireJSModules] node. Y
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         options:
@@ -228,7 +228,7 @@ Grid states processed using Backbone.Router, and it could be easily disabled in 
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         options:
@@ -242,7 +242,7 @@ datagrid:
 
 Example:
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         source:
@@ -257,7 +257,7 @@ datagrid:
 - configure grid (set option 'skip_acl_apply' to TRUE)
 - override option 'acl_resource' and to make it false
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         acl_resource: false
@@ -275,7 +275,7 @@ my_bundle.event_listener.my_grid_listener:
 ```
 - last step is implementing grid listener
 - as an example see:
-    - Oro/Bundle/UserBundle/Resources/config/datagrid.yml (owner-users-select-grid)
+    - Oro/Bundle/UserBundle/Resources/config/oro/datagrids.yml (owner-users-select-grid)
     - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php (service name: "oro_user.event_listener.owner_user_grid_listener")
 
 #### Problem:
@@ -284,7 +284,7 @@ my_bundle.event_listener.my_grid_listener:
 - configure grid with option 'skip_acl_apply' set to TRUE, it will ignore applying of ACL to source query of the grid
 - configure grid with option 'acl_resource' set to name of some ACL resource, it will check permission to this ACL resouce before datagrid data will be loaded 
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         acl_resource: 'acme_demo_entity_view'
