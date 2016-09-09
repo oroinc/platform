@@ -128,5 +128,4 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     {
         $this->getPage()->find('css', 'div.title-buttons-container a.btn-primary')->click();
     }
-
 }
