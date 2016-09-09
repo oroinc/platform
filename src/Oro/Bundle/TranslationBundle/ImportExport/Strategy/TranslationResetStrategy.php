@@ -19,15 +19,15 @@ class TranslationResetStrategy extends TranslationImportStrategy
     protected function beforeProcessEntity($entity)
     {
         if ($entity instanceof Translation) {
-            $locale = $entity->getLocale();
-            if ($locale && empty($this->processedLanguages[$locale])) {
+            $language = $entity->getLanguage();
+            if ($language && empty($this->processedLanguages[$language->getId()])) {
                 $this->context->incrementDeleteCount(
-                    $this->translationManager->getCountByLocale($locale)
+                    $this->translationManager->getCountByLanguage($language)
                 );
 
-                $this->translationManager->deleteByLocale($locale);
+                $this->translationManager->deleteByLanguage($language);
 
-                $this->processedLanguages[$locale] = true;
+                $this->processedLanguages[$language->getId()] = true;
             }
         }
 

@@ -102,26 +102,21 @@ class TranslationManager
     }
 
     /**
-     * @param string $locale
+     * @param Language $language
      *
      * @return int
      */
-    public function getCountByLocale($locale)
+    public function getCountByLanguage(Language $language)
     {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-
-        return $repo->getCountByLanguage($this->getLanguageByCode($locale));
+        return $this->getEntityRepository(Translation::class)->getCountByLanguage($language);
     }
 
     /**
-     * @param string $locale
+     * @param Language $language
      */
-    public function deleteByLocale($locale)
+    public function deleteByLanguage(Language $language)
     {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-        $repo->deleteByLocale($locale);
+        return $this->getEntityRepository(Translation::class)->deleteByLanguage($language);
     }
 
     /**
