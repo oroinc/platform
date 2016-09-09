@@ -27,6 +27,9 @@ class AssociationMetadata implements ToArrayInterface
     /** @var bool */
     protected $nullable = false;
 
+    /** @var bool */
+    protected $collapsed = false;
+
     /** @var EntityMetadata|null */
     private $targetMetadata;
 
@@ -269,5 +272,35 @@ class AssociationMetadata implements ToArrayInterface
     public function setIsNullable($value)
     {
         $this->nullable = $value;
+    }
+
+    /**
+     * Indicates whether the association should be collapsed to a scalar.
+     *
+     * @return bool
+     */
+    public function isCollapsed()
+    {
+        return $this->collapsed;
+    }
+
+    /**
+     * Sets a flag indicates whether the association should be collapsed to a scalar.
+     *
+     * @param bool $collapsed
+     */
+    public function setCollapsed($collapsed = true)
+    {
+        $this->collapsed = $collapsed;
+    }
+
+    /**
+     * Checks whether the association should be represented as an array attribute.
+     *
+     * @return bool
+     */
+    public function isArrayAttribute()
+    {
+        return 'array' === $this->getDataType();
     }
 }

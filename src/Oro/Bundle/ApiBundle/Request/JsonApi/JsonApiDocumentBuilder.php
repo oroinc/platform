@@ -172,7 +172,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             $value = $this->getRelationshipValue($data, $name, $association);
-            if ($this->isArrayAttribute($association)) {
+            if ($association->isArrayAttribute()) {
                 $result[self::ATTRIBUTES][$name] = $value;
             } else {
                 $result[self::RELATIONSHIPS][$name][self::DATA] = $value;

@@ -183,18 +183,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     }
 
     /**
-     * Checks whether a given association should be represented as an array attribute.
-     *
-     * @param AssociationMetadata $association
-     *
-     * @return bool
-     */
-    protected function isArrayAttribute(AssociationMetadata $association)
-    {
-        return 'array' === $association->getDataType();
-    }
-
-    /**
      * @return AssociationToArrayAttributeConverter
      */
     protected function getArrayAttributeConverter()
@@ -241,14 +229,13 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         if (array_key_exists($associationName, $data)) {
             $val = $data[$associationName];
             if (!$this->isEmptyRelationship($val, $isCollection)) {
-                $isArrayAttribute = $this->isArrayAttribute($association);
                 if ($isCollection) {
-                    $result = $isArrayAttribute
+                    $result = $association->isArrayAttribute()
                         ? $this->getArrayAttributeConverter()
                             ->convertCollectionToArray($val, $association->getTargetMetadata())
                         : $this->processRelatedCollection($val, $association);
                 } else {
-                    $result = $isArrayAttribute
+                    $result = $association->isArrayAttribute()
                         ? $this->getArrayAttributeConverter()
                             ->convertObjectToArray($val, $association->getTargetMetadata())
                         : $this->processRelatedObject($val, $association);
