@@ -21,7 +21,7 @@ class DefaultMenuUpdateProvider extends AbstractMenuUpdateProvider
         $businessUnit = $this->getCurrentBusinessUnit($organization);
         $user = $this->getCurrentUser();
 
-        $repository->getMenuUpdates($menu, $organization, $businessUnit, $user);
+        return $repository->getMenuUpdates($menu, $organization, $businessUnit, $user);
     }
 
     /**
@@ -36,11 +36,13 @@ class DefaultMenuUpdateProvider extends AbstractMenuUpdateProvider
             return null;
         }
 
-        return $user->getBusinessUnits()
+        $businessUnit = $user->getBusinessUnits()
             ->filter(function (BusinessUnit $businessUnit) use ($organization) {
                 return $businessUnit->getOrganization()->getId() === $organization->getId();
             })
             ->first();
+
+        return !is_bool($businessUnit) ? $businessUnit : null;
     }
 
     /**

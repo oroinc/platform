@@ -47,7 +47,7 @@ class MenuUpdateRepository extends EntityRepository
         if ($user !== null) {
             $exprs[] = $qb->expr()->andX(
                 $qb->expr()->eq('mu.ownershipType', MenuUpdate::OWNERSHIP_USER),
-                $qb->expr()->eq('mu.owner_id', $user->getId())
+                $qb->expr()->eq('mu.ownerId', $user->getId())
             );
         }
 
@@ -59,7 +59,7 @@ class MenuUpdateRepository extends EntityRepository
 
         return $qb
             ->setParameter('menu', $menu)
-            ->orderBy('mu.ownership_type', 'ASC')
+            ->orderBy('mu.ownershipType', 'ASC')
             ->addOrderBy('mu.id', 'ASC')
             ->getQuery()
             ->getResult();

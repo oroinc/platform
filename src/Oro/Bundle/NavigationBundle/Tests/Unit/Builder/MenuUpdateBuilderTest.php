@@ -34,6 +34,9 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getParentKey')
             ->will($this->returnValue(null));
         $update->expects($this->any())
+            ->method('getTitle')
+            ->will($this->returnValue('title'));
+        $update->expects($this->any())
             ->method('getUri')
             ->will($this->returnValue('#'));
         $update->expects($this->once())
@@ -69,6 +72,9 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('key'));
         $resultItem->expects($this->once())
+            ->method('setLabel')
+            ->with('title');
+        $resultItem->expects($this->once())
             ->method('setUri')
             ->with('#');
         $resultItem->expects($this->once())
@@ -87,21 +93,31 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
         /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject $menu */
         $menu = $this->getMock(ItemInterface::class);
-        $menu->expects($this->once())
+        $menu->expects($this->at(0))
             ->method('getExtra')
             ->with('area')
             ->will($this->returnValue('default'));
-        $menu->expects($this->any())
+        $menu->expects($this->at(1))
             ->method('getName')
             ->will($this->returnValue('menu_key'));
-        $menu->expects($this->once())
+        $menu->expects($this->at(2))
             ->method('getChild')
             ->with('key')
             ->will($this->returnValue(null));
-        $menu->expects($this->once())
+        $menu->expects($this->at(3))
             ->method('getChildren')
             ->will($this->returnValue([$nestedItem]));
-        $menu->expects($this->once())
+        $menu->expects($this->at(4))
+            ->method('getChild')
+            ->with(null)
+            ->will($this->returnValue(null));
+        $menu->expects($this->at(5))
+            ->method('getChildren')
+            ->will($this->returnValue([]));
+        $menu->expects($this->at(6))
+            ->method('getName')
+            ->will($this->returnValue('menu_key'));
+        $menu->expects($this->at(7))
             ->method('addChild')
             ->with($resultItem)
             ->will($this->returnValue($resultItem));

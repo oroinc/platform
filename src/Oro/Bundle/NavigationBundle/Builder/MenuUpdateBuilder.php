@@ -7,6 +7,7 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate;
 use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
@@ -19,7 +20,8 @@ class MenuUpdateBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $provider = $this->getProvider($menu->getExtra('area'));
+        $area = $this->getArea($menu->getExtra('area'));
+        $provider = $this->getProvider($area);
         $menuName = $menu->getName();
         foreach ($provider->getUpdates($menuName) as $update) {
             if ($update->getMenu() == $menuName) {
@@ -39,6 +41,16 @@ class MenuUpdateBuilder implements BuilderInterface
         $this->providers[$area] = $provider;
 
         return $this;
+    }
+
+    /**
+     * @param string|null $area
+     *
+     * @return string
+     */
+    private function getArea($area = null)
+    {
+        return $area === null ? ConfigurationBuilder::DEFAULT_AREA : $area;
     }
 
     /**
@@ -62,7 +74,8 @@ class MenuUpdateBuilder implements BuilderInterface
     private function applyUpdate(ItemInterface $menu, AbstractMenuUpdate $update)
     {
         $item = $this->findMenuItem($menu, $update->getKey());
-        $parentItem = !$update->getParentKey() ? $menu : $this->findMenuItem($menu, $update->getParentKey());
+        $parentItem = $this->findMenuItem($menu, $update->getParentKey());
+        $parentItem = $parentItem === null ? $menu : $parentItem;
 
         if (!$item instanceof ItemInterface) {
             $item = $parentItem->addChild($update->getKey());
@@ -85,10 +98,6 @@ class MenuUpdateBuilder implements BuilderInterface
 
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
-        }
-
-        if ($update->getPriority() !== null) {
-            $item->setExtra('position', $update->getPriority());
         }
     }
 
