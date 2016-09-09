@@ -84,7 +84,7 @@
 
     {% if placeholder is defined %}
         {% set attr = attr|merge({
-            placeholder: placeholder
+            placeholder: placeholder|block_text(translation_domain)
         }) %}
     {% endif %}
 
@@ -97,12 +97,6 @@
     {% if type == 'password' %}
         {% set attr = attr|merge({
             autocomplete: 'off'
-        }) %}
-    {% endif %}
-
-    {% if attr.placeholder is defined %}
-        {% set attr = layout_attr_defaults(attr, {
-            'placeholder': attr.placeholder|block_text(translation_domain)
         }) %}
     {% endif %}
 
