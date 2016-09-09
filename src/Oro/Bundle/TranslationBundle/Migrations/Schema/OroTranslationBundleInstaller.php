@@ -28,6 +28,7 @@ class OroTranslationBundleInstaller implements Installation
 
         /** Foreign keys generation **/
         $this->addOroLanguageForeignKeys($schema);
+        $this->addOroTranslationForeignKeys($schema);
     }
 
     /**
@@ -59,14 +60,15 @@ class OroTranslationBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_translation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('language_id', 'integer', ['notnull' => false]);
         $table->addColumn('key', 'string', ['length' => 255]);
         $table->addColumn('value', 'text', ['notnull' => false]);
-        $table->addColumn('locale', 'string', ['length' => 5]);
         $table->addColumn('domain', 'string', ['length' => 255]);
         $table->addColumn('scope', 'smallint', []);
+        $table->addIndex(['key'], 'message_idx', []);
+        $table->addIndex(['language_id']);
+        $table->addIndex(['language_id', 'domain'], 'messages_idx', []);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['locale', 'domain'], 'MESSAGES_IDX', []);
-        $table->addIndex(['`key`'], 'MESSAGE_IDX', []);
     }
 
     /**
@@ -88,6 +90,22 @@ class OroTranslationBundleInstaller implements Installation
             ['user_owner_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add oro_translation foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroTranslationForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_translation');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_language'),
+            ['language_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 }

@@ -3,11 +3,13 @@
 namespace Oro\Bundle\TranslationBundle\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Validator\Constraints\Language;
-
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
@@ -43,7 +45,7 @@ class TranslationManager
     {
         return $this->getEntityRepository(Translation::class)->findOneBy(
             [
-                'locale' => $locale,
+                'language' => $this->getLanguageByCode($locale),
                 'domain' => $domain,
                 'key' => $key,
                 'scope' => $scope
@@ -63,7 +65,7 @@ class TranslationManager
     {
         return $this->getEntityRepository(Translation::class)->findBy(
             [
-                'locale' => $locale,
+                'language' => $this->getLanguageByCode($locale),
                 'domain' => $domain,
             ]
         );
@@ -80,20 +82,14 @@ class TranslationManager
      *
      * @return Translation
      */
-    public function saveValue(
-        $key,
-        $value,
-        $locale,
-        $domain = self::DEFAULT_DOMAIN,
-        $scope = Translation::SCOPE_SYSTEM
-    )
+    public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
         $translationValue = $this->findValue($key, $locale, $domain, $scope);
         if (!$translationValue) {
             $translationValue = new Translation();
             $translationValue
                 ->setKey($key)
-                ->setLocale($locale)
+                ->setLanguage($this->getLanguageByCode($locale))
                 ->setDomain($domain)
                 ->setScope($scope);
         }
@@ -112,7 +108,10 @@ class TranslationManager
      */
     public function getCountByLocale($locale)
     {
-        return $this->getEntityRepository(Translation::class)->getCountByLocale($locale);
+        /** @var TranslationRepository $repo */
+        $repo = $this->getEntityRepository(Translation::class);
+
+        return $repo->getCountByLanguage($this->getLanguageByCode($locale));
     }
 
     /**
@@ -120,7 +119,9 @@ class TranslationManager
      */
     public function deleteByLocale($locale)
     {
-        $this->getEntityRepository(Translation::class)->deleteByLocale($locale);
+        /** @var TranslationRepository $repo */
+        $repo = $this->getEntityRepository(Translation::class);
+        $repo->deleteByLocale($locale);
     }
 
     /**
@@ -144,11 +145,14 @@ class TranslationManager
      *
      * @param string[] $locales
      *
-     * @return array [['locale' = '...', 'domain' => '...'], ...]
+     * @return array [['code' = '...', 'domain' => '...'], ...]
      */
     public function findAvailableDomainsForLocales(array $locales)
     {
-        return $this->getEntityRepository(Translation::class)->findAvailableDomainsForLocales($locales);
+        /** @var TranslationRepository $repo */
+        $repo = $this->getEntityRepository(Translation::class);
+
+        return $repo->findAvailableDomainsForLocales($locales);
     }
 
     /**
@@ -158,7 +162,10 @@ class TranslationManager
      */
     protected function getLanguageByCode($code)
     {
-        return $this->getEntityRepository(Language::class)->findOneBy(['code' => $code]);
+        /** @var LanguageRepository $repo */
+        $repo = $this->getEntityRepository(Language::class);
+
+        return $repo->findOneBy(['code' => $code]);
     }
 
     /**

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
  * @ORM\Table(name="oro_translation", indexes={
  *      @ORM\Index(name="MESSAGE_IDX", columns={"`key`"}),
- *      @ORM\Index(name="MESSAGES_IDX", columns={"locale", "domain"})
+ *      @ORM\Index(name="MESSAGES_IDX", columns={"language_id", "domain"})
  * })
  */
 class Translation
@@ -38,9 +38,12 @@ class Translation
     protected $value;
 
     /**
-     * @ORM\Column(type="string", length=5)
+     * @var Language
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
+     * @ORM\JoinColumn(name="language_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $locale;
+    protected $language;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -101,25 +104,6 @@ class Translation
     }
 
     /**
-     * @param mixed $locale
-     * @return $this
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    /**
      * @param mixed $domain
      * @return $this
      */
@@ -156,5 +140,24 @@ class Translation
     public function getScope()
     {
         return $this->scope;
+    }
+
+    /**
+     * @param Language $language
+     * @return $this
+     */
+    public function setLanguage(Language $language)
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * @return Language
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 }

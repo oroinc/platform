@@ -302,7 +302,7 @@ class Translator extends BaseTranslator
                     ->findAvailableDomainsForLocales($locales);
                 foreach ($availableDomainsData as $item) {
                     $item['resource'] = new OrmTranslationResource(
-                        $item['locale'],
+                        $item['code'],
                         $this->databaseTranslationMetadataCache
                     );
                     $item['format']   = 'oro_database_translation';

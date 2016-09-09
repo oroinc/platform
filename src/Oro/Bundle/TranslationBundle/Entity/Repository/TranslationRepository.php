@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
 class TranslationRepository extends EntityRepository
 {
@@ -11,45 +12,46 @@ class TranslationRepository extends EntityRepository
     /**
      * Returns the list of all existing in the database translation domains for the given locales.
      *
-     * @param string[] $locales
+     * @param Language[] $languages
      *
-     * @return array [['locale' = '...', 'domain' => '...'], ...]
+     * @return array [['code' = '...', 'domain' => '...'], ...]
      */
-    public function findAvailableDomainsForLocales(array $locales)
+    public function findAvailableDomainsForLocales(array $languages)
     {
         $qb = $this->createQueryBuilder('t')
             ->distinct(true)
-            ->select('t.locale', 't.domain')
-            ->where('t.locale IN (:locales)')
-            ->setParameter('locales', $locales);
+            ->select('l.code', 't.domain')
+            ->join('t.language', 'l');
+
+        $qb->where($qb->expr()->in('l.code', $languages));
 
         return $qb->getQuery()->getArrayResult();
     }
 
     /**
-     * @param string $locale
+     * @param Language $language
      *
      * @return int
      */
-    public function getCountByLocale($locale)
+    public function getCountByLanguage(Language $language)
     {
         $qb = $this->createQueryBuilder('t')
             ->select('count(t.id)')
-            ->where('t.locale = :locale')
-            ->setParameter('locale', $locale);
+            ->where('t.language = :language')
+            ->setParameter('language', $language);
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * @param string $locale
+     * @param Language $language
      */
-    public function deleteByLocale($locale)
+    public function deleteByLanguage($language)
     {
         $this->createQueryBuilder('t')
             ->delete()
-            ->where('t.locale = :locale')
-            ->setParameter('locale', $locale)
+            ->where('t.language = :language')
+            ->setParameter('language', $language)
             ->getQuery()
             ->execute();
     }
