@@ -267,6 +267,18 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 ####SearchBundle:
 - Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
 - Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
+- Search `\Oro\Bundle\SearchBundle\Query\Query::addSelect()` and `\Oro\Bundle\SearchBundle\Query\Query::select()` have been extended to support the SQL aliasing syntax. New method `\Oro\Bundle\SearchBundle\Query\Query::getSelectAliases()` added to the public interface. 
+- `\Oro\Bundle\SearchBundle\Extension\IndexerQuery` has now an interface `\Oro\Bundle\SearchBundle\Extension\SearchQueryInterface` and an abstract base class with common operations
+- `\Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager` is no longer depending on IndexerQuery
+- `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` has now improved alignment with the `\Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource`. Moved to the `Oro\Bundle\SearchBundle\Datasource` namespace.
+- Search Query is now created by `\Oro\Bundle\SearchBundle\Query\Factory\QueryFactory`.
+- using own, customized Query wrappers, instead of IndexerQuery now possible, by replacing QueryFactory with own factory `\Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface` object.
+- new Extensions added: `\Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension` (extending the Orm version), `\Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension` (common part with the Orm version).
+- `\Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension` makes it possible to use search filters together with a new `\Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter`.
+- filters are now loaded per Datasource, by specifying the `datasource` attribute. Currently supported values are `orm` and `search`.
+- custom Search filter added: `\Oro\Bundle\SearchBundle\Filter\SearchStringFilter`. Supporting 4 types of string comparisons: =, !==, contains, not contains. 
+- `\Oro\Bundle\SearchBundle\Query\Result\Item` is now compatible with the default backend datagrid templates.
+- `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` can now be defined as the datasource of any datagrid (both frontend and backend).
 
 ####UiBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
