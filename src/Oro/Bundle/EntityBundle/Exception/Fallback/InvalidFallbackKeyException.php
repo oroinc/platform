@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Exception;
+namespace Oro\Bundle\EntityBundle\Exception\Fallback;
 
 class InvalidFallbackKeyException extends \Exception
 {

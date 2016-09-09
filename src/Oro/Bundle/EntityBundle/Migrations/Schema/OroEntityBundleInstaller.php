@@ -7,10 +7,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- */
 class OroEntityBundleInstaller implements Installation
 {
     /**
@@ -27,20 +23,21 @@ class OroEntityBundleInstaller implements Installation
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
-        $this->createOroEntityFieldFallbackValTable($schema);
+        $this->createOroEntityFallbackValueTable($schema);
     }
 
     /**
-     * Create oro_entity_field_fallback_val table
+     * Create oro_entity_fallback_value table
      *
      * @param Schema $schema
      */
-    protected function createOroEntityFieldFallbackValTable(Schema $schema)
+    protected function createOroEntityFallbackValueTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_entity_field_fallback_val');
+        $table = $schema->createTable('oro_entity_fallback_value');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('fallback', 'string', ['notnull' => false, 'length' => 64]);
-        $table->addColumn('string_value', 'string', ['notnull' => false, 'length' => 64]);
+        $table->addColumn('scalar_value', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('array_value', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
     }
 }

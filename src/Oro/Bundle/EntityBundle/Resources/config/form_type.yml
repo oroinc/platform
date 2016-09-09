@@ -94,6 +94,6 @@ services:
     oro_entity.form.type.entity_field_fallback_value:
         class: 'Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType'
         arguments:
-            - "@oro_entity_config.provider.fallback"
+            - "@oro_entity.fallback.resolver.entity_fallback_resolver"
         tags:
-            - { name: form.type, alias: oro_entity_field_fallback_value }
+            - { name: form.type, alias: oro_entity_fallback_value }

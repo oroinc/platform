@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class EntityFallbackCompilerPass implements CompilerPassInterface
 {
     const RESOLVER_SERVICE = 'oro_entity.fallback.resolver.entity_fallback_resolver';
-    const PROVIDER_TAGS = 'oro.fallback.provider';
+    const PROVIDER_TAGS = 'oro_entity.fallback_provider';
 
     public function process(ContainerBuilder $container)
     {
@@ -21,10 +21,8 @@ class EntityFallbackCompilerPass implements CompilerPassInterface
         $providers = $container->findTaggedServiceIds(self::PROVIDER_TAGS);
 
         foreach ($providers as $id => $tags) {
-            $provider = $container->findDefinition($id);
             $tags = reset($tags);
-            $provider->addMethodCall('setId', [$tags['id']]);
-            $resolver->addMethodCall('addFallbackProvider', [new Reference($id)]);
+            $resolver->addMethodCall('addFallbackProvider', [new Reference($id), $tags['id']]);
         }
     }
 }

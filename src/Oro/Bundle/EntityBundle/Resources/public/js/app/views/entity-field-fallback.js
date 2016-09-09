@@ -51,16 +51,22 @@ define(function(require) {
 
         handleCheckboxValue: function($checkbox, $fieldValue, $fallbackValue) {
             if ($checkbox.is(':checked')) {
-                $fieldValue.parent().addClass('disabled', 'disabled');
-                $fieldValue.attr('disabled', 'disabled');
-                $fallbackValue.parent().removeClass('disabled');
-                $fallbackValue.removeAttr('disabled');
+                this.disableElement($fieldValue);
+                this.enableElement($fallbackValue);
             } else {
-                $fallbackValue.parent().addClass('disabled', 'disabled');
-                $fallbackValue.attr('disabled', 'disabled');
-                $fieldValue.parent().removeClass('disabled');
-                $fieldValue.removeAttr('disabled');
+                this.disableElement($fallbackValue);
+                this.enableElement($fieldValue);
             }
+        },
+
+        disableElement: function($element) {
+            $element.attr('disabled', 'disabled');
+            $element.parent().addClass('disabled');
+        },
+
+        enableElement: function($element) {
+            $element.removeAttr('disabled');
+            $element.parent().removeClass('disabled');
         }
     });
 

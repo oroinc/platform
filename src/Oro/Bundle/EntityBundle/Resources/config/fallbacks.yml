@@ -3,10 +3,20 @@ services:
         class: Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver
         arguments:
             - "@oro_entity_config.provider.fallback"
+            - "@oro_config.provider.system_configuration.form_provider"
+            - "@oro_config.manager"
+            - "@oro_config.config_bag"
+
+    oro_entity.fallback.provider.abstract_provider:
+        class: Oro\Bundle\EntityBundle\Fallback\Provider\AbstractEntityFallbackProvider
+        abstract: true
+        calls:
+            - [setConfigProvider, ["@oro_entity_config.provider.fallback"]]
 
     oro_entity.fallback.provider.system_config_provider:
         class: Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider
+        parent: oro_entity.fallback.provider.abstract_provider
         arguments:
             - "@oro_config.manager"
         tags:
-            - { name: oro.fallback.provider, id: systemConfig }
+            - { name: oro_entity.fallback_provider, id: systemConfig }
