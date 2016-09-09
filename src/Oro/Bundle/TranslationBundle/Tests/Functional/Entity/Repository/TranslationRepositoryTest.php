@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
@@ -36,36 +37,39 @@ class TranslationRepositoryTest extends WebTestCase
 
     /**
      * @param int $expectedCount
-     * @param string $locale
+     * @param string $code
      *
-     * @dataProvider getCountByLocaleProvider
+     * @dataProvider getCountByLanguageProvider
      */
-    public function testGetCountByLocale($expectedCount, $locale)
+    public function testGetCountByLanguage($expectedCount, $code)
     {
-        $this->assertEquals($expectedCount, $this->repository->getCountByLocale($locale));
+        $this->assertEquals($expectedCount, $this->repository->getCountByLanguage($this->getReference($code)));
     }
 
     /**
      * @return array
      */
-    public function getCountByLocaleProvider()
+    public function getCountByLanguageProvider()
     {
         return [
             'language1' => [
                 'count' => 2,
-                'locale' => LoadLanguages::LANGUAGE1,
+                'code' => LoadLanguages::LANGUAGE1,
             ],
             'language2' => [
                 'count' => 1,
-                'locale' => LoadLanguages::LANGUAGE2,
+                'code' => LoadLanguages::LANGUAGE2,
             ],
         ];
     }
 
-    public function testDeleteByLocale()
+    public function testDeleteByLanguage()
     {
-        $this->repository->deleteByLocale(LoadLanguages::LANGUAGE1);
+        /* @var $language Language */
+        $language = $this->getReference(LoadLanguages::LANGUAGE1);
 
-        $this->assertEquals(0, $this->repository->getCountByLocale(LoadLanguages::LANGUAGE1));
+        $this->repository->deleteByLanguage($language);
+
+        $this->assertEquals(0, $this->repository->getCountByLanguage($language));
     }
 }

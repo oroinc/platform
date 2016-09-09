@@ -20,7 +20,7 @@ class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
         $existingTranslation = $this->getReference(LoadTranslations::TRANSLATION1);
         $translation = new Translation();
         $translation
-            ->setLocale($existingTranslation->getLocale())
+            ->setLanguage($existingTranslation->getLanguage())
             ->setDomain($existingTranslation->getDomain())
             ->setKey($existingTranslation->getKey())
             ->setValue($existingTranslation->getValue());
@@ -31,7 +31,7 @@ class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
 
         $translation = new Translation();
         $translation
-            ->setLocale(LoadLanguages::LANGUAGE1)
+            ->setLanguage($this->getReference(LoadLanguages::LANGUAGE1))
             ->setDomain('new_domain')
             ->setKey('new_key')
             ->setValue('new_value');
