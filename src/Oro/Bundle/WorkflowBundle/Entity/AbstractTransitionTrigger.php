@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
@@ -37,6 +38,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  */
 abstract class AbstractTransitionTrigger
 {
+    use DatesAwareTrait;
+
     /**
      * @var integer
      *
@@ -60,7 +63,7 @@ abstract class AbstractTransitionTrigger
      *
      * @ORM\Column(name="queued", type="boolean")
      */
-    protected $queued = false;
+    protected $queued = true;
 
     /**
      * @var string
@@ -76,34 +79,6 @@ abstract class AbstractTransitionTrigger
      * @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE")
      */
     protected $workflowDefinition;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
 
     /**
      * @return integer
@@ -163,25 +138,6 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
-     * @return string
-     */
-    public function getRelation()
-    {
-        return $this->relation;
-    }
-
-    /**
-     * @param string $relation
-     * @return $this
-     */
-    public function setRelation($relation)
-    {
-        $this->relation = $relation;
-
-        return $this;
-    }
-
-    /**
      * @return boolean
      */
     public function isQueued()
@@ -217,61 +173,6 @@ abstract class AbstractTransitionTrigger
     public function getWorkflowDefinition()
     {
         return $this->workflowDefinition;
-    }
-
-    /**
-     * @param \DateTime $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     * @return $this
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->preUpdate();
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**

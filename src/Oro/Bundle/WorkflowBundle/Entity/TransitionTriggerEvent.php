@@ -35,6 +35,8 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     protected $require;
 
     /**
+     * Expression Language condition
+     *
      * @var string
      *
      * @ORM\Column(name="relation", type="text", length=1024, nullable=true)
