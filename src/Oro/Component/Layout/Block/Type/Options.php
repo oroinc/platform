@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class Options implements \ArrayAccess, \Iterator
 {
@@ -40,6 +41,15 @@ class Options implements \ArrayAccess, \Iterator
         }
 
         throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $offset));
+    }
+
+    public function getOr($offset, $default = null)
+    {
+        try {
+            return $this->get($offset, false);
+        } catch (\OutOfBoundsException $e) {
+            return $default;
+        }
     }
 
     /**
