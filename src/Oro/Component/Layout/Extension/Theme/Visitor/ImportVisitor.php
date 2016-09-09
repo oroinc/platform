@@ -126,7 +126,7 @@ class ImportVisitor implements VisitorInterface
         $this->updates[$el] = array_merge(
             array_slice($this->updates[$el], 0, $parentUpdateIndex + 1, true),
             [$update],
-            array_slice($this->updates[$el], $parentUpdateIndex + 1, NULL, true)
+            array_slice($this->updates[$el], $parentUpdateIndex + 1, null, true)
         );
     }
 

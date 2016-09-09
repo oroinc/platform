@@ -43,11 +43,13 @@ class ExpressionConditionVisitor implements VisitorInterface
             PhpParameter::create('context')
                 ->setType('\Oro\Component\Layout\ContextInterface')
         );
-        $setFactoryMethod->setBody($writer->reset()
-            ->write(
-                sprintf('return %s;', $this->expressionLanguage->compile($this->expression))
-            )
-            ->getContent()
+        $setFactoryMethod->setBody(
+            $writer
+                ->reset()
+                ->write(
+                    sprintf('return %s;', $this->expressionLanguage->compile($this->expression))
+                )
+                ->getContent()
         );
         $class->setMethod($setFactoryMethod);
 
