@@ -75,7 +75,6 @@ define(['jquery'], function($) {
                 }
             } else {
                 $group.find('label[data-required] em').show();
-                $group.find('input, select').data('ignore-validation', false);
             }
         },
 
@@ -129,10 +128,9 @@ define(['jquery'], function($) {
             var inputs = $group
                 .find('input, select');
 
-            inputs.data('ignore-validation', true);
             inputs.each(function(key, element) {
                     validator.hideElementErrors($(element));
                 });
-        },
+        }
     };
 });
