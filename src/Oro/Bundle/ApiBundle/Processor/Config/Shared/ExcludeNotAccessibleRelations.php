@@ -8,8 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
-use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -23,28 +22,17 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ResourcesLoader */
-    protected $resourcesLoader;
-
-    /** @var ResourcesCache */
-    protected $resourcesCache;
-
-    /** @var array */
-    private $accessibleResources;
+    /** @var ResourcesProvider */
+    protected $resourcesProvider;
 
     /**
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ResourcesLoader $resourcesLoader
-     * @param ResourcesCache  $resourcesCache
+     * @param DoctrineHelper    $doctrineHelper
+     * @param ResourcesProvider $resourcesProvider
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper,
-        ResourcesLoader $resourcesLoader,
-        ResourcesCache $resourcesCache
-    ) {
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->resourcesLoader = $resourcesLoader;
-        $this->resourcesCache  = $resourcesCache;
+    public function __construct(DoctrineHelper $doctrineHelper, ResourcesProvider $resourcesProvider)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->resourcesProvider = $resourcesProvider;
     }
 
     /**
@@ -82,9 +70,10 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         RequestType $requestType
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $fields   = $definition->getFields();
+        $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
+            // skip a field if it is already excluded or the "exclude" flag is set explicitly
+            if ($field->isExcluded() || $field->hasExcluded()) {
                 continue;
             }
 
@@ -93,7 +82,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
                 continue;
             }
 
-            $mapping        = $metadata->getAssociationMapping($propertyPath);
+            $mapping = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
             if (!$this->isResourceForRelatedEntityAccessible($targetMetadata, $version, $requestType)) {
                 $field->setExcluded();
@@ -113,39 +102,18 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         $version,
         RequestType $requestType
     ) {
-        if ($this->isResourceAccessible($targetMetadata->name, $version, $requestType)) {
+        if ($this->resourcesProvider->isResourceAccessible($targetMetadata->name, $version, $requestType)) {
             return true;
         }
         if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
             // check that at least one inherited entity has Data API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
-                if ($this->isResourceAccessible($inheritedEntityClass, $version, $requestType)) {
+                if ($this->resourcesProvider->isResourceAccessible($inheritedEntityClass, $version, $requestType)) {
                     return true;
                 }
             }
         }
 
         return false;
-    }
-
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
-    protected function isResourceAccessible($entityClass, $version, RequestType $requestType)
-    {
-        if (null === $this->accessibleResources) {
-            $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
-            if (null === $accessibleResources) {
-                $this->resourcesLoader->getResources($version, $requestType);
-                $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
-            }
-            $this->accessibleResources = array_fill_keys($accessibleResources, true);
-        }
-
-        return isset($this->accessibleResources[$entityClass]);
     }
 }

@@ -70,8 +70,8 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
                 }
 
                 try {
-                    $this->container->get('oro_attachment.manager')
-                        ->copyLocalFileToStorage($filePath, $userData['image']);
+                    $this->container->get('oro_attachment.file_manager')
+                        ->writeFileToStorage($filePath, $userData['image']);
                 } catch (\Exception $e) {
                     $this->container->get('logger')
                         ->addError(sprintf('File copy error: %s', $e->getMessage()));
@@ -85,7 +85,7 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
                      created_at, updated_at, owner_user_id)
                     values (%s, \'%s\', \'%s\', \'%s\', %s, \'%s\', \'%s\', \'%s\', %s);',
                     $maxId,
-                    $file->getFileName(),
+                    $file->getFilename(),
                     $file->guessExtension(),
                     $file->getMimeType(),
                     $file->getSize(),

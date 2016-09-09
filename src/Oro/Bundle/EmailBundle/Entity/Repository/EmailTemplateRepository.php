@@ -102,4 +102,19 @@ class EmailTemplateRepository extends EntityRepository
             ->select('e.entityName')
             ->distinct();
     }
+
+    /**
+     * Get templates without any related entity
+     *
+     * @return QueryBuilder
+     */
+    public function getSystemTemplatesQueryBuilder()
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->where('e.entityName IS NULL')
+            ->andWhere('e.isSystem = :isSystem')
+            ->setParameter('isSystem', true);
+
+        return $qb;
+    }
 }

@@ -44,7 +44,7 @@
                                             'entity': entity,
                                             'entity_class': audit_entity_class|default(null),
                                             'id': audit_entity_id,
-                                            'title': audit_title|default(entity.__toString is defined ? entity : null),
+                                            'title': audit_title|default(entity.__toString is defined ? entity.__toString : null),
                                             'audit_path': audit_path|default('oro_dataaudit_history'),
                                             'audit_show_change_history': audit_show_change_history|default(false)
                                         } %}
@@ -94,7 +94,7 @@
                                                 <span class="separator">/</span>
                                             {% endfor %}
                                         {% endif %}
-                                        <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
+                                        <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
                                     </div>
                                     {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                 {% endblock breadcrumbs %}
@@ -103,8 +103,12 @@
                                 <ul class="inline">
                                     {% placeholder page_header_stats_before with {entity: entity} %}
                                     {% block stats %}
-                                        <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-                                        <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt is defined and breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                        {% if  resource_granted('VIEW', entity, 'createdAt') %}
+                                            <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+                                        {% endif %}
+                                        {% if  resource_granted('VIEW', entity, 'updatedAt') %}
+                                            <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt is defined and breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                        {% endif %}
                                     {% endblock stats %}
                                     {% placeholder page_header_stats_after with {entity: entity} %}
 

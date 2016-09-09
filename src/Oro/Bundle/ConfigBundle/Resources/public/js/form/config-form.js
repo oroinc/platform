@@ -53,12 +53,14 @@ define([
             confirm.on('ok', _.bind(function() {
                 this.$el.get(0).reset();
                 this.$el.find('.select2').each(function(key, elem) {
-                    $(elem).select2('val', null, true);
+                    $(elem).inputWidget('val', null, true);
                 });
                 this.$el.find('.removeRow').each(function() {
-                    $(this).closest('*[data-content]')
-                        .trigger('content:remove')
-                        .remove();
+                    var $row = $(this).closest('*[data-content]');
+                    // non-persisted options have a simple number for data-content
+                    if (_.isNumber($row.data('content'))) {
+                        $row.trigger('content:remove').remove();
+                    }
                 });
                 $checkboxes
                     .prop('checked', true)

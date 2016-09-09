@@ -16,8 +16,7 @@ class ControllersResetTest extends WebTestCase
         $this->client->useHashNavigation(true);
         $this->client->followRedirects();
         $this->loadFixtures([
-            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData',
-            'Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData',
+            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'
         ]);
     }
 
@@ -55,13 +54,10 @@ class ControllersResetTest extends WebTestCase
 
     public function testSendEmailAction()
     {
-        /** @var User $user */
-        $user = $this->getReference('default_user');
-
         $this->client->request(
             'POST',
             $this->getUrl('oro_user_reset_send_email'),
-            ['username' => $user->getUsername()],
+            ['username' => self::USER_NAME],
             [],
             $this->generateNoHashNavigationHeader()
         );
@@ -69,7 +65,10 @@ class ControllersResetTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('An email has been sent to', $result->getContent());
 
-        $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
+        /** @var User $user */
+        $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->findOneBy(
+            ['username' => self::USER_NAME]
+        );
         $this->assertNotNull($user->getPasswordRequestedAt());
     }
 

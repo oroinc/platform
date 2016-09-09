@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
@@ -71,16 +72,35 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     public function getExceptionText(\Exception $exception)
     {
-        if ($this->debug) {
-            return $exception->getMessage();
-        }
-
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
+        $text = null;
         if ($this->isSafeException($underlyingException)) {
-            return $underlyingException->getMessage();
+            $text = $underlyingException->getMessage();
+        } elseif ($this->debug) {
+            $text = $underlyingException->getMessage();
+            if ($text) {
+                $text = '*DEBUG ONLY* ' . $text;
+            }
+        }
+        if (null !== $text && !$text) {
+            $text = null;
+        }
+        if (null !== $text) {
+            if (substr($text, -1) !== '.') {
+                $text .= '.';
+            }
+            if ($underlyingException !== $exception && $exception instanceof ExecutionFailedException) {
+                $processorPath = $exception->getProcessorId();
+                $e = $exception->getPrevious();
+                while (null !== $e && $e instanceof ExecutionFailedException) {
+                    $processorPath .= '->' . $e->getProcessorId();
+                    $e = $e->getPrevious();
+                }
+                $text .= ' Processor: ' . $processorPath . '.';
+            }
         }
 
-        return null;
+        return $text;
     }
 
     /**

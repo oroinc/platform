@@ -12,6 +12,14 @@ class EmbeddedFormType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'embedded_form';
     }
 
@@ -38,7 +46,17 @@ class EmbeddedFormType extends AbstractType
                     'label'   => 'oro.embeddedform.success_message.label',
                     'tooltip' => 'oro.embeddedform.success_message.description'
                 ]
-            );
+            )
+            ->add(
+                'allowedDomains',
+                'textarea',
+                [
+                    'label'   => 'oro.embeddedform.allowed_domains.label',
+                    'required' => false,
+                    'tooltip' => 'oro.embeddedform.allowed_domains.description'
+                ]
+            )
+        ;
     }
 
     /**

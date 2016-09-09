@@ -14,7 +14,7 @@ services:
         arguments:
             - '@oro_reminder.entity.manager'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     # Form types
     oro_reminder.form.type.reminder:

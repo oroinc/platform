@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
+use Symfony\Component\Intl\Intl;
+
 use Oro\Bundle\LocaleBundle\Twig\LocaleExtension;
 
 class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
@@ -44,6 +46,7 @@ class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $expectedFunctions = array(
+            'oro_currency_name' => array(Intl::getCurrencyBundle(), 'getCurrencyName'),
             'oro_locale' => array($this->localeSettings, 'getLocale'),
             'oro_language' => array($this->localeSettings, 'getLanguage'),
             'oro_country' => array($this->localeSettings, 'getCountry'),

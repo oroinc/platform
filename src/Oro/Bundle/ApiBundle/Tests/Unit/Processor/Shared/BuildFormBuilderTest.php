@@ -26,6 +26,32 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->processor = new BuildFormBuilder($this->formFactory);
     }
 
+    /**
+     * @param string $fieldName
+     *
+     * @return FieldMetadata
+     */
+    protected function createFieldMetadata($fieldName)
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName($fieldName);
+
+        return $fieldMetadata;
+    }
+
+    /**
+     * @param string $associationName
+     *
+     * @return AssociationMetadata
+     */
+    protected function createAssociationMetadata($associationName)
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName($associationName);
+
+        return $associationMetadata;
+    }
+
     public function testProcessWhenFormBuilderAlreadyExists()
     {
         $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
@@ -101,24 +127,12 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $configAssociation3->setFormOptions(['trim' => false]);
 
         $metadata = new EntityMetadata();
-        $field1 = new FieldMetadata();
-        $field1->setName('field1');
-        $metadata->addField($field1);
-        $field2 = new FieldMetadata();
-        $field2->setName('field2');
-        $metadata->addField($field2);
-        $field3 = new FieldMetadata();
-        $field3->setName('field3');
-        $metadata->addField($field3);
-        $association1 = new AssociationMetadata();
-        $association1->setName('association1');
-        $metadata->addAssociation($association1);
-        $association2 = new AssociationMetadata();
-        $association2->setName('association2');
-        $metadata->addAssociation($association2);
-        $association3 = new AssociationMetadata();
-        $association3->setName('association3');
-        $metadata->addAssociation($association3);
+        $metadata->addField($this->createFieldMetadata('field1'));
+        $metadata->addField($this->createFieldMetadata('field2'));
+        $metadata->addField($this->createFieldMetadata('field3'));
+        $metadata->addAssociation($this->createAssociationMetadata('association1'));
+        $metadata->addAssociation($this->createAssociationMetadata('association2'));
+        $metadata->addAssociation($this->createAssociationMetadata('association3'));
 
         $this->formFactory->expects($this->once())
             ->method('createNamedBuilder')

@@ -33,7 +33,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
      */
     public function isPropagable()
     {
-        return true;
+        return false;
     }
 
     /**

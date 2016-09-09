@@ -33,11 +33,8 @@ class TransactionEmailsAclTest extends Selenium2TestCase
     {
         $username = 'User_'.mt_rand();
 
-        $login = $this->login();
-        /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
-            ->add()
-            ->assertTitle('Create User - Users - User Management - System')
+        $page = $this->login()->openUsers('Oro\Bundle\UserBundle')->add();
+        $page->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
@@ -46,8 +43,11 @@ class TransactionEmailsAclTest extends Selenium2TestCase
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
-            ->setRoles(array('Label_' . $role))
-            ->setBusinessUnit(['Main'])
+            ->setRoles(array('Label_' . $role));
+        if ($page->hasBusinessUnitOrganizationChoice()) {
+            $page->setBusinessUnitOrganization(['OroCRM']);
+        }
+        $page->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')

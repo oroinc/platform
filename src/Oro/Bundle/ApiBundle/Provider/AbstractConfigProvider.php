@@ -26,7 +26,7 @@ abstract class AbstractConfigProvider
     ) {
         $context->setClassName($className);
         $context->setVersion($version);
-        $context->getRequestType()->set($requestType->toArray());
+        $context->getRequestType()->set($requestType);
         if (!empty($extras)) {
             $context->setExtras($extras);
         }
@@ -54,6 +54,28 @@ abstract class AbstractConfigProvider
     }
 
     /**
+     * @param string                 $className
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @return string
+     */
+    protected function buildConfigKey($className, array $extras)
+    {
+        $configKey = $className;
+        foreach ($extras as $extra) {
+            if ($extra instanceof ConfigExtraSectionInterface) {
+                continue;
+            }
+            $part = $extra->getCacheKeyPart();
+            if (!empty($part)) {
+                $configKey .= '|' . $part;
+            }
+        }
+
+        return $configKey;
+    }
+
+    /**
      * @param ConfigContext $context
      *
      * @return Config
@@ -70,6 +92,10 @@ abstract class AbstractConfigProvider
             if ($extra instanceof ConfigExtraSectionInterface && $context->has($sectionName)) {
                 $config->set($sectionName, $context->get($sectionName));
             }
+        }
+        $definition = $config->getDefinition();
+        if ($definition) {
+            $definition->setKey($this->buildConfigKey($context->getClassName(), $context->getExtras()));
         }
 
         return $config;

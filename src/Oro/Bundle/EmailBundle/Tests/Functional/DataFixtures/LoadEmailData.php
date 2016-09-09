@@ -9,8 +9,8 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
@@ -27,9 +27,9 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
     protected $emailEntityBuilder;
 
     /**
-     * @var Processor
+     * @var EmailOriginHelper
      */
-    protected $mailerProcessor;
+    protected $emailOriginHelper;
 
     /**
      * @var ContainerInterface
@@ -60,7 +60,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
         $this->container = $container;
         $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
-        $this->mailerProcessor = $container->get('oro_email.mailer.processor');
+        $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
     }
 
     /**
@@ -103,7 +103,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         foreach ($this->templates as $index => $template) {
             $owner = $this->getReference('simple_user');
             $simpleUser2 = $this->getReference('simple_user2');
-            $origin = $this->mailerProcessor->getEmailOrigin($owner->getEmail());
+            $origin = $this->emailOriginHelper->getEmailOrigin($owner->getEmail());
 
             $emailUser = $this->emailEntityBuilder->emailUser(
                 $template['Subject'],

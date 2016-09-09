@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Selenium;
 
+use Oro\Bundle\ConfigBundle\Tests\Selenium\Pages\UserEmailSettings;
 use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\Emails;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
@@ -56,10 +57,10 @@ class SendEmailTest extends Selenium2TestCase
 
         $login = $this->login();
         /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
+        $page = $login->openUsers('Oro\Bundle\UserBundle')
             ->assertTitle('All - Users - User Management - System')
-            ->add()
-            ->assertTitle('Create User - Users - User Management - System')
+            ->add();
+        $page->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->setOwner('Main')
             ->enable()
@@ -68,15 +69,19 @@ class SendEmailTest extends Selenium2TestCase
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@example.com')
-            ->setRoles(['Administrator'], true)
-            ->setBusinessUnit(['Main'])
+            ->setRoles(['Administrator'], true);
+        if ($page->hasBusinessUnitOrganizationChoice()) {
+            $page->setBusinessUnitOrganization(['OroCRM']);
+        }
+        $page->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
-            ->setImap($imapSetting)
             ->save()
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
             ->submit();
+        /** @var UserEmailSettings $login */
+        $login->openUserEmailSettings('Oro\Bundle\ConfigBundle')->setImap($imapSetting);
         exec("app/console oro:cron:imap-sync --env prod");
         /** @var Emails $login */
         $login->openEmails('Oro\Bundle\EmailBundle')
@@ -141,6 +146,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setLastName($lastName)
             ->setEmail($username.'@example.com')
             ->setRoles(['Administrator'], true)
+            ->setBusinessUnitOrganization(['OroCRM'])
             ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->save();

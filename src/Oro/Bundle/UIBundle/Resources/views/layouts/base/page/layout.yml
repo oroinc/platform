@@ -20,19 +20,23 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        visible: { '@not_empty': $data.theme.icon }
-                        href: { '@asset': $data.theme.icon }
+                        visible: '=data["theme"].getIcon(context["theme"])!=null'
+                        href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
                         rel: shortcut icon
                 styles:
                     blockType: style
                     options:
-                        src: { '@asset': $data.theme.data.assets.styles.output }
+                        src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
                 body:
                     blockType: body
                 scripts_before:
                     blockType: container
                 require_js:
                     blockType: container
+                requirejs_scripts:
+                    blockType: requires
+                requirejs_scripts_after:
+                    blockType: block
                 require_modules:
                     blockType: container
                 app_script:
@@ -48,7 +52,9 @@ layout:
                         theme_icon: ~
                         styles: ~
                         scripts_before: ~
-                        require_js: ~
+                        require_js:
+                            requirejs_scripts: ~
+                            requirejs_scripts_after: ~
                         require_modules:
                             app_script: ~
                     body: ~

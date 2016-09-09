@@ -22,7 +22,8 @@ define(function(require) {
     var localeSettings = require('orolocale/js/locale-settings');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
-    require('jquery.fullcalendar');
+    var persistentStorage = require('oroui/js/persistent-storage');
+    require('fullcalendar');
 
     CalendarView = BaseView.extend({
         MOMENT_BACKEND_FORMAT: dateTimeFormatter.getBackendDateTimeFormat(),
@@ -46,7 +47,7 @@ define(function(require) {
         options: {
             timezone: localeSettings.getTimeZone(),
             eventsOptions: {
-                defaultView: 'month',
+                defaultView: 'agendaWeek',
                 allDayText: __('oro.calendar.control.all_day'),
                 buttonText: {
                     today: __('oro.calendar.control.today'),
@@ -73,7 +74,8 @@ define(function(require) {
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
+                recoverView: true
             },
             connectionsOptions: {
                 collection: null,
@@ -127,6 +129,28 @@ define(function(require) {
             // set options for new events
             this.options.newEventEditable = this.options.eventsOptions.editable;
             this.options.newEventRemovable = this.options.eventsOptions.removable;
+
+            if (this.options.eventsOptions.recoverView) {
+                // try to retrieve the last view for this calendar
+                var viewKey = this.getStorageKey('defaultView');
+                var dateKey = this.getStorageKey('defaultDate');
+
+                var defaultView = persistentStorage.getItem(viewKey);
+                var defaultDate = persistentStorage.getItem(dateKey);
+
+                if (defaultView) {
+                    this.options.eventsOptions.defaultView =  defaultView;
+                }
+
+                if (defaultDate && !isNaN(defaultDate)) {
+                    defaultDate = moment.unix(defaultDate);
+                    this.options.eventsOptions.defaultDate = defaultDate;
+                    /**
+                     * @TODO This is hotfix. Should be fixed in CRM-6061
+                     */
+                    this.enableEventLoading = (defaultDate.format('M') !== moment().format('M'));
+                }
+            }
 
             // subscribe to event collection events
             this.listenTo(this.collection, 'add', this.onEventAdded);
@@ -222,6 +246,13 @@ define(function(require) {
 
         handleEventViewAdd: function(eventModel) {
             this.collection.add(eventModel);
+            //after editing recurrence event, all events should be loaded with actual data
+            if (eventModel.get('recurrence')) {
+                var oldEnableEventLoading = this.enableEventLoading;
+                this.enableEventLoading = true;
+                this.getCalendarElement().fullCalendar('refetchEvents');
+                this.enableEventLoading = oldEnableEventLoading;
+            }
         },
 
         visibleDefaultCalendar: function(eventModel) {
@@ -281,8 +312,9 @@ define(function(require) {
         },
 
         onEventDeleted: function(eventModel) {
-            this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
             this.trigger('event:deleted', eventModel);
+            this.updateEvents();
+            this.updateLayout();
         },
 
         onConnectionAdded: function() {
@@ -543,9 +575,16 @@ define(function(require) {
          * Performs filtration of calendar events before they are rendered
          *
          * @param {Array} events
+         *
          * @returns {Array}
          */
         filterEvents: function(events) {
+            var visibleEvents = this.filterVisibleEvents(events);
+
+            return this.filterCancelledEvents(visibleEvents);
+        },
+
+        filterVisibleEvents: function(events) {
             var visibleConnectionIds = [];
             // collect visible connections
             this.options.connectionsOptions.collection.each(function(connectionModel) {
@@ -553,12 +592,16 @@ define(function(require) {
                     visibleConnectionIds.push(connectionModel.get('calendarUid'));
                 }
             }, this);
-            // filter visible events
-            events = _.filter(events, function(event) {
+
+            return _.filter(events, function(event) {
                 return -1 !== _.indexOf(visibleConnectionIds, event.get('calendarUid'));
             });
+        },
 
-            return events;
+        filterCancelledEvents: function(events) {
+            return _.filter(events, function(event) {
+                return !event.get('isCancelled');
+            });
         },
 
         /**
@@ -569,7 +612,18 @@ define(function(require) {
         createViewModel: function(eventModel) {
             var fcEvent = _.pick(
                 eventModel.attributes,
-                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
+                [
+                    'id',
+                    'title',
+                    'start',
+                    'end',
+                    'allDay',
+                    'backgroundColor',
+                    'calendarUid',
+                    'editable',
+                    'startEditable',
+                    'durationEditable'
+                ]
             );
             var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
 
@@ -798,7 +852,6 @@ define(function(require) {
         },
 
         setTimeline: function() {
-            var todayElement;
             var timeGrid;
             var timelineElement;
             var percentOfDay;
@@ -807,6 +860,11 @@ define(function(require) {
             var dayCol;
             var calendarElement = this.getCalendarElement();
             var currentView = calendarElement.fullCalendar('getView');
+
+            if (this.options.eventsOptions.recoverView) {
+                this.persistView();
+            }
+
             // shown interval in calendar timezone
             var shownInterval = {
                 start: currentView.intervalStart.clone().utc(),
@@ -823,11 +881,10 @@ define(function(require) {
             // this function is called every 1 minute
             if (now.hours() === 0 && now.minutes() <= 2) {
                 // the day has changed
-                todayElement = calendarElement.find('.fc-today');
-                todayElement.removeClass('fc-today');
-                todayElement.removeClass('fc-state-highlight');
-                todayElement.next().addClass('fc-today');
-                todayElement.next().addClass('fc-state-highlight');
+                calendarElement.find('.fc-today')
+                    .removeClass('fc-today fc-state-highlight')
+                    .next()
+                    .addClass('fc-today fc-state-highlight');
             }
 
             timeGrid = calendarElement.find('.fc-time-grid');
@@ -857,6 +914,22 @@ define(function(require) {
                         left: (dayCol.position().left) + 'px',
                         width: (dayCol.width() + 3) + 'px'
                     });
+                }
+            }
+        },
+
+        persistView: function() {
+            var calendarElement = this.getCalendarElement();
+            var currentDate = calendarElement.fullCalendar('getDate');
+            var currentView = calendarElement.fullCalendar('getView');
+            var viewKey = this.getStorageKey('defaultView');
+            var dateKey = this.getStorageKey('defaultDate');
+
+            if (this.options.eventsOptions.recoverView) {
+                persistentStorage.setItem(viewKey, currentView.name);
+
+                if (!isNaN(currentDate)) {
+                    persistentStorage.setItem(dateKey, currentDate.unix());
                 }
             }
         },
@@ -918,6 +991,12 @@ define(function(require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
+        },
+
+        getStorageKey: function(item) {
+            var calendarId = this.options.calendar;
+
+            return calendarId ? item + calendarId : '';
         }
     });
 

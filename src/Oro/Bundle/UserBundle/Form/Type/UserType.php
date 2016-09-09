@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
@@ -32,24 +31,18 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
-    /** ConfigManager */
-    protected $userConfigManager;
-
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade           $securityFacade
      * @param Request                  $request Request
-     * @param ConfigManager            $userConfigManager
      */
     public function __construct(
         SecurityContextInterface $security,
         SecurityFacade           $securityFacade,
-        Request                  $request,
-        ConfigManager            $userConfigManager
+        Request                  $request
     ) {
         $this->security          = $security;
         $this->securityFacade    = $securityFacade;
-        $this->userConfigManager = $userConfigManager;
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
     }
@@ -60,7 +53,6 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addEntityFields($builder);
-        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
     }
 
     /**
@@ -112,15 +104,7 @@ class UserType extends AbstractType
                 ]
             );
         }
-        if ($this->securityFacade->isGranted('oro_organization_view')
-            && $this->securityFacade->isGranted('oro_business_unit_view')
-        ) {
-            $builder->add(
-                'organizations',
-                'oro_organizations_select',
-                ['required' => false, 'label' => 'oro.user.form.access_settings.label']
-            );
-        }
+        $this->addOrganizationField($builder);
         $builder
             ->add(
                 'plainPassword',
@@ -146,19 +130,6 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 ]
             );
-        if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
-            $builder->add(
-                'imapAccountType',
-                'oro_imap_choice_account_type',
-                ['label' => 'oro.user.imap_configuration.label']
-            );
-        } else {
-            $builder->add(
-                'imapConfiguration',
-                'oro_imap_configuration',
-                ['label' => 'oro.user.imap_configuration.label']
-            );
-        }
         $builder->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
@@ -198,6 +169,14 @@ class UserType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_user_user';
     }
@@ -242,29 +221,20 @@ class UserType extends AbstractType
     }
 
     /**
-     * Post set data handler
-     *
-     * @param FormEvent $event
+     * @param FormBuilderInterface $builder
      */
-    public function postSetData(FormEvent $event)
+    protected function addOrganizationField(FormBuilderInterface $builder)
     {
-        /** @var Form $form */
-        $form = $event->getForm();
-        $data = $form->getData();
-        if ($data instanceof User) {
-            $token = $this->security->getToken();
-            if ($token && is_object($user = $token->getUser()) && $data->getId() == $user->getId()) {
-                $form->add(
-                    'signature',
-                    'oro_rich_text',
-                    [
-                        'label'    => 'oro.user.form.signature.label',
-                        'required' => false,
-                        'mapped'   => false,
-                        'data'     => $this->userConfigManager->get('oro_email.signature'),
-                    ]
-                );
-            }
+        if ($this->securityFacade->isGranted('oro_organization_view')
+            && $this->securityFacade->isGranted('oro_business_unit_view')
+        ) {
+            $builder->add(
+                'organizations',
+                'oro_organizations_select',
+                [
+                    'required' => false,
+                ]
+            );
         }
     }
 }

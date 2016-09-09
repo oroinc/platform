@@ -47,9 +47,7 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
             $entity = $this->getEntityReference($entityClass, $entity['entityId']);
         }
 
-        $isFieldAllowed = $this->isFieldAclEnabled($entityClass) ?
-            $this->authChecker->isGranted('VIEW', new FieldVote($entity, $field)) :
-            true;
+        $isFieldAllowed = $this->authChecker->isGranted('VIEW', new FieldVote($entity, $field));
         $shouldShowRestricted = $this->shouldShowRestricted($entityClass);
 
         if (!$shouldShowRestricted && !$isFieldAllowed) {
@@ -61,28 +59,6 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
         }
 
         return static::FILTER_VALUE; // field will be shown, but without value, e.g. null
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkEntity($entity)
-    {
-        return $this->authChecker->isGranted('VIEW', $entity) ?
-            static::FILTER_NOTHING :
-            static::FILTER_ALL;
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
-    protected function isFieldAclEnabled($entityClass)
-    {
-        $securityConfig = $this->getSecurityConfig($entityClass);
-
-        return $securityConfig ? $securityConfig->get('field_acl_enabled') : false;
     }
 
     /**

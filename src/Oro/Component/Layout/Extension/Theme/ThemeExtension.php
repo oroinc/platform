@@ -2,19 +2,19 @@
 
 namespace Oro\Component\Layout\Extension\Theme;
 
-use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
-use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
-use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
+use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
+use Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
+use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 
 class ThemeExtension extends AbstractExtension
 {
-    /** @var array */
-    protected $resources;
+    const THEME_KEY = 'theme';
 
     /** @var LayoutUpdateLoaderInterface */
     protected $loader;
@@ -25,22 +25,39 @@ class ThemeExtension extends AbstractExtension
     /** @var PathProviderInterface */
     protected $pathProvider;
 
+    /** @var ResourceProviderInterface */
+    protected $resourceProvider;
+
+    /** @var VisitorInterface[] */
+    protected $visitors = [];
+
+    /** @var array */
+    protected $updates = [];
+
     /**
-     * @param array                       $resources
      * @param LayoutUpdateLoaderInterface $loader
-     * @param DependencyInitializer       $dependencyInitializer
-     * @param PathProviderInterface       $provider
+     * @param DependencyInitializer $dependencyInitializer
+     * @param PathProviderInterface $pathProvider
+     * @param ResourceProviderInterface $resourceProvider
      */
     public function __construct(
-        array $resources,
         LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
-        PathProviderInterface $provider
+        PathProviderInterface $pathProvider,
+        ResourceProviderInterface $resourceProvider
     ) {
-        $this->resources             = $resources;
-        $this->loader                = $loader;
+        $this->loader = $loader;
         $this->dependencyInitializer = $dependencyInitializer;
-        $this->pathProvider          = $provider;
+        $this->pathProvider = $pathProvider;
+        $this->resourceProvider = $resourceProvider;
+    }
+
+    /**
+     * @param VisitorInterface $visitor
+     */
+    public function addVisitor(VisitorInterface $visitor)
+    {
+        $this->visitors[] = $visitor;
     }
 
     /**
@@ -48,72 +65,52 @@ class ThemeExtension extends AbstractExtension
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
-        $updates = [];
-
-        if ($context->getOr('theme')) {
-            $iterator = new ResourceIterator($this->findApplicableResources($context));
-            foreach ($iterator as $file) {
-                $update = $this->loader->load($file);
-                if ($update) {
-                    $this->dependencyInitializer->initialize($update);
-                    $el             = $update instanceof ElementDependentLayoutUpdateInterface
-                        ? $update->getElement()
-                        : 'root';
-                    $updates[$el][] = $update;
-                }
+        if ($context->getOr(self::THEME_KEY)) {
+            $paths = $this->getPaths($context);
+            $files = $this->resourceProvider->findApplicableResources($paths);
+            foreach ($files as $file) {
+                $this->loadLayoutUpdate($file);
             }
         }
 
-        return $updates;
+        foreach ($this->visitors as $visitor) {
+            $visitor->walkUpdates($this->updates, $context);
+        }
+
+        return $this->updates;
     }
 
     /**
-     * Filters resources by paths that comes from provider and returns array of resource files
+     * @param string $file
+     *
+     * @return array
+     */
+    protected function loadLayoutUpdate($file)
+    {
+        $update = $this->loader->load($file);
+        if ($update) {
+            $el = $update instanceof ElementDependentLayoutUpdateInterface
+                ? $update->getElement()
+                : 'root';
+            $this->updates[$el][] = $update;
+
+            $this->dependencyInitializer->initialize($update);
+        }
+    }
+
+    /**
+     * Return paths that comes from provider and returns array of resource files
      *
      * @param ContextInterface $context
      *
      * @return array
      */
-    protected function findApplicableResources(ContextInterface $context)
+    protected function getPaths(ContextInterface $context)
     {
         if ($this->pathProvider instanceof ContextAwareInterface) {
             $this->pathProvider->setContext($context);
         }
 
-        $result = [];
-        $paths  = $this->pathProvider->getPaths([]);
-        foreach ($paths as $path) {
-            $pathArray = explode(PathProviderInterface::DELIMITER, $path);
-
-            $value = $this->resources;
-            for ($i = 0, $length = count($pathArray); $i < $length; ++$i) {
-                $value = $this->readValue($value, $pathArray[$i]);
-
-                if (null === $value) {
-                    break;
-                }
-            }
-
-            if ($value && is_array($value)) {
-                $result = array_merge($result, array_filter($value, 'is_string'));
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array  $array
-     * @param string $property
-     *
-     * @return mixed
-     */
-    protected function readValue(&$array, $property)
-    {
-        if (is_array($array) && isset($array[$property])) {
-            return $array[$property];
-        }
-
-        return null;
+        return $this->pathProvider->getPaths([]);
     }
 }

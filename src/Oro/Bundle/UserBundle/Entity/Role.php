@@ -16,10 +16,13 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  * @ORM\Table(name="oro_access_role")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
+ *      routeName="oro_user_role_index",
+ *      routeView="oro_user_role_update",
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true
@@ -85,7 +88,10 @@ class Role extends ExtendRole
      */
     public function __clone()
     {
-        $this->id = null;
+        if ($this->id) {
+            $this->id = null;
+            $this->setRole($this->role);
+        }
     }
 
     /**

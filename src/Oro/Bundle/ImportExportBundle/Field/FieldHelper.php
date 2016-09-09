@@ -4,7 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Field;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 
 use Doctrine\Common\Util\ClassUtils;
 
@@ -12,6 +14,10 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class FieldHelper
 {
     const HAS_CONFIG = 'has_config';
@@ -266,17 +272,26 @@ class FieldHelper
      * @param object $object
      * @param string $fieldName
      * @param mixed  $value
-     * @throws NoSuchPropertyException|\TypeError|\ErrorException
+     * @throws NoSuchPropertyException|\TypeError|\ErrorException|InvalidArgumentException
      */
     public function setObjectValue($object, $fieldName, $value)
     {
+        $propertyPath = new PropertyPath($fieldName);
+
+        if (null === $value && $propertyPath->getLength() === 1) {
+            $this->setObjectValueWithReflection($object, $fieldName, $value);
+            return;
+        }
+
         try {
-            $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
+            $this->getPropertyAccessor()->setValue($object, $propertyPath, $value);
         } catch (NoSuchPropertyException $e) {
             $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
         } catch (\TypeError $e) {
             $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
         } catch (\ErrorException $e) {
+            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
+        } catch (InvalidArgumentException $e) {
             $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
         }
     }
@@ -288,13 +303,21 @@ class FieldHelper
      * @param object $object
      * @param string $fieldName
      * @param mixed  $value
-     * @param NoSuchPropertyException|\TypeError|\ErrorException $exception
-     * @throws NoSuchPropertyException|\TypeError|\ErrorException
+     * @param NoSuchPropertyException|\TypeError|\ErrorException|InvalidArgumentException $exception
+     * @throws NoSuchPropertyException|\TypeError|\ErrorException|InvalidArgumentException
      */
-    protected function setObjectValueWithReflection($object, $fieldName, $value, $exception)
+    protected function setObjectValueWithReflection($object, $fieldName, $value, $exception = null)
     {
         $class = ClassUtils::getClass($object);
         while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+        }
+
+        if ($exception === null) {
+            $exception = new NoSuchPropertyException(sprintf(
+                'Property "%s" does not exist in class "%s"',
+                $fieldName,
+                $class
+            ));
         }
 
         if ($class) {

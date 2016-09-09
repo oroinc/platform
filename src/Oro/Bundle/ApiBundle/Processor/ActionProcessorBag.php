@@ -28,4 +28,12 @@ class ActionProcessorBag implements ActionProcessorBagInterface
 
         return $this->processors[$action];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActions()
+    {
+        return array_keys($this->processors);
+    }
 }

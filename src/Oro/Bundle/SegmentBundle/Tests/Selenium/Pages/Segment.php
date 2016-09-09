@@ -13,7 +13,7 @@ use Oro\Bundle\ReportBundle\Tests\Selenium\Pages\FilterConditions;
  */
 class Segment extends FilterConditions
 {
-    protected $organization = '//select[@data-ftid="oro_segment_form_owner"]';
+    protected $organization = '//*[@data-ftid="oro_segment_form_owner"]/preceding-sibling::div/a';
 
     public function setName($name)
     {

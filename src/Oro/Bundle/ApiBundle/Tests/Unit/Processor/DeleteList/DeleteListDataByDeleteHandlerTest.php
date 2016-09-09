@@ -63,7 +63,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The result property of the Context should be array or Traversable, "stdClass" given.
      */
     public function testProcessForNotArrayResult()

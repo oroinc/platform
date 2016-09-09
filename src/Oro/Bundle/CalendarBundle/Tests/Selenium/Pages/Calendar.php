@@ -86,7 +86,7 @@ class Calendar extends Calendars
     public function setGuestUser($username)
     {
         $this->test->byXpath(
-            "//div[starts-with(@id,'s2id_oro_calendar_event_form_invitedUsers')]//input"
+            "//div[starts-with(@id,'s2id_oro_calendar_event_form_attendees')]//input"
         )->value($username);
         $this->waitForAjax();
         $this->assertElementPresent(

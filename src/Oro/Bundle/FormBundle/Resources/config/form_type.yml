@@ -2,6 +2,7 @@ parameters:
     oro_form.type.date.class:                                    Oro\Bundle\FormBundle\Form\Type\OroDateType
     oro_form.type.datetime.class:                                Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
     oro_form.type.time_interval.class:                           Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType
+    oro_form.type.duration.class:                                Oro\Bundle\FormBundle\Form\Type\OroDurationType
     oro_form.type.money.class:                                   Oro\Bundle\FormBundle\Form\Type\OroMoneyType
     oro_form.type.percent.class:                                 Oro\Bundle\FormBundle\Form\Type\OroPercentType
     oro_form.type.entity_identifier.class:                       Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
@@ -58,6 +59,12 @@ services:
         class: %oro_form.type.time_interval.class%
         tags:
             - { name: form.type, alias: oro_time_interval }
+
+    oro_form.type.duration:
+        class: '%oro_form.type.duration.class%'
+        tags:
+            - { name: form.type, alias: oro_duration }
+            - { name: oro.api.form.type, alias: oro_duration }
 
     oro_form.type.money:
         class: %oro_form.type.money.class%
@@ -175,12 +182,12 @@ services:
     oro_form.extension.data_block:
         class: %oro_form.extension.data_block.class%
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_form.extension.client_validation:
         class: %oro_form.extension.client_validation.class%
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_help.form.tooltip_extension:
         class: %oro_form.extension.tooltip.class%
@@ -188,20 +195,20 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@translator.default'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_form.extension.constraint_as_option:
         class: %oro_form.extension.constraint_as_option.class%
         arguments:
             - '@oro_form.validator.constraint_factory'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_form.extension.js_validation:
         class: %oro_form.extension.js_validation.class%
         arguments: ['@oro_form.extension.js_validation.constraints_provider']
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_form.extension.js_validation.constraints_provider:
         class: %oro_form.extension.js_validation.constraints_provider.class%
@@ -217,19 +224,19 @@ services:
     oro_form.extension.additional_attr:
         class: %oro_form.extension.additional_attr.class%
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_form.extension.data_transformer:
         class: %oro_form.extension.data_transformer.class%
         arguments:
             - '@service_container'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_form.extension.sortable:
         class: %oro_form.extension.sortable.class%
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_form.type.encoded_password:
         class: %oro_form.type.encoded_password.class%
@@ -248,6 +255,8 @@ services:
         arguments:
             - '@oro_security.security_facade'
             - '@oro_entity_config.config_manager'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.search_registry'
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
 

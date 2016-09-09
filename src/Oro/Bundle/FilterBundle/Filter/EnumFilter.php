@@ -71,31 +71,19 @@ class EnumFilter extends BaseMultiChoiceFilter
     /**
      * {@inheritDoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        $data = $this->parseData($data);
-        if (!$data) {
-            return false;
-        }
-
-        $type =  $data['type'];
         $parameterName = $ds->generateParameterName($this->getName());
-
-        $this->applyFilterToClause(
-            $ds,
-            $this->buildComparisonExpr(
-                $ds,
-                $type,
-                $this->get(FilterUtility::DATA_NAME_KEY),
-                $parameterName
-            )
-        );
-
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
-        return true;
+        return $this->buildComparisonExpr(
+            $ds,
+            $comparisonType,
+            $fieldName,
+            $parameterName
+        );
     }
 
     /**

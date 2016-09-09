@@ -46,26 +46,16 @@ class EntityExtendPassTest extends \PHPUnit_Framework_TestCase
         $loaderDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-        $extendLoaderDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $loaderDef->expects($this->once())
-            ->method('replaceArgument')
-            ->with(0, [$extendLoaderDef]);
 
         $container->expects($this->at(3))
             ->method('hasDefinition')
-            ->with(EntityExtendPass::VALIDATION_LOADER_ID)
+            ->with('validator.builder')
             ->will($this->returnValue(true));
         $container->expects($this->at(4))
             ->method('getDefinition')
-            ->with(EntityExtendPass::VALIDATION_LOADER_ID)
+            ->with('validator.builder')
             ->will($this->returnValue($loaderDef));
-        $container->expects($this->at(5))
-            ->method('getDefinition')
-            ->with(EntityExtendPass::EXTEND_VALIDATION_LOADER_ID)
-            ->will($this->returnValue($extendLoaderDef));
+
 
         $compiler = new EntityExtendPass();
         $compiler->process($container);

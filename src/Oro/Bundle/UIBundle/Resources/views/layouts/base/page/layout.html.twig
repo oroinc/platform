@@ -6,13 +6,22 @@
 {% endblock %}
 
 {% block _require_js_widget %}
+    {{ block_widget(block) }}
+{% endblock %}
+
+{% block _requirejs_scripts_widget %}
     {% set requirejs_config_extend %}
         {%- placeholder requirejs_config_extend -%}
     {% endset %}
     {% include 'OroRequireJSBundle::scripts.html.twig' with {
         compressed: not app.debug,
-        config_extend: requirejs_config_extend
+        config_extend: requirejs_config_extend,
+        provider_alias: provider_alias
     } %}
+    {{ block_widget(block) }}
+{% endblock %}
+
+{% block _requirejs_scripts_after_widget %}
     {% placeholder scripts_after %}
     {{ block_widget(block) }}
 {% endblock %}

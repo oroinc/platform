@@ -4,16 +4,18 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 class DatagridExportConnector implements ItemReaderInterface, \Countable, ContextAwareInterface
 {
@@ -67,8 +69,8 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
      */
     public function __construct(ServiceLink $gridManagerLink)
     {
-        $this->gridManagerLink   = $gridManagerLink;
-        $this->pageSize          = BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE;
+        $this->gridManagerLink = $gridManagerLink;
+        $this->pageSize        = BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE;
     }
 
     /**
@@ -88,7 +90,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
     {
         $this->ensureSourceDataInitialized();
 
-        $result = null;
+        $result  = null;
         $context = $this->getContext();
         if ($context->getReadCount() < $this->totalCount) {
             if ($this->offset === $this->pageSize && $this->page * $this->pageSize < $this->totalCount) {
@@ -172,13 +174,14 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
             $this->gridDataSource = clone $this->grid->getDatasource();
         }
 
-        $this->grid->getParameters()->set(
-            PagerInterface::PAGER_ROOT_PARAM,
-            [
-                PagerInterface::PAGE_PARAM     => $this->page,
-                PagerInterface::PER_PAGE_PARAM => $this->pageSize
-            ]
-        );
+        $pagerParameters = [
+            PagerInterface::PAGE_PARAM     => $this->page,
+            PagerInterface::PER_PAGE_PARAM => $this->pageSize
+        ];
+        if (null !== $this->totalCount) {
+            $pagerParameters[PagerInterface::ADJUSTED_COUNT] = $this->totalCount;
+        }
+        $this->grid->getParameters()->set(PagerInterface::PAGER_ROOT_PARAM, $pagerParameters);
 
         return $this->grid->getData();
     }

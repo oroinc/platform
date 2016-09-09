@@ -60,6 +60,14 @@ abstract class AbstractDriver implements DriverInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getUpdateFilenamePattern($fileExtension)
+    {
+        return '/\.' . $fileExtension . '$/';
+    }
+
+    /**
      * @param string $className
      * @param string $file
      *
@@ -68,7 +76,6 @@ abstract class AbstractDriver implements DriverInterface
     protected function doGenerate($className, $file)
     {
         $resourceDataForGenerator = $this->loadResourceGeneratorData($file);
-        $resourceDataForGenerator->setFilename($file);
 
         try {
             $visitors = $this->prepareVisitors($file);

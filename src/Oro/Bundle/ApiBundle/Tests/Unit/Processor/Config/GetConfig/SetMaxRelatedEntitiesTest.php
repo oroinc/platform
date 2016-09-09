@@ -101,7 +101,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntityWithoutTargetOptions()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -139,6 +139,155 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testProcessForNotManageableEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null,
+                'field2' => [
+                    'target_class'     => 'Test\Target',
+                    'target_type'      => 'to-many',
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'field21' => null,
+                        'field22' => [
+                            'target_class'     => 'Test\Target',
+                            'target_type'      => 'to-many',
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'field221' => null
+                            ]
+                        ],
+                        'field23' => [
+                            'target_class'     => 'Test\Target',
+                            'target_type'      => 'to-many',
+                            'exclusion_policy' => 'all',
+                            'max_results'      => -1,
+                            'fields'           => [
+                                'field231' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $limit  = 100;
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $configObject = $this->createConfigObject($config);
+        $this->context->setMaxRelatedEntities($limit);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => null,
+                    'field2' => [
+                        'target_class'     => 'Test\Target',
+                        'target_type'      => 'to-many',
+                        'exclusion_policy' => 'all',
+                        'max_results'      => $limit,
+                        'fields'           => [
+                            'field21' => null,
+                            'field22' => [
+                                'target_class'     => 'Test\Target',
+                                'target_type'      => 'to-many',
+                                'exclusion_policy' => 'all',
+                                'max_results'      => $limit,
+                                'fields'           => [
+                                    'field221' => null
+                                ]
+                            ],
+                            'field23' => [
+                                'target_class'     => 'Test\Target',
+                                'target_type'      => 'to-many',
+                                'exclusion_policy' => 'all',
+                                'fields'           => [
+                                    'field231' => null
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $configObject
+        );
+    }
+
+    public function testProcessForNotManageableEntityWithParentToOneAndChildToMany()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null,
+                'field2' => [
+                    'target_class'     => 'Test\Target',
+                    'target_type'      => 'to-one',
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'field21' => null,
+                        'field22' => [
+                            'target_class'     => 'Test\Target',
+                            'target_type'      => 'to-many',
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'field221' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $limit  = 100;
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $configObject = $this->createConfigObject($config);
+        $this->context->setMaxRelatedEntities($limit);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => null,
+                    'field2' => [
+                        'target_class'     => 'Test\Target',
+                        'target_type'      => 'to-one',
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'field21' => null,
+                            'field22' => [
+                                'target_class'     => 'Test\Target',
+                                'target_type'      => 'to-many',
+                                'exclusion_policy' => 'all',
+                                'max_results'      => $limit,
+                                'fields'           => [
+                                    'field221' => null
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $configObject
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessForManageableEntityWithToManyAssociations()
     {
         $config = [
@@ -153,6 +302,13 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                             'exclusion_policy' => 'all',
                             'fields'           => [
                                 'field221' => null
+                            ]
+                        ],
+                        'field23' => [
+                            'exclusion_policy' => 'all',
+                            'max_results'      => -1,
+                            'fields'           => [
+                                'field231' => null
                             ]
                         ]
                     ]
@@ -177,29 +333,29 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
         $field2TargetEntityMetadata->expects($this->any())
             ->method('hasAssociation')
-            ->willReturnMap([['field22', true]]);
+            ->willReturnMap([['field22', true], ['field23', true]]);
         $field2TargetEntityMetadata->expects($this->any())
             ->method('getAssociationTargetClass')
-            ->with('field22')
-            ->willReturn('Test\Field22Target');
-        $field2TargetEntityMetadata->expects($this->once())
+            ->willReturnMap([['field22', 'Test\Field22Target'], ['field23', 'Test\Field23Target']]);
+        $field2TargetEntityMetadata->expects($this->any())
             ->method('isCollectionValuedAssociation')
-            ->with('field22')
-            ->willReturn(true);
+            ->willReturnMap([['field22', true], ['field23', true]]);
 
         $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
+        $field23TargetEntityMetadata = $this->getClassMetadataMock('Test\Field23Target');
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(3))
+        $this->doctrineHelper->expects($this->exactly(4))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
                     ['Test\Field2Target', true, $field2TargetEntityMetadata],
                     ['Test\Field22Target', true, $field22TargetEntityMetadata],
+                    ['Test\Field23Target', true, $field23TargetEntityMetadata],
                 ]
             );
 
@@ -223,6 +379,12 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                                 'max_results'      => $limit,
                                 'fields'           => [
                                     'field221' => null
+                                ]
+                            ],
+                            'field23' => [
+                                'exclusion_policy' => 'all',
+                                'fields'           => [
+                                    'field231' => null
                                 ]
                             ]
                         ]

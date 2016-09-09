@@ -30,19 +30,25 @@ class Role extends AbstractPageEntity
     public function setEntity($entityName, $aclAction, $accessLevel)
     {
         foreach ($aclAction as $action) {
-            $action = strtoupper($action);
             $this->accessLevel = $this->test->byXpath(
-                "//div[normalize-space(strong/text()) = '{$entityName}']/ancestor::tr//input" .
-                "[contains(@name, '[$action][accessLevel')]/preceding-sibling::div/a"
+                "//td[normalize-space(text()) = '{$entityName}']/ancestor::tr" .
+                "//span[normalize-space(text()) = '$action']/following-sibling::a"
             );
-            $this->test->moveto($this->accessLevel);
+
             $this->accessLevel->click();
             $this->waitForAjax();
             if ($accessLevel === 'System'
-                && !$this->isElementPresent("//div[@id='select2-drop']//div[contains(., '{$accessLevel}')]")) {
+                && !$this->isElementPresent(
+                    "//li[contains(@class, 'action-permissions__item') and contains(@class, 'open')]" .
+                    "//a[normalize-space(text()) = '{$accessLevel}']"
+                )
+            ) {
                 $accessLevel = 'Organization';
             }
-            $this->test->byXPath("//div[@id='select2-drop']//div[contains(., '{$accessLevel}')]")->click();
+            $this->test->byXPath(
+                "//li[contains(@class, 'action-permissions__item') and contains(@class, 'open')]" .
+                "//a[normalize-space(text()) = '{$accessLevel}']"
+            )->click();
         }
 
         return $this;

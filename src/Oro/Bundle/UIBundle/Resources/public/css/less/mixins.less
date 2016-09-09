@@ -98,11 +98,14 @@
 }
 
 .horizontal-icon-menu () {
-  .dropdown-menu.pull-right {
+  .dropdown-menu {
     padding: 0;
-    right: 33px;
+    right: 100%;
     left: auto;
     top: -10px;
+    > li {
+      display: table-cell;
+    }
     .nav.launchers-list {
       padding: 0;
       > li:first-child > a{
@@ -193,4 +196,11 @@
     border-color: lighten(@errorText, 20%) transparent;
     border-width: 8px 4px 0;
   }
+}
+
+.text-line-truncate(@width: 100%) {
+  width: @width;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

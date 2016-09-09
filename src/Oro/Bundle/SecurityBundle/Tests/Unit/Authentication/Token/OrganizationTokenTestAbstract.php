@@ -35,6 +35,14 @@ abstract class OrganizationTokenTestAbstract extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSerializeError()
+    {
+        $idBeforeSerialization = $this->token->getOrganizationContext()->getId();
+        $serialized = $this->token->serialize();
+        $this->token->unserialize($serialized);
+        $this->assertEquals($idBeforeSerialization, $this->token->getOrganizationContext()->getId());
+    }
+    
     /**
      * @return OrganizationContextTokenInterface
      */

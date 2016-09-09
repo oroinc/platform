@@ -45,7 +45,7 @@ definitions:
         enabled: true
         order: 150
         entity: Oro\Bundle\EmailBundle\Entity\EmailFolder
-        pre_conditions:
+        preconditions:
             '@equal': [$syncEnabled, false]
         actions_configuration:
             - '@assign_constant_value':

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Update\JsonApi\ValidateRequestData;
-use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class ValidateRequestDataTest extends FormProcessorTestCase

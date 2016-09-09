@@ -1,1 +1,5 @@
-<img src="<% if (avatar) { %><%= avatar %><% } else { %>{{ asset('bundles/oroui/img/avatar-xsmall.png')|e('html_attr')|raw }}<% } %>" width="16" height="16" />&nbsp;<%= highlight(_.escape(fullName)) %> - <%= highlight(_.escape(email)) %> (<%= highlight(_.escape(username)) %>)
+<% if (id !== null) { %>
+    <img src="<% if (avatar) { %><%= avatar %><% } else { %>{{ asset('bundles/oroui/img/avatar-xsmall.png')|e('html_attr')|raw }}<% } %>" width="16" height="16" />&nbsp;<%= highlight(_.escape(fullName)) %> - <%= highlight(_.escape(email)) %> (<%= highlight(_.escape(username)) %>)
+<% } else { %>
+    <%= highlight(_.escape(email)) %>
+<% } %>

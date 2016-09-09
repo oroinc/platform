@@ -2,15 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
 
 class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $configProvider;
-
     /**
      * @var ActionPermissionProvider
      */
@@ -18,10 +14,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->provider = new ActionPermissionProvider($this->configProvider);
+        $this->provider = new ActionPermissionProvider();
     }
 
     /**
@@ -34,14 +27,17 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
+    /**
+     * @return array
+     */
     public function getWorkflowDefinitionPermissionsDataProvider()
     {
-        $systemDefinition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+        $systemDefinition = $this->getMock(ResultRecordInterface::class);
         $systemDefinition->expects($this->any())
             ->method('getValue')
             ->will($this->returnValueMap(array(array('system', true))));
 
-        $regularDefinition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+        $regularDefinition = $this->getMock(ResultRecordInterface::class);
         $regularDefinition->expects($this->any())
             ->method('getValue')
             ->will($this->returnValueMap(array(array('system', false))));
@@ -75,41 +71,19 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expected
      * @param object $input
-     * @param bool $hasConfig
-     * @param string $activeWorkflowName
      * @dataProvider getWorkflowDefinitionActivationDataProvider
      */
     public function testGetWorkflowDefinitionPermissionsActivationRelated(
         array $expected,
-        $input,
-        $hasConfig,
-        $activeWorkflowName
+        $input
     ) {
-        $relatedEntity = $input->getValue('entityClass');
-        $this->configProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($relatedEntity)
-            ->will($this->returnValue($hasConfig));
-        if ($hasConfig) {
-            $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-                ->getMock();
-            $config->expects($this->once())
-                ->method('get')
-                ->with('active_workflow')
-                ->will($this->returnValue($activeWorkflowName));
-
-            $this->configProvider->expects($this->once())
-                ->method('getConfig')
-                ->with($relatedEntity)
-                ->will($this->returnValue($config));
-        } else {
-            $this->configProvider->expects($this->never())
-                ->method('getConfig');
-        }
 
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
+    /**
+     * @return array
+     */
     public function getWorkflowDefinitionActivationDataProvider()
     {
 
@@ -123,9 +97,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $this->getDefinitionMock(),
-                false,
-                null
+                'input' => $this->getDefinitionMock(false)
             ),
             'active definition' => array(
                 'expected' => array(
@@ -136,9 +108,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => false,
                     'deactivate' => true
                 ),
-                'input' => $this->getDefinitionMock(),
-                true,
-                'workflow_name'
+                'input' => $this->getDefinitionMock(true)
             ),
             'inactive definition' => array(
                 'expected' => array(
@@ -149,27 +119,27 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $this->getDefinitionMock(),
-                true,
-                'other_workflow_name'
+                'input' => $this->getDefinitionMock(false)
             )
         );
     }
 
     /**
+     * @param bool $active weather workflow is active
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getDefinitionMock()
+    protected function getDefinitionMock($active)
     {
-        $definition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+        $definition = $this->getMock(ResultRecordInterface::class);
 
         $definition->expects($this->any())
             ->method('getValue')
             ->will(
                 $this->returnValueMap(
                     array(
+                        array('active', $active),
                         array('name', 'workflow_name'),
-                        array('entityClass', '\stdClass')
+                        array('entityClass', \stdClass::class)
                     )
                 )
             );

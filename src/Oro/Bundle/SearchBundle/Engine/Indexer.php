@@ -182,7 +182,7 @@ class Indexer
      */
     public function select()
     {
-        $query = new Query(Query::SELECT);
+        $query = new Query();
 
         $query->setMappingConfig($this->mapper->getMappingConfig());
         $query->setEntityManager($this->em);
@@ -245,6 +245,7 @@ class Indexer
     protected function prepareQuery(Query $query)
     {
         $this->applyModesBehavior($query);
+
         if ($this->isAllowedApplyAcl) {
             $this->searchAclHelper->apply($query);
         }

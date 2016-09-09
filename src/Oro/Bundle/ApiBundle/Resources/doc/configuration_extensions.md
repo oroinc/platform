@@ -60,6 +60,9 @@ The following table describes existing sections for which new options can be add
 | actions.action | Add an action options |
 | actions.action.status_code | Add a response status code options |
 | actions.action.field | Add a field options specific for a particular action. These options override options defined in `entities.entity.field` |
+| subresources.subresource | Add a sub-resource options |
+| subresources.subresource.action | Add a sub-resource action options |
+| subresources.subresource.action.field | Add a field options specific for a particular action of a sub-resource. These options override options defined in `entities.entity.field` |
 
 An example:
 

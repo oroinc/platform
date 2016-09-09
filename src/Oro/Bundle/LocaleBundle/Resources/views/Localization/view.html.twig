@@ -1,0 +1,48 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+{% oro_title_set({params : {"%name%": entity.name}}) %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_locale_localization_index'),
+        'indexLabel': 'oro.locale.localization.entity_plural_label'|trans,
+        'entityTitle': 'oro.locale.localization.navigation.view'|trans({
+            '%name%': entity.name|default('N/A'|trans)
+        })
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set localizationInfo %}
+        {{ UI.renderProperty('oro.locale.localization.name.label'|trans, entity.name) }}
+        {{ UI.renderProperty('oro.locale.localization.title.label'|trans, entity.defaultTitle) }}
+        {{ UI.renderProperty('oro.locale.localization.language_code.label'|trans, entity.languageCode|oro_language_code_title) }}
+        {{ UI.renderProperty('oro.locale.localization.formatting_code.label'|trans, entity.formattingCode|oro_formatting_code_title) }}
+
+        {% if entity.parentLocalization %}
+            {{ UI.renderHtmlProperty(
+                'oro.locale.localization.parent_localization.label'|trans,
+                UI.entityViewLink(entity.parentLocalization, entity.parentLocalization.name, 'oro_locale_localization_view')
+            ) }}
+        {% endif %}
+    {% endset %}
+
+    {% set dataBlocks = [{
+        'title': 'oro.locale.localization.sections.general'|trans,
+        'class': 'active',
+        'subblocks': [{data: [localizationInfo]}]
+    }] %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': 'oro.locale.localization.child_localizations.label'|trans,
+        'subblocks': [{'data' : [dataGrid.renderGrid('oro-locale-localizations-children-grid', { localization_id: entity.id })], spanClass: 'order-line-items'}]
+    }]) %}
+
+    {% set id = 'localization-view' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}

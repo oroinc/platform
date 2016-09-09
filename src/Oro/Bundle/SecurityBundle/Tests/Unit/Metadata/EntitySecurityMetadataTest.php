@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
+use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 
 class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,12 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
             'SomeGroup',
             'SomeLabel',
             array(), //permissions
-            'SomeDescription'
+            'SomeDescription',
+            'SomeCategory',
+            [
+                'first' => new FieldSecurityMetadata('first', 'First Label'),
+                'second' => new FieldSecurityMetadata('second', 'Second Label', ['VIEW'])
+            ]
         );
     }
 
@@ -33,6 +39,14 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
         static::assertEquals('SomeGroup', $this->entity->getGroup());
         static::assertEquals('SomeLabel', $this->entity->getLabel());
         static::assertEquals('SomeDescription', $this->entity->getDescription());
+        static::assertEquals('SomeCategory', $this->entity->getCategory());
+        $fields = $this->entity->getFields();
+        static::assertCount(2, $fields);
+        static::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
+        $secondFieldConfig =  $fields['second'];
+        static::assertEquals('second', $secondFieldConfig->getFieldName());
+        static::assertEquals('Second Label', $secondFieldConfig->getLabel());
+        static::assertEquals(['VIEW'], $secondFieldConfig->getPermissions());
     }
 
     public function testSerialize()
@@ -45,5 +59,10 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
         static::assertEquals('SomeGroup', $emptyEntity->getGroup());
         static::assertEquals('SomeLabel', $emptyEntity->getLabel());
         static::assertEquals('SomeDescription', $emptyEntity->getDescription());
+        static::assertEquals('SomeCategory', $emptyEntity->getCategory());
+        $fields = $emptyEntity->getFields();
+        static::assertCount(2, $fields);
+        static::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
+        static::assertEquals(new FieldSecurityMetadata('second', 'Second Label', ['VIEW']), $fields['second']);
     }
 }

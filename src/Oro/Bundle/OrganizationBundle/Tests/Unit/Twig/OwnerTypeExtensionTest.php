@@ -77,6 +77,7 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertArrayHasKey('oro_get_owner_type', $this->extension->getFunctions());
         $this->assertArrayHasKey('oro_get_entity_owner', $this->extension->getFunctions());
+        $this->assertArrayHasKey('oro_get_owner_field_name', $this->extension->getFunctions());
     }
 
     public function testGetEntityOwner()
@@ -85,6 +86,16 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $entity = new Entity();
         $entity->setOwner($owner);
         $this->assertSame($owner, $this->extension->getEntityOwner($entity));
+    }
+
+    public function testGetOwnerFieldName()
+    {
+        $entity = new BusinessUnit();
+        $this->prepareConfigProvider(
+            ['owner_field_name' => 'test_field'],
+            'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
+        );
+        $this->assertEquals('test_field', $this->extension->getOwnerFieldName($entity));
     }
 
     protected function prepareConfigProvider(array $configValues, $className)

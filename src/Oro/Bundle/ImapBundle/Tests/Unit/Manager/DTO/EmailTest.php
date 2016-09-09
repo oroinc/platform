@@ -8,6 +8,7 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
+use Zend\Mail\Header\ContentType;
 
 class EmailTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,6 +62,12 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testXThreadId', $obj->getXThreadId());
         $this->assertCount(2, $obj->getMultiMessageId());
         $this->assertInternalType('array', $obj->getMultiMessageId());
+
+        $contentType = new ContentType();
+        $contentType->setType('text/plain');
+        $message->expects($this->once())
+            ->method('getPriorContentType')
+            ->will($this->returnValue($contentType));
 
         $srcBodyContent = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Content')
             ->disableOriginalConstructor()

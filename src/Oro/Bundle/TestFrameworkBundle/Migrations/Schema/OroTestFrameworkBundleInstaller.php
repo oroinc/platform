@@ -49,7 +49,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
@@ -67,15 +67,18 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestCustomEntityTables($schema);
         $this->createTestDepartmentTable($schema);
         $this->createTestPersonTable($schema);
+        $this->createTestProductTable($schema);
+        $this->createTestProductTypeTable($schema);
 
         /** Foreign keys generation **/
-        $this->addTestWorkflowAwareEntityForeignKeys($schema);
         $this->addTestSearchItemForeignKeys($schema);
         $this->addTestSearchItemValueForeignKeys($schema);
         $this->addTestActivityForeignKeys($schema);
         $this->addTestPersonForeignKeys($schema);
+        $this->addTestProductForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
+        $this->activityExtension->addActivityAssociation($schema, 'oro_calendar_event', 'test_activity_target', true);
     }
 
     /**
@@ -99,10 +102,7 @@ class OroTestFrameworkBundleInstaller implements
     {
         $table = $schema->createTable('test_workflow_aware_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('workflow_item_id', 'integer', ['notnull' => false]);
-        $table->addColumn('workflow_step_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addUniqueIndex(['workflow_item_id'], 'uniq_f824a8531023c4ee');
         $table->setPrimaryKey(['id']);
     }
 
@@ -134,6 +134,34 @@ class OroTestFrameworkBundleInstaller implements
         $table->addColumn('position', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['department_id'], 'IDX_A305D658AE80F5DF', []);
+    }
+
+    /**
+     * Create test_product table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestProductTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_product');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('product_type', 'string', ['notnull' => false, 'length' => 50]);
+        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['product_type'], 'IDX_F0BD0651367588', []);
+    }
+
+    /**
+     * Create test_product_type table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestProductTypeTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_product_type');
+        $table->addColumn('name', 'string', ['length' => 50]);
+        $table->addColumn('label', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['name']);
     }
 
     /**
@@ -394,28 +422,6 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /**
-     * Add test_workflow_aware_entity foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addTestWorkflowAwareEntityForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('test_workflow_aware_entity');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_workflow_item'),
-            ['workflow_item_id'],
-            ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_workflow_step'),
-            ['workflow_step_id'],
-            ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
-        );
-    }
-
-    /**
      * Add test_person foreign keys.
      *
      * @param Schema $schema
@@ -488,6 +494,22 @@ class OroTestFrameworkBundleInstaller implements
             ['organization_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+    }
+
+    /**
+     * Add test_product foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addTestProductForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('test_product');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('test_product_type'),
+            ['product_type'],
+            ['name'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 }

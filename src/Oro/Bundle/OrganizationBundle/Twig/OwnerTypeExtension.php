@@ -34,7 +34,8 @@ class OwnerTypeExtension extends \Twig_Extension
     {
         return [
             'oro_get_owner_type' => new \Twig_Function_Method($this, 'getOwnerType'),
-            'oro_get_entity_owner' => new \Twig_Function_Method($this, 'getEntityOwner')
+            'oro_get_entity_owner' => new \Twig_Function_Method($this, 'getEntityOwner'),
+            'oro_get_owner_field_name' => new \Twig_Function_Method($this, 'getOwnerFieldName')
         ];
     }
 
@@ -51,6 +52,21 @@ class OwnerTypeExtension extends \Twig_Extension
         $config = $this->configProvider->getConfig($ownerClassName);
 
         return $config->get('owner_type');
+    }
+
+    /**
+     * @param object $entity
+     * @return string
+     */
+    public function getOwnerFieldName($entity)
+    {
+        $ownerClassName = ClassUtils::getRealClass($entity);
+        if (!$this->configProvider->hasConfig($ownerClassName)) {
+            return null;
+        }
+        $config = $this->configProvider->getConfig($ownerClassName);
+
+        return $config->get('owner_field_name');
     }
 
     /**

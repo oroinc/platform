@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -258,21 +259,11 @@ class EntitySerializer
         $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
         if ($useIdAsKey) {
             foreach ($entities as $entity) {
-                if ($this->fieldFilter
-                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity)) {
-                    continue;
-                }
-
                 $id          = $this->dataAccessor->getValue($entity, $idFieldName);
                 $result[$id] = $this->serializeItem($entity, $entityClass, $config);
             }
         } else {
             foreach ($entities as $entity) {
-                if ($this->fieldFilter
-                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity)) {
-                    continue;
-                }
-
                 $result[] = $this->serializeItem($entity, $entityClass, $config);
             }
         }
@@ -295,6 +286,9 @@ class EntitySerializer
      * @param EntityConfig $config
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function serializeItem($entity, $entityClass, EntityConfig $config)
     {
@@ -325,11 +319,11 @@ class EntitySerializer
 
             $value = null;
             if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
-                if ($entityMetadata->isAssociation($field)) {
-                    if ($value !== null) {
+                if ($this->isAssociation($field, $entityMetadata, $fieldConfig)) {
+                    if (is_object($value)) {
                         $targetConfig = $this->getTargetEntity($config, $field);
                         if (null !== $targetConfig && !$targetConfig->isEmpty()) {
-                            $targetEntityClass = $entityMetadata->getAssociationTargetClass($field);
+                            $targetEntityClass = $this->getAssociationTargetClass($field, $entityMetadata, $value);
                             $targetEntityId    = $this->dataAccessor->getValue(
                                 $value,
                                 $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
@@ -365,6 +359,34 @@ class EntitySerializer
         }
 
         return $result;
+    }
+
+    /**
+     * @param string           $fieldName
+     * @param EntityMetadata   $entityMetadata
+     * @param FieldConfig|null $fieldConfig
+     *
+     * @return bool
+     */
+    protected function isAssociation($fieldName, EntityMetadata $entityMetadata, FieldConfig $fieldConfig = null)
+    {
+        return
+            $entityMetadata->isAssociation($fieldName)
+            || (null !== $fieldConfig && $fieldConfig->getTargetEntity());
+    }
+
+    /**
+     * @param string         $fieldName
+     * @param EntityMetadata $entityMetadata
+     * @param mixed          $value
+     *
+     * @return null|string
+     */
+    protected function getAssociationTargetClass($fieldName, EntityMetadata $entityMetadata, $value)
+    {
+        return $entityMetadata->isAssociation($fieldName)
+            ? $entityMetadata->getAssociationTargetClass($fieldName)
+            : ClassUtils::getClass($value);
     }
 
     /**
@@ -655,27 +677,45 @@ class EntitySerializer
             $qb->addOrderBy(sprintf('r.%s', $field), $direction);
         }
 
-        $fields = $this->fieldAccessor->getFieldsToSerialize($mapping['targetEntity'], $config);
-        foreach ($fields as $field) {
-            $qb->addSelect(sprintf('r.%s', $field));
-        }
+        $result = [];
 
-        $items = $this->queryFactory->getQuery($qb, $config)->getArrayResult();
-
-        $result      = [];
         $entityClass = $mapping['targetEntity'];
-
-        $postSerializeHandler = $config->getPostSerializeHandler();
-        if (null !== $postSerializeHandler) {
-            foreach ($items as $item) {
-                $result[$item['entityId']][] = $this->postSerialize(
-                    $this->serializeItem($item, $entityClass, $config),
-                    $postSerializeHandler
-                );
+        $targetEntityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        if ($targetEntityMetadata->hasInheritance()) {
+            $fields = $this->fieldAccessor->getFieldsToSelect($entityClass, $config);
+            $qb->addSelect(sprintf('partial r.{%s}', implode(',', $fields)));
+            $items = $this->queryFactory->getQuery($qb, $config)->getResult();
+            $postSerializeHandler = $config->getPostSerializeHandler();
+            if (null !== $postSerializeHandler) {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->postSerialize(
+                        $this->serializeItem($item[0], $entityClass, $config),
+                        $postSerializeHandler
+                    );
+                }
+            } else {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->serializeItem($item[0], $entityClass, $config);
+                }
             }
         } else {
-            foreach ($items as $item) {
-                $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
+            $fields = $this->fieldAccessor->getFieldsToSerialize($entityClass, $config);
+            foreach ($fields as $field) {
+                $qb->addSelect(sprintf('r.%s', $field));
+            }
+            $items = $this->queryFactory->getQuery($qb, $config)->getArrayResult();
+            $postSerializeHandler = $config->getPostSerializeHandler();
+            if (null !== $postSerializeHandler) {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->postSerialize(
+                        $this->serializeItem($item, $entityClass, $config),
+                        $postSerializeHandler
+                    );
+                }
+            } else {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
+                }
             }
         }
 

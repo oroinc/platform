@@ -2,39 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-
-class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
+class GetRestJsonApiWithIncludeFieldsTest extends RestJsonApiTestCase
 {
     /**
      * FQCN of the entity being used for testing.
      */
     const ENTITY_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->initClient(
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
-        );
-
-        parent::setUp();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getRequestType()
-    {
-        return new RequestType([RequestType::REST, RequestType::JSON_API]);
-    }
 
     /**
      * @param array $params
@@ -44,27 +17,15 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
      */
     public function testGetEntityWithIncludeParameter($params, $expects)
     {
-        $entityAlias = $this->valueNormalizer->normalizeValue(
-            self::ENTITY_CLASS,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
+        $entityType = $this->getEntityType(self::ENTITY_CLASS);
 
-        // test get list request
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1]),
-            $params,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1]),
+            $params
         );
 
-        $response = $this->client->getResponse();
-
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expects, json_decode($response->getContent(), true));
     }
 

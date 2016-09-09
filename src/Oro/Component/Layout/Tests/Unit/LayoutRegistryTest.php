@@ -6,6 +6,7 @@ use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\LayoutRegistry;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -136,7 +137,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testFindDataProvider()
     {
         $name         = 'test';
-        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+        $dataProvider = $this->getMock(\stdClass::class);
 
         $this->extension->expects($this->once())
             ->method('hasDataProvider')
@@ -190,7 +191,8 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testSetDefaultOptions()
     {
         $name     = 'test';
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var OptionsResolver $resolver */
+        $resolver = $this->getMock('Oro\Component\Layout\Block\OptionsResolver\OptionsResolver');
 
         $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
@@ -203,10 +205,10 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($name)
             ->will($this->returnValue([$typeExtension]));
         $typeExtension->expects($this->once())
-            ->method('setDefaultOptions')
+            ->method('configureOptions')
             ->with($this->identicalTo($resolver));
 
-        $this->registry->setDefaultOptions($name, $resolver);
+        $this->registry->configureOptions($name, $resolver);
     }
 
     public function testNormalizeOptions()

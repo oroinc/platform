@@ -17,6 +17,14 @@ class ChoiceFilterType extends AbstractChoiceType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return self::NAME;
     }
 

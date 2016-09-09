@@ -1,0 +1,11 @@
+<div
+    data-toggle="dropdown"
+    data-target="<%= dropdownTarget %>"
+    class="dropdown-toggle action-permissions__item-wrapper<% if (isAccessLevelChanged) {%> action-permissions__item-wrapper_changed<% } %>">
+    <span class="action-permissions__label"
+          title="<%- label %>"><%- label %></span>
+    -
+    <a href="#"
+       class="action-permissions__dropdown-toggle"
+       title="<%- access_level_label %>"><%- access_level_label %></a>
+</div>

@@ -24,6 +24,16 @@ oro_system_configuration:
                                     wysiwyg_settings:
                                         children:
                                             - oro_form.wysiwyg_enabled
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    wysiwyg_settings:
+                                        children:
+                                            - oro_form.wysiwyg_enabled
 
     api_tree:
         look-and-feel:

@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -43,9 +47,17 @@ class LoadFromMetadata implements ProcessorInterface
 
         $definition->setExcludeAll();
         $definition->setCollapsed();
-        $targetIdFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($context->getClassName());
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+        // add all identifier fields
+        $targetIdFields = $metadata->getIdentifierFieldNames();
         foreach ($targetIdFields as $fieldName) {
             $definition->addField($fieldName);
+        }
+        // add "__class__" meta property if an entity uses Doctrine table inheritance
+        if ($metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+            $classNameField = $definition->addField(ConfigUtil::CLASS_NAME);
+            $classNameField->setMetaProperty(true);
+            $classNameField->setDataType(DataType::STRING);
         }
     }
 }

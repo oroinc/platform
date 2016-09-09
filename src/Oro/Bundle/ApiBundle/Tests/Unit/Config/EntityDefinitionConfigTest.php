@@ -2,11 +2,44 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 {
+    public function testKey()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getKey());
+
+        $config->setKey('text');
+        $this->assertEquals('text', $config->getKey());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setKey(null);
+        $this->assertNull($config->getKey());
+    }
+
+    public function testClone()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setKey('some key');
+        $config->setExcludeAll();
+        $config->set('test_scalar', 'value');
+        $objValue = new \stdClass();
+        $objValue->someProp = 123;
+        $config->set('test_object', $objValue);
+        $config->addField('field1')->setDataType('int');
+
+        $configClone = clone $config;
+
+        $this->assertEquals($config, $configClone);
+        $this->assertNotSame($objValue, $configClone->get('test_object'));
+    }
+
     public function testCustomAttribute()
     {
         $attrName = 'test';
@@ -31,52 +64,6 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testLabel()
-    {
-        $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-
-        $config->setLabel('text');
-        $this->assertTrue($config->hasLabel());
-        $this->assertEquals('text', $config->getLabel());
-        $this->assertEquals(['label' => 'text'], $config->toArray());
-
-        $config->setLabel(null);
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setLabel('text');
-        $config->setLabel('');
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-    }
-
-    public function testPluralLabel()
-    {
-        $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasPluralLabel());
-        $this->assertNull($config->getPluralLabel());
-
-        $config->setPluralLabel('text');
-        $this->assertTrue($config->hasPluralLabel());
-        $this->assertEquals('text', $config->getPluralLabel());
-        $this->assertEquals(['plural_label' => 'text'], $config->toArray());
-
-        $config->setPluralLabel(null);
-        $this->assertFalse($config->hasPluralLabel());
-        $this->assertNull($config->getPluralLabel());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setPluralLabel('text');
-        $config->setPluralLabel('');
-        $this->assertFalse($config->hasPluralLabel());
-        $this->assertNull($config->getPluralLabel());
-        $this->assertEquals([], $config->toArray());
-    }
-
     public function testDescription()
     {
         $config = new EntityDefinitionConfig();
@@ -97,6 +84,29 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $config->setDescription('');
         $this->assertFalse($config->hasDescription());
         $this->assertNull($config->getDescription());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testDocumentation()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+
+        $config->setDocumentation('text');
+        $this->assertTrue($config->hasDocumentation());
+        $this->assertEquals('text', $config->getDocumentation());
+        $this->assertEquals(['documentation' => 'text'], $config->toArray());
+
+        $config->setDocumentation(null);
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setDocumentation('text');
+        $config->setDocumentation('');
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
         $this->assertEquals([], $config->toArray());
     }
 
@@ -131,36 +141,36 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $field2->setPropertyPath('realField2');
         $field3 = $config->addField('field3');
         $field3->setPropertyPath('field3');
-        $swapField1 = $config->addField('swapField');
-        $swapField1->setPropertyPath('realSwapField');
-        $swapField2 = $config->addField('realSwapField');
-        $swapField2->setPropertyPath('swapField');
+        $swapField = $config->addField('swapField');
+        $swapField->setPropertyPath('realSwapField');
+        $realSwapField = $config->addField('realSwapField');
+        $realSwapField->setPropertyPath('swapField');
 
-        $this->assertNull($config->findFieldNameByPropertyPath('unknown'));
         $this->assertNull($config->findField('unknown'));
         $this->assertNull($config->findField('unknown', true));
+        $this->assertNull($config->findFieldNameByPropertyPath('unknown'));
 
-        $this->assertSame('field1', $config->findFieldNameByPropertyPath('field1'));
         $this->assertSame($field1, $config->findField('field1'));
         $this->assertSame($field1, $config->findField('field1', true));
+        $this->assertSame('field1', $config->findFieldNameByPropertyPath('field1'));
 
-        $this->assertNull($config->findFieldNameByPropertyPath('field2'));
-        $this->assertSame('field2', $config->findFieldNameByPropertyPath('realField2'));
         $this->assertSame($field2, $config->findField('field2'));
         $this->assertNull($config->findField('field2', true));
+        $this->assertNull($config->findFieldNameByPropertyPath('field2'));
         $this->assertNull($config->findField('realField2'));
         $this->assertSame($field2, $config->findField('realField2', true));
+        $this->assertSame('field2', $config->findFieldNameByPropertyPath('realField2'));
 
-        $this->assertSame('field3', $config->findFieldNameByPropertyPath('field3'));
         $this->assertSame($field3, $config->findField('field3'));
         $this->assertSame($field3, $config->findField('field3', true));
+        $this->assertSame('field3', $config->findFieldNameByPropertyPath('field3'));
 
+        $this->assertSame($swapField, $config->findField('swapField'));
+        $this->assertSame($realSwapField, $config->findField('swapField', true));
         $this->assertSame('realSwapField', $config->findFieldNameByPropertyPath('swapField'));
+        $this->assertSame($realSwapField, $config->findField('realSwapField'));
+        $this->assertSame($swapField, $config->findField('realSwapField', true));
         $this->assertSame('swapField', $config->findFieldNameByPropertyPath('realSwapField'));
-        $this->assertSame($swapField1, $config->findField('swapField'));
-        $this->assertSame($swapField2, $config->findField('swapField', true));
-        $this->assertSame($swapField2, $config->findField('realSwapField'));
-        $this->assertSame($swapField1, $config->findField('realSwapField', true));
     }
 
     public function testGetOrAddField()
@@ -233,20 +243,86 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testPartialLoad()
+    public function testPageSize()
     {
         $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasPartialLoad());
-        $this->assertTrue($config->isPartialLoadEnabled());
+        $this->assertFalse($config->hasPageSize());
+        $this->assertNull($config->getPageSize());
 
-        $config->disablePartialLoad();
-        $this->assertTrue($config->hasPartialLoad());
-        $this->assertFalse($config->isPartialLoadEnabled());
-        $this->assertEquals(['disable_partial_load' => true], $config->toArray());
+        $config->setPageSize(50);
+        $this->assertTrue($config->hasPageSize());
+        $this->assertEquals(50, $config->getPageSize());
+        $this->assertEquals(['page_size' => 50], $config->toArray());
 
-        $config->enablePartialLoad();
-        $this->assertTrue($config->hasPartialLoad());
-        $this->assertTrue($config->isPartialLoadEnabled());
+        $config->setPageSize('100');
+        $this->assertTrue($config->hasPageSize());
+        $this->assertSame(100, $config->getPageSize());
+        $this->assertSame(['page_size' => 100], $config->toArray());
+
+        $config->setPageSize(-1);
+        $this->assertTrue($config->hasPageSize());
+        $this->assertEquals(-1, $config->getPageSize());
+        $this->assertEquals(['page_size' => -1], $config->toArray());
+
+        $config->setPageSize(null);
+        $this->assertFalse($config->hasPageSize());
+        $this->assertNull($config->getPageSize());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testSortingFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertTrue($config->isSortingEnabled());
+
+        $config->disableSorting();
+        $this->assertFalse($config->isSortingEnabled());
+        $this->assertEquals(['disable_sorting' => true], $config->toArray());
+
+        $config->enableSorting();
+        $this->assertTrue($config->isSortingEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testInclusionFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertTrue($config->isInclusionEnabled());
+
+        $config->disableInclusion();
+        $this->assertFalse($config->isInclusionEnabled());
+        $this->assertEquals(['disable_inclusion' => true], $config->toArray());
+
+        $config->enableInclusion();
+        $this->assertTrue($config->isInclusionEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testFieldsetFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertTrue($config->isFieldsetEnabled());
+
+        $config->disableFieldset();
+        $this->assertFalse($config->isFieldsetEnabled());
+        $this->assertEquals(['disable_fieldset' => true], $config->toArray());
+
+        $config->enableFieldset();
+        $this->assertTrue($config->isFieldsetEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testIdentifierFieldNames()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertEquals([], $config->getIdentifierFieldNames());
+
+        $config->setIdentifierFieldNames(['id']);
+        $this->assertEquals(['id'], $config->getIdentifierFieldNames());
+        $this->assertEquals(['identifier_field_names' => ['id']], $config->toArray());
+
+        $config->setIdentifierFieldNames([]);
+        $this->assertEquals([], $config->getIdentifierFieldNames());
         $this->assertEquals([], $config->toArray());
     }
 
@@ -277,7 +353,46 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testSetHints()
+    public function testFormType()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getFormType());
+
+        $config->setFormType('test');
+        $this->assertEquals('test', $config->getFormType());
+        $this->assertEquals(['form_type' => 'test'], $config->toArray());
+
+        $config->setFormType(null);
+        $this->assertNull($config->getFormType());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testFormOptions()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getFormOptions());
+
+        $config->setFormOptions(['key' => 'val']);
+        $this->assertEquals(['key' => 'val'], $config->getFormOptions());
+        $this->assertEquals(['form_options' => ['key' => 'val']], $config->toArray());
+
+        $config->setFormOptions(null);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testAddFormConstraint()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $config->addFormConstraint(new NotNull());
+        $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+
+        $config->addFormConstraint(new NotBlank());
+        $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+    }
+
+    public function testHints()
     {
         $config = new EntityDefinitionConfig();
         $this->assertEquals([], $config->getHints());

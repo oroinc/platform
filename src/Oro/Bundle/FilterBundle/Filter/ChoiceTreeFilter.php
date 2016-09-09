@@ -4,31 +4,45 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Routing\RouterInterface;
 
+use Oro\Bundle\FilterBundle\Event\ChoiceTreeFilterLoadDataEvent;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType;
 
 class ChoiceTreeFilter extends AbstractFilter
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
+    /** @var RouterInterface */
+    protected $router;
+
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     * Constructor
+     * ChoiceTreeFilter constructor.
      *
      * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
+     * @param FilterUtility $util
+     * @param ManagerRegistry $registry
+     * @param RouterInterface $router
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        RouterInterface $router,
+        EventDispatcherInterface $eventDispatcher
     ) {
         parent::__construct($factory, $util);
         $this->registry = $registry;
+        $this->router = $router;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -45,36 +59,40 @@ class ChoiceTreeFilter extends AbstractFilter
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
+
+        $entities = [];
+
+        if ($this->getOr('className') && $this->state) {
+            $data = $this->parseData($this->state);
+
+            $event = new ChoiceTreeFilterLoadDataEvent($this->getOr('className'), $data['value']);
+            $this->eventDispatcher->dispatch(ChoiceTreeFilterLoadDataEvent::EVENT_NAME, $event);
+            $entities = $event->getData();
+        }
+
         $metadata[FilterUtility::TYPE_KEY] = 'choice-tree';
-        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
-        $metadata['data'] = isset($options['data']) ? $options['data'] : [];
+        $metadata['data'] = $entities;
+        $metadata['autocomplete_alias'] = $this->getAutocompleteAlias();
+        $metadata['autocomplete_url'] = $this->getAutocompleteUrl();
+        $metadata['renderedPropertyName'] = $this->getRenderedPropertyName();
+
         return $metadata;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        $data = $this->parseData($data);
-        if (!$data) {
-            return false;
-        }
-
-        $type =  $data['type'];
         if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
             $parameterName = $ds->generateParameterName($this->getName());
 
-            $this->applyFilterToClause(
-                $ds,
-                $this->get(FilterUtility::DATA_NAME_KEY) . ' in (:'. $parameterName .')'
-            );
-
-            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
                 $ds->setParameter($parameterName, $data['value']);
             }
+
+            return $fieldName . ' in (:'. $parameterName .')';
         }
-        return true;
     }
 
     /**
@@ -86,5 +104,34 @@ class ChoiceTreeFilter extends AbstractFilter
     {
         $data['value'] = explode(',', $data['value']);
         return $data;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function getAutocompleteAlias()
+    {
+        return $this->getOr('autocomplete_alias') ?
+            $this->getOr('autocomplete_alias') : false;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAutocompleteUrl()
+    {
+        $routeName = $this->getOr('autocomplete_url') ?
+            $this->getOr('autocomplete_url') : 'oro_form_autocomplete_search';
+
+        return $this->router->generate($routeName);
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function getRenderedPropertyName()
+    {
+        return $this->getOr('renderedPropertyName') ?
+            $this->getOr('renderedPropertyName') : false;
     }
 }

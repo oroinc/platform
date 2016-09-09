@@ -128,6 +128,15 @@ Single workflow configuration has next properties:
     Contains configuration for Transitions
 * **transition_definitions**
     Contains configuration for Transition Definitions
+* **priority** - integer value of current workflow dominance level in part of automatically performed tasks (ordering, exclusiveness). It is recommended to use high degree integer values to give a scope for 3rd party integrators.
+* **exclusive_active_groups** - list of group names for which current workflow should be active exclusively
+* **exclusive_record_groups** - list of group names for which current workflow can not be performed together with other workflows with one of specified groups. E.g., no concurrent transitions are possible among workflows in same exclusive_record_group. 
+* **entity_restrictions**
+    Contains configuration for Workflow Restrictions
+* **defaults** - node for default workflow configuration values that can be changed in UI later. 
+    * **active** - determine if workflow should be active right after first load of configuration.
+
+
 
 Example
 -------
@@ -135,11 +144,17 @@ Example
 workflows:                                                    # Root elements
     b2b_flow_sales:                                           # A unique name of workflow
         label: B2B Sales Flow                                 # This will be shown in UI
+        defaults:
+            active: true                                      # Active by default (when config is loaded)
         entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
         steps_display_ordered: true                           # Show all steps in step widget
+        priority: 100                                         # Priority level
+        exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
+        exclusive_record_groups:
+            - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps
@@ -147,6 +162,8 @@ workflows:                                                    # Root elements
         transitions:                                          # configuration for Transitions
                                                               # ...
         transition_definitions:                               # configuration for Transition Definitions
+                                                              # ...
+        entity_restrictions:                                  # configuration for Restrictions
                                                               # ...
 ```
 
@@ -257,7 +274,7 @@ Summarizing all above, step has next configuration:
     *boolean*
     If true than step will be counted as workflow final step.
 * **entity_acl**
-    Defines an ACL for the workflow related entity when workflow is in this step.
+    Defines an ACL for an entity related to the specified attribute when workflow is in this step.
     * **update**
         *boolean*
         Can entity be updated. Default value is true.
@@ -280,7 +297,11 @@ workflows:
                 allowed_transitions: # list of allowed transitions from this step
                     - connected
                     - not_answered
-             start_conversation:
+                entity_acl:
+                    owner:
+                        update: false
+                        delete: false
+            start_conversation:
                 label: 'Call Phone Conversation'
                 allowed_transitions:
                     - end_conversation
@@ -300,6 +321,9 @@ Transition configuration has next options:
 * **unique name**
     *string*
     A transition must have unique name in scope of Workflow. Step configuration references transitions by this value.
+* **label**
+    *string*
+    Label of transition, will to be shown in UI.
 * **step_to**
     *string*
     Next step name. This is a reference to step that will be set to Workflow Item after transition is performed.
@@ -344,6 +368,20 @@ Transition configuration has next options:
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
     will be shown when user clicks transition button.
+* **schedule**
+    These options can be used to configure the schedule for performing transition. This block can contain following sub-options:
+    - **cron** (*string*) - cron-definition for scheduling time for performing transition.
+    - **filter** (*string*) - "WHERE" part of DQL expression. This option used to filter entities that will be used in transition.
+    Following aliases are available:
+        - **e** - entity
+        - **wd** - WorkflowDefinition
+        - **wi** - WorkflowItem
+        - **ws** - WorkflowStep
+
+    - **check_conditions_before_job_creation** (*boolean*, default = false) - whether to check conditions of transition before creating new `Job` for transition performing.
+    
+    Transition for entity can be performed by schedule, when entity is on the appropriate step and all defined conditions are met.
+
 * **transition_definition**
     *string*
     Name of associated transition definition.
@@ -362,6 +400,9 @@ workflows:
                                                             # when transition will be performed
 
                 transition_definition: connected_definition # A reference to Transition Definition configuration
+                schedule:
+                    cron: '0 * * * *'                       # try to perform transition every hour
+                    filter: "e.expired = 1"                 # transition by schedule will be executed only for entities that have field `expired` = true
                 frontend_options:
                     icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
                     class: 'btn-primary'                    # add css class "btn-primary" to transition button
@@ -384,16 +425,27 @@ workflows:
 Transition Definition Configuration
 ===================================
 
-Transition Definition is used by Transition to check Conditions and to perform Init Action and Post Actions.
+Transition Definition is used by Transition to check Pre Conditions and Conditions, to perform Init Action and Post
+Actions.
 
 Transition definition configuration has next options.
 
+* **preactions**
+    Configuration of Pre Actions that must be performed before Pre Conditions check.
+* **preconditions**
+    Configuration of Pre Conditions that must satisfy to allow displaying transition.
 * **conditions**
-    Configuration of Conditions that must satisfy to allow transition
-* **post_actions**
+    Configuration of Conditions that must satisfy to allow transition.
+* **actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
+* **form_init**
+    Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
+* **pre_conditions**
+    Deprecated, use `preconditions` instead.
 * **init_actions**
-    Configuration of Init Actions that may be performed on workflow item before conditions and post actions.
+    Deprecated, use `form_init` instead.
+* **post_actions**
+    Deprecated, use `actions` instead.
 
 Example
 -------
@@ -404,22 +456,28 @@ workflows:
         # ...
         transition_definitions:
             connected_definition: # Try to make call connected
+                # Set timeout value
+                preactions:
+                    - @assign_value: [$call_timeout, 120]
                 # Check that timeout is set
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, true]
-                init_actions:
+                form_init:
                     - @increment_value: [$call_attempt]
             not_answered_definition: # Callee did not answer
+                # Set timeout value
+                preactions:
+                    - @assign_value: [$call_timeout, 30]
                 # Make sure that caller waited at least 60 seconds
                 conditions: # call_timeout not empty and >= 60
                     @and:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, false]
             end_conversation_definition:
                 conditions:
@@ -430,7 +488,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -439,6 +497,68 @@ workflows:
                             comment: $conversation_comment
                             successful: $conversation_successful
                             call: $phone_call
+```
+
+Entity Restrictions Configuration
+=================================
+
+Entity Restrictions add validation rules for configured attributes fields. They do not permit to edit these fields on the attributes' edit or create form,
+on the attributes' grids via inline editing,  via API or performing an import.
+Single entity restriction can be described with next configuration:
+
+* **unique name**
+    *string*
+    A restriction must have unique name in scope of Workflow.
+* **attribute**
+    *string*
+    This is reference to workflow attribute (attribute must be of type 'entity').
+* **field**
+    *string*
+    Field name of attribute class for which restriction will be applied. 
+* **mode**
+    *enum*
+    Restriction mode. Allowed values for this option are 'full', 'disallow', 'allow'. Default value is 'full'
+     - 'full' mode means that field will be completely disabled for editing. This is default value for this option.
+     - 'disallow' mode do not permit to fill field with values listed in 'values' option.
+     - 'allow' mode do not permit to fill field with values except listed in 'values' option.
+* **values**
+    *array*
+    Optional list of field values which will be used for restriction with 'allow' and 'disallow' modes. 
+* **step**
+    *string*
+    This is reference to workflow step. Restriction will be applied only When workflow is in this step.
+    If no step is provided restriction will be applied for attribute creation.
+
+Example
+-------
+
+```
+workflows:
+    opportunity_flow:
+        # ...
+        entity_restrictions:
+            opportunity_status_creation:           # unique restriction name in scope of this Workflow 
+                attribute: opportunity             # attribute's reference links to attribute(attribute must be of type 'entity') 
+                field: status                      # field name of attribute class
+                mode: disallow                     # restriction mode (default is 'full')
+                values:                            # disallowed values for this field
+                    - 'won'                  
+                    - 'lost'
+            opportunity_close_reason_creation:
+                attribute: opportunity
+                field: closeReason
+            opportunity_status_open:
+                attribute: opportunity
+                field: status
+                step: open                        # restriction will be applied only When workflow is in this step.
+                mode: disallow
+                values:
+                    - 'won'
+                    - 'lost'
+            opportunity_close_reason_open:
+                attribute: opportunity
+                field: closeReason
+                step: open
 ```
 
 Conditions Configuration
@@ -475,7 +595,7 @@ workflows:
         transition_definitions:
             # some transition definition
             qualify_call:
-                pre_conditions:
+                preconditions:
                     @equal: [$status, "in_progress"]
                 conditions:
                     # empty($call_timeout) || (($call_timeout >= 60 && $call_timeout < 100) || ($call_timeout > 0 && $call_timeout <= 30))
@@ -494,10 +614,12 @@ workflows:
                                     - @greater: [$call_timeout, 0]
 ```
 
-Post Actions and Init Action
-============================
+Pre Actions, Post Actions and Init Action
+=========================================
 
-Post Actions and Init Action configuration complements Transition Definition configuration.
+Pre Action, Post Actions and Init Action configuration complements Transition Definition configuration.
+
+Pre Actions will be performed BEFORE the Pre Conditions will be qualified.
 
 Post Actions will be performed during transition AFTER conditions will be qualified and current Step of Workflow Item
 will be changed to the corresponding one (step_to option) in the Transition.
@@ -520,9 +642,11 @@ workflows:
         # ...
         transition_definitions:
             # some transition definition
-                init_actions:
+                preactions:
+                    - @some_action: ~
+                form_init:
                     - @assign_value: [$call_attempt, 1]
-                post_actions:
+                actions:
                     - @create_entity: # create an entity PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -556,7 +680,6 @@ workflows:
     phone_call:
         label: 'Demo Call Workflow'
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-        enabled: true
         start_step: start_call
         steps:
             start_call:
@@ -616,7 +739,7 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, true]
             not_answered_definition: # Callee did not answer
@@ -626,7 +749,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, false]
             end_conversation_definition:
@@ -638,7 +761,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         parameters:
                             class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation

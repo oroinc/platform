@@ -35,3 +35,14 @@ oro_system_configuration:
                                         priority: -10
                                         children:
                                             - oro_report.display_sql_query
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    reports_settings:
+                                        priority: -10
+                                        children:
+                                            - oro_report.display_sql_query

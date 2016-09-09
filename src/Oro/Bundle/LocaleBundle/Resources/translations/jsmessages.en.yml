@@ -5,3 +5,7 @@
 "Sorry, calendar events were not loaded correctly": "Sorry, calendar events were not loaded correctly"
 "Sorry, calendar event was not saved correctly": "Sorry, calendar event was not saved correctly"
 "Yesterday": "Yesterday"
+
+oro.locale:
+    localization:
+        delete_confirm: 'All related localized data will be deleted. Are you sure you want to delete this {{ entityLabel }}?'

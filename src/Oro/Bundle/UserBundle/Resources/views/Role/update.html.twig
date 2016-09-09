@@ -7,6 +7,7 @@
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
 
 {% block navButtons %}
+    {{ parent() }}
     {% if entityId and resource_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
                 'dataUrl': path('oro_api_delete_role', {'id': entityId}),
@@ -20,32 +21,30 @@
         }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {% if entityId and resource_granted('CREATE', form.vars.value)%}
-        {{ UI.button({
-            'iCss': 'icon-copy',
-            'label': 'oro.user.role.clone'|trans,
-            'title': 'oro.user.role.clone'|trans,
-            'path': path('oro_user_role_clone', {'id': entityId}),
-        }) }}
-    {% endif %}
-    {{ UI.buttonSeparator() }}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
-    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
+    {% set html = UI.saveAndCloseButton({
+        'type': 'button',
+        'class': 'btn-success role-submit',
+        'route': 'oro_user_role_view',
+        'params': {'id': '$id'}
+    }) %}
+    {% if resource_granted('oro_user_role_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_user_role_create'
+        }) %}
+    {% endif %}
     {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
         {# button attribute 'action' is avoided because of there is unacceptable submit binding on .action-button in init-layout.js #}
-        {% set html = html ~ UI.buttonType({
-            'type': 'button',
+        {% set html = html ~ UI.saveAndStayButton({
             'class': 'btn-success main-group role-submit',
-            'label': 'Save'|trans,
-            'data': {
-                'action': 'save_and_stay'
-            }
+            'route': 'oro_user_role_update',
+            'params': {'id': '$id'}
         }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
     {% set fields = [] %}
     {% for name, child in form %}
-        {% if name not in ['appendUsers', 'removeUsers', 'entity', 'privileges', 'action'] %}
+        {% if name not in ['appendUsers', 'removeUsers', 'privileges'] %}
             {% set fields = fields|merge({(name): '#' ~ child.vars.id}) %}
         {% endif %}
     {% endfor %}
@@ -113,27 +112,34 @@
         ) %}
     {% endif %}
 
-    {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
-        {% if privilegeBlock != 'field' %} {# do not show field controls here #}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': privilegeConfig.label|trans,
-            'subblocks': [
-                {
-                    'title': '',
-                    'useSpan': false,
-                    'data': [
-                        form_widget(form.children[privilegeBlock])
-                    ]
-                }
-            ]
-        }]) %}
-        {% endif %}
-    {% endfor %}
+    {% set rolePermissionsGrid %}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/entity-category-tabs-component',
+            options: tabsOptions
+        }) }}></div>
+        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/capability-set-component',
+            options: capabilitySetOptions
+        }) }}></div>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': privilegesConfig['entity'].label|trans,
+        'subblocks': [
+            {
+                'title': '',
+                'useSpan': false,
+                'data': [
+                    rolePermissionsGrid
+                ]
+            }
+        ]
+    }]) %}
 
     {% set dataBlocks = dataBlocks|merge([{
         'title' : 'oro.user.entity_plural_label'|trans,
-        'subblocks':
-        [
+        'subblocks': [
             {
                 'title' : null,
                 'useSpan': false,

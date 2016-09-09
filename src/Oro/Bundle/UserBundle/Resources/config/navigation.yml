@@ -64,6 +64,13 @@ oro_menu_config:
             route: 'oro_user_profile_view'
             extras:
                 position: 10
+        oro_user_profile_configuration:
+            label: 'oro.user.menu.oro_user_profile_configuration.label'
+            route: 'oro_user_profile_configuration'
+            extras:
+                position: 12
+            attributes:
+                class: 'mobile-hide'
 
     tree:
         application_menu:
@@ -78,6 +85,7 @@ oro_menu_config:
         usermenu:
             children:
                 oro_user_profile_view: ~
+                oro_user_profile_configuration: ~
 
         shortcuts:
             children:
@@ -91,13 +99,14 @@ oro_titles:
     oro_user_view: '%%username%%'
     oro_user_update: '%%username%% - Edit'
     oro_user_create: 'Create User'
+    oro_user_config: '%%username%% - Configure'
 
     oro_user_profile_view: '%%username%%'
     oro_user_profile_update: '%%username%% - Edit'
+    oro_user_profile_configuration: '%%username%% - Configure'
 
     oro_user_role_index: ~
     oro_user_role_update: '%%role%% - Edit'
-    oro_field_acl_update: '%%role%% - %%className%% Fields'
     oro_user_role_create: 'Create Role'
 
     oro_user_security_login: 'Login'

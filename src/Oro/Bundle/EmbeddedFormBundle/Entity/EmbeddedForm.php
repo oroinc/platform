@@ -27,7 +27,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "activity"={
  *              "immutable"=true
@@ -76,6 +77,13 @@ class EmbeddedForm extends ExtendEmbeddedForm
      * @ORM\Column(name="success_message", type="text")
      */
     protected $successMessage;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="allowed_domains", type="text", nullable=true)
+     */
+    protected $allowedDomains;
 
     /**
      * @var \DateTime $created
@@ -183,6 +191,22 @@ class EmbeddedForm extends ExtendEmbeddedForm
     public function getSuccessMessage()
     {
         return $this->successMessage;
+    }
+
+    /**
+     * @param string $allowedDomains
+     */
+    public function setAllowedDomains($allowedDomains)
+    {
+        $this->allowedDomains = $allowedDomains;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAllowedDomains()
+    {
+        return $this->allowedDomains;
     }
 
     /**

@@ -34,9 +34,9 @@ class EntityController extends FOSRestController
     {
         $statusCode = Codes::HTTP_OK;
         /** @var EntityWithFieldsProvider $provider */
-        $provider = $this->get('oro_workflow.entity_field_list_provider');
+        $provider = $this->get('oro_entity.entity_field_list_provider');
         try {
-            $result = $provider->getFields();
+            $result = $provider->getFields(false, false, true, false);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());

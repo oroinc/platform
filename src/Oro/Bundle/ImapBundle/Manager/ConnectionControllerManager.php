@@ -26,9 +26,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ConnectionControllerManager
 {
-    /** @var FormInterface */
-    protected $formUser;
-
     /** @var FormFactory */
     protected $formFactory;
 
@@ -45,6 +42,9 @@ class ConnectionControllerManager
     protected $userFormName;
 
     /** @var string */
+    protected $userFormType;
+
+    /** @var string */
     protected $emailMailboxFormName;
 
     /** @var string */
@@ -54,34 +54,34 @@ class ConnectionControllerManager
     protected $imapEmailGoogleOauth2Manager;
 
     /**
-     * @param FormInterface $formUser
      * @param FormFactory $formFactory
      * @param Mcrypt $mcrypt
      * @param ManagerRegistry $doctrineHelper
      * @param ImapConnectorFactory $imapConnectorFactory
      * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
      * @param string $userFormName
+     * @param $userFormType
      * @param string $emailMailboxFormName
      * @param string $emailMailboxFormType
      */
     public function __construct(
-        FormInterface $formUser,
         FormFactory $formFactory,
         Mcrypt $mcrypt,
         ManagerRegistry $doctrineHelper,
         ImapConnectorFactory $imapConnectorFactory,
         ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
         $userFormName,
+        $userFormType,
         $emailMailboxFormName,
         $emailMailboxFormType
     ) {
-        $this->formUser = $formUser;
         $this->formFactory = $formFactory;
         $this->mcrypt = $mcrypt;
         $this->doctrine = $doctrineHelper;
         $this->imapConnectorFactory = $imapConnectorFactory;
         $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
         $this->userFormName = $userFormName;
+        $this->userFormType = $userFormType;
         $this->emailMailboxFormName = $emailMailboxFormName;
         $this->emailMailboxFormType = $emailMailboxFormType;
     }
@@ -191,11 +191,16 @@ class ConnectionControllerManager
     protected function prepareForm($formParentName, $accountTypeModel)
     {
         $form = null;
-        if ($formParentName === $this->userFormName) {
+        if ($formParentName === $this->userFormName || $formParentName === 'value') {
             $data = $user = new User();
             $data->setImapAccountType($accountTypeModel);
-            $this->formUser->setData($data);
-            $form = $this->formUser;
+            $form = $this->formFactory->createNamed(
+                $this->userFormName,
+                $this->userFormType,
+                null,
+                ['csrf_protection' => false]
+            );
+            $form->setData($data);
         } elseif ($formParentName === $this->emailMailboxFormName) {
             $data = $user = new Mailbox();
             $data->setImapAccountType($accountTypeModel);

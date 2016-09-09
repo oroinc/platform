@@ -40,6 +40,7 @@ class SortersConfiguration extends AbstractConfigurationSection
             ->end()
             ->arrayNode(SortersConfig::FIELDS)
                 ->useAttributeAsKey('name')
+                ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
         $this->configureFieldNode($fieldNode);

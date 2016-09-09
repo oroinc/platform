@@ -5,10 +5,8 @@ layout:
             parentId:  content
             blockType: embed_form_legacy_form
             options:
-                form:        { '@value': $context.embedded_form.view }
-                form_layout: { '@value': $context.embedded_form_custom_layout }
+                form: '=context["embedded_form"].getView()'
+                form_layout: '=context["embedded_form_custom_layout"]'
 
-    conditions:
-        '@neq':
-            - ''
-            - $context.embedded_form_custom_layout
+    conditions: 'context["embedded_form_custom_layout"]!=""'
+

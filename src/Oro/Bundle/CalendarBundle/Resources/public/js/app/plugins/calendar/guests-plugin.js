@@ -45,14 +45,14 @@ define(function(require) {
          */
         hasLoadedGuestEvents: function(parentEventModel) {
             var result = false;
-            var guests = parentEventModel.get('invitedUsers');
-            guests = _.isNull(guests) ? [] : guests;
-            if (parentEventModel.hasChanged('invitedUsers') && !_.isEmpty(parentEventModel.previous('invitedUsers'))) {
-                guests = _.union(guests, parentEventModel.previous('invitedUsers'));
+            var attendees = parentEventModel.get('attendees');
+            attendees = _.isNull(attendees) ? [] : attendees;
+            if (parentEventModel.hasChanged('attendees') && !_.isEmpty(parentEventModel.previous('attendees'))) {
+                attendees = _.union(attendees, parentEventModel.previous('attendees'));
             }
-            if (!_.isEmpty(guests)) {
+            if (!_.isEmpty(attendees)) {
                 result = Boolean(this.main.getConnectionCollection().find(function(connection) {
-                    return -1 !== guests.indexOf(connection.get('userId'));
+                    return -1 !== attendees.indexOf(connection.get('userId'));
                 }, this));
             }
             return result;
@@ -93,7 +93,7 @@ define(function(require) {
             var updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
             if (this.hasLoadedGuestEvents(eventModel)) {
-                if (eventModel.hasChanged('invitedUsers')) {
+                if (eventModel.hasChanged('attendees')) {
                     eventModel.once('sync', this.main.updateEvents, this.main);
                     return;
                 }

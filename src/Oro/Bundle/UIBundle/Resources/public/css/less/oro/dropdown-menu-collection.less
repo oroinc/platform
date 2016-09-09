@@ -1,0 +1,28 @@
+.dropdown-menu.dropdown-menu-collection {
+  padding: 5px 0;
+  min-width: 80px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  .dropdown-menu-collection__fallback,
+  .dropdown-menu-collection__loading {
+    padding: 2px 12px;
+  }
+  .dropdown-menu-collection__list {
+    list-style: none;
+    margin: 0;
+    > li {
+      display: block;
+      a {
+        display: block;
+        padding: 2px 12px;
+        color: @menuItemColor;
+        &:hover, &:focus {
+          background: #f3f3f3;
+          color: @menuItemColor;
+        }
+      }
+    }
+  }
+}

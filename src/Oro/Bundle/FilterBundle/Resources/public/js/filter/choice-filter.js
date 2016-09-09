@@ -245,9 +245,9 @@ define([
             var menu = this.$('.choice-filter .dropdown-menu');
             menu.find('li a').each(function() {
                 var item = $(this);
-                if (item.data('value') === oldValue.type && item.parent().hasClass('active')) {
+                if (item.data('value').toString() === oldValue.type && item.parent().hasClass('active')) {
                     item.parent().removeClass('active');
-                } else if (item.data('value') === newValue.type && !item.parent().hasClass('active')) {
+                } else if (item.data('value').toString() === newValue.type && !item.parent().hasClass('active')) {
                     item.parent().addClass('active');
                     menu.parent().find('button').html(item.html() + '<span class="caret"></span>');
                 }

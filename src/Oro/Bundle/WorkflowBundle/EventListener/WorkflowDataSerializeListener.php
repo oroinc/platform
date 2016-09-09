@@ -28,7 +28,7 @@ class WorkflowDataSerializeListener
     /**
      * @var WorkflowItem[]
      */
-    protected $scheduledEntities = array();
+    protected $scheduledEntities = [];
 
     /**
      * @var WorkflowAwareSerializer

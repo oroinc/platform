@@ -1,0 +1,21 @@
+layout:
+    actions:
+        - '@changeBlockType':
+            - 'root'
+            - 'container'
+        - '@setBlockTheme':
+            themes: 'OroEmbeddedFormBundle:layouts:embedded_default/form_inline.html.twig'
+        - '@addTree':
+            items:
+                form_css:
+                    blockType:   style
+                    options:
+                        content: '=data["embedded_form_entity"].getCss()'
+                content:
+                    blockType: container
+            tree:
+                root:
+                    content:
+                        form_css: ~
+
+    conditions: 'context["embedded_form_inline"]==true'

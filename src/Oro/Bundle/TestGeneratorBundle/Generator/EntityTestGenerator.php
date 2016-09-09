@@ -58,9 +58,7 @@ class EntityTestGenerator extends AbstractTestGenerator
             $temp = [];
             $temp['propertyName'] = $property->getName();
             if ($type) {
-                if ($type === 'integer' || $type === 'float'
-                    || $type === 'string' || $type === 'bool' || $type === 'boolean'
-                ) {
+                if (ctype_lower($type)) {
                     $temp['type'] = $type;
                     $temp = $this->fillScalarType($type, $temp);
                 } elseif (strpos($type, '[]') !== false) {
@@ -139,18 +137,25 @@ class EntityTestGenerator extends AbstractTestGenerator
 
     /**
      * @param \ReflectionClass $class
+     * @param bool $trait
      * @return array
      */
-    protected function getUses(\ReflectionClass $class)
+    protected function getUses(\ReflectionClass $class, $trait = false)
     {
         $result = [];
         $lines = file($class->getFileName());
         $i = 4;
-        while (strpos($lines[$i], '/*') === false && strpos($lines[$i], 'class ') === false) {
+        $classString = $trait ? 'trait ' : 'class ';
+        while (strpos($lines[$i], '/*') === false && strpos($lines[$i], $classString) === false) {
             if ($lines[$i] !== "\n" && strpos($lines[$i], ' as ') === false) {
                 $result[] = str_replace(['use ', ';' . PHP_EOL], '', $lines[$i]);
             }
             $i++;
+        }
+        if ($traits = class_uses($class->getName())) {
+            foreach ($traits as $traitName) {
+                $result = array_merge($this->getUses(new \ReflectionClass($traitName), true), $result);
+            }
         }
 
         return $result;
@@ -186,7 +191,7 @@ class EntityTestGenerator extends AbstractTestGenerator
      */
     protected function fillScalarType($type, $temp)
     {
-        if ($type === 'integer') {
+        if ($type === 'integer' || $type === 'int') {
             $temp['value'] = 42;
 
             return $temp;

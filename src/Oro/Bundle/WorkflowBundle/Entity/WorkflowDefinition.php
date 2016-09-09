@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(name="oro_workflow_definition")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @Config(
  *      routeName="oro_workflow_definition_index",
  *      routeView="oro_workflow_definition_view",
@@ -24,7 +24,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true
@@ -38,10 +39,18 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowDefinition implements DomainObjectInterface
 {
+    const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
+    const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
+
     /**
      * @var string
      *
@@ -85,11 +94,25 @@ class WorkflowDefinition implements DomainObjectInterface
     protected $system = false;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean", options={"default"=false})
+     */
+    protected $active = false;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="priority", type="integer", options={"default"=0})
+     */
+    protected $priority = 0;
+
+    /**
      * @var array
      *
      * @ORM\Column(name="configuration", type="array")
      */
-    protected $configuration = array();
+    protected $configuration = [];
 
     /**
      * @var WorkflowStep[]|Collection
@@ -122,6 +145,25 @@ class WorkflowDefinition implements DomainObjectInterface
      * )
      */
     protected $entityAcls;
+
+    /**
+     * @var WorkflowRestriction[]|Collection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="WorkflowRestriction",
+     *      mappedBy="definition",
+     *      orphanRemoval=true,
+     *      cascade={"all"}
+     * )
+     */
+    protected $restrictions;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="groups", type="array")
+     */
+    protected $groups = [];
 
     /**
      * @var \DateTime $created
@@ -158,6 +200,23 @@ class WorkflowDefinition implements DomainObjectInterface
     {
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
+        $this->restrictions = new ArrayCollection();
+    }
+
+    public function __clone()
+    {
+        if ($this->name) {
+            $this->setName($this->getName() . uniqid('_clone_'));
+            $this->setSystem(false);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getLabel();
     }
 
     /**
@@ -332,7 +391,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function setSteps($steps)
     {
-        $newStepNames = array();
+        $newStepNames = [];
         foreach ($steps as $step) {
             $newStepNames[] = $step->getName();
         }
@@ -422,7 +481,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function setEntityAcls($entityAcl)
     {
-        $newAttributeSteps = array();
+        $newAttributeSteps = [];
         foreach ($entityAcl as $acl) {
             $newAttributeSteps[] = $acl->getAttributeStepKey();
         }
@@ -436,6 +495,61 @@ class WorkflowDefinition implements DomainObjectInterface
         foreach ($entityAcl as $acl) {
             $this->addEntityAcl($acl);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowRestriction[]|ArrayCollection $restrictions
+     *
+     * @return WorkflowDefinition
+     */
+    public function setRestrictions($restrictions)
+    {
+        $newRestrictions = [];
+        foreach ($restrictions as $restriction) {
+            $newRestrictions[$restriction->getHashKey()] = $restriction;
+        }
+
+        $oldRestrictions = $this->restrictions;
+        foreach ($oldRestrictions as $old) {
+            $hashKey = $old->getHashKey();
+            if (isset($newRestrictions[$hashKey])) {
+                $old->setValues($newRestrictions[$hashKey]->getValues());
+                unset($newRestrictions[$hashKey]);
+            } else {
+                $this->restrictions->removeElement($old);
+            }
+        }
+
+        foreach ($newRestrictions as $newRestriction) {
+            $this->addRestriction($newRestriction);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|WorkflowRestriction[]
+     */
+    public function getRestrictions()
+    {
+        return $this->restrictions;
+    }
+
+    /**
+     * @param WorkflowRestriction $restriction
+     *
+     * @return $this
+     */
+    public function addRestriction(WorkflowRestriction $restriction)
+    {
+        $restriction->setDefinition($this);
+        if ($restriction->getStep()) {
+            $restriction->setStep($this->getStepByName($restriction->getStep()->getName()));
+        }
+
+        $this->restrictions->add($restriction);
 
         return $this;
     }
@@ -514,7 +628,10 @@ class WorkflowDefinition implements DomainObjectInterface
             ->setStartStep($definition->getStartStep())
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
             ->setEntityAcls($definition->getEntityAcls())
-            ->setSystem($definition->isSystem());
+            ->setRestrictions($definition->getRestrictions())
+            ->setSystem($definition->isSystem())
+            ->setPriority($definition->getPriority())
+            ->setGroups($definition->groups);
 
         return $this;
     }
@@ -608,5 +725,92 @@ class WorkflowDefinition implements DomainObjectInterface
     public function getObjectIdentifier()
     {
         return $this->getName();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param boolean $active
+     *
+     * @return $this
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param mixed $priority
+     *
+     * @return $this
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
+     * @param array $groups
+     * @return $this
+     */
+    public function setGroups(array $groups)
+    {
+        $this->groups = $groups;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasExclusiveActiveGroups()
+    {
+        return !empty($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getExclusiveActiveGroups()
+    {
+        return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE])
+            ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]
+            : [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasExclusiveRecordGroups()
+    {
+        return !empty($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getExclusiveRecordGroups()
+    {
+        return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD])
+            ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]
+            : [];
     }
 }

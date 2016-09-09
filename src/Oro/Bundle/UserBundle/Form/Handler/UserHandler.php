@@ -12,7 +12,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -46,9 +45,6 @@ class UserHandler extends AbstractUserHandler
     /** @var ConfigManager */
     protected $userConfigManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /**
      * @param FormInterface $form
      * @param Request $request
@@ -59,7 +55,6 @@ class UserHandler extends AbstractUserHandler
      * @param FlashBagInterface $flashBag
      * @param TranslatorInterface $translator
      * @param LoggerInterface $logger
-     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         FormInterface $form,
@@ -70,8 +65,7 @@ class UserHandler extends AbstractUserHandler
         \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
         TranslatorInterface $translator = null,
-        LoggerInterface $logger = null,
-        SecurityFacade $securityFacade = null
+        LoggerInterface $logger = null
     ) {
         parent::__construct($form, $request, $manager);
         $this->userConfigManager = $userConfigManager;
@@ -80,7 +74,6 @@ class UserHandler extends AbstractUserHandler
         $this->flashBag = $flashBag;
         $this->translator = $translator;
         $this->logger = $logger;
-        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -88,9 +81,6 @@ class UserHandler extends AbstractUserHandler
      */
     public function process(User $user)
     {
-        if ($this->securityFacade !== null && $user->getCurrentOrganization() === null) {
-            $user->setCurrentOrganization($this->securityFacade->getOrganization());
-        }
         $this->form->setData($user);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
@@ -140,18 +130,7 @@ class UserHandler extends AbstractUserHandler
         // Reloads the user to reset its username. This is needed when the
         // username or password have been changed to avoid issues with the
         // security layer.
-        // Additional checking for userConfigManager !== null is added because of API
-        // to avoid "Call to a member function on a non-object".
         $this->manager->reloadUser($user);
-        if ($this->form->has('signature') && $this->userConfigManager !== null) {
-            $signature = $this->form->get('signature')->getData();
-            if ($signature) {
-                $this->userConfigManager->set('oro_email.signature', $signature);
-            } else {
-                $this->userConfigManager->reset('oro_email.signature');
-            }
-            $this->userConfigManager->flush();
-        }
     }
 
     /**

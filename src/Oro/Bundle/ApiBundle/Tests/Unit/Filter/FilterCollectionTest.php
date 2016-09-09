@@ -23,6 +23,7 @@ class FilterCollectionTest extends \PHPUnit_Framework_TestCase
     public function testActions()
     {
         $this->assertCount(0, $this->filterCollection);
+        $this->assertTrue($this->filterCollection->isEmpty());
 
         $sortFilter     = new SortFilter('type');
         $pageSizeFilter = new PageSizeFilter('type');
@@ -30,6 +31,8 @@ class FilterCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->filterCollection->add('filter1', $sortFilter);
         $this->filterCollection->add('filter2', $pageSizeFilter);
+
+        $this->assertFalse($this->filterCollection->isEmpty());
 
         $this->assertTrue($this->filterCollection->has('filter1'));
         $this->assertTrue($this->filterCollection->has('filter2'));

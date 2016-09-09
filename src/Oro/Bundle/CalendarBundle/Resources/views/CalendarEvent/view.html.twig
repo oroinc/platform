@@ -7,9 +7,10 @@
 {% oro_title_set({params : {"%entity.title%": entity.title|default('N/A') }}) %}
 
 {% block navButtons %}
-    {% if app.user and app.user.id == entity.calendar.owner.id %}
+    {% if app.user and entity.relatedAttendee and entity.relatedAttendee.user and app.user.id == entity.relatedAttendee.user.id  %}
         {% include 'OroCalendarBundle:CalendarEvent:invitationButtons.html.twig' with {'entity': entity} %}
     {% endif %}
+
     {% if entity.parent is empty and resource_granted('EDIT', entity) %}
         {# Button for add context on the activity list item view page #}
         {{ AC.addContextButton(entity) }}
@@ -20,7 +21,7 @@
     {% endif %}
     {% if resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
-            'dataUrl':      path('oro_api_delete_calendarevent', {'id': entity.id}),
+            'dataUrl':      path('oro_calendar_event_delete', {'id': entity.id, 'notifyInvitedUsers': true}),
             'dataRedirect': path('oro_calendar_event_index'),
             'aCss':         'no-hash remove-button',
             'dataId':       entity.id,
@@ -49,12 +50,15 @@
 {% block breadcrumbs %}
     {{ parent() }}
     <div class="pull-left">
-        {% set invitationClass = invitations.get_invitatition_badge_class(entity.invitationStatus) %}
-        {% if (entity.invitationStatus and invitationClass) %}
-            <div class="invitation-status badge badge-{{ invitationClass }} status-{{ invitationClass }}">
-                <i class="icon-status-{{ invitationClass }} icon-circle"></i>
-                {{ invitations.calendar_event_invitation_status(entity.invitationStatus) }}
-            </div>
+        {% set relatedAttendee = entity.relatedAttendee %}
+        {% if relatedAttendee and relatedAttendee.status %}
+            {% set invitationClass = invitations.get_invitatition_badge_class(relatedAttendee.status.id) %}
+            {% if entity.relatedAttendee.status and invitationClass %}
+                <div class="invitation-status badge badge-{{ invitationClass }} status-{{ invitationClass }}">
+                    <i class="icon-status-{{ invitationClass }} icon-circle"></i>
+                    {{ entity.relatedAttendee.status.name }}
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
@@ -64,17 +68,19 @@
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
                 {{ UI.renderProperty('oro.calendar.calendarevent.title.label'|trans, entity.title) }}
-                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, entity.description) }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, entity.description|raw|nl2br) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.start.label'|trans, entity.start|oro_format_datetime) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.end.label'|trans, entity.end|oro_format_datetime) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, entity.allDay ? 'Yes'|trans : 'No'|trans) }}
-                {% if entity.childEvents is not empty %}
-                    {% set invitationEvent = entity  %}
-                {% elseif entity.parent %}
-                    {% set invitationEvent = entity.parent %}
+                {% set invitationEvent = entity.parent ?: entity %}
+                {% if invitationEvent and invitationEvent.attendees is not empty %}
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.attendees.label'|trans, invitations.calendar_event_invitation(invitationEvent)) }}
                 {% endif %}
-                {% if invitationEvent is defined %}
-                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.invitation.label'|trans, invitations.calendar_event_invitation(invitationEvent)) }}
+                {% if entity.recurrence %}
+                    {{ UI.renderProperty('oro.calendar.calendarevent.recurrence.label'|trans, get_recurrence_text_value(entity.recurrence)) }}
+                {% endif %}
+                {% if entity.recurringEvent %}
+                    {{ UI.renderProperty('oro.calendar.calendarevent.recurrence.exception.label'|trans, get_recurrence_text_value(entity.recurringEvent.recurrence)) }}
                 {% endif %}
             </div>
             <div class="responsive-block">

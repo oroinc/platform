@@ -164,4 +164,12 @@ final class NullAclExtension implements AclExtensionInterface
     {
         return array();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFieldExtension()
+    {
+        return null;
+    }
 }

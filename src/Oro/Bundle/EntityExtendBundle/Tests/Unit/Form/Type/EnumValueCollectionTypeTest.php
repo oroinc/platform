@@ -96,7 +96,8 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                 'disabled'          => false,
                 'allow_add'         => true,
                 'allow_delete'      => true,
-                'validation_groups' => true
+                'validation_groups' => true,
+                'options'           => []
             ]
         );
 
@@ -120,7 +121,10 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'disabled'          => false,
                     'allow_add'         => true,
                     'allow_delete'      => true,
-                    'validation_groups' => true
+                    'validation_groups' => true,
+                    'options'           => [
+                        'allow_multiple_selection' => false
+                    ]
                 ]
             ],
             [
@@ -134,7 +138,10 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'disabled'          => false,
                     'allow_add'         => true,
                     'allow_delete'      => true,
-                    'validation_groups' => true
+                    'validation_groups' => true,
+                    'options'           => [
+                        'allow_multiple_selection' => false
+                    ]
                 ]
             ],
             [
@@ -150,7 +157,10 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'disabled'          => true,
                     'allow_add'         => false,
                     'allow_delete'      => false,
-                    'validation_groups' => false
+                    'validation_groups' => false,
+                    'options'           => [
+                        'allow_multiple_selection' => false
+                    ]
                 ]
             ],
             [
@@ -167,7 +177,10 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'disabled'          => false,
                     'allow_add'         => false,
                     'allow_delete'      => false,
-                    'validation_groups' => true
+                    'validation_groups' => true,
+                    'options'           => [
+                        'allow_multiple_selection' => false
+                    ]
                 ]
             ],
             [
@@ -181,7 +194,10 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'disabled'          => true,
                     'allow_add'         => false,
                     'allow_delete'      => false,
-                    'validation_groups' => false
+                    'validation_groups' => false,
+                    'options'           => [
+                        'allow_multiple_selection' => false
+                    ]
                 ]
             ],
             [
@@ -195,7 +211,10 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'disabled'          => false,
                     'allow_add'         => false,
                     'allow_delete'      => true,
-                    'validation_groups' => true
+                    'validation_groups' => true,
+                    'options'           => [
+                        'allow_multiple_selection' => false
+                    ]
                 ]
             ],
             [
@@ -209,7 +228,27 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'disabled'          => false,
                     'allow_add'         => true,
                     'allow_delete'      => false,
-                    'validation_groups' => true
+                    'validation_groups' => true,
+                    'options'           => [
+                        'allow_multiple_selection' => false
+                    ]
+                ]
+            ],
+            [
+                'configId'          => new FieldConfigId('multiEnum', 'Test\Entity', 'testField', 'multiEnum'),
+                'isNewConfig'       => false,
+                'enumCode'          => 'test_enum',
+                'isImmutableAdd'    => false,
+                'isImmutableDelete' => true,
+                'options'           => [],
+                'expectedOptions'   => [
+                    'disabled'          => false,
+                    'allow_add'         => true,
+                    'allow_delete'      => false,
+                    'validation_groups' => true,
+                    'options'           => [
+                        'allow_multiple_selection' => true
+                    ]
                 ]
             ],
         ];

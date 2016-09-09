@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 
-use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
-class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
+class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
 {
     /** @var JsonApiDocumentBuilder */
     protected $documentBuilder;
@@ -52,6 +50,10 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The metadata should be provided.
+     */
     public function testSetDataObjectWithoutMetadata()
     {
         $object = [
@@ -60,19 +62,12 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->documentBuilder->setDataObject($object);
-        $this->assertEquals(
-            [
-                'data' => [
-                    'attributes' => [
-                        'id'   => 123,
-                        'name' => 'Name',
-                    ]
-                ]
-            ],
-            $this->documentBuilder->getDocument()
-        );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The metadata should be provided.
+     */
     public function testSetDataCollectionWithoutMetadata()
     {
         $object = [
@@ -81,19 +76,6 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->documentBuilder->setDataCollection([$object]);
-        $this->assertEquals(
-            [
-                'data' => [
-                    [
-                        'attributes' => [
-                            'id'   => 123,
-                            'name' => 'Name',
-                        ]
-                    ]
-                ]
-            ],
-            $this->documentBuilder->getDocument()
-        );
     }
 
     /**
@@ -104,6 +86,7 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         $object = [
             'id'         => 123,
             'name'       => 'Name',
+            'meta1'      => 'Meta1',
             'category'   => 456,
             'group'      => null,
             'role'       => ['id' => 789],
@@ -121,21 +104,27 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
             ],
+            'unknown'    => 'test'
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
-        $metadata->addField($this->getFieldMetadata('id'));
-        $metadata->addField($this->getFieldMetadata('name'));
-        $metadata->addAssociation($this->getAssociationMetadata('category', 'Test\Category'));
-        $metadata->addAssociation($this->getAssociationMetadata('group', 'Test\Groups'));
-        $metadata->addAssociation($this->getAssociationMetadata('role', 'Test\Role'));
-        $metadata->addAssociation($this->getAssociationMetadata('categories', 'Test\Category', true));
-        $metadata->addAssociation($this->getAssociationMetadata('groups', 'Test\Group', true));
-        $metadata->addAssociation($this->getAssociationMetadata('products', 'Test\Product', true));
-        $metadata->addAssociation($this->getAssociationMetadata('roles', 'Test\Role', true));
-        $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->getFieldMetadata('name'));
-        $metadata->addAssociation($this->getAssociationMetadata('otherRoles', 'Test\Role', true));
-        $metadata->getAssociation('otherRoles')->getTargetMetadata()->addField($this->getFieldMetadata('name'));
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addField($this->createFieldMetadata('missingField'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
+        $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+        $metadata->addAssociation($this->createAssociationMetadata('groups', 'Test\Group', true));
+        $metadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
+        $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('otherRoles', 'Test\Role', true));
+        $metadata->getAssociation('otherRoles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
 
         $this->documentBuilder->setDataObject($object, $metadata);
         $this->assertEquals(
@@ -143,26 +132,30 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                 'data'     => [
                     'type'          => 'test_entity',
                     'id'            => '123',
+                    'meta'          => [
+                        'meta1' => 'Meta1',
+                    ],
                     'attributes'    => [
-                        'name' => 'Name',
+                        'name'         => 'Name',
+                        'missingField' => null
                     ],
                     'relationships' => [
-                        'category'   => [
+                        'category'      => [
                             'data' => [
                                 'type' => 'test_category',
                                 'id'   => '456'
                             ]
                         ],
-                        'group'      => [
+                        'group'         => [
                             'data' => null
                         ],
-                        'role'       => [
+                        'role'          => [
                             'data' => [
                                 'type' => 'test_role',
                                 'id'   => '789'
                             ]
                         ],
-                        'categories' => [
+                        'categories'    => [
                             'data' => [
                                 [
                                     'type' => 'test_category',
@@ -174,13 +167,13 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ]
                         ],
-                        'groups'     => [
+                        'groups'        => [
                             'data' => []
                         ],
-                        'products'   => [
+                        'products'      => [
                             'data' => []
                         ],
-                        'roles'      => [
+                        'roles'         => [
                             'data' => [
                                 [
                                     'type' => 'test_role',
@@ -192,7 +185,7 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ]
                         ],
-                        'otherRoles' => [
+                        'otherRoles'    => [
                             'data' => [
                                 [
                                     'type' => 'test_role',
@@ -203,6 +196,12 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                                     'id'   => '780'
                                 ]
                             ]
+                        ],
+                        'missingToOne'  => [
+                            'data' => null
+                        ],
+                        'missingToMany' => [
+                            'data' => []
                         ]
                     ]
                 ],
@@ -235,6 +234,7 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         $object = [
             'id'         => 123,
             'name'       => 'Name',
+            'meta1'      => 'Meta1',
             'category'   => 456,
             'group'      => null,
             'role'       => ['id' => 789],
@@ -247,20 +247,26 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
             'roles'      => [
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
-            ]
+            ],
+            'unknown'    => 'test'
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
-        $metadata->addField($this->getFieldMetadata('id'));
-        $metadata->addField($this->getFieldMetadata('name'));
-        $metadata->addAssociation($this->getAssociationMetadata('category', 'Test\Category'));
-        $metadata->addAssociation($this->getAssociationMetadata('group', 'Test\Groups'));
-        $metadata->addAssociation($this->getAssociationMetadata('role', 'Test\Role'));
-        $metadata->addAssociation($this->getAssociationMetadata('categories', 'Test\Category', true));
-        $metadata->addAssociation($this->getAssociationMetadata('groups', 'Test\Group', true));
-        $metadata->addAssociation($this->getAssociationMetadata('products', 'Test\Product', true));
-        $metadata->addAssociation($this->getAssociationMetadata('roles', 'Test\Role', true));
-        $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->getFieldMetadata('name'));
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addField($this->createFieldMetadata('missingField'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
+        $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+        $metadata->addAssociation($this->createAssociationMetadata('groups', 'Test\Group', true));
+        $metadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
+        $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
 
         $this->documentBuilder->setDataCollection([$object], $metadata);
         $this->assertEquals(
@@ -269,26 +275,30 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                     [
                         'type'          => 'test_entity',
                         'id'            => '123',
+                        'meta'          => [
+                            'meta1' => 'Meta1',
+                        ],
                         'attributes'    => [
-                            'name' => 'Name',
+                            'name'         => 'Name',
+                            'missingField' => null
                         ],
                         'relationships' => [
-                            'category'   => [
+                            'category'      => [
                                 'data' => [
                                     'type' => 'test_category',
                                     'id'   => '456'
                                 ]
                             ],
-                            'group'      => [
+                            'group'         => [
                                 'data' => null
                             ],
-                            'role'       => [
+                            'role'          => [
                                 'data' => [
                                     'type' => 'test_role',
                                     'id'   => '789'
                                 ]
                             ],
-                            'categories' => [
+                            'categories'    => [
                                 'data' => [
                                     [
                                         'type' => 'test_category',
@@ -300,13 +310,13 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                                     ]
                                 ]
                             ],
-                            'groups'     => [
+                            'groups'        => [
                                 'data' => []
                             ],
-                            'products'   => [
+                            'products'      => [
                                 'data' => []
                             ],
-                            'roles'      => [
+                            'roles'         => [
                                 'data' => [
                                     [
                                         'type' => 'test_role',
@@ -317,6 +327,12 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                                         'id'   => '780'
                                     ]
                                 ]
+                            ],
+                            'missingToOne'  => [
+                                'data' => null
+                            ],
+                            'missingToMany' => [
+                                'data' => []
                             ]
                         ]
                     ]
@@ -353,13 +369,13 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
-        $metadata->addField($this->getFieldMetadata('id'));
-        $metadata->addAssociation($this->getAssociationMetadata('categories', 'Test\CategoryWithoutAlias', true));
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\CategoryWithoutAlias', true));
         $metadata->getAssociation('categories')->getTargetMetadata()->setInheritedType(true);
         $metadata->getAssociation('categories')->setAcceptableTargetClassNames(
             ['Test\Category1', 'Test\Category2']
         );
-        $metadata->getAssociation('categories')->getTargetMetadata()->addField($this->getFieldMetadata('name'));
+        $metadata->getAssociation('categories')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
         $this->documentBuilder->setDataObject($object, $metadata);
         $this->assertEquals(
@@ -414,13 +430,13 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
-        $metadata->addField($this->getFieldMetadata('id'));
-        $metadata->addAssociation($this->getAssociationMetadata('categories', 'Test\Category', true));
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
         $metadata->getAssociation('categories')->getTargetMetadata()->setInheritedType(true);
         $metadata->getAssociation('categories')->setAcceptableTargetClassNames(
             ['Test\Category1', 'Test\Category2WithoutAlias']
         );
-        $metadata->getAssociation('categories')->getTargetMetadata()->addField($this->getFieldMetadata('name'));
+        $metadata->getAssociation('categories')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
         $this->documentBuilder->setDataObject($object, $metadata);
         $this->assertEquals(
@@ -464,6 +480,149 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAssociationsAsArrayAttributes()
+    {
+        $object = [
+            'id'         => 123,
+            'category'   => 456,
+            'group'      => null,
+            'role'       => ['id' => 789],
+            'categories' => [
+                ['id' => 456],
+                ['id' => 457]
+            ],
+            'groups'     => null,
+            'products'   => [],
+            'roles'      => [
+                ['id' => 789, 'name' => 'Role1'],
+                ['id' => 780, 'name' => 'Role2']
+            ],
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
+        $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+        $metadata->addAssociation($this->createAssociationMetadata('groups', 'Test\Group', true));
+        $metadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
+        $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
+        foreach ($metadata->getAssociations() as $association) {
+            $association->setDataType('array');
+        }
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'category'      => 456,
+                        'group'         => null,
+                        'role'          => 789,
+                        'categories'    => [456, 457],
+                        'groups'        => [],
+                        'products'      => [],
+                        'roles'         => [
+                            ['id' => 789, 'name' => 'Role1'],
+                            ['id' => 780, 'name' => 'Role2']
+                        ],
+                        'missingToOne'  => null,
+                        'missingToMany' => []
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testNestedAssociationAsArrayAttribute()
+    {
+        $object = [
+            'id'          => 1,
+            'association' => [
+                'id'         => 123,
+                'name'       => 'Name',
+                'meta1'      => 'Meta1',
+                'category'   => 456,
+                'group'      => null,
+                'role'       => ['id' => 789],
+                'categories' => [
+                    ['id' => 456],
+                    ['id' => 457]
+                ],
+                'groups'     => null,
+                'products'   => [],
+                'roles'      => [
+                    ['id' => 789, 'name' => 'Role1'],
+                    ['id' => 780, 'name' => 'Role2']
+                ],
+                'unknown'    => 'test'
+            ],
+        ];
+
+        $targetMetadata = $this->getEntityMetadata('Test\Target', ['id']);
+        $targetMetadata->addField($this->createFieldMetadata('id'));
+        $targetMetadata->addField($this->createFieldMetadata('name'));
+        $targetMetadata->addField($this->createFieldMetadata('missingField'));
+        $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('groups', 'Test\Group', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $targetMetadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $associationMetadata = $metadata->addAssociation(
+            $this->createAssociationMetadata('association', 'Test\Target')
+        );
+        $associationMetadata->setTargetMetadata($targetMetadata);
+        $associationMetadata->setDataType('array');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '1',
+                    'attributes' => [
+                        'association' => [
+                            'id'            => 123,
+                            'name'          => 'Name',
+                            'missingField'  => null,
+                            'meta1'         => 'Meta1',
+                            'category'      => 456,
+                            'group'         => null,
+                            'role'          => 789,
+                            'categories'    => [456, 457],
+                            'groups'        => [],
+                            'products'      => [],
+                            'roles'         => [
+                                ['id' => 789, 'name' => 'Role1'],
+                                ['id' => 780, 'name' => 'Role2']
+                            ],
+                            'missingToOne'  => null,
+                            'missingToMany' => []
+                        ]
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetErrorObject()
     {
         $error = new Error();
@@ -471,9 +630,8 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorObject($error, $metadata);
+        $this->documentBuilder->setErrorObject($error);
         $this->assertEquals(
             [
                 'errors' => [
@@ -496,9 +654,8 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorCollection([$error], $metadata);
+        $this->documentBuilder->setErrorCollection([$error]);
         $this->assertEquals(
             [
                 'errors' => [
@@ -512,53 +669,5 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
             ],
             $this->documentBuilder->getDocument()
         );
-    }
-
-    /**
-     * @param string   $class
-     * @param string[] $idFields
-     *
-     * @return EntityMetadata
-     */
-    protected function getEntityMetadata($class, array $idFields)
-    {
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($class);
-        $metadata->setIdentifierFieldNames($idFields);
-
-        return $metadata;
-    }
-
-    /**
-     * @param string $fieldName
-     *
-     * @return FieldMetadata
-     */
-    protected function getFieldMetadata($fieldName)
-    {
-        $metadata = new FieldMetadata();
-        $metadata->setName($fieldName);
-
-        return $metadata;
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $targetClass
-     * @param bool   $isCollection
-     *
-     * @return AssociationMetadata
-     */
-    protected function getAssociationMetadata($fieldName, $targetClass, $isCollection = false)
-    {
-        $metadata = new AssociationMetadata();
-        $metadata->setName($fieldName);
-        $metadata->setTargetClassName($targetClass);
-        $metadata->setAcceptableTargetClassNames([$targetClass]);
-        $metadata->setIsCollection($isCollection);
-        $metadata->setTargetMetadata($this->getEntityMetadata($targetClass, ['id']));
-        $metadata->getTargetMetadata()->addField($this->getFieldMetadata('id'));
-
-        return $metadata;
     }
 }

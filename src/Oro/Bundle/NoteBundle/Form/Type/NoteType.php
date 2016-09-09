@@ -23,6 +23,14 @@ class NoteType extends AbstractType
                     'required' => true,
                     'label'    => 'oro.note.message.label'
                 ]
+            )
+            ->add(
+                'attachment',
+                'oro_image',
+                [
+                    'label' => 'oro.note.attachment.label',
+                    'required' => false
+                ]
             );
     }
 
@@ -47,6 +55,14 @@ class NoteType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_note';
     }

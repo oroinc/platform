@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
@@ -140,7 +141,7 @@ class GridController extends Controller
         $writer            = $this->has($writerId) ? $this->get($writerId) : $this->get($csvWriterId);
         $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
         $parameters        = $parametersFactory->createParameters($gridName);
-
+        $parameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
         $response = $this->get('oro_datagrid.handler.export')->handle(
             $this->get('oro_datagrid.importexport.export_connector'),
             $this->get('oro_datagrid.importexport.processor.export'),

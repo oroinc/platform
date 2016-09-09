@@ -21,6 +21,7 @@ class WorkflowHandler extends AbstractHandler
         WorkflowConfiguration::NODE_ATTRIBUTES,
         WorkflowConfiguration::NODE_TRANSITIONS,
         WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+        WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
     );
 
     /**

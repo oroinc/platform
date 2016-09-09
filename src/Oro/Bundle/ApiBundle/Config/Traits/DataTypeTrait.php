@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+
 /**
  * @property array $items
  */
@@ -14,7 +16,7 @@ trait DataTypeTrait
      */
     public function hasDataType()
     {
-        return array_key_exists(self::DATA_TYPE, $this->items);
+        return array_key_exists(EntityDefinitionFieldConfig::DATA_TYPE, $this->items);
     }
 
     /**
@@ -24,8 +26,8 @@ trait DataTypeTrait
      */
     public function getDataType()
     {
-        return array_key_exists(self::DATA_TYPE, $this->items)
-            ? $this->items[self::DATA_TYPE]
+        return array_key_exists(EntityDefinitionFieldConfig::DATA_TYPE, $this->items)
+            ? $this->items[EntityDefinitionFieldConfig::DATA_TYPE]
             : null;
     }
 
@@ -37,9 +39,9 @@ trait DataTypeTrait
     public function setDataType($dataType)
     {
         if ($dataType) {
-            $this->items[self::DATA_TYPE] = $dataType;
+            $this->items[EntityDefinitionFieldConfig::DATA_TYPE] = $dataType;
         } else {
-            unset($this->items[self::DATA_TYPE]);
+            unset($this->items[EntityDefinitionFieldConfig::DATA_TYPE]);
         }
     }
 }

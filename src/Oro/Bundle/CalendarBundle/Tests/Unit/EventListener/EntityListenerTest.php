@@ -3,12 +3,14 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\EventListener\EntityListener;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
@@ -26,6 +28,9 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityContext;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $recurrenceModel;
 
     /** @var EntityListener */
     protected $listener;
@@ -51,8 +56,11 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $securityContextLink->expects($this->any())->method('getService')
             ->will($this->returnValue($this->securityContext));
+        $this->recurrenceModel = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->listener = new EntityListener($securityContextLink);
+        $this->listener = new EntityListener($securityContextLink, $this->recurrenceModel);
     }
 
     /**
@@ -197,6 +205,31 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->with($calendarMetadata, $newCalendar);
 
         $this->listener->onFlush($args);
+    }
+
+    public function testPrePersistShouldCalculateEndTimeForRecurrenceEntity()
+    {
+        $recurrence = new Recurrence();
+        $calculatedEndTime = new \DateTime();
+
+        // guard
+        $this->assertNotEquals($calculatedEndTime, $recurrence->getCalculatedEndTime());
+
+        $this->recurrenceModel->expects($this->once())
+            ->method('getCalculatedEndTime')
+            ->with($recurrence)
+            ->will($this->returnValue($calculatedEndTime));
+
+        $this->listener->prePersist(new LifecycleEventArgs($recurrence, $this->em));
+        $this->assertEquals($calculatedEndTime, $recurrence->getCalculatedEndTime());
+    }
+
+    public function testPrePersistShouldNotCalculateEndTimeForOtherThanRecurrenceEntity()
+    {
+        $this->recurrenceModel->expects($this->never())
+            ->method('getCalculatedEndTime');
+
+        $this->listener->prePersist(new LifecycleEventArgs(new Organization(), $this->em));
     }
 
     /**

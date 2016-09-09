@@ -33,10 +33,6 @@ define([
 
         selectState: null,
 
-        events: {
-            'click [data-select]:checkbox': 'onCheckboxClick'
-        },
-
         /**
          * Initializer.
          * Subscribers on events listening
@@ -92,11 +88,14 @@ define([
             SelectAllHeaderCell.__super__.delegateEvents.call(this, events);
             // binds event handlers directly to dropdown-menu, because the menu can be attached to document body
             this.$('.dropdown-menu').on('click' + this.eventNamespace(), _.bind(this.onDropdownClick, this));
+            // binds event handlers directly to checkbox, because a toggle-dropdown stops event propagation
+            this.$('[data-select]:checkbox').on('click' + this.eventNamespace(), _.bind(this.onCheckboxClick, this));
             return this;
         },
 
         undelegateEvents: function() {
             this.$('.dropdown-menu').off(this.eventNamespace());
+            this.$('[data-select]:checkbox').off(this.eventNamespace());
             return SelectAllHeaderCell.__super__.undelegateEvents.call(this);
         },
 

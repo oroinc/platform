@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 
 /**
@@ -20,7 +21,7 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
 
         $entityList = $context->getResult();
         if (!is_array($entityList) && !$entityList instanceof \Traversable) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'The result property of the Context should be array or Traversable, "%s" given.',
                     is_object($entityList) ? get_class($entityList) : gettype($entityList)

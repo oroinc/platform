@@ -282,7 +282,10 @@ class DoctrineHelper
      */
     public function getEntityMetadataForClass($entityClass, $throwException = true)
     {
-        $manager = $this->getEntityManagerForClass($entityClass, $throwException);
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (null === $manager && $throwException) {
+            throw new Exception\NotManageableEntityException($entityClass);
+        }
 
         return null !== $manager
             ? $manager->getClassMetadata($entityClass)

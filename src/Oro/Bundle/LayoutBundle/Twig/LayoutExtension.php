@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Layout\BlockView;
 
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
 class LayoutExtension extends \Twig_Extension
@@ -73,6 +73,15 @@ class LayoutExtension extends \Twig_Extension
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
+            new \Twig_SimpleFunction(
+                'parent_block_widget',
+                null,
+                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFunction(
+                'layout_attr_defaults',
+                [$this, 'defaultAttributes']
+            )
         ];
     }
 
@@ -103,6 +112,32 @@ class LayoutExtension extends \Twig_Extension
         }
 
         return $view;
+    }
+
+    /**
+     * @param array $attr
+     * @param array $defaultAttr
+     * @return array
+     */
+    public function defaultAttributes(array $attr, array $defaultAttr)
+    {
+        foreach ($defaultAttr as $key => $value) {
+            if (strpos($key, '~') === 0) {
+                $key = substr($key, 1);
+                if (array_key_exists($key, $attr)) {
+                    if (is_array($value)) {
+                        $attr[$key] = ArrayUtil::arrayMergeRecursiveDistinct($value, (array)$attr[$key]);
+                    } else {
+                        $attr[$key] .= $value;
+                    }
+                }
+            }
+            if (!array_key_exists($key, $attr)) {
+                $attr[$key] = $value;
+            }
+        }
+
+        return $attr;
     }
 
     /**

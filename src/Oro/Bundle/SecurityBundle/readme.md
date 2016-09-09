@@ -56,6 +56,7 @@ And these permissions are supported for fields:
 - [UI](./Resources/doc/ui.md)
 - [ACL manager](./Resources/doc/acl-manager.md)
 - [Access levels] (./Resources/doc/access-levels.md)
+- [Field ACL](./Resources/doc/field-acl.md)
 - [Custom listeners] (./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
 

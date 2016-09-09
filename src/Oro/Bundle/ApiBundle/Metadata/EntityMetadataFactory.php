@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class EntityMetadataFactory
 {
@@ -41,6 +42,25 @@ class EntityMetadataFactory
      * @param string        $fieldName
      * @param string|null   $fieldType
      *
+     * @return MetaPropertyMetadata
+     */
+    public function createMetaPropertyMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
+    {
+        if (!$fieldType) {
+            $fieldType = (string)$classMetadata->getTypeOfField($fieldName);
+        }
+        $fieldMetadata = new MetaPropertyMetadata();
+        $fieldMetadata->setName($fieldName);
+        $fieldMetadata->setDataType($fieldType);
+
+        return $fieldMetadata;
+    }
+
+    /**
+     * @param ClassMetadata $classMetadata
+     * @param string        $fieldName
+     * @param string|null   $fieldType
+     *
      * @return FieldMetadata
      */
     public function createFieldMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
@@ -63,24 +83,35 @@ class EntityMetadataFactory
     /**
      * @param ClassMetadata $classMetadata
      * @param string        $associationName
+     * @param string|null   $associationDataType
      *
      * @return AssociationMetadata
      */
-    public function createAssociationMetadata(ClassMetadata $classMetadata, $associationName)
-    {
+    public function createAssociationMetadata(
+        ClassMetadata $classMetadata,
+        $associationName,
+        $associationDataType = null
+    ) {
         $targetClass = $classMetadata->getAssociationTargetClass($associationName);
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
+        $associationMetadata->setAssociationType(
+            $this->getAssociationType($classMetadata->getAssociationMapping($associationName))
+        );
         $associationMetadata->setIsCollection($classMetadata->isCollectionValuedAssociation($associationName));
 
         $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
-        $targetIdFields = $targetMetadata->getIdentifierFieldNames();
-        if (count($targetIdFields) === 1) {
-            $associationMetadata->setDataType($targetMetadata->getTypeOfField(reset($targetIdFields)));
+        if ($associationDataType) {
+            $associationMetadata->setDataType($associationDataType);
         } else {
-            $associationMetadata->setDataType(DataType::STRING);
+            $targetIdFields = $targetMetadata->getIdentifierFieldNames();
+            if (count($targetIdFields) === 1) {
+                $associationMetadata->setDataType($targetMetadata->getTypeOfField(reset($targetIdFields)));
+            } else {
+                $associationMetadata->setDataType(DataType::STRING);
+            }
         }
 
         if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
@@ -99,5 +130,26 @@ class EntityMetadataFactory
         $associationMetadata->setIsNullable($isNullable);
 
         return $associationMetadata;
+    }
+
+    /**
+     * @param array $associationMapping
+     *
+     * @return string|null
+     */
+    protected function getAssociationType(array $associationMapping)
+    {
+        switch ($associationMapping['type']) {
+            case ClassMetadata::MANY_TO_ONE:
+                return RelationType::MANY_TO_ONE;
+            case ClassMetadata::MANY_TO_MANY:
+                return RelationType::MANY_TO_MANY;
+            case ClassMetadata::ONE_TO_MANY:
+                return RelationType::ONE_TO_MANY;
+            case ClassMetadata::ONE_TO_ONE:
+                return RelationType::ONE_TO_ONE;
+            default:
+                return null;
+        }
     }
 }

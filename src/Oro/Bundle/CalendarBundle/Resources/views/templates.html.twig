@@ -1,3 +1,5 @@
+{% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
+
 {% macro calendar_event_view_template(id) %}
 
 <script type="text/template" id="activity-context-activity-list">
@@ -25,10 +27,33 @@
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, '<%= formatter.string(title) %>') }}
-                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, '<%= formatter.text(description) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, '<%= formatter.html(description) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+                <% if (recurrence) { %>
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.recurrence.label'|trans, '<%= formatter.string(recurrencePattern) %>') }}
+                <% } %>
+                <% if (recurringEventId && recurrencePattern) { %>
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.recurrence.exception.label'|trans, '<%= formatter.string(recurrencePattern) %>') }}
+                <% } %>
+
+                <% var attendeesView = _.map(attendees, function (attendee) {
+                    var attendeeName = attendee.displayName;
+                    if (attendee.fullName) {
+                        attendeeName = attendee.fullName;
+                    }
+
+                    if (attendee.email) {
+                        attendeeName = attendeeName ? attendeeName + ' (' + attendee.email + ')' : attendee.email;
+                    }
+
+                    return attendeeName;
+                }); %>
+                <% if (attendeesView.length > 0) { %>
+                    {{ UI.renderAttribute('oro.calendar.calendarevent.attendees.label'|trans, '<div class="calendar-event-guests-widget"><%= attendeesView.join(", ") %></div>') }}
+                <% } %>
+
                 <div class="activity-context-activity">
                 {{ UI.renderAttribute('oro.activity.contexts.label'|trans, '<div class="activity-context-activity-items"></div>') }}
                 </div>
@@ -43,7 +68,7 @@
                         'dataMessage': 'oro.calendar.delete_event.confirmation'|trans,
                         'title': 'oro.calendar.delete_event.title'|trans,
                         'label': 'Delete'|trans,
-                        'data': {'action-name': 'delete'}
+                        'data': {'action-name': 'delete', 'url': 'oro_calendar_event_delete'}
                     })
                 }}
                 <% } %>
@@ -67,10 +92,22 @@
             form_row(form.start),
             form_row(form.end),
             form_row(form.allDay),
+            '<% if (recurrence) { %>' ~
+                UI.renderHtmlProperty(
+                    'oro.calendar.calendarevent.recurrence.label'|trans,
+                    '<%= recurrencePattern %>'
+                ) ~
+            '<% } %>',
+            '<% if (recurringEventId && recurrencePattern) { %>' ~
+                UI.renderHtmlProperty(
+                    'oro.calendar.calendarevent.recurrence.exception.label'|trans,
+                    '<%= recurrencePattern %>'
+                ) ~
+            '<% } %>',
             form_row(form.backgroundColor),
             form.calendarUid is defined ? form_row(form.calendarUid) : null,
-            form_row(form.childEvents)|replace({'childEvents': 'invitedUsers'}),
-            form_row(form.reminders),
+            form_row(form.attendees),
+            '<% if (!recurrence) { %>' ~ form_row(form.reminders) ~ '<% } %>',
             form_row(form.notifyInvitedUsers)
         ]
     %}
@@ -92,6 +129,7 @@
                     <% if (typeof notifiable !== 'undefined' && notifiable) { %>
                         {{ invitations.notifyGuestsComponent() }}
                     <% } %>
+
                     <div class="widget-actions form-actions" style="display: none;">
                         <% if (id != null && removable) { %>
                         {{
@@ -101,7 +139,7 @@
                                 'dataMessage': 'oro.calendar.delete_event.confirmation'|trans,
                                 'title': 'oro.calendar.delete_event.title'|trans,
                                 'label': 'Delete'|trans,
-                                'data': {'action-name': 'delete'}
+                                'data': {'action-name': 'delete', 'url': 'oro_calendar_event_delete'}
                             })
                         }}
                         <% } %>

@@ -10,6 +10,7 @@ oro_datagrid_gridview_publish:
     type: action
     group_name: ""
     bindings: ~
+    category: "application"
 
 oro_datagrid_gridview_update_public:
     label: oro.grid.action.gridview_edit_public.label
@@ -17,3 +18,4 @@ oro_datagrid_gridview_update_public:
     type: action
     group_name: ""
     bindings: ~
+    category: "application"

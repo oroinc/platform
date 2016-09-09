@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
-use Gaufrette\Filesystem;
-
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment as AttachmentOro;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as AttachmentEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
@@ -16,22 +13,17 @@ use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 
-/**
- * Class EmailAttachmentTransformer
- *
- * @package Oro\Bundle\EmailBundle\Tools
- */
 class EmailAttachmentTransformer
 {
-    /**
-     * @var Filesystem
-     */
-    protected $filesystem;
-
     /**
      * @var Factory
      */
     protected $factory;
+
+    /**
+     * @var FileManager
+     */
+    protected $fileManager;
 
     /**
      * @var AttachmentManager
@@ -44,19 +36,19 @@ class EmailAttachmentTransformer
     protected $emailAttachmentManager;
 
     /**
-     * @param FilesystemMap          $filesystemMap
      * @param Factory                $factory
+     * @param FileManager            $fileManager
      * @param AttachmentManager      $manager
      * @param EmailAttachmentManager $emailAttachmentManager
      */
     public function __construct(
-        FilesystemMap $filesystemMap,
         Factory $factory,
+        FileManager $fileManager,
         AttachmentManager $manager,
         EmailAttachmentManager $emailAttachmentManager
     ) {
-        $this->filesystem             = $filesystemMap->get('attachments');
         $this->factory                = $factory;
+        $this->fileManager            = $fileManager;
         $this->manager                = $manager;
         $this->emailAttachmentManager = $emailAttachmentManager;
     }
@@ -130,7 +122,7 @@ class EmailAttachmentTransformer
 
         $emailAttachmentContent = new EmailAttachmentContent();
         $emailAttachmentContent->setContent(
-            base64_encode($this->filesystem->get($attachmentOro->getFile()->getFilename())->getContent())
+            base64_encode($this->fileManager->getContent($attachmentOro->getFile()))
         );
 
         $emailAttachmentContent->setContentTransferEncoding('base64');

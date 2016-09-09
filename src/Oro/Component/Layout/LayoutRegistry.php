@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Component\Layout\Extension\ExtensionInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class LayoutRegistry implements LayoutRegistryInterface
 {
@@ -17,7 +16,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     /** @var BlockTypeInterface[] */
     private $types = [];
 
-    /** @var DataProviderInterface[] */
+    /** @var object[] */
     private $dataProviders = [];
 
     /** @var BlockTypeExtensionInterface[] */
@@ -110,14 +109,14 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions($name, OptionsResolverInterface $resolver)
+    public function configureOptions($name, OptionsResolver $resolver)
     {
         $extensions = isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
             : $this->loadTypeExtensions($name);
 
         foreach ($extensions as $extension) {
-            $extension->setDefaultOptions($resolver);
+            $extension->configureOptions($resolver);
         }
     }
 

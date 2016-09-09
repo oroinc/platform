@@ -12,7 +12,7 @@
             </div>
             <span class="separator">/</span>
             {% else %}
-            <h1 class="user-name">{{ title }}</h1>
+            <h1 class="user-name">{{ title|raw }}</h1>
             {% endif %}
         {% endfor %}
         </div>
@@ -108,7 +108,7 @@
                 <div class="accordion-heading">
                     <a href="#config_tab_{{ tabData.name }}" data-toggle="collapse"
                        class="accordion-toggle{% if not tabData.isActive %} collapsed{% endif %}">
-                        {%- if tabData.icon is defined and tabData.icon != '' %}<i class="icon {{ tabData.icon }}"></i>{% endif -%}
+                        {%- if tabData.icon is defined and tabData.icon != '' %}<i class="icon fa {{ tabData.icon }}"></i>{% endif -%}
                         {{- tabData.title|trans -}}
                     </a>
                 </div>

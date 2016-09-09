@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
 
-use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpCommand extends AbstractDebugCommand
 {
@@ -30,15 +33,27 @@ class DumpCommand extends AbstractDebugCommand
             ->addArgument(
                 'entity',
                 InputArgument::OPTIONAL,
-                'The entity class name or alias'
-            );
-           // @todo: API version is not supported for now
+                'The entity class or entity type'
+            )
+            // @todo: API version is not supported for now
             //->addArgument(
             //    'version',
             //    InputArgument::OPTIONAL,
             //    'API version',
             //    Version::LATEST
-            //);
+            //)
+            ->addOption(
+                'sub-resources',
+                null,
+                InputOption::VALUE_NONE,
+                'Shows sub-resources'
+            )
+            ->addOption(
+                'not-accessible',
+                null,
+                InputOption::VALUE_NONE,
+                'Shows only entities that are not accessible through Data API'
+            );
         parent::configure();
     }
 
@@ -47,42 +62,128 @@ class DumpCommand extends AbstractDebugCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityClass = $input->getArgument('entity');
-        if ($entityClass) {
-            /** @var EntityClassNameHelper $entityClassNameHelper */
-            $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
-            $entityClass = $entityClassNameHelper->resolveEntityClass($entityClass, true);
+        $isNotAccessible = $input->getOption('not-accessible');
+        if ($isNotAccessible) {
+            $this->dumpNotAccessibleEntities($input, $output);
+        } else {
+            $this->dumpResources($input, $output);
         }
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    public function dumpNotAccessibleEntities(InputInterface $input, OutputInterface $output)
+    {
         $requestType = $this->getRequestType($input);
         // @todo: API version is not supported for now
-        //$version     = $input->getArgument('version');
-        $version = Version::LATEST;
+        //$version = $input->getArgument('version');
+        $version = Version::normalizeVersion(null);
 
-        /** @var ResourcesLoader $resourcesLoader */
-        $resourcesLoader = $this->getContainer()->get('oro_api.resources_loader');
-        $resources       = $resourcesLoader->getResources($version, $requestType);
-
-        $table = new Table($output);
-        $table->setHeaders(['Entity', 'Attributes']);
-
-        $i = 0;
+        /** @var ResourcesProvider $resourcesProvider */
+        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
+        $resources = $resourcesProvider->getResources($version, $requestType);
+        $accessibleEntities = [];
         foreach ($resources as $resource) {
+            $accessibleEntities[$resource->getEntityClass()] = true;
+        }
+
+        $notAccessibleEntities = [];
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->getContainer()->get('doctrine');
+        $managers = $doctrine->getManagers();
+        foreach ($managers as $manager) {
+            if (!$manager instanceof EntityManager) {
+                continue;
+            }
+            /** @var ClassMetadata[] $allMetadata */
+            $allMetadata = $manager->getMetadataFactory()->getAllMetadata();
+            foreach ($allMetadata as $metadata) {
+                if (!isset($accessibleEntities[$metadata->name])
+                    && !isset($notAccessibleEntities[$metadata->name])
+                    && !$metadata->isMappedSuperclass
+                ) {
+                    $notAccessibleEntities[$metadata->name] = true;
+                }
+            }
+        }
+        $notAccessibleEntities = array_keys($notAccessibleEntities);
+        sort($notAccessibleEntities);
+
+        foreach ($notAccessibleEntities as $entityClass) {
+            $output->writeln(sprintf('<info>%s</info>', $entityClass));
+        }
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    public function dumpResources(InputInterface $input, OutputInterface $output)
+    {
+        $requestType = $this->getRequestType($input);
+        // @todo: API version is not supported for now
+        //$version = $input->getArgument('version');
+        $version = Version::normalizeVersion(null);
+        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
+        $isSubresourcesRequested = $input->getOption('sub-resources');
+
+        /** @var ResourcesProvider $resourcesProvider */
+        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
+        $resources = $resourcesProvider->getResources($version, $requestType);
+        /** @var ApiResource[] $sortedResources */
+        $sortedResources = [];
+        foreach ($resources as $resource) {
+            $sortedResources[$resource->getEntityClass()] = $resource;
+        }
+        ksort($sortedResources);
+
+        /** @var SubresourcesProvider $subresourcesProvider */
+        $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
+
+        foreach ($sortedResources as $resource) {
             if ($entityClass && $resource->getEntityClass() !== $entityClass) {
                 continue;
             }
-            if ($i > 0) {
-                $table->addRow(new TableSeparator());
-            }
-            $table->addRow(
-                [
-                    $resource->getEntityClass(),
-                    $this->convertResourceAttributesToString($this->getResourceAttributes($resource, $requestType))
-                ]
+            $output->writeln(sprintf('<info>%s</info>', $resource->getEntityClass()));
+            $output->writeln(
+                $this->convertResourceAttributesToString(
+                    $this->getResourceAttributes($resource, $requestType)
+                )
             );
-            $i++;
+            if ($isSubresourcesRequested) {
+                $subresourcesText = $this->getEntitySubresourcesText(
+                    $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType)
+                );
+                if ($subresourcesText) {
+                    $output->writeln($subresourcesText);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ApiResourceSubresources $entitySubresources
+     *
+     * @return string
+     */
+    protected function getEntitySubresourcesText(ApiResourceSubresources $entitySubresources)
+    {
+        $result = '';
+        $subresources = $entitySubresources->getSubresources();
+        if (!empty($subresources)) {
+            $result .= ' Sub-resources:';
+            foreach ($subresources as $associationName => $subresource) {
+                $result .= sprintf("\n  <comment>%s</comment>", $associationName);
+                $subresourceExcludedActions = $subresource->getExcludedActions();
+                if (!empty($subresourceExcludedActions)) {
+                    $result .= "\n   Excluded Actions: " . implode(', ', $subresourceExcludedActions);
+                }
+            }
         }
 
-        $table->render();
+        return $result;
     }
 
     /**
@@ -98,17 +199,12 @@ class DumpCommand extends AbstractDebugCommand
         $entityClass = $resource->getEntityClass();
 
         /** @var ValueNormalizer $valueNormalizer */
-        $valueNormalizer      = $this->getContainer()->get('oro_api.value_normalizer');
+        $valueNormalizer = $this->getContainer()->get('oro_api.value_normalizer');
         $result['Entity Type'] = $valueNormalizer->normalizeValue(
             $entityClass,
             DataType::ENTITY_TYPE,
             $requestType
         );
-
-        /** @var EntityClassNameProviderInterface $entityClassNameProvider */
-        $entityClassNameProvider = $this->getContainer()->get('oro_entity.entity_class_name_provider');
-        $result['Name']          = $entityClassNameProvider->getEntityClassName($entityClass);
-        $result['Plural Name']   = $entityClassNameProvider->getEntityClassPluralName($entityClass);
 
         $excludedActions = $resource->getExcludedActions();
         if (!empty($excludedActions)) {
@@ -132,7 +228,7 @@ class DumpCommand extends AbstractDebugCommand
             if ($i > 0) {
                 $result .= PHP_EOL;
             }
-            $result .= sprintf('%s: %s', $name, $value);
+            $result .= sprintf(' %s: %s', $name, $this->convertValueToString($value));
             $i++;
         }
 

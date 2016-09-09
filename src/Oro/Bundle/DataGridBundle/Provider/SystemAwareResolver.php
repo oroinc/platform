@@ -92,12 +92,8 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        while (strpos($val, '%') !== false) {
-            $newVal = $this->resolveParameter($val);
-            if ($newVal == $val) {
-                break;
-            }
-            $val = $newVal;
+        if (is_scalar($val) && strpos($val, '%') !== false) {
+            $val = $this->resolveClassName($val);
         }
 
         while (is_scalar($val) && strpos($val, '::') !== false) {
@@ -128,18 +124,19 @@ class SystemAwareResolver implements ContainerAwareInterface
     }
 
     /**
-     * Replace %parameter% with it's value.
-     *
      * @param string $val
      * @return mixed
      */
-    protected function resolveParameter($val)
+    protected function resolveClassName($val)
     {
-        if (preg_match('#%([\w\._]+)%#', $val, $match)) {
-            $val = $this->replaceValueInString(
+        if (preg_match('#%([^\'":\s]+)%#', $val, $match)) {
+            $matchedString = $match[0];
+            $class = $match[1];
+
+            return $this->replaceValueInString(
                 $val,
-                $match[0],
-                $this->container->getParameter($match[1])
+                $matchedString,
+                $this->container->getParameter($class)
             );
         }
 

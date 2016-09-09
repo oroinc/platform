@@ -13,6 +13,9 @@ class AttachmentProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $attachmentAssociationHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $attachmentManager;
+
     /**
      * @var AttachmentProvider|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -29,7 +32,14 @@ class AttachmentProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attachmentProvider = new AttachmentProvider($this->em, $this->attachmentAssociationHelper);
+        $this->attachmentManager = $this
+            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+        $this->attachmentProvider =
+            new AttachmentProvider($this->em, $this->attachmentAssociationHelper, $this->attachmentManager);
     }
 
     public function testGetEntityAttachments()

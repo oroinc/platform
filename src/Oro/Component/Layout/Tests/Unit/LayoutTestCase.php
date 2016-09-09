@@ -91,6 +91,7 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
             unset($result['vars']['translation_domain']);
             unset($result['vars']['label']);
             unset($result['vars']['block_type']);
+            unset($result['vars']['block_type_widget_id']);
             unset($result['vars']['unique_block_prefix']);
             unset($result['vars']['block_prefixes']);
             unset($result['vars']['cache_key']);

@@ -73,7 +73,7 @@ class User extends AbstractPageEntity
         $this->email = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_email']");
         $this->groups = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_groups']");
         $this->roles = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_roles']");
-        $this->owner = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_owner']"));
+        $this->owner = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_owner']/preceding-sibling::div/a");
         $this->inviteUser = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_inviteUser']");
 
         return $this;
@@ -88,7 +88,9 @@ class User extends AbstractPageEntity
 
     public function setOwner($owner)
     {
-        $this->owner->selectOptionByLabel($owner);
+        $this->owner->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
     }
@@ -298,13 +300,43 @@ class User extends AbstractPageEntity
      */
     public function setBusinessUnit($businessUnits = array('Main'))
     {
+        $this->test->byXpath(
+            "//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div//input"
+        )->click();
         foreach ($businessUnits as $businessUnit) {
             $this->test->byXpath(
-                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]"
+                "//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div" .
+                "//li[@class='select2-search-field']//input"
+            )->value($businessUnit);
+            $this->waitForAjax();
+            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$businessUnit}')]")->click();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Select one or more organizations in business unit selector. This method should be used before
+     * business unit selection when multiple organizations is used
+     *
+     * @param array $organizations
+     * @return $this
+     */
+    public function setBusinessUnitOrganization($organizations = array())
+    {
+        foreach ($organizations as $organization) {
+            $this->test->byXpath(
+                "//*[@data-ftid='oro_user_user_form_organizations']" .
+                "//b[contains(., '{$organization}')]"
             )->click();
         }
 
         return $this;
+    }
+
+    public function hasBusinessUnitOrganizationChoice()
+    {
+        return $this->isElementPresent("//*[@data-ftid='oro_user_user_form_organizations']//input[@type='checkbox']");
     }
 
     public function edit()
@@ -364,72 +396,6 @@ class User extends AbstractPageEntity
         $this->assertElementNotPresent(
             "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
             "ui-dialog-normal']"
-        );
-
-        return $this;
-    }
-
-    /**
-     * Method configure user IMAP sync
-     * @param array $imapSetting
-     * @return $this
-     */
-    public function setImap($imapSetting)
-    {
-        $this->test->byXpath(
-            "//div[@class='control-group imap-config check-connection control-group-checkbox']" .
-            "//input[@data-ftid='oro_user_user_form_imapConfiguration_useImap']"
-        )->click();
-        $this->waitForAjax();
-        $this->test->byXPath(
-            "//input[@data-ftid='oro_user_user_form_imapConfiguration_imapHost']"
-        )->value($imapSetting['host']);
-        $this->test->byXPath(
-            "//input[@data-ftid='oro_user_user_form_imapConfiguration_imapPort']"
-        )->value($imapSetting['port']);
-        $this->test->byXPath(
-            "//input[@data-ftid='oro_user_user_form_imapConfiguration_user']"
-        )->value($imapSetting['user']);
-        $this->test->byXPath(
-            "//input[@data-ftid='oro_user_user_form_imapConfiguration_password']"
-        )->value($imapSetting['password']);
-        $this->encryption = $this->test
-            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
-        $this->encryption->selectOptionByLabel($imapSetting['encryption']);
-        $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
-        $this->waitForAjax();
-        $this->waitPageToLoad();
-        $this->test->byXPath(
-            "//div[@class='control-group folder-tree "
-            . "control-group-oro_email_email_folder_tree']//input[@class='check-all']"
-        )->click();
-
-        return $this;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function setSignature($value)
-    {
-        $this->test->waitUntil(
-            function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
-                return $testCase->execute(
-                    [
-                        'script' => 'return tinyMCE.activeEditor.initialized',
-                        'args' => [],
-                    ]
-                );
-            },
-            intval(MAX_EXECUTION_TIME)
-        );
-
-        $this->test->execute(
-            [
-                'script' => sprintf('tinyMCE.activeEditor.setContent(\'%s\')', $value),
-                'args' => [],
-            ]
         );
 
         return $this;

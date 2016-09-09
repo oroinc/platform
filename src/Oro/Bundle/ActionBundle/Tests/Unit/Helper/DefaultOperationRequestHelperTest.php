@@ -85,7 +85,7 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
                 'executionRoute' => 'execution_route',
                 'expected' => 'test_route',
             ],
-            'exists route name with datagrid' => [
+            'exists route name with datagrid route' => [
                 'masterRequest' => new Request([
                     '_route' => DefaultOperationRequestHelper::DATAGRID_ROUTE,
                     'gridName' => 'test-grid',
@@ -96,6 +96,70 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
                 'executionRoute' => 'test_route',
                 'expected' => 'test_original_route',
             ],
+            'exists route name with mass action route' => [
+                'masterRequest' => new Request([
+                    '_route' => DefaultOperationRequestHelper::MASS_ACTION_ROUTE,
+                    'gridName' => 'test-grid',
+                    'test-grid' => [
+                        'originalRoute' => 'test_original_route'
+                    ]
+                ]),
+                'executionRoute' => 'test_route',
+                'expected' => 'test_original_route',
+            ],
+        ];
+    }
+
+    /**
+     * @param Request $masterRequest
+     * @param string|null $executionRoute
+     * @param bool $expected
+     *
+     * @dataProvider isExecutionRouteRequestProvider
+     */
+    public function isExecutionRouteRequest(Request $masterRequest = null, $executionRoute = null, $expected = null)
+    {
+        $this->requestStack->expects($this->once())
+            ->method('getMasterRequest')
+            ->willReturn($masterRequest);
+
+        $this->applicationsHelper->expects($executionRoute ? $this->once() : $this->never())
+            ->method('getExecutionRoute')
+            ->willReturn($executionRoute);
+
+        $this->assertEquals($expected, $this->helper->isExecutionRouteRequest());
+    }
+
+    /**
+     * @return array
+     */
+    public function isExecutionRouteRequestProvider()
+    {
+        return [
+            'empty master request' => [
+                'masterRequest' => null,
+                'executionRoute' => null,
+                'expected' => false,
+            ],
+            'empty route name' => [
+                'masterRequest' => new Request(),
+                'executionRoute' => 'execution_route',
+                'expected' => false,
+            ],
+            'execution route name' => [
+                'masterRequest' => new Request([
+                    '_route' => 'execution_route',
+                ]),
+                'executionRoute' => 'execution_route',
+                'expected' => true,
+            ],
+            'exists route name' => [
+                'masterRequest' => new Request([
+                    '_route' => 'test_route',
+                ]),
+                'executionRoute' => 'execution_route',
+                'expected' => false,
+            ]
         ];
     }
 }

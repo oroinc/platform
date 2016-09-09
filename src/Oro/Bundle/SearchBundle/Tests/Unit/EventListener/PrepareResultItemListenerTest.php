@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,6 +43,11 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     protected $entity;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityTitleResolver;
+
+    /**
      * Set up test environment
      */
     protected function setUp()
@@ -70,7 +76,14 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new PrepareResultItemListener($this->router, $this->mapper, $this->em);
+        $this->entityTitleResolver = $this->getMock(EntityTitleResolverInterface::class);
+
+        $this->listener = new PrepareResultItemListener(
+            $this->router,
+            $this->mapper,
+            $this->em,
+            $this->entityTitleResolver
+        );
     }
 
     /**
@@ -261,47 +274,6 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Process entity without predefined title fields
-     */
-    public function testProcessTitleDefaultBehavior()
-    {
-        $this->event->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($this->entity));
-
-        $this->event->expects($this->once())
-            ->method('getResultItem')
-            ->will($this->returnValue($this->item));
-
-        $this->item->expects($this->once())
-            ->method('getRecordUrl')
-            ->will($this->returnValue('url'));
-
-        $this->item->expects($this->once())
-            ->method('getRecordTitle')
-            ->will($this->returnValue(false));
-
-        $this->item->expects($this->once())
-            ->method('getEntityName')
-            ->will($this->returnValue(get_class($this->entity)));
-
-        $this->mapper->expects($this->once())
-            ->method('getEntityMapParameter')
-            ->with(get_class($this->entity), 'title_fields')
-            ->will($this->returnValue(false));
-
-        $this->entity->expects($this->once())
-            ->method('__toString')
-            ->will($this->returnValue('testTitle'));
-
-        $this->item->expects($this->once())
-            ->method('setRecordTitle')
-            ->with('testTitle');
-
-        $this->listener->process($this->event);
-    }
-
-    /**
      * Process loading entity and using fields for title
      */
     public function testProcessTitle()
@@ -326,11 +298,6 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityName')
             ->will($this->returnValue(get_class($this->entity)));
 
-        $this->mapper->expects($this->atLeastOnce())
-            ->method('getEntityMapParameter')
-            ->with(get_class($this->entity), 'title_fields')
-            ->will($this->returnValue(array('testField')));
-
         $repositoryMock = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -344,9 +311,8 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->with(get_class($this->entity))
             ->will($this->returnValue($repositoryMock));
 
-        $this->mapper->expects($this->once())
-            ->method('getFieldValue')
-            ->with($this->entity, 'testField')
+        $this->entityTitleResolver->expects($this->once())
+            ->method('resolve')
             ->will($this->returnValue('testTitle'));
 
         $this->item->expects($this->once())

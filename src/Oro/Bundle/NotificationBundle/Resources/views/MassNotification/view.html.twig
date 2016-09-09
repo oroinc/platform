@@ -1,0 +1,39 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+
+{% oro_title_set({params : {"%entity.name%": entity.email|default('N/A') }}) %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_notification_massnotification_index'),
+        'indexLabel':  'oro.notification.massnotification.entity_plural_label'|trans,
+        'entityTitle': entity.email|default('N/A'),
+    } %}
+    {% block stats %}
+    {% endblock stats %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set massNotificationWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_notification_massnotification_info', {id: entity.id}),
+            'title': 'oro.notification.massnotification.block.info'|trans
+        }) }}
+    {% endset %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'General'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data': [massNotificationWidget]}
+            ]
+        }
+    ] %}
+
+    {% set id = 'massNotificationView' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+    {{ parent() }}
+{% endblock %}

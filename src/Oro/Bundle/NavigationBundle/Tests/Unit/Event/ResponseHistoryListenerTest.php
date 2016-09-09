@@ -151,6 +151,32 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onResponse($event);
     }
 
+    public function testLongHistoryUrlCut()
+    {
+        $response   = $this->getResponse();
+        $repository = $this->getDefaultRepositoryMock(null);
+        $request = $this->getRequest();
+        $request->expects($this->once())->method('getRequestUri')->will($this->returnValue(str_repeat('a', 200)));
+        $em = $this->getEntityManager($repository);
+
+        $this->factory->expects($this->once())
+            ->method('createItem')
+            ->with(
+                'history',
+                $this->callback(
+                    function ($params) {
+                        $this->assertEquals(100, strlen($params['url']));
+
+                        return true;
+                    }
+                )
+            )
+            ->will($this->returnValue($this->item));
+
+        $listener = $this->getListener($this->factory, $this->securityContext, $em);
+        $listener->onResponse($this->getEventMock($request, $response));
+    }
+
     /**
      * Get the mock of the GetResponseEvent and FilterResponseEvent.
      *
@@ -286,6 +312,16 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'))
             ->will($this->returnValue($repositoryMock));
+
+        $meta = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $meta->expects($this->once())->method('getFieldMapping')->with($this->equalTo('url'))
+            ->will($this->returnValue(array('length' => 100)));
+        $this->em->expects($this->any())
+            ->method('getClassMetadata')
+            ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'))
+            ->will($this->returnValue($meta));
 
         $shouldBeDisabled = $eventManager instanceof OroEventManager;
         if ($shouldBeDisabled) {

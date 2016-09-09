@@ -27,7 +27,8 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "form"={
  *              "form_type"="oro_organization_select"
@@ -286,6 +287,34 @@ class Organization extends ExtendOrganization implements
     public function getBusinessUnits()
     {
         return $this->businessUnits;
+    }
+
+    /**
+     * @param BusinessUnit $businessUnit
+     *
+     * @return self
+     */
+    public function addBusinessUnit(BusinessUnit $businessUnit)
+    {
+        if (!$this->businessUnits->contains($businessUnit)) {
+            $this->businessUnits->add($businessUnit);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param BusinessUnit $businessUnit
+     *
+     * @return self
+     */
+    public function removeBusinessUnit(BusinessUnit $businessUnit)
+    {
+        if ($this->businessUnits->contains($businessUnit)) {
+            $this->businessUnits->removeElement($businessUnit);
+        }
+
+        return $this;
     }
 
     /**

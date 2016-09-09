@@ -20,6 +20,7 @@ services:
             - '@oro_security.security_facade'
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
+            - '@oro_attachment.provider.attachment'
             - '@oro_attachment.manager'
 
     oro_note.association_helper:

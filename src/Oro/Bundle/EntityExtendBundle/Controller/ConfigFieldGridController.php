@@ -86,9 +86,7 @@ class ConfigFieldGridController extends Controller
                     $newFieldModel->getType()
                 );
 
-                return $this->redirect(
-                    $this->generateUrl('oro_entityextend_field_update', ['id' => $entity->getId()])
-                );
+                return $this->get('oro_ui.router')->redirect($entity);
             }
         }
 
@@ -173,10 +171,7 @@ class ConfigFieldGridController extends Controller
                 $configManager->persist($extendEntityConfig);
                 $configManager->flush();
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_entityconfig_field_update', 'parameters' => ['id' => $newFieldModel->getId()]],
-                    ['route' => 'oro_entityconfig_view', 'parameters' => ['id' => $entity->getId()]]
-                );
+                return $this->get('oro_ui.router')->redirect($newFieldModel);
             }
         }
 

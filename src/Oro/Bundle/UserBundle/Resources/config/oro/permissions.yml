@@ -1,0 +1,7 @@
+oro_permissions:
+    CONFIGURE:
+        label: oro.user.permission.update_configuration.label
+        group_names: ""
+        apply_to_all: false
+        apply_to_entities:
+            - 'Oro\Bundle\UserBundle\Entity\User'

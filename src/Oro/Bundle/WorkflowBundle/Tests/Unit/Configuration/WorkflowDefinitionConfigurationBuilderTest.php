@@ -11,9 +11,25 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowAssembler;
+
+    /** @var WorkflowDefinitionConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    protected $builder;
+
+    protected function setUp()
+    {
+        $this->workflowAssembler = $this->getMockBuilder(WorkflowAssembler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->builder = new WorkflowDefinitionConfigurationBuilder($this->workflowAssembler);
+    }
+
     /**
      * @param WorkflowDefinition $definition
      * @return array
@@ -24,6 +40,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
             'entity' => $definition->getRelatedEntity(),
+            'defaults' => ['active' => $definition->isActive()],
+            'priority' => $definition->getPriority(),
             'configuration' => $definition->getConfiguration(),
         );
 
@@ -39,6 +57,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
      * @param array $expectedData
      * @param array $expectedAcls
      * @dataProvider buildFromConfigurationDataProvider
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function testBuildFromConfiguration(array $inputData, array $expectedData, array $expectedAcls = array())
     {
@@ -79,9 +100,24 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         }
         $attributeManager = new AttributeManager($attributes);
 
+        $activeGroups = [];
+        $recordGroups = [];
+        if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS])) {
+            $activeGroups = array_map(
+                'strtolower',
+                $workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS]
+            );
+        }
+        if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS])) {
+            $recordGroups = array_map(
+                'strtolower',
+                $workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS]
+            );
+        }
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
-            ->setMethods(array('getStepManager', 'getAttributeManager'))
+            ->setMethods(array('getStepManager', 'getAttributeManager', 'getRestrictions'))
             ->getMock();
         $workflow->expects($this->any())
             ->method('getStepManager')
@@ -89,31 +125,24 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $workflow->expects($this->any())
             ->method('getAttributeManager')
             ->will($this->returnValue($attributeManager));
+        $workflow->expects($this->any())
+            ->method('getRestrictions')
+            ->will($this->returnValue([]));
 
-        $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
-            ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
-            ->getMock();
-        $workflowAssembler->expects($this->once())
+        $this->workflowAssembler->expects($this->once())
             ->method('assemble')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
             ->will($this->returnValue($workflow));
 
-        $fieldGenerator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Field\FieldGenerator')
-            ->disableOriginalConstructor()
-            ->setMethods(array('generateWorkflowFields'))
-            ->getMock();
-        $fieldGenerator->expects($this->once())
-            ->method('generateWorkflowFields')
-            ->with($expectedData['entity']);
 
-        $builder = new WorkflowDefinitionConfigurationBuilder($workflowAssembler, $fieldGenerator);
-        $workflowDefinitions = $builder->buildFromConfiguration($inputData);
+        $workflowDefinitions = $this->builder->buildFromConfiguration($inputData);
         $this->assertCount(1, $workflowDefinitions);
 
         /** @var WorkflowDefinition $workflowDefinition */
         $workflowDefinition = current($workflowDefinitions);
         $this->assertEquals($expectedData, $this->getDataAsArray($workflowDefinition));
+        $this->assertEquals($workflowDefinition->getExclusiveActiveGroups(), $activeGroups);
+        $this->assertEquals($workflowDefinition->getExclusiveRecordGroups(), $recordGroups);
 
         $actualAcls = $workflowDefinition->getEntityAcls()->toArray();
         $this->assertSameSize($expectedAcls, $actualAcls);
@@ -122,8 +151,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             $actualAcl = array_shift($actualAcls);
             $this->assertEquals($expectedAcl['step'], $actualAcl->getStep()->getName());
             $this->assertEquals($expectedAcl['attribute'], $actualAcl->getAttribute());
-            $this->assertEquals($expectedAcl['permissions']['update'], $actualAcl->isUpdatable());
-            $this->assertEquals($expectedAcl['permissions']['delete'], $actualAcl->isDeletable());
+            $this->assertEquals($expectedAcl['permissions']['UPDATE'], $actualAcl->isUpdatable());
+            $this->assertEquals($expectedAcl['permissions']['DELETE'], $actualAcl->isDeletable());
         }
     }
 
@@ -133,17 +162,29 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
     public function buildFromConfigurationDataProvider()
     {
         $minimumConfiguration = array(
-            'label'  => 'Test Workflow',
+            'label' => 'Test Workflow',
             'entity' => 'My\Entity',
+            'defaults' => ['active' => false],
+            'priority' => 0,
         );
 
         $maximumConfiguration = array(
             'label' => 'Test Workflow',
             'is_system' => true,
             'entity' => 'My\Entity',
+            'defaults' => ['active' => false],
+            'priority' => 1,
             'start_step' => 'test_step',
             'entity_attribute' => 'my_entity',
             'steps_display_ordered' => true,
+            WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS => [
+                'active_group1',
+                'active_group2',
+            ],
+            WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS => [
+                'record_group1',
+                'record_group2',
+            ],
             WorkflowConfiguration::NODE_STEPS => array(
                 array(
                     'name' => 'first',
@@ -179,9 +220,11 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'test_workflow' => $minimumConfiguration,
                 ),
                 'expectedData' => array(
-                    'name'  => 'test_workflow',
+                    'name' => 'test_workflow',
                     'label' => 'Test Workflow',
-                    'entity'     => 'My\Entity',
+                    'entity' => 'My\Entity',
+                    'defaults' => ['active' => false],
+                    'priority' => 0,
                     'configuration' => $this->filterConfiguration($minimumConfiguration),
                 ),
             ),
@@ -190,22 +233,24 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'test_workflow' => $maximumConfiguration,
                 ),
                 'expectedData' => array(
-                    'name'  => 'test_workflow',
+                    'name' => 'test_workflow',
                     'label' => 'Test Workflow',
                     'start_step' => 'test_step',
                     'entity' => 'My\Entity',
+                    'defaults' => ['active' => false],
+                    'priority' => 1,
                     'configuration' => $this->filterConfiguration($maximumConfiguration),
                 ),
                 'expected_acls' => array(
                     array(
                         'step' => 'first',
                         'attribute' => 'entity_attribute',
-                        'permissions' => array('update' => false, 'delete' => false),
+                        'permissions' => array('UPDATE' => false, 'DELETE' => false),
                     ),
                     array(
                         'step' => 'test_step',
                         'attribute' => 'entity_attribute',
-                        'permissions' => array('update' => true, 'delete' => false),
+                        'permissions' => array('UPDATE' => true, 'DELETE' => false),
                     ),
                 ),
             ),
@@ -238,16 +283,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
     {
         $this->setExpectedException($expectedException, $expectedMessage);
 
-        $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fieldGenerator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Field\FieldGenerator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $builder = new WorkflowDefinitionConfigurationBuilder($workflowAssembler, $fieldGenerator);
-        $builder->buildFromConfiguration($inputData);
+        $this->builder->buildFromConfiguration($inputData);
     }
 
     /**

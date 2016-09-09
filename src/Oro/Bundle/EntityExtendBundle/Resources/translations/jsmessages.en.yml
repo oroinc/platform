@@ -11,3 +11,4 @@ oro:
         schema_updated: Schema updated
         schema_update_failed: Schema update failed
         delete_field.confirm_content: Are you sure you want to delete this field?
+        enum_value_collection.clear_default: Do not set Default

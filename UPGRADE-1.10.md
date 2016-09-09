@@ -7,25 +7,39 @@ UPGRADE FROM 1.9 to 1.10
 - Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::cleanUpConnections method was removed.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::startTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::rollbackTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
+- `\Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData` is deprecated, use `\Oro\Bundle\TestFrameworkBundle\Migrations\Data\ORM\LoadUserData` instead
+- No need to load fixtures after test environment setup using `doctrine:fixture:load`
 
-####EntityBundle:
+####EntityBundle
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
+- The `Oro\Bundle\EntityBundle\Controller\Api\Rest\EntityDataController::patchAction` was fixed to return correct HTTP status code. Previous implementation was 
+always returning 204 (No Content), now it returns HTTP 200 (OK) if the response contains content. 
 
-####EntityConfigBundle:
+####EntityConfigBundle
 - Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
+- Added `Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToOneRelationQuery` as an automated way to remove ManyToOne relation
 
-####DashboardBundle:
+####DashboardBundle
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
 - Added new class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter`.
+- `oro_type_widget_user_multiselect` form type was renamed to `oro_type_widget_user_select` and moved to UserBundle.
+- Class `Oro\Bundle\DashboardBundle\Twig\FilterDateRangeExtension` was renamed to `Oro\Bundle\DashboardBundle\Twig\DashboardExtension`. Service was renamed to `oro_dashboard.twig.extension`. Added parameters `Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager $manager` and `Oro\Bundle\EntityBundle\Provider\EntityProvider $entityProvider` to the constructor.
 
-####DataGridBundle:
+####DataAuditBundle
+- The constructor of the `Oro/Bundle/DataAuditBundle/EventListener/SegmentWidgetOptionsListener` class was changed. Before: `__construct(HttpKernelInterface $httpKernel)`. After: `__construct(HttpKernelInterface $httpKernel, SecurityFacade $securityFacade, ContextChecker $contextChecker)`.
+
+####DataGridBundle
 - Events `Oro\Bundle\DataGridBundle\Event\OrmResultBefore` second constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
 - Event `Oro\Bundle\DataGridBundle\Event\OrmResultAfter` third constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
 
-####EntityBundle:
+####EntityBundle
 - The constructor of the `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` class was changed. Before: `__construct(ManagerRegistry $doctrine, $debug)`. After: `__construct(DoctrineHelper $doctrineHelper, ManagerBagInterface $managerBag, $debug)`.
 - The constructor of the `Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, EntityManagerBag $entityManagerBag)`. After: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, ManagerBagInterface $managerBag)`.
 - Method `getAllShortMetadata` was added to `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`. Using of this method instead of the `getAllMetadata` method can give significant performance gain.
+
+####ImportExportBundle
+- ACL resource (capability) `oro_importexport` was removed. Please, use `oro_importexport_import` or `oro_importexport_export` instead.
+- Added `NewEntitiesHelper $newEntitiesHelper` and `DoctrineHelper $doctrineHelper` parameters to constructor of `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy`
 
 ####SecurityBundle
 - **IMPORTANT**: The behaviour of the [Access Decision Manager](http://symfony.com/doc/current/components/security/authorization.html#access-decision-manager) was changed. Now the `allowIfAllAbstainDecisions` flag is set to `true` by default. It means that an access to a resource is denied as soon as there is one voter denying access. The goal of this change is to grant access when all voters abstain.
@@ -41,7 +55,15 @@ UPGRADE FROM 1.9 to 1.10
 - Added migration `Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery` for updating ACL Entries to use custom Permissions.
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`.
 - Added third parameter `$byCurrentGroup` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions` for getting permissions only for current application group name. Updated same method in `Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension` and `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`.
+- Added second parameter `$permissionName` to `getAccessLevelNames` method of `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
+- Added `getFieldExtension` method of `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
 - For php version from 7.0.0 to 7.0.5 we replaced `Symfony\Component\Security\Acl\Domain\Entry` on `Oro\Bundle\SecurityBundle\Acl\Domain\Entry` to avoid [bug](https://bugs.php.net/bug.php?id=71940) with unserialization of an object reference
+- Method `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::getTreeData` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::createTreeObject` instead.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBU` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBusinessUnit` instead.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getBusinessUnitUserIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getOrganizationUserIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder::fillOrganizationBusinessUnitIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder::fillOrganizationUserIds` marked as deprecated as it is not used anywhere.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Exception\ActionException` marked as deprecated. Use `Oro\Component\Action\Exception\ActionException` instead.
@@ -84,8 +106,8 @@ UPGRADE FROM 1.9 to 1.10
 - Class `Oro\Bundle\WorkflowBundle\Model\ContextAccessor` marked as deprecated. Use `Oro\Component\Action\Model\ContextAccessor` instead.
 - Class `Oro\Bundle\WorkflowBundle\Model\Event\ExecuteActionEvent` marked as deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvent` instead.
 - Class `Oro\Bundle\WorkflowBundle\Model\Event\ExecuteActionEvents` marked as deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents` instead.
-- `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_BEFORE` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
-- `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_AFTER` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
+- Constant `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_BEFORE` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
+- Constant `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_AFTER` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Service `oro_workflow.action_assembler` is deprecated. Use `oro_action.action_assembler` instead.
 - Service `oro_workflow.attribute_guesser` is deprecated. Use `oro_action.attribute_guesser` instead.
 - Service `oro_workflow.context_accessor` is deprecated. Use `oro_action.context_accessor` instead.
@@ -93,32 +115,94 @@ UPGRADE FROM 1.9 to 1.10
 - Service `oro_workflow.configuration_pass.replace_property_path` is deprecated. Use `oro_action.configuration_pass.replace_property_path` instead.
 - The constructor of the `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` class was changed. Third argument `LoggerInterface` (@logger service) was added.
 - Added error logging in `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` at handle method.
+- Added parameter `RestrictionAssembler $restrictionAssembler` to constructor of `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler`
+- Added parameter `RestrictionManager $restrictionManager` to constructor of `Oro\Bundle\WorkflowBundle\Model\Workflow`
+- Added parameter `WorkflowPermissionRegistry $permissionRegistry` to constructor of `Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter`
+- Added tags: `oro_workflow.changes.listener` and `oro_workflow.changes.subscriber` for `\Oro\Bundle\WorkflowBundle\Event\WorkflowEvents` event constants and separate dispatcher service `oro_workflow.changes.event.dispatcher`.
+- Added class `Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator` with corresponded service `oro_workflow.process.configurator` for single point of workflow processes configurations by configuration sets.
+- Added class `Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator`
+    **IMPORTANT**: Configuration must provide full list of triggers for mentioned process definition. If list under definition key comes empty - triggers would be removed. See more in `\Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator::configureTriggers` doc-block.
+    **IMPORTANT**: Changing of process cron triggers configuration will not keep all old cron triggers in database. E.g. old triggers would be removed and new created.
+- Added class `Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler` (`oro_workflow.handler.workflow_definition` service) for single point of `WorkflowDefinition` entity management.
+    All manipulations with `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity persistence should be provided through the handler.
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: additional (fifth) argument `Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher` was added.
+
+####CronBundle
+- Added action `@create_job` for instance of `JMS\JobQueueBundle\Entity\Job` creation and persistence through actions (Class `Oro\Bundle\CronBundle\Action\CreateJobAction`).
 
 ####SearchBundle
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.9. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.9. Will be removed after 1.11.
 - `Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener` is no longer requires `Oro\Bundle\SearchBundle\Engine\FulltextIndexManager` as an first argument
+- The constructor of the `Oro\Bundle\SearchBundle\Engine\AbstractEngine` class was changed. Before: `__construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher, DoctrineHelper $doctrineHelper, ObjectMapper $mapper)`. After: `__construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher, DoctrineHelper $doctrineHelper, ObjectMapper $mapper, EntityTitleResolverInterface $entityTitleResolver)`.
+- The constructor of the `Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener` class was changed. Before: `__construct(Router $router, ObjectMapper $mapper, EntityManager $em)`. After: `__construct(Router $router, ObjectMapper $mapper, EntityManager $em, EntityTitleResolverInterface $entityTitleResolver)`.
 
-####FormBundle:
+####FormBundle
 - 'Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension' was renamed to 'Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension'
 - 'oro_form.extension.random_id' service was renamed to 'oro_form.extension.additional_attr'
 - Form field identifier - 'data-name' attribute generation added to 'AdditionalAttrExtension'
+- Method `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate` marked as deprecated. Use `Oro\Bundle\FormBundle\Model\UpdateHandler::update` instead.
+- In previous version client of methods `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` and `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate`
+was responsible to pass redirect data in arguments, for example:
+```
+    return $this->get('oro_ui.router')->redirectAfterSave(
+        ['route' => 'oro_calendar_event_update', 'parameters' => ['id' => $entity->getId()]],
+        ['route' => 'oro_calendar_event_view', 'parameters' => ['id' => $entity->getId()]]
+    );
+```
+```
+    return $this->get('oro_form.model.update_handler')->handleUpdate(
+        $trackingWebsite,
+        $this->createForm($this->getFormType(), $trackingWebsite),
+        function (TrackingWebsite $entity) {
+            return [
+                'route' => 'oro_tracking_website_update',
+                'parameters' => ['id' => $entity->getId()]
+            ];
+        },
+        function (TrackingWebsite $entity) {
+            return [
+                'route' => 'oro_tracking_website_view',
+                'parameters' => ['id' => $entity->getId()]
+            ];
+        },
+        $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
+    );
+```
+These routes were used to make redirect when user clicked on one of 2 buttons on UI rendered using 2 Twig macroses: saveAndCloseButton and saveAndStayButton.
+Now controller's action is not responsible to configure redirect data at all.
+```
+    return $this->get('oro_ui.router')->redirect($entity);
+```
+```
+    return $this->get('oro_form.model.update_handler')->update(
+        $trackingWebsite,
+        $this->createForm($this->getFormType(), $trackingWebsite),
+        $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
+    );
+```
+Redirect data is now configured directly in the button rendered in Twig template using macroses: saveAndCloseButton, saveAndStayButton, saveAndNewButton and saveActionButton.
+See other related information in section `OroUIBundle` of this document.
+- Constructor for `Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType` changed. New arguments: `EntityManager $entityManager`, `SearchRegistry $searchRegistry`.
 
-####TranslationBundle:
+####TranslationBundle
 - Added translation strategies to dynamically handle translation fallbacks
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
 
 ####DataGridBundle
-- The class Oro\Bundle\DataGridBundle\Common\Object was renamed to DataObject
+- Moved and renamed class `Oro\Bundle\DataGridBundle\Common\Object` to `Oro\Component\Config\Common\ConfigObject`
 - Changed priority in next extensions:
     * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260
     * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261
+- The constructor of the `Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler` class was changed.
+    Before: `__construct(EntityManager $entityManager, TranslatorInterface $translator, SecurityFacade $securityFacade, MassDeleteLimiter $limiter, RequestStack $requestStack)`.
+    After: `__construct(RegistryInterface $registry, TranslatorInterface $translator, SecurityFacade $securityFacade, MassDeleteLimiter $limiter, RequestStack $requestStack, OptionalListenerManager $listenerManager)`.
 
 ####ConfigExpression
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
 - The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition
 
-####UiBundle
+####UIBundle
 - Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) plugin by Sachin N.
 
 Gallery view for a group of `<a>` elements can be triggered by adding 'data-gallery' attribute with unique gallery id.
@@ -128,9 +212,157 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 <a href="sample2.jpg" data-gallery="unique-id"></a>
 ```
 
+- Method `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` marked as deprecated. Use method `Oro\Bundle\UIBundle\Route\Router::redirect` instead.
+- Use of Twig macroses `saveAndCloseButton` and `saveAndStayButton` was changed. In old version client was responsible to pass just a label of button.
+In this new version client responsible to specify route and parameters which will be used to make redirect if form will successfully saved.
+Before:
+```
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+```
+Now:
+```
+    {% if resource_granted('oro_user_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_user_create'
+        }) %}
+    {% endif %}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_user_update',
+            'params': {'id': '$id'}
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+```
+- New macros `saveAndNewButton` was added and used on most of pages with forms. By clicking on this button user redirects to page with form where a new record could be created.
+
+
 ####EmailBundle
-- Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
-- Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
+- `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager::__construct()` signature changed from `public function __construct(FilesystemMap $filesystemMap, EntityManager $em, KernelInterface $kernel, ServiceLink $securityFacadeLink, RouterInterface $router, ConfigFileValidator $configFileValidator, AttachmentAssociationHelper $attachmentAssociationHelper)` to `public function __construct(FileManager $fileManager, EntityManager $em, RouterInterface $router, ConfigFileValidator $configFileValidator, AttachmentAssociationHelper $attachmentAssociationHelper)`.
+- `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer::__construct()` signature changed from `public function __construct(FilesystemMap $filesystemMap, Factory $factory)` to `public function __construct(Factory $factory, FileManager $fileManager, AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager)`.
+- The constructor of the `Oro\Bundle\EmailBundle\Mailer\Processor` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailOwnerProvider $emailOwnerProvider, EmailActivityManager $emailActivityManager, ServiceLink $serviceLink, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`. After: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailActivityManager $emailActivityManager, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`.
+- `Oro\Bundle\EmailBundle\Mailer\Processor::getEmailOrigin` marked as deprecated. Use method `Oro\Bundle\EmailBundle\Tools\EmailOriginHelper::getEmailOrigin` instead.
+- Additional you should use origin as second parameter for `Oro\Bundle\EmailBundle\Mailer\Processor::process` if you want use specific transport different from system.
+- The constructor of the `Oro\Bundle\EmailBundle\Manager\EmailNotificationManager` class was changed.
+    Before: `__construct(EntityManager $entityManager, HtmlTagHelper $htmlTagHelper, Router $router, EmailCacheManager $emailCacheManager, ConfigManager $configManager)`.
+    After: `__construct(EntityManager $entityManager, HtmlTagHelper $htmlTagHelper, Router $router, ConfigManager $configManager)`.
+- Visibility of method `recipientsFromResult` in `Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper` was changed from `protected` to `public`. This can bring a `backward compatibility break` if you have own implementation of this class.
 
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
+
+####AttachmentBundle:
+- Fixed `Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser` to avoid PHP notices on file upload in some cases
+- Added translation strategies to dynamically handle translation fallbacks
+- Extracted a file system relates functionality from `Oro\Bundle\AttachmentBundle\Manager\AttachmentManager` to `Oro\Bundle\AttachmentBundle\Manager\FileManager`. As result the following methods of the AttachmentManager class was marked as deprecated: `prepareRemoteFile`, `preUpload`, `upload`, `copyLocalFileToStorage`, `getContent`, `checkOnDelete`, `copyAttachmentFile`.
+- `Oro\Bundle\AttachmentBundle\Manager\AttachmentManager::__construct()` signature changed from `public function __construct(FilesystemMap $filesystemMap, Router $router, ServiceLink $securityFacadeLink, array $fileIcons, AssociationManager $associationManager)` to `public function __construct(RouterInterface $router, array $fileIcons, AssociationManager $associationManager)`.
+- Removed `uploaded` property of `Oro\Bundle\AttachmentBundle\Entity\File`.
+- `Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter::__construct()` signature changed from `public function __construct(AttachmentManager $manager, FileLocatorInterface $fileLocator)` to `public function __construct(FileManager $fileManager, FileLocatorInterface $fileLocator)`.
+- `Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager::__construct()` signature changed from `public function __construct(string $class, ObjectManager $om, SecurityFacade $securityFacade, AttachmentManager $attachmentManager)` to `public function __construct(string $class, ObjectManager $om, SecurityFacade $securityFacade, FileManager $fileManager, AttachmentManager $attachmentManager)`.
+- `Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator::validate()` signature changed from `public function validate(string $dataClass, File $entity, string $fieldName = '')` to `public function validate(ComponentFile $file, string $dataClass, string $fieldName = '')`.
+
+####CalendarBundle
+- The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
+- Added method `formatCalendarDateRangeUser` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatUserExtension.php`. Method `calendar_date_range_user` get additional param 'user' and return sate range according to user organization localization settings.
+- Added method `formatCalendarDateRangeOrganization` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatOrganizationExtension.php`. Method `calendar_date_range_organization` get additional param 'organization' and return sate range according to organization localization settings.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::NOT_RESPONDED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_NONE`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::TENTATIVELY_ACCEPTED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_TENTATIVE`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::ACCEPTED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_ACCEPTED`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::DECLINED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_DECLINED`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getInvitationStatus` marked as deprecated. To get invitation status call methods `getRelatedAttendee()->getStatus()`.
+- Guests `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` of event are now represented via collection accessible by methods `getAttendees` and `setAttendees`. Before to get all guets it was required to get all user owners of child events from parent event. Now parent event holds collection of entities `Oro\Bundle\CalendarBundle\Entity\Attendee`. Every attendee entity could refer to `Oro\Bundle\UserBundle\Entity\User`, but it's optional.
+- All email templates of events notifications were updated: `Migrations/Data/ORM/data/emails/invitation`.
+- Field `invitedUsers` in `Oro\Bundle\CalendarBundle\Form\Type\CalendarEvent[Api]Type` was deprecated. Use new field `attendees`.
+- Field `invitationStatus` in `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` was removed. Use new field `relatedAttendee.status`.
+- Field `doctrineHelper` in `Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType::__construct` method was changed. Before: `__construct()`. After: `__construct(ManagerRegistry $registry, SecurityFacade $securityFacade)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Methods of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType` were removed: `subscribeOnChildEvents`, `preSubmit`, `postSubmitChildEvents`, `postSubmit`, `setDefaultEventStatus`, `preSetData`. Separate subscriber classes were added to handle logic of event listeners. See classes in namespace `Oro\Bundle\CalendarBundle\Form\EventListeners`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType` class.
+- Method `setInvitationStatus` in `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` was removed. Use new method `getRelatedAttendee.setStatus`.
+- Signature of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType::__construct` method was changed. Before: `__construct(CalendarEventManager $calendarEventManager)`. After: `__construct(CalendarEventManager $calendarEventManager, ManagerRegistry $registry, SecurityFacade $securityFacade, RequestStack $requestStack, AttendeeRelationManager $attendeeRelationManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler::__construct` method was changed. Before: `__construct(FormInterface $form, Request $request, ObjectManager $manager, EmailSendProcessor $emailSendProcessor, ActivityManager $activityManager)`. After: `__construct(FormInterface $form, Request $request, ObjectManager $manager, EmailSendProcessor $emailSendProcessor, ActivityManager $activityManager, AttendeeRelationManager $attendeeRelationManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler::onSuccess` method was changed. Before: `onSuccess(CalendarEvent $entity, ArrayCollection $originalChildren)`. After: `onSuccess(CalendarEvent $entity, ArrayCollection $originalAttendees)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler::onSuccess` method was changed. Before: `onSuccess(CalendarEvent $entity, ArrayCollection $originalChildren, $notify)`. After: `onSuccess(CalendarEvent $entity, ArrayCollection $originalAttendees, $notify)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType::postSubmitData` method was moved to `Oro\Bundle\CalendarBundle\Form\EventListener\CalendarEventApiTypeSubscriber::postSubmitData`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventInviteesType` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Model\Email\EmailNotification` and `Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor` were updated to support entity `Oro\Bundle\CalendarBundle\Entity\Attendee` additionally to `Oro\Bundle\CalendarBundle\Entity\CalendarEvent`.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\AbstractCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager)`. After: `__construct(ReminderManager $reminderManager, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, DoctrineHelper $doctrineHelper)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\EventListener\EntityListener::__construct` method was changed. Before: `__construct(ServiceLink $securityContextLink)`. After: `__construct(ServiceLink $securityContextLink, Recurrence $recurrenceModel)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider::__construct` method was changed. Before: `__construct(DoctrineHelper $doctrineHelper, EntityNameResolver $entityNameResolver, AbstractCalendarEventNormalizer $calendarEventNormalizer)`. After: `__construct(DoctrineHelper $doctrineHelper, EntityNameResolver $entityNameResolver, AbstractCalendarEventNormalizer $calendarEventNormalizer, Recurrence $recurrenceModel)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Route name for `Oro\Bundle\CalendarBundle\ControllerAjaxCalendarEventController::changeStatus` has been changed, according to status changes, form `oro_calendar_event_tentatively_accepted` to `oro_calendar_event_tentative`
+- Url for `Oro\Bundle\CalendarBundle\ControllerAjaxCalendarEventController::changeStatus` has been changed from "/accept/{id}" to "/accepted/{id}" and from "/tentatively/{id}" to "/tentative/{id}"
+- The constructor of the `Oro\Bundle\CalendarBundle\Form\DataTransformer\AttendeesToViewTransformer` class was changed. Before: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, ObjectMapper $mapper, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, AttendeeRelationManager $attendeeRelationManager)`. After: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, AttendeeRelationManager $attendeeRelationManager, EntityTitleResolverInterface $entityTitleResolver)`.
+
+####LayoutBundle:
+- Added possibility to create layout block types using only DI configuration, for details please check out documentation at
+ [Creating new block types](./src/Oro/Bundle/LayoutBundle/Resources/doc/example.md) section.
+- BlockType classes replaced with DI configuration for listed block types: `root`, `head`, `body`, `fieldset`, `list`, `listitem`, `text`, `button` and `button_group`.
+Corresponding block type classes was removed.
+- Renamed `setDefaultOptions` to `configureOptions` method at `Oro\Component\Layout\BlockTypeInterface\BlockTypeInterface` and `Oro\Component\Layout\BlockTypeInterface\BlockTypeExtensionInterface`.
+- Defined image types configuration section for theme config
+- Added `oro_layout.provider.image_type` service to get image types available across all themes
+- The class Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType was renamed to FormFieldsType
+- New `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` block type was added. This block type creates three child blocks in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.
+- Added possibility to view layout tree in developer toolbar and include block debug information in HTML, for details please check out documentation at
+ [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
+- Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
+- Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
+- Layout theme additional configuration such as assets, images or requirejs from now placed in `layout/{theme_name}/config` folder [Config definition](./src/Oro/Bundle/LayoutBundle/Resources/doc/config_definition.md).
+- Changed current expression language in layouts to symfony expression language, for details please check out documentation at
+ [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
+
+####EmbeddedFormBundle:
+- Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
+Classes `Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormSuccessType` and
+`Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormType` was removed.
+
+####ActionBundle:
+- Layout block types was replaced with DI only configuration for `abstract_configurable` block,
+class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was removed.
+
+####LocaleBundle:
+- Added entity `Oro\Bundle\LocaleBundle\Entity\Localization` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localization)).
+- Added entity `Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localizedfallbackvalue)) for translating strings in different localizations.
+- Added trait `Oro\Bundle\LocaleBundle\Entity\FallbackTrait` for retrieve translated value for the needed localization.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter` for displaying full title of the language by code.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` for displaying full title of the formatting by code.
+- Added `oro_format_datetime_organization` twig extension - allows get formatted date and calendar date range by organization localization settings. Deprecated since 1.11. Will be removed after 1.13.
+
+####Layout Component:
+- `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
+- `@addTree` layout update action is `\Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension` now
+- Layout update `@setFormTheme` and `@setBlockTheme` actions can accept relative paths now
+
+####NotificationBundle:
+- The constructor of the `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool` class was changed. Before: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass)`. After: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass, EventDispatcherInterface $eventDispatcher)`.
+
+####Oro\Component\Config
+- `Oro\Component\Config\CumulativeResourceInfo::__construct` signature changed from
+`public function __construct($bundleClass, $name, $path, $data)` to `public function __construct($bundleClass, $name, $path, array $data = [])`
+
+####UserBundle:
+- The constructor of the `Oro\Bundle\UserBundle\Form\Type\UserType` class was changed. Removed argument: `ConfigManager $userConfigManager`.
+- The constructor of the `Oro\Bundle\UserBundle\Form\Handler\UserHandler` class was changed. Removed argument: `SecurityFacade $securityFacade = null`.
+- Added new configuration group user_configuration used to define which personal configurations can be updated by the user (Languages, Locale etc.)
+- Added 2 new capabilites: Update User Profile and Access personal configuration to control access to "My Profile" and  "My Configuration" updates
+- Added new permission "Configure" which controls access to entity configuration settings. Currently is applied to User entity only.
+
+####RequireJsBundle:
+- Added `Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface` interface. 
+- Class `Oro\Bundle\RequireJSBundle\Provider\Config` marked as deprecated. Use `Oro\Bundle\RequireJSBundle\Provider\ConfigProvider` instead.
+- Added `Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider` class. 
+- Added `Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager` class for building all configs provided by config providers via `oro:requirejs:build`.
+
+####ActivityBundle
+- The constructor of the `Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager` class was changed. Before: `__construct(ObjectManager $om, ActivityManager $activityManager, TokenStorageInterface $securityTokenStorage, ConfigManager $configManager, RouterInterface $router, EntityAliasResolver $entityAliasResolver, ObjectMapper $objectMapper, TranslatorInterface $translator, DoctrineHelper $doctrineHelper)`. After: `__construct(ObjectManager $om, ActivityManager $activityManager, TokenStorageInterface $securityTokenStorage, ConfigManager $configManager, RouterInterface $router, EntityAliasResolver $entityAliasResolver, EntityTitleResolverInterface $entityTitleResolver, DoctrineHelper $doctrineHelper)`.
+- The constructor of the `Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer` class was changed. Before: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, ObjectMapper $mapper, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher)`. After: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, EntityTitleResolverInterface $entityTitleResolver)`.
+- The constructor of the `Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType` class was changed. Before: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, ObjectMapper $mapper, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher)`. After: `__construct(EntityManager $entityManager, ConfigManager $configManager, TranslatorInterface $translator, TokenStorageInterface $securityTokenStorage, EventDispatcherInterface $dispatcher, EntityTitleResolverInterface $entityTitleResolver)`.

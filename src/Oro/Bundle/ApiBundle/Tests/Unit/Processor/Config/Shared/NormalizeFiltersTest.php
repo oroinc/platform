@@ -25,6 +25,38 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         $this->processor = new NormalizeFilters($this->doctrineHelper);
     }
 
+    public function testRemoveExcludedFilters()
+    {
+        $filters = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => [
+                    'data_type' => 'integer'
+                ],
+                'field2' => [
+                    'data_type' => 'integer',
+                    'exclude'   => true
+                ]
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject([]));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type' => 'integer'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
     /**
      * @dataProvider processNotManageableEntityProvider
      */
@@ -237,11 +269,15 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
      */
     public function testProcessForManageableEntity($definition, $filters, $expectedFilters)
     {
-        $rootMetadata           = $this->getClassMetadataMock();
-        $toOne1Metadata         = $this->getClassMetadataMock();
-        $toOne1toOne11Metadata  = $this->getClassMetadataMock();
+        $rootMetadata = $this->getClassMetadataMock();
+        $toOne1Metadata = $this->getClassMetadataMock();
+        $toOne1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne1_id']);
+        $toOne1toOne11Metadata = $this->getClassMetadataMock();
+        $toOne1toOne11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne11_id']);
         $toOne1toMany11Metadata = $this->getClassMetadataMock();
-        $toMany1Metadata        = $this->getClassMetadataMock();
+        $toOne1toMany11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany11_id']);
+        $toMany1Metadata = $this->getClassMetadataMock();
+        $toMany1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany1_id']);
 
         $rootMetadata->expects($this->any())
             ->method('hasAssociation')
@@ -316,6 +352,9 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                 'toOne1_toOne11'  => [
                                     'filters' => [
                                         'fields' => [
+                                            'toOne11_id'              => [
+                                                'data_type' => 'integer'
+                                            ],
                                             'toOne1_toOne11_field111' => [
                                                 'data_type' => 'string'
                                             ]
@@ -325,6 +364,9 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                 'toOne1_toMany11' => [
                                     'filters' => [
                                         'fields' => [
+                                            'toMany11_id'              => [
+                                                'data_type' => 'integer'
+                                            ],
                                             'toOne1_toMany11_field111' => [
                                                 'data_type' => 'string'
                                             ]
@@ -334,6 +376,9 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             ],
                             'filters'    => [
                                 'fields' => [
+                                    'toOne1_id'       => [
+                                        'data_type' => 'integer'
+                                    ],
                                     'toOne1_field1'   => [
                                         'data_type' => 'string'
                                     ],
@@ -349,6 +394,9 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                         'toMany1' => [
                             'filters' => [
                                 'fields' => [
+                                    'toMany1_id'    => [
+                                        'data_type' => 'integer'
+                                    ],
                                     'toMany1_field1' => [
                                         'data_type' => 'string'
                                     ]

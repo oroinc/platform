@@ -159,8 +159,8 @@ define(function(require) {
          * Handler response for request to get token
          */
         prepareAuthorization: function(response) {
-            if (response.code !== undefined) {
-                this.view.setErrorMessage(response.message);
+            if (response.error !== undefined) {
+                this.view.setErrorMessage(response.error);
                 this.view.render();
                 mediator.execute('hideLoading');
             } else if (response) {

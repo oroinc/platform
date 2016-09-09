@@ -6,7 +6,7 @@ use Doctrine\Common\Inflector\Inflector;
 
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
-class EntityAliasProvider implements EntityAliasProviderInterface
+class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface
 {
     /** @var EntityAliasConfigBag */
     protected $config;
@@ -49,6 +49,14 @@ class EntityAliasProvider implements EntityAliasProviderInterface
             strtolower($name),
             strtolower(Inflector::pluralize($name))
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClassNames()
+    {
+        return $this->config->getClassNames();
     }
 
     /**

@@ -11,7 +11,7 @@ oro:
         from:
             button:
                 send_comment:
-                    label: Send
+                    label: Add
                 add_comment:
                     label: Add Comment
                 edit_comment:

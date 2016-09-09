@@ -21,7 +21,7 @@ trait DescriptionTrait
     }
 
     /**
-     * Gets the value of the description of the entity.
+     * Gets the value of the description attribute.
      *
      * @return string|Label|null
      */
@@ -33,7 +33,7 @@ trait DescriptionTrait
     }
 
     /**
-     * Sets the value of the description of the entity.
+     * Sets the value of the description attribute.
      *
      * @param string|Label|null $description
      */

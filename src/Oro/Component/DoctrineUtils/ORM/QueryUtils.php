@@ -5,17 +5,22 @@ namespace Oro\Component\DoctrineUtils\ORM;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\SQLParserUtils;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\PhpUtils\QueryUtil;
+use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class QueryUtils
 {
+    const IN         = 'in';
+    const IN_BETWEEN = 'in_between';
+
     /**
      * @param Query $query
      * @param array $paramMappings
@@ -309,33 +314,197 @@ class QueryUtils
 
     /**
      * @param QueryBuilder $qb
-     * @param string $field
-     * @param int $values
+     * @param string       $field
+     * @param int[]        $values
      */
     public static function applyOptimizedIn(QueryBuilder $qb, $field, array $values)
     {
-        $exprs = [];
-        $optimizedValues = QueryUtil::optimizeIntValues($values);
+        $expressions     = [];
+        $optimizedValues = static::optimizeIntegerValues($values);
 
-        if ($optimizedValues[QueryUtil::IN]) {
-            $inParam = QueryUtil::generateParameterName('buid');
+        if ($optimizedValues[static::IN]) {
+            $param = static::generateParameterName($field);
 
-            $qb->setParameter($inParam, $optimizedValues[QueryUtil::IN]);
-            $exprs[] = $qb->expr()->in($field, ':'.$inParam);
+            $qb->setParameter($param, $optimizedValues[static::IN]);
+            $expressions[] = $qb->expr()->in($field, sprintf(':%s', $param));
         }
 
-        foreach ($optimizedValues[QueryUtil::IN_BETWEEN] as $range) {
+        foreach ($optimizedValues[static::IN_BETWEEN] as $range) {
             list($min, $max) = $range;
-            $minParam = QueryUtil::generateParameterName('buid');
-            $maxParam = QueryUtil::generateParameterName('buid');
+            $minParam = static::generateParameterName($field);
+            $maxParam = static::generateParameterName($field);
 
             $qb->setParameter($minParam, $min);
             $qb->setParameter($maxParam, $max);
-            $exprs[] = $qb->expr()->between($field, ':'.$minParam, ':'.$maxParam);
+
+            $expressions[] = $qb->expr()->between(
+                $field,
+                sprintf(':%s', $minParam),
+                sprintf(':%s', $maxParam)
+            );
         }
 
-        if ($exprs) {
-            $qb->andWhere(call_user_func_array([$qb->expr(), 'orX'], $exprs));
+        if ($expressions) {
+            $qb->andWhere(call_user_func_array([$qb->expr(), 'orX'], $expressions));
         }
+    }
+
+    /**
+     * @param int[] $values
+     *
+     * @return array
+     */
+    public static function optimizeIntegerValues(array $values)
+    {
+        $result = [
+            static::IN         => [],
+            static::IN_BETWEEN => [],
+        ];
+
+        $ranges = ArrayUtil::intRanges($values);
+        foreach ($ranges as $range) {
+            list($min, $max) = $range;
+            if ($min === $max) {
+                $result[static::IN][] = $min;
+            } else {
+                $result[static::IN_BETWEEN][] = $range;
+            }
+        }
+
+        // when there is lots of ranges, it takes way longer than IN
+        if (count($result[static::IN_BETWEEN]) > 1000) {
+            $result[static::IN]         = $values;
+            $result[static::IN_BETWEEN] = [];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    public static function generateParameterName($prefix)
+    {
+        static $n = 0;
+        $n++;
+
+        return sprintf('%s_%d', uniqid(str_replace('.', '', $prefix)), $n);
+    }
+
+    /**
+     * Removes unused parameters from query builder
+     *
+     * @param QueryBuilder $qb
+     */
+    public static function removeUnusedParameters(QueryBuilder $qb)
+    {
+        $dql = $qb->getDQL();
+        $usedParameters = [];
+        foreach ($qb->getParameters() as $parameter) {
+            /** @var $parameter \Doctrine\ORM\Query\Parameter */
+            $parameterName = $parameter->getName();
+            if (self::dqlContainsParameter($dql, $parameterName)) {
+                $usedParameters[$parameterName] = $parameter->getValue();
+            }
+        }
+
+        $qb->setParameters($usedParameters);
+    }
+
+    /**
+     * Returns TRUE if $dql contains usage of parameter with $parameterName
+     *
+     * @param string $dql
+     * @param string $parameterName
+     *
+     * @return bool
+     */
+    public static function dqlContainsParameter($dql, $parameterName)
+    {
+        $pattern = is_numeric($parameterName)
+            ? sprintf('/\?%s[^\w]/', preg_quote($parameterName))
+            : sprintf('/\:%s[^\w]/', preg_quote($parameterName));
+
+        return (bool) preg_match($pattern, $dql . ' ');
+    }
+
+    /**
+     * @param string $dql
+     *
+     * @return array
+     */
+    public static function getDqlAliases($dql)
+    {
+        $matches = [];
+        preg_match_all('/(FROM|JOIN)\s+\S+\s+(AS\s+)?(\S+)/i', $dql, $matches);
+
+        return $matches[3];
+    }
+
+    /**
+     * @param string $dql
+     * @param array $replacements
+     *
+     * @return string
+     */
+    public static function replaceDqlAliases($dql, array $replacements)
+    {
+        return array_reduce(
+            $replacements,
+            function ($carry, array $replacement) {
+                return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
+            },
+            $dql
+        );
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param Expr\Join $join
+     *
+     * @return string
+     */
+    public static function getJoinClass(QueryBuilder $qb, Expr\Join $join)
+    {
+        if (class_exists($join->getJoin())) {
+            return $join->getJoin();
+        }
+
+        $fromParts = $qb->getDqlPart('from');
+        $aliasToClassMap = [];
+        foreach ($fromParts as $from) {
+            $aliasToClassMap[$from->getAlias()] = $from->getFrom();
+        }
+
+        list($parentAlias, $field) = explode('.', $join->getJoin());
+        $parentClass = isset($aliasToClassMap[$parentAlias])
+            ? $aliasToClassMap[$parentAlias]
+            : static::getJoinClass($qb, static::findJoinByAlias($qb, $parentAlias));
+
+        return $qb->getEntityManager()
+            ->getClassMetadata($parentClass)
+            ->getAssociationTargetClass($field);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $alias
+     *
+     * @return Expr\Join
+     */
+    public static function findJoinByAlias(QueryBuilder $qb, $alias)
+    {
+        $joinParts = $qb->getDQLPart('join');
+        foreach ($joinParts as $joins) {
+            foreach ($joins as $join) {
+                if ($join->getAlias() === $alias) {
+                    return $join;
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -49,7 +49,6 @@ define([
             this.$privileges = $(this.options.privilegesSelector);
             this.$appendUsers = $(this.options.appendUsersSelector);
             this.$removeUsers = $(this.options.removeUsersSelector);
-            this.privileges = JSON.parse(this.$privileges.val());
 
             var fields = {};
             _.each(
@@ -73,7 +72,6 @@ define([
             delete this.$privileges;
             delete this.$appendUsers;
             delete this.$removeUsers;
-            delete this.privileges;
             delete this.$fields;
 
             RoleView.__super__.dispose.call(this);
@@ -106,13 +104,14 @@ define([
             var url = (typeof action === 'string') ? $.trim(action) : '';
             url = url || window.location.href || '';
             if (url) {
-                url += '?input_action=' + $(event.currentTarget).data('action');
+                url += '?input_action=' + $(event.target).attr('data-action');
 
                 // clean url (don't include hash value)
                 url = (url.match(/^([^#]+)/) || [])[1];
             }
 
             var data = this.getData();
+
             var dataAction = $(event.target).attr('data-action');
             if (dataAction) {
                 data.input_action = dataAction;
@@ -136,11 +135,21 @@ define([
             _.each(
                 this.$fields,
                 function(element, name) {
-                    data[formName + '[' + name + ']'] = element.val();
+                    var value = element.val();
+
+                    if (element.attr('type') === 'checkbox') {
+                        value = element.is(':checked') ? 1 : 0;
+
+                        if (value === 0) { // do not send the value of checkbox,
+                            return;       // it will be set as false in the backend
+                        }
+                    }
+
+                    data[formName + '[' + name + ']'] = value;
                 }
             );
 
-            data[formName + '[privileges]'] = JSON.stringify(this.privileges);
+            data[formName + '[privileges]'] = this.$privileges.val();
             data[formName + '[appendUsers]'] = this.$appendUsers.val();
             data[formName + '[removeUsers]'] = this.$removeUsers.val();
 
@@ -154,18 +163,63 @@ define([
             if (this.disposed) {
                 return;
             }
+            var obj = JSON.parse(this.$privileges.val());
 
-            $.each(this.privileges, function(scopeName, privileges) {
-                $.each(privileges, function(key, privilege) {
-                    if (privilege.identity.id === data.identityId) {
-                        $.each(privilege.permissions, function(permissionName, permission) {
-                            if (permission.name === data.permissionName) {
-                                permission.accessLevel = data.accessLevel;
-                            }
-                        });
-                    }
-                });
-            });
+            var knownIdentities = _.reduce(obj, function(memo, group) {
+                memo = _.reduce(group, function(memo, item) {
+                    memo[item.identity.id] = item;
+                    return memo;
+                }, memo);
+                return memo;
+            }, {});
+
+            var identity = data.identityId;
+            var splittedIdentity = identity.split('::');
+            var field;
+            if (typeof splittedIdentity[1] !== 'undefined') {
+                identity = splittedIdentity[0];
+                field = splittedIdentity[1];
+            }
+
+            var privelege;
+            var fieldPrivelege;
+            if (identity in knownIdentities) {
+                privelege = knownIdentities[identity];
+            } else {
+                // create privelege
+                privelege = {
+                    identity: {
+                        id: identity
+                    },
+                    permissions: {}
+                };
+                if (data.permissionName === 'EXECUTE') {
+                    obj.action[Object.keys(knownIdentities).length] = privelege;
+                } else {
+                    obj.entity[Object.keys(knownIdentities).length] = privelege;
+                }
+            }
+
+            if (!field) {
+                if (!(data.permissionName in privelege.permissions)) {
+                    privelege.permissions[data.permissionName] = {
+                        name: data.permissionName
+                    };
+                }
+                var permission = privelege.permissions[data.permissionName];
+                permission.accessLevel = data.accessLevel;
+            } else {
+                var knownFieldIdentities = _.reduce(privelege.fields, function(memo, item) {
+                    memo[item.identity.id] = item;
+                    return memo;
+                }, {});
+
+                fieldPrivelege = knownFieldIdentities[data.identityId];
+                var fieldPermission = fieldPrivelege.permissions[data.permissionName];
+                fieldPermission.accessLevel = data.accessLevel;
+            }
+
+            this.$privileges.val(JSON.stringify(obj)).trigger('change');
         }
     });
 

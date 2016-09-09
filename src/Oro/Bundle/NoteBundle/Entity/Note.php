@@ -33,7 +33,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "activity"={
  *              "immutable"=true

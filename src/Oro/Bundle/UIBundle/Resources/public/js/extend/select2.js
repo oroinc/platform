@@ -1,5 +1,10 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'], function($, _, __, Select2) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Select2 = require('jquery.select2');
+    require('oroui/js/select2-l10n');
 
     /**
      * An overload of populateResults method,
@@ -119,6 +124,49 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             } else {
                 original.apply(this, _.rest(arguments));
             }
+        },
+        initContainer: function(original) {
+            original.apply(this, _.rest(arguments));
+
+            this.focusser.off('keyup-change input');
+            this.focusser.on('keyup-change input', this.bind(function(e) {
+                var showSearch = this.results[0].children.length >= this.opts.minimumResultsForSearch;
+
+                if (showSearch) {
+                    e.stopPropagation();
+                    if (this.opened()) {
+                        return;
+                    }
+                    this.open();
+                } else {
+                    this.clearSearch();
+                }
+            }));
+        },
+        tokenize: function(original) {
+            var opts = this.opts;
+            var search = this.search;
+            var results = this.results;
+            if (opts.allowCreateNew && opts.createSearchChoice) {
+                var def = opts.createSearchChoice.call(this, search.val(), []);
+                if (def !== void 0 && def !== null && this.id(def) !== void 0 && this.id(def) !== null) {
+                    results.empty();
+                    if (search.val()) {
+                        opts.populateResults.call(this, results, [def], {
+                            term: search.val(),
+                            page: this.resultsPage,
+                            context: null
+                        });
+                        this.highlight(0);
+                    }
+                    if (opts.formatSearching) {
+                        results.append('<li class="select2-searching">' + opts.formatSearching() + '</li>');
+                    }
+                    search.removeClass('select2-active');
+                    this.positionDropdown();
+                }
+            }
+            original.apply(this, _.rest(arguments));
         }
     };
 
@@ -193,6 +241,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         var onSelect = prototype.onSelect;
         var updateResults = prototype.updateResults;
         var clear = prototype.clear;
+        var isPlaceholderOptionSelected = prototype.isPlaceholderOptionSelected;
 
         prototype.onSelect = function(data, options) {
             if (data.id === undefined && data.pagePath) {
@@ -208,6 +257,46 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
                 this.focusser.focus();
             }
+        };
+
+        // Overriding method to avoid bug with placeholder in version 3.4.1
+        // see https://github.com/select2/select2/issues/1542
+        // @todo remove after upgrade to version >= 3.4.2
+        prototype.updateSelection = function(data) {
+            var container = this.selection.find('.select2-chosen');
+            var formatted;
+            var cssClass;
+
+            this.selection.data('select2-data', data);
+
+            container.empty();
+            if (data !== null && data !== []) {
+                formatted = this.opts.formatSelection(data, container, this.opts.escapeMarkup);
+            }
+            if (formatted !== undefined) {
+                container.append(formatted);
+            }
+            cssClass = this.opts.formatSelectionCssClass(data, container);
+            if (cssClass !== undefined) {
+                container.addClass(cssClass);
+            }
+
+            this.selection.removeClass('select2-default');
+
+            if (this.opts.allowClear && this.getPlaceholder() !== undefined) {
+                this.container.addClass('select2-allowclear');
+            }
+        };
+
+        // Overriding method to avoid bug with placeholder in version 3.4.1
+        // see https://github.com/select2/select2/issues/1542
+        // @todo remove after upgrade to version >= 3.4.2
+        prototype.isPlaceholderOptionSelected = function() {
+            if (!this.getPlaceholder()) {
+                return false; // no placeholder specified so no option should be considered
+            }
+
+            return isPlaceholderOptionSelected.call(this);
         };
 
         prototype.updateResults = function(initial) {
@@ -227,6 +316,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
 
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
+        prototype.initContainer = _.wrap(prototype.initContainer, overrideMethods.initContainer);
+        prototype.tokenize = _.wrap(prototype.tokenize, overrideMethods.tokenize);
 
     }(Select2['class'].single.prototype));
 
@@ -318,6 +409,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
                     '<div></div>' +
                     '</li>');
             var choice = enableChoice ? enabledItem : disabledItem;
+            if (data.hidden) {
+                choice.addClass('hide');
+            }
             var id = this.id(data);
             var formatted;
 
@@ -367,9 +461,4 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
 
     }(Select2['class'].multi.prototype));
-
-    $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
-        formatSearching: function() { return __('Searching...'); },
-        formatNoMatches: function() { return __('No matches found'); }
-    });
 });

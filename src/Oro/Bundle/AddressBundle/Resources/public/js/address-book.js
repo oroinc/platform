@@ -37,7 +37,10 @@ define([
             'addressCreateUrl': null,
             'addressUpdateUrl': null,
             'mapView': Googlemaps,
-            'addressMapOptions': {}
+            'addressMapOptions': {},
+            'allowToRemovePrimary': false,
+            'confirmRemove': false,
+            'confirmRemoveComponent': null
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
@@ -148,7 +151,11 @@ define([
             if (!this.$el.find('#address-book-' + address.id).length) {
                 var addressView = new AddressView({
                     model: address,
-                    map: this.options.addressMapOptions
+                    map: this.options.addressMapOptions,
+                    template: this.options.template,
+                    allowToRemovePrimary: this.options.allowToRemovePrimary,
+                    confirmRemove: this.options.confirmRemove,
+                    confirmRemoveComponent: this.options.confirmRemoveComponent
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);

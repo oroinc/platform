@@ -3,4 +3,30 @@
     <div class="responsive-block">
         {{ UI.renderSwitchableHtmlProperty('oro.note.message.label'|trans, entity.message) }}
     </div>
+    {% if attachment is not empty and attachment.attachmentURL %}
+    <div class="note-attachments">
+        <div class="control-group">
+            <label class="control-label">
+                Attachment
+            </label>
+            <div class="attachment-item">
+                <div class="thumbnail">
+                    {% if attachment.attachmentThumbnail  %}
+                        <a href="{{ attachment.attachmentURL }}" class="no-hash" title="{{ attachment.attachmentFileName }}">
+                            <span class="thumbnail" style="background: url('{{ attachment.attachmentThumbnail  }}') 50% 50% no-repeat;"></span>
+                        </a>
+                    {% else  %}
+                        <i class="fa {{ attachment.attachmentIcon }} fa-3x"></i>
+                    {% endif  %}
+                </div>
+                <div class="dropdown link-to-record">
+                    <a class="no-hash dropdown-toggle file-menu" href="javascript: void(0);" data-toggle="dropdown">
+                        <i class="fa {{ attachment.attachmentIcon }}"></i> {{ attachment.attachmentFileName }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
 </div>

@@ -1,0 +1,143 @@
+datagrid:
+    jobs-grid:
+        acl_resource: oro_jobs
+        source:
+            type: orm
+            query:
+                select:
+                    - partial j.{id, command, args, state, runtime, memoryUsageReal, priority, createdAt, startedAt, closedAt}
+                from:
+                    - { table: JMSJobQueueBundle:Job , alias: j }
+                where:
+                    and:
+                        - j.originalJob IS NULL
+            hints:
+                - HINT_FORCE_PARTIAL_LOAD
+
+        columns:
+            id:
+              label: oro.cron.header.id
+              frontend_type: integer
+            command:
+                label: oro.cron.header.command
+                type: twig
+                template: OroCronBundle:Job:Datagrid/command.html.twig
+                frontend_type: html
+            state:
+                label: oro.cron.header.state
+                type: twig
+                template: OroCronBundle:Job:Datagrid/state.html.twig
+                frontend_type: html
+            runtime:
+                label: oro.cron.header.runtime
+                frontend_type: integer
+            memoryUsageReal:
+                label: oro.cron.header.memory
+                type: twig
+                template: OroCronBundle:Job:Datagrid/memory.html.twig
+                frontend_type: html
+            priority:
+                label: oro.cron.header.priority
+                frontend_type: integer
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime
+            startedAt:
+                label: oro.cron.header.started_at
+                frontend_type: datetime
+            closedAt:
+                label: oro.cron.header.closed_at
+                frontend_type: datetime
+        sorters:
+            columns:
+                command:         { data_name: j.command }
+                state:           { data_name: j.state }
+                runtime:         { data_name: j.runtime }
+                memoryUsageReal: { data_name: j.memoryUsageReal }
+                priority:        { data_name: j.priority * -1}
+                createdAt:       { data_name: j.createdAt }
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                command:
+                    type: command_with_args
+                    data_name: j.command, j.args
+                state:
+                    type: choice
+                    data_name: j.state
+                    options:
+                        field_options:
+                            choices:
+                                new:        oro.cron.job.status.new
+                                pending:    oro.cron.job.status.pending
+                                canceled:   oro.cron.job.status.canceled
+                                running:    oro.cron.job.status.running
+                                finished:   oro.cron.job.status.finished
+                                failed:     oro.cron.job.status.failed
+                                terminated: oro.cron.job.status.terminated
+                                incomplete: oro.cron.job.status.incomplete
+                runtime:
+                    type: number-range
+                    data_name: j.runtime
+                priority:
+                    type: number-range
+                    data_name: j.priority * -1
+                createdAt:
+                    type:      datetime
+                    data_name: j.createdAt
+        properties:
+            id: ~
+            view_link:
+                type: url
+                route: oro_cron_job_view
+                params: [ id ]
+        actions:
+            view:
+                type:         navigate
+                label:        oro.grid.action.view
+                link:         view_link
+                icon:         eye-open
+                acl_resource: oro_jobs
+                rowAction:    true
+        options:
+            entityHint: job
+
+    oro-cron-schedules-grid:
+        acl_resource: oro_cron_schedule_view
+        options:
+            entityHint: schedule
+        source:
+            type: orm
+            query:
+                select:
+                    - s.command
+                    - s.arguments
+                    - s.definition
+                from:
+                    - { table: OroCronBundle:Schedule , alias: s }
+        columns:
+            command:
+                label: oro.cron.schedule.command.label
+                type: twig
+                template: OroCronBundle:Schedule:Datagrid/command.html.twig
+                frontend_type: html
+            definition:
+                label: oro.cron.schedule.definition.label
+                type: twig
+                template: OroCronBundle:Schedule:Datagrid/definition.html.twig
+                frontend_type: html
+        sorters:
+            columns:
+                command:
+                    data_name: s.command
+                definition:
+                    data_name: s.definition
+        filters:
+            columns:
+                command:
+                    type: command_with_args
+                    data_name: s.command, s.arguments
+                definition:
+                    type: string
+                    data_name: s.definition

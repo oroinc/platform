@@ -7,8 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class StepManager
 {
+    const DEFAULT_START_STEP_NAME = 'step:starting_point';
+
     /**
-     * @var Collection
+     * @var Collection|Step[]
      */
     protected $steps;
 
@@ -42,14 +44,24 @@ class StepManager
      */
     public function setSteps($steps)
     {
-        $data = array();
+        $this->steps = new ArrayCollection();
+
         if ($steps) {
             foreach ($steps as $step) {
-                $data[$step->getName()] = $step;
+                $this->addStep($step);
             }
-            unset($steps);
         }
-        $this->steps = new ArrayCollection($data);
+
+        return $this;
+    }
+
+    /**
+     * @param Step $step
+     * @return $this
+     */
+    private function addStep(Step $step)
+    {
+        $this->steps->set($step->getName(), $step);
 
         return $this;
     }
@@ -65,18 +77,52 @@ class StepManager
     /**
      * Get steps sorted by order.
      *
+     * @param bool $withoutDefaultStartStep
+     * @param bool $onlyNames
      * @return Collection|Step[]
      */
-    public function getOrderedSteps()
+    public function getOrderedSteps($withoutDefaultStartStep = false, $onlyNames = false)
     {
-        $steps = $this->steps->toArray();
+        $steps = $this->steps;
+
+        if ($withoutDefaultStartStep) {
+            $steps = $steps->filter(
+                function (Step $step) {
+                    return $step->getName() !== self::DEFAULT_START_STEP_NAME;
+                }
+            );
+        }
+
+        $steps = $steps->toArray();
+
         usort(
             $steps,
             function (Step $stepOne, Step $stepTwo) {
                 return ($stepOne->getOrder() >= $stepTwo->getOrder()) ? 1 : -1;
             }
         );
+
+        if ($onlyNames) {
+            $steps = array_map(
+                function (Step $step) {
+                    return $step->getName();
+                },
+                $steps
+            );
+        }
+
         return new ArrayCollection($steps);
+    }
+
+    /**
+     * @param string $transitionName
+     * @return Collection|Step[]
+     */
+    public function getRelatedTransitionSteps($transitionName)
+    {
+        return $this->steps->filter(function (Step $step) use ($transitionName) {
+            return in_array($transitionName, $step->getAllowedTransitions(), true);
+        });
     }
 
     /**
@@ -108,6 +154,15 @@ class StepManager
     public function hasStartStep()
     {
         $startStep = $this->getStartStep();
+
         return !empty($startStep);
+    }
+
+    /**
+     * @return null|Transition
+     */
+    public function getDefaultStartStep()
+    {
+        return $this->getStep(self::DEFAULT_START_STEP_NAME);
     }
 }

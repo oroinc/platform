@@ -25,10 +25,8 @@ class ValueNormalizer
      * @var array
      */
     protected $cachedData = [
-        DataType::ENTITY_TYPE         => [],
-        DataType::ENTITY_CLASS        => [],
-        DataType::ENTITY_ALIAS        => [],
-        DataType::ENTITY_PLURAL_ALIAS => [],
+        DataType::ENTITY_TYPE  => [],
+        DataType::ENTITY_CLASS => [],
     ];
 
     /**
@@ -112,7 +110,7 @@ class ValueNormalizer
     {
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
-        $context->getRequestType()->set($requestType->toArray());
+        $context->getRequestType()->set($requestType);
         $context->setDataType($dataType);
         $context->setResult($value);
         $context->setArrayAllowed($isArrayAllowed);

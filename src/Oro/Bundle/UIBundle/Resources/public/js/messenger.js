@@ -4,8 +4,9 @@ define([
     'oroui/js/tools',
     'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',
+    'oroui/js/mediator',
     'bootstrap'
-], function($, _, tools, MultiUseResourceManager, CryptoJS) {
+], function($, _, tools, MultiUseResourceManager, CryptoJS, mediator) {
     'use strict';
 
     var defaults = {
@@ -25,14 +26,24 @@ define([
     function showMessage(type, message, options) {
         var opt = _.extend({}, defaults, options || {});
         var $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container);
+        if (opt.onClose) {
+            $el.find('button.close').click(opt.onClose);
+        }
         var delay = opt.delay || (opt.flash && 5000);
-        var actions = {close: _.bind($el.alert, $el, 'close')};
+        var actions = {
+            close: function() {
+                var result = $el.alert('close');
+                mediator.trigger('layout:adjustHeight');
+                return result;
+            }
+        };
         if (opt.namespace) {
             $el.attr('data-messenger-namespace', opt.namespace);
         }
         if (delay) {
             _.delay(actions.close, delay);
         }
+        mediator.trigger('layout:adjustHeight');
         return actions;
     }
 
@@ -110,7 +121,6 @@ define([
                 }
 
                 this.clear(namespace, options);
-
                 return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
             },
 

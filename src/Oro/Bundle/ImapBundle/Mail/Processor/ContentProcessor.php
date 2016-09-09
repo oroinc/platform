@@ -54,7 +54,7 @@ class ContentProcessor
                 }
 
                 $contentTypeHeader = $this->getPartContentType($part);
-                if (strtolower($contentTypeHeader->getType()) === $format) {
+                if ($contentTypeHeader && (strtolower($contentTypeHeader->getType()) === $format)) {
                     return $this->extractContent($part);
                 }
             }
@@ -92,8 +92,18 @@ class ContentProcessor
             $encoding    = 'ASCII';
         }
         $contentTransferEncoding = 'BINARY';
-        if ($part->getHeaders()->has('Content-Transfer-Encoding')) {
-            $contentTransferEncoding = $part->getHeader('Content-Transfer-Encoding')->getFieldValue();
+        $headerKey = 'Content-Transfer-Encoding';
+        if ($part->getHeaders()->has($headerKey)) {
+            $header = $part->getHeader($headerKey);
+            if ($header instanceof \ArrayIterator) {
+                foreach ($header as $headerItem) {
+                    if ($headerItem->getFieldName() === $headerKey) {
+                        $contentTransferEncoding = $headerItem->getFieldValue();
+                    }
+                }
+            } else {
+                $contentTransferEncoding = $header->getFieldValue();
+            }
         }
 
         return new Content($part->getContent(), $contentType, $contentTransferEncoding, $encoding);

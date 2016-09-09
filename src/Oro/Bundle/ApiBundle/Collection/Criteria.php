@@ -16,21 +16,16 @@ class Criteria extends BaseCriteria
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var string */
-    protected $joinAliasTemplate;
-
     /** @var Join[] */
     private $joins = [];
 
     /**
      * @param EntityClassResolver $entityClassResolver
-     * @param string              $joinAliasTemplate
      */
-    public function __construct(EntityClassResolver $entityClassResolver, $joinAliasTemplate = 'alias%d')
+    public function __construct(EntityClassResolver $entityClassResolver)
     {
         parent::__construct();
         $this->entityClassResolver = $entityClassResolver;
-        $this->joinAliasTemplate   = $joinAliasTemplate;
     }
 
     /**
@@ -107,28 +102,6 @@ class Criteria extends BaseCriteria
     public function addLeftJoin($propertyPath, $join, $conditionType = null, $condition = null, $indexBy = null)
     {
         return $this->addJoin($propertyPath, Join::LEFT_JOIN, $join, $conditionType, $condition, $indexBy);
-    }
-
-    /**
-     * Makes sure that this criteria object contains all required joins and aliases are set for all joins.
-     */
-    public function completeJoins()
-    {
-        $this->ensureJoinAliasesSet();
-        $pathMap = $this->getJoinPathMap();
-        if (!empty($pathMap)) {
-            $this->sortJoinPathMap($pathMap);
-            foreach ($pathMap as $path => $item) {
-                if (!$this->hasJoin($path)) {
-                    $parentAlias = empty($item['parent'])
-                        ? self::ROOT_ALIAS_PLACEHOLDER
-                        : $this->getJoin(implode('.', $item['parent']))->getAlias();
-                    $this
-                        ->addLeftJoin($path, $parentAlias . '.' . $item['field'])
-                        ->setAlias($item['field']);
-                }
-            }
-        }
     }
 
     /**
@@ -210,111 +183,5 @@ class Criteria extends BaseCriteria
         } catch (ORMException $e) {
             return null;
         }
-    }
-
-    /**
-     * Sets missing join aliases
-     */
-    protected function ensureJoinAliasesSet()
-    {
-        $counter = 0;
-        $joins   = $this->getJoins();
-        foreach ($joins as $join) {
-            $counter++;
-            if (!$join->getAlias()) {
-                $join->setAlias(sprintf($this->joinAliasTemplate, $counter));
-            }
-        }
-    }
-
-    /**
-     * @return array [path => ['field' => string, 'parent' => [...]], ...]
-     */
-    protected function getJoinPathMap()
-    {
-        $fields = $this->getFields();
-
-        $pathMap = [];
-        foreach ($fields as $field) {
-            $lastDelimiter = strrpos($field, '.');
-            if (false !== $lastDelimiter) {
-                $path = substr($field, 0, $lastDelimiter);
-                if (!isset($pathMap[$path])) {
-                    $pathMap[$path] = $this->buildJoinPathMapValue($path);
-                }
-            }
-        }
-        $joinPaths = array_keys($this->getJoins());
-        foreach ($joinPaths as $path) {
-            if (!isset($pathMap[$path])) {
-                $pathMap[$path] = $this->buildJoinPathMapValue($path);
-            }
-        }
-
-        return $pathMap;
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getFields()
-    {
-        $fields    = [];
-        $whereExpr = $this->getWhereExpression();
-        if ($whereExpr) {
-            $visitor = new FieldVisitor();
-            $visitor->dispatch($whereExpr);
-            $fields = $visitor->getFields();
-        }
-        $orderBy = $this->getOrderings();
-        if (!empty($orderBy)) {
-            foreach ($orderBy as $field => $direction) {
-                if (!in_array($field, $fields, true)) {
-                    $fields[] = $field;
-                }
-            }
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @param string $propertyPath
-     *
-     * @return array
-     */
-    protected function buildJoinPathMapValue($propertyPath)
-    {
-        $lastDelimiter = strrpos($propertyPath, '.');
-        if (false === $lastDelimiter) {
-            return [
-                'field'  => $propertyPath,
-                'parent' => []
-            ];
-        } else {
-            return [
-                'field'  => substr($propertyPath, $lastDelimiter + 1),
-                'parent' => explode('.', $propertyPath)
-            ];
-        }
-    }
-
-    /**
-     * @param array $pathMap
-     */
-    protected function sortJoinPathMap(array &$pathMap)
-    {
-        uasort(
-            $pathMap,
-            function (array $a, array $b) {
-                $aCount = count($a['parent']);
-                $bCount = count($b['parent']);
-                if ($aCount === $bCount) {
-                    return 0;
-                }
-
-                return ($aCount < $bCount) ? -1 : 1;
-            }
-        );
     }
 }

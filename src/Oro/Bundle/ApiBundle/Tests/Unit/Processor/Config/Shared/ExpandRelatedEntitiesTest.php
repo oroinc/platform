@@ -52,7 +52,30 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 
     public function testProcessForNotManageableEntity()
     {
-        $config = [];
+        $config = [
+            'fields' => [
+                'field1'       => null,
+                'association1' => [
+                    'target_class' => 'Test\Association1Target'
+                ],
+                'association2' => [
+                    'target_class'  => 'Test\Association2Target',
+                    'property_path' => 'realAssociation2'
+                ],
+                'association3' => [
+                    'target_class' => 'Test\Association3Target'
+                ],
+            ]
+        ];
+
+        $this->context->setExtras(
+            [
+                new ExpandRelatedEntitiesConfigExtra(
+                    ['field1', 'association1', 'association2', 'association3', 'association4']
+                ),
+                new TestConfigSection('test_section')
+            ]
+        );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -61,8 +84,60 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadataForClass');
 
+        $this->configProvider->expects($this->exactly(3))
+            ->method('getConfig')
+            ->willReturnMap(
+                [
+                    [
+                        'Test\Association1Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
+                    ],
+                    [
+                        'Test\Association2Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
+                    ],
+                    [
+                        'Test\Association3Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject(['exclusion_policy' => 'all'])
+                    ],
+                ]
+            );
+
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1'       => null,
+                    'association1' => [
+                        'target_class'     => 'Test\Association1Target',
+                        'exclusion_policy' => 'all',
+                        'test_section'     => ['attr' => 'val']
+                    ],
+                    'association2' => [
+                        'target_class'     => 'Test\Association2Target',
+                        'property_path'    => 'realAssociation2',
+                        'exclusion_policy' => 'all',
+                        'test_section'     => ['attr' => 'val']
+                    ],
+                    'association3' => [
+                        'target_class'     => 'Test\Association3Target',
+                        'exclusion_policy' => 'all'
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
     }
 
     /**
@@ -163,15 +238,18 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association1Target',
                         'test_section'     => ['attr' => 'val']
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association2Target',
                         'test_section'     => ['attr' => 'val']
                     ],
                     'association3' => [
                         'exclusion_policy' => 'all',
-                        'property_path'    => 'realAssociation3'
+                        'property_path'    => 'realAssociation3',
+                        'target_class'     => 'Test\Association3Target'
                     ],
                 ]
             ],
@@ -228,7 +306,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             [
                 'fields' => [
                     'association1' => [
-                        'exclusion_policy' => 'all'
+                        'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association1Target'
                     ],
                 ]
             ],

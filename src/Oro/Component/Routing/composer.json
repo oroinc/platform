@@ -11,9 +11,6 @@
         "symfony/routing": "~2.3",
         "oro/php-utils": "dev-master"
     },
-    "require-dev": {
-        "nelmio/api-doc-bundle": "~2.8"
-    },
     "autoload": {
         "psr-0": { "Oro\\Component\\Routing": "" }
     },

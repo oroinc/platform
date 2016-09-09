@@ -24,13 +24,14 @@ interface DateModifierInterface
     const VAR_FMQ            = 16; // first month of quarter
     const VAR_THIS_DAY_W_Y   = 29;
 
-    const PART_SOURCE  = 'source';
-    const PART_VALUE   = 'value';
-    const PART_DOW     = 'dayofweek';
-    const PART_WEEK    = 'week';
-    const PART_DAY     = 'day';
-    const PART_MONTH   = 'month';
-    const PART_QUARTER = 'quarter';
-    const PART_DOY     = 'dayofyear';
-    const PART_YEAR    = 'year';
+    const PART_SOURCE   = 'source';
+    const PART_VALUE    = 'value';
+    const PART_DOW      = 'dayofweek';
+    const PART_WEEK     = 'week';
+    const PART_DAY      = 'day';
+    const PART_MONTH    = 'month';
+    const PART_QUARTER  = 'quarter';
+    const PART_DOY      = 'dayofyear';
+    const PART_YEAR     = 'year';
+    const PART_ALL_TIME = 'all_time';
 }

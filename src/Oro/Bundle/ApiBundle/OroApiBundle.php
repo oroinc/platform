@@ -10,6 +10,11 @@ use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPa
 use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConstraintTextExtractorConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityAliasesConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExceptionTextExtractorConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExclusionProviderConfigurationCompilerPass;
 
 class OroApiBundle extends Bundle
 {
@@ -21,6 +26,11 @@ class OroApiBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new ConfigurationCompilerPass());
+        $container->addCompilerPass(new DataTransformerConfigurationCompilerPass());
+        $container->addCompilerPass(new EntityAliasesConfigurationCompilerPass());
+        $container->addCompilerPass(new ExclusionProviderConfigurationCompilerPass());
+        $container->addCompilerPass(new ExceptionTextExtractorConfigurationCompilerPass());
+        $container->addCompilerPass(new ConstraintTextExtractorConfigurationCompilerPass());
         $container->addCompilerPass(
             new LoadProcessorsCompilerPass(
                 'oro_api.processor_bag',

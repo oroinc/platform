@@ -86,4 +86,19 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($instance, $this->provider->getEnumValueByCode($code, $id));
     }
+
+    public function getDefaultEnumValuesByCode()
+    {
+        $code = 'test_enum';
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $id = 1;
+        $instance = new \stdClass();
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->will($this->returnValue([$instance]));
+
+        $this->assertEquals([$instance], $this->provider->getEnumValueByCode($code));
+    }
 }

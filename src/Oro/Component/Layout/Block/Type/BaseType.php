@@ -2,8 +2,7 @@
 
 namespace Oro\Component\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -14,26 +13,17 @@ class BaseType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver)
     {
-        $resolver->setOptional(
-            [
-                'vars',
-                'attr',
-                'label',
-                'label_attr',
-                'translation_domain',
-                'class_prefix'
-            ]
-        );
-        $resolver->setAllowedTypes(
-            [
-                'vars'       => 'array',
-                'attr'       => 'array',
-                'label_attr' => 'array',
-                'class_prefix' => 'string'
-            ]
-        );
+        $optionsResolver->setDefined([
+            'vars',
+            'attr',
+            'label',
+            'label_attr',
+            'translation_domain',
+            'class_prefix',
+            'additional_block_prefixes'
+        ]);
     }
 
     /**
@@ -81,13 +71,17 @@ class BaseType extends AbstractType
         // due to limitations of block names in TWIG
         $uniqueBlockPrefix = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $id);
         $blockPrefixes     = $block->getTypeHelper()->getTypeNames($name);
+        if (isset($options['additional_block_prefixes'])) {
+            $blockPrefixes = array_merge($blockPrefixes, $options['additional_block_prefixes']);
+        }
         $blockPrefixes[]   = $uniqueBlockPrefix;
 
-        $view->vars['id']                  = $id;
-        $view->vars['block_type']          = $name;
-        $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
-        $view->vars['block_prefixes']      = $blockPrefixes;
-        $view->vars['cache_key']           = sprintf('_%s_%s', $id, $name);
+        $view->vars['id']                   = $id;
+        $view->vars['block_type']           = $name;
+        $view->vars['block_type_widget_id'] = $name . '_widget';
+        $view->vars['unique_block_prefix']  = $uniqueBlockPrefix;
+        $view->vars['block_prefixes']       = $blockPrefixes;
+        $view->vars['cache_key']            = sprintf('_%s_%s', $id, $name);
     }
 
     /**

@@ -1,24 +1,35 @@
 define([
+    'jquery',
     'underscore',
-    'backbone',
-    'orotranslation/js/translator',
+    'oroui/js/app/views/base/view',
     'oroui/js/mediator',
-    'orolocale/js/formatter/address'
-], function(_, Backbone, __, mediator, addressFormatter) {
+    'orolocale/js/formatter/address',
+    'oroui/js/delete-confirmation',
+    'orotranslation/js/translator'
+], function($, _, BaseView, mediator, addressFormatter, deleteConfirmation, __) {
     'use strict';
 
-    var $ = Backbone.$;
+    var AddressView;
 
     /**
      * @export  oroaddress/js/address/view
      * @class   oroaddress.address.View
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    AddressView = BaseView.extend({
         tagName: 'div',
 
         attributes: {
             'class': 'list-item map-item'
+        },
+
+        confirmRemoveComponent: deleteConfirmation,
+
+        confirmRemoveMessages: {
+            title: __('Delete Confirmation'),
+            content: __('Are you sure you want to delete this item?'),
+            okText: __('Yes, Delete'),
+            cancelText: __('Cancel')
         },
 
         events: {
@@ -27,33 +38,54 @@ define([
             'click .item-remove-button': 'close'
         },
 
+        defaultMapping: {
+            'namePrefix': 'prefix',
+            'nameSuffix': 'suffix',
+            'firstName': 'first_name',
+            'middleName': 'middle_name',
+            'lastName': 'last_name',
+            'organization': 'organization',
+            'street': 'street',
+            'street2': 'street2',
+            'city': 'city',
+            'country': 'country',
+            'countryIso2': 'country_iso2',
+            'countryIso3': 'country_iso3',
+            'postalCode': 'postal_code',
+            'region': 'region',
+            'regionText': 'region',
+            'regionCode': 'region_code'
+        },
+
         options: {
-            map: {
-                'namePrefix': 'prefix',
-                'nameSuffix': 'suffix',
-                'firstName': 'first_name',
-                'middleNamem': 'iddle_name',
-                'lastName': 'last_name',
-                'organization': 'organization',
-                'street': 'street',
-                'street2': 'street2',
-                'city': 'city',
-                'country': 'country',
-                'countryIso2': 'country_iso2',
-                'countryIso3': 'country_iso3',
-                'postalCode': 'postal_code',
-                'region': 'region',
-                'regionText': 'region',
-                'regionCode': 'region_code'
-            }
+            map: {},
+            'allowToRemovePrimary': false,
+            'confirmRemove': false
         },
 
         initialize: function(options) {
-            this.options.map = _.defaults(options.map || {}, this.options.map);
+            this.options = _.defaults(options || {}, this.options);
+            this.mapping = _.extend({}, this.defaultMapping, this.options.map || {});
+            if (this.options.confirmRemoveComponent) {
+                this.confirmRemoveComponent = this.options.confirmRemoveComponent;
+                if (_.isString(this.confirmRemoveComponent)) {
+                    this.confirmRemoveComponent = require(this.confirmRemoveComponent);
+                }
+            }
+
             this.$el.attr('id', 'address-book-' + this.model.id);
-            this.template = _.template($('#template-addressbook-item').html());
+            this.template = _.template($(options.template || '#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:active', this.toggleActive);
+        },
+
+        dispose: function(options) {
+            if (this.disposed) {
+                return;
+            }
+
+            delete this.confirmRemoveComponent;
+            return AddressView.__super__.dispose.apply(this, arguments);
         },
 
         activate: function() {
@@ -73,10 +105,21 @@ define([
         },
 
         close: function() {
-            if (this.model.get('primary')) {
+            if (this.model.get('primary') && !this.options.allowToRemovePrimary) {
                 mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
-                this.model.destroy({wait: true});
+                this.confirmClose(_.bind(this.model.destroy, this.model, {wait: true}));
+            }
+        },
+
+        confirmClose: function(callback) {
+            if (this.options.confirmRemove) {
+                var confirmRemoveComponent = new this.confirmRemoveComponent(this.confirmRemoveMessages);
+                this.subview('confirmRemoveComponent', confirmRemoveComponent);
+                confirmRemoveComponent.on('ok', callback)
+                    .open();
+            } else {
+                callback();
             }
         },
 
@@ -93,7 +136,7 @@ define([
 
         prepareData: function(data) {
             var mappedData = {};
-            var map = this.options.map;
+            var map = this.mapping;
 
             if (data) {
                 _.each(data, function(value, key) {
@@ -106,4 +149,6 @@ define([
             return mappedData;
         }
     });
+
+    return AddressView;
 });

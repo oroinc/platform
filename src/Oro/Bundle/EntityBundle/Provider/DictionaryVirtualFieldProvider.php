@@ -112,7 +112,6 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                     $fieldNames = array_keys($fields);
                     foreach ($fieldNames as $fieldName) {
                         $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
-                        $fieldName = Inflector::tableize($fieldName);
                         $label = $isCombinedLabelName
                             ? $virtualFieldName
                             : Inflector::tableize($associationName);

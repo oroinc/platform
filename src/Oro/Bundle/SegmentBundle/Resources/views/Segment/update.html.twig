@@ -28,11 +28,28 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.cancelButton(path('oro_segment_index')) }}
-    {% set html = UI.saveAndCloseButton() %}
-    {% if form.vars.value.id or resource_granted('oro_segment_update') %}
-        {% set html = html ~ UI.saveAndStayButton() %}
+    {% set html = UI.saveAndCloseButton({
+        'route': 'oro_segment_view',
+        'params': {id: '$id'}
+    }) %}
+    {% if resource_granted('oro_segment_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_segment_create'
+        }) %}
     {% endif %}
-    {% set html = html ~ segmentQD.saveAndRefreshButton(entity) %}
+    {% if entity.id and resource_granted('EDIT', entity) and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC') %}
+        {% set html = html ~ UI.saveActionButton({
+            'label': 'Save and refresh'|trans,
+            'route': 'oro_segment_refresh',
+            'params': {id: entity.id}
+        }) %}
+    {% endif %}
+    {% if form.vars.value.id or resource_granted('oro_segment_update') %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_segment_update',
+            'params': {id: '$id'}
+        }) %}
+    {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock %}
 

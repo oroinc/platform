@@ -164,7 +164,7 @@ define(function(require) {
                     error.appendTo($(element).closest('.inline-editor-wrapper'));
                 },
                 rules: {
-                    value: this.getValidationRules()
+                    value: $.validator.filterUnsupportedValidators(this.getValidationRules())
                 }
             });
             if (this.options.value) {

@@ -4,13 +4,17 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 
-use Oro\Component\Action\Action\ActionInterface;
-
+/**
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class Transition
 {
     /**
@@ -41,7 +45,12 @@ class Transition
     /**
      * @var ActionInterface|null
      */
-    protected $postAction;
+    protected $preAction;
+
+    /**
+     * @var ActionInterface|null
+     */
+    protected $action;
 
     /**
      * @var bool
@@ -92,6 +101,21 @@ class Transition
      * @var string
      */
     protected $dialogTemplate;
+
+    /**
+     * @var string
+     */
+    protected $scheduleCron;
+
+    /**
+     * @var string
+     */
+    protected $scheduleFilter;
+
+    /**
+     * @var bool
+     */
+    protected $scheduleCheckConditions = false;
 
     /**
      * Set label.
@@ -182,25 +206,39 @@ class Transition
     }
 
     /**
-     * Set post action.
-     *
-     * @param ActionInterface $postAction
+     * @param ActionInterface $preAction
      * @return Transition
      */
-    public function setPostAction(ActionInterface $postAction = null)
+    public function setPreAction(ActionInterface $preAction = null)
     {
-        $this->postAction = $postAction;
+        $this->preAction = $preAction;
         return $this;
     }
 
     /**
-     * Get post action.
-     *
      * @return ActionInterface|null
      */
-    public function getPostAction()
+    public function getPreAction()
     {
-        return $this->postAction;
+        return $this->preAction;
+    }
+
+    /**
+     * @param ActionInterface $action
+     * @return Transition
+     */
+    public function setAction(ActionInterface $action = null)
+    {
+        $this->action = $action;
+        return $this;
+    }
+
+    /**
+     * @return ActionInterface|null
+     */
+    public function getAction()
+    {
+        return $this->action;
     }
 
     /**
@@ -250,6 +288,10 @@ class Transition
      */
     protected function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
     {
+        if ($this->preAction) {
+            $this->preAction->execute($workflowItem);
+        }
+
         if (!$this->preCondition) {
             return true;
         }
@@ -298,8 +340,8 @@ class Transition
             $stepTo = $this->getStepTo();
             $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
 
-            if ($this->postAction) {
-                $this->postAction->execute($workflowItem);
+            if ($this->action) {
+                $this->action->execute($workflowItem);
             }
         } else {
             throw new ForbiddenTransitionException(
@@ -503,5 +545,70 @@ class Transition
     public function getDialogTemplate()
     {
         return $this->dialogTemplate;
+    }
+
+    /**
+     * @param string $cron
+     * @return $this
+     */
+    public function setScheduleCron($cron)
+    {
+        $this->scheduleCron = (string) $cron;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheduleCron()
+    {
+        return $this->scheduleCron;
+    }
+
+    /**
+     * @param string $dqlFilter
+     * @return $this
+     */
+    public function setScheduleFilter($dqlFilter)
+    {
+        $this->scheduleFilter = (string) $dqlFilter;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheduleFilter()
+    {
+        return $this->scheduleFilter;
+    }
+
+    /**
+     * @param bool $scheduleCheckConditions
+     * @return $this
+     */
+    public function setScheduleCheckConditions($scheduleCheckConditions)
+    {
+        $this->scheduleCheckConditions = $scheduleCheckConditions;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isScheduleCheckConditions()
+    {
+        return $this->scheduleCheckConditions;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->name;
     }
 }

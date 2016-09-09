@@ -35,17 +35,20 @@ Microsecond: Microsecond
 "Error! Incorrect server response.": "Error! Incorrect server response."
 "Sorry, unexpected error was occurred": "Sorry, unexpected error was occurred"
 "Please select a file...": "Please select a file..."
+"Attach file:": "Attach file:"
+"Upload": "Upload"
 "Choose File": "Choose File"
 "Searching...": "Searching..."
 "No matches found": "No matches found"
+"Loading more results...": "Loading more results..."
 OK: OK
 "N/A": "N/A"
 maximize: maximize
 restore: restore
 minimize: minimize
 close: close
-Undo: Undo
-Redo: Redo
+Save: Save
+Discard: Discard
 "Copy to Clipboard": "Copy to Clipboard"
 oro:
     ui:
@@ -55,6 +58,8 @@ oro:
         item_add_error: Item adding failed.
         item_delete_error: Item deleting failed.
         leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
+        leave_page_save_data_or_discard_title: "Navigation confirmation"
+        leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
         page_header:
             button:
                 more: "More"
@@ -80,3 +85,12 @@ oro:
             other: Other
         jstree:
             move_node_error: "You can not move node {{ nodeText }} here."
+        select2:
+            input_too_short: "{1}Please enter {{ number }} more character|[2,Inf[Please enter {{ number }} more characters"
+            input_too_long: "{1}Please delete {{ number }} character|[2,Inf[Please delete {{ number }} characters"
+            selection_too_big: "{1}You can only select {{ limit }} item|[2,Inf[You can only select {{ limit }} items"
+            load_more: "Loading more results..."
+articles: "a|an|the|some|every|any|no"
+abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
+postpositions: "ago|apart|aside|away|hence|through"
+prepositions:  "a|an|per|aboard|about|bout|above|abreast|abroad|across|after|against|again|along|amid|among|around|as|astride|at|atop|ontop|bar|before|afore|tofore|B4|behind|ahind|below|ablow|beneath|beside|besides|between|beyond|but|by|come|despite|spite|down|during|except|for|4|from|in|inside|into|less|like|minus|near|of|off|on|onto|opposite|out|outside|over|past|per|post|pre|pro|re|short|since|than|through|thru|throughout|thruout|to|2|@|the|toward|towards|under|underneath|unlike|until|til|till|up|upon|upside|versus|via|vice|with|within|without|worth"

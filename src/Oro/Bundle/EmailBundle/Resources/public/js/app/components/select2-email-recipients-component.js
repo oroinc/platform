@@ -61,7 +61,7 @@ define([
              * previously autocompleted text instead of text currently typed
              */
             config.createSearchChoice = function(term, data) {
-                var selectedData = this.opts.element.select2('data');
+                var selectedData = this.opts.element.inputWidget('data');
                 if (!dataHasText(data, term) && !dataHasText(selectedData, term)) {
                     searchChoice.data = {id: '', text: ''};
                     searchChoice.data.id = term;

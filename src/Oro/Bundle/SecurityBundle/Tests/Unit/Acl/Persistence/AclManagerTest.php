@@ -30,6 +30,9 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
     private $extension;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $fieldExtension;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $extensionSelector;
 
     protected function setUp()
@@ -40,7 +43,12 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
 
         $this->extension = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
+        $this->fieldExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->extension->expects($this->any())->method('getExtensionKey')->will($this->returnValue('entity'));
+        $this->extension->expects($this->any())->method('getFieldExtension')
+            ->will($this->returnValue($this->fieldExtension));
         $this->extension->expects($this->any())->method('getServiceBits')->will($this->returnValue(0));
         $this->extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
             ->disableOriginalConstructor()
@@ -279,14 +287,14 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findAcl')
             ->with($this->identicalTo($oid))
             ->will($this->returnValue($acl));
-        $this->extension->expects($this->once())
+        $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
         $this->aceProvider->expects($this->once())
             ->method('setPermission')
             ->with(
                 $this->identicalTo($acl),
-                $this->identicalTo($this->extension),
+                $this->identicalTo($this->fieldExtension),
                 $this->equalTo(true),
                 $this->equalTo(AclManager::OBJECT_ACE),
                 $this->equalTo($field),
@@ -313,14 +321,14 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findAcl')
             ->with($this->identicalTo($oid))
             ->will($this->returnValue($acl));
-        $this->extension->expects($this->once())
+        $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
         $this->aceProvider->expects($this->once())
             ->method('setPermission')
             ->with(
                 $this->identicalTo($acl),
-                $this->identicalTo($this->extension),
+                $this->identicalTo($this->fieldExtension),
                 $this->equalTo(true),
                 $this->equalTo(AclManager::CLASS_ACE),
                 $this->equalTo($field),
@@ -695,7 +703,7 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findAcl')
             ->with($this->identicalTo($oid))
             ->will($this->throwException(new AclNotFoundException()));
-        $this->extension->expects($this->once())
+        $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
         $this->aceProvider->expects($this->never())
@@ -717,7 +725,7 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findAcl')
             ->with($this->identicalTo($oid))
             ->will($this->throwException(new AclNotFoundException()));
-        $this->extension->expects($this->once())
+        $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
         $this->aceProvider->expects($this->never())

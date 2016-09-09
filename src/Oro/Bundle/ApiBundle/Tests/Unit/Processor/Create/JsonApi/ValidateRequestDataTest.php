@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ValidateRequestData;
-use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class ValidateRequestDataTest extends FormProcessorTestCase
@@ -63,7 +62,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer)
+    public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer, $expectedCode = 400)
     {
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
@@ -78,7 +77,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $errors = $this->context->getErrors();
         $this->assertCount(1, $errors);
         $error = $errors[0];
-        $this->assertEquals(400, $error->getStatusCode());
+        $this->assertEquals($expectedCode, $error->getStatusCode());
         $this->assertEquals('request data constraint', $error->getTitle());
         $this->assertEquals($expectedErrorString, $error->getDetail());
         $this->assertEquals($pointer, $error->getSource()->getPointer());

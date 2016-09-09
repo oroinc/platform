@@ -3,9 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
@@ -13,7 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 class DoctrineHelper extends BaseHelper
 {
     /** @var array */
-    private $manageableEntityClasses = [];
+    protected $manageableEntityClasses = [];
 
     /**
      * {@inheritdoc}
@@ -24,41 +22,10 @@ class DoctrineHelper extends BaseHelper
             return $this->manageableEntityClasses[$entityClass];
         }
 
-        $isManageable = null !== $this->getEntityManagerForClass($entityClass, false);
+        $isManageable = null !== $this->registry->getManagerForClass($entityClass);
         $this->manageableEntityClasses[$entityClass] = $isManageable;
 
         return $isManageable;
-    }
-
-    /**
-     * Adds criteria to the query.
-     *
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
-     */
-    public function applyCriteria(QueryBuilder $qb, Criteria $criteria)
-    {
-        $joins = $criteria->getJoins();
-        if (!empty($joins)) {
-            $basePlaceholders = [];
-            foreach ($joins as $path => $join) {
-                $basePlaceholders[sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
-            }
-            $basePlaceholders[Criteria::ROOT_ALIAS_PLACEHOLDER] = QueryUtils::getSingleRootAlias($qb);
-            foreach ($joins as $join) {
-                $alias        = $join->getAlias();
-                $placeholders = array_merge($basePlaceholders, [Criteria::ENTITY_ALIAS_PLACEHOLDER => $alias]);
-                $joinExpr     = strtr($join->getJoin(), $placeholders);
-                $condition    = $join->getCondition();
-                if ($condition) {
-                    $condition = strtr($condition, $placeholders);
-                }
-
-                $method = strtolower($join->getJoinType()) . 'Join';
-                $qb->{$method}($joinExpr, $alias, $join->getConditionType(), $condition, $join->getIndexBy());
-            }
-        }
-        $qb->addCriteria($criteria);
     }
 
     /**
@@ -71,14 +38,19 @@ class DoctrineHelper extends BaseHelper
      */
     public function findEntityMetadataByPath($entityClass, array $associationPath)
     {
-        $metadata = $this->getEntityMetadataForClass($entityClass, false);
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (null === $manager) {
+            return null;
+        }
+
+        $metadata = $manager->getClassMetadata($entityClass);
         if (null !== $metadata) {
             foreach ($associationPath as $associationName) {
                 if (!$metadata->hasAssociation($associationName)) {
                     $metadata = null;
                     break;
                 }
-                $metadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($associationName));
+                $metadata = $manager->getClassMetadata($metadata->getAssociationTargetClass($associationName));
             }
         }
 

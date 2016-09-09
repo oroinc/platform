@@ -86,6 +86,7 @@ abstract class AbstractProcessor implements ProcessorInterface
                 $context->setResult($this->normalizeValue($value));
             }
         }
+        $context->setProcessed(true);
     }
 
     /**

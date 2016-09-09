@@ -1,5 +1,7 @@
 parameters:
     oro_importexport.form.type.import.class: Oro\Bundle\ImportExportBundle\Form\Type\ImportType
+    oro_importexport.form.type.export.class: Oro\Bundle\ImportExportBundle\Form\Type\ExportType
+    oro_importexport.form.type.export_template.class: Oro\Bundle\ImportExportBundle\Form\Type\ExportTemplateType
 
 services:
     oro_importexport.form.type.import:
@@ -7,3 +9,15 @@ services:
         arguments: ['@oro_importexport.processor.registry']
         tags:
             - { name: form.type, alias: oro_importexport_import }
+
+    oro_importexport.form.type.export:
+        arguments: ['@oro_importexport.processor.registry']
+        class: "%oro_importexport.form.type.export.class%"
+        tags:
+            - { name: form.type, alias: oro_importexport_export }
+
+    oro_importexport.form.type.export_template:
+        arguments: ['@oro_importexport.processor.registry']
+        class: "%oro_importexport.form.type.export_template.class%"
+        tags:
+            - { name: form.type, alias: oro_importexport_export_template }

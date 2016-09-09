@@ -40,8 +40,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['gridName', 'testGridName'],
             ['template', new EmailTemplate('test')],
             ['contexts', [new \stdClass()]],
-            ['organization', new Organization()],
-            ['campaignOwner', new User()]
+            ['organization', new Organization()]
         ];
     }
 

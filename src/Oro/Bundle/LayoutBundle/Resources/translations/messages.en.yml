@@ -1,0 +1,28 @@
+oro:
+    layout:
+        system_configuration:
+            groups:
+                development_settings:
+                    title: Development Settings
+                development_layout_settings:
+                    title: Layouts
+            fields:
+                debug_block_info:
+                    label: Include block debug info into HTML
+                    choices:
+                        no: No
+                        yes: Yes
+                debug_developer_toolbar:
+                    label: Generate layout tree dump for the developer toolbar
+                    tooltip: This option works with debug mode enabled only
+                    choices:
+                        no: No
+                        yes: Yes
+
+        profiler:
+            title: Layout
+            tree: Layout Tree
+            context.items: Context Items
+            messages:
+                tree: Views tree is not found.
+                context.items: Context items is not found.

@@ -43,6 +43,14 @@ class OrganizationUserAclMultiSelectType extends UserMultiSelectType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_user_organization_acl_multiselect';
     }
 }

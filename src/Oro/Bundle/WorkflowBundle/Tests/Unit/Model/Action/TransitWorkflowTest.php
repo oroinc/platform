@@ -28,7 +28,7 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
         $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
             ->setMethods(
                 [
-                    'getWorkflowItemByEntity',
+                    'getWorkflowItem',
                     'transit',
                 ]
             )
@@ -59,6 +59,7 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
         $options = [
             'entity' => new PropertyPath('test'),
             'transition' => 'test_transition',
+            'workflow' => 'test_workflow',
             'data' => [
                 'scalar' => 'value',
                 'path' => new PropertyPath('parameter'),
@@ -78,8 +79,8 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
             ->willReturn($workflowData);
 
         $this->workflowManager->expects($this->once())
-            ->method('getWorkflowItemByEntity')
-            ->with($expectedEntity)
+            ->method('getWorkflowItem')
+            ->with($expectedEntity, $options['workflow'])
             ->will($this->returnValue($expectedWorkflowItem));
 
         $this->workflowManager->expects($this->once())
@@ -104,11 +105,12 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
         $options = [
             'entity' => new PropertyPath('test'),
             'transition' => 'test_transition',
+            'workflow' => 'test_workflow'
         ];
 
         $this->workflowManager->expects($this->once())
-            ->method('getWorkflowItemByEntity')
-            ->with($expectedEntity)
+            ->method('getWorkflowItem')
+            ->with($expectedEntity, $options['workflow'])
             ->will($this->returnValue(null));
 
         $this->workflowManager->expects($this->never())
@@ -122,14 +124,21 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
      * @param array $options
      * @param string $expectedEntity
      * @param string $expectedTransition
+     * @param string $expectedWorkflow
      * @param array $expectedData
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options, $expectedEntity, $expectedTransition, $expectedData = [])
-    {
+    public function testInitialize(
+        array $options,
+        $expectedEntity,
+        $expectedTransition,
+        $expectedWorkflow,
+        array $expectedData = []
+    ) {
         $this->action->initialize($options);
         $this->assertAttributeEquals($expectedEntity, 'entity', $this->action);
         $this->assertAttributeEquals($expectedTransition, 'transition', $this->action);
+        $this->assertAttributeEquals($expectedWorkflow, 'workflow', $this->action);
         $this->assertAttributeEquals($expectedData, 'data', $this->action);
     }
 
@@ -143,14 +152,17 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
                 'options' => [
                     'entity' => new PropertyPath('test'),
                     'transition' => 'test_transition',
+                    'workflow' => 'test_workflow'
                 ],
                 'expectedEntity' => new PropertyPath('test'),
                 'expectedTransition' => 'test_transition',
+                'expectedWorkflow' => 'test_workflow',
             ],
             'associated array options with data' => [
                 'options' => [
                     'entity' => new PropertyPath('test'),
                     'transition' => 'test_transition',
+                    'workflow' => 'test_workflow',
                     'data' => [
                         'scalar' => 'value',
                         'path' => new PropertyPath('parameter'),
@@ -158,6 +170,7 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedEntity' => new PropertyPath('test'),
                 'expectedTransition' => 'test_transition',
+                'expectedWorkflow' => 'test_workflow',
                 'expectedData' => [
                     'scalar' => 'value',
                     'path' => new PropertyPath('parameter'),
@@ -167,14 +180,17 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
                 'options' => [
                     new PropertyPath('test'),
                     'test_transition',
+                    'test_workflow'
                 ],
                 'expectedEntity' => new PropertyPath('test'),
                 'expectedTransition' => 'test_transition',
+                'expectedWorkflow' => 'test_workflow',
             ],
             'indexed array options with data' => [
                 'options' => [
                     new PropertyPath('test'),
                     'test_transition',
+                    'test_workflow',
                     [
                         'scalar' => 'value',
                         'path' => new PropertyPath('parameter'),
@@ -182,6 +198,7 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedEntity' => new PropertyPath('test'),
                 'expectedTransition' => 'test_transition',
+                'expectedWorkflow' => 'test_workflow',
                 'expectedData' => [
                     'scalar' => 'value',
                     'path' => new PropertyPath('parameter'),
@@ -213,12 +230,20 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Option "entity" is required.',
             ],
-            'invalid route parameters' => [
+            'no transition provided' => [
                 'options' => [
                     'entity' => new PropertyPath('test'),
                 ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Option "transition" is required.',
+            ],
+            'no workflow provided' => [
+                'options' => [
+                    'entity' => new PropertyPath('test'),
+                    'transition' => 'test_transition',
+                ],
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionMessage' => 'Option "workflow" is required.',
             ],
         ];
     }

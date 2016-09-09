@@ -205,8 +205,17 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
+            $unsetOptions = ['choice_list'];
+            /**
+             * @todo: should be removed in scope of BAP-11222
+             */
+            /* Check if right now we're using Symfony 2.8+ */
+            if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
+                array_push($unsetOptions, 'choice_label');
+            }
+
             $choices = $registry->getAvailableTransportTypesChoiceList($type);
-            FormUtils::replaceField($form, 'transportType', ['choices' => $choices], ['choice_list']);
+            FormUtils::replaceField($form, 'transportType', ['choices' => $choices], $unsetOptions);
         };
     }
 
@@ -226,8 +235,17 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
+            $unsetOptions = ['choice_list'];
+            /**
+             * @todo: should be removed in scope of BAP-11222
+             */
+            /* Check if right now we're using Symfony 2.8+ */
+            if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
+                array_push($unsetOptions, 'choice_label');
+            }
+
             $choices = $registry->getAvailableConnectorsTypesChoiceList($type);
-            FormUtils::replaceField($form, 'connectors', ['choices' => $choices], ['choice_list']);
+            FormUtils::replaceField($form, 'connectors', ['choices' => $choices], $unsetOptions);
         };
     }
 

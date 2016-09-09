@@ -17,6 +17,9 @@ class AddIncludeFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'include';
 
+    const FILTER_DESCRIPTION =
+        'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.';
+
     /**
      * {@inheritdoc}
      */
@@ -30,26 +33,31 @@ class AddIncludeFilter implements ProcessorInterface
             return;
         }
 
+        /**
+         * TODO: BAP-9470 - Refactoring of filters in API to add possibility to add dependency between filters
+         *
+         * this filter has descriptive nature and it should be added to the list of filters
+         * only if descriptions are requested
+         * actually a filtering by this filter is performed by
+         * @see Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
+         */
+        /*
         if (!$context->hasConfigExtra(DescriptionsConfigExtra::NAME)) {
-            /**
-             * this filter has descriptive nature and it should be added to the list of filters
-             * only if descriptions are requested
-             * actually a filtering by this filter is performed by
-             * @see Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
-             */
             return;
         }
+        */
 
+        if (!$context->getConfig()->isInclusionEnabled()) {
+            // the "include" filter is disabled
+            return;
+        }
         $associations = $context->getMetadata()->getAssociations();
         if (empty($associations)) {
             // the "include" filter has sense only if an entity has at least one association
             return;
         }
 
-        $filter = new IncludeFilter(
-            DataType::STRING,
-            'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.'
-        );
+        $filter = new IncludeFilter(DataType::STRING, self::FILTER_DESCRIPTION);
         $filter->setArrayAllowed(true);
         $filters->add(self::FILTER_KEY, $filter);
     }

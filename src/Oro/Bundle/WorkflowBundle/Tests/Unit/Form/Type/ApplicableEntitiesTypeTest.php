@@ -6,119 +6,56 @@ use Doctrine\Common\Inflector\Inflector;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Fixtures\StubEntity;
 
-class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
+class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $configManager;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var  WorkflowEntityConnector|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityConnector;
 
-    /**
-     * @var ApplicableEntitiesType
-     */
-    protected $formType;
+    /** @var ApplicableEntitiesType */
+    protected $type;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityConnector = $this->getMockBuilder(WorkflowEntityConnector::class)
+            ->disableOriginalConstructor()->getMock();
 
-        $this->entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formType = new ApplicableEntitiesType($this->configManager, $this->entityConnector);
+        $this->type = new ApplicableEntitiesType($this->entityConnector);
     }
 
-    protected function tearDown()
+    public function testConfigureOptions()
     {
-        unset($this->configManager);
-        unset($this->entityConnector);
-        unset($this->formType);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(ApplicableEntitiesType::NAME, $this->formType->getName());
-    }
-
-    public function testGetParent()
-    {
-        $this->assertEquals(EntityChoiceType::NAME, $this->formType->getParent());
-    }
-
-    public function testChoiceNormalizer()
-    {
-        // source data
-        $workflowAwareClass = 'WorkflowAwareClass';
-        $extendedClass = 'ExtendedClass';
-        $notExtendedClass = 'NotExtendedClass';
-        $notConfigurableClass = 'NotConfigurableClass';
-
-        // asserts
-        $this->entityConnector->expects($this->any())->method('isWorkflowAware')
-            ->will(
-                $this->returnCallback(
-                    function ($class) use ($workflowAwareClass) {
-                        return $class === $workflowAwareClass;
-                    }
-                )
-            );
-
-        $extendedEntityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $extendedEntityConfig->expects($this->any())->method('is')->with('is_extend')
-            ->will($this->returnValue(true));
-
-        $notExtendedEntityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $notExtendedEntityConfig->expects($this->any())->method('is')->with('is_extend')
-            ->will($this->returnValue(false));
-
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $hasConfigMap = array(
-            array($workflowAwareClass, null, false),
-            array($extendedClass, null, true),
-            array($notExtendedClass, null, true),
-            array($notConfigurableClass, null, false),
-        );
-        $extendConfigProvider->expects($this->any())->method('hasConfig')->with($this->isType('string'), null)
-            ->will($this->returnValueMap($hasConfigMap));
-        $getConfigMap = array(
-            array($extendedClass, null, $extendedEntityConfig),
-            array($notExtendedClass, null, $notExtendedEntityConfig),
-        );
-        $extendConfigProvider->expects($this->any())->method('getConfig')->with($this->isType('string'), null)
-            ->will($this->returnValueMap($getConfigMap));
-
-        $this->configManager->expects($this->once())->method('getProvider')->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
-
-        // test
-        $inputChoices = array(
-            $workflowAwareClass => Inflector::tableize($workflowAwareClass),
-            $extendedClass => Inflector::tableize($extendedClass),
-            $notExtendedClass => Inflector::tableize($notExtendedClass),
-            $notConfigurableClass => Inflector::tableize($notConfigurableClass)
-        );
-        $expectedChoices = array(
-            $workflowAwareClass => Inflector::tableize($workflowAwareClass),
-            $extendedClass => Inflector::tableize($extendedClass)
-        );
-
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(array('choices' => $inputChoices));
-        $this->formType->setDefaultOptions($resolver);
-        $result = $resolver->resolve(array());
-        $this->assertEquals($expectedChoices, $result['choices']);
+
+        $resolver->setDefaults([
+            'choices' => [
+                StubEntity::class => Inflector::tableize(StubEntity::class),
+                \stdClass::class => Inflector::tableize(\stdClass::class)
+            ]
+        ]);
+
+        $this->type->configureOptions($resolver);
+
+        $this->entityConnector->expects($this->at(0))
+            ->method('isApplicableEntity')
+            ->with(StubEntity::class)
+            ->willReturn(true);
+
+        $this->entityConnector->expects($this->at(1))
+            ->method('isApplicableEntity')
+            ->with(\stdClass::class)
+            ->willReturn(false);
+
+        $result = $resolver->resolve([]);
+
+        $this->assertEquals(
+            [
+                StubEntity::class => Inflector::tableize(StubEntity::class)
+            ],
+            $result['choices']
+        );
     }
 }

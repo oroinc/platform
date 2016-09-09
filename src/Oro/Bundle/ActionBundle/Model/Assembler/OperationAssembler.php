@@ -115,6 +115,7 @@ class OperationAssembler extends AbstractAssembler
             $operationDefinition->setActions($name, $this->getOption($options, $name, []));
         }
 
+        $this->addFeaturePrecondition($operationDefinition);
         $this->addAclPrecondition($operationDefinition, $this->getOption($options, 'acl_resource'));
 
         return $operationDefinition;
@@ -130,12 +131,32 @@ class OperationAssembler extends AbstractAssembler
             return;
         }
 
+        $aclDefinition = ['@acl_granted' => $aclResource];
         $definition = $operationDefinition->getConditions(OperationDefinition::PRECONDITIONS);
-
-        $newDefinition = ['@and' => [['@acl_granted' => $aclResource]]];
         if ($definition) {
             $newDefinition['@and'][] = $definition;
         }
+        $newDefinition['@and'][] = $aclDefinition;
+
+        $operationDefinition->setConditions(OperationDefinition::PRECONDITIONS, $newDefinition);
+    }
+
+    /**
+     * @param OperationDefinition $operationDefinition
+     */
+    protected function addFeaturePrecondition(OperationDefinition $operationDefinition)
+    {
+        $featureResourceDefinition = [
+            '@feature_resource_enabled' => [
+                'resource' => $operationDefinition->getName(),
+                'resource_type' => 'operations'
+            ]
+        ];
+        $definition = $operationDefinition->getConditions(OperationDefinition::PRECONDITIONS);
+        if ($definition) {
+            $newDefinition['@and'][] = $definition;
+        }
+        $newDefinition['@and'][] = $featureResourceDefinition;
 
         $operationDefinition->setConditions(OperationDefinition::PRECONDITIONS, $newDefinition);
     }

@@ -25,15 +25,15 @@ trait FindFieldTrait
             if (!$findByPropertyPath) {
                 return $field;
             }
-            $propertyPath = $field->getPropertyPath();
-            if (!$propertyPath || $propertyPath === $fieldName) {
+            $fieldPropertyPath = $field->getPropertyPath();
+            if (!$fieldPropertyPath || $fieldPropertyPath === $fieldName) {
                 return $field;
             }
         }
         if ($findByPropertyPath) {
             foreach ($this->fields as $field) {
-                $propertyPath = $field->getPropertyPath();
-                if ($propertyPath && $propertyPath === $fieldName) {
+                $fieldPropertyPath = $field->getPropertyPath();
+                if ($fieldPropertyPath && $fieldPropertyPath === $fieldName) {
                     return $field;
                 }
             }
@@ -53,14 +53,14 @@ trait FindFieldTrait
     {
         if (isset($this->fields[$propertyPath])) {
             $field = $this->fields[$propertyPath];
-            $path = $field->getPropertyPath();
-            if (!$path || $path === $propertyPath) {
+            $fieldPropertyPath = $field->getPropertyPath();
+            if (!$fieldPropertyPath || $fieldPropertyPath === $propertyPath) {
                 return $propertyPath;
             }
         }
         foreach ($this->fields as $fieldName => $field) {
-            $path = $field->getPropertyPath();
-            if ($propertyPath && $path === $propertyPath) {
+            $fieldPropertyPath = $field->getPropertyPath();
+            if ($fieldPropertyPath && $fieldPropertyPath === $propertyPath) {
                 return $fieldName;
             }
         }

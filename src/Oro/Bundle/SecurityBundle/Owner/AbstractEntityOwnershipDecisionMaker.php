@@ -7,10 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
 /**
@@ -121,7 +122,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      */
     public function isGlobalLevelEntity($domainObject)
     {
-        return is_a($domainObject, $this->getMetadataProvider()->getGlobalLevelClass());
+        return is_a(
+            $domainObject instanceof EntityObjectReference ? $domainObject->getType() : $domainObject,
+            $this->getMetadataProvider()->getGlobalLevelClass(),
+            true
+        );
     }
 
     /**
@@ -129,7 +134,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      */
     public function isLocalLevelEntity($domainObject)
     {
-        return is_a($domainObject, $this->getMetadataProvider()->getLocalLevelClass());
+        return is_a(
+            $domainObject instanceof EntityObjectReference ? $domainObject->getType() : $domainObject,
+            $this->getMetadataProvider()->getLocalLevelClass(),
+            true
+        );
     }
 
     /**
@@ -138,13 +147,18 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      */
     public function isBasicLevelEntity($domainObject)
     {
-        return is_a($domainObject, $this->getMetadataProvider()->getBasicLevelClass());
+        return is_a(
+            $domainObject instanceof EntityObjectReference ? $domainObject->getType() : $domainObject,
+            $this->getMetadataProvider()->getBasicLevelClass(),
+            true
+        );
     }
 
     /**
      * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
     {
@@ -216,6 +230,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
     {
@@ -249,7 +266,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return false;
         }
 
-        $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
+        $ownerId = $domainObject instanceof EntityObjectReference ?
+            $domainObject->getOwnerId() :
+            $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isLocalLevelOwned()) {
             return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep, $organizationId);
         } elseif ($metadata->isBasicLevelOwned()) {
@@ -294,7 +313,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
         $metadata = $this->getObjectMetadata($domainObject);
         if ($metadata->isBasicLevelOwned()) {
-            $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
+            $ownerId = $domainObject instanceof EntityObjectReference ?
+                $domainObject->getOwnerId() :
+                $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
 
             return $userId === $ownerId;
         }
@@ -407,7 +428,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      */
     protected function getObjectId($domainObject)
     {
-        return $this->getObjectIdAccessor()->getId($domainObject);
+        return $domainObject instanceof EntityObjectReference ?
+            $domainObject->getIdentifier() :
+            $this->getObjectIdAccessor()->getId($domainObject);
     }
 
     /**
@@ -424,7 +447,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return null;
         }
 
-        return $this->getObjectIdAccessor()->getId($domainObject);
+        return $domainObject instanceof EntityObjectReference ?
+            $domainObject->getIdentifier() :
+            $this->getObjectIdAccessor()->getId($domainObject);
     }
 
     /**
@@ -435,7 +460,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      */
     protected function getObjectClass($domainObjectOrClassName)
     {
-        return ClassUtils::getRealClass($domainObjectOrClassName);
+        return ClassUtils::getRealClass(
+            $domainObjectOrClassName instanceof EntityObjectReference ?
+            $domainObjectOrClassName->getType() :
+            $domainObjectOrClassName
+        );
     }
 
     /**

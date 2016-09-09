@@ -13,11 +13,7 @@ define(function(require) {
     require('jquery.validate');
 
     function setValue($elem, value) {
-        if ($elem.data('select2')) {
-            $elem.select2('val', value);
-        } else {
-            $elem.val(value);
-        }
+        $elem.inputWidget('val', value);
         $elem.trigger('change');
     }
 
@@ -44,11 +40,14 @@ define(function(require) {
         },
 
         render: function() {
+            this._deferredRender();
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
                 .validate();
-            this.initLayout();
+            this.initLayout().then(_.bind(function() {
+                this._resolveDeferredRender();
+            }, this));
             this.bindData();
 
             return this;

@@ -20,6 +20,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 class CronCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:cron';
+    const DEFAULT_MAX_COUNT_CONCURRENT_JOBS = 1;
 
     /**
      * {@inheritdoc}
@@ -118,7 +119,12 @@ class CronCommand extends ContainerAwareCommand
             $schedule = $matchedSchedules->first();
             $this->checkDefinition($command, $schedule);
 
-            if ($job = $this->createJob($output, $schedule)) {
+            $maxCountConcurrentJobs = self::DEFAULT_MAX_COUNT_CONCURRENT_JOBS;
+            if ($command instanceof CronCommandConcurrentJobsInterface) {
+                $maxCountConcurrentJobs = $command->getMaxJobsCount();
+            }
+
+            if ($job = $this->createJob($output, $schedule, $maxCountConcurrentJobs)) {
                 $jobs[] = $job;
             }
         }
@@ -236,11 +242,15 @@ class CronCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param Schedule $schedule
+     * @param integer $maxJobsCount
      *
      * @return null|Job
      */
-    protected function createJob(OutputInterface $output, Schedule $schedule)
-    {
+    protected function createJob(
+        OutputInterface $output,
+        Schedule $schedule,
+        $maxJobsCount = self::DEFAULT_MAX_COUNT_CONCURRENT_JOBS
+    ) {
         $cron = $this->getContainer()->get('oro_cron.helper.cron')->createCron($schedule->getDefinition());
         $arguments = array_values($schedule->getArguments());
 
@@ -248,7 +258,9 @@ class CronCommand extends ContainerAwareCommand
          * @todo Add "Oro timezone" setting as parameter to isDue method
          */
         if ($cron->isDue()) {
-            if (!$this->hasJobInQueue($schedule->getCommand(), $arguments)) {
+            if (!$this->hasJobInQueue($schedule->getCommand(), $arguments)
+                || $this->getJobsInQueueCount($schedule->getCommand(), $arguments) < $maxJobsCount
+            ) {
                 $job = new Job($schedule->getCommand(), $arguments);
 
                 $output->writeln('<comment>added to job queue</comment>');
@@ -299,5 +311,16 @@ class CronCommand extends ContainerAwareCommand
     protected function getAllSchedules()
     {
         return new ArrayCollection($this->getRepository('OroCronBundle:Schedule')->findAll());
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     *
+     * @return integer
+     */
+    protected function getJobsInQueueCount($name, array $arguments)
+    {
+        return $this->getContainer()->get('oro_cron.job_manager')->getJobsInQueueCount($name, json_encode($arguments));
     }
 }

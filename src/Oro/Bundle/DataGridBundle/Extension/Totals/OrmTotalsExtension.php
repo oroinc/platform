@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -252,7 +252,7 @@ class OrmTotalsExtension extends AbstractExtension
                     /** @var Expr\Select $selectPart */
                     foreach ($selectParts as $selectPart) {
                         foreach ($selectPart->getParts() as $part) {
-                            if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
+                            if (preg_match('/^(.*)\sas\s(.*)$/is', $part, $matches)) {
                                 if (count($matches) === 3 && $groupPart === $matches[2]) {
                                     $rootIds[] = [
                                         'fieldAlias' => $matches[1],
@@ -304,8 +304,8 @@ class OrmTotalsExtension extends AbstractExtension
         $parameters = $queryBuilder->getParameters();
         if ($parameters->count()) {
             $queryBuilder->resetDQLPart('where')
-                ->resetDQLPart('having')
-                ->setParameters(new ArrayCollection());
+                ->resetDQLPart('having');
+            QueryUtils::removeUnusedParameters($queryBuilder);
         }
 
         $this->addPageLimits($queryBuilder, $pageData, $perPage);

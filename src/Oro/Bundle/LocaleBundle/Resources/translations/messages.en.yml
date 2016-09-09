@@ -1,6 +1,69 @@
 oro.locale:
+    menu:
+        localization:
+            label: Localization
+        localizations:
+            label: Localizations
+
+    localization:
+        entity_label: 'Localization'
+        entity_plural_label: 'Localizations'
+        entity_description: 'Holds language code, formatting code and parent localization'
+
+        id.label: 'Id'
+        name.label: 'Name'
+        title.label: 'Title'
+        titles.label: 'Titles'
+        language_code.label: 'Language'
+        formatting_code.label: 'Formatting'
+        child_localizations.label: 'Child localizations'
+        parent_localization.label: 'Parent localization'
+
+        widgets:
+            localization_information: Localization Information
+
+        sections:
+            general: General
+
+        navigation:
+            view: 'Localization "%name%"'
+
+        form:
+            placeholder:
+                select_parent_localization: 'Please select parent localization...'
+                select_language: 'Please select language...'
+                select_formatting: 'Please select formatting...'
+
+    localizedfallbackvalue:
+        entity_label: 'Localized fallback value'
+        entity_plural_label: 'Localized fallback values'
+        id.label: 'ID'
+        fallback.label: 'Fallback'
+        localization.label: 'Localization'
+        string.label: 'String value'
+        text.label: 'Text value'
+
+    fallback:
+        type:
+            parent_localization: 'Parent Localization'
+            default: 'Default Value'
+
+        value:
+            default: 'Default Value'
+
+        use_fallback:
+            label: 'Use'
+
+    controller:
+        localization:
+            saved.message: 'Localization has been saved'
+
     date_format:
         day: "MMM d"
+        month: "MMMM Y"
+        quarter: "QQQ Y"
+        year: "'Year' Y"
+
     address_format:
         region_name_type:
             parish: "parish"
@@ -21,6 +84,7 @@ oro.locale:
             language_languages.title: 'Languages'
             locale_settings.title: 'Localization options'
             map_settings.title: 'Map options'
+            localization_settings.title: 'Localization settings'
         fields:
             locale.label: 'Locale'
             country.label: 'Primary Location'
@@ -41,6 +105,8 @@ oro.locale:
                     miles_per_hour: 'Miles per hour'
                     kilometers_per_hour: 'Kilometers per hour'
                     meters_per_second: 'Meters per second'
+            enabled_localizations.label: 'Enabled Localizations'
+            default_localization.label: 'Default Localization'
     formatter:
         datetime:
             default: N/A

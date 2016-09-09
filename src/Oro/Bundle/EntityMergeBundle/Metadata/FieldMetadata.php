@@ -208,4 +208,24 @@ class FieldMetadata extends Metadata implements MetadataInterface
     {
         return $this->getSourceClassName() == $this->getEntityMetadata()->getClassName();
     }
+
+    /**
+     * Checks if field should be cloned
+     *
+     * @return bool
+     */
+    public function shouldBeCloned()
+    {
+        if (!$this->hasDoctrineMetadata()) {
+            return false;
+        }
+
+        $doctrineMetadata = $this->getDoctrineMetadata();
+
+        if (!$doctrineMetadata->isAssociation()) {
+            return false;
+        }
+
+        return $doctrineMetadata->isOrphanRemoval() && $doctrineMetadata->isOneToMany();
+    }
 }

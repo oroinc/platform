@@ -96,4 +96,13 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->setScopeId(456);
         $this->assertEquals(456, $this->manager->getScopeId());
     }
+
+    public function testSetScopeIdFromEntity()
+    {
+        $user = new User();
+        $user->setId(123);
+
+        $this->manager->setScopeIdFromEntity($user);
+        $this->assertEquals(123, $this->manager->getScopeId());
+    }
 }

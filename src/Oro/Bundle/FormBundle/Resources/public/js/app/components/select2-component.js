@@ -173,14 +173,14 @@ define(function(require) {
                     if (typeof response.results !== 'undefined') {
                         handleResults(response.results);
                     }
-                    element.trigger('select2-data-loaded');
+                    element.trigger({type: 'select2-data-loaded', items: response});
                 }
             });
         }
 
         var selectedData;
         var dataIds;
-        var currentValue = tools.ensureArray(element.select2('val'));
+        var currentValue = tools.ensureArray(element.inputWidget('val'));
 
         if (config.forceSelectedData && element.data('selected-data')) {
             var data = element.data('selected-data');

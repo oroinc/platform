@@ -31,9 +31,20 @@ class AclPrivilege
      */
     private $description;
 
+    /**
+     * @var string
+     */
+    private $category;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $fields;
+
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
+        $this->fields = new ArrayCollection();
     }
 
     /**
@@ -165,5 +176,37 @@ class AclPrivilege
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param string $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param ArrayCollection $fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
     }
 }

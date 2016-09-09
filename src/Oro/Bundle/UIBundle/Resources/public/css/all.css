@@ -205,9 +205,7 @@
 /* End: Progress bar */
 .dropdown-toggle:focus {
     outline: 0;
-    font-weight: bold;
 }
-
 .loading-indicator:before {
     display: inline-block;
     background: url(../img/loader-16.gif);

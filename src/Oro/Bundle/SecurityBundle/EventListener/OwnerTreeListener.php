@@ -3,47 +3,29 @@
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 class OwnerTreeListener implements ContainerAwareInterface
 {
-    /**
-     * Array with classes need to be checked for
-     *
-     * @var array
-     */
+    /** @var array [class name => [[field name, ...], [association name, ...]], ...] */
     protected $securityClasses = [];
 
-    /**
-     * @var OwnerTreeProviderInterface
-     */
+    /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
 
-    /**
-     * @var bool
-     */
-    protected $needWarmup;
-
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @return array
-     */
-    protected function getUserFieldsToIgnore()
-    {
-        return ['lastLogin', 'loginCount'];
-    }
+    /** @var bool */
+    protected $isCacheOutdated = false;
 
     /**
      * {@inheritdoc}
@@ -64,13 +46,13 @@ class OwnerTreeListener implements ContainerAwareInterface
     }
 
     /**
-     * @param string $class
+     * @param string   $class        The FQCN of an entity to be monitored
+     * @param string[] $fields       The names of fields or to-one associations
+     * @param string[] $associations The names of to-many associations
      */
-    public function addSupportedClass($class)
+    public function addSupportedClass($class, array $fields = [], array $associations = [])
     {
-        if (!in_array($class, $this->securityClasses, true)) {
-            $this->securityClasses[] = $class;
-        }
+        $this->securityClasses[$class] = [$fields, $associations];
     }
 
     /**
@@ -78,39 +60,84 @@ class OwnerTreeListener implements ContainerAwareInterface
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        if (!$this->securityClasses) {
+        if ($this->isCacheOutdated || !$this->securityClasses) {
             return;
         }
 
         $uow = $args->getEntityManager()->getUnitOfWork();
-        $this->needWarmup = $this->checkEntities($uow, $uow->getScheduledEntityInsertions())
-            || $this->checkEntities($uow, $uow->getScheduledEntityUpdates())
-            || $this->checkEntities($uow, $uow->getScheduledEntityDeletions());
+        $this->isCacheOutdated =
+            $this->checkInsertedOrDeletedEntities($uow->getScheduledEntityInsertions())
+            || $this->checkInsertedOrDeletedEntities($uow->getScheduledEntityDeletions())
+            || $this->checkUpdatedEntities($uow)
+            || $this->checkToManyRelations($uow->getScheduledCollectionUpdates())
+            || $this->checkToManyRelations($uow->getScheduledCollectionDeletions());
 
-        if ($this->needWarmup) {
+        if ($this->isCacheOutdated) {
             $this->getTreeProvider()->clear();
         }
     }
 
     /**
-     * @param UnitOfWork $uow
-     * @param array      $entities
+     * @param object[] $entities
      *
      * @return bool
      */
-    protected function checkEntities(UnitOfWork $uow, array $entities)
+    protected function checkInsertedOrDeletedEntities($entities)
     {
-        $fieldsToIgnore = $this->getUserFieldsToIgnore();
         foreach ($entities as $entity) {
-            if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
-                if ($entity instanceof UserInterface) {
-                    $changeSet = $uow->getEntityChangeSet($entity);
-                    if (!array_diff(array_keys($changeSet), $fieldsToIgnore)) {
-                        continue;
-                    }
-                }
-
+            if (isset($this->securityClasses[ClassUtils::getRealClass($entity)])) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param UnitOfWork $uow
+     *
+     * @return bool
+     */
+    protected function checkUpdatedEntities(UnitOfWork $uow)
+    {
+        $entities = $uow->getScheduledEntityUpdates();
+        foreach ($entities as $entity) {
+            $entityClass = ClassUtils::getRealClass($entity);
+            if (!isset($this->securityClasses[$entityClass])) {
+                continue;
+            }
+
+            list($fields) = $this->securityClasses[$entityClass];
+            if ($fields) {
+                $changeSet = $uow->getEntityChangeSet($entity);
+                if (array_intersect(array_keys($changeSet), $fields)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param PersistentCollection[] $collections
+     *
+     * @return bool
+     */
+    protected function checkToManyRelations($collections)
+    {
+        foreach ($collections as $collection) {
+            $entityClass = ClassUtils::getRealClass($collection->getOwner());
+            if (!isset($this->securityClasses[$entityClass])) {
+                continue;
+            }
+
+            list(, $associations) = $this->securityClasses[$entityClass];
+            if ($associations) {
+                $associationMapping = $collection->getMapping();
+                if (in_array($associationMapping['fieldName'], $associations, true)) {
+                    return true;
+                }
             }
         }
 

@@ -218,7 +218,10 @@ class WidgetConfigs
      */
     public function getWidgetOptions($widgetId = null)
     {
-        $widgetId = is_null($widgetId) && $this->request ? $this->request->query->get('_widgetId', null) : $widgetId;
+        if (is_null($widgetId) && $this->request) {
+            $widgetId = $this->request->query->get('_widgetId', null);
+        }
+
         if (!$widgetId) {
             return new WidgetOptionBag();
         }
@@ -228,6 +231,9 @@ class WidgetConfigs
         }
 
         $widget       = $this->findWidget($widgetId);
+        if (!$widget) {
+            return new WidgetOptionBag();
+        }
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
         $options      = $widget->getOptions();
 

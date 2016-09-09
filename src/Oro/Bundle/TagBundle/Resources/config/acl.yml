@@ -3,6 +3,7 @@ oro_tag_assign_unassign:
     type: action
     group_name: ""
     bindings: ~
+    category: "application"
 
 oro_tag_unassign_global:
     label: oro.tag.action.unassign_global.label
@@ -10,3 +11,4 @@ oro_tag_unassign_global:
     type: action
     group_name: ""
     bindings: ~
+    category: "application"

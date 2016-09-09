@@ -50,20 +50,25 @@ class OptionalListenersListener
     protected function addOptionsToCommand(Command $command, InputInterface $input)
     {
         $inputDefinition = $command->getApplication()->getDefinition();
-        $inputDefinition->addOption(
-            new InputOption(
-                self::DISABLE_OPTIONAL_LISTENERS,
-                null,
-                InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
-                sprintf(
-                    'Disable optional listeners, "%s" to disable all listeners, '
-                    .'command "%s" shows all listeners',
-                    self::ALL_OPTIONAL_LISTENERS_VALUE,
-                    OptionalListenersCommand::NAME
-                )
+        $disableOptionalListenerOption = new InputOption(
+            self::DISABLE_OPTIONAL_LISTENERS,
+            null,
+            InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
+            sprintf(
+                'Disable optional listeners, "%s" to disable all listeners, '
+                .'command "%s" shows all listeners',
+                self::ALL_OPTIONAL_LISTENERS_VALUE,
+                OptionalListenersCommand::NAME
             )
         );
-
+        /**
+         * Starting from Symfony 2.8 event 'ConsoleCommandEvent' fires after all definitions were merged.
+         */
+        $inputDefinition->addOption($disableOptionalListenerOption);
+        $command->getDefinition()->addOption($disableOptionalListenerOption);
+        /**
+         * Added only for compatibility with Symfony below 2.8
+         */
         $command->mergeApplicationDefinition();
         $input->bind($command->getDefinition());
     }

@@ -14,14 +14,14 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 class SetHttpResponseStatusCode implements ProcessorInterface
 {
     /** @var int */
-    protected $okStatusCode;
+    protected $defaultSuccessStatusCode;
 
     /**
-     * @param int $statusCode
+     * @param int $defaultSuccessStatusCode
      */
-    public function __construct($statusCode = Response::HTTP_OK)
+    public function __construct($defaultSuccessStatusCode = Response::HTTP_OK)
     {
-        $this->okStatusCode = $statusCode;
+        $this->defaultSuccessStatusCode = $defaultSuccessStatusCode;
     }
 
     /**
@@ -29,22 +29,25 @@ class SetHttpResponseStatusCode implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var $context Context */
+        /** @var Context $context */
 
-        /** @var $context Context */
         if (null !== $context->getResponseStatusCode()) {
             // the status code is already set
             return;
         }
 
-        $statusCode = $this->okStatusCode;
+        $statusCode = $this->defaultSuccessStatusCode;
         if ($context->hasErrors()) {
             $groupedCodes = [];
             foreach ($context->getErrors() as $error) {
                 $code      = $error->getStatusCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
                 $groupCode = (int)floor($code / 100) * 100;
 
-                $groupedCodes[$groupCode][] = $code;
+                if (!array_key_exists($groupCode, $groupedCodes)
+                    || !in_array($code, $groupedCodes[$groupCode], true)
+                ) {
+                    $groupedCodes[$groupCode][] = $code;
+                }
             }
 
             if (!empty($groupedCodes)) {

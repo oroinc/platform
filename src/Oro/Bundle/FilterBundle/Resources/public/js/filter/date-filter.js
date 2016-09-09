@@ -111,6 +111,18 @@ define(function(require) {
         /**
          * @property
          */
+        typeDefinedValues: {
+            today:        7,
+            this_week:    8,
+            this_month:   9,
+            this_quarter: 10,
+            this_year:    11,
+            all_time:     12
+        },
+
+        /**
+         * @property
+         */
         dateParts: [],
 
         /**
@@ -231,7 +243,19 @@ define(function(require) {
             if (!isNaN(type)) {
                 // it's type
                 this.$('.filter-separator, .filter-start-date, .filter-end-date').css('display', '');
-                if (this.typeValues.moreThan === type) {
+                var typeDefinedValues = [
+                    this.typeDefinedValues.today,
+                    this.typeDefinedValues.this_week,
+                    this.typeDefinedValues.this_month,
+                    this.typeDefinedValues.this_quarter,
+                    this.typeDefinedValues.this_year,
+                    this.typeDefinedValues.all_time,
+                ];
+                if (typeDefinedValues.indexOf(type) > -1) {
+                    this.$('.filter-separator, .filter-start-date, .filter-end-date').hide();
+                    this.subview('start').setValue('');
+                    this.subview('end').setValue('');
+                } else if (this.typeValues.moreThan === type) {
                     this.$('.filter-separator, .filter-end-date').hide();
                     this.subview('end').setValue('');
                 } else if (this.typeValues.lessThan === type) {
@@ -270,44 +294,16 @@ define(function(require) {
             var value = _.extend({}, this.emptyValue, this.getValue());
             var part = {value: value.part, type: value.part};
 
-            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
             this.dateWidgetOptions.part = part.type;
 
-            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
-            var parts = [];
-
-            // add date parts only if embed template used
-            if (this.templateTheme !== '') {
-                parts.push(
-                    datePartTemplate({
-                        name: this.name + '_part',
-                        choices: this.dateParts,
-                        selectedChoice: value.part,
-                        selectedChoiceLabel: selectedPartLabel,
-                        selectedChoiceTooltip: this._getPartTooltip(value.part)
-                    })
-                );
-            }
-
             this._updateRangeFilter(value, false);
-
-            parts.push(
-                datePartTemplate({
-                    name: this.name,
-                    choices: this.choices,
-                    selectedChoice: value.type,
-                    selectedChoiceLabel: selectedChoiceLabel,
-                    popoverContent: __('oro.filter.date.info')
-                })
-            );
 
             var displayValue = this._formatDisplayValue(value);
             var $filter = $(
                 this.template({
                     inputClass: this.inputClass,
                     value: displayValue,
-                    parts: parts,
+                    parts: this._getParts(),
                     popoverContent: __('oro.filter.date.info')
                 })
             );
@@ -330,6 +326,41 @@ define(function(require) {
             }, this));
 
             this._criteriaRenderd = true;
+        },
+
+        _getParts: function() {
+            var value = _.extend({}, this.emptyValue, this.getValue());
+            var part = {value: value.part, type: value.part};
+
+            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
+            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
+            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var parts = [];
+
+            // add date parts only if embed template used
+            if (this.templateTheme !== '') {
+                parts.push(
+                    datePartTemplate({
+                        name: this.name + '_part',
+                        choices: this.dateParts,
+                        selectedChoice: value.part,
+                        selectedChoiceLabel: selectedPartLabel,
+                        selectedChoiceTooltip: this._getPartTooltip(value.part)
+                    })
+                );
+            }
+
+            parts.push(
+                datePartTemplate({
+                    name: this.name,
+                    choices: this.choices,
+                    selectedChoice: value.type,
+                    selectedChoiceLabel: selectedChoiceLabel,
+                    popoverContent: __('oro.filter.date.info')
+                })
+            );
+
+            return parts;
         },
 
         /**
@@ -528,7 +559,7 @@ define(function(require) {
          * Converts the date value from Raw to Display
          *
          * @param {string} value
-         * @param {string{ part
+         * @param {string} part
          * @returns {string}
          * @protected
          */

@@ -17,7 +17,13 @@ define([
             count:    1, //total activities count
             current:  1, //current page
             pagesize: 1, //items per page
-            total:    1  //total pages
+            total:    1, //total pages
+            sortingField: 'updatedAt' //the activity list item attribute being used for data sorting
+        },
+        pageFilter: {
+            date: null,
+            ids: [],
+            action: null //'next' or 'prev' or '' (refresh action)
         },
 
         url: function() {
@@ -25,9 +31,32 @@ define([
                 this.route,
                 _.extend(
                     _.extend([], this.routeParameters),
-                    _.extend({page: this.getPage()}, {filter: this.filter})
+                    _.extend({filter: this.filter}, {pageFilter: this.pageFilter})
                 )
             );
+        },
+
+        setPageFilterDate: function(value) {
+            this.pageFilter.date = value;
+        },
+        setPageFilterIds: function(value) {
+            this.pageFilter.ids = value ? value : [];
+        },
+        getPageFilterIds: function() {
+            return this.pageFilter.ids;
+        },
+        setPageFilterAction: function(value) {
+            this.pageFilter.action = value ? value : null;
+        },
+        getPageFilterAction: function() {
+            return this.pageFilter.action;
+        },
+        resetPageFilter: function() {
+            this.pageFilter = {
+                date: null,
+                ids: [],
+                action: null
+            };
         },
 
         setFilter: function(filter) {
@@ -48,7 +77,20 @@ define([
             this.pager.pagesize = pagesize;
         },
 
+        getPageTotal: function() {
+            return parseInt(this.pager.total);
+        },
+        setPageTotal: function(value) {
+            this.pager.total = value;
+        },
+
         reset: function(models, options) {
+            if (this.getPage() > 1 && models.count === 0 && this.models.length) {
+                this.setPage(this.getPage() - 1);
+                this.setCount(0);
+                return;
+            }
+
             var i;
             var newModel;
             var oldModel;
@@ -87,8 +129,6 @@ define([
 
         setCount: function(count) {
             this.pager.count = count;
-            this.pager.total = count === 0 ? 1 : Math.ceil(count / this.pager.pagesize);
-
             this.count = count;
         },
 

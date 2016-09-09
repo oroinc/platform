@@ -24,7 +24,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper  = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
@@ -74,14 +74,62 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessForNotManageableEntity()
     {
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'field1' => null
+            'identifier_field_names' => ['id'],
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'           => null,
+                'field1'       => null,
+                'field2'       => null,
+                'association1' => [
+                    'identifier_field_names' => ['id'],
+                    'target_class'           => 'Test\Association1Target',
+                    'exclusion_policy'       => 'all',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                        'field2' => null,
+                    ]
+                ],
+                'association2' => [
+                    'identifier_field_names' => ['id'],
+                    'target_class'           => 'Test\Association2Target',
+                    'exclusion_policy'       => 'all',
+                    'property_path'          => 'realAssociation2',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                        'field2' => null,
+                    ]
+                ],
+                'association3' => [
+                    'identifier_field_names' => ['id'],
+                    'target_class'           => 'Test\Association3Target',
+                    'exclusion_policy'       => 'all',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                    ]
+                ],
             ]
         ];
+
+        $this->context->setExtras(
+            [
+                new FilterFieldsConfigExtra(
+                    [
+                        'primary_entity'       => ['field1', 'association1', 'association2', 'association3'],
+                        'association_1_entity' => ['id', 'field1'],
+                        'association_2_entity' => ['field2'],
+                    ]
+                )
+            ]
+        );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -90,8 +138,85 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadataForClass');
 
+        $this->valueNormalizer->expects($this->exactly(3))
+            ->method('normalizeValue')
+            ->willReturnMap(
+                [
+                    [
+                        'primary_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        self::TEST_CLASS_NAME
+                    ],
+                    [
+                        'association_1_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        'Test\Association1Target'
+                    ],
+                    [
+                        'association_2_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        'Test\Association2Target'
+                    ],
+                ]
+            );
+
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'fields'                 => [
+                    'id'           => null,
+                    'field1'       => null,
+                    'field2'       => [
+                        'exclude' => true
+                    ],
+                    'association1' => [
+                        'identifier_field_names' => ['id'],
+                        'target_class'           => 'Test\Association1Target',
+                        'exclusion_policy'       => 'all',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => null,
+                            'field2' => [
+                                'exclude' => true
+                            ],
+                        ]
+                    ],
+                    'association2' => [
+                        'identifier_field_names' => ['id'],
+                        'target_class'           => 'Test\Association2Target',
+                        'exclusion_policy'       => 'all',
+                        'property_path'          => 'realAssociation2',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => [
+                                'exclude' => true
+                            ],
+                            'field2' => null,
+                        ]
+                    ],
+                    'association3' => [
+                        'identifier_field_names' => ['id'],
+                        'target_class'           => 'Test\Association3Target',
+                        'exclusion_policy'       => 'all',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => null,
+                        ]
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
     }
 
     /**
@@ -123,6 +248,13 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         'field2' => null,
                     ]
                 ],
+                'association3' => [
+                    'exclusion_policy'       => 'all',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                    ]
+                ],
             ]
         ];
 
@@ -130,9 +262,9 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             [
                 new FilterFieldsConfigExtra(
                     [
-                        'test_class'    => ['field1', 'association1', 'association2'],
-                        'association_1' => ['id', 'field1'],
-                        'association_2' => ['field2'],
+                        'primary_entity'       => ['field1', 'association1', 'association2', 'association3'],
+                        'association_1_entity' => ['id', 'field1'],
+                        'association_2_entity' => ['field2'],
                     ]
                 )
             ]
@@ -142,20 +274,22 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $rootEntityMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->exactly(2))
+        $rootEntityMetadata->expects($this->exactly(3))
             ->method('hasAssociation')
             ->willReturnMap(
                 [
                     ['association1', true],
                     ['realAssociation2', true],
+                    ['association3', true],
                 ]
             );
-        $rootEntityMetadata->expects($this->exactly(2))
+        $rootEntityMetadata->expects($this->exactly(3))
             ->method('getAssociationTargetClass')
             ->willReturnMap(
                 [
                     ['association1', 'Test\Association1Target'],
                     ['realAssociation2', 'Test\Association2Target'],
+                    ['association3', 'Test\Association3Target'],
                 ]
             );
 
@@ -169,17 +303,22 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
+        $association3Metadata = $this->getClassMetadataMock('Test\Association3Target');
+        $association3Metadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(3))
+        $this->doctrineHelper->expects($this->exactly(4))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
                     ['Test\Association1Target', true, $association1Metadata],
                     ['Test\Association2Target', true, $association2Metadata],
+                    ['Test\Association3Target', true, $association3Metadata],
                 ]
             );
 
@@ -188,25 +327,25 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             ->willReturnMap(
                 [
                     [
-                        self::TEST_CLASS_NAME,
-                        DataType::ENTITY_TYPE,
+                        'primary_entity',
+                        DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
-                        'test_class'
+                        self::TEST_CLASS_NAME
                     ],
                     [
-                        'Test\Association1Target',
-                        DataType::ENTITY_TYPE,
+                        'association_1_entity',
+                        DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
-                        'association_1'
+                        'Test\Association1Target'
                     ],
                     [
-                        'Test\Association2Target',
-                        DataType::ENTITY_TYPE,
+                        'association_2_entity',
+                        DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
-                        'association_2'
+                        'Test\Association2Target'
                     ],
                 ]
             );
@@ -245,6 +384,13 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                             'field2' => null,
                         ]
                     ],
+                    'association3' => [
+                        'exclusion_policy'       => 'all',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => null,
+                        ]
+                    ],
                 ]
             ],
             $this->context->getResult()
@@ -274,8 +420,8 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             [
                 new FilterFieldsConfigExtra(
                     [
-                        'test_class'      => ['field1', 'association1'],
-                        'association_1_1' => ['id', 'field1'],
+                        'primary_entity'         => ['field1', 'association1'],
+                        'association_1_1_entity' => ['id', 'field1'],
                     ]
                 )
             ]
@@ -294,9 +440,9 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             ->with('association1')
             ->willReturn('Test\Association1Target');
 
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
         $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
-        $association1Metadata->subClasses      = ['Test\Association1Target1', 'Test\Association1Target2'];
+        $association1Metadata->subClasses = ['Test\Association1Target1', 'Test\Association1Target2'];
         $association1Metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
@@ -314,42 +460,33 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->valueNormalizer->expects($this->at(0))
+        $this->valueNormalizer->expects($this->exactly(2))
             ->method('normalizeValue')
-            ->with(
-                self::TEST_CLASS_NAME,
-                DataType::ENTITY_TYPE,
-                $this->context->getRequestType(),
-                false
-            )
-            ->willReturn('test_class');
-        $this->valueNormalizer->expects($this->at(1))
-            ->method('normalizeValue')
-            ->with(
-                'Test\Association1Target',
-                DataType::ENTITY_TYPE,
-                $this->context->getRequestType(),
-                false
-            )
-            ->willThrowException(new EntityAliasNotFoundException());
-        $this->valueNormalizer->expects($this->at(2))
-            ->method('normalizeValue')
-            ->with(
-                'Test\Association1Target1',
-                DataType::ENTITY_TYPE,
-                $this->context->getRequestType(),
-                false
-            )
-            ->willReturn('association_1_1');
-        $this->valueNormalizer->expects($this->at(3))
-            ->method('normalizeValue')
-            ->with(
-                'Test\Association1Target2',
-                DataType::ENTITY_TYPE,
-                $this->context->getRequestType(),
-                false
-            )
-            ->willReturn('association_1_2');
+            ->willReturnMap(
+                [
+                    [
+                        'primary_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        self::TEST_CLASS_NAME
+                    ],
+                    [
+                        'association_1_1_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        'Test\Association1Target'
+                    ],
+                    [
+                        'association_2_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        'Test\Association1Target1'
+                    ],
+                ]
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);

@@ -3,12 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 class DoctrineHelperTest extends OrmRelatedTestCase
@@ -43,104 +40,6 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         $this->assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
         // test local cache
         $this->assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
-    }
-
-    public function testApplyCriteriaWithoutJoins()
-    {
-        $qb = $this->getQueryBuilderMock();
-
-        $criteria = new Criteria(new EntityClassResolver($this->doctrine));
-
-        $qb->expects($this->once())
-            ->method('addCriteria')
-            ->with($this->identicalTo($criteria));
-
-        $this->doctrineHelper->applyCriteria($qb, $criteria);
-    }
-
-    public function testApplyCriteria()
-    {
-        $qb = $this->getQueryBuilderMock();
-
-        $criteria = new Criteria(new EntityClassResolver($this->doctrine));
-        $criteria
-            ->addInnerJoin(
-                'category',
-                $this->getEntityClass('Category')
-            )
-            ->setAlias('user_category');
-        $criteria
-            ->addLeftJoin(
-                'products',
-                $this->getEntityClass('Product'),
-                Join::WITH,
-                '{entity}.name IS NULL',
-                'idx_name'
-            )
-            ->setAlias('products');
-        $criteria
-            ->addLeftJoin(
-                'products.owner',
-                $this->getEntityClass('User'),
-                Join::WITH,
-                '{entity}.name = {root}.name'
-            )
-            ->setAlias('product_owner');
-        $criteria
-            ->addLeftJoin(
-                'products.category',
-                '{products}.category',
-                Join::WITH,
-                '{entity}.name = {category}.name'
-            )
-            ->setAlias('product_category');
-
-        $qb->expects($this->once())
-            ->method('getRootAliases')
-            ->willReturn(['user']);
-
-        $qb->expects($this->at(1))
-            ->method('innerJoin')
-            ->with(
-                $this->getEntityClass('Category'),
-                'user_category',
-                null,
-                null,
-                null
-            );
-        $qb->expects($this->at(2))
-            ->method('leftJoin')
-            ->with(
-                $this->getEntityClass('Product'),
-                'products',
-                Join::WITH,
-                'products.name IS NULL',
-                'idx_name'
-            );
-        $qb->expects($this->at(3))
-            ->method('leftJoin')
-            ->with(
-                $this->getEntityClass('User'),
-                'product_owner',
-                Join::WITH,
-                'product_owner.name = user.name',
-                null
-            );
-        $qb->expects($this->at(4))
-            ->method('leftJoin')
-            ->with(
-                'products.category',
-                'product_category',
-                Join::WITH,
-                'product_category.name = user_category.name',
-                null
-            );
-
-        $qb->expects($this->once())
-            ->method('addCriteria')
-            ->with($this->identicalTo($criteria));
-
-        $this->doctrineHelper->applyCriteria($qb, $criteria);
     }
 
     public function testFindEntityMetadataByPath()
@@ -225,9 +124,11 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         // category = ManyToOne
         // groups = ManyToMany (should be ignored)
         // products = OneToMany (should be ignored)
+        // owner = ManyToOne
         $this->assertEquals(
             [
                 'category' => 'string',
+                'owner'    => 'integer',
             ],
             $this->doctrineHelper->getIndexedAssociations($this->getClassMetadata('User'))
         );

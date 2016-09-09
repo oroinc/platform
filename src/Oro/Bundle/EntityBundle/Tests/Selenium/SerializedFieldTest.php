@@ -85,7 +85,7 @@ class SerializedFieldTest extends Selenium2TestCase
         $login->save()
             ->assertMessage('User saved');
         foreach ($this->fields as $field) {
-            $login->checkEntityFieldData(strtolower($field['type']).'_serialized', $field['value']);
+            $login->checkEntityFieldData(strtolower($field['type']).'_serialized', $field['value'], $field['type']);
         }
     }
 }

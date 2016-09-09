@@ -60,16 +60,16 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
      */
     public function setGetDataProvider()
     {
-        return array(
-            'event' => array('event', 'update'),
-            'field' => array('field', 'status'),
-            'queued' => array('queued', true, false),
-            'timeShift' => array('timeShift', time()),
-            'definition' => array('definition', new ProcessDefinition()),
-            'cron' => array('cron', '* * * * *'),
-            'createdAt' => array('createdAt', new \DateTime()),
-            'updatedAt' => array('updatedAt', new \DateTime()),
-        );
+        return [
+            'event' => ['event', 'update'],
+            'field' => ['field', 'status'],
+            'queued' => ['queued', true, false],
+            'timeShift' => ['timeShift', time()],
+            'definition' => ['definition', new ProcessDefinition()],
+            'cron' => ['cron', '* * * * *'],
+            'createdAt' => ['createdAt', new \DateTime()],
+            'updatedAt' => ['updatedAt', new \DateTime()],
+        ];
     }
 
     /**
@@ -102,16 +102,16 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
      */
     public function dateIntervalAndSecondsDataProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 'interval' => new \DateInterval('PT3600S'),
                 'seconds' => 3600,
-            ),
-            array(
+            ],
+            [
                 'interval' => new \DateInterval('P1DT2H3M4S'),
                 'seconds' => 93784,
-            ),
-        );
+            ],
+        ];
     }
 
     public function testSetGetTimeShiftInterval()
@@ -184,5 +184,116 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         $this->$method($expectedEntity->isQueued(), $actualEntity->isQueued());
         $this->$method($expectedEntity->getTimeShift(), $actualEntity->getTimeShift());
         $this->$method($expectedEntity->getDefinition(), $actualEntity->getDefinition());
+    }
+
+    /**
+     * @param array $trigger1Attributes
+     * @param array $trigger2Attributes
+     * @param bool $expected
+     *
+     * @dataProvider testIsDefinitiveEqualData
+     */
+    public function testIsDefinitiveEqual(array $trigger1Attributes, array $trigger2Attributes, $expected)
+    {
+        $trigger1 = $this->createProcessTriggerByAttributes($trigger1Attributes);
+        $trigger2 = $this->createProcessTriggerByAttributes($trigger2Attributes);
+
+        $result = $trigger1->isDefinitiveEqual($trigger2);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function testIsDefinitiveEqualData()
+    {
+        return [
+            'equal full' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => 'd1'],
+                'trigger2' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => 'd1'],
+                'expected' => true
+            ],
+            'equal partial: no definition name' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => null],
+                'trigger2' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => null],
+                'expected' => true
+            ],
+            'equal partial: no definition' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *'],
+                'trigger2' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *'],
+                'expected' => true
+            ],
+            'equal partial: no cron and definition' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1'],
+                'trigger2' => ['event' => 'event1', 'field' => 'field1'],
+                'expected' => true
+            ],
+            'equal partial: no field, cron, definition' => [
+                'trigger1' => ['event' => 'event1'],
+                'trigger2' => ['event' => 'event1'],
+                'expected' => true
+            ],
+            'equal: empty' => [
+                'trigger1' => [],
+                'trigger2' => [],
+                'expected' => true
+            ],
+            'not equal: definition name' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => 'd1'],
+                'trigger2' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => 'd2'],
+                'expected' => false
+            ],
+            'not equal: definition name strict' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => '0'],
+                'trigger2' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *', 'definition' => null],
+                'expected' => false
+            ],
+            'not equal: cron' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '1 * * * *'],
+                'trigger2' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *'],
+                'expected' => false
+            ],
+            'not equal: field' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *'],
+                'trigger2' => ['event' => 'event1', 'field' => 'field2', 'cron' => '* * * * *'],
+                'expected' => false
+            ],
+            'not equal: event' => [
+                'trigger1' => ['event' => 'event1', 'field' => 'field1', 'cron' => '* * * * *'],
+                'trigger2' => ['event' => 'event2', 'field' => 'field1', 'cron' => '* * * * *'],
+                'expected' => false
+            ]
+        ];
+    }
+
+    /**
+     * @param array $attributes
+     * @return ProcessTrigger
+     */
+    public function createProcessTriggerByAttributes(array $attributes)
+    {
+        $trigger = new ProcessTrigger();
+
+        if (isset($attributes['event'])) {
+            $trigger->setEvent($attributes['event']);
+        }
+
+        if (isset($attributes['field'])) {
+            $trigger->setField($attributes['field']);
+        }
+
+        if (isset($attributes['cron'])) {
+            $trigger->setCron($attributes['cron']);
+        }
+
+        if (isset($attributes['definition'])) {
+            $definition = new ProcessDefinition();
+            $definition->setName($attributes['definition']);
+
+            $trigger->setDefinition($definition);
+        }
+
+        return $trigger;
     }
 }

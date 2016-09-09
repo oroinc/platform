@@ -35,10 +35,6 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->loadFixtures([
-            'Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData'
-        ]);
-
         $this->registry = $this->getContainer()->get('doctrine');
         $this->helper = $this->getContainer()->get('oro_entity.orm.native_query_executor_helper');
 

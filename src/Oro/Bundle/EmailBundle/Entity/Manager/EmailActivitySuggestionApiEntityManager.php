@@ -2,13 +2,28 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEntityManager
 {
+    /** @var TokenStorageInterface|null */
+    protected $tokenStorage;
+
+    /**
+     * @param TokenStorageInterface $tokenStorage
+     */
+    public function setTokenStorage(TokenStorageInterface $tokenStorage)
+    {
+        $this->tokenStorage = $tokenStorage;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -35,16 +50,18 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
     /**
      * Gets suggestion result.
      *
-     * @param int $emailId
-     * @param int $page
-     * @param int $limit
+     * @param int  $emailId
+     * @param int  $page
+     * @param int  $limit
+     * @param bool $excludeCurrentUser
      *
      * @return array
      */
     public function getSuggestionResult(
         $emailId,
         $page = 1,
-        $limit = 10
+        $limit = 10,
+        $excludeCurrentUser = false
     ) {
         /** @var Email $email */
         $email = $this->find($emailId);
@@ -52,9 +69,19 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
             throw new NotFoundHttpException();
         }
 
+        $excludeEntities = [];
+        if ($excludeCurrentUser && $this->tokenStorage) {
+            $token = $this->tokenStorage->getToken();
+            if ($token && $token->getUser() instanceof AbstractUser) {
+                $currentUser = $token->getUser();
+                $excludeEntities[] = ['entity' => ClassUtils::getClass($currentUser), 'id' => $currentUser->getId()];
+            }
+        }
+
         $data = $this->diff(
             $this->getSuggestionEntities($email),
-            $this->getAssignedEntities($email)
+            $this->getAssignedEntities($email),
+            $excludeEntities
         );
 
         $slice = array_slice(
@@ -138,12 +165,16 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
      *
      * @param array $searchResult
      * @param array $assignedEntities
+     * @param array $excludeEntities  The list of entities that should be excluded from the result
+     *                                [['entity' => entity class, 'id' => entity id], ...]
      *
      * @return array of [id, entity, title]
      */
-    protected function diff($searchResult, array $assignedEntities = [])
+    protected function diff($searchResult, array $assignedEntities = [], array $excludeEntities = [])
     {
         $result = [];
+
+        $assignedEntities = array_merge($assignedEntities, $excludeEntities);
 
         foreach ($searchResult as $item) {
             foreach ($assignedEntities as $entity) {

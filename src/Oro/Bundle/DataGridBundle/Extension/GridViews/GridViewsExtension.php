@@ -7,15 +7,18 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class GridViewsExtension extends AbstractExtension
 {
@@ -42,28 +45,34 @@ class GridViewsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var ServiceLink */
+    protected $managerLink;
+
     /** @var GridView|null|bool */
     protected $defaultGridView = false;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
-     * @param SecurityFacade           $securityFacade
-     * @param TranslatorInterface      $translator
-     * @param ManagerRegistry          $registry
-     * @param AclHelper                $aclHelper
+     * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface $translator
+     * @param ManagerRegistry $registry
+     * @param AclHelper $aclHelper
+     * @param ServiceLink $managerLink
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         SecurityFacade $securityFacade,
         TranslatorInterface $translator,
         ManagerRegistry $registry,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        ServiceLink $managerLink
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->securityFacade  = $securityFacade;
         $this->translator      = $translator;
         $this->registry        = $registry;
         $this->aclHelper       = $aclHelper;
+        $this->managerLink = $managerLink;
     }
 
     /**
@@ -100,7 +109,7 @@ class GridViewsExtension extends AbstractExtension
         $currentViewId = $this->getCurrentViewId($config->getName());
         // need to set [initialState][filters] from [state][filters]
         // before [state][filters] will be set from default grid view
-        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
+        $filtersState = $data->offsetGetByPath('[state][filters]', []);
         $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID, 'filters' => $filtersState]);
         $this->setDefaultParams($config->getName(), $data);
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
@@ -111,12 +120,8 @@ class GridViewsExtension extends AbstractExtension
             $systemGridView->setLabel($this->translator->trans($config['options']['gridViews']['allLabel']));
         }
 
-        $gridViews = [$systemGridView->getMetadata()];
-        /** @var AbstractViewsList $list */
-        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-        if ($list !== false) {
-            $gridViews = array_merge($gridViews, $list->getMetadata());
-        }
+        $currentUser = $this->getCurrentUser();
+        $gridViews = $this->managerLink->getService()->getAllGridViews($currentUser, $config->getName());
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
             $event = new GridViewsLoadEvent($config->getName(), $gridViews);
@@ -145,7 +150,12 @@ class GridViewsExtension extends AbstractExtension
     {
         $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         if (isset($params[self::VIEWS_PARAM_KEY])) {
-            return (int)$params[self::VIEWS_PARAM_KEY];
+            $viewKey = $params[self::VIEWS_PARAM_KEY];
+            if (is_numeric($viewKey)) {
+                return (int)$viewKey;
+            } else {
+                return $viewKey;
+            }
         } else {
             $defaultViewId = $this->getDefaultViewId($gridName);
 
@@ -162,9 +172,18 @@ class GridViewsExtension extends AbstractExtension
      */
     protected function getDefaultViewId($gridName)
     {
+        $defaultGridViewId = null;
         $defaultGridView = $this->getDefaultView($gridName);
 
-        return $defaultGridView ? $defaultGridView->getId() : null;
+        if ($defaultGridView) {
+            if ($defaultGridView->getType() == 'system') {
+                $defaultGridViewId = $defaultGridView->getName();
+            } else {
+                $defaultGridViewId = $defaultGridView->getId();
+            }
+        }
+
+        return $defaultGridViewId;
     }
 
     /**
@@ -177,18 +196,10 @@ class GridViewsExtension extends AbstractExtension
     protected function getDefaultView($gridName)
     {
         if ($this->defaultGridView === false) {
-            if (!$currentUser = $this->securityFacade->getLoggedUser()) {
+            if (!$currentUser = $this->getCurrentUser()) {
                 return null;
             }
-
-            $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
-            $defaultGridView = $repository->findDefaultGridView(
-                $this->aclHelper,
-                $currentUser,
-                $gridName
-            );
-
-            $this->defaultGridView = $defaultGridView;
+            $this->defaultGridView = $this->managerLink->getService()->getDefaultView($currentUser, $gridName);
         }
 
         return $this->defaultGridView;
@@ -212,6 +223,10 @@ class GridViewsExtension extends AbstractExtension
             if ($defaultGridView) {
                 $this->getParameters()->mergeKey('_filter', $defaultGridView->getFiltersData());
                 $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
+                $this->getParameters()->mergeKey(AppearanceExtension::APPEARANCE_ROOT_PARAM, [
+                    AppearanceExtension::APPEARANCE_TYPE_PARAM => $defaultGridView->getAppearanceTypeName(),
+                    AppearanceExtension::APPEARANCE_DATA_PARAM => $defaultGridView->getAppearanceData()
+                ]);
                 $filtersState = array_merge(
                     $defaultGridView->getFiltersData(),
                     $data->offsetGetByPath('[state][filters]', [])
@@ -254,5 +269,18 @@ class GridViewsExtension extends AbstractExtension
         }
 
         parent::setParameters($parameters);
+    }
+
+    /**
+     * @return User
+     */
+    protected function getCurrentUser()
+    {
+        $user = $this->securityFacade->getLoggedUser();
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        return null;
     }
 }

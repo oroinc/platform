@@ -4,9 +4,20 @@
 {% set entityId = entity.id %}
 
 {% block navButtons %}
-    {% set html = UI.saveAndCloseButton() %}
+    {% set html = UI.saveAndCloseButton({
+        'route': 'oro_system_calendar_view',
+        'params': {'id': '$id'}
+    }) %}
+    {% if resource_granted('oro_calendar_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_system_calendar_create'
+        }) %}
+    {% endif %}
     {% if resource_granted('oro_public_calendar_management') or resource_granted('oro_system_calendar_update') %}
-        {% set html = html ~ UI.saveAndStayButton() %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_system_calendar_update',
+            'params': {'id': '$id'}
+        }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
     {{ UI.cancelButton(path('oro_system_calendar_index')) }}

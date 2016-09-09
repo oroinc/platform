@@ -95,7 +95,7 @@ define(function(require) {
             }
 
             // clear autocomplete
-            $(e.target).select2('val', '');
+            $(e.target).inputWidget('val', '');
         },
 
         /**

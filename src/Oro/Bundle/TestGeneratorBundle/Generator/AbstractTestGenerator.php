@@ -22,6 +22,11 @@ abstract class AbstractTestGenerator
     protected $usedClasses;
 
     /**
+     * @var float
+     */
+    protected $phpVersion;
+
+    /**
      * @param \Twig_Environment $twig
      * @param KernelInterface $kernelInterface
      */
@@ -32,6 +37,25 @@ abstract class AbstractTestGenerator
         $this->twig = $twig;
         $this->kernel = $kernelInterface;
         $this->usedClasses = [];
+    }
+
+    /**
+     * @return float
+     */
+    public function getPhpVersion()
+    {
+        return $this->phpVersion;
+    }
+
+    /**
+     * @param $phpVersion
+     * @return $this
+     */
+    public function setPhpVersion($phpVersion)
+    {
+        $this->phpVersion = $phpVersion;
+
+        return $this;
     }
 
     /**

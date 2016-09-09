@@ -12,8 +12,6 @@ class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
     public function testEmptyIterator()
     {
         $context = new Context();
-        $context->setAction('action1');
-
         $processors = [];
 
         $iterator = new ProcessorIterator(
@@ -32,13 +30,9 @@ class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
     public function testProcessorsForKnownAction()
     {
         $context = new Context();
-        $context->setAction('action1');
-
         $processors = [
-            'action1' => [
-                ['processor' => 'processor1', 'attributes' => []],
-                ['processor' => 'processor2', 'attributes' => []]
-            ]
+            ['processor' => 'processor1', 'attributes' => []],
+            ['processor' => 'processor2', 'attributes' => []]
         ];
 
         $iterator = new ProcessorIterator(
@@ -57,41 +51,13 @@ class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessorsForUnknownAction()
-    {
-        $context = new Context();
-        $context->setAction('unknown_action');
-
-        $processors = [
-            'action1' => [
-                ['processor' => 'processor1', 'attributes' => []]
-            ]
-        ];
-
-        $iterator = new ProcessorIterator(
-            $processors,
-            $context,
-            new ChainApplicableChecker(),
-            $this->getProcessorFactory()
-        );
-
-        $this->assertProcessors(
-            [],
-            $iterator
-        );
-    }
-
     public function testUnknownProcessor()
     {
         $context = new Context();
-        $context->setAction('action1');
-
         $processors = [
-            'action1' => [
-                ['processor' => 'processor1', 'attributes' => []],
-                ['processor' => 'processor2', 'attributes' => []],
-                ['processor' => 'processor3', 'attributes' => []]
-            ]
+            ['processor' => 'processor1', 'attributes' => []],
+            ['processor' => 'processor2', 'attributes' => []],
+            ['processor' => 'processor3', 'attributes' => []]
         ];
 
         $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
@@ -159,15 +125,13 @@ class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $context->setAction('action1');
 
         $processors = [
-            'action1' => [
-                [
-                    'processor'  => 'processor1',
-                    'attributes' => ['group' => 'group1', 'attr1' => 'val1']
-                ],
-                [
-                    'processor'  => 'processor2',
-                    'attributes' => ['group' => 'group2', 'attr1' => 'val1']
-                ]
+            [
+                'processor'  => 'processor1',
+                'attributes' => ['group' => 'group1', 'attr1' => 'val1']
+            ],
+            [
+                'processor'  => 'processor2',
+                'attributes' => ['group' => 'group2', 'attr1' => 'val1']
             ]
         ];
 

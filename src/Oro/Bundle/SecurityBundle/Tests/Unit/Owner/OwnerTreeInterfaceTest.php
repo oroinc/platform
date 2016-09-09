@@ -54,17 +54,6 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['bu2', 'bu3'], $tree->getOrganizationBusinessUnitIds('org'));
     }
 
-    public function testAddLocalEntityShouldSetBusinessUnitUserIds()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addBasicEntity('user1', 'bu');
-        $tree->addBasicEntity('user2', 'bu');
-
-        $tree->addLocalEntity('bu', null);
-        $this->assertEquals(['user1', 'user2'], $tree->getBusinessUnitUserIds('bu'));
-    }
-
     public function testAddLocalEntityShouldSetUserOwningOrganizationId()
     {
         $tree = new OwnerTree();
@@ -119,19 +108,6 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $tree->getUserBusinessUnitIds('user'));
     }
 
-    public function testAddUserShouldSetBusinessUnitUserIds()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addLocalEntity('bu', null);
-
-        $tree->addBasicEntity('user', 'bu');
-        $this->assertEquals(['user'], $tree->getBusinessUnitUserIds('bu'));
-
-        $tree->addBasicEntity('user1', 'bu');
-        $this->assertEquals(['user', 'user1'], $tree->getBusinessUnitUserIds('bu'));
-    }
-
     public function testAddUserShouldNotSetUserOrganizationIds()
     {
         $tree = new OwnerTree();
@@ -170,16 +146,6 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
 
         $tree->addBasicEntity('user', 'bu');
         $this->assertNull($tree->getUserOrganizationId('user'));
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testAddUserBusinessUnitShouldThrowExceptionIfUserDoesNotSet()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addLocalEntityToBasic('user', 'org1', null);
     }
 
     public function testAddUserBusinessUnitShouldNotSetUserBusinessUnitIdsIfBusinessUnitIdIsNull()
@@ -303,9 +269,9 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
             ],
             '1: [11, 12] reverse' => [
                 [
+                    ['1', null],
                     ['12', '1'],
                     ['11', '1'],
-                    ['1', null],
                 ],
                 [
                     '1' => ['12', '11'],
@@ -317,11 +283,11 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
                 [
                     ['1', null],
                     ['11', '1'],
-                    ['111', '11'],
                     ['12', '1'],
+                    ['111', '11'],
                 ],
                 [
-                    '1' => ['11', '12', '111'],
+                    '1' => ['11', '111', '12'],
                     '11' => ['111'],
                     '111' => [],
                     '12' => [],
@@ -340,7 +306,7 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
                     ['1221', '122'],
                 ],
                 [
-                    '1' => ['11', '12', '111', '121', '122', '1111', '1112',   '1221'],
+                    '1' => ['11', '111', '1111', '1112', '12', '121', '122', '1221'],
                     '11' => ['111', '1111', '1112'],
                     '111' => ['1111', '1112'],
                     '1111' => [],

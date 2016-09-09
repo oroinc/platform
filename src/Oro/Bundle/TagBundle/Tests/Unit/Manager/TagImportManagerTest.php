@@ -81,7 +81,7 @@ class TagImportManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     'username' => 'admin',
                 ],
-                null,
+                [],
             ],
             'data with "tags" field' => [
                 [

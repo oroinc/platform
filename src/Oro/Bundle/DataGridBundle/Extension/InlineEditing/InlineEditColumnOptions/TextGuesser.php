@@ -25,13 +25,13 @@ class TextGuesser implements GuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column)
+    public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
-        if ($metadata->hasField($columnName) && !$metadata->hasAssociation($columnName)) {
+        if ($isEnabledInline && $metadata->hasField($columnName) && !$metadata->hasAssociation($columnName)) {
             $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
         }
 

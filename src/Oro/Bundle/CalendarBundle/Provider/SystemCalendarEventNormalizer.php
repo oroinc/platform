@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 
@@ -13,10 +14,14 @@ class SystemCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     /**
      * @param ReminderManager $reminderManager
      * @param SecurityFacade  $securityFacade
+     * @param AttendeeManager $attendeeManager
      */
-    public function __construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)
-    {
-        parent::__construct($reminderManager);
+    public function __construct(
+        ReminderManager $reminderManager,
+        SecurityFacade $securityFacade,
+        AttendeeManager $attendeeManager
+    ) {
+        parent::__construct($reminderManager, $attendeeManager);
         $this->securityFacade = $securityFacade;
     }
 

@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="user_table")
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id
@@ -43,6 +43,12 @@ class User
      * @ORM\OneToMany(targetEntity="Product", mappedBy="owner")
      */
     protected $products;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
+     **/
+    protected $owner;
 
     public function __construct()
     {
@@ -107,6 +113,14 @@ class User
     }
 
     /**
+     * @param Group[]|Collection $groups
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+    }
+
+    /**
      * @param Group $group
      */
     public function addGroup(Group $group)
@@ -154,6 +168,22 @@ class User
             $this->products->removeElement($product);
             $product->setOwner(null);
         }
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param User|null $owner
+     */
+    public function setOwner(User $owner = null)
+    {
+        $this->owner = $owner;
     }
 
     /**

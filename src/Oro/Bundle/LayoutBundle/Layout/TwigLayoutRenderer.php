@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout;
 
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-
 use Oro\Component\Layout\LayoutRenderer;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 
 class TwigLayoutRenderer extends LayoutRenderer
 {

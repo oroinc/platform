@@ -1,6 +1,5 @@
 <?php
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 return array(
@@ -11,6 +10,10 @@ return array(
         'start_step' => 'first_step',
         'entity_attribute' => 'my_entity',
         'steps_display_ordered' => true,
+        'priority' => 1,
+        'defaults' => [
+            'active' => true,
+        ],
         'steps' => array(
             'first_step' => array(
                 'label' => 'First Step',
@@ -75,13 +78,24 @@ return array(
                         )
                     )
                 ),
+                'schedule' => [
+                    'cron' => '1 * * * *',
+                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')",
+                    'check_conditions_before_job_creation' => true,
+                ]
             )
         ),
         'transition_definitions' => array(
             'first_transition_definition' => array(
-                'pre_conditions' => array(
-                    '@true' => null
+                'preactions' => array(
+                    array(
+                        '@custom_action' => null
+                    )
                 ),
+                'preconditions' => [
+                    '@true' => null,
+                    '@condition1' => null,
+                ],
                 'conditions' => array(
                     '@and' => array(
                         '@true' => null,
@@ -97,19 +111,24 @@ return array(
                         'message' => 'Fail upper level'
                     )
                 ),
-                'post_actions' => array(
-                    array(
-                        '@custom_post_action' => null
-
-                    )
-                )
+                'actions' => [
+                    ['@custom_action2' => null],
+                    ['@custom_action' => null],
+                ],
             )
         ),
+        'entity_restrictions' => array(),
+        'exclusive_active_groups' => ['active_group1'],
+        'exclusive_record_groups' => ['record_group1'],
     ),
     'second_workflow' => array(
         'label' => 'Second Workflow',
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
+        'priority' => 0,
+        'defaults' => [
+            'active' => false,
+        ],
         'steps' => array(
             'second_step' => array(
                 'label' => 'Second Step',
@@ -145,13 +164,17 @@ return array(
         ),
         'transition_definitions' => array(
             'second_transition_definition' => array(
-                'pre_conditions' => array(),
+                'preactions' => array(),
+                'preconditions' => array(),
                 'conditions' => array(),
-                'post_actions' => array()
+                'actions' => array()
             )
         ),
         'is_system' => false,
         'entity_attribute' => 'entity',
         'steps_display_ordered' => false,
+        'entity_restrictions' => array(),
+        'exclusive_active_groups' => [],
+        'exclusive_record_groups' => [],
     )
 );

@@ -151,17 +151,7 @@ class EmbeddedFormController extends Controller
                 $this->get('translator')->trans('oro.embeddedform.controller.saved_message')
             );
 
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                [
-                    'route' => 'oro_embedded_form_update',
-                    'parameters' => ['id' => $entity->getId()],
-                ],
-                [
-                    'route' => 'oro_embedded_form_view',
-                    'parameters' => ['id' => $entity->getId()],
-                ]
-            );
-
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         $formManager = $this->getFormManager();

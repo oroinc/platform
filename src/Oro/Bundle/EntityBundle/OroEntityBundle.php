@@ -19,6 +19,7 @@ use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\CustomGridFieldValidatorCompilerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
 
 class OroEntityBundle extends Bundle
 {
@@ -54,6 +55,7 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new QueryHintResolverPass());
         $container->addCompilerPass(new EntityFieldHandlerPass());
         $container->addCompilerPass(new CustomGridFieldValidatorCompilerPass());
+        $container->addCompilerPass(new DataCollectorCompilerPass());
 
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new GeneratedValueStrategyListenerPass());

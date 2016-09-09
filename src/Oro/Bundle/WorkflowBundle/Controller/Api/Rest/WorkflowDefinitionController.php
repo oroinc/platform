@@ -3,17 +3,18 @@
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
+
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 
 /**
  * @Rest\NamePrefix("oro_api_workflow_definition_")
@@ -67,15 +68,7 @@ class WorkflowDefinitionController extends FOSRestController
             /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
             $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
             $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration());
-            $workflowDefinition->import($builtDefinition);
-
-            /** @var WorkflowAssembler $workflowAssembler */
-            $workflowAssembler = $this->get('oro_workflow.workflow_assembler');
-            $workflowAssembler->assemble($workflowDefinition);
-
-            $entityManager = $this->getEntityManager();
-            $entityManager->persist($workflowDefinition);
-            $entityManager->flush($workflowDefinition);
+            $this->getHandler()->updateWorkflowDefinition($workflowDefinition, $builtDefinition);
         } catch (\Exception $exception) {
             return $this->handleView(
                 $this->view(
@@ -91,6 +84,8 @@ class WorkflowDefinitionController extends FOSRestController
     /**
      * Create new workflow definition
      *
+     * @param WorkflowDefinition $workflowDefinition
+     *
      * @Rest\Post(
      *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
      *      defaults={"version"="latest", "_format"="json", "workflowDefinition"=null}
@@ -100,21 +95,12 @@ class WorkflowDefinitionController extends FOSRestController
      *      resource=true
      * )
      * @AclAncestor("oro_workflow_definition_create")
+     * @return Response
      */
     public function postAction(WorkflowDefinition $workflowDefinition = null)
     {
         if (!$workflowDefinition) {
             $workflowDefinition = new WorkflowDefinition();
-            $configuration = $this->getConfiguration();
-            if (!empty($configuration['name'])) {
-                $existingDefinition = $this->getEntityManager()->find(
-                    'OroWorkflowBundle:WorkflowDefinition',
-                    $configuration['name']
-                );
-                if ($existingDefinition) {
-                    $workflowDefinition = $existingDefinition;
-                }
-            }
         }
 
         return $this->putAction($workflowDefinition);
@@ -147,19 +133,10 @@ class WorkflowDefinitionController extends FOSRestController
         if ($workflowDefinition->isSystem()) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         } else {
-            $entityManager = $this->getEntityManager();
-            $entityManager->remove($workflowDefinition);
-            $entityManager->flush();
+            $this->getHandler()->deleteWorkflowDefinition($workflowDefinition);
+
             return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
         }
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->getDoctrine()->getManagerForClass('OroWorkflowBundle:WorkflowDefinition');
     }
 
     /**
@@ -168,5 +145,13 @@ class WorkflowDefinitionController extends FOSRestController
     protected function getConfiguration()
     {
         return $this->getRequest()->request->all();
+    }
+
+    /**
+     * @return WorkflowDefinitionHandler
+     */
+    protected function getHandler()
+    {
+        return $this->get('oro_workflow.handler.workflow_definition');
     }
 }

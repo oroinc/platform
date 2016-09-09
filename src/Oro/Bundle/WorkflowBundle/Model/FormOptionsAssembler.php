@@ -93,9 +93,9 @@ class FormOptionsAssembler extends BaseAbstractAssembler
             $options['attribute_default_values'] = $this->passConfiguration($value);
         }
 
-        if (!empty($options['init_actions'])) {
-            $options['init_actions'] =
-                $this->actionFactory->create(ConfigurableAction::ALIAS, $options['init_actions']);
+        if (!empty($options['form_init'])) {
+            $options['form_init'] =
+                $this->actionFactory->create(ConfigurableAction::ALIAS, $options['form_init']);
         }
 
         return $options;

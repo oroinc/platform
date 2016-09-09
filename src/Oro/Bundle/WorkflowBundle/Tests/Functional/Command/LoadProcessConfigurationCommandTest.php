@@ -4,12 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
-use Symfony\Component\Console\Tester\CommandTester;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand;
 
 /**
  * @dbIsolation
@@ -71,9 +69,16 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         return [
             [
                 'expectedMessages' => [
-                    'Loading process definitions...',
-                    'Loading process triggers...',
-                    'Loading cron schedules for process triggers...'
+                    '"test_definition" - created',
+                    '"another_definition" - created',
+                    'Process definitions configuration updates are stored into database',
+                    'test_definition [update] - created',
+                    'process trigger: test_definition [create] - created',
+                    'process trigger: test_definition [delete] - created',
+                    'process trigger: test_definition [cron:*/1 * * * *] - created',
+                    'process triggers modifications stored in DB',
+                    'process trigger cron schedule [*/1 * * * *]',
+                    'process trigger schedule modification persisted.',
                 ],
                 'expectedDefinitions' => [
                     'test_definition',

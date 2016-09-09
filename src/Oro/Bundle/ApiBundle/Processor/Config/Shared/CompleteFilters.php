@@ -37,7 +37,8 @@ class CompleteFilters extends CompleteSection
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         /** @var FiltersConfig $section */
-        $this->completeFieldFilters($section, $metadata, $definition);
+        $this->completePreConfiguredFieldFilters($section, $metadata, $definition);
+        $this->completeIndexedFieldFilters($section, $metadata, $definition);
         $this->completeAssociationFilters($section, $metadata, $definition);
     }
 
@@ -46,7 +47,42 @@ class CompleteFilters extends CompleteSection
      * @param ClassMetadata          $metadata
      * @param EntityDefinitionConfig $definition
      */
-    protected function completeFieldFilters(
+    protected function completePreConfiguredFieldFilters(
+        FiltersConfig $filters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
+        $filtersFields = $filters->getFields();
+        foreach ($filtersFields as $fieldName => $filter) {
+            $propertyPath = $filter->getPropertyPath();
+            if (!$propertyPath) {
+                $field = $definition->getField($fieldName);
+                if ($field) {
+                    $propertyPath = $field->getPropertyPath();
+                }
+            }
+            if (!$propertyPath) {
+                $propertyPath = $fieldName;
+            }
+            if (!$metadata->hasField($propertyPath)) {
+                continue;
+            }
+
+            if (!$filter->hasDataType()) {
+                $filter->setDataType($metadata->getTypeOfField($propertyPath));
+            }
+            if (!$filter->hasArrayAllowed()) {
+                $filter->setArrayAllowed();
+            }
+        }
+    }
+
+    /**
+     * @param FiltersConfig          $filters
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function completeIndexedFieldFilters(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition

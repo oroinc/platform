@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
-use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
@@ -13,11 +12,13 @@ use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 /**
@@ -49,18 +50,34 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
      */
     protected function saveConfig(ConfigContext $context, array $config)
     {
-        $targetAction = $context->getTargetAction();
-        if ($targetAction && !empty($config[ActionsConfigExtra::NAME][$targetAction])) {
-            $actionConfig = $config[ActionsConfigExtra::NAME][$targetAction];
-            if (array_key_exists(ActionConfig::STATUS_CODES, $actionConfig)
-                && $context->hasExtra(DescriptionsConfigExtra::NAME)
-            ) {
-                $config[ActionConfig::STATUS_CODES] = $this->loadStatusCodes(
-                    $actionConfig[ActionConfig::STATUS_CODES]
+        $action = $context->getTargetAction();
+        if ($action) {
+            if (!empty($config[ConfigUtil::ACTIONS][$action])) {
+                $config = $this->mergeActionConfig(
+                    $config,
+                    $config[ConfigUtil::ACTIONS][$action],
+                    $context
                 );
             }
-            unset($actionConfig[ActionConfig::STATUS_CODES]);
-            $config = $this->mergeActionConfig($config, $actionConfig);
+            $association = $context->getAssociationName();
+            if ($association) {
+                $parentConfig = $this->loadConfig($context->getParentClassName(), $context->getVersion());
+                if (!empty($parentConfig[ConfigUtil::SUBRESOURCES][$association])) {
+                    $subresourceConfig = $parentConfig[ConfigUtil::SUBRESOURCES][$association];
+                    if (!empty($subresourceConfig[ConfigUtil::ACTIONS][$action])) {
+                        $config = $this->mergeActionConfig(
+                            $config,
+                            $subresourceConfig[ConfigUtil::ACTIONS][$action],
+                            $context
+                        );
+                    }
+                    if ($context->hasExtra(FiltersConfigExtra::NAME)
+                        && !empty($subresourceConfig[ConfigUtil::FILTERS])
+                    ) {
+                        $config = $this->mergeFiltersConfig($config, $subresourceConfig[ConfigUtil::FILTERS]);
+                    }
+                }
+            }
         }
 
         parent::saveConfig($context, $config);
@@ -79,13 +96,24 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     }
 
     /**
-     * @param array $config
-     * @param array $actionConfig
+     * @param array         $config
+     * @param array         $actionConfig
+     * @param ConfigContext $context
      *
      * @return array
      */
-    protected function mergeActionConfig(array $config, array $actionConfig)
+    protected function mergeActionConfig(array $config, array $actionConfig, ConfigContext $context)
     {
+        if (!empty($actionConfig[ActionConfig::STATUS_CODES])
+            && $context->hasExtra(DescriptionsConfigExtra::NAME)
+        ) {
+            $config = $this->mergeStatusCodes(
+                $config,
+                $this->loadStatusCodes($actionConfig[ActionConfig::STATUS_CODES])
+            );
+        }
+        unset($actionConfig[ActionConfig::STATUS_CODES]);
+
         unset($actionConfig[ActionConfig::EXCLUDE]);
         $actionFields = null;
         if (array_key_exists(ActionConfig::FIELDS, $actionConfig)) {
@@ -97,6 +125,28 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
             $config[EntityDefinitionConfig::FIELDS] = !empty($config[EntityDefinitionConfig::FIELDS])
                 ? $this->mergeActionFields($config[EntityDefinitionConfig::FIELDS], $actionFields)
                 : $actionFields;
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param array             $config
+     * @param StatusCodesConfig $statusCodes
+     *
+     * @return array
+     */
+    protected function mergeStatusCodes(array $config, StatusCodesConfig $statusCodes)
+    {
+        if (!array_key_exists(ActionConfig::STATUS_CODES, $config)) {
+            $config[ActionConfig::STATUS_CODES] = $statusCodes;
+        } else {
+            /** @var StatusCodesConfig $existingStatusCodes */
+            $existingStatusCodes = $config[ActionConfig::STATUS_CODES];
+            $codes = $statusCodes->getCodes();
+            foreach ($codes as $code => $statusCode) {
+                $existingStatusCodes->addCode($code, $statusCode);
+            }
         }
 
         return $config;
@@ -121,6 +171,30 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
         }
 
         return $fields;
+    }
+
+    /**
+     * @param array $config
+     * @param array $filtersConfig
+     *
+     * @return array
+     */
+    protected function mergeFiltersConfig(array $config, array $filtersConfig)
+    {
+        if (ConfigUtil::isExcludeAll($filtersConfig) || !array_key_exists(ConfigUtil::FILTERS, $config)) {
+            $config[ConfigUtil::FILTERS] = $filtersConfig;
+        } elseif (!empty($filtersConfig[ConfigUtil::FIELDS])) {
+            if (!array_key_exists(ConfigUtil::FIELDS, $config[ConfigUtil::FILTERS])) {
+                $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS] = $filtersConfig[ConfigUtil::FIELDS];
+            } else {
+                $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS] = array_merge(
+                    $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS],
+                    $filtersConfig[ConfigUtil::FIELDS]
+                );
+            }
+        }
+
+        return $config;
     }
 
     /**

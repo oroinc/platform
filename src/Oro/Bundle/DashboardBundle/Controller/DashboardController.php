@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -102,6 +103,10 @@ class DashboardController extends Controller
      * @Route("/configure/{id}", name="oro_dashboard_configure", requirements={"id"="\d+"})
      * @Method({"GET", "POST"})
      * @Template("OroDashboardBundle:Dashboard:dialog/configure.html.twig")
+     *
+     * @param Request $request
+     * @param Widget $widget
+     * @return array
      */
     public function configureAction(Request $request, Widget $widget)
     {
@@ -138,6 +143,9 @@ class DashboardController extends Controller
      * )
      *
      * @Template()
+     *
+     * @param Dashboard $dashboard
+     * @return array
      */
     public function updateAction(Dashboard $dashboard)
     {
@@ -165,7 +173,7 @@ class DashboardController extends Controller
 
     /**
      * @param DashboardModel $dashboardModel
-     * @return mixed
+     * @return array
      */
     protected function update(DashboardModel $dashboardModel)
     {
@@ -186,23 +194,7 @@ class DashboardController extends Controller
                     $this->get('translator')->trans('oro.dashboard.saved_message')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    [
-                        'route'      => 'oro_dashboard_update',
-                        'parameters' => [
-                            'id'                      => $dashboardModel->getId(),
-                            '_enableContentProviders' => 'mainMenu'
-                        ]
-                    ],
-                    [
-                        'route'      => 'oro_dashboard_view',
-                        'parameters' => [
-                            'id'                      => $dashboardModel->getId(),
-                            'change_dashboard'        => true,
-                            '_enableContentProviders' => 'mainMenu'
-                        ]
-                    ]
-                );
+                return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
             }
         }
 
@@ -215,6 +207,11 @@ class DashboardController extends Controller
      *      name="oro_dashboard_widget",
      *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
      * )
+     *
+     * @param string $widget
+     * @param string $bundle
+     * @param string $name
+     * @return Response
      */
     public function widgetAction($widget, $bundle, $name)
     {
@@ -230,6 +227,11 @@ class DashboardController extends Controller
      *      name="oro_dashboard_itemized_widget",
      *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
      * )
+     *
+     * @param string $widget
+     * @param string $bundle
+     * @param string $name
+     * @return Response
      */
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
@@ -255,6 +257,11 @@ class DashboardController extends Controller
      *      name="oro_dashboard_itemized_data_widget",
      *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
      * )
+     *
+     * @param string $widget
+     * @param string $bundle
+     * @param string $name
+     * @return Response
      */
     public function itemizedDataWidgetAction($widget, $bundle, $name)
     {

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CronBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -10,7 +12,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -32,6 +33,8 @@ class JobController extends Controller
      * @Route("/view/{id}", name="oro_cron_job_view", requirements={"id"="\d+"})
      * @Template
      * @AclAncestor("oro_jobs")
+     * @param Job $job
+     * @return array
      */
     public function viewAction(Job $job)
     {
@@ -56,8 +59,10 @@ class JobController extends Controller
     /**
      * @Route("/run-daemon", name="oro_cron_job_run_daemon")
      * @AclAncestor("oro_jobs")
+     * @param Request $request
+     * @return RedirectResponse|Response
      */
-    public function runDaemonAction()
+    public function runDaemonAction(Request $request)
     {
         $daemon     = $this->get('oro_cron.job_daemon');
         $translator = $this->get('translator');
@@ -74,7 +79,7 @@ class JobController extends Controller
             $ret['message'] = $e->getMessage();
         }
 
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest()) {
             return new Response(json_encode($ret));
         } else {
             if ($ret['error']) {
@@ -93,8 +98,10 @@ class JobController extends Controller
     /**
      * @Route("/stop-daemon", name="oro_cron_job_stop_daemon")
      * @AclAncestor("oro_jobs")
+     * @param Request $request
+     * @return RedirectResponse|Response
      */
-    public function stopDaemonAction()
+    public function stopDaemonAction(Request $request)
     {
         $daemon     = $this->get('oro_cron.job_daemon');
         $translator = $this->get('translator');
@@ -111,7 +118,7 @@ class JobController extends Controller
             $ret['message'] = $e->getMessage();
         }
 
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest()) {
             return new Response(json_encode($ret));
         } else {
             $this->get('session')->getFlashBag()->add($ret['error'] ? 'error' : 'success', $ret['message']);
@@ -123,10 +130,12 @@ class JobController extends Controller
     /**
      * @Route("/status", name="oro_cron_job_status")
      * @AclAncestor("oro_jobs")
+     * @param Request $request
+     * @return RedirectResponse|Response
      */
-    public function statusAction()
+    public function statusAction(Request $request)
     {
-        return $this->getRequest()->isXmlHttpRequest()
+        return $request->isXmlHttpRequest()
             ? new Response($this->get('oro_cron.job_daemon')->getPid())
             : $this->redirect($this->generateUrl('oro_cron_job_index'));
     }

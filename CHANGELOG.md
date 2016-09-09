@@ -1,3 +1,10 @@
+CHANGELOG for 1.10.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.10.0 versions.
+  * The application has been upgraded to Symfony 2.8 (Symfony 2.8.10 doesn't supported because of [Symfony issue](https://github.com/symfony/symfony/issues/19840))
+  * Added support php 7
+  * Changed minimum required php version to 5.5.9
+
 CHANGELOG for 1.9.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.9.0 versions.
@@ -10,6 +17,8 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Apply range filters for numerical fields in grids
  * Manage field tooltips from the UI
  * Override calendar-view.js in customizations
+ * Profiler of duplicated queries
+ * Importing layout updates
 
 CHANGELOG for 1.8.0
 ===================

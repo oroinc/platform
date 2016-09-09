@@ -3,9 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -67,6 +64,13 @@ class SetHttpResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
                     $this->getError(Response::HTTP_CONFLICT)
                 ],
                 Response::HTTP_BAD_REQUEST
+            ],
+            'several errors with the same status code from one group' => [
+                [
+                    $this->getError(Response::HTTP_CONFLICT),
+                    $this->getError(Response::HTTP_CONFLICT)
+                ],
+                Response::HTTP_CONFLICT
             ],
             'several errors from different groups (one error in a group with higher severity)' => [
                 [

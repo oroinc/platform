@@ -16,8 +16,6 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
  */
 class HandleIncludeFilter implements ProcessorInterface
 {
-    const FILTER_KEY = 'include';
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -41,7 +39,7 @@ class HandleIncludeFilter implements ProcessorInterface
             return;
         }
 
-        $filterValue = $context->getFilterValues()->get(self::FILTER_KEY);
+        $filterValue = $context->getFilterValues()->get(AddIncludeFilter::FILTER_KEY);
         if (null === $filterValue) {
             // expanding of related entities was not requested
             return;

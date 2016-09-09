@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -12,6 +13,7 @@ use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
+use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -68,9 +70,13 @@ class FieldTypeTest extends TypeTestCase
         ],
     ];
 
+    protected $expectedChoicesView;
+
     protected function setUp()
     {
         parent::setUp();
+
+        $this->expectedChoicesView = $this->prepareExpectedChoicesView($this->defaultFieldTypeChoices);
 
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -79,6 +85,7 @@ class FieldTypeTest extends TypeTestCase
         $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(
@@ -109,9 +116,37 @@ class FieldTypeTest extends TypeTestCase
         );
     }
 
+    /**
+     * @param array $defaultFieldTypeChoices
+     *
+     * @return array
+     */
+    protected function prepareExpectedChoicesView($defaultFieldTypeChoices)
+    {
+        $choiceCounter = 0;
+        $expectedChoicesView = [];
+        foreach ($defaultFieldTypeChoices as $fieldGroup => $fields) {
+            $preparedFields = [];
+            foreach ($fields as $fieldValue => $fieldLabel) {
+                $preparedFields[$choiceCounter++] = new ChoiceView($fieldValue, $fieldValue, $fieldLabel);
+            }
+            $expectedChoicesView[$fieldGroup] = new ChoiceGroupView(
+                $fieldGroup,
+                $preparedFields
+            );
+        }
+        return $expectedChoicesView;
+    }
+
     protected function tearDown()
     {
-        unset($this->type, $this->configManager, $this->translator, $this->fieldTypeProvider);
+        unset(
+            $this->type,
+            $this->configManager,
+            $this->translator,
+            $this->fieldTypeProvider,
+            $this->expectedChoicesView
+        );
     }
 
     protected function getExtensions()
@@ -164,9 +199,9 @@ class FieldTypeTest extends TypeTestCase
 
         $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
 
-        $this->assertSame(
-            $this->defaultFieldTypeChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
+        $this->assertEquals(
+            $this->expectedChoicesView,
+            $form->createView()->offsetGet('type')->vars['choices']
         );
 
         $form->submit(['fieldName' => 'name', 'type' => 'string']);
@@ -179,9 +214,9 @@ class FieldTypeTest extends TypeTestCase
 
         $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
 
-        $this->assertSame(
-            $this->defaultFieldTypeChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
+        $this->assertEquals(
+            $this->expectedChoicesView,
+            $form->createView()->offsetGet('type')->vars['choices']
         );
 
         $form->submit(['fieldName' => 'field1', 'type' => 'string']);
@@ -207,9 +242,12 @@ class FieldTypeTest extends TypeTestCase
                     'Reuse "Rel One-To-Many" of Source Entity',
             ]
         );
-        $this->assertSame(
-            $expectedChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
+
+        $expectedChoicesView = $this->prepareExpectedChoicesView($expectedChoices);
+
+        $this->assertEquals(
+            $expectedChoicesView,
+            $form->createView()->offsetGet('type')->vars['choices']
         );
 
         $form->submit(['fieldName' => 'field1', 'type' => 'string']);
@@ -373,9 +411,9 @@ class FieldTypeTest extends TypeTestCase
 
         $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
 
-        $this->assertSame(
-            $this->defaultFieldTypeChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
+        $this->assertEquals(
+            $this->expectedChoicesView,
+            $form->createView()->offsetGet('type')->vars['choices']
         );
 
         $form->submit(['fieldName' => 'field1', 'type' => 'string']);
@@ -388,9 +426,9 @@ class FieldTypeTest extends TypeTestCase
 
         $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
 
-        $this->assertSame(
-            $this->defaultFieldTypeChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
+        $this->assertEquals(
+            $this->expectedChoicesView,
+            $form->createView()->offsetGet('type')->vars['choices']
         );
 
         $form->submit(['fieldName' => 'field1', 'type' => 'string']);
@@ -600,9 +638,9 @@ class FieldTypeTest extends TypeTestCase
 
         $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
 
-        $this->assertSame(
-            $this->defaultFieldTypeChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
+        $this->assertEquals(
+            $this->expectedChoicesView,
+            $form->createView()->offsetGet('type')->vars['choices']
         );
 
         $form->submit(['fieldName' => 'field1', 'type' => 'string']);
@@ -628,9 +666,12 @@ class FieldTypeTest extends TypeTestCase
                     'Reuse "Rel One-To-Many" of Source Entity',
             ]
         );
-        $this->assertSame(
-            $expectedChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
+
+        $expectedChoicesView = $this->prepareExpectedChoicesView($expectedChoices);
+
+        $this->assertEquals(
+            $expectedChoicesView,
+            $form->createView()->offsetGet('type')->vars['choices']
         );
 
         $form->submit(['fieldName' => 'field1', 'type' => 'string']);

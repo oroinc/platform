@@ -49,6 +49,8 @@ define(function(require) {
         /** @property */
         enabled: true,
 
+        appearances: null,
+
         /** @property */
         permissions: {
             CREATE: false,
@@ -90,7 +92,7 @@ define(function(require) {
                 throw new TypeError('"viewsCollection" is required');
             }
 
-            _.extend(this, _.pick(options, ['viewsCollection', 'title']));
+            _.extend(this, _.pick(options, ['viewsCollection', 'title', 'appearances']));
 
             this.template = _.template($('#template-datagrid-grid-view').html());
             this.titleTemplate = _.template($('#template-datagrid-grid-view-label').html());
@@ -111,7 +113,9 @@ define(function(require) {
             this.viewsCollection.get(this.DEFAULT_GRID_VIEW_ID).set({
                 filters: options.collection.initialState.filters,
                 sorters: options.collection.initialState.sorters,
-                columns: options.collection.initialState.columns
+                columns: options.collection.initialState.columns,
+                appearanceType: options.collection.initialState.appearanceType,
+                appearanceData: options.collection.initialState.appearanceData
             });
 
             this.viewDirty = !this._isCurrentStateSynchronized();
@@ -210,10 +214,13 @@ define(function(require) {
             var self = this;
 
             model.save({
+                icon: void 0,
                 label: model.get('label'),
                 filters: this.collection.state.filters,
                 sorters: this.collection.state.sorters,
-                columns: this.collection.state.columns
+                columns: this.collection.state.columns,
+                appearanceType: this.collection.state.appearanceType,
+                appearanceData: this.collection.state.appearanceData
             }, {
                 wait: true,
                 success: function() {
@@ -227,7 +234,6 @@ define(function(require) {
          */
         onSaveAs: function(e) {
             var modal = new ViewNameModal();
-
             var self = this;
             modal.on('ok', function(e) {
                 var model = self._createViewModel({
@@ -238,13 +244,17 @@ define(function(require) {
                     filters: self.collection.state.filters,
                     sorters: self.collection.state.sorters,
                     columns: self.collection.state.columns,
+                    appearanceType: self.collection.state.appearanceType,
+                    appearanceData: self.collection.state.appearanceData,
                     editable: self.permissions.EDIT,
                     deletable: self.permissions.DELETE
                 });
                 model.save(null, {
                     wait: true,
                     success: function(model) {
+                        var icon = self._getAppearanceIcon(model.get('appearanceType'));
                         model.set('name', model.get('id'));
+                        model.set('icon', icon);
                         model.unset('id');
                         self.viewsCollection.add(model);
                         self.changeView(model.get('name'));
@@ -267,6 +277,9 @@ define(function(require) {
 
             modal.open();
             $('#gridViewName').focus();
+        },
+        _getAppearanceIcon: function(appearanceType) {
+            return this.appearances ? _.result(_.findWhere(this.appearances, {type: appearanceType}), 'icon') : '';
         },
 
         /**
@@ -377,12 +390,14 @@ define(function(require) {
         /**
          * Prepares choice items for grid view dropdown
          *
-         * @return {Array<{label:{string},value:{*}}>}
+         * @return {Array<{label:{string},icon:{string},value:{*}}>}
          */
         getViewChoices: function() {
+            var showIcons = _.uniq(this.viewsCollection.pluck('icon')).length > 1;
             var choices = this.viewsCollection.map(function(model) {
                 return {
                     label: model.getLabel(),
+                    icon: showIcons ? model.get('icon') : false,
                     value: model.get('name')
                 };
             });
@@ -402,6 +417,7 @@ define(function(require) {
             var self = this;
             var isDefault = 1;
             var defaultModel = this._getCurrentDefaultViewModel();
+            var gridName = this.gridName;
             var currentViewModel = this._getCurrentViewModel();
             var id = currentViewModel.id;
             if (this._isCurrentViewSystem()) {
@@ -412,7 +428,8 @@ define(function(require) {
             return $.post(
                 routing.generate('oro_datagrid_api_rest_gridview_default', {
                     id: id,
-                    default: isDefault
+                    default: isDefault,
+                    gridName: gridName
                 }),
                 {},
                 function(response) {
@@ -734,7 +751,9 @@ define(function(require) {
             return {
                 filters: model.get('filters'),
                 sorters: model.get('sorters'),
-                columns: model.get('columns')
+                columns: model.get('columns'),
+                appearanceType: model.get('appearanceType'),
+                appearanceData: model.get('appearanceData')
             };
         },
 
@@ -747,7 +766,9 @@ define(function(require) {
             return {
                 filters: this.collection.state.filters,
                 sorters: this.collection.state.sorters,
-                columns: this.collection.state.columns
+                columns: this.collection.state.columns,
+                appearanceType: this.collection.state.appearanceType,
+                appearanceData: this.collection.state.appearanceData
             };
         },
 

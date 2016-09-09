@@ -221,4 +221,11 @@ interface AclExtensionInterface
      *   value = access level name
      */
     public function getAccessLevelNames($object, $permissionName = null);
+
+    /**
+     * Returns Field ACL extension
+     *
+     * @return AclExtensionInterface|null
+     */
+    public function getFieldExtension();
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+use Oro\Bundle\UserBundle\DependencyInjection\Compiler\PrivilegeCategoryPass;
 use Oro\Bundle\UserBundle\DependencyInjection\Compiler\EscapeWsseConfigurationPass;
 
 class OroUserBundle extends Bundle
@@ -16,5 +17,6 @@ class OroUserBundle extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new EscapeWsseConfigurationPass());
+        $container->addCompilerPass(new PrivilegeCategoryPass());
     }
 }

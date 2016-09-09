@@ -28,6 +28,10 @@ oro_system_configuration:
             title: oro.email.system_configuration.mailbox_configuration.label
             priority: -10
 
+        user_mailbox:
+            title: oro.user.imap_configuration.label
+            priority: 95
+
         user_bar_settings:
             title: oro.user.user_bar_settings.title
             priority: 100
@@ -110,6 +114,15 @@ oro_system_configuration:
                 tooltip: oro.email.form.tooltip.attachment_sync.preview_limit
                 required: true
 
+        oro_email.user_mailbox:
+            type: oro_user_emailsettings
+            ui_only: true
+            priority: 10
+            options:
+                label: false
+                required: false
+                resettable: false
+
     tree:
         system_configuration:
             platform:
@@ -141,6 +154,28 @@ oro_system_configuration:
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    user_bar_settings:
+                                        children:
+                                            - oro_email.show_recent_emails_in_user_bar
+                            email_configuration:
+                                children:
+                                    signature_configuration:
+                                        children:
+                                            - oro_email.signature
+                                            - oro_email.append_signature
+                                    reply_configuration:
+                                        children:
+                                            - oro_email.default_button_reply
+                                    user_mailbox:
+                                        children:
+                                            - oro_email.user_mailbox
 
     api_tree:
         signature_configuration:

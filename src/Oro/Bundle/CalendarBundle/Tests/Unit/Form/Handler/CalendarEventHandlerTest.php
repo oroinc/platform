@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -61,7 +61,14 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $transformer = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
         $this->entity  = new CalendarEvent();
+
         $this->handler = new CalendarEventHandler(
             $this->form,
             $this->request,
@@ -69,7 +76,8 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             $this->activityManager,
             $this->entityRoutingHelper,
             $this->securityFacade,
-            $this->emailSendProcessor
+            $this->emailSendProcessor,
+            $transformer
         );
     }
 
@@ -86,6 +94,15 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->handler->process($this->entity)
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
+    public function testProcessWithExceptionWithParent()
+    {
+        $this->entity->setParent(new CalendarEvent());
+        $this->handler->process($this->entity);
     }
 
     /**
@@ -140,11 +157,9 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
-        $this->form->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($this->form));
-        $this->form->expects($this->once())
-            ->method('getData');
+        $this->form->expects($this->exactly(2))
+            ->method('has')
+            ->will($this->returnValue(false));
         $this->entityRoutingHelper->expects($this->once())
             ->method('getEntityClassName')
             ->will($this->returnValue(null));
@@ -161,20 +176,79 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider supportedMethods
+     */
+    public function testProcessWithContexts($method)
+    {
+        $context = new User();
+        ReflectionUtil::setId($context, 123);
+
+        $owner = new User();
+        ReflectionUtil::setId($owner, 321);
+
+        $organization = new Organization();
+        ReflectionUtil::setId($organization, 1);
+        $owner->setOrganization($organization);
+
+        $this->request->setMethod($method);
+        $this->form->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+
+        $defaultCalendar = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Calendar')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entity->setCalendar($defaultCalendar);
+
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->will($this->returnValue(true));
+
+        $this->form->expects($this->exactly(2))
+            ->method('has')
+            ->withConsecutive(
+                ['contexts'],
+                ['notifyInvitedUsers']
+            )
+            ->will($this->returnValue(true));
+
+        $defaultCalendar->expects($this->once())
+            ->method('getOwner')
+            ->will($this->returnValue($owner));
+
+        $this->form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue([$context]));
+
+        $this->activityManager->expects($this->once())
+            ->method('setActivityTargets')
+            ->with(
+                $this->identicalTo($this->entity),
+                $this->identicalTo([$context, $owner])
+            );
+
+        $this->activityManager->expects($this->never())
+            ->method('removeActivityTarget');
+        $this->assertTrue(
+            $this->handler->process($this->entity)
+        );
+
+        $this->assertSame($defaultCalendar, $this->entity->getCalendar());
+    }
+
+
+    /**
+     * @dataProvider supportedMethods
      *
      * @expectedException \LogicException
      * @expectedExceptionMessage Both logged in user and organization must be defined.
      */
-    public function testProcessGetRequestWithoutCurrentUser($method)
+    public function testProcessRequestWithoutCurrentUser($method)
     {
         $this->request->setMethod($method);
 
-        $this->form->expects($this->once())
+        $this->form->expects($this->never())
             ->method('submit')
             ->with($this->identicalTo($this->request));
-        $this->form->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(true));
 
         $this->securityFacade->expects($this->once())
             ->method('getLoggedUser')
@@ -250,11 +324,10 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $this->form->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($this->form));
-        $this->form->expects($this->once())
-            ->method('getData');
+        $this->form->expects($this->exactly(2))
+            ->method('has')
+            ->will($this->returnValue(false));
+
         $this->om->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($this->entity));
@@ -313,12 +386,10 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->activityManager->expects($this->once())
             ->method('addActivityTarget')
             ->with($this->identicalTo($this->entity), $this->identicalTo($targetEntity));
+        $this->form->expects($this->exactly(2))
+            ->method('has')
+            ->will($this->returnValue(false));
 
-        $this->form->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($this->form));
-        $this->form->expects($this->once())
-            ->method('getData');
         $this->om->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($this->entity));

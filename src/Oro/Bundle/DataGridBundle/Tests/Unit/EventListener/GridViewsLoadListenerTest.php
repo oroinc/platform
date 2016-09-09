@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
@@ -16,6 +17,8 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
     private $securityFacade;
 
     private $gridViewsLoadListener;
+
+    private $appearanceTypeManager;
 
     public function setUp()
     {
@@ -32,6 +35,10 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
         $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $gridViewManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->registry
@@ -44,26 +51,23 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->will($this->returnValue(true));
 
+        $this->appearanceTypeManager = $this
+            ->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->gridViewsLoadListener = new GridViewsLoadListener(
             $this->registry,
             $this->securityFacade,
             $aclHelper,
-            $translator
+            $translator,
+            $gridViewManager,
+            $this->appearanceTypeManager
         );
     }
 
     public function testListenerShouldAddViewsIntoEvent()
     {
-        $originalViews = [
-            [
-                'name' => 'first',
-                'filters' => [],
-                'sorters' => [],
-                'type' => 'system',
-            ],
-        ];
-        $event = new GridViewsLoadEvent('grid', $originalViews);
-
         $currentUser = new User();
 
         $this->securityFacade
@@ -71,30 +75,42 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getLoggedUser')
             ->will($this->returnValue($currentUser));
 
+
+        $systemView = new View('first');
         $view1 = new GridView();
         $view1->setId(1);
         $view1->setOwner($currentUser);
         $view1->setName('view1');
+        $view1->setAppearanceType(new AppearanceType('grid'));
         $view2 = new GridView();
         $view2->setId(2);
         $view2->setName('view2');
+        $view2->setAppearanceType(new AppearanceType('board'));
         $view2->setOwner($currentUser);
         $gridViews = [
-            $view1,
-            $view2,
+            'system' => [
+                $systemView
+            ],
+            'user' => [$view1, $view2]
         ];
 
-        $this->gridViewRepository
-            ->expects($this->once())
-            ->method('findGridViews')
-            ->will($this->returnValue($gridViews));
+        $event = new GridViewsLoadEvent('grid', $gridViews);
 
         $expectedViews = [
             [
-                'name'    => 'first',
-                'filters' => [],
-                'sorters' => [],
-                'type' => 'system',
+                'name'       => 'first',
+                'label'      => 'first',
+                'type'       => 'system',
+                'filters'    => [],
+                'sorters'    => [],
+                'columns'    => [],
+                'editable'   => false,
+                'deletable'  => false,
+                'is_default' => false,
+                'shared_by'  => null,
+                'appearanceType' => 'grid',
+                'appearanceData' => [],
+                'icon' => ''
             ],
             [
                 'label'     => 'view1',
@@ -106,7 +122,10 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
                 'editable'  => true,
                 'columns'   => [],
                 'is_default' => false,
-                'shared_by'  => null
+                'shared_by'  => null,
+                'appearanceType' => 'grid',
+                'appearanceData' => [],
+                'icon' => ''
             ],
             [
                 'label'     => 'view2',
@@ -118,7 +137,10 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
                 'editable'  => true,
                 'columns'   => [],
                 'is_default' => false,
-                'shared_by'  => null
+                'shared_by'  => null,
+                'appearanceType' => 'board',
+                'appearanceData' => [],
+                'icon' => ''
             ],
         ];
 

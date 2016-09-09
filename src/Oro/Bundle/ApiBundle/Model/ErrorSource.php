@@ -20,7 +20,8 @@ class ErrorSource
      * Creates an instance of ErrorSource class represents
      * the path to a property caused the error.
      *
-     * @param string $propertyPath
+     * @param string $propertyPath The property path.
+     *                             If it contains several elements they should be separated by the point (.)
      *
      * @return ErrorSource
      */
@@ -36,7 +37,8 @@ class ErrorSource
      * Creates an instance of ErrorSource class represents
      * a pointer to a property in the request document caused the error.
      *
-     * @param string $pointer
+     * @param string $pointer The property pointer.
+     *                        If it contains several elements they should be separated by the slash (/)
      *
      * @return ErrorSource
      */
@@ -52,7 +54,7 @@ class ErrorSource
      * Creates an instance of ErrorSource class represents
      * URI query parameter caused the error.
      *
-     * @param string $parameter
+     * @param string $parameter The name of a parameter.
      *
      * @return ErrorSource
      */

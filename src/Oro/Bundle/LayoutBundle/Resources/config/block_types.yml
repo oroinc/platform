@@ -1,4 +1,18 @@
 services:
+    oro_layout.block_type.abstract_configurable:
+        abstract: true
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType
+
+    oro_layout.block_type.abstract_configurable_container:
+        abstract: true
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setParent, ['container']]
+
+    oro_layout.block_type.extension.abstract_configurable:
+        abstract: true
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigurableTypeExtension
+
     oro_layout.block_type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
         tags:
@@ -10,12 +24,17 @@ services:
              - { name: layout.block_type, alias: container }
 
     oro_layout.block_type.root:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RootType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{doctype: {default: ''}}]]
+            - [setName, ['root']]
         tags:
              - { name: layout.block_type, alias: root }
 
     oro_layout.block_type.head:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['head']]
         tags:
              - { name: layout.block_type, alias: head }
 
@@ -24,37 +43,32 @@ services:
         tags:
              - { name: layout.block_type, alias: title }
 
-    oro_layout.block_type.meta:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\MetaType
+    oro_layout.block_type.requires:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{provider_alias: {default: 'oro_requirejs_config_provider'}}]]
+            - [setName, ['requires']]
         tags:
-             - { name: layout.block_type, alias: meta }
-
-    oro_layout.block_type.script:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ScriptType
-        tags:
-             - { name: layout.block_type, alias: script }
-
-    oro_layout.block_type.style:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
-        tags:
-             - { name: layout.block_type, alias: style }
-
-    oro_layout.block_type.input:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\InputType
-        tags:
-             - { name: layout.block_type, alias: input }
+            - { name: layout.block_type, alias: requires }
 
     oro_layout.block_type.body:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\BodyType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['body']]
         tags:
              - { name: layout.block_type, alias: body }
 
     oro_layout.block_type.form:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType
+        tags:
+             - { name: layout.block_type, alias: form }
+
+    oro_layout.block_type.form_fields:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType
         arguments:
             - '@oro_layout.form_layout_builder'
         tags:
-             - { name: layout.block_type, alias: form }
+             - { name: layout.block_type, alias: form_fields }
 
     oro_layout.block_type.form_start:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType
@@ -71,47 +85,209 @@ services:
         tags:
              - { name: layout.block_type, alias: form_field }
 
+    oro_layout.block_type.form_errors:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{form: {required: true}}]]
+            - [setName, ['form_errors']]
+        tags:
+             - { name: layout.block_type, alias: form_errors }
+
     oro_layout.block_type.fieldset:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FieldsetType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{title: {default: ''}}]]
+            - [setName, ['fieldset']]
         tags:
              - { name: layout.block_type, alias: fieldset }
 
     oro_layout.block_type.text:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\TextType
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{escape: {default: true}, text: {required: true}}]]
+            - [setName, ['text']]
         tags:
              - { name: layout.block_type, alias: text }
 
-    oro_layout.block_type.link:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType
-        tags:
-             - { name: layout.block_type, alias: link }
-
     oro_layout.block_type.button:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonType
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'button'}
+                        action: {default: 'none'}
+                        name: ~
+                        value: ~
+                        text: ~
+                        icon: ~
+            - [setName, ['button']]
         tags:
              - { name: layout.block_type, alias: button }
 
     oro_layout.block_type.button_group:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonGroupType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['button_group']]
         tags:
              - { name: layout.block_type, alias: button_group }
 
-    oro_layout.block_type.resource:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ExternalResourceType
-        tags:
-             - { name: layout.block_type, alias: external_resource }
-
     oro_layout.block_type.list:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['list']]
         tags:
              - { name: layout.block_type, alias: list }
 
+    oro_layout.block_type.list_item:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{own_template: {default: true}}]]
+            - [setName, ['list_item']]
+        tags:
+             - { name: layout.block_type, alias: list_item }
+
+    oro_layout.block_type_extension.class_attribute:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension
+        arguments:
+            - '@oro_layout.expression.encoder_registry'
+        tags:
+            - { name: layout.block_type_extension, alias: block, priority: 260 }
+
+    oro_layout.block_type_extension.option_value_bag:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension
+        tags:
+            - { name: layout.block_type_extension, alias: block, priority: 270 }
+
+    oro_layout.block_type.extension.visible:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{visible: {default: true}}]]
+            - [setExtendedType, ['block']]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.extension.hidden:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{hidden: {default: false}}]]
+            - [setExtendedType, ['block']]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.extension.attr_renderer:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{attr_renderer: ~}]]
+            - [setExtendedType, ['block']]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.input:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'text'}
+                        id: {default: null}
+                        name: ~
+                        value: ~
+                        placeholder: ~
+            - [setName, ['input']]
+        tags:
+             - { name: layout.block_type, alias: input }
+
+    oro_layout.block_type.external_resource:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        rel: {required: true}
+                        href: {required: true}
+                        type: ~
+            - [setName, ['external_resource']]
+        tags:
+             - { name: layout.block_type, alias: external_resource }
+
+    oro_layout.block_type.link:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        path: ~
+                        route_name: ~
+                        route_parameters: {default: []}
+                        text: ~
+                        icon: ~
+            - [setName, ['link']]
+        tags:
+             - { name: layout.block_type, alias: link }
+
     oro_layout.block_type.ordered_list:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\OrderedListType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: ~
+                        start: ~
+            - [setName, ['ordered_list']]
         tags:
              - { name: layout.block_type, alias: ordered_list }
 
-    oro_layout.block_type.list_item:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListItemType
+    oro_layout.block_type.meta:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        charset: ~
+                        content: ~
+                        http_equiv: ~
+                        name: ~
+            - [setName, ['meta']]
         tags:
-             - { name: layout.block_type, alias: list_item }
+             - { name: layout.block_type, alias: meta }
+
+    oro_layout.block_type.style:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'text/css'}
+                        content: {default: ''}
+                        src: ~
+                        media: ~
+                        scoped: {default: false}
+                        crossorigin: ~
+            - [setName, ['style']]
+        tags:
+             - { name: layout.block_type, alias: style }
+
+    oro_layout.block_type.script:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'text/javascript'}
+                        content: {default: ''}
+                        src: ~
+                        async: {default: false}
+                        defer: {default: false}
+                        crossorigin: ~
+            - [setName, ['script']]
+        tags:
+             - { name: layout.block_type, alias: script }

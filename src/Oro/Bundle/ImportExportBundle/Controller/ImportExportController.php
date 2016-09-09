@@ -9,9 +9,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
@@ -131,9 +133,9 @@ class ImportExportController extends Controller
      *
      * @return Response
      */
-    public function instantExportAction($processorAlias)
+    public function instantExportAction($processorAlias, Request $request)
     {
-        $jobName = $this->getRequest()->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
+        $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
 
         return $this->getExportHandler()->handleExport(
             $jobName,
@@ -146,6 +148,82 @@ class ImportExportController extends Controller
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
             )
         );
+    }
+
+    /**
+     * @Route("/export/config", name="oro_importexport_export_config")
+     * @AclAncestor("oro_importexport_export")
+     * @Template
+     *
+     * @param Request $request
+     *
+     * @return array|Response
+     */
+    public function configurableExportAction(Request $request)
+    {
+        $entityName = $request->get('entity');
+
+        $exportForm = $this->createForm('oro_importexport_export', null, ['entityName' => $entityName]);
+
+        if ($request->isMethod('POST')) {
+            $exportForm->submit($request);
+
+            if ($exportForm->isValid()) {
+                /** @var ExportData $data */
+                $data = $exportForm->getData();
+
+                return $this->forward(
+                    'OroImportExportBundle:ImportExport:instantExport',
+                    [
+                        'processorAlias' => $data->getProcessorAlias(),
+                        'request' => $request
+                    ]
+                );
+            }
+        }
+
+        return [
+            'entityName' => $entityName,
+            'form' => $exportForm->createView(),
+            'options' => $this->getOptionsFromRequest(),
+            'exportJob' => $request->get('exportJob')
+        ];
+    }
+
+    /**
+     * @Route("/export/template/config", name="oro_importexport_export_template_config")
+     * @AclAncestor("oro_importexport_export")
+     * @Template
+     *
+     * @param Request $request
+     * @return array|Response
+     */
+    public function configurableTemplateExportAction(Request $request)
+    {
+        $entityName = $request->get('entity');
+
+        $exportForm = $this->createForm('oro_importexport_export_template', null, ['entityName' => $entityName]);
+
+        if ($request->isMethod('POST')) {
+            $exportForm->submit($request);
+
+            if ($exportForm->isValid()) {
+                $data = $exportForm->getData();
+
+                $exportTemplateResponse = $this->forward(
+                    'OroImportExportBundle:ImportExport:templateExport',
+                    ['processorAlias' => $data->getProcessorAlias()]
+                );
+
+                return new JsonResponse(['url' => $exportTemplateResponse->getTargetUrl()]);
+            }
+        }
+
+        return [
+            'entityName' => $entityName,
+            'form' => $exportForm->createView(),
+            'options' => $this->getOptionsFromRequest()
+        ];
     }
 
     /**
@@ -186,14 +264,20 @@ class ImportExportController extends Controller
 
     /**
      * @Route("/import_export/error/{jobCode}.log", name="oro_importexport_error_log")
-     * @AclAncestor("oro_importexport")
      *
      * @param string $jobCode
-     *
      * @return Response
+     * @throws AccessDeniedException
      */
     public function errorLogAction($jobCode)
     {
+        $securityFacade = $this->get('oro_security.security_facade');
+        if (!$securityFacade->isGranted('oro_importexport_import') &&
+            !$securityFacade->isGranted('oro_importexport_export')
+        ) {
+            throw new AccessDeniedException('Insufficient permission');
+        }
+
         $jobExecutor = $this->getJobExecutor();
         $errors      = array_merge(
             $jobExecutor->getJobFailureExceptions($jobCode),

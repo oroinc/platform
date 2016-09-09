@@ -50,21 +50,22 @@ class EmailRepository extends EntityRepository
 
     /**
      * Get $limit last emails
+     * todo: BAP-11456 Move method getNewEmails from EmailRepository to EmailUserRepository
      *
      * @param User         $user
      * @param Organization $organization
      * @param int          $limit
      * @param int|null     $folderId
      *
-     * @return mixed
+     * @return array
      */
     public function getNewEmails(User $user, Organization $organization, $limit, $folderId)
     {
-        $qb = $this->createQueryBuilder('e')
-            ->select('e, eu.seen')
-            ->leftJoin('e.emailUsers', 'eu')
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('eu')
+            ->from('OroEmailBundle:EmailUser', 'eu')
+            ->leftJoin('eu.email', 'e')
             ->where($this->getAclWhereCondition($user, $organization))
-            ->groupBy('e, eu.seen')
             ->orderBy('eu.seen', 'ASC')
             ->addOrderBy('e.sentAt', 'DESC')
             ->setParameter('organization', $organization)
@@ -73,8 +74,8 @@ class EmailRepository extends EntityRepository
 
         if ($folderId > 0) {
             $qb->leftJoin('eu.folders', 'f')
-               ->andWhere('f.id = :folderId')
-               ->setParameter('folderId', $folderId);
+                ->andWhere('f.id = :folderId')
+                ->setParameter('folderId', $folderId);
         }
 
         return $qb->getQuery()->getResult();
@@ -91,9 +92,9 @@ class EmailRepository extends EntityRepository
      */
     public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        $qb = $this->createQueryBuilder('e')
-            ->select('COUNT(DISTINCT e)')
-            ->leftJoin('e.emailUsers', 'eu')
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('COUNT(DISTINCT IDENTITY(eu.email))')
+            ->from('OroEmailBundle:EmailUser', 'eu')
             ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
             ->setParameter('organization', $organization)
@@ -107,6 +108,30 @@ class EmailRepository extends EntityRepository
         }
 
         return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Get count new emails per folders
+     *
+     * @param User         $user
+     * @param Organization $organization
+     * @return array
+     */
+    public function getCountNewEmailsPerFolders(User $user, Organization $organization)
+    {
+        $repository = $this->getEntityManager()->getRepository('OroEmailBundle:EmailUser');
+
+        $qb = $repository->createQueryBuilder('eu')
+            ->select('COUNT(DISTINCT IDENTITY(eu.email)) num, f.id')
+            ->leftJoin('eu.folders', 'f')
+            ->where($this->getAclWhereCondition($user, $organization))
+            ->andWhere('eu.seen = :seen')
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
+            ->setParameter('seen', false)
+            ->groupBy('f.id');
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -126,29 +151,6 @@ class EmailRepository extends EntityRepository
             ->orderBy('email.sentAt', 'DESC')
             ->getQuery()
             ->getResult();
-    }
-
-    /**
-     * Get count new emails per folders
-     *
-     * @param User         $user
-     * @param Organization $organization
-     * @return array
-     */
-    public function getCountNewEmailsPerFolders(User $user, Organization $organization)
-    {
-        $qb = $this->createQueryBuilder('e')
-            ->select('COUNT(DISTINCT e) num, f.id')
-            ->leftJoin('e.emailUsers', 'eu')
-            ->where($this->getAclWhereCondition($user, $organization))
-            ->andWhere('eu.seen = :seen')
-            ->setParameter('organization', $organization)
-            ->setParameter('owner', $user)
-            ->setParameter('seen', false)
-            ->leftJoin('eu.folders', 'f')
-            ->groupBy('f.id');
-
-        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -200,7 +202,7 @@ class EmailRepository extends EntityRepository
      *
      * @return QueryBuilder[]
      */
-    protected function createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
+    public function createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
     {
         return [
             $this

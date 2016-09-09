@@ -74,8 +74,10 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
         $emailUser = new EmailUser();
 
         $origin = new TestEmailOrigin();
+        $origin->setActive(true);
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
+        $origin->addFolder($folder);
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
@@ -96,7 +98,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailBody));
 
         $this->em->expects($this->once())
-            ->method('persist')
+            ->method('flush')
             ->with($this->identicalTo($email));
 
         $this->logger->expects($this->never())
@@ -111,7 +113,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException
-     * @expectedExceptionMessage Cannot load a body for "test email" email. Reason: some exception.
+     * @expectedExceptionMessage Cannot load a body for "test email" email.
      */
     public function testSyncOneEmailBodyFailure()
     {
@@ -122,8 +124,10 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
         $emailUser = new EmailUser();
 
         $origin = new TestEmailOrigin();
+        $origin->setActive(true);
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
+        $origin->addFolder($folder);
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
@@ -140,19 +144,13 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('loadEmailBody')
             ->will($this->throwException($exception));
 
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('persist');
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('flush');
 
-        $this->logger->expects($this->never())
-            ->method('notice');
         $this->logger->expects($this->once())
-            ->method('warning')
-            ->with(
-                'Load email body failed. Email id: 123. Error: some exception.',
-                ['exception' => $exception]
-            );
+            ->method('notice');
 
         $this->synchronizer->syncOneEmailBody($email);
 
@@ -160,8 +158,8 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException
-     * @expectedExceptionMessage Cannot find a body for "test email" email.
+     * @expectedException \Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException
+     * @expectedExceptionMessage Cannot load a body for "test email" email.
      */
     public function testSyncOneEmailBodyNotFound()
     {
@@ -172,8 +170,10 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
         $emailUser = new EmailUser();
 
         $origin = new TestEmailOrigin();
+        $origin->setActive(true);
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
+        $origin->addFolder($folder);
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
@@ -190,15 +190,15 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('loadEmailBody')
             ->will($this->throwException($exception));
 
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('persist');
-        $this->em->expects($this->never())
+        $this->em->expects($this->once())
             ->method('flush');
 
         $this->logger->expects($this->once())
             ->method('notice')
             ->with(
-                'Load email body failed. Email id: 123. Error: Cannot find a body for "test email" email.',
+                'Attempt to load email body failed. Email id: 123. Error: Cannot find a body for "test email" email.',
                 ['exception' => $exception]
             );
         $this->logger->expects($this->never())
@@ -218,7 +218,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
         $repo->expects($this->once())->method('getEmailsWithoutBody')
             ->willReturn([]);
         $this->logger->expects($this->once())
-            ->method('notice')
+            ->method('info')
             ->with(
                 'All emails was processed'
             );
@@ -234,8 +234,10 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
         $emailUser = new EmailUser();
 
         $origin = new TestEmailOrigin();
+        $origin->setActive(true);
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
+        $origin->addFolder($folder);
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
@@ -270,14 +272,14 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailBody));
 
         $this->em->expects($this->once())
-            ->method('persist')
+            ->method('flush')
             ->with($this->identicalTo($email));
         $this->em->expects($this->once())
-            ->method('flush');
-        $this->em->expects($this->once())
             ->method('clear');
-        $this->logger->expects($this->exactly(2))
+        $this->logger->expects($this->once())
             ->method('notice');
+        $this->logger->expects($this->exactly(2))
+            ->method('info');
         $this->logger->expects($this->never())
             ->method('warning');
 

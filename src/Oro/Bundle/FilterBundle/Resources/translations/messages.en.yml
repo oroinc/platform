@@ -59,3 +59,11 @@ oro:
             label_date_var.this_year:      current year
             label_date_var.this_fdq:       first day of quarter
             label_date_var.this_fmq:       first month of quarter
+        date:
+            info: >
+                In addition to exact dates, the filter supports entry of days and months.
+                Delete the year from the date in order to filter records that fall into
+                this date of any year (e.g. customers that have birthdays on November 15th);
+                delete the year and the day to filter records by entire months
+                (e.g. all orders placed between January and March). Both long and short month
+                names are supported.

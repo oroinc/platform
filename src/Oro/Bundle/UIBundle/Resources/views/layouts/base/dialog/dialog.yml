@@ -5,9 +5,9 @@ layout:
         - '@addTree':
             items:
                 widget_content:
-                    blockType: container
+                    blockType: widget_content
                 widget_actions:
-                    blockType: container
+                    blockType: widget_actions
             tree:
                 root:
                     widget_content:

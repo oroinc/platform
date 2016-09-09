@@ -17,7 +17,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

@@ -2,25 +2,28 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Extension;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Validator\ConstraintViolation;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 {
-    /** whether remove restricted fields */
-    const IS_REMOVE_RESTRICTED = true;
-
     /** @var SecurityFacade */
     protected $securityFacade;
 
@@ -30,28 +33,39 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var array */
-    protected $allowedFields = [];
-
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /** @var bool */
-    protected $isFieldAclEnabled = false;
+    /** @var LoggerInterface */
+    protected $logger;
 
     /** @var bool */
     protected $showRestricted = true;
 
+    /**
+     * @var array List of non accessable fields with commited data
+     */
+    protected $disabledFields = [];
+
+    /**
+     * @param SecurityFacade      $securityFacade
+     * @param EntityClassResolver $entityClassResolver
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ConfigProvider      $configProvider
+     * @param LoggerInterface     $logger
+     */
     public function __construct(
         SecurityFacade $securityFacade,
         EntityClassResolver $entityClassResolver,
         DoctrineHelper $doctrineHelper,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        LoggerInterface $logger
     ) {
-        $this->securityFacade  = $securityFacade;
+        $this->securityFacade = $securityFacade;
         $this->entityClassResolver = $entityClassResolver;
         $this->doctrineHelper = $doctrineHelper;
         $this->configProvider = $configProvider;
+        $this->logger = $logger;
     }
 
     /**
@@ -59,34 +73,9 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'form';
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return bool
-     */
-    protected function isApplicable(array $options)
-    {
-        $className = empty($options['data_class']) ? false : $options['data_class'];
-        if (!$className || !$this->entityClassResolver->isEntity($className)) {
-            // apply extension only to forms that bound to entities
-            // cause there's no way to get object identifier for non-entity (can be any field, or even without it)
-
-            return false;
-        }
-
-        try {
-            $securityConfig    = $this->configProvider->getConfig($className);
-            $this->isFieldAclEnabled = $securityConfig->get('field_acl_enabled');
-            $this->showRestricted    = $securityConfig->get('show_restricted_fields');
-        } catch (\Exception $e) {
-            $this->isFieldAclEnabled = false;
-            $this->showRestricted = true;
-        }
-
-        return $this->isFieldAclEnabled;
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
+            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
+            : 'form';
     }
 
     /**
@@ -99,12 +88,8 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         }
 
         // Filter submitted data and ignore data for restricted fields
-        if (static::IS_REMOVE_RESTRICTED) {
-            $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
-        } else {
-            // Check for restricted fields and add error messages if any
-            $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'validateForbiddenFields']);
-        }
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit'], -255);
     }
 
     /**
@@ -117,6 +102,8 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         }
 
         $entity = $this->getEntityByForm($form);
+        $hiddenFieldsWithErrors = [];
+        /** @var FormInterface $childForm */
         foreach ($form as $childName => $childForm) {
             if ($this->isFormGranted($childForm)) {
                 continue;
@@ -133,12 +120,52 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 $view->children[$childName]->vars['read_only'] = true;
             } else {
                 $view->children[$childName]->setRendered();
+                if ($childForm->getErrors()->count()) {
+                    $hiddenFieldsWithErrors[$childName] = (string)$childForm->getErrors();
+                }
             }
+        }
+
+        $this->processHiddenFieldsWithErrors($hiddenFieldsWithErrors, $view, $form);
+    }
+
+    /**
+     * Used on post submit to add validation errors
+     *
+     * @param FormEvent $event
+     */
+    public function postSubmit(FormEvent $event)
+    {
+        $entity = $event->getData();
+        $className = $event->getForm()->getConfig()->getDataClass();
+        if (!$entity instanceof $className) {
+            return;
+        }
+        $form = $event->getForm();
+
+        $clearFormErrors = function (Form $form, $fieldName) {
+            $form->$fieldName = [];
+        };
+
+        foreach ($this->disabledFields as $field) {
+            /** @var Form $fieldInstance */
+            $fieldInstance = $form->get($field);
+            // Clear all other validation errors
+            if ($fieldInstance->getErrors()->count()) {
+                $clearClosure = \Closure::bind($clearFormErrors, $fieldInstance, 'Symfony\Component\Form\Form');
+                $clearClosure($fieldInstance, 'errors');
+            }
+
+            // add Field ACL validation error
+            $fieldInstance->addError($this->getFieldForbiddenFormError());
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Validate input data. If form data contain data for forbidden fields - set the original data for such fields and
+     * collect this fields to add validation error.
+     *
+     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -153,43 +180,40 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 continue;
             }
 
-            if ($this->showRestricted) {
-                // reset existing value instead of submitted
-                $data[$childForm->getName()] = $childForm->getData();
-                $event->setData($data);
-            } else {
-                $form->remove($childForm->getName());
+            $fieldName = $childForm->getName();
+            if (isset($data[$fieldName]) && $data[$fieldName] && $data[$fieldName] !== $childForm->getData()) {
+                $this->disabledFields[] = $childForm->getName();
             }
+            $data[$childForm->getName()] = $childForm->getData();
         }
+        $event->setData($data);
     }
 
     /**
-     * Used on post submit to add validation errors
+     * @param array $options
      *
-     * @param FormEvent $event
+     * @return bool
      */
-    public function validateForbiddenFields(FormEvent $event)
+    protected function isApplicable(array $options)
     {
-        $entity = $event->getData();
-        $className = $event->getForm()->getConfig()->getDataClass();
-        if (!$entity instanceof $className) {
-            return;
+        $className = empty($options['data_class']) ? false : $options['data_class'];
+        if (!$className || !$this->entityClassResolver->isEntity($className)) {
+            // apply extension only to forms that bound to entities
+            // cause there's no way to get object identifier for non-entity (can be any field, or even without it)
+            return false;
         }
 
-        foreach ($event->getForm()->all() as $childForm) {
-            if ($this->isFormGranted($childForm)) {
-                continue;
-            }
-
-            // add violation to form
-            $childForm->addError(
-                new FormError(
-                    sprintf('You are not allowed to modify \'%s\' field.', $childForm->getName())
-                    // do not use message template and 'message parameters' params here
-                    // they are not processed in SOAP responses, only message will be used
-                )
-            );
+        try {
+            $securityConfig    = $this->configProvider->getConfig($className);
+            $isFieldAclEnabled = ($securityConfig->get('field_acl_supported')
+                && $securityConfig->get('field_acl_enabled'));
+            $this->showRestricted = $securityConfig->get('show_restricted_fields');
+        } catch (\Exception $e) {
+            $isFieldAclEnabled = false;
+            $this->showRestricted = true;
         }
+
+        return $isFieldAclEnabled;
     }
 
     /**
@@ -203,17 +227,15 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     {
         $entity = $this->getEntityByForm($form->getParent());
         if (!$entity) {
-            $isGranted = true;
-        } else {
-            $isNewEntity = is_null($this->doctrineHelper->getSingleEntityIdentifier($entity));
-
-            $isGranted = $this->securityFacade->isGranted(
-                $isNewEntity ? 'CREATE' : 'EDIT',
-                new FieldVote($entity, $this->getPropertyByForm($form))
-            );
+            return true;
         }
 
-        return $isGranted;
+        $isNewEntity = is_null($this->doctrineHelper->getSingleEntityIdentifier($entity));
+
+        return $this->securityFacade->isGranted(
+            $isNewEntity ? 'CREATE' : 'EDIT',
+            new FieldVote($entity, $this->getPropertyByForm($form))
+        );
     }
 
     /**
@@ -234,7 +256,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         }
     }
 
-        /**
+    /**
      * Return class property form mapped to
      *
      * @param FormInterface $form
@@ -247,5 +269,65 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         $isMapped  = $form->getConfig()->getMapped();
 
         return $isMapped && $propertyPath && $propertyPath->getLength() == 1 ? (string)$propertyPath : $form->getName();
+    }
+
+    /**
+     * in case if we have error in the non accessable fields - add validation error.
+     *
+     * @param array         $hiddenFieldsWithErrors
+     * @param FormView      $view
+     * @param FormInterface $form
+     */
+    protected function processHiddenFieldsWithErrors(array $hiddenFieldsWithErrors, FormView $view, FormInterface $form)
+    {
+        if (count($hiddenFieldsWithErrors)) {
+            $viewErrors = array_key_exists('errors', $view->vars) ? $view->vars['errors'] : [];
+            $errorsArray = [];
+            foreach ($viewErrors as $error) {
+                $errorsArray[] = $error;
+            }
+            $errorsArray[] = $error = new FormError(
+                sprintf(
+                    'The form contains fields "%s" that are required or not valid but you have no access to them. '
+                    . 'Please contact your administrator to solve this issue.',
+                    implode(', ', array_keys($hiddenFieldsWithErrors))
+                )
+            );
+            $view->vars['errors'] = new FormErrorIterator($form, $errorsArray);
+            foreach ($hiddenFieldsWithErrors as $fieldName => $errorsString) {
+                $this->logger->error(
+                    sprintf(
+                        'Non accessable field `%s` detected in form `%s`. Validation errors: %s',
+                        $fieldName,
+                        $form->getName(),
+                        $errorsString
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * Get Form Error with FieldAccessGranted constraint
+     *
+     * @return FormError
+     */
+    protected function getFieldForbiddenFormError()
+    {
+        $constraint = new FieldAccessGranted();
+        $message = $constraint->message;
+        $violation = new ConstraintViolation(
+            $message,
+            $message,
+            [],
+            '',
+            '',
+            '',
+            null,
+            null,
+            $constraint
+        );
+
+        return new FormError($message, $message, [], null, $violation);
     }
 }

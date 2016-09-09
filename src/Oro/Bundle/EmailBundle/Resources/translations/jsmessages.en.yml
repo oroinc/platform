@@ -14,7 +14,7 @@ oro:
             cannot_insert_variable: Cannot insert variable, please put the cursor into the subject or the content of the template.
         thread:
             load_error: Sorry, email thread was not loaded correctly.
-            no_signature: You don't have a signature yet. Please add it in <a href="{{ url }}">My Profile</a>.
+            no_signature: You don't have a signature yet. Please add it in <a href="{{ url }}">My Configuration</a>.
             no_signature_no_permission: You don't have a signature yet. Contact your administrator to add it.
             collapse_all:
                 label: Collapse All

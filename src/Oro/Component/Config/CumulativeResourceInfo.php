@@ -22,7 +22,7 @@ class CumulativeResourceInfo
     /**
      * @var array
      */
-    public $data;
+    public $data = [];
 
     /**
      * @param string $bundleClass
@@ -30,7 +30,7 @@ class CumulativeResourceInfo
      * @param string $path
      * @param array  $data
      */
-    public function __construct($bundleClass, $name, $path, $data)
+    public function __construct($bundleClass, $name, $path, array $data = [])
     {
         $this->bundleClass = $bundleClass;
         $this->name        = $name;

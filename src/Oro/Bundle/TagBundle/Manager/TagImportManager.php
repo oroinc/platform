@@ -24,6 +24,13 @@ class TagImportManager
     protected $pendingTags = [];
 
     /**
+     * New imported tags which are not yet persisted are stored here to prevent creation tags with the same names
+     *
+     * @var array of ['tag_name' => Tag]
+     */
+    protected $loadedTags = [];
+    
+    /**
      * @param TagStorage $tagStorage
      * @param TaggableHelper $taggableHelper
      */
@@ -43,17 +50,33 @@ class TagImportManager
      */
     public function denormalizeTags(array $data)
     {
-        if (empty($data[static::TAGS_FIELD]) || !array_key_exists('name', $data[static::TAGS_FIELD])) {
-            return;
+        $tags = $tagsToLoad = [];
+        if (isset($data[static::TAGS_FIELD]['name'])) {
+            $tagNames = explode(',', $data[static::TAGS_FIELD]['name']);
+            foreach ($tagNames as $tagName) {
+                $tagName = trim($tagName);
+                if (isset($this->loadedTags[$tagName])) {
+                    $tags[] = $this->loadedTags[$tagName];
+                } else {
+                    $tagsToLoad[] = $tagName;
+                }
+            }
+            if (!empty($tagsToLoad)) {
+                $loadedTags = $this->tagStorage->loadOrCreateTags($tagsToLoad);
+                foreach ($loadedTags as $loadedTag) {
+                    $this->loadedTags[$loadedTag->getName()] = $loadedTag;
+                    $tags[] = $loadedTag;
+                }
+            }
+
         }
 
-        return $this->tagStorage->loadOrCreateTags(array_map(
-            'trim',
-            explode(
-                ',',
-                $data[static::TAGS_FIELD]['name']
-            )
-        ));
+        return $tags;
+    }
+
+    public function clear()
+    {
+        $this->loadedTags = [];
     }
 
     /**

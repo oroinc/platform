@@ -4,14 +4,14 @@ namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\DataGridBundle\Common\DataObject;
+use Oro\Component\Config\Common\ConfigObject;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DatagridConfiguration extends DataObject
+class DatagridConfiguration extends ConfigObject
 {
     const COLUMN_PATH = '[columns][%s]';
     const SORTER_PATH = '[sorters][columns][%s]';

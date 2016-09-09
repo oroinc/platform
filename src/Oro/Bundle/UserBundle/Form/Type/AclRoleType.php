@@ -38,23 +38,6 @@ class AclRoleType extends AbstractType
             ]
         );
 
-        foreach ($this->privilegeConfig as $fieldName => $config) {
-            $builder->add(
-                $fieldName,
-                PrivilegeCollectionType::NAME,
-                [
-                    'type'         => AclPrivilegeType::NAME,
-                    'allow_add'    => true,
-                    'prototype'    => false,
-                    'allow_delete' => false,
-                    'mapped'       => false,
-                    'options'      => [
-                        'privileges_config' => $config,
-                    ]
-                ]
-            );
-        }
-
         $builder->add(
             'appendUsers',
             'oro_entity_identifier',
@@ -86,7 +69,7 @@ class AclRoleType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -99,9 +82,17 @@ class AclRoleType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_user_role_form';
     }

@@ -40,6 +40,10 @@ define([
 
             this.on('preExecute', _.bind(this._preExecuteSubscriber, this));
 
+            if (options.parameters) {
+                this.parameters = options.parameters;
+            }
+
             if (this.useDirectLauncherLink) {
                 this.launcherOptions = _.extend({
                     link: this.getLink(),
@@ -61,6 +65,23 @@ define([
             var value = this.datagrid.collection.stateHashValue();
 
             url = this.addUrlParameter(url, key, value);
+
+            if (options.parameters) {
+                for (key in options.parameters) {
+                    if (options.parameters.hasOwnProperty(key)) {
+                        value = options.parameters[key];
+                        url = this.addUrlParameter(url, key,  value);
+                    }
+                }
+            }
+            if (this.parameters) {
+                for (key in this.parameters) {
+                    if (this.parameters.hasOwnProperty(key)) {
+                        value = this.parameters[key];
+                        url = this.addUrlParameter(url, key,  value);
+                    }
+                }
+            }
             mediator.execute('redirectTo', {url: url}, options);
         },
 

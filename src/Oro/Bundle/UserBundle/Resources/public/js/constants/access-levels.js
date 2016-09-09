@@ -1,0 +1,3 @@
+define({
+    NONE: 0
+});

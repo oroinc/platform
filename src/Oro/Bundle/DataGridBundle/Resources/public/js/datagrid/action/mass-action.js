@@ -73,11 +73,13 @@ define([
         getActionParameters: function() {
             var selectionState = this.datagrid.getSelectionState();
             var collection = this.datagrid.collection;
+            var stateKey = collection.stateHashKey();
             var params = {
                 inset: selectionState.inset ? 1 : 0,
                 values: selectionState.selectedIds.join(',')
             };
 
+            params[stateKey] = collection.stateHashValue();
             params = collection.processFiltersParams(params, null, 'filters');
 
             return params;

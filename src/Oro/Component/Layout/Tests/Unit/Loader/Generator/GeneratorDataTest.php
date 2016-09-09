@@ -28,11 +28,9 @@ class GeneratorDataTest extends \PHPUnit_Framework_TestCase
     public function testFilenameSetter()
     {
         $data = new GeneratorData(uniqid('testSource', true));
-
+        $this->assertNull($data->getFilename());
         $filename = uniqid('testFilename', true);
-        $data->setFilename($filename);
-
+        $data = new GeneratorData(uniqid('testSource', true), $filename);
         $this->assertSame($filename, $data->getFilename());
-
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
+use Symfony\Component\Intl\Intl;
+
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class LocaleExtension extends \Twig_Extension
@@ -33,6 +35,7 @@ class LocaleExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
+            new \Twig_SimpleFunction('oro_currency_name', array(Intl::getCurrencyBundle(), 'getCurrencyName')),
             new \Twig_SimpleFunction('oro_locale', array($this->localeSettings, 'getLocale')),
             new \Twig_SimpleFunction('oro_language', array($this->localeSettings, 'getLanguage')),
             new \Twig_SimpleFunction('oro_country', array($this->localeSettings, 'getCountry')),

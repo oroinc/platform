@@ -67,15 +67,23 @@ class ChangePasswordType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {

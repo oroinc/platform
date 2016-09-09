@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form\Guesser;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 
@@ -52,7 +53,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             if ($metadata->hasField($property)) {
                 return $this->getTypeGuessForField($metadata->getField($property)->getDataType());
             } elseif ($metadata->hasAssociation($property)) {
-                return $this->getTypeGuessForAssociation($metadata->getAssociation($property)->isCollection());
+                return $this->getTypeGuessForAssociation($metadata->getAssociation($property));
             }
         }
 
@@ -132,15 +133,15 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @param bool $multiple
+     * @param AssociationMetadata $metadata
      *
      * @return TypeGuess|null
      */
-    protected function getTypeGuessForAssociation($multiple)
+    protected function getTypeGuessForAssociation(AssociationMetadata $metadata)
     {
         return $this->createTypeGuess(
             'oro_api_entity',
-            ['multiple' => $multiple],
+            ['metadata' => $metadata],
             TypeGuess::HIGH_CONFIDENCE
         );
     }

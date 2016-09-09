@@ -43,9 +43,15 @@ workflows:
                             label: 'First Attribute'
                             options:
                                 required: true
+                schedule:
+                    cron: 1 * * * *
+                    filter: e.field < DATE_ADD(NOW(), 1, 'day')
+                    check_conditions_before_job_creation: true
         transition_definitions:
             first_transition_definition:
-                pre_conditions:
+                preactions:
+                    - '@custom_action': ~
+                preconditions:
                     '@true': ~
                 conditions:
                     '@and':
@@ -57,5 +63,9 @@ workflows:
                                     parameters: [1, 1]
                                     message: "Not equals"
                         message: "Fail upper level"
+                actions:
+                    - '@custom_action2': ~
+                pre_conditions:
+                    '@condition1': ~
                 post_actions:
-                    - '@custom_post_action': ~
+                    - '@custom_action': ~

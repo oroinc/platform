@@ -4,11 +4,7 @@
 {% set fullname = form.vars.value|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
-{% if editRoute %}
-    {% set formAction = path(editRoute) %}
-{% else %}
-    {% set formAction = form.vars.value.id ? path('oro_user_update', { id: form.vars.value.id}) : path('oro_user_create') %}
-{% endif %}
+{% set formAction = path('oro_user_profile_update') %}
 
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) and form.vars.value.id != app.user.id %}
@@ -23,10 +19,19 @@
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {{ UI.cancelButton(path(cancelRoute)) }}
-    {% set html = UI.saveAndCloseButton() %}
+    {{ UI.cancelButton(path('oro_user_profile_view')) }}
+    {% set html = UI.saveAndCloseButton({
+        'route': 'oro_user_profile_view'
+    }) %}
+    {% if resource_granted('oro_user_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_user_create'
+        }) %}
+    {% endif %}
     {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
-        {% set html = html ~ UI.saveAndStayButton() %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_user_profile_update'
+        }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
@@ -118,30 +123,6 @@
                 }
             ]
         }] ) %}
-    {% endif %}
-
-    {% if form.imapAccountType is defined %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'oro.user.imap_configuration.label'|trans,
-            'subblocks': [{
-                'title': '',
-                'data': [
-                    form_widget(form.imapAccountType)
-                ]
-            }]
-        }]) %}
-    {% endif %}
-
-    {% if form.imapConfiguration is defined %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'oro.user.imap_configuration.label'|trans,
-            'subblocks': [{
-                'title': '',
-                'data': [
-                    form_widget(form.imapConfiguration)
-                ]
-            }]
-        }]) %}
     {% endif %}
 
     {% set data = {

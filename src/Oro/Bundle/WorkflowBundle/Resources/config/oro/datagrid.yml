@@ -1,0 +1,250 @@
+datagrid:
+    process-definitions-grid:
+        options:
+            entityHint: processes
+            export:     false
+        acl_resource: oro_process_definition_view
+        source:
+            type: orm
+            query:
+                select:
+                    - process.name
+                    - process.label
+                    - process.relatedEntity
+                    - process.executionOrder
+                    - process.enabled
+                    - process.createdAt
+                    - process.name as processDefinition
+                from:
+                    - { table: %oro_workflow.process_definition.entity.class%, alias: process }
+        columns:
+            label:
+                label: oro.workflow.processdefinition.label.label
+            relatedEntity:
+                label:         oro.workflow.processdefinition.related_entity.label
+                data_name:     relatedEntity
+                frontend_type: select
+                choices:       "@oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice"
+            executionOrder:
+                label:         oro.workflow.processdefinition.execution_order.label
+                frontend_type: integer
+            enabled:
+                label:         oro.workflow.processdefinition.enabled.label
+                frontend_type: boolean
+            createdAt:
+                label:         oro.ui.created_at
+                frontend_type: datetime
+        properties:
+            name:              ~
+            processDefinition: ~
+            view_link:
+                type:   url
+                route:  oro_process_definition_view
+                params: [ name ]
+            activate_link:
+                type:   url
+                route:  oro_api_process_activate
+                params: [ processDefinition ]
+            deactivate_link:
+                type:   url
+                route:  oro_api_process_deactivate
+                params: [ processDefinition ]
+        sorters:
+            columns:
+                executionOrder:
+                    data_name: process.executionOrder
+                label:
+                    data_name: process.label
+                createdAt:
+                    data_name: process.createdAt
+            default:
+                label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        actions:
+            view:
+                type:         navigate
+                acl_resource: oro_process_definition_view
+                label:        oro.grid.action.view
+                icon:         eye-open
+                link:         view_link
+                rowAction:    true
+            activate:
+                type:         ajax
+                acl_resource: oro_process_definition_update
+                label:        oro.workflow.action.process.activate
+                icon:         ok
+                link:         activate_link
+            deactivate:
+                type:         ajax
+                acl_resource: oro_process_definition_update
+                label:        oro.workflow.action.process.deactivate
+                icon:         remove
+                link:         deactivate_link
+        action_configuration: ["@oro_workflow.datagrid.action_permission_provider", "getProcessDefinitionPermissions"]
+        filters:
+            columns:
+                label:
+                    type:      string
+                    data_name: process.label
+                relatedEntity:
+                    type:      choice
+                    data_name: process.relatedEntity
+                    options:
+                        field_options:
+                            multiple: true
+                            choices:  "@oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice"
+                createdAt:
+                    type:      datetime
+                    data_name: process.createdAt
+
+    workflow-definitions-grid:
+        options:
+            entityHint: workflowssss
+            export:     false
+        acl_resource: oro_workflow_definition_view
+        source:
+            type: orm
+            query:
+                select:
+                    - w.name as id
+                    - w.name
+                    - w.name as workflowDefinition
+                    - w.relatedEntity
+                    - w.relatedEntity as entityClass
+                    - w.active
+                    - w.label
+                    - w.system
+                    - w.priority
+                    - w.groups
+                    - w.createdAt
+                from:
+                    - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
+        columns:
+            label:
+                label:         oro.workflow.workflowdefinition.label.label
+            relatedEntity:
+                label:         oro.workflow.workflowdefinition.related_entity.label
+                data_name:     relatedEntity
+                frontend_type: select
+                choices:       "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
+            active:
+                label:         oro.workflow.workflowdefinition.active.label
+                frontend_type: boolean
+            system:
+                label:         oro.workflow.workflowdefinition.system.label
+                frontend_type: boolean
+            priority:
+                label:         oro.workflow.workflowdefinition.priority.label
+                frontend_type: integer
+            exclusiveActiveGroups:
+                label:         oro.workflow.workflowdefinition.exclusive_active_groups.label
+                data_name:     groups
+                type:          twig
+                template:      OroWorkflowBundle:Datagrid:Column/exclusiveActiveGroups.html.twig
+                frontend_type: html
+            exclusiveRecordGroups:
+                label:         oro.workflow.workflowdefinition.exclusive_record_groups.label
+                data_name:     groups
+                type:          twig
+                template:      OroWorkflowBundle:Datagrid:Column/exclusiveRecordGroups.html.twig
+                frontend_type: html
+            createdAt:
+                label:         oro.ui.created_at
+                frontend_type: datetime
+        properties:
+            id: ~
+            name: ~
+            workflowDefinition: ~
+            entityClass: ~
+            view_link:
+                type:       url
+                route:      oro_workflow_definition_view
+                params:     [ name ]
+            update_link:
+                type:       url
+                route:      oro_workflow_definition_update
+                params:     [ name ]
+            delete_link:
+                type:       url
+                route:      oro_api_workflow_definition_delete
+                params:     [ workflowDefinition ]
+            activate_link:
+                type:       url
+                route:      oro_api_workflow_activate
+                params:     [ workflowDefinition ]
+            deactivate_link:
+                type:       url
+                route:      oro_api_workflow_deactivate
+                params:     [ workflowDefinition ]
+        sorters:
+            columns:
+                label:
+                    data_name: w.label
+                active:
+                    data_name: w.active
+                system:
+                    data_name: w.system
+                priority:
+                    data_name: w.priority
+                createdAt:
+                    data_name: w.createdAt
+                relatedEntity:
+                    data_name: w.relatedEntity
+            default:
+                label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        actions:
+            view:
+                type:          navigate
+                acl_resource:  oro_workflow_definition_view
+                label:         oro.grid.action.view
+                icon:          eye-open
+                link:          view_link
+                rowAction:     true
+            activate:
+                type:          workflow-activate
+                acl_resource:  oro_workflow_definition_update
+                label:         oro.workflow.workflowdefinition.datagrid.activate
+                icon:          ok
+                link:          activate_link
+            deactivate:
+                type:          workflow-deactivate
+                acl_resource:  oro_workflow_definition_update
+                label:         oro.workflow.workflowdefinition.datagrid.deactivate
+                icon:          remove
+                link:          deactivate_link
+            update:
+                type:          navigate
+                acl_resource:  oro_workflow_definition_update
+                label:         oro.grid.action.update
+                icon:          edit
+                link:          update_link
+            delete:
+                type:          delete
+                acl_resource:  oro_workflow_definition_delete
+                label:         oro.grid.action.delete
+                icon:          trash
+                link:          delete_link
+        action_configuration: ["@oro_workflow.datagrid.action_permission_provider", "getWorkflowDefinitionPermissions"]
+        filters:
+            columns:
+                label:
+                    type: string
+                    data_name: w.label
+                relatedEntity:
+                    type: choice
+                    data_name: w.relatedEntity
+                    options:
+                        field_options:
+                            multiple: true
+                            choices: "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
+                active:
+                    type: boolean
+                    data_name: w.active
+                system:
+                    type: boolean
+                    data_name: w.system
+                priority:
+                    type: number
+                    data_name: w.priority
+                createdAt:
+                    type:      datetime
+                    data_name: w.createdAt

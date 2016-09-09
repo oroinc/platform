@@ -14,11 +14,12 @@ services:
     oro_datagrid.extension.mass_action.handler.delete:
         class: %oro_datagrid.extension.mass_action.handler.delete.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@translator'
             - '@oro_security.security_facade'
             - '@oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter'
             - '@request_stack'
+            - '@oro_platform.optional_listeners.manager'
 
     oro_datagrid.mass_action.parameters_parser:
         class: %oro_datagrid.mass_action.parameters_parser.class%

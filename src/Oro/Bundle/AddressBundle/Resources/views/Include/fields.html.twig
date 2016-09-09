@@ -23,7 +23,7 @@
     {% endif %}
 
     {{ form_widget(form, attr) }}
-    {% set showSelect = (choices is not empty and region_text_field.vars.value is empty and withoutSelect is not defined) %}
+    {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
 
     <script type="text/javascript">
         require(['jquery', 'oroaddress/js/region/view', 'oroaddress/js/region/collection'],

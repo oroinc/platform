@@ -21,6 +21,32 @@ class ConfigUtil extends BaseConfigUtil
     /** the name of response status codes configuration section */
     const STATUS_CODES = 'status_codes';
 
+    /** the name of subresources configuration section */
+    const SUBRESOURCES = 'subresources';
+
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */
     const INHERIT = 'inherit';
+
+    /**
+     * Gets a native PHP array representation of each object in a given array.
+     *
+     * @param object[] $objects
+     * @param bool     $treatEmptyAsNull
+     *
+     * @return array
+     */
+    public static function convertObjectsToArray(array $objects, $treatEmptyAsNull = false)
+    {
+        $result = [];
+        foreach ($objects as $key => $value) {
+            $arrayValue = $value->toArray();
+            if (!empty($arrayValue)) {
+                $result[$key] = $arrayValue;
+            } elseif ($treatEmptyAsNull) {
+                $result[$key] = null;
+            }
+        }
+
+        return $result;
+    }
 }

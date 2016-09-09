@@ -13,10 +13,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesLoader;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesCache;
+    protected $resourcesProvider;
 
     /** @var ExcludeNotAccessibleRelations */
     protected $processor;
@@ -28,17 +25,13 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->resourcesLoader = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesLoader')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->resourcesCache = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesCache')
+        $this->resourcesProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->processor = new ExcludeNotAccessibleRelations(
             $this->doctrineHelper,
-            $this->resourcesLoader,
-            $this->resourcesCache
+            $this->resourcesProvider
         );
     }
 
@@ -135,6 +128,9 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 'association3' => [
                     'property_path' => 'realAssociation3'
                 ],
+                'association4' => [
+                    'exclude' => false
+                ],
             ]
         ];
 
@@ -173,10 +169,14 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     ['Test\Association3Target', true, $association3Metadata],
                 ]
             );
-        $this->resourcesCache->expects($this->once())
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn(['Test\Association1Target', 'Test\Association3Target']);
+        $this->resourcesProvider->expects($this->exactly(2))
+            ->method('isResourceAccessible')
+            ->willReturnMap(
+                [
+                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
+                    ['Test\Association3Target', $this->context->getVersion(), $this->context->getRequestType(), true],
+                ]
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -196,6 +196,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     'association3' => [
                         'property_path' => 'realAssociation3'
                     ],
+                    'association4' => null,
                 ]
             ],
             $this->context->getResult()
@@ -235,10 +236,13 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     ['Test\Association1Target', true, $association1Metadata],
                 ]
             );
-        $this->resourcesCache->expects($this->once())
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([]);
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceAccessible')
+            ->willReturnMap(
+                [
+                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
+                ]
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -291,10 +295,13 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     ['Test\Association1Target', true, $association1Metadata],
                 ]
             );
-        $this->resourcesCache->expects($this->once())
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn(['Test\Association1Target']);
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceAccessible')
+            ->willReturnMap(
+                [
+                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
+                ]
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -345,10 +352,14 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     ['Test\Association1Target', true, $association1Metadata],
                 ]
             );
-        $this->resourcesCache->expects($this->once())
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([]);
+        $this->resourcesProvider->expects($this->exactly(2))
+            ->method('isResourceAccessible')
+            ->willReturnMap(
+                [
+                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
+                    ['Test\Association1Target1', $this->context->getVersion(), $this->context->getRequestType(), false],
+                ]
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -360,67 +371,6 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclude' => true
                     ]
-                ]
-            ],
-            $this->context->getResult()
-        );
-    }
-
-    public function testProcessWhenNoResourcesCache()
-    {
-        $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'association1' => null,
-            ]
-        ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->once())
-            ->method('hasAssociation')
-            ->with('association1')
-            ->willReturn(true);
-        $rootEntityMetadata->expects($this->once())
-            ->method('getAssociationMapping')
-            ->with('association1')
-            ->willReturn(['targetEntity' => 'Test\Association1Target']);
-
-        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
-        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
-        $association1Metadata->subClasses      = ['Test\Association1Target1'];
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(2))
-            ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata],
-                ]
-            );
-        $this->resourcesCache->expects($this->at(0))
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn(null);
-        $this->resourcesLoader->expects($this->once())
-            ->method('getResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType());
-        $this->resourcesCache->expects($this->at(1))
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn(['Test\Association1Target1']);
-
-        $this->context->setResult($this->createConfigObject($config));
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'association1' => null
                 ]
             ],
             $this->context->getResult()

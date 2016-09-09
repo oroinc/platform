@@ -508,14 +508,14 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ],
             'simple with name' => [
                 [
-                    'from' => 'Test <test@test.com>',
-                    'to' => 'Test <test@test.com>',
+                    'from' => '"Test" <test@test.com>',
+                    'to' => '"Test" <test@test.com>',
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
                 [
-                    'from' => 'Test <test@test.com>',
-                    'to' => ['Test <test@test.com>'],
+                    'from' => '"Test" <test@test.com>',
+                    'to' => ['"Test" <test@test.com>'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                 ]
@@ -534,8 +534,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'entity' => new \stdClass(),
                 ],
                 [
-                    'from' => 'Test <test@test.com>',
-                    'to' => ['Test <test@test.com>'],
+                    'from' => '"Test" <test@test.com>',
+                    'to' => ['"Test" <test@test.com>'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                 ]
@@ -554,8 +554,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'entity' => new \stdClass(),
                 ],
                 [
-                    'from' => '_Formatted <test@test.com>',
-                    'to' => ['_Formatted <test@test.com>'],
+                    'from' => '"_Formatted" <test@test.com>',
+                    'to' => ['"_Formatted" <test@test.com>'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                 ]
@@ -572,18 +572,18 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                             'email' => 'test@test.com'
                         ],
                         'test@test.com',
-                        'Test <test@test.com>'
+                        '"Test" <test@test.com>'
                     ],
                     'template' => 'test',
                     'entity' => new \stdClass(),
                     'attribute' => 'attr'
                 ],
                 [
-                    'from' => 'Test <test@test.com>',
+                    'from' => '"Test" <test@test.com>',
                     'to' => [
-                        'Test <test@test.com>',
+                        '"Test" <test@test.com>',
                         'test@test.com',
-                        'Test <test@test.com>'
+                        '"Test" <test@test.com>'
                     ],
                     'subject' => 'Test subject',
                     'body' => 'Test body',

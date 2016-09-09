@@ -98,6 +98,14 @@ class DatabaseType extends AbstractType
 
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_installer_configuration_database';
     }
 }

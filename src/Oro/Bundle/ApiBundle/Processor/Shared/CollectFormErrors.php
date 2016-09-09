@@ -10,22 +10,33 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Collects errors occurred during the the form submit and adds them into the Context.
  */
 class CollectFormErrors implements ProcessorInterface
 {
+    /** @var ConstraintTextExtractorInterface */
+    protected $constraintTextExtractor;
+
+    /**
+     * @param ConstraintTextExtractorInterface $constraintTextExtractor
+     */
+    public function __construct(ConstraintTextExtractorInterface $constraintTextExtractor)
+    {
+        $this->constraintTextExtractor = $constraintTextExtractor;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var $context FormContext */
+        /** @var FormContext $context */
 
         if (!$context->hasForm()) {
             // no form
@@ -47,12 +58,21 @@ class CollectFormErrors implements ProcessorInterface
         foreach ($errors as $error) {
             $errorObject = $this->createErrorObject(
                 $error,
-                $this->getFormErrorPropertyPath($error, $form)
+                $this->getFormErrorPropertyPath($error)
             );
             $context->addError($errorObject);
         }
 
-        // collect form childes errors
+        // collect form child errors
+        $this->processChildren($form, $context);
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param FormContext   $context
+     */
+    protected function processChildren(FormInterface $form, FormContext $context)
+    {
         /** @var FormInterface $child */
         foreach ($form as $child) {
             if (!$child->isValid()) {
@@ -63,30 +83,25 @@ class CollectFormErrors implements ProcessorInterface
                     );
                     $context->addError($errorObject);
                 }
+                if ($child->getConfig()->getCompound()) {
+                    $this->processChildren($child, $context);
+                }
             }
         }
     }
 
     /**
-     * @param FormError     $error
-     * @param FormInterface $form
+     * @param FormError $error
      *
      * @return string|null
      */
-    protected function getFormErrorPropertyPath(FormError $error, FormInterface $form)
+    protected function getFormErrorPropertyPath(FormError $error)
     {
         $result = null;
 
         $cause = $error->getCause();
         if ($cause instanceof ConstraintViolation) {
-            $result = $cause->getPropertyPath();
-            if (0 === strpos($result, 'data.')) {
-                $result = substr($result, 5);
-            }
-            // in case if propertyPath = 'data', this error can be an entity level error
-            if ($result === 'data' && !$form->has('data')) {
-                $result = null;
-            }
+            $result = $this->getConstraintViolationPropertyPath($cause);
         }
         if (!$result) {
             $originName = $error->getOrigin()->getName();
@@ -110,14 +125,30 @@ class CollectFormErrors implements ProcessorInterface
 
         $cause = $error->getCause();
         if ($cause instanceof ConstraintViolation) {
-            $path = new ViolationPath($cause->getPropertyPath());
-            $result = implode('.', $path->getElements());
+            $result = $this->getConstraintViolationPropertyPath($cause);
         }
         if (!$result) {
             $result = $field->getName();
         }
 
         return $result;
+    }
+
+    /**
+     * @param ConstraintViolation $constraintViolation
+     *
+     * @return string|null
+     */
+    protected function getConstraintViolationPropertyPath(ConstraintViolation $constraintViolation)
+    {
+        $propertyPath = $constraintViolation->getPropertyPath();
+        if (!$propertyPath) {
+            return null;
+        }
+
+        $path = new ViolationPath($propertyPath);
+
+        return implode('.', $path->getElements());
     }
 
     /**
@@ -129,6 +160,10 @@ class CollectFormErrors implements ProcessorInterface
     protected function createErrorObject(FormError $formError, $propertyPath = null)
     {
         $error = Error::createValidationError($this->getFormErrorTitle($formError), $formError->getMessage());
+        $statusCode = $this->getFormErrorStatusCode($formError);
+        if (null !== $statusCode) {
+            $error->setStatusCode($statusCode);
+        }
         if ($propertyPath) {
             $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
         }
@@ -151,11 +186,27 @@ class CollectFormErrors implements ProcessorInterface
                 return Constraint::EXTRA_FIELDS;
             }
 
-            return ValueNormalizerUtil::humanizeClassName(get_class($cause->getConstraint()), 'Constraint');
+            return $this->constraintTextExtractor->getConstraintType($cause->getConstraint());
         }
 
         // undefined constraint type
         return Constraint::FORM;
+    }
+
+    /**
+     * @param FormError $formError
+     *
+     * @return int|null
+     */
+    protected function getFormErrorStatusCode(FormError $formError)
+    {
+        $cause = $formError->getCause();
+        if ($cause instanceof ConstraintViolation) {
+            $constraint = $cause->getConstraint();
+            return $this->constraintTextExtractor->getConstraintStatusCode($constraint);
+        }
+
+        return null;
     }
 
     /**

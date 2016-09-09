@@ -71,7 +71,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $context->setFirstGroup('test');
         $this->assertEquals('test', $context->getFirstGroup());
-        $this->assertEquals('test', $context->get(Context::FIRST_GROUP));
     }
 
     public function testLastGroup()
@@ -82,7 +81,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $context->setLastGroup('test');
         $this->assertEquals('test', $context->getLastGroup());
-        $this->assertEquals('test', $context->get(Context::LAST_GROUP));
     }
 
     public function testSkippedGroups()
@@ -91,32 +89,26 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($context->hasSkippedGroups());
         $this->assertSame([], $context->getSkippedGroups());
-        $this->assertNull($context->get(Context::SKIPPED_GROUPS));
 
         $context->skipGroup('test');
         $this->assertTrue($context->hasSkippedGroups());
         $this->assertEquals(['test'], $context->getSkippedGroups());
-        $this->assertEquals(['test'], $context->get(Context::SKIPPED_GROUPS));
 
         $context->skipGroup('test1');
         $this->assertTrue($context->hasSkippedGroups());
         $this->assertEquals(['test', 'test1'], $context->getSkippedGroups());
-        $this->assertEquals(['test', 'test1'], $context->get(Context::SKIPPED_GROUPS));
 
         $context->skipGroup('test');
         $this->assertTrue($context->hasSkippedGroups());
         $this->assertEquals(['test', 'test1'], $context->getSkippedGroups());
-        $this->assertEquals(['test', 'test1'], $context->get(Context::SKIPPED_GROUPS));
 
         $context->undoGroupSkipping('test');
         $this->assertTrue($context->hasSkippedGroups());
         $this->assertEquals(['test1'], $context->getSkippedGroups());
-        $this->assertEquals(['test1'], $context->get(Context::SKIPPED_GROUPS));
 
         $context->undoGroupSkipping('test1');
         $this->assertFalse($context->hasSkippedGroups());
         $this->assertSame([], $context->getSkippedGroups());
-        $this->assertNull($context->get(Context::SKIPPED_GROUPS));
     }
 
     public function testResult()

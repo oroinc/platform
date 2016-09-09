@@ -48,4 +48,11 @@ interface FilterValueAccessorInterface
      * @param FilterValue|null $value The filter value
      */
     public function set($key, FilterValue $value = null);
+
+    /**
+     * Removes a filter.
+     *
+     * @param string $key The key of a filter value
+     */
+    public function remove($key);
 }

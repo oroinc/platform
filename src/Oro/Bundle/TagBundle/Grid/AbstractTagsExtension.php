@@ -14,6 +14,7 @@ abstract class AbstractTagsExtension extends AbstractExtension
     const GRID_COLUMN_ALIAS_PATH  = '[source][query_config][column_aliases]';
     const GRID_FILTERS_PATH       = '[filters][columns]';
     const GRID_SORTERS_PATH       = '[sorters][columns]';
+    /** @deprecated since 1.10. Use config->getName() instead */
     const GRID_NAME_PATH          = 'name';
     const FILTER_COLUMN_NAME      = 'tagname';
     const PROPERTY_ID_PATH        = '[properties][id]';
@@ -48,7 +49,7 @@ abstract class AbstractTagsExtension extends AbstractExtension
      */
     protected function isReportOrSegmentGrid(DatagridConfiguration $config)
     {
-        $gridName = $config->offsetGetByPath(self::GRID_NAME_PATH);
+        $gridName = $config->getName();
 
         return
             strpos($gridName, 'oro_report') === 0 ||

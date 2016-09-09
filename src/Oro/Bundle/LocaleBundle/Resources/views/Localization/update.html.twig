@@ -1,0 +1,64 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% oro_title_set({params : {
+    '%name%': entity.name|default('N/A'|trans),
+    '%entityName%': 'oro.locale.localization.entity_label'|trans
+} }) %}
+
+{% set formAction = entity.id ? path('oro_locale_localization_update', { 'id': entity.id }) : path('oro_locale_localization_create')  %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_locale_localization_index'),
+        'indexLabel': 'oro.locale.localization.entity_plural_label'|trans,
+        'entityTitle': entity.id ? 'oro.locale.localization.navigation.view'|trans({'%name%': entity.name}) : 'oro.ui.create_entity'|trans({'%entityName%': 'oro.locale.localization.entity_label'|trans})
+    } %}
+
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block navButtons %}
+    {{ parent() }}
+
+    {{ UI.cancelButton(path('oro_locale_localization_index')) }}
+    {% if entity.id and resource_granted('oro_locale_localization_update') or resource_granted('oro_locale_localization_create') %}
+        {% set html = UI.saveAndStayButton({
+            'route': 'oro_locale_localization_update',
+            'params': {'id': '$id'}
+        }) %}
+        {% if resource_granted('oro_locale_localization_view') %}
+            {% set html = html ~ UI.saveAndCloseButton({
+                'route': 'oro_locale_localization_view',
+                'params': {'id': '$id'}
+            }) %}
+        {% endif %}
+
+        {{ UI.dropdownSaveButton({'html': html}) }}
+    {% endif %}
+
+{% endblock navButtons %}
+
+{% block content_data %}
+    {% set id = 'localization-edit' %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.locale.localization.sections.general'|trans,
+            'class': 'active',
+            'subblocks': [{
+                'data': [
+                    form_widget(form),
+                ]
+            }]
+        }
+    ] %}
+
+    {% set data = {
+        'formErrors': form_errors(form),
+        'dataBlocks': dataBlocks
+    }%}
+
+    {{ parent() }}
+{% endblock content_data %}

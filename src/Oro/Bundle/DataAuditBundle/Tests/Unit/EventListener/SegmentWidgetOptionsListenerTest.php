@@ -2,22 +2,41 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\EventListener;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var HttpKernelInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $httpKernel;
+
+    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
     protected $request;
+
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
+    protected $security;
+
+    /** @var SegmentWidgetOptionsListener */
+    protected $listener;
 
     public function setUp()
     {
         $this->httpKernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor('Symfony\Component\HttpFoundation\Request')
+        $this->request    = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+            ->disableOriginalConstructor()
             ->getMock();
+        $this->security   = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->listener = new SegmentWidgetOptionsListener($this->httpKernel, $this->security, new ContextChecker());
+        $this->listener->setRequest($this->request);
     }
 
     public function testListener()
@@ -30,7 +49,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
                 'loadingMaskParent' => 'loadingMask',
                 'confirmMessage'    => 'confirmMessage',
             ],
-            'metadata' => [
+            'metadata'     => [
                 'filters' => [
                     'date' => [
                         'type'      => 'date',
@@ -46,11 +65,11 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
         $auditFields = json_encode(['field1', 'field2']);
 
         $expectedOptions = [
-            'column'     => [],
-            'extensions' => [
+            'column'            => [],
+            'extensions'        => [
                 'orodataaudit/js/app/components/segment-component-extension',
             ],
-            'fieldsLoader' => [
+            'fieldsLoader'      => [
                 'entityChoice'      => 'choice',
                 'loadingMaskParent' => 'loadingMask',
                 'confirmMessage'    => 'confirmMessage',
@@ -60,10 +79,10 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
                 'loadingMaskParent' => 'loadingMask',
                 'confirmMessage'    => 'confirmMessage',
                 'router'            => 'oro_api_get_audit_fields',
-                'routingParams'    => [],
+                'routingParams'     => [],
                 'fieldsData'        => $auditFields,
             ],
-            'metadata' => [
+            'metadata'          => [
                 'filters' => [
                     'date' => [
                         'type'      => 'date',
@@ -74,11 +93,11 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            'auditFilters' => [
+            'auditFilters'      => [
                 'date' => [
                     'type'      => 'date',
                     'dateParts' => [
-                        'value'  => 'val',
+                        'value' => 'val',
                     ],
                 ],
             ],
@@ -97,12 +116,81 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
             ->method('handle')
             ->with($subRequest)
             ->will($this->returnValue(new Response($auditFields)));
+        $this->security
+            ->expects($this->once())
+            ->method('isGranted')
+            ->willReturn(true);
 
-        $listener = new SegmentWidgetOptionsListener($this->httpKernel);
-        $listener->setRequest($this->request);
         $event = new WidgetOptionsLoadEvent($options);
-        $listener->onLoad($event);
+        $this->listener->onLoad($event);
 
         $this->assertEquals($expectedOptions, $event->getWidgetOptions());
+    }
+
+    public function testOnLoadWhenNotApplicable()
+    {
+        $options = [
+            'column'                       => [],
+            'extensions'                   => [],
+            'fieldsLoader'                 => [
+                'entityChoice'      => 'choice',
+                'loadingMaskParent' => 'loadingMask',
+                'confirmMessage'    => 'confirmMessage',
+            ],
+            'metadata'                     => [
+                'filters' => [
+                    'date' => [
+                        'type'      => 'date',
+                        'dateParts' => [
+                            'value'  => 'val',
+                            'source' => 'sour',
+                        ],
+                    ],
+                ],
+            ],
+            ContextChecker::DISABLED_PARAM => true
+        ];
+
+        $event = new WidgetOptionsLoadEvent($options);
+        $this->security
+            ->expects($this->once())
+            ->method('isGranted')
+            ->willReturn(true);
+
+        $this->listener->onLoad($event);
+        $this->assertEquals($options, $event->getWidgetOptions());
+    }
+
+    public function testOnLoadWhenNotGranted()
+    {
+        $options = [
+            'column'       => [],
+            'extensions'   => [],
+            'fieldsLoader' => [
+                'entityChoice'      => 'choice',
+                'loadingMaskParent' => 'loadingMask',
+                'confirmMessage'    => 'confirmMessage',
+            ],
+            'metadata'     => [
+                'filters' => [
+                    'date' => [
+                        'type'      => 'date',
+                        'dateParts' => [
+                            'value'  => 'val',
+                            'source' => 'sour',
+                        ],
+                    ],
+                ],
+            ]
+        ];
+
+        $event = new WidgetOptionsLoadEvent($options);
+        $this->security
+            ->expects($this->once())
+            ->method('isGranted')
+            ->willReturn(false);
+
+        $this->listener->onLoad($event);
+        $this->assertEquals($options, $event->getWidgetOptions());
     }
 }

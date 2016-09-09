@@ -31,6 +31,17 @@ oro_system_configuration:
                                         children:
                                             - oro_sidebar.sidebar_left_active
                                             - oro_sidebar.sidebar_right_active
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    sidebar_settings:
+                                        children:
+                                            - oro_sidebar.sidebar_left_active
+                                            - oro_sidebar.sidebar_right_active
 
     api_tree:
         look-and-feel:

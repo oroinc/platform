@@ -39,3 +39,10 @@ services:
         public: false
         tags:
             - { name: oro_entity.alias_provider }
+
+    oro_test.event_listener.update_user_command:
+        class: Oro\Bundle\TestFrameworkBundle\EventListener\UpdateUserCommandEventListener
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }

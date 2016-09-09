@@ -20,7 +20,7 @@ class RelationGuesser implements GuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column)
+    public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];
         if (array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)

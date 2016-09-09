@@ -74,7 +74,7 @@ define(function(require) {
             var events = {};
             var linkSelector = '';
             if (this.links) {
-                events['click .dropdown-toggle'] = 'onToggle';
+                events['shown.bs.dropdown'] = 'onDropdownShown';
                 linkSelector = ' .dropdown-menu a';
             }
             events['click' + linkSelector] = 'onClick';
@@ -228,11 +228,8 @@ define(function(require) {
             return this.onClickReturnValue;
         },
 
-        onToggle: function(e) {
-            var $link = $(e.currentTarget);
-            if (!$link.closest('.btn-group').hasClass('open')) {
-                this.trigger('expand', this);
-            }
+        onDropdownShown: function(e) {
+            this.trigger('expand', this);
         },
 
         /**

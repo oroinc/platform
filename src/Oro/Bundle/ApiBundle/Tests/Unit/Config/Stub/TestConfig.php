@@ -8,11 +8,12 @@ class TestConfig
 {
     use Traits\ConfigTrait;
     use Traits\ExclusionPolicyTrait;
+    use Traits\DescriptionTrait;
 
     const EXCLUSION_POLICY      = 'exclusion_policy';
     const EXCLUSION_POLICY_ALL  = 'all';
     const EXCLUSION_POLICY_NONE = 'none';
-    const LABEL                 = 'label';
+    const DESCRIPTION           = 'description';
 
     /** @var array */
     protected $items = [];
@@ -38,27 +39,5 @@ class TestConfig
     public function isEmpty()
     {
         return empty($this->items);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getLabel()
-    {
-        return array_key_exists(self::LABEL, $this->items)
-            ? $this->items[self::LABEL]
-            : null;
-    }
-
-    /**
-     * @param string|null $label
-     */
-    public function setLabel($label)
-    {
-        if ($label) {
-            $this->items[self::LABEL] = $label;
-        } else {
-            unset($this->items[self::LABEL]);
-        }
     }
 }

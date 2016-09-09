@@ -25,6 +25,13 @@ oro_layout:
 ```
 See [theme definition](./theme_definition.md) topic for more details.
 
+Use layout theme configuration
+-----------------------
+
+Configuration files such as **assets**, **images** or **requirejs** should be placed in `layout/{theme_name}/config` folder.
+
+See [config definition](./config_definition.md) topic for more details.
+
 Set default theme
 -----------------
 
@@ -52,7 +59,7 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        href: { @value: $data.theme.icon }
+                        href: '=data["theme"].getIcon()'
                         rel: shortcut icon
                 head_style:
                     blockType: container

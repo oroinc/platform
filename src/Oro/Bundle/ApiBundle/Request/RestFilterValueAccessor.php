@@ -35,7 +35,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        return isset($this->parameters[strtolower($key)]);
+        return isset($this->parameters[$key]);
     }
 
     /**
@@ -44,8 +44,6 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     public function get($key)
     {
         $this->ensureRequestParsed();
-
-        $key = strtolower($key);
 
         return isset($this->parameters[$key])
             ? $this->parameters[$key]
@@ -81,7 +79,6 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        $key = strtolower($key);
         $delimPos = strpos($key, '[');
         $group = false !== $delimPos && substr($key, -1) === ']'
             ? substr($key, 0, $delimPos)
@@ -94,6 +91,22 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
             unset($this->parameters[$key]);
             unset($this->groups[$group][$key]);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($key)
+    {
+        $this->ensureRequestParsed();
+
+        $delimPos = strpos($key, '[');
+        $group = false !== $delimPos && substr($key, -1) === ']'
+            ? substr($key, 0, $delimPos)
+            : $key;
+
+        unset($this->parameters[$key]);
+        unset($this->groups[$group][$key]);
     }
 
     /**
@@ -141,11 +154,8 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      */
     protected function addParsed($group, $key, $path, $value, $operator)
     {
-        $group = strtolower($group);
-        $key = strtolower($key);
-
         $filterValue = new FilterValue(
-            strtolower($path),
+            $path,
             $value,
             $this->normalizeOperator($operator)
         );

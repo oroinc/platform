@@ -13,7 +13,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class MergeListener
 {
-    const TRANSLATE_KEY = 'plural_label';
+    const TRANSLATE_KEY = 'label';
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -55,7 +55,10 @@ class MergeListener
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
                 'template'      => 'OroActivityListBundle:Merge:value.html.twig',
                 'is_collection' => true,
-                'label'         => $this->translator->trans($this->getAliasByActivityClass($type)),
+                'label'         => $this->translator->trans(
+                    'oro.activity.merge.label',
+                    ['%activity%' => $this->translator->trans($this->getAliasByActivityClass($type))]
+                ),
                 'merge_modes'   => [MergeModes::ACTIVITY_UNITE, MergeModes::ACTIVITY_REPLACE]
             ];
 

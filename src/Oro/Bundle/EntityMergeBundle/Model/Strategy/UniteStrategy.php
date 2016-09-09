@@ -56,6 +56,13 @@ class UniteStrategy implements StrategyInterface
         }
 
         $collection = new ArrayCollection(array_values($relatedEntities));
+
+        if ($fieldMetadata->shouldBeCloned()) {
+            $collection = $collection->map(function ($element) {
+                return clone $element;
+            });
+        }
+
         $this->accessor->setValue($masterEntity, $fieldMetadata, $collection);
     }
 

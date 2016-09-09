@@ -2,72 +2,35 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-
 /**
  * @dbIsolation
  */
-class UpdateRestJsonApiWithTableInheritanceTest extends ApiTestCase
+class UpdateRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
 {
     /**
      * FQCN of the entity being used for testing.
      */
     const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->initClient(
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
-        );
-
-        parent::setUp();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getRequestType()
-    {
-        return new RequestType([RequestType::REST, RequestType::JSON_API]);
-    }
-
     public function testCreate()
     {
-        $entityAlias = $this->valueNormalizer->normalizeValue(
-            self::ENTITY_CLASS,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
+        $entityType = $this->getEntityType(self::ENTITY_CLASS);
 
         $data = [
             'data' => [
-                'type'       => $entityAlias,
+                'type'       => $entityType,
                 'attributes' => [
                     'title' => 'Department created by API'
                 ]
             ]
         ];
 
-        $this->client->request(
+        $response = $this->request(
             'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityAlias]),
-            $data,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
+            $data
         );
 
-        $response = $this->client->getResponse();
         self::assertResponseStatusCodeEquals($response, 201);
         self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
         $result = self::jsonToArray($response->getContent());
@@ -84,15 +47,11 @@ class UpdateRestJsonApiWithTableInheritanceTest extends ApiTestCase
      */
     public function testUpdate($id)
     {
-        $entityAlias = $this->valueNormalizer->normalizeValue(
-            self::ENTITY_CLASS,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
+        $entityType = $this->getEntityType(self::ENTITY_CLASS);
 
         $data = [
             'data' => [
-                'type'       => $entityAlias,
+                'type'       => $entityType,
                 'id'         => $id,
                 'attributes' => [
                     'title' => 'Department updated by API'
@@ -100,18 +59,12 @@ class UpdateRestJsonApiWithTableInheritanceTest extends ApiTestCase
             ]
         ];
 
-        $this->client->request(
+        $response = $this->request(
             'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityAlias, 'id' => $id]),
-            $data,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => $id]),
+            $data
         );
 
-        $response = $this->client->getResponse();
         self::assertResponseStatusCodeEquals($response, 200);
         self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
         $result = self::jsonToArray($response->getContent());

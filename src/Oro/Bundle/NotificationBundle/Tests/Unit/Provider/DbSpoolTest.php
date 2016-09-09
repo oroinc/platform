@@ -4,6 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
+use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 
 class DbSpoolTest extends \PHPUnit_Framework_TestCase
@@ -35,6 +36,11 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
      */
     protected $handler;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $eventDispatcher;
+
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -44,7 +50,10 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
         $this->entityPool = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Doctrine\EntityPool')
             ->disableOriginalConstructor()->getMock();
 
-        $this->spool = new DbSpool($this->em, $this->entityPool, self::SPOOL_ITEM_CLASS);
+        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->spool = new DbSpool($this->em, $this->entityPool, self::SPOOL_ITEM_CLASS, $this->eventDispatcher);
 
         $this->spool->start();
         $this->spool->stop();
@@ -57,7 +66,7 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
     public function testQueueMessage()
     {
         $message = $this->getMock('\Swift_Mime_Message');
-
+        $this->spool->setLogType('log type');
         $this->entityPool->expects($this->once())
             ->method('addPersistEntity')
             ->with(
@@ -67,6 +76,7 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
                         $this->assertInstanceOf(self::SPOOL_ITEM_CLASS, $spoolItem);
                         $this->assertEquals($message, $spoolItem->getMessage());
                         $this->assertEquals(DbSpool::STATUS_READY, $spoolItem->getStatus());
+                        $this->assertEquals('log type', $spoolItem->getLogType());
                         return true;
                     }
                 )
@@ -123,6 +133,18 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with($message, array())
             ->will($this->returnValue(1));
+
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
+            NotificationSentEvent::NAME,
+            $this->callback(
+                function ($event) use ($spoolItem) {
+                    $this->assertTrue($event instanceof NotificationSentEvent);
+                    $this->assertEquals($spoolItem, $event->getSpoolItem());
+                    $this->assertEquals(1, $event->getSentCount());
+                    return true;
+                }
+            )
+        );
 
         $this->spool->setTimeLimit(-100);
         $count = $this->spool->flushQueue($transport);

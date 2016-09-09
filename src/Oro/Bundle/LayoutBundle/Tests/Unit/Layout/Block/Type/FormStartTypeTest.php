@@ -4,7 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
 use Symfony\Component\Form\FormView;
 
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Block\Type\BaseType;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType;

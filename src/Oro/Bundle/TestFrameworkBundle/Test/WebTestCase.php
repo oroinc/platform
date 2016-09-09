@@ -6,11 +6,11 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
-use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
-use Oro\Component\Testing\DbIsolationExtension;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Component\Testing\DbIsolationExtension;
 
 /**
  * Abstract class for functional and integration tests
@@ -32,6 +33,7 @@ abstract class WebTestCase extends BaseWebTestCase
     
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
+    const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
     const DB_REINDEX_ANNOTATION   = 'dbReindex';
 
     /** Default WSSE credentials */
@@ -47,6 +49,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @var bool[]
      */
     private static $dbIsolation;
+
+    /**
+     * @var bool[]
+     */
+    private static $dbIsolationPerTest;
 
     /**
      * @var bool[]
@@ -85,6 +92,11 @@ abstract class WebTestCase extends BaseWebTestCase
 
     protected function tearDown()
     {
+        if (self::getDbIsolationPerTestSetting()) {
+            $this->rollbackTransaction();
+            self::$loadedFixtures = [];
+        }
+        
         $refClass = new \ReflectionClass($this);
         foreach ($refClass->getProperties() as $prop) {
             if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
@@ -96,7 +108,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     public static function tearDownAfterClass()
     {
-        if (self::getDbIsolationSetting()) {
+        if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
             self::rollbackTransaction();
         }
 
@@ -120,6 +132,10 @@ abstract class WebTestCase extends BaseWebTestCase
             $this->resetClient();
         }
 
+        if (self::getDbIsolationPerTestSetting()) {
+            $this->resetClient();
+        }
+
         if (!self::$clientInstance) {
             // Fix for: The "native_profiler" extension is not enabled in "*.html.twig".
             // If you still getting this exception please run "php app/console cache:clear --env=test --no-debug".
@@ -130,7 +146,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
             $this->client = self::$clientInstance = static::createClient($options, $server);
 
-            if (self::getDbIsolationSetting()) {
+            if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
                 //This is a workaround for MyISAM search tables that are not transactional
                 if (self::getDbReindexSetting()) {
                     self::getContainer()->get('oro_search.search.engine')->reindex();
@@ -151,7 +167,7 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function resetClient()
     {
         if (self::$clientInstance) {
-            if (self::getDbIsolationSetting()) {
+            if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
                 self::$loadedFixtures = [];
                 $this->rollbackTransaction();
             }
@@ -197,6 +213,24 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$dbIsolation[$calledClass];
+    }
+
+    /**
+     * Get value of dbIsolationPerTest option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getDbIsolationPerTestSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$dbIsolationPerTest[$calledClass])) {
+            self::$dbIsolationPerTest[$calledClass] = self::isClassHasAnnotation(
+                $calledClass,
+                self::DB_ISOLATION_PER_TEST_ANNOTATION
+            );
+        }
+
+        return self::$dbIsolationPerTest[$calledClass];
     }
 
     /**
@@ -285,6 +319,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function runCommand($name, array $params = [])
     {
+        /** @var KernelInterface $kernel */
         $kernel = self::getContainer()->get('kernel');
 
         $application = new Application($kernel);
@@ -339,6 +374,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $loader = $this->getFixtureLoader($classNames);
         $fixtures = array_values($loader->getFixtures());
 
+        /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManager();
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
@@ -349,11 +385,20 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @param string $referenceUID
      *
-     * @return object
+     * @return object|mixed
      */
     protected function getReference($referenceUID)
     {
         return $this->getReferenceRepository()->getReference($referenceUID);
+    }
+
+    /**
+     * @param string $referenceUID
+     * @return bool
+     */
+    protected function hasReference($referenceUID)
+    {
+        return $this->getReferenceRepository()->hasReference($referenceUID);
     }
 
     /**
@@ -686,11 +731,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
     {
         try {
-            \PHPUnit_Framework_TestCase::assertEquals(
-                $statusCode,
-                $response->getStatusCode(),
-                $response->getContent()
-            );
+            \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode());
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             if ($statusCode < 400
                 && $response->getStatusCode() >= 400
@@ -708,6 +749,11 @@ abstract class WebTestCase extends BaseWebTestCase
                         $e->getMessage()
                         . ' Error message: ' . $content['message']
                         . ($errors ? '. Errors: ' . $errors : ''),
+                        $e->getComparisonFailure()
+                    );
+                } else {
+                    $e = new \PHPUnit_Framework_ExpectationFailedException(
+                        $e->getMessage() . ' Response content: ' . $response->getContent(),
                         $e->getComparisonFailure()
                     );
                 }

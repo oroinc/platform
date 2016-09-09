@@ -254,4 +254,27 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([$resource1, $resource2, $resource3], $result);
     }
+
+    public function testLoadEmptyFileWithoutWarnings()
+    {
+        $bundle1 = new TestBundle1();
+        $bundle1Dir = dirname((new \ReflectionClass($bundle1))->getFileName());
+
+        $resource1 = new CumulativeResourceInfo(get_class($bundle1), 'empty', 'empty', []);
+
+        $resourceLoader = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader->expects($this->once())
+            ->method('load')
+            ->with(get_class($bundle1), $bundle1Dir)
+            ->will($this->returnValue([$resource1]));
+
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles(['TestBundle1' => get_class($bundle1)]);
+
+        $loader = new CumulativeConfigLoader('empty', $resourceLoader);
+        $result = $loader->load();
+
+        $this->assertEquals([$resource1], $result);
+    }
 }

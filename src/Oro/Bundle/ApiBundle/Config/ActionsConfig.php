@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Config\Traits;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 class ActionsConfig
 {
+    use Traits\ActionsTrait;
+
     /** @var ActionConfig[] [action name => ActionConfig, ...] */
     protected $actions = [];
 
@@ -14,17 +19,7 @@ class ActionsConfig
      */
     public function toArray()
     {
-        $result = [];
-        if (!empty($this->actions)) {
-            foreach ($this->actions as $actionName => $action) {
-                $actionConfig = $action->toArray();
-                if (!empty($actionConfig)) {
-                    $result[$actionName] = $actionConfig;
-                }
-            }
-        }
-
-        return $result;
+        return ConfigUtil::convertObjectsToArray($this->actions);
     }
 
     /**
@@ -38,68 +33,10 @@ class ActionsConfig
     }
 
     /**
-     * Make a deep copy of object.
+     * Makes a deep copy of the object.
      */
     public function __clone()
     {
-        array_walk(
-            $this->actions,
-            function (&$action) {
-                $action = clone $action;
-            }
-        );
-    }
-
-    /**
-     * Gets the configuration for all actions.
-     *
-     * @return ActionConfig[] [action name => ActionConfig, ...]
-     */
-    public function getActions()
-    {
-        return $this->actions;
-    }
-
-    /**
-     * Gets the configuration of the action.
-     *
-     * @param string $actionName
-     *
-     * @return ActionConfig|null
-     */
-    public function getAction($actionName)
-    {
-        return isset($this->actions[$actionName])
-            ? $this->actions[$actionName]
-            : null;
-    }
-
-    /**
-     * Adds the configuration of the action.
-     *
-     * @param string            $actionName
-     * @param ActionConfig|null $action
-     *
-     * @return ActionConfig
-     */
-    public function addAction($actionName, ActionConfig $action = null)
-    {
-        if (null === $action) {
-            $action = new ActionConfig();
-        }
-
-        $this->actions[$actionName] = $action;
-
-        return $action;
-    }
-
-    /**
-     * Removes the configuration of the action.
-     *
-     * @param string $actionName
-     */
-    public function removeAction($actionName)
-    {
-        unset($this->actions[$actionName]);
+        $this->actions = ConfigUtil::cloneObjects($this->actions);
     }
 }

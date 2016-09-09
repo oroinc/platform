@@ -5,6 +5,9 @@ namespace Oro\Bundle\CalendarBundle\Handler;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
@@ -15,6 +18,9 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class CalendarEventDeleteHandler extends DeleteHandler
 {
+    /** @var RequestStack */
+    protected $requestStack;
+
     /** @var SystemCalendarConfig */
     protected $calendarConfig;
 
@@ -25,9 +31,21 @@ class CalendarEventDeleteHandler extends DeleteHandler
     protected $emailSendProcessor;
 
     /**
+     * @param RequestStack $requestStack
+     *
+     * @return CalendarEventDeleteHandler
+     */
+    public function setRequestStack(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+
+        return $this;
+    }
+
+    /**
      * @param EmailSendProcessor $emailSendProcessor
      *
-     * @return self
+     * @return CalendarEventDeleteHandler
      */
     public function setEmailSendProcessor(EmailSendProcessor $emailSendProcessor)
     {
@@ -39,7 +57,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
     /**
      * @param SystemCalendarConfig $calendarConfig
      *
-     * @return self
+     * @return CalendarEventDeleteHandler
      */
     public function setCalendarConfig(SystemCalendarConfig $calendarConfig)
     {
@@ -51,7 +69,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
     /**
      * @param SecurityFacade $securityFacade
      *
-     * @return self
+     * @return CalendarEventDeleteHandler
      */
     public function setSecurityFacade(SecurityFacade $securityFacade)
     {
@@ -95,6 +113,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
      */
     public function handleDelete($id, ApiEntityManager $manager)
     {
+        /** @var CalendarEvent $entity */
         $entity = $manager->find($id);
         if (!$entity) {
             throw new EntityNotFoundException();
@@ -105,11 +124,61 @@ class CalendarEventDeleteHandler extends DeleteHandler
     }
 
     /**
+     * @param CalendarEvent $entity
+     *
      * {@inheritdoc}
      */
     public function processDelete($entity, ObjectManager $em)
     {
-        parent::processDelete($entity, $em);
-        $this->emailSendProcessor->sendDeleteEventNotification($entity);
+        $this->checkPermissions($entity, $em);
+
+        if ($this->shouldCancelInsteadDelete() && $entity->getRecurringEvent()) {
+            $event = $entity->getRealCalendarEvent();
+            $event->setCancelled(true);
+
+            $childEvents = $event->getChildEvents();
+            foreach ($childEvents as $childEvent) {
+                $childEvent->setCancelled(true);
+            }
+        } else {
+            if ($entity->getRecurrence() && $entity->getRecurrence()->getId()) {
+                $em->remove($entity->getRecurrence());
+            }
+
+            if ($entity->getRecurringEvent()) {
+                $event = $entity->getRealCalendarEvent();
+                $childEvents = $event->getChildEvents();
+                foreach ($childEvents as $childEvent) {
+                    $this->deleteEntity($childEvent, $em);
+                }
+            }
+            $this->deleteEntity($entity, $em);
+        }
+
+        $em->flush();
+        
+        if ($this->shouldSendNotification()) {
+            $this->emailSendProcessor->sendDeleteEventNotification($entity);
+        }
+    }
+    
+    /**
+     * @return bool
+     */
+    protected function shouldSendNotification()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        return !$request || (bool) $request->query->get('notifyInvitedUsers', false);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldCancelInsteadDelete()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request && (bool) $request->query->get('isCancelInsteadDelete', false);
     }
 }

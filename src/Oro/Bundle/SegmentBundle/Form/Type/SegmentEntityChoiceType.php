@@ -11,6 +11,14 @@ class SegmentEntityChoiceType extends EntityChoiceType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_segment_entity_choice';
     }
 }

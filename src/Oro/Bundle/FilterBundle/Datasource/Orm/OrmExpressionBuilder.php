@@ -148,7 +148,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function in($x, $y, $withParam = false)
     {
-        return $this->expr->in($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
+        return $this->expr->in($this->prepareParameter($x), $this->prepareParameter($y, $withParam, false));
     }
 
     /**
@@ -156,7 +156,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function notIn($x, $y, $withParam = false)
     {
-        return $this->expr->notIn($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
+        return $this->expr->notIn($this->prepareParameter($x), $this->prepareParameter($y, $withParam, false));
     }
 
     /**
@@ -246,13 +246,14 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     /**
      * @param $param
      * @param bool $withParam
+     * @param bool $allowInsensitive
      *
      * @return mixed
      */
-    protected function prepareParameter($param, $withParam = false)
+    protected function prepareParameter($param, $withParam = false, $allowInsensitive = true)
     {
         $param = $withParam ? ':' . $param : $param;
-        if ($this->caseInsensitive) {
+        if ($allowInsensitive && $this->caseInsensitive) {
             $param = $this->expr->lower($param);
         }
 

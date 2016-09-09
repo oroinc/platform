@@ -15,6 +15,11 @@ use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
  */
 class Manager implements ManagerInterface
 {
+    /**
+     * This flag may be used by callers of this class and extensions to decide are they required for current request
+     */
+    const REQUIRE_ALL_EXTENSIONS = 'require_all_extensions';
+
     /** @var Builder */
     protected $datagridBuilder;
 

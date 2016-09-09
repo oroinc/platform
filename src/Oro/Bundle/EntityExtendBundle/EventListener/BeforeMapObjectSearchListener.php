@@ -118,13 +118,14 @@ class BeforeMapObjectSearchListener
                         [
                             'name'          => $targetField,
                             'target_type'   => $targetType,
-                            'target_fields' => [strtolower($fieldName . '_' . $targetField)]
+                            'target_fields' => [$fieldName . '_' . $targetField]
                         ]
                     ]
                 ];
             } elseif (in_array($fieldType, [Indexer::RELATION_MANY_TO_MANY, Indexer::RELATION_ONE_TO_MANY])) {
                 $config       = $extendConfigProvider->getConfig($className, $fieldName);
                 $targetEntity = $config->get('target_entity');
+
 
                 $targetFields = array_unique(
                     array_merge(
@@ -141,7 +142,7 @@ class BeforeMapObjectSearchListener
                     $fields[]   = [
                         'name'          => $targetField,
                         'target_type'   => $targetType,
-                        'target_fields' => [strtolower($fieldName . '_' . $targetField)]
+                        'target_fields' => [$fieldName . '_' . $targetField]
                     ];
                 }
 
@@ -154,7 +155,7 @@ class BeforeMapObjectSearchListener
                 $field = [
                     'name'          => $fieldName,
                     'target_type'   => $fieldType,
-                    'target_fields' => [strtolower($fieldName)]
+                    'target_fields' => [$fieldName]
                 ];
             }
             $mapConfig[$className][self::FIELDS_PATH][] = $field;

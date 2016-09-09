@@ -9,6 +9,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
 
 /**
  * Base testcase class for all ORM testcases.
@@ -109,6 +110,9 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
                     array_merge($records, [false])
                 )
             );
+        $statement->expects($this->any())
+            ->method('getIterator')
+            ->willReturn(new FetchIterator($statement));
         if ($params) {
             if ($types) {
                 $counter = 0;

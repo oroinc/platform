@@ -22,8 +22,16 @@ class PhpDriver extends AbstractDriver
     /**
      * {@inheritdoc}
      */
+    public function getUpdateFilenamePattern($fileExtension)
+    {
+        return sprintf('/^(?!.*html\.%s$).*\.%s$/', $fileExtension, $fileExtension);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     protected function loadResourceGeneratorData($file)
     {
-        return new GeneratorData(file_get_contents($file));
+        return new GeneratorData(file_get_contents($file), $file);
     }
 }

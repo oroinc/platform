@@ -9,7 +9,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class Email
@@ -80,9 +79,6 @@ class Email implements OrganizationAwareInterface
 
     /** @var  Organization */
     protected $organization;
-
-    /** @var User */
-    protected $campaignOwner;
 
     /**
      * Constructor
@@ -549,21 +545,5 @@ class Email implements OrganizationAwareInterface
         $this->organization = $organization;
 
         return $this;
-    }
-
-    /**
-     * @return User
-     */
-    public function getCampaignOwner()
-    {
-        return $this->campaignOwner;
-    }
-
-    /**
-     * @param User $user
-     */
-    public function setCampaignOwner(User $user = null)
-    {
-        $this->campaignOwner = $user;
     }
 }

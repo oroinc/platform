@@ -54,7 +54,7 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
      */
     public function isPropagable()
     {
-        return true;
+        return false;
     }
 
     /**

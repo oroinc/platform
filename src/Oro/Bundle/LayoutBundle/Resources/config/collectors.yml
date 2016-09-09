@@ -1,0 +1,9 @@
+services:
+    oro_layout.profiler.layout_data_collector:
+        class: Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector
+        public: false
+        arguments:
+            - '@oro_config.user'
+            - '%kernel.debug%'
+        tags:
+            - { name: data_collector, template: 'OroLayoutBundle:Collector:layout.html.twig', id: layout }

@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
@@ -18,11 +17,9 @@ class TaggableDatagridExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver
-            ->setDefaults(['enable_tagging' => false])
-            ->setAllowedTypes(['enable_tagging' => 'bool']);
+        $resolver->setDefaults(['enable_tagging' => false]);
     }
 
     /**

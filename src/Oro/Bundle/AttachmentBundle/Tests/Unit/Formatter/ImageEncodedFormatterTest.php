@@ -14,12 +14,12 @@ class ImageEncodedFormatterTest extends \PHPUnit_Framework_TestCase
     protected $fileLocator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $manager;
+    protected $fileManager;
 
     protected function setUp()
     {
-        $this->manager = $this
-            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+        $this->fileManager = $this
+            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -27,7 +27,7 @@ class ImageEncodedFormatterTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Symfony\Component\HttpKernel\Config\FileLocator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formatter   = new ImageEncodedFormatter($this->manager, $this->fileLocator);
+        $this->formatter   = new ImageEncodedFormatter($this->fileManager, $this->fileLocator);
     }
 
     public function testGetFormatterName()
@@ -42,7 +42,7 @@ class ImageEncodedFormatterTest extends \PHPUnit_Framework_TestCase
         $file->setOriginalFilename('test.png');
         $expected = '<img src="data:image/png;base64,dGVzdA==" alt = "test.png"/>';
 
-        $this->manager
+        $this->fileManager
             ->expects($this->once())
             ->method('getContent')
             ->with($file)

@@ -5,6 +5,8 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -62,15 +64,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function fixUnusedParameters(QueryBuilder $qb)
     {
-        $dql            = $qb->getDQL();
-        $usedParameters = [];
-        /** @var $parameter \Doctrine\ORM\Query\Parameter */
-        foreach ($qb->getParameters() as $parameter) {
-            if ($this->dqlContainsParameter($dql, $parameter->getName())) {
-                $usedParameters[$parameter->getName()] = $parameter->getValue();
-            }
-        }
-        $qb->setParameters($usedParameters);
+        QueryUtils::removeUnusedParameters($qb);
     }
 
     /**
@@ -83,11 +77,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function dqlContainsParameter($dql, $parameterName)
     {
-        $pattern = is_numeric($parameterName)
-            ? sprintf('/\?%s[^\w]/', preg_quote($parameterName))
-            : sprintf('/\:%s[^\w]/', preg_quote($parameterName));
-
-        return (bool)preg_match($pattern, $dql . ' ');
+        return QueryUtils::dqlContainsParameter($dql, $parameterName);
     }
 
     /**

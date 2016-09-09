@@ -20,6 +20,10 @@ define([
      * @extends Backbone.BootstrapModal
      */
     Modal = Backbone.BootstrapModal.extend({
+        events: _.extend(Backbone.BootstrapModal.prototype.events, {
+            'click [data-button-id]': 'onButtonClick'
+        }),
+
         defaults: {
             okText: __('OK'),
             cancelText: __('Cancel'),
@@ -50,6 +54,17 @@ define([
         },
 
         /**
+         * Handler for button click
+         *
+         * @param {jQuery.Event} event
+         */
+        onButtonClick: function(event) {
+            event.preventDefault();
+            this.trigger('buttonClick', $(event.target).data('button-id'));
+            this.close();
+        },
+
+        /**
          * Renders and shows the modal
          *
          * @param {Function} [cb]     Optional callback that runs only when OK is pressed.
@@ -69,12 +84,7 @@ define([
                 backdrop: this.options.allowCancel ? true : 'static'
             }, this.options.modalOptions));
 
-            //Focus OK button
             $el.one('shown', function() {
-                if (self.options.focusOk) {
-                    $el.find('.btn.ok').focus();
-                }
-
                 if (self.options.content && self.options.content.trigger) {
                     self.options.content.trigger('shown', self);
                 }
@@ -140,6 +150,19 @@ define([
                 $(window).on('resize' + this._eventNamespace(), _.bind(this._fixHeightForMobile, this));
             }
             mediator.trigger('modal:open', this);
+
+            //Focus OK button
+            if (self.options.focusOk) {
+                $el.find('.btn.ok')
+                    .one('focusin', function(e) {
+                        /*
+                         * Prevents jquery-ui from focusing different dialog
+                         * (which is happening when focusin is triggered on document
+                         */
+                        e.stopPropagation();
+                    })
+                    .focus();
+            }
 
             return this;
         },

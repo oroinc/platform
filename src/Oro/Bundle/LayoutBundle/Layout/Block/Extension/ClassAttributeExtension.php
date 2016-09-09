@@ -7,7 +7,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\OptionValueBag;
 
-use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry;
+use Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry;
 
 /**
  * This extension normalizes 'class' attribute and allows to use [append/subtract/replace]Option methods
@@ -16,13 +16,13 @@ use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry;
  */
 class ClassAttributeExtension extends BaseClassAttributeExtension
 {
-    /** @var ConfigExpressionEncoderRegistry */
+    /** @var ExpressionEncoderRegistry */
     protected $encoderRegistry;
 
     /**
-     * @param ConfigExpressionEncoderRegistry $encoderRegistry
+     * @param ExpressionEncoderRegistry $encoderRegistry
      */
-    public function __construct(ConfigExpressionEncoderRegistry $encoderRegistry)
+    public function __construct(ExpressionEncoderRegistry $encoderRegistry)
     {
         $this->encoderRegistry = $encoderRegistry;
     }

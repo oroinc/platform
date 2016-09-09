@@ -1,7 +1,7 @@
 parameters:
     oro_layout.twig.extension.layout.class:   Oro\Bundle\LayoutBundle\Twig\LayoutExtension
     oro_layout.twig.renderer.class:           Oro\Bundle\LayoutBundle\Twig\TwigRenderer
-    oro_layout.twig.renderer.engine.class:    Symfony\Bridge\Twig\Form\TwigRendererEngine
+    oro_layout.twig.renderer.engine.class:    Oro\Bundle\LayoutBundle\Form\TwigRendererEngine
     oro_layout.twig.layout_renderer.class:    Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer
     oro_layout.twig.form.engine.class:        Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine
 
@@ -26,6 +26,8 @@ services:
         class: %oro_layout.twig.renderer.engine.class%
         arguments:
             - %oro_layout.twig.resources%
+        calls:
+            - [setLayoutHelper, ['@oro_layout.helper']]
 
     oro_layout.twig.layout_renderer:
         public: false

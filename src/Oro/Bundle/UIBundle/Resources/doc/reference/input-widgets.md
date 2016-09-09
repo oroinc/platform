@@ -28,7 +28,7 @@ var UniformSelectInputWidget = AbstractInputWidget.extend({
     },
 
     findContainer: function() {
-        this.$container = this.$el.parent('.selector');
+        return this.$el.parent('.selector');
     }
 });
 
@@ -43,6 +43,13 @@ InputWidgetManager.addWidget('uniform-select', {
 //Create widgets for all apllicable inputs
 
 $(':input').inputWidget('create');
+
+/**
+* Call function from InputWidget or jQuery.
+* See available functions in AbstractInputWidget.overrideJqueryMethods
+* Example: will be executed InputWidget.val function, if widget and function exists, or $.val function.
+*/
+$(':input').inputWidget('val', newValue);
 ```
 
 Your can see more examples in code:

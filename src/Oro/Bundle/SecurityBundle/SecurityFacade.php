@@ -170,7 +170,7 @@ class SecurityFacade
     /**
      * Gets logged user object or null
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function getLoggedUser()
     {

@@ -11,9 +11,12 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
  */
 class CollectResourcesContext extends ApiContext
 {
-    public function __construct()
+    /**
+     * {@inheritdoc}
+     */
+    protected function initialize()
     {
-        parent::__construct();
+        parent::initialize();
         $this->setResult(new ApiResourceCollection());
     }
 }

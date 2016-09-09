@@ -13,7 +13,7 @@ class ControllersTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
     }
 
@@ -31,7 +31,7 @@ class ControllersTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_calendar_view',
-                array('id' => self::DEFAULT_USER_CALENDAR_ID)
+                ['id' => self::DEFAULT_USER_CALENDAR_ID]
             )
         );
         $result = $this->client->getResponse();

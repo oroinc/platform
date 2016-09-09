@@ -12,13 +12,10 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
-    use Traits\LabelTrait;
     use Traits\DescriptionTrait;
     use Traits\DataTypeTrait;
+    use Traits\AssociationTargetTrait;
     use Traits\FormTrait;
-
-    /** a human-readable representation of the field */
-    const LABEL = EntityDefinitionConfig::LABEL;
 
     /** a human-readable description of the field */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
@@ -26,11 +23,26 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /** the data type of the field value */
     const DATA_TYPE = 'data_type';
 
+    /** a flag indicates whether the field represents a meta information */
+    const META_PROPERTY = 'meta_property';
+
+    /** the class name of a target entity */
+    const TARGET_CLASS = 'target_class';
+
+    /**
+     * the type of a target association, can be "to-one" or "to-many",
+     * also "collection" can be used in Resources/config/oro/api.yml file as an alias for "to-many"
+     */
+    const TARGET_TYPE = 'target_type';
+
     /** the form type that should be used for the field */
     const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;
 
     /** the form options that should be used for the field */
     const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
+
+    /** a list of fields on which this field depends on */
+    const DEPENDS_ON = 'depends_on';
 
     /**
      * {@inheritdoc}
@@ -42,6 +54,32 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
         $this->removeItemWithDefaultValue($result, self::COLLAPSE);
 
         return $result;
+    }
+
+    /**
+     * Indicates whether the field represents a meta information.
+     *
+     * @return bool
+     */
+    public function isMetaProperty()
+    {
+        return array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY, $this->items)
+            ? $this->items[EntityDefinitionFieldConfig::META_PROPERTY]
+            : false;
+    }
+
+    /**
+     * Sets a flag indicates whether the field represents a meta information.
+     *
+     * @param bool $isMetaProperty
+     */
+    public function setMetaProperty($isMetaProperty)
+    {
+        if ($isMetaProperty) {
+            $this->items[EntityDefinitionFieldConfig::META_PROPERTY] = $isMetaProperty;
+        } else {
+            unset($this->items[EntityDefinitionFieldConfig::META_PROPERTY]);
+        }
     }
 
     /**
@@ -136,6 +174,32 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
                 $dataTransformers = [$dataTransformers];
             }
             $this->items[self::DATA_TRANSFORMER] = $dataTransformers;
+        }
+    }
+
+    /**
+     * Gets a list of fields on which this field depends on.
+     *
+     * @return string[]|null
+     */
+    public function getDependsOn()
+    {
+        return array_key_exists(self::DEPENDS_ON, $this->items)
+            ? $this->items[self::DEPENDS_ON]
+            : null;
+    }
+
+    /**
+     * Sets a list of fields on which this field depends on.
+     *
+     * @param string[] $fieldNames
+     */
+    public function setDependsOn(array $fieldNames)
+    {
+        if (!empty($fieldNames)) {
+            $this->items[self::DEPENDS_ON] = $fieldNames;
+        } else {
+            unset($this->items[self::DEPENDS_ON]);
         }
     }
 }

@@ -133,7 +133,10 @@ class SendEmailTemplate extends AbstractSendEmail
         $emailModel->setBody($templateRendered);
         $emailModel->setType($emailTemplate->getType());
 
-        $emailUser = $this->emailProcessor->process($emailModel);
+        $emailUser = $this->emailProcessor->process(
+            $emailModel,
+            $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
+        );
 
         if (array_key_exists('attribute', $this->options)) {
             $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());

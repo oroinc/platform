@@ -42,7 +42,9 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persist
         _mainButtons: function($buttons) {
             var key = this._getStorageKey();
             var index = key ? persistentStorage.getItem(key) || 0 : 0;
-            return $($buttons.get(index)) || this._superApply(arguments);
+            var result = $buttons.get(index);
+
+            return result ? $(result) : this._superApply(arguments);
         },
 
         /**

@@ -4,6 +4,7 @@ namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
@@ -26,14 +27,15 @@ class NoteManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    /** @var AttachmentProvider */
+    protected $attachmentProvider;
 
     /**
      * @param EntityManager      $em
      * @param SecurityFacade     $securityFacade
      * @param AclHelper          $aclHelper
      * @param EntityNameResolver $entityNameResolver
+     * @param AttachmentProvider $attachmentProvider
      * @param AttachmentManager  $attachmentManager
      */
     public function __construct(
@@ -41,12 +43,14 @@ class NoteManager
         SecurityFacade $securityFacade,
         AclHelper $aclHelper,
         EntityNameResolver $entityNameResolver,
+        AttachmentProvider $attachmentProvider,
         AttachmentManager $attachmentManager
     ) {
         $this->em                 = $em;
         $this->securityFacade     = $securityFacade;
         $this->aclHelper          = $aclHelper;
         $this->entityNameResolver = $entityNameResolver;
+        $this->attachmentProvider = $attachmentProvider;
         $this->attachmentManager  = $attachmentManager;
     }
 
@@ -98,6 +102,7 @@ class NoteManager
         ];
         $this->addUser($result, 'createdBy', $entity->getOwner());
         $this->addUser($result, 'updatedBy', $entity->getUpdatedBy());
+        $result = array_merge($result, $this->attachmentProvider->getAttachmentInfo($entity));
 
         return $result;
     }

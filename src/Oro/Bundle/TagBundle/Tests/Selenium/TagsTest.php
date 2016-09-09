@@ -21,7 +21,7 @@ class TagsTest extends Selenium2TestCase
             ->assertTitle('Create Tag - Tags - System')
             ->setTagName($tagName)
             ->setOwner('admin')
-            ->save()
+            ->save('Save and Close')
             ->assertMessage('Tag saved')
             ->assertTitle('All - Tags - System');
 
@@ -43,7 +43,7 @@ class TagsTest extends Selenium2TestCase
             ->edit()
             ->assertTitle("{$tagName} Tag - Edit - Tags - System")
             ->setTagName($newTagName)
-            ->save()
+            ->save('Save and Close')
             ->assertMessage('Tag saved')
             ->assertTitle('All - Tags - System');
 

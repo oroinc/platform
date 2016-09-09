@@ -8,6 +8,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('oro/filter/choice-filter');
     var messenger = require('oroui/js/messenger');
+    var tools = require('oroui/js/tools');
     require('jquery.select2');
 
     /**
@@ -62,6 +63,11 @@ define(function(require) {
         previousData: [],
 
         /**
+         * Data of selected values
+         */
+        selectedData: {},
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
@@ -70,6 +76,9 @@ define(function(require) {
             } else {
                 this.dictionaryClass = this.class.replace(/\\/g, '_');
             }
+
+            this.listenTo(this, 'renderCriteriaLoadValues', this.renderCriteriaLoadValues);
+            this.listenTo(this, 'updateCriteriaLabels', this.updateCriteriaLabels);
 
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
@@ -80,11 +89,11 @@ define(function(require) {
         reset: function() {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
-            var data = select2element.select2('data');
-            if (data.length) {
+            var data = select2element.inputWidget('data');
+            if (data) {
                 this.previousData = data;
             }
-            select2element.select2('data',  null);
+            select2element.inputWidget('data',  null);
         },
 
         /**
@@ -99,12 +108,12 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * Execute ajax request to get data of entities by ids.
+         *
+         * @param successEventName
          */
-        _renderCriteria: function() {
+        loadValuesById: function(successEventName) {
             var self = this;
-            self.renderTemplate();
-
             $.ajax({
                 url: routing.generate(
                     'oro_dictionary_value',
@@ -115,16 +124,65 @@ define(function(require) {
                 data: {
                     'keys': this.value.value
                 },
-                success: function(reposne) {
-                    self.value.value = reposne.results;
-                    self._writeDOMValue(self.value);
-                    self.applySelect2();
-                    self.renderDeferred.resolve();
+                success: function(response) {
+                    self.trigger(successEventName, response);
                 },
                 error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
             });
+        },
+
+        /**
+         * Handler for event 'renderCriteriaLoadValues'
+         *
+         * @param response
+         */
+        renderCriteriaLoadValues: function(response) {
+            this.updateLocalValues(response.results);
+
+            this._writeDOMValue(this.value);
+            this.applySelect2();
+            this._updateCriteriaHint();
+            this.renderDeferred.resolve();
+        },
+
+        /**
+         * Handler for event 'updateCriteriaLabels'
+         *
+         * @param response
+         */
+        updateCriteriaLabels: function(response) {
+            this.updateLocalValues(response.results);
+            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
+            this._updateCriteriaHint();
+        },
+
+        /**
+         * Update privet variables selectedData and value
+         *
+         * @param values
+         *
+         * @returns {oro.filter.DictionaryFilter}
+         */
+        updateLocalValues: function(values) {
+            var ids = [];
+            _.each(values, function(item) {
+                ids.push(item.id);
+                this.selectedData[item.id] = item;
+            }, this);
+
+            this.value.value = ids;
+
+            return this;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _renderCriteria: function() {
+            this.renderTemplate();
+            this.loadValuesById('renderCriteriaLoadValues');
         },
 
         /**
@@ -135,7 +193,7 @@ define(function(require) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value === value.type);
+                    return (parseInt(choice.value) === parseInt(value.type));
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
@@ -167,14 +225,14 @@ define(function(require) {
 
             select2element.removeClass('hide');
             select2element.attr('multiple', 'multiple');
-            select2element.select2(select2Config);
+            select2element.inputWidget('create', 'select2', {initializeOptions: select2Config});
             self.isInitSelect2 = true;
             if (this.templateTheme) {
                 select2element.on('change', function() {
                     self.applyValue();
                 });
             }
-            select2element.select2('data',  values);
+            select2element.inputWidget('data',  values);
 
             this._criteriaRenderd = true;
         },
@@ -222,16 +280,21 @@ define(function(require) {
 
         /**
          * Convert data to format for select2
+         *
          * @returns {Array}
          */
         getDataForSelect2: function() {
             var values = [];
-            $.each(this.value.value, function(index, value) {
-                values.push({
-                    'id': value.id,
-                    'text': value.text
-                });
-            });
+            _.each(this.value.value, function(value) {
+                var item = this.selectedData[value];
+
+                if (item) {
+                    values.push({
+                        'id': item.id,
+                        'text': item.text
+                    });
+                }
+            }, this);
 
             return values;
         },
@@ -269,6 +332,57 @@ define(function(require) {
         },
 
         /**
+         * Set raw value to filter
+         *
+         * @param value
+         *
+         * @return {*}
+         */
+        setValue: function(value) {
+            this.preloadSelectedData(value);
+
+            var oldValue = this.value;
+            this.value = tools.deepClone(value);
+            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
+            this._updateDOMValue();
+
+            if (this.valueIsLoaded(value.value)) {
+                this._onValueUpdated(this.value, oldValue);
+            } else {
+                this.loadValuesById('updateCriteriaLabels');
+            }
+
+            return this;
+        },
+
+        /**
+         * Preloads selectedData with available data from select2 so that we don't have to
+         * make additional requests
+         */
+        preloadSelectedData: function(value) {
+            if (!this.isInitSelect2 || !value.value) {
+                return;
+            }
+
+            var data = this.$(this.elementSelector).inputWidget('data');
+            _.each(value.value, function(id) {
+                if (this.selectedData[id]) {
+                    return;
+                }
+
+                var item = _.find(data, function(item) {
+                    return item.id === id;
+                });
+
+                if (!item) {
+                    return;
+                }
+
+                this.selectedData[item.id] = item;
+            }, this);
+        },
+
+        /**
          * @inheritDoc
          */
         _writeDOMValue: function(value) {
@@ -281,7 +395,7 @@ define(function(require) {
         _readDOMValue: function() {
             var value;
             if (this.isInitSelect2) {
-                value = this.$el.find('.select-values-autocomplete').select2('val');
+                value = this.$el.find('.select-values-autocomplete').inputWidget('val');
             } else {
                 value = null;
             }
@@ -318,14 +432,14 @@ define(function(require) {
             var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
             var rightWidth = this.$('.filter-update').outerWidth();
             valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('margin-right', rightWidth);
+            valueFrame.css('padding-right', rightWidth);
         },
 
         /**
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var value = this._getDisplayValue();
             var option = null;
 
             if (!_.isUndefined(value.type)) {
@@ -341,34 +455,64 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var data = this.$(this.elementSelector).select2('data');
-            if (!data.length) {
+            var data = this.$(this.elementSelector).inputWidget('data');
+            if (!data || !data.length) {
                 data = this.previousData.length ? this.previousData : this.initialData;
             }
-            var hintRawValue = _.isObject(_.first(value.value)) ?
-                _.map(value.value, _.property('text')) :
-                _.chain(value.value)
-                    .map(function(id) {
-                        var item =  _.find(data, function(item) {
-                            return item.id === id;
-                        });
 
-                        return item ? item.text : item;
-                    })
-                    .filter(_.negate(_.isUndefined))
-                    .value();
+            if (this.valueIsLoaded(value.value)) {
+                var self = this;
 
-            var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
+                var hintRawValue = _.isObject(_.first(value.value)) ?
+                    _.map(value.value, _.property('text')) :
+                    _.chain(value.value)
+                        .map(function(id) {
+                            var item =  _.find(self.selectedData, function(item) {
+                                return item.id === id;
+                            });
 
-            return (option ? option.label + ' ' : '') + hintValue;
+                            return item ? item.text : item;
+                        })
+                        .filter(_.negate(_.isUndefined))
+                        .value();
+
+                var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
+
+                return (option ? option.label + ' ' : '') + hintValue;
+            } else {
+                return this.placeholder;
+            }
         },
 
         /**
          * @inheritDoc
          */
         _hideCriteria: function() {
-            this.$el.find(this.elementSelector).select2('close');
+            this.$el.find(this.elementSelector).inputWidget('close');
             DictionaryFilter.__super__._hideCriteria.apply(this, arguments);
+        },
+
+        /**
+         * Checking  the existence of entities with selected ids in loaded data.
+         *
+         * @param values
+         *
+         * @returns {boolean}
+         */
+        valueIsLoaded: function(values) {
+            if (values) {
+                var foundItems = 0;
+                var self = this;
+                _.each(values, function(item) {
+                    if (self.selectedData && self.selectedData[item]) {
+                        foundItems++;
+                    }
+                });
+
+                return foundItems === values.length;
+            }
+
+            return true;
         }
     });
 

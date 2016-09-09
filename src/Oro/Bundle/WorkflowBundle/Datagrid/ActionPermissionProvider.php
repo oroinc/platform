@@ -3,36 +3,16 @@
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActionPermissionProvider
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @param ConfigProvider $configProvider
-     */
-    public function __construct(ConfigProvider $configProvider)
-    {
-        $this->configProvider = $configProvider;
-    }
-
     /**
      * @param ResultRecordInterface $record
      * @return array
      */
     public function getWorkflowDefinitionPermissions(ResultRecordInterface $record)
     {
-        $isActiveWorkflow = false;
-        $relatedEntity = $record->getValue('entityClass');
-        if ($this->configProvider->hasConfig($relatedEntity)) {
-            $config = $this->configProvider->getConfig($relatedEntity);
-            $isActiveWorkflow = $record->getValue('name') == $config->get('active_workflow');
-        }
-
+        $isActiveWorkflow = $record->getValue('active');
         $isSystem = $record->getValue('system');
 
         return array(
@@ -42,7 +22,6 @@ class ActionPermissionProvider
             'delete'     => !$isSystem,
             'update'     => !$isSystem,
             'view'       => true,
-
         );
     }
 

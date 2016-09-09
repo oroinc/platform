@@ -23,7 +23,7 @@ class ReminderData implements ReminderDataInterface
      * @var User
      */
     protected $recipient;
-
+    
     /**
      * @param string $subject
      * @return ReminderData

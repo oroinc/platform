@@ -1,4 +1,9 @@
 oro_api:
+    entity_aliases:
+        Test\Entity4:
+            alias: entity4
+            plural_alias: entity4_plural
+
     entities:
         Test\Entity1:
             exclude: true
@@ -23,7 +28,7 @@ oro_api:
                         field51:
                             fields:
                                 field511:
-                                    disable_partial_load: true
+                                    hints: [HINT_TRANSLATABLE]
             filters:
                 fields:
                     field1: ~

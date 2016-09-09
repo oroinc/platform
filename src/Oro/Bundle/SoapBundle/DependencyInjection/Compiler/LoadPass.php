@@ -68,9 +68,7 @@ class LoadPass implements CompilerPassInterface
                 $className = $container->getParameter($className);
             }
 
-            $implementedInterfaces = class_implements($className);
-
-            if (isset($implementedInterfaces[FilterableLoaderInterface::class])) {
+            if (is_a($className, 'Oro\Bundle\SoapBundle\ServiceDefinition\Loader\FilterableLoaderInterface', true)) {
                 foreach ($definitionLoaderFilters as $filterId => $tags) {
                     $definition->addMethodCall($injectMethod, [new Reference($filterId)]);
                 }

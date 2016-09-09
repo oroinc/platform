@@ -36,7 +36,14 @@ class ReplaceStrategy implements StrategyInterface
             $sourceEntity = $masterEntity;
         }
 
-        $value         = $this->accessor->getValue($sourceEntity, $fieldMetadata);
+        $value = $this->accessor->getValue($sourceEntity, $fieldMetadata);
+
+        if ($fieldMetadata->shouldBeCloned()) {
+            $value = $value->map(function ($element) {
+                return clone $element;
+            });
+        }
+
         $this->accessor->setValue($masterEntity, $fieldMetadata, $value);
     }
 

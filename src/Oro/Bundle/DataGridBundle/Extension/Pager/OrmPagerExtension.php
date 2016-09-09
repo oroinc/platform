@@ -14,9 +14,6 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 /**
- * Class OrmPagerExtension
- * @package Oro\Bundle\DataGridBundle\Extension\Pager
- *
  * Responsibility of this extension is to apply pagination on query for ORM datasource
  */
 class OrmPagerExtension extends AbstractExtension
@@ -45,11 +42,10 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        // enabled by default for ORM datasource
-        $disabled = $this->getOr(PagerInterface::DISABLED_PARAM, false)
-            || $config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
-
-        return !$disabled && $config->getDatasourceType() == OrmDatasource::TYPE;
+        return
+            $config->getDatasourceType() === OrmDatasource::TYPE
+            && !$this->getOr(PagerInterface::DISABLED_PARAM, false)
+            && !$config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
     }
 
     /**
@@ -78,6 +74,7 @@ class OrmPagerExtension extends AbstractExtension
             $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
             $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
         }
+        $this->tryAdjustTotalCount();
         $this->pager->init();
     }
 
@@ -154,5 +151,18 @@ class OrmPagerExtension extends AbstractExtension
         $pagerParameters = $this->getParameters()->get(PagerInterface::PAGER_ROOT_PARAM, []);
 
         return isset($pagerParameters[$paramName]) ? $pagerParameters[$paramName] : $default;
+    }
+
+    /**
+     * If adjusted count will be provided in parameters this extension will pass it to pager
+     * to prevent unneeded count query.
+     */
+    protected function tryAdjustTotalCount()
+    {
+        $adjustedCount = $this->getOr(PagerInterface::ADJUSTED_COUNT);
+
+        if (null !== $adjustedCount && is_int($adjustedCount) && $adjustedCount >= 0) {
+            $this->pager->adjustTotalCount($adjustedCount);
+        }
     }
 }

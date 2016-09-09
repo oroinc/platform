@@ -6,8 +6,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 
 /**
  * Class ChoicesGuesser
@@ -22,32 +22,35 @@ class ChoicesGuesser implements GuesserInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var AclHelper */
-    protected $aclHelper;
+    /** @var ChoiceFieldHelper */
+    protected $choiceHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param AclHelper $aclHelper
+     * @param ChoiceFieldHelper $choiceHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, AclHelper $aclHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ChoiceFieldHelper $choiceHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->aclHelper = $aclHelper;
+        $this->choiceHelper = $choiceHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column)
+    public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
+
         if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
-                $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
+                if ($isEnabledInline) {
+                    $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
+                }
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::SELECT;
                 $result[PropertyInterface::TYPE_KEY] = 'field';
 
@@ -55,7 +58,10 @@ class ChoicesGuesser implements GuesserInterface
                 $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
                 $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
-                $result[Configuration::CHOICES_KEY] = $this->getChoices($targetEntity, $keyField, $labelField);
+                if (empty($column[Configuration::CHOICES_KEY])) {
+                    $result[Configuration::CHOICES_KEY] = $this->choiceHelper
+                        ->getChoices($targetEntity, $keyField, $labelField);
+                }
 
                 $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
                 $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
@@ -63,68 +69,6 @@ class ChoicesGuesser implements GuesserInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $columnName
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    protected function guessLabelField($metadata, $columnName)
-    {
-        $labelField = '';
-
-        if ($metadata->hasField('label')) {
-            $labelField = 'label';
-        } elseif ($metadata->hasField('name')) {
-            $labelField = 'name';
-        } else {
-            //get first field with type "string"
-            $isStringFieldPresent = false;
-            foreach ($metadata->getFieldNames() as $fieldName) {
-                if ($metadata->getTypeOfField($fieldName) === "string") {
-                    $labelField = $fieldName;
-                    $isStringFieldPresent = true;
-                    break;
-                }
-            }
-
-            if (!$isStringFieldPresent) {
-                throw new \Exception(
-                    "Could not find any field for using as label for 'choices' of '$columnName' column."
-                );
-            }
-        }
-
-        return $labelField;
-    }
-
-    /**
-     * @param string $entity
-     * @param string $keyField
-     * @param string $labelField
-     *
-     * @return array
-     */
-    protected function getChoices($entity, $keyField, $labelField)
-    {
-        $entityManager = $this->doctrineHelper->getEntityManager($entity);
-        $queryBuilder = $entityManager
-            ->getRepository($entity)
-            ->createQueryBuilder('e');
-        //select only id and label fields
-        $queryBuilder->select("e.$keyField, e.$labelField");
-
-        $result = $this->aclHelper->apply($queryBuilder)->getResult();
-        $choices = [];
-        foreach ($result as $item) {
-            $choices[$item[$keyField]] = $item[$labelField];
-        }
-
-        return $choices;
     }
 
     /**
@@ -193,7 +137,7 @@ class ChoicesGuesser implements GuesserInterface
             $labelField = $column[Configuration::BASE_CONFIG_KEY]
                 [Configuration::VIEW_OPTIONS_KEY][Configuration::VALUE_FIELD_NAME_KEY];
         } else {
-            $labelField = $this->guessLabelField($targetEntityMetadata, $columnName);
+            $labelField = $this->choiceHelper->guessLabelField($targetEntityMetadata, $columnName);
         }
 
         return $labelField;

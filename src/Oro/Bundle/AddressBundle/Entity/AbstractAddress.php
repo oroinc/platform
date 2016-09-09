@@ -312,6 +312,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @param int $id
      * @return AbstractAddress
+     * @deprecated since 1.10, to be removed in 2.0
      */
     public function setId($id)
     {
@@ -763,6 +764,16 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Pre update event listener
+     *
+     * @ORM\PreUpdate
+     */
+    public function beforeUpdate()
+    {
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 

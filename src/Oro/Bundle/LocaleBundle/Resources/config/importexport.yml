@@ -1,0 +1,31 @@
+services:
+    oro_locale.importexport.data_converter.property_path_title:
+        class: 'Oro\Bundle\LocaleBundle\ImportExport\DataConverter\PropertyPathTitleDataConverter'
+        public: false
+        parent: oro_importexport.data_converter.configurable
+
+    oro_locale.importexport.data_converter.localized_fallback_value_aware:
+        class: 'Oro\Bundle\LocaleBundle\ImportExport\DataConverter\LocalizedFallbackValueAwareDataConverter'
+        public: false
+        parent: oro_locale.importexport.data_converter.property_path_title
+        calls:
+            - [setRegistry, ["@doctrine"]]
+            - [setLocalizedFallbackValueClassName, ['%oro_locale.entity.localized_fallback_value.class%']]
+            - [setLocalizationClassName, ['%oro_locale.entity.localization.class%']]
+
+    oro_locale.importexport.strategy.localized_fallback_value_aware:
+        class: 'Oro\Bundle\LocaleBundle\ImportExport\Strategy\LocalizedFallbackValueAwareStrategy'
+        public: false
+        parent: oro_importexport.strategy.configurable_add_or_replace
+        calls:
+            - [setLocalizedFallbackValueClass, ['%oro_locale.entity.localized_fallback_value.class%']]
+
+    oro_locale.importexport.normalizer.localized_fallback_value_collection_normalizer:
+        class: 'Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizedFallbackValueCollectionNormalizer'
+        public: false
+        arguments:
+            - "@doctrine"
+            - '%oro_locale.entity.localized_fallback_value.class%'
+            - '%oro_locale.entity.localization.class%'
+        tags:
+            - { name: oro_importexport.normalizer, priority: -5 }

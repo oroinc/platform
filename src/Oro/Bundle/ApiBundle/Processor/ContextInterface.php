@@ -97,6 +97,13 @@ interface ContextInterface extends ComponentContextInterface
     public function setResponseStatusCode($statusCode);
 
     /**
+     * Indicates whether a result document represents a success response.
+     *
+     * @return int|null
+     */
+    public function isSuccessResponse();
+
+    /**
      * Gets a list of filters is used to add additional restrictions to a query is used to get result data.
      *
      * @return FilterCollection

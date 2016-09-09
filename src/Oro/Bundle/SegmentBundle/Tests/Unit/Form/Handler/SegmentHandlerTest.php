@@ -22,7 +22,12 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $manager;
+    protected $managerRegistry;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $staticSegmentManager;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -30,14 +35,14 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
+     * @var Segment| \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entity;
+
+    /**
      * @var SegmentHandler
      */
     protected $handler;
-
-    /**
-     * @var Segment
-     */
-    protected $entity;
 
     protected function setUp()
     {
@@ -45,12 +50,22 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();
-        $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->staticSegmentManager = $this->getMockBuilder(
+            'Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entity  = new Segment();
-        $this->handler = new SegmentHandler($this->form, $this->request, $this->manager);
+        $this->entity = $this->getMockBuilder('Oro\Bundle\SegmentBundle\Entity\Segment')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->handler = new SegmentHandler(
+            $this->form,
+            $this->request,
+            $this->managerRegistry,
+            $this->staticSegmentManager
+        );
     }
 
     protected function tearDown()
@@ -86,12 +101,23 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('isValid')
             ->will($this->returnValue(true));
 
-        $this->manager->expects($this->once())
+        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager->expects($this->once())
             ->method('persist')
             ->with($this->entity);
-
-        $this->manager->expects($this->once())
+        $manager->expects($this->once())
             ->method('flush');
+        $this->managerRegistry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($manager);
+
+        $this->entity->expects($this->atLeastOnce())
+            ->method('isStaticType')
+            ->willReturn(true);
+
+        $this->staticSegmentManager->expects($this->once())
+            ->method('run')
+            ->with($this->entity);
 
         $this->assertTrue($this->handler->process($this->entity));
     }

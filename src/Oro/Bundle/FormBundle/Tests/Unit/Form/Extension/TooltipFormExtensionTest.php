@@ -55,7 +55,6 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension = new TooltipFormExtension($this->configProvider, $this->translator);
         $extension->setDefaultOptions($resolver);
-        $this->assertEquals('form', $extension->getExtendedType());
     }
 
     public function testBuildView()

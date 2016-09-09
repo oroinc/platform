@@ -61,7 +61,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "dataaudit"={"auditable"=true},
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "form"={
  *              "form_type"="oro_user_select",

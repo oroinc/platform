@@ -23,7 +23,7 @@ services:
     oro_filter.form.event_subscriber.date:
         class: %oro_filter.form.event_subscriber.date.class%
         arguments:
-            - '@oro_filter.expression.date.compiler'
+            - '@oro_filter.utils.date_filter_modifier'
             - '@oro_locale.settings'
 
     oro_filter.form.type.date_range:

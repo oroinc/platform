@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
-class View
+class View implements ViewInterface
 {
     /** @var string */
     protected $name;
@@ -19,6 +19,9 @@ class View
     /** @var string */
     protected $type = 'system';
 
+    /** @var string */
+    protected $gridName;
+
     /** @var bool */
     protected $editable = false;
 
@@ -27,6 +30,15 @@ class View
 
     /** @var bool */
     protected $default = false;
+
+    /** @var string */
+    protected $appearanceType = false;
+
+    /** @var string */
+    protected $icon = '';
+
+    /** @var array */
+    protected $appearanceData;
 
     /** @var string|null */
     protected $sharedBy;
@@ -44,24 +56,27 @@ class View
 
     /**
      * @param string $name
-     * @param array  $filtersData
-     * @param array  $sortersData
+     * @param array $filtersData
+     * @param array $sortersData
      * @param string $type
-     * @param array  $columnsData
+     * @param array $columnsData
+     * @param string $appearanceType
      */
     public function __construct(
         $name,
         array $filtersData = [],
         array $sortersData = [],
         $type = 'system',
-        array $columnsData = []
+        array $columnsData = [],
+        $appearanceType = 'grid'
     ) {
-        $this->name        = $name;
-        $this->label       = $name;
-        $this->filtersData = $filtersData;
-        $this->sortersData = $sortersData;
-        $this->type        = $type;
-        $this->columnsData = $columnsData;
+        $this->name            = $name;
+        $this->label           = $name;
+        $this->filtersData     = $filtersData;
+        $this->sortersData     = $sortersData;
+        $this->type            = $type;
+        $this->appearanceType  = $appearanceType;
+        $this->columnsData     = $columnsData;
     }
 
     /**
@@ -86,6 +101,28 @@ class View
         return $this->label;
     }
 
+     /**
+     * @param string $icon
+     *
+     * @return $this
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
+    /**
+     * Getter for icon
+     *
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
     /**
      * Getter for name
      *
@@ -105,13 +142,9 @@ class View
     }
 
     /**
-     * Setter for sorters data
-     *
-     * @param array $sortersData
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function setSortersData(array $sortersData)
+    public function setSortersData(array $sortersData = [])
     {
         $this->sortersData = $sortersData;
 
@@ -119,9 +152,7 @@ class View
     }
 
     /**
-     * Getter for sorters data
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getSortersData()
     {
@@ -129,11 +160,7 @@ class View
     }
 
     /**
-     * Setter for filter data
-     *
-     * @param array $filtersData
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setFiltersData(array $filtersData)
     {
@@ -143,9 +170,7 @@ class View
     }
 
     /**
-     * Getter for filter data
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getFiltersData()
     {
@@ -181,7 +206,7 @@ class View
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getColumnsData()
     {
@@ -193,11 +218,42 @@ class View
     }
 
     /**
-     * @param array $columnsData
+     * {@inheritdoc}
      */
     public function setColumnsData(array $columnsData = [])
     {
         $this->columnsData = $columnsData;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAppearanceData()
+    {
+        if ($this->appearanceData === null) {
+            $this->appearanceData = [];
+        }
+
+        return $this->appearanceData;
+    }
+
+    /**
+     * @param array $appearanceData
+     * @return $this
+     */
+    public function setAppearanceData(array $appearanceData = [])
+    {
+        $this->appearanceData = $appearanceData;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppearanceTypeName()
+    {
+        return $this->appearanceType;
     }
 
     /**
@@ -237,6 +293,24 @@ class View
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setGridName($gridName)
+    {
+        $this->gridName = $gridName;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridName()
+    {
+        return $this->gridName;
+    }
+
+    /**
      * Convert to view data
      *
      * @return array
@@ -244,16 +318,19 @@ class View
     public function getMetadata()
     {
         return [
-            'name'       => $this->getName(),
-            'label'      => $this->label,
-            'type'       => $this->getType(),
-            'filters'    => $this->getFiltersData(),
-            'sorters'    => $this->getSortersData(),
-            'columns'    => $this->columnsData,
-            'editable'   => $this->editable,
-            'deletable'  => $this->deletable,
-            'is_default' => $this->default,
-            'shared_by'  => $this->sharedBy
+            'name'           => $this->getName(),
+            'label'          => $this->label,
+            'icon'           => $this->icon,
+            'appearanceType' => $this->appearanceType,
+            'appearanceData' => $this->getAppearanceData(),
+            'type'           => $this->getType(),
+            'filters'        => $this->getFiltersData(),
+            'sorters'        => $this->getSortersData(),
+            'columns'        => $this->columnsData,
+            'editable'       => $this->editable,
+            'deletable'      => $this->deletable,
+            'is_default'     => $this->default,
+            'shared_by'      => $this->sharedBy
         ];
     }
 }

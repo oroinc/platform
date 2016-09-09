@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -29,9 +30,13 @@ class EmbedFormController extends Controller
         $response = new Response();
         $response->setPublic();
         $response->setEtag($formEntity->getId() . $formEntity->getUpdatedAt()->format(\DateTime::ISO8601));
+        $this->setCorsHeaders($formEntity, $request, $response);
+
         if ($response->isNotModified($request)) {
             return $response;
         }
+
+        $isInline = $request->query->getBoolean('inline');
 
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
@@ -83,11 +88,22 @@ class EmbedFormController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('oro_embedded_form_success', ['id' => $formEntity->getId()]));
+            $redirectUrl = $this->generateUrl('oro_embedded_form_success', [
+                'id' => $formEntity->getId(),
+                'inline' => $isInline
+            ]);
+
+            $redirectResponse = new RedirectResponse($redirectUrl);
+            $this->setCorsHeaders($formEntity, $request, $redirectResponse);
+
+            return $redirectResponse;
         }
 
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+
+        $layoutManager->setInline($isInline);
+
         $response->setContent($layoutManager->getLayout($formEntity, $form)->render());
 
         return $response;
@@ -96,11 +112,58 @@ class EmbedFormController extends Controller
     /**
      * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
      */
-    public function formSuccessAction(EmbeddedForm $formEntity)
+    public function formSuccessAction(EmbeddedForm $formEntity, Request $request)
     {
+        $response = new Response();
+        $response->setPublic();
+        $response->setEtag(
+            $formEntity->getId() . $formEntity->getUpdatedAt()->format(\DateTime::ISO8601)
+        );
+        $this->setCorsHeaders($formEntity, $request, $response);
+
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
 
-        return new Response($layoutManager->getLayout($formEntity)->render());
+        $layoutManager->setInline($request->query->getBoolean('inline'));
+
+        $response->setContent($layoutManager->getLayout($formEntity)->render());
+
+        return $response;
+    }
+
+    /**
+     * Checks if Origin request header match any of the allowed domains
+     * and set Access-Control-Allow-Origin
+     *
+     * @param EmbeddedForm $formEntity
+     * @param Request $request
+     * @param Response $response
+     */
+    protected function setCorsHeaders(EmbeddedForm $formEntity, Request $request, Response $response)
+    {
+        // skip if not a CORS request
+        if (!$request->headers->has('Origin')
+            || $request->headers->get('Origin') == $request->getSchemeAndHttpHost()
+        ) {
+            return;
+        }
+
+        // skip if no allowed domains
+        $allowedDomains = $formEntity->getAllowedDomains();
+        if (empty($allowedDomains)) {
+            return;
+        }
+
+        $allowedDomains = explode("\n", $allowedDomains);
+        $origin = $request->headers->get('Origin');
+
+        foreach ($allowedDomains as $allowedDomain) {
+            $regexp = '#^https?:\/\/' . str_replace('\*', '.*', preg_quote($allowedDomain, '#')) . '$#i';
+            if ('*' === $allowedDomain || preg_match($regexp, $origin)) {
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+                $response->headers->set('Access-Control-Allow-Credentials', 'true');
+                break;
+            }
+        }
     }
 }

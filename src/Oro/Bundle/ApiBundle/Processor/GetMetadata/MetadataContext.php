@@ -15,18 +15,21 @@ class MetadataContext extends ApiContext
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
-    /** the configuration of an entity */
-    const CONFIG = 'config';
-
     /** a list of requests for additional metadata information that should be retrieved */
     const EXTRA = 'extra';
 
     /** @var MetadataExtraInterface[] */
     protected $extras = [];
 
-    public function __construct()
+    /** @var EntityDefinitionConfig */
+    protected $config;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initialize()
     {
-        parent::__construct();
+        parent::initialize();
         $this->set(self::EXTRA, []);
     }
 
@@ -53,11 +56,11 @@ class MetadataContext extends ApiContext
     /**
      * Gets the configuration of an entity.
      *
-     * @return EntityDefinitionConfig|null
+     * @return EntityDefinitionConfig
      */
     public function getConfig()
     {
-        return $this->get(self::CONFIG);
+        return $this->config;
     }
 
     /**
@@ -65,13 +68,9 @@ class MetadataContext extends ApiContext
      *
      * @param EntityDefinitionConfig $definition
      */
-    public function setConfig(EntityDefinitionConfig $definition = null)
+    public function setConfig(EntityDefinitionConfig $definition)
     {
-        if (null !== $definition) {
-            $this->set(self::CONFIG, $definition);
-        } else {
-            $this->remove(self::CONFIG);
-        }
+        $this->config = $definition;
     }
 
     /**

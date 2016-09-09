@@ -313,14 +313,14 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
             ),
             'simple with name' => array(
                 array(
-                    'from' => 'Test <test@test.com>',
-                    'to' => 'Test <test@test.com>',
+                    'from' => '"Test" <test@test.com>',
+                    'to' => '"Test" <test@test.com>',
                     'subject' => 'test',
                     'body' => 'test'
                 ),
                 array(
-                    'from' => 'Test <test@test.com>',
-                    'to' => array('Test <test@test.com>'),
+                    'from' => '"Test" <test@test.com>',
+                    'to' => array('"Test" <test@test.com>'),
                     'subject' => 'test',
                     'body' => 'test'
                 )
@@ -339,8 +339,8 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
                     'body' => 'test'
                 ),
                 array(
-                    'from' => 'Test <test@test.com>',
-                    'to' => array('Test <test@test.com>'),
+                    'from' => '"Test" <test@test.com>',
+                    'to' => array('"Test" <test@test.com>'),
                     'subject' => 'test',
                     'body' => 'test'
                 )
@@ -359,8 +359,8 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
                     'body' => 'test'
                 ),
                 array(
-                    'from' => '_Formatted <test@test.com>',
-                    'to' => array('_Formatted <test@test.com>'),
+                    'from' => '"_Formatted" <test@test.com>',
+                    'to' => array('"_Formatted" <test@test.com>'),
                     'subject' => 'test',
                     'body' => 'test'
                 )
@@ -377,18 +377,18 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
                             'email' => 'test@test.com'
                         ),
                         'test@test.com',
-                        'Test <test@test.com>'
+                        '"Test" <test@test.com>'
                     ),
                     'subject' => 'test',
                     'body' => 'test',
                     'attribute' => 'attr'
                 ),
                 array(
-                    'from' => 'Test <test@test.com>',
+                    'from' => '"Test" <test@test.com>',
                     'to' => array(
-                        'Test <test@test.com>',
+                        '"Test" <test@test.com>',
                         'test@test.com',
-                        'Test <test@test.com>'
+                        '"Test" <test@test.com>'
                     ),
                     'subject' => 'test',
                     'body' => 'test'

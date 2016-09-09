@@ -38,6 +38,14 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_activity_multiple_association_choice';
     }
 

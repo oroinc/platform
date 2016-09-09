@@ -94,4 +94,32 @@ class TestDepartment implements TestFrameworkEntityInterface
 
         return $this;
     }
+
+    /**
+     * @param TestPerson $person
+     *
+     * @return self
+     */
+    public function addStaff(TestPerson $person)
+    {
+        if (!$this->staff->contains($person)) {
+            $this->staff->add($person);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param TestPerson $person
+     *
+     * @return self
+     */
+    public function removeStaff(TestPerson $person)
+    {
+        if ($this->staff->contains($person)) {
+            $this->staff->removeElement($person);
+        }
+
+        return $this;
+    }
 }

@@ -14,7 +14,3 @@ oro_permissions:
     ASSIGN:
         exclude_entities:
             - Oro\Bundle\CronBundle\Entity\Schedule
-
-    SHARE:
-        exclude_entities:
-            - Oro\Bundle\CronBundle\Entity\Schedule

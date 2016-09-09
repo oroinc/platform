@@ -46,13 +46,19 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createWorkflow()
     {
-        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
-        return new Workflow($entityConnector, $aclManager);
+
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return new Workflow($doctrineHelper, $aclManager, $restrictionManager);
     }
 
     /**
@@ -289,6 +295,9 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $expectedDefinitions
         );
         $translator = $this->createTranslatorMock();
+        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // test
         $workflowAssembler = new WorkflowAssembler(
@@ -296,6 +305,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler,
+            $restrictionAssembler,
             $translator
         );
         $actualWorkflow = $workflowAssembler->assemble($workflowDefinition);
@@ -435,6 +445,9 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
         $translator = $this->createTranslatorMock();
+        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // test
         $workflowAssembler = new WorkflowAssembler(
@@ -442,6 +455,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler,
+            $restrictionAssembler,
             $translator
         );
         $workflowAssembler->assemble($workflowDefinition);
@@ -471,6 +485,9 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
         $translator = $this->createTranslatorMock();
+        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // test
         $workflowAssembler = new WorkflowAssembler(
@@ -478,6 +495,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler,
+            $restrictionAssembler,
             $translator
         );
         $workflow = $workflowAssembler->assemble($workflowDefinition, false);
@@ -504,12 +522,16 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps, false);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions, false);
         $translator = $this->createTranslatorMock();
+        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $workflowAssembler = new WorkflowAssembler(
             $container,
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler,
+            $restrictionAssembler,
             $translator
         );
         $workflowAssembler->assemble($workflowDefinition);

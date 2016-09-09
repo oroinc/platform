@@ -123,7 +123,7 @@ define([
             this.$auditFilterContainer.css('display', 'block');
             this.filter.$el.find('> .dropdown:last').before(this.$changeStateChoice);
 
-            var selectedField = this.element.find('input.select').select2('val');
+            var selectedField = this.element.find('input.select').inputWidget('val');
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', selectedField);
 
             if (_.contains(['date', 'datetime'], conditions.type)) {
@@ -148,7 +148,7 @@ define([
 
             var auditFilter = {};
             if (this.auditFilter) {
-                auditFilter.columnName = this.element.find('input.select').select2('val');
+                auditFilter.columnName = this.element.find('input.select').inputWidget('val');
                 auditFilter.data = this.auditFilter.getValue();
 
                 if (this.auditFilter.filterParams) {
@@ -210,7 +210,7 @@ define([
             }
 
             var value = {
-                columnName: this.element.find('input.select').select2('val'),
+                columnName: this.element.find('input.select').inputWidget('val'),
                 criterion: this._getFilterCriterion()
             };
 

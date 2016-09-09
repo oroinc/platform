@@ -19,26 +19,19 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     public function testMoveDataToDataCollection()
     {
         $dataKey1 = 'test1';
-        $dataId1  = 'dataId1';
         $data1    = new \stdClass();
         $dataKey2 = 'test2';
-        $dataId2  = 'dataId2';
         $data2    = null;
-        $dataKey3  = 'dataId3';
-        $data3    = 123;
 
         $context = new LayoutContext();
 
         $context['data'] = [
             $dataKey1 => [
-                'id'   => $dataId1,
                 'data' => $data1
             ],
             $dataKey2 => [
-                'identifier' => $dataId2,
                 'data'       => $data2
             ],
-            $dataKey3 => $data3
         ];
 
         $this->contextConfigurator->configureContext($context);
@@ -46,14 +39,9 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($context->has('data'));
         $this->assertTrue($context->data()->has($dataKey1));
-        $this->assertEquals($dataId1, $context->data()->getIdentifier($dataKey1));
         $this->assertSame($data1, $context->data()->get($dataKey1));
         $this->assertTrue($context->data()->has($dataKey2));
-        $this->assertEquals($dataId2, $context->data()->getIdentifier($dataKey2));
         $this->assertSame($data2, $context->data()->get($dataKey2));
-        $this->assertTrue($context->data()->has($dataKey3));
-        $this->assertEquals(null, $context->data()->getIdentifier($dataKey3));
-        $this->assertSame($data3, $context->data()->get($dataKey3));
     }
 
     public function testEmptyData()
@@ -93,28 +81,6 @@ class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context         = new LayoutContext();
         $context['data'] = [123];
-        $this->contextConfigurator->configureContext($context);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data item "test" must have either "id" or "identifier" key.
-     */
-    public function testShouldThrowExceptionIfDataItemIsEmptyArray()
-    {
-        $context         = new LayoutContext();
-        $context['data'] = ['test' => []];
-        $this->contextConfigurator->configureContext($context);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data identifier for the data item "test" must be a string, but "integer" given.
-     */
-    public function testShouldThrowExceptionIfDataIdIsNotString()
-    {
-        $context         = new LayoutContext();
-        $context['data'] = ['test' => ['identifier' => 123]];
         $this->contextConfigurator->configureContext($context);
     }
 

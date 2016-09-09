@@ -183,11 +183,11 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'owner'     => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
-                        'name'    => null,
-                        'groups1' => [
+                        'name'          => null,
+                        'ownerCategory' => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'groups',
-                            'fields'           => 'id'
+                            'property_path'    => 'category',
+                            'fields'           => 'name'
                         ]
                     ],
                     'post_serialize'   => function (array $item) {
@@ -209,8 +209,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'id'        => 123,
                 'category1' => 'category_label',
                 'owner'     => [
-                    'name'    => 'user_name_additional',
-                    'groups1' => [11, 22]
+                    'name'          => 'user_name_additional',
+                    'ownerCategory' => 'owner_category_name'
                 ]
             ],
             $result
@@ -262,7 +262,87 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNormalizeObjectWithNullToManyRelations()
+    public function testNormalizeObjectWithToManyRelation()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'        => null,
+                'name'      => ['exclude' => true],
+                'owner'     => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'    => null,
+                        'groups1' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'groups',
+                            'fields'           => 'id'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $this->createProductObject(),
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'        => 123,
+                'owner'     => [
+                    'name'    => 'user_name',
+                    'groups1' => [11, 22]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithArrayToManyRelation()
+    {
+        $data = $this->createProductObject();
+        $data->getOwner()->setGroups($data->getOwner()->getGroups()->toArray());
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'        => null,
+                'name'      => ['exclude' => true],
+                'owner'     => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'    => null,
+                        'groups1' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'groups',
+                            'target_type'      => 'to-many',
+                            'fields'           => 'id'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $data,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'        => 123,
+                'owner'     => [
+                    'name'    => 'user_name',
+                    'groups1' => [11, 22]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithNullToManyRelation()
     {
         $product = new Object\Product();
         $product->setId(123);
@@ -311,6 +391,43 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             $result
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage A value of "groups" field of entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" should be "\Traversable or array". Got: string.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testNormalizeObjectWithInvalidValueForToManyRelation()
+    {
+        $data = $this->createProductObject();
+        $data->getOwner()->setGroups('invalid value');
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'        => null,
+                'name'      => ['exclude' => true],
+                'owner'     => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'    => null,
+                        'groups1' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'groups',
+                            'target_type'      => 'to-many',
+                            'fields'           => 'id'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $data,
+            $this->createConfigObject($config)
         );
     }
 

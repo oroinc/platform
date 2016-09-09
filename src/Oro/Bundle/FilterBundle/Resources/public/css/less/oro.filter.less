@@ -277,15 +277,12 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 .filter-item-simple .caret {
     display: none;
 }
-.active-filter .dropdown:after {
+.active-filter .dropdown:after,
+.active-filter .dropup:after {
     display: inline-block;
 }
 .active-filter .field-select {
     display: block;
-}
-
-.ui-multiselect-menu.multiselect-filter-widget {
-    margin-top: 7px;
 }
 .ui-multiselect.multiselect-filter-widget span,
 .filter-item .filter-criteria-hint {
@@ -326,6 +323,18 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
         border-right-width: 0;
         margin-bottom: 0;
       }
+      .select2-container {
+        border: 0 none;
+        .select2-choices {
+          border-left: 0;
+          border-right: 0;
+          border-radius: 0;
+          min-height: 29px;
+        }
+        .select2-search-choice {
+          line-height: 15px;
+        }
+      }
       .filter-update {
         position: absolute;
         right: 0;
@@ -358,6 +367,9 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
   margin-bottom: 0;
   max-width: 300px;
   min-width: 180px;
+  .select2-container {
+    margin-bottom: 8px;
+  }
   .choice-tree-filter-search{
     width: calc(~"100% - 14px");
   }

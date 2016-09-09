@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
@@ -56,7 +57,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         } elseif (count($result) === 1) {
             $result = reset($result);
         } else {
-            throw new \RuntimeException('The result must have one or zero items.');
+            throw new RuntimeException('The result must have one or zero items.');
         }
 
         $context->setResult($result);

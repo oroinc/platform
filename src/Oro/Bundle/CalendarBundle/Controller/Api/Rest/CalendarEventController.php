@@ -25,13 +25,13 @@ use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\CalendarBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\CalendarBundle\Exception\NotUserCalendarEvent;
 
 /**
  * @RouteResource("calendarevent")
@@ -94,6 +94,11 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *     nullable=true,
      *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
      * )
+     * @QueryParam(
+     *     name="recurringEventId", requirements="\d+",
+     *     nullable=true,
+     *     description="Filter events associated with recurring event. Recurring event will be returned as well."
+     * )
      * @ApiDoc(
      *      description="Get calendar events",
      *      resource=true
@@ -121,11 +126,27 @@ class CalendarEventController extends RestController implements ClassResourceInt
         } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
             $dateParamFilter  = new HttpDateTimeParameterFilter();
             $filterParameters = ['createdAt' => $dateParamFilter, 'updatedAt' => $dateParamFilter];
-            $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
+            $parameters = ['createdAt', 'updatedAt'];
+            if ($this->getRequest()->get('recurringEventId')) {
+                $filterParameters['recurringEventId'] = new IdentifierToReferenceFilter(
+                    $this->getDoctrine(),
+                    'OroCalendarBundle:CalendarEvent'
+                );
+                $parameters[] = 'recurringEventId';
+            }
+            $filterCriteria   = $this->getFilterCriteria(
+                $parameters,
+                $filterParameters,
+                ['recurringEventId' => 'recurringEvent']
+            );
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
-            $qb    = $repo->getUserEventListQueryBuilder($filterCriteria, $extendFields);
+            $qb    = $repo->getUserEventListByRecurringEventQueryBuilder(
+                $filterCriteria,
+                $extendFields,
+                (int)$this->getRequest()->get('recurringEventId')
+            );
             $page  = (int)$this->getRequest()->get('page', 1);
             $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
             $qb
@@ -302,34 +323,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
     /**
      * {@inheritdoc}
      */
-    protected function fixFormData(array &$data, $entity)
-    {
-        parent::fixFormData($data, $entity);
-
-        if (isset($data['allDay']) && ($data['allDay'] === 'false' || $data['allDay'] === '0')) {
-            $data['allDay'] = false;
-        }
-
-        // remove auxiliary attributes if any
-        unset($data['updatedAt']);
-        unset($data['editable']);
-        unset($data['removable']);
-        unset($data['notifiable']);
-
-        return true;
-    }
-
-    /**
-     * @return SystemCalendarConfig
-     */
-    protected function getCalendarConfig()
-    {
-        return $this->get('oro_calendar.system_calendar_config');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function handleUpdateRequest($id)
     {
         /** @var CalendarEvent $entity */
@@ -339,7 +332,9 @@ class CalendarEventController extends RestController implements ClassResourceInt
             try {
                 $entity = $this->processForm($entity);
                 if ($entity) {
-                    $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+                    $response = $this->createResponseData($entity);
+                    unset($response['id']);
+                    $view = $this->view($response, Codes::HTTP_OK);
                 } else {
                     $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
                 }
@@ -371,9 +366,48 @@ class CalendarEventController extends RestController implements ClassResourceInt
             }
         } catch (ForbiddenException $forbiddenEx) {
             $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+        } catch (NotUserCalendarEvent $e) {
+            $view = $this->view(['error' => $e->getMessage()], Codes::HTTP_BAD_REQUEST);
         }
 
         return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array &$data, $entity)
+    {
+        parent::fixFormData($data, $entity);
+
+        if (isset($data['allDay']) && ($data['allDay'] === 'false' || $data['allDay'] === '0')) {
+            $data['allDay'] = false;
+        }
+
+        if (isset($data['isCancelled']) && ($data['isCancelled'] === 'false' || $data['isCancelled'] === '0')) {
+            $data['isCancelled'] = false;
+        }
+
+        if (isset($data['use_hangout']) && ($data['use_hangout'] === 'false' || $data['use_hangout'] === '0')) {
+            $data['use_hangout'] = false;
+        }
+
+        if (isset($data['attendees']) && ($data['attendees'] === '')) {
+            $data['attendees'] = null;
+        }
+
+        // remove auxiliary attributes if any
+        unset($data['updatedAt'], $data['editable'], $data['removable'], $data['notifiable']);
+
+        return true;
+    }
+
+    /**
+     * @return SystemCalendarConfig
+     */
+    protected function getCalendarConfig()
+    {
+        return $this->get('oro_calendar.system_calendar_config');
     }
 
     /**
@@ -409,5 +443,19 @@ class CalendarEventController extends RestController implements ClassResourceInt
             },
             $configs
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createResponseData($entity)
+    {
+        $response        = parent::createResponseData($entity);
+        $serializedEvent = $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvent($entity);
+
+        $response['notifiable']       = $serializedEvent['notifiable'];
+        $response['invitationStatus'] = (string)$serializedEvent['invitationStatus'];
+
+        return $response;
     }
 }

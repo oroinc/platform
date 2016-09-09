@@ -20,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_15';
     }
 
     /**
@@ -70,8 +70,8 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('connectors', 'array', ['comment' => '(DC2Type:array)']);
-        $table->addColumn('synchronization_settings', 'object', ['comment' => '(DC2Type:object)']);
-        $table->addColumn('mapping_settings', 'object', ['comment' => '(DC2Type:object)']);
+        $table->addColumn('synchronization_settings', 'config_object', ['comment' => '(DC2Type:config_object)']);
+        $table->addColumn('mapping_settings', 'config_object', ['comment' => '(DC2Type:config_object)']);
         $table->addColumn('enabled', 'boolean', ['notnull' => false]);
         $table->addColumn('edit_mode', 'integer', ['notnull' => true, 'default' => Channel::EDIT_MODE_ALLOW]);
         $table->addColumn('default_business_unit_owner_id', 'integer', ['notnull' => false]);

@@ -3,22 +3,31 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
+use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
+use Behat\Testwork\Cli\ServiceContainer\CliExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
-
+use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
+use Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
+    const DUMPER_TAG = 'oro_test.dumper';
+
     /**
      * {@inheritdoc}
      */
@@ -27,7 +36,8 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
         $this->processElements($container);
-        $this->processDbIsolationSubscribers($container);
+        $this->processDbDumpers($container);
+        $this->processIsolationSubscribers($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -44,6 +54,9 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function initialize(ExtensionManager $extensionManager)
     {
+        /** @var MinkExtension $minkExtension */
+        $minkExtension = $extensionManager->getExtension('mink');
+        $minkExtension->registerDriverFactory(new OroSelenium2Factory());
     }
 
     /**
@@ -53,9 +66,21 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $builder
             ->children()
+                ->arrayNode('application_suites')
+                    ->prototype('scalar')->end()
+                    ->info(
+                        "Suites that applicable for application.\n".
+                        'This suites will be run with --applicable-suites key in console'
+                    )
+                    ->defaultValue([])
+                ->end()
                 ->arrayNode('shared_contexts')
                     ->prototype('scalar')->end()
                     ->info('Contexts that added to all autoload bundles suites')
+                    ->defaultValue([])
+                ->end()
+                ->scalarNode('reference_initializer_class')
+                    ->defaultValue('Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer')
                 ->end()
             ->end();
     }
@@ -67,31 +92,58 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
+        $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
+        $container->setParameter('oro_test.application_suites', $config['application_suites']);
+        $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
     }
 
     /**
      * @param ContainerBuilder $container
      */
-    private function processDbIsolationSubscribers(ContainerBuilder $container)
+    public function processDbDumpers(ContainerBuilder $container)
     {
-        $dumper = $this->getDumper($container);
-        $container->getDefinition('oro_test.listener.db_restore_subscriber')->replaceArgument(
+        $dbDumper = $this->getDbDumper($container);
+        $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    /**
+     * @param ContainerBuilder $container
+     * @throws OutOfBoundsException When
+     * @throws InvalidArgumentException
+     */
+    private function processIsolationSubscribers(ContainerBuilder $container)
+    {
+        $dumpers = [];
+
+        foreach ($container->findTaggedServiceIds(self::DUMPER_TAG) as $id => $attributes) {
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $dumpers[$priority][] = new Reference($id);
+        }
+
+        // sort by priority and flatten
+        krsort($dumpers);
+        $dumpers = call_user_func_array('array_merge', $dumpers);
+
+        $container->getDefinition('oro_test.listener.feature_isolation_subscriber')->replaceArgument(
             0,
-            $dumper
+            $dumpers
         );
-        $container->getDefinition('oro_test.listener.db_dump_subscriber')->replaceArgument(
+        $container->getDefinition('oro_test.listener.dump_environment_subscriber')->replaceArgument(
             0,
-            $dumper
+            $dumpers
         );
     }
 
     /**
      * @param ContainerBuilder $container
-     * @return Reference
+     * @return Definition
      */
-    private function getDumper(ContainerBuilder $container)
+    private function getDbDumper(ContainerBuilder $container)
     {
         $driver = $container->get(Symfony2Extension::KERNEL_ID)->getContainer()->getParameter('database_driver');
 
@@ -105,7 +157,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                     continue;
                 }
 
-                return new Reference($id);
+                return $container->getDefinition($id);
             }
         }
 
@@ -190,10 +242,10 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse($mappingPath));
+            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse(file_get_contents($mappingPath)));
         }
 
-        $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
+        $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
     }
 
     /**
@@ -204,7 +256,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function getSuiteContexts(SymfonyBundleSuite $bundleSuite, array $commonContexts)
     {
         $suiteContexts = array_filter($bundleSuite->getSetting('contexts'), 'class_exists');
-        $suiteContexts = count($suiteContexts) ? $suiteContexts : $commonContexts;
+        $suiteContexts = array_merge($suiteContexts, $commonContexts);
 
         return $suiteContexts;
     }

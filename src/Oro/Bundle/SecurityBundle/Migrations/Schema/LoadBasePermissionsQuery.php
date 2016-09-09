@@ -10,6 +10,15 @@ use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 
 class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
 {
+    /** @var array */
+    protected $permissions = [
+        'VIEW',
+        'CREATE',
+        'EDIT',
+        'DELETE',
+        'ASSIGN'
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -26,7 +35,9 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
             'description' => Type::STRING
         ];
 
-        foreach (['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'SHARE'] as $permission) {
+        $permissions = array_diff($this->permissions, $this->getExistingPermissions($logger));
+
+        foreach ($permissions as $permission) {
             $this->addSql(
                 $query,
                 [
@@ -41,5 +52,17 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
         }
 
         parent::processQueries($logger, $dryRun);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @return array
+     */
+    protected function getExistingPermissions(LoggerInterface $logger)
+    {
+        $sql = 'SELECT name FROM oro_security_permission';
+        $this->logQuery($logger, $sql);
+
+        return array_column((array)$this->connection->fetchAll($sql), 'name');
     }
 }

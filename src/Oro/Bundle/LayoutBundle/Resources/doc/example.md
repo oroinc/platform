@@ -18,6 +18,7 @@ Our guide is divided into the following sections:
 * [Working with forms](#working-with-forms)
 * [Creating new block types](#creating-new-block-types)
 * [Wrapping up](#wrapping-up)
+* [Simplify block attribute configuration](#simplify-block-attribute-configuration)
 
 Getting started
 -----------------------
@@ -49,7 +50,7 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        href: { @value: $data.theme.icon }
+                        href: '=data["theme"].getIcon()'
                         rel: shortcut icon
                 head_style:
                     blockType: container
@@ -121,7 +122,7 @@ Customizing block rendering
 ---------------------------------
 
 As you have seen in the previous section we are using the `setBlockTheme` action in our layout update file. This is the block theme responsible for defining how layout blocks are rendered.
-Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file.
+Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file. Also you can use relative path for block theme like `default.html.twig`.
 
 ```twig
 {% block _page_container_widget %}
@@ -427,7 +428,7 @@ layout:
             parentId: body_wrapper
             blockType: block
             options:
-                visible: { @value: $context.debug }
+                visible: '=context["debug"]'
 ```
 Note that if `visible` evaluates to false, the block will not be added to the final layout at all.
 
@@ -533,21 +534,16 @@ layout:
         - @setOption:
             id: head
             optionName: title
-            optionValue:
-                @join:
-                    - ' - '
-                    - { @value: {@value: $data.product.name} }
-                    - { @value: {@value: $data.product.subcategory} }
-                    - { @value: {@value: $data.product.category} }
+            optionValue: '=data["product"].getName()~" - "~data["product"].getSubcategory()~" - "~data["product"].getCategory()'
         - @add:
             id: link_canonical
             parentId: head
             blockType: external_resource
             options:
                 rel:  canonical
-                href: {@value: $data.product.url}
+                href: '=data["product"].getUrl()'
 ```
-Note how we use [Join](../../../../Component/ConfigExpression/Func/Join.php) function to compose the page title from different product fields.
+Note how we use [Symfony expression syntax](http://symfony.com/doc/current/components/expression_language/syntax.html) to compose the page title from different product fields.
 
 ### Data providers ###
 
@@ -557,31 +553,27 @@ To implement a language switcher we'll create a separate data provider class, si
 ```php
 namespace Acme\Bundle\LocaleBundle\Layout\Extension\Provider;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataProviderInterface;
-
-class LocaleDataProvider implements DataProviderInterface
+class LocaleDataProvider
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getIdentifier()
+    public function getDefaultLanguage()
     {
-        throw new \BadMethodCallException('Not implemented');
+        $this->options['default_language'] = 'english';
+        return $this->options['default_language'];
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getData(ContextInterface $context)
+    public function getAvailableLanguages()
     {
-        return [
-            'default_language'    => 'english',
-            'available_languages' => [
-                'english' => 'English',
-                'french'  => 'French'
-            ]
+        $this->options['available_languages'] = [
+            'english' => 'English',
+            'french'  => 'French'
         ];
+        return $this->options['available_languages'];
     }
 }
 ```
@@ -589,7 +581,7 @@ class LocaleDataProvider implements DataProviderInterface
 We need to register our data provider in the DI container by `layout.data_provider` tag:
 ```yaml
     acme_locale.layout.data_provider.locale:
-        class: Acme\Bundle\LocaleBundle\Layout\Extension\Provider\LocaleDataProvider
+        class: Acme\Bundle\LocaleBundle\Layout\DataProvider\LocaleProvider
         tags:
             - { name: layout.data_provider, alias: locale }
 ```
@@ -605,9 +597,9 @@ layout:
             blockType: block
             options:
                vars:
-                  default_language: { @value: $data.locale.default_language }
-                  available_languages: { @value: $data.locale.available_languages }
-                  product_url: { @value: $data.product.url }
+                  default_language: '=data["locale"].getDefaultLanguage()'
+                  available_languages: '=data["locale"].getAvailableLanguages()'
+                  product_url: '=data["product"].getUrl()'
 ```
 
 We also need to create the block template for the language switcher:
@@ -705,7 +697,7 @@ layout:
         - @setOption:
             id: lang_switch
             optionName: vars.current_language
-            optionValue: { @value: $data.current_language }
+            optionValue: '=data["current_language"]'
 ```
 
 Now if you go to `/layout/test?product_id=99&___store=french` url you'll see that French language is preselected.
@@ -725,7 +717,7 @@ layout:
             blockType: meta
             options:
                 name: 'description'
-                content: {@value: $data.product.description}
+                content: '=data["product"].getDescription()'
             siblingId: meta
 ```
 If you need to place some block before another one, you should use the `prepend: true` attribute.
@@ -749,11 +741,10 @@ First, create a `LinkExtension` class in place it in: `Acme/Bundle/LayoutBundle/
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType;
 
@@ -766,9 +757,9 @@ class LinkExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['image']);
+        $resolver->setDefined('image');
     }
 
     /**
@@ -858,7 +849,7 @@ class ContainerExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional(['type']);
     }
@@ -1043,7 +1034,7 @@ layout:
             parentId: breadcrumbs
             blockType: text
             options:
-                text: { @value: $data.product.name }
+                text: '=data["product"].getName()'
 ```
 
 This should render into the following HTML:
@@ -1180,8 +1171,8 @@ layout:
                     'searh_form:end': ~
 ```
 
-Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
-For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
+Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
+For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form. Also we can use only one block type `form` which will create three child block: `form_start`, `form_fields`, `form_end`.
 
 All that is left is to define the search autocomplete block in our block theme file we'll:
 ```twig
@@ -1385,6 +1376,64 @@ Creating new block types
 -----------------------------------
 
 Since the existing layout block types are covering only basic scenarios, it is often required to create new ones.
+
+You can create custom block type by providing DI configuration for it. Configuration provides possibility to set name and name of a parent, and setup options of the block. See below examples.
+
+Simple block type:
+```yaml
+services:
+    acme_demo.block_type.datetime:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
+            - [setName, ['datetime']]
+        tags:
+            - { name: layout.block_type, alias: datetime }
+```
+
+`setOptionsConfig` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
+
+Container block type:
+```yaml
+services:
+    acme_demo.block_type.sidebar:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['sidebar']]
+        tags:
+            - { name: layout.block_type, alias: sidebar }
+```
+
+Block type inherited from "text" type:
+```yaml
+services:
+    acme_demo.block_type.title:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{level: {default: 1}}]]
+            - [setName, ['title']]
+            - [setParent, ['text']]
+        tags:
+            - { name: layout.block_type, alias: title }
+```
+
+Also you can create block type extension via DI configuration. This configuration allows to setup additional options for block types.
+
+```yaml
+services:
+    custom_acme_demo.block_type.extension.sidebar:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{minimized: {default: false}]]
+            - [setExtendedType, ['sidebar']]
+        tags:
+            - { name: layout.block_type_extension, alias: sidebar }
+```
+
+Usually the definition of layout block types and types extension are located in `Resource\config\block_types.yml`, but you can use any file.
+
+If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
+
 Let's see how this is done on the example of `ImageType` that will be responsible for rendering `<img>` elements.
 
 First, let's create the block type file itself and place it in the `Acme/Bundle/LayoutBundle/Layout/Block/Type` directory:
@@ -1403,11 +1452,11 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolverInterface $resolver)
     {
         $resolver
             ->setRequired(['path'])
-            ->setOptional(['alt']);
+            ->setDefined(['alt']);
     }
 
     /**
@@ -1468,12 +1517,12 @@ layout:
                 product_image:
                     blockType: image
                     options:
-                        path: { @value: $data.product.image }
-                        alt: { @value: $data.product.name }
+                        path: '=data["product"].getImage()'
+                        alt: '=data["product"].getName()'
                         attr:
                             id: image-main
                             class: gallery-image visible
-                            title: { @value: $data.product.name }
+                            title: '=data["product"].getName()'
                 product_gallery:
                     blockType: list
                     options:
@@ -1483,7 +1532,7 @@ layout:
                     blockType: link
                     options:
                         path: '#'
-                        image: { @value: $data.product.image }
+                        image: '=data["product"].getImage()'
                         attr:
                             class: thumb-link
             tree:
@@ -1579,12 +1628,12 @@ layout:
                     blockType: block
                     options:
                         vars:
-                            name: { @value: $data.product.name }
+                            name: '=data["product"].getName()'
                 product_price:
                     blockType: block
                     options:
                         vars:
-                            price: { @value: $data.product.price }
+                            price: '=data["product"].getPrice()'
                 # All blocks are managed in the layout update. No custom block templates are required.
                 product_extra:
                     blockType: container
@@ -1597,11 +1646,7 @@ layout:
                     options:
                         type: p
                         attr:
-                            class:
-                                @join:
-                                    - ' '
-                                    - availability
-                                    - { @iif: [$data.product.is_in_stock, 'in-stock', 'out-of-stock'] }
+                            class: '=availability~"  "~data["product"].getIsInStock() ? "in-stock" : "out-of-stock"'
                 product_availability_label_wrapper:
                     blockType: container
                     options:
@@ -1621,7 +1666,7 @@ layout:
                 product_availability_value:
                     blockType: text
                     options:
-                        text: { @iif: [$data.product.is_in_stock, 'In Stock', 'Out of Stock'] }
+                        text: 'data.["product"].getIsInStock() ? "In Stock" : "Out of Stock"'
                 product_short_description:
                     blockType: container
                     options:
@@ -1637,7 +1682,7 @@ layout:
                 product_short_description_value:
                     blockType: text
                     options:
-                        text: { @value: $data.product.short_description }
+                        text: 'data["product"].getShortDescription()'
                 # Adding list of links in 2 different ways.
                 # 1 - Using only layout update
                 product_add_to_links:
@@ -1648,11 +1693,7 @@ layout:
                 product_add_to_wishlist_link:
                     blockType: link
                     options:
-                        path:
-                            @join:
-                              - '/'
-                              - wishlist/index/add/product/
-                              - { @value: $data.product.id }
+                        path: '="/wishlist/index/add/product/"~data["product"].getId()'
                         text: Add to Wishlist
                         attr:
                             class: link-wishlist
@@ -1728,7 +1769,7 @@ layout:
             parentId: product_collateral_tabs
             blockType: text
             options:
-                text: { @value: $data.product.description }
+                text: '=data["product"].getDescription()'
                 vars:
                     tabLabel: "Description"
         # Adding footer links
@@ -1946,3 +1987,15 @@ And the footer like this:
     </div>
 </div>
 ```
+
+Simplify block attribute configuration
+-------------
+For simplify block attribute configuration use twig function `layout_attr_defaults(attr, default_attr)`:
+```twig
+{% set attr = layout_attr_defaults(attr, {
+    required: 'required',
+    autofocus: true,
+    '~class': " input input_block input_md {{ class_prefix }}__form__input"
+}) %}
+```
+If you use prefix `~` value `attr` concatenate `default_attr` value with this prefix.

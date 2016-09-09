@@ -7,9 +7,6 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class FixFieldNamingTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
-
     /** @var FixFieldNaming */
     protected $processor;
 
@@ -17,11 +14,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->processor = new FixFieldNaming($this->doctrineHelper);
+        $this->processor = new FixFieldNaming();
     }
 
     public function testProcessWhenNoFields()
@@ -43,7 +36,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessWithUnknownIdentifierFields()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -72,33 +65,25 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithIdentifierNamedId()
+    public function testProcessWithIdentifierNamedId()
     {
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
                 'id'   => null,
                 'type' => null,
             ]
         ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->once())
-            ->method('getIdentifierFieldNames')
-            ->willReturn(['id']);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME, false)
-            ->willReturn($rootEntityMetadata);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
                     'id'        => null,
                     'classType' => [
                         'property_path' => 'type'
@@ -109,33 +94,25 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithIdentifierNotNamedId()
+    public function testProcessWithIdentifierNotNamedId()
     {
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['name'],
+            'fields'                 => [
                 'id'   => null,
                 'type' => null,
             ]
         ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->once())
-            ->method('getIdentifierFieldNames')
-            ->willReturn(['name']);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME, false)
-            ->willReturn($rootEntityMetadata);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['name'],
+                'fields'                 => [
                     'classId'   => [
                         'property_path' => 'id'
                     ],
@@ -148,33 +125,25 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithCompositeIdentifier()
+    public function testProcessWithCompositeIdentifier()
     {
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id', 'id1'],
+            'fields'                 => [
                 'id'   => null,
                 'type' => null,
             ]
         ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->once())
-            ->method('getIdentifierFieldNames')
-            ->willReturn(['id', 'id1']);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME, false)
-            ->willReturn($rootEntityMetadata);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['classId', 'id1'],
+                'fields'                 => [
                     'classId'   => [
                         'property_path' => 'id'
                     ],
@@ -222,7 +191,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The "id" reserved word cannot be used as a field name and it cannot be renamed to "classId" because a field with this name already exists.
      */
     // @codingStandardsIgnoreEnd
@@ -242,7 +211,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The "type" reserved word cannot be used as a field name and it cannot be renamed to "classType" because a field with this name already exists.
      */
     // @codingStandardsIgnoreEnd

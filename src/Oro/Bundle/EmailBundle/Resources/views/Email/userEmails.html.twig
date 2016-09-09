@@ -106,11 +106,6 @@
                                 button.html('{{ actionProcessing|raw }}');
                                 button.attr('disabled', 'disabled');
 
-                                messenger.notificationFlashMessage(
-                                    'info',
-                                    {{ 'oro.email.action.message.processing'|trans|json_encode|raw }}
-                                );
-
                                 loader = setInterval(function() { dotsLoader() }, 500);
                             },
                             success: function (response) {
@@ -119,14 +114,12 @@
                                 button.html('{{ actionSync|raw }}');
                                 button.removeAttr('disabled');
 
-                                mediator.trigger('datagrid:doRefresh:{{ gridName }}');
-
                                 if (response.error !== undefined) {
                                     messenger.notificationFlashMessage('error', response.error);
                                 } else {
                                     messenger.notificationFlashMessage(
-                                            'success',
-                                            {{ 'oro.email.action.message.success'|trans|json_encode|raw }}
+                                        'info',
+                                        {{ 'oro.email.action.message.processing'|trans|json_encode|raw }}
                                     );
                                 }
                             },

@@ -309,4 +309,12 @@ class BusinessUnitManager
             }
         }
     }
+
+    /**
+     * @return int
+     */
+    protected function getOrganizationContextId()
+    {
+        return $this->securityFacade->getOrganization()->getId();
+    }
 }

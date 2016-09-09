@@ -37,16 +37,82 @@ delete_status_codes_full_syntax:
                 '417':
                     exclude: true
 
+exclude:
+    config:
+        create:
+            exclude: true
+        update:
+            exclude: false
+    expected:
+        create:
+            exclude: true
+        update:
+            exclude: false
+
+empty_order_by:
+    config:
+        create:
+            order_by: []
+    expected: []
+
+sorting:
+    config:
+        actions:
+            get_list:
+                disable_sorting: false
+            get_subresource:
+                disable_sorting: true
+    expected:
+        actions:
+            get_list:
+                disable_sorting: false
+            get_subresource:
+                disable_sorting: true
+
+inclusion:
+    config:
+        actions:
+            get_list:
+                disable_inclusion: false
+            get_subresource:
+                disable_inclusion: true
+    expected:
+        actions:
+            get_list:
+                disable_inclusion: false
+            get_subresource:
+                disable_inclusion: true
+
+fieldset:
+    config:
+        actions:
+            get_list:
+                disable_fieldset: false
+            get_subresource:
+                disable_fieldset: true
+    expected:
+        actions:
+            get_list:
+                disable_fieldset: false
+            get_subresource:
+                disable_fieldset: true
+
 full:
     config:
         get: ~
         create: []
+        get_list:
+            order_by:
+                id: DESC
         update:
             acl_resource: update_action_acl_resource
         delete:
             exclude: false
             acl_resource: delete_action_acl_resource
     expected:
+        get_list:
+            order_by:
+                id: DESC
         update:
             acl_resource: update_action_acl_resource
         delete:

@@ -196,7 +196,7 @@
 
                                 <% print('<sc' + 'ript>'); %>
                                 require(['jquery'], function($) {
-                                $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
+                                $('#{{ form.transition_prototype_icon.vars.id }}').inputWidget('val', '<%= buttonIcon %>');
                                 });
                                 <% print('</sc' + 'ript>'); %>
 

@@ -29,7 +29,7 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->converter = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
+        $this->dateCompiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -43,47 +43,55 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
         $settings->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-        $doctrine  = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+        $doctrine         = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
             ->getMock();
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+        $aclHelper        = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->dateHelper    = new DateHelper($settings, $doctrine, $aclHelper);
+        $this->dateHelper = new DateHelper($settings, $doctrine, $aclHelper);
 
         $this->converter = new FilterDateRangeConverter(
             $this->formatter,
-            $this->converter,
+            $this->dateCompiler,
             $this->translator,
             $this->dateHelper
         );
     }
 
-    public function testGetConvertedValueDefaultValues()
+    public function testGetConvertedValueDefaultValuesWithoutValueTypes()
     {
-        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $start = clone $currentDate;
-        $start = $start->sub(new \DateInterval('P1M'));
-
         $result = $this->converter->getConvertedValue([]);
 
-        $this->assertEquals($currentDate->format('M'), $result['end']->format('M'));
-        $this->assertEquals($start->format('M'), $result['start']->format('M'));
+        $this->assertNull($result['start']);
+        $this->assertNull($result['end']);
+    }
+
+    public function testGetConvertedValueDefaultValuesWithValueTypes()
+    {
+        $this->dateCompiler->expects($this->once())
+            ->method('compile')
+            ->with('{{4}}')
+            ->will($this->returnValue(new \DateTime('01-01-2016 00:00:00')));
+        $result = $this->converter->getConvertedValue([], null, ['options' => ['value_types' => true]]);
+
+        $this->assertEquals('2016-01-01 00:00:00', $result['start']->format('Y-m-d H:i:s'));
+        $this->assertEquals('2016-01-31 23:59:59', $result['end']->format('Y-m-d H:i:s'));
     }
 
     public function testGetConvertedValueBetween()
     {
         $start = new \DateTime('2014-01-01', new \DateTimeZone('UTC'));
-        $end = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
+        $end   = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
 
         $result = $this->converter->getConvertedValue(
             [],
             [
                 'value' => [
                     'start' => $start,
-                    'end' => $end
+                    'end'   => $end
                 ],
-                'type' => AbstractDateFilterType::TYPE_BETWEEN
+                'type'  => AbstractDateFilterType::TYPE_BETWEEN
             ]
         );
 
@@ -100,9 +108,9 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
             [
                 'value' => [
                     'start' => $value,
-                    'end' => null
+                    'end'   => null
                 ],
-                'type' => AbstractDateFilterType::TYPE_MORE_THAN
+                'type'  => AbstractDateFilterType::TYPE_MORE_THAN
             ]
         );
 
@@ -119,10 +127,10 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
             [],
             [
                 'value' => [
-                    'end' => $value,
+                    'end'   => $value,
                     'start' => null
                 ],
-                'type' => AbstractDateFilterType::TYPE_LESS_THAN
+                'type'  => AbstractDateFilterType::TYPE_LESS_THAN
             ]
         );
 
@@ -140,15 +148,16 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
                 }
             );
         $start = new \DateTime('2014-01-01', new \DateTimeZone('UTC'));
-        $end = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
+        $end   = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
 
         $this->assertEquals(
             '2014-01-01 - 2015-01-01',
             $this->converter->getViewValue(
                 [
                     'start' => $start,
-                    'end' => $end,
-                    'type' => AbstractDateFilterType::TYPE_BETWEEN
+                    'end'   => $end,
+                    'type'  => AbstractDateFilterType::TYPE_BETWEEN,
+                    'part'  => null
                 ]
             )
         );

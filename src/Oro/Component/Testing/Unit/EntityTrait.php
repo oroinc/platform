@@ -70,4 +70,28 @@ trait EntityTrait
 
         return $this->propertyAccessor;
     }
+
+    /**
+     * @param array $data
+     * @return array|object
+     */
+    public function convertArrayToEntities(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->convertArrayToEntities($value);
+            }
+        }
+
+        if (!array_key_exists('testEntity', $data)) {
+            return $data;
+        }
+
+        $className = $data['testEntity'];
+        $properties = array_key_exists('testProperties', $data) ? $data['testProperties'] : [];
+        $constructorArguments =
+            array_key_exists('testConstructorArguments', $data) ? $data['testConstructorArguments'] : null;
+
+        return $this->getEntity($className, $properties, $constructorArguments);
+    }
 }

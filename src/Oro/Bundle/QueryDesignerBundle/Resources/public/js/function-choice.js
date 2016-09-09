@@ -119,13 +119,8 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         _disable: function(flag) {
-            var $elem = this.element;
-            if ($elem.data('select2')) {
-                $elem.select2('enable', !flag);
-            } else {
-                $elem.attr('disabled', flag);
-            }
-            var $widgetContainer = $elem.inputWidget('getContainer');
+            this.element.prop('disabled', flag).inputWidget('refresh');
+            var $widgetContainer = this.element.inputWidget('container');
             if ($widgetContainer) {
                 $widgetContainer.toggleClass('disabled', flag);
             }

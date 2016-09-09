@@ -20,6 +20,12 @@ class EmbedFormLayoutManager
     protected $formManager;
 
     /**
+     * Use inline layout
+     * @var bool
+     */
+    protected $inline = false;
+
+    /**
      * @param LayoutManager       $layoutManager
      * @param EmbeddedFormManager $formManager
      */
@@ -46,12 +52,14 @@ class EmbedFormLayoutManager
 
         $layoutContext->getResolver()
             ->setRequired(['embedded_form_type'])
+            ->setRequired(['embedded_form_inline'])
             ->setOptional(['embedded_form', 'embedded_form_custom_layout']);
 
         $layoutContext->set('theme', 'embedded_default');
         $layoutContext->set('embedded_form', null === $form ? null : new FormAccessor($form));
         $layoutContext->set('embedded_form_type', $formTypeName);
         $layoutContext->set('embedded_form_custom_layout', $customLayout);
+        $layoutContext->set('embedded_form_inline', $this->inline);
         $layoutContext->data()->set('embedded_form_entity', '', $formEntity);
 
         $layoutBuilder = $this->layoutManager->getLayoutBuilder();
@@ -59,5 +67,13 @@ class EmbedFormLayoutManager
         $layoutBuilder->add('root', null, 'root');
 
         return $layoutBuilder->getLayout($layoutContext);
+    }
+
+    /**
+     * @param bool $inline
+     */
+    public function setInline($inline)
+    {
+        $this->inline = (bool)$inline;
     }
 }

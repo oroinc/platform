@@ -10,14 +10,14 @@ class Context extends ParameterBag implements ContextInterface
     /** result data */
     const RESULT = 'result';
 
-    /** a group starting from which processors should be executed */
-    const FIRST_GROUP = 'firstGroup';
+    /** @var string|null */
+    protected $firstGroup;
 
-    /** a group after which processors should not be executed */
-    const LAST_GROUP = 'lastGroup';
+    /** @var string|null */
+    protected $lastGroup;
 
-    /** a list of groups to be skipped */
-    const SKIPPED_GROUPS = 'skippedGroups';
+    /** @var string[] */
+    protected $skippedGroups = [];
 
     /**
      * {@inheritdoc}
@@ -40,7 +40,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function getFirstGroup()
     {
-        return $this->get(self::FIRST_GROUP);
+        return $this->firstGroup;
     }
 
     /**
@@ -48,7 +48,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function setFirstGroup($group)
     {
-        $this->set(self::FIRST_GROUP, $group);
+        $this->firstGroup = $group;
     }
 
     /**
@@ -56,7 +56,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function getLastGroup()
     {
-        return $this->get(self::LAST_GROUP);
+        return $this->lastGroup;
     }
 
     /**
@@ -64,7 +64,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function setLastGroup($group)
     {
-        $this->set(self::LAST_GROUP, $group);
+        $this->lastGroup = $group;
     }
 
     /**
@@ -72,7 +72,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function hasSkippedGroups()
     {
-        return $this->has(self::SKIPPED_GROUPS);
+        return !empty($this->skippedGroups);
     }
 
     /**
@@ -80,11 +80,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function getSkippedGroups()
     {
-        $groups = $this->get(self::SKIPPED_GROUPS);
-
-        return null !== $groups
-            ? $groups
-            : [];
+        return $this->skippedGroups;
     }
 
     /**
@@ -92,12 +88,8 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function skipGroup($group)
     {
-        $groups = $this->get(self::SKIPPED_GROUPS);
-        if (null === $groups) {
-            $this->set(self::SKIPPED_GROUPS, [$group]);
-        } elseif (!in_array($group, $groups, true)) {
-            $groups[] = $group;
-            $this->set(self::SKIPPED_GROUPS, $groups);
+        if (!in_array($group, $this->skippedGroups, true)) {
+            $this->skippedGroups[] = $group;
         }
     }
 
@@ -106,14 +98,8 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function undoGroupSkipping($group)
     {
-        $groups = $this->get(self::SKIPPED_GROUPS);
-        if (null !== $groups && in_array($group, $groups, true)) {
-            $groups = array_values(array_diff($groups, [$group]));
-            if (empty($groups)) {
-                $this->remove(self::SKIPPED_GROUPS);
-            } else {
-                $this->set(self::SKIPPED_GROUPS, $groups);
-            }
+        if (in_array($group, $this->skippedGroups, true)) {
+            $this->skippedGroups = array_values(array_diff($this->skippedGroups, [$group]));
         }
     }
 

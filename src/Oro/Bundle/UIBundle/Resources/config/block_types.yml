@@ -1,0 +1,14 @@
+services:
+    oro_ui.layout.block_type.widget_content:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['widget_content']]
+        tags:
+            - { name: layout.block_type, alias: widget_content }
+
+    oro_ui.layout.block_type.widget_actions:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['widget_actions']]
+        tags:
+            - { name: layout.block_type, alias: widget_actions }

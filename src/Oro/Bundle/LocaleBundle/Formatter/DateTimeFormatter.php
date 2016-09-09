@@ -17,6 +17,12 @@ class DateTimeFormatter
     /** @var TranslatorInterface */
     private $translator;
 
+    /** @var \IntlDateFormatter[] */
+    protected $cachedFormatters = [];
+
+    /** @var string[] */
+    protected $cachedPatterns = [];
+
     /**
      * @param LocaleSettings      $localeSettings
      * @param TranslatorInterface $translator
@@ -65,6 +71,52 @@ class DateTimeFormatter
     public function formatDate($date, $dateType = null, $locale = null, $timeZone = null)
     {
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone);
+    }
+
+    /**
+     * @param \DateTime|string|int $date
+     * @param string|int|null      $dateType
+     * @param string|null          $locale
+     * @param string|null          $timeZone
+     *
+     * @return string
+     */
+    public function formatYear($date, $dateType = null, $locale = null, $timeZone = null)
+    {
+        $pattern = $this->translator->trans('oro.locale.date_format.year', [], null, $locale);
+
+        return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
+    }
+
+    /**
+     * @param \DateTime|string|int $date
+     * @param string|int|null      $dateType
+     * @param string|null          $locale
+     * @param string|null          $timeZone
+     *
+     * @return string
+     */
+    public function formatQuarter($date, $dateType = null, $locale = null, $timeZone = null)
+    {
+        $pattern = $this->translator->trans('oro.locale.date_format.quarter', [], null, $locale);
+
+        return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
+    }
+
+
+    /**
+     * @param \DateTime|string|int $date
+     * @param string|int|null      $dateType
+     * @param string|null          $locale
+     * @param string|null          $timeZone
+     *
+     * @return string
+     */
+    public function formatMonth($date, $dateType = null, $locale = null, $timeZone = null)
+    {
+        $pattern = $this->translator->trans('oro.locale.date_format.month', [], null, $locale);
+
+        return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
 
     /**
@@ -124,8 +176,14 @@ class DateTimeFormatter
         $dateType = $this->parseDateType($dateType);
         $timeType = $this->parseDateType($timeType);
 
-        $localeFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
-        return $localeFormatter->getPattern();
+        $key = md5(serialize([$dateType, $timeType, $locale]));
+        if (!isset($this->cachedPatterns[$key])) {
+            $this->cachedPatterns[$key] =
+                (new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN))
+                    ->getPattern();
+        }
+
+        return $this->cachedPatterns[$key];
     }
 
     /**
@@ -145,14 +203,20 @@ class DateTimeFormatter
         if (!$pattern) {
             $pattern = $this->getPattern($dateType, $timeType, $locale, $value);
         }
-        return new \IntlDateFormatter(
-            $this->localeSettings->getLanguage(),
-            null,
-            null,
-            $timeZone,
-            \IntlDateFormatter::GREGORIAN,
-            $pattern
-        );
+
+        $key = md5(serialize([$timeZone, $pattern]));
+        if (!isset($this->cachedFormatters[$key])) {
+            $this->cachedFormatters[$key] = new \IntlDateFormatter(
+                $this->localeSettings->getLanguage(),
+                null,
+                null,
+                $timeZone,
+                \IntlDateFormatter::GREGORIAN,
+                $pattern
+            );
+        }
+
+        return $this->cachedFormatters[$key];
     }
 
     /**
@@ -195,7 +259,7 @@ class DateTimeFormatter
      *
      * @return \DateTime|false
      */
-    protected function getDateTime($date)
+    public function getDateTime($date)
     {
         if (!$date) {
             return false;

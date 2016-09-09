@@ -19,11 +19,9 @@ class GuestCalendarTest extends Selenium2TestCase
     {
         $username = 'User_'.mt_rand();
 
-        $login = $this->login();
+        $page = $this->login()->openUsers('Oro\Bundle\UserBundle')->add();
         /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
-            ->add()
-            ->assertTitle('Create User - Users - User Management - System')
+        $page->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
@@ -32,9 +30,11 @@ class GuestCalendarTest extends Selenium2TestCase
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
-            ->setRoles(['Administrator'])
-            ->setBusinessUnit()
-            ->setOrganization('OroCRM')
+            ->setRoles(['Administrator']);
+        if ($page->hasBusinessUnitOrganizationChoice()) {
+            $page->setBusinessUnitOrganization(['OroCRM']);
+        }
+        $page->setBusinessUnit()
             ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')

@@ -101,7 +101,8 @@ define(function(require) {
                 success: __('oro.form.inlineEditing.successMessage'),
                 processingMessage: __('oro.form.inlineEditing.saving_progress'),
                 preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
-            }
+            },
+            id: null
         },
 
         ESCAPE_KEY_CODE: 27,
@@ -117,6 +118,7 @@ define(function(require) {
             this.overlayOptions = options.overlay;
             this.widthIncrement = options.widthIncrement;
             this.messages = options.messages;
+            this.eventChannelId = options.eventChannelId;
             this.inlineEditingOptions = options.metadata.inline_editing;
             var waitors = [];
             this.fieldName = options.fieldName;
@@ -290,7 +292,9 @@ define(function(require) {
                 view: wrapper,
                 model: this.model,
                 oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData)),
-                messages: this.messages
+                messages: this.messages,
+                eventChannelId: this.eventChannelId,
+                updateData: modelUpdateData
             };
             this.updateModel(this.model, this.editorView, modelUpdateData);
             if (this.saveApiAccessor.initialOptions.field_name) {
@@ -367,6 +371,9 @@ define(function(require) {
                 }, this);
             }
             mediator.execute('showFlashMessage', 'success', this.messages.success);
+            if (this.eventChannelId) {
+                mediator.trigger('inlineEditor:' + this.eventChannelId + ':update', this.updateData);
+            }
         },
 
         onSaveError: function(jqXHR) {

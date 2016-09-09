@@ -106,7 +106,8 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'name'     => 'user_name',
                 'category' => null,
                 'groups'   => [],
-                'products' => []
+                'products' => [],
+                'owner'    => null
             ],
             $result
         );
@@ -124,7 +125,8 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'name'     => 'user_name',
                 'category' => 'owner_category_name',
                 'groups'   => ['owner_group1', 'owner_group2'],
-                'products' => ['product_name']
+                'products' => ['product_name'],
+                'owner'    => null
             ],
             $result
         );

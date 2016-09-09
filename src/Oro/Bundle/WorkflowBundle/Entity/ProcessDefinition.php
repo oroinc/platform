@@ -11,7 +11,7 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 /**
  * @ORM\Table("oro_process_definition")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      routeName="oro_process_definition_index",
@@ -22,7 +22,8 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

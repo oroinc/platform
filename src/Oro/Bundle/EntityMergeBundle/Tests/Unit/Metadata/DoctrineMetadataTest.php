@@ -46,7 +46,7 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->doctrineMetadata->isField());
 
         $this->doctrineMetadata->set('targetEntity', self::CLASS_NAME);
-        $this->assertTrue($this->doctrineMetadata->isField());
+        $this->assertFalse($this->doctrineMetadata->isField());
 
         $this->doctrineMetadata->set('joinColumns', []);
         $this->assertFalse($this->doctrineMetadata->isField());
@@ -57,7 +57,7 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->doctrineMetadata->isAssociation());
 
         $this->doctrineMetadata->set('targetEntity', self::CLASS_NAME);
-        $this->assertFalse($this->doctrineMetadata->isAssociation());
+        $this->assertTrue($this->doctrineMetadata->isAssociation());
 
         $this->doctrineMetadata->set('joinColumns', []);
         $this->assertTrue($this->doctrineMetadata->isAssociation());
@@ -101,5 +101,13 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
         $this->doctrineMetadata->set('type', $expectedType);
         $this->assertTrue($this->doctrineMetadata->isTypeEqual($expectedType));
         $this->assertFalse($this->doctrineMetadata->isTypeEqual(ClassMetadataInfo::ONE_TO_ONE));
+    }
+
+    public function testOrphanRemoval()
+    {
+        $this->assertFalse($this->doctrineMetadata->isOrphanRemoval());
+
+        $this->doctrineMetadata->set('orphanRemoval', true);
+        $this->assertTrue($this->doctrineMetadata->isOrphanRemoval());
     }
 }

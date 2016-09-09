@@ -58,6 +58,14 @@ class NoteApiType extends NoteType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_note_api';
     }
 }

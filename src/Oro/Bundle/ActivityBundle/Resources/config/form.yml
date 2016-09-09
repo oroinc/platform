@@ -8,9 +8,9 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity_config.config_manager'
             - '@translator'
-            - '@oro_search.mapper'
             - '@security.token_storage'
             - '@event_dispatcher'
+            - '@oro_activity.resolver.entity_title'
         tags:
             - { name: form.type, alias: oro_activity_contexts_select }
 
@@ -24,7 +24,7 @@ services:
         calls:
             - [setRequest, ["@?request="]]
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_activity.type.multiple_association_choice:
         class: %oro_activity.type.multiple_association_choice.class%

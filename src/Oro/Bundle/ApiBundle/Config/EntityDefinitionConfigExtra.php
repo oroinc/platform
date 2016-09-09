@@ -13,15 +13,37 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
 {
     const NAME = ConfigUtil::DEFINITION;
 
-    /** @var string */
+    /** @var string|null */
     protected $action;
 
+    /** @var bool */
+    protected $collection;
+
+    /** @var string|null */
+    protected $parentClassName;
+
+    /** @var string|null */
+    protected $associationName;
+
     /**
-     * @param string $action The name of the action for which the configuration is requested
+     * @param string|null $action          The name of the action for which the configuration is requested
+     * @param bool        $collection      A flag indicates Whether a configuration is requested
+     *                                     for a list of entities resource or a single entity  resource
+     * @param string|null $parentClassName The class name of the parent entity
+     *                                     for which the configuration is requested
+     * @param string|null $associationName The association name of a sub-resource
+     *                                     for which the configuration is requested
      */
-    public function __construct($action = null)
-    {
+    public function __construct(
+        $action = null,
+        $collection = false,
+        $parentClassName = null,
+        $associationName = null
+    ) {
         $this->action = $action;
+        $this->collection = $collection;
+        $this->parentClassName = $parentClassName;
+        $this->associationName = $associationName;
     }
 
     /**
@@ -38,6 +60,9 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     public function configureContext(ConfigContext $context)
     {
         $context->setTargetAction($this->action);
+        $context->setIsCollection($this->collection);
+        $context->setParentClassName($this->parentClassName);
+        $context->setAssociationName($this->associationName);
     }
 
     /**
@@ -53,8 +78,20 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
      */
     public function getCacheKeyPart()
     {
-        return $this->action
-            ? self::NAME . ':' . $this->action
-            : self::NAME;
+        $result = self::NAME;
+        if ($this->action) {
+            $result .= ':' . $this->action;
+        }
+        if ($this->collection) {
+            $result .= ':collection';
+        }
+        if ($this->parentClassName) {
+            $result .= ':' . $this->parentClassName;
+        }
+        if ($this->associationName) {
+            $result .= ':' . $this->associationName;
+        }
+
+        return $result;
     }
 }

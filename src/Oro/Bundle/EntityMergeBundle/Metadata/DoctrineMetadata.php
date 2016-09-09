@@ -23,7 +23,7 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
      */
     public function isAssociation()
     {
-        return $this->has('targetEntity') && ($this->has('joinColumns') || $this->has('joinTable'));
+        return $this->has('targetEntity');
     }
 
     /**
@@ -83,5 +83,15 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
     public function getFieldName()
     {
         return $this->get('fieldName', true);
+    }
+
+    /**
+     * Checks if association has orphan removal enabled
+     *
+     * @return bool
+     */
+    public function isOrphanRemoval()
+    {
+        return $this->is('orphanRemoval');
     }
 }

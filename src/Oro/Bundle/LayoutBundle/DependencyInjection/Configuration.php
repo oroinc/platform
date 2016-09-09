@@ -6,6 +6,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
@@ -18,6 +20,15 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_layout');
+
+        SettingsBuilder::append($rootNode, [
+            'debug_block_info' => [
+                'value' => false
+            ],
+            'debug_developer_toolbar' => [
+                'value' => true
+            ],
+        ]);
 
         $rootNode
             ->children()
@@ -112,9 +123,9 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $node        = $treeBuilder->root('themes');
 
-        $dataTreeBuilder = new TreeBuilder();
-        $dataNode = $dataTreeBuilder->root('data');
-        $dataNode->info('Layout theme additional data')->end();
+        $configTreeBuilder = new TreeBuilder();
+        $configNode = $configTreeBuilder->root('config');
+        $configNode->info('Layout theme additional config')->end();
 
         $node
             ->useAttributeAsKey('theme-identifier')
@@ -149,11 +160,11 @@ class Configuration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                         ->cannotBeEmpty()
                     ->end()
-                    ->append($dataNode)
+                    ->append($configNode)
                 ->end()
             ->end();
 
-        $this->appendDataNodes($dataNode);
+        $this->appendConfigNodes($configNode);
 
         $parentNode
             ->append($node)
@@ -169,12 +180,13 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param ArrayNodeDefinition $dataNode
+     * @param ArrayNodeDefinition $configNode
      */
-    protected function appendDataNodes($dataNode)
+    protected function appendConfigNodes($configNode)
     {
         $treeBuilder = new TreeBuilder();
         $assetsNode = $treeBuilder->root('assets');
+        $imagesNode = $treeBuilder->root('images');
 
         $assetsNode
             ->useAttributeAsKey('asset-identifier')
@@ -195,6 +207,21 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        $dataNode->append($assetsNode);
+        $imagesNode
+            ->children()
+                ->arrayNode('types')
+                ->useAttributeAsKey('image-type-identifier')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('label')->cannotBeEmpty()->end()
+                            ->scalarNode('dimensions')->defaultNull()->end()
+                            ->scalarNode('max_number')->defaultNull()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        $configNode->append($assetsNode);
+        $configNode->append($imagesNode);
     }
 }

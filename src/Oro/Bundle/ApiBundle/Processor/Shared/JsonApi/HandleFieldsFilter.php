@@ -17,8 +17,6 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
  */
 class HandleFieldsFilter implements ProcessorInterface
 {
-    const FILTER_KEY = 'fields';
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -43,7 +41,7 @@ class HandleFieldsFilter implements ProcessorInterface
         }
 
         $fields       = [];
-        $filterValues = $context->getFilterValues()->getGroup(self::FILTER_KEY);
+        $filterValues = $context->getFilterValues()->getGroup(AddFieldsFilter::FILTER_KEY);
         foreach ($filterValues as $filterValue) {
             $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
                 $filterValue->getValue(),

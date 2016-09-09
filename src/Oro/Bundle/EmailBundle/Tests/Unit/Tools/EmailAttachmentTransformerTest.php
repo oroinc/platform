@@ -4,11 +4,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Gaufrette\Filesystem;
 
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
+use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
-use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
@@ -19,9 +20,9 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
     protected $filesystem;
 
     /**
-     * @var FilesystemMap|\PHPUnit_Framework_MockObject_MockObject
+     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $filesystemMap;
+    protected $fileManager;
 
     /**
      * @var Factory
@@ -45,19 +46,9 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->filesystemMap = $this->getMockBuilder('Knp\Bundle\GaufretteBundle\FilesystemMap')
+        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->filesystem = $this->getMockBuilder('Gaufrette\Filesystem')
-            ->setMethods(['get'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->filesystemMap->expects($this->once())
-            ->method('get')
-            ->with('attachments')
-            ->will($this->returnValue($this->filesystem));
 
         $this->manager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
             ->disableOriginalConstructor()
@@ -70,8 +61,8 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
         $this->factory = new Factory();
 
         $this->emailAttachmentTransformer = new EmailAttachmentTransformer(
-            $this->filesystemMap,
             $this->factory,
+            $this->fileManager,
             $this->manager,
             $this->emailAttachmentManager
         );
@@ -128,32 +119,15 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testOroToModel()
     {
-        $attachmentOro = $this->getMock('Oro\Bundle\AttachmentBundle\Entity\Attachment');
+        $file = new File();
+        $file->setOriginalFilename('filename.txt');
+        $file->setFileSize(100);
+        $file->setMimeType('image/jpeg');
 
-        $attachmentOro->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
-
-        $file = $this->getMock('Oro\Bundle\AttachmentBundle\Entity\File');
-        $file->expects($this->once())
-            ->method('getOriginalFilename')
-            ->willReturn('filename.txt');
-
-        $file->expects($this->once())
-            ->method('getFileSize')
-            ->willReturn(100);
-
-        $file->expects($this->once())
-            ->method('getMimeType')
-            ->willReturn('image/jpeg');
-
-        $attachmentOro->expects($this->exactly(5))
-            ->method('getFile')
-            ->willReturn($file);
-
-        $attachmentOro->expects($this->once())
-            ->method('getCreatedAt')
-            ->willReturn('2015-04-13 19:09:32');
+        $attachmentOro = new Attachment();
+        ReflectionUtil::setId($attachmentOro, 1);
+        $attachmentOro->setFile($file);
+        $attachmentOro->setCreatedAt(new \DateTime('2015-04-13 19:09:32', new \DateTimeZone('UTC')));
 
         $this->manager->expects($this->once())
             ->method('isImageType')
@@ -172,7 +146,10 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\EmailAttachment', $attachmentModel);
         $this->assertEquals(1, $attachmentModel->getId());
         $this->assertEquals(100, $attachmentModel->getFileSize());
-        $this->assertEquals('2015-04-13 19:09:32', $attachmentModel->getModified());
+        $this->assertEquals(
+            new \DateTime('2015-04-13 19:09:32', new \DateTimeZone('UTC')),
+            $attachmentModel->getModified()
+        );
         $this->assertEquals(1, $attachmentModel->getType());
         $this->assertEquals(null, $attachmentModel->getEmailAttachment());
         $this->assertEquals('imageurl.jpg', $attachmentModel->getPreview());
@@ -181,37 +158,18 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testOroToEntity()
     {
-        $attachmentOro = $this->getMock('Oro\Bundle\AttachmentBundle\Entity\Attachment');
+        $file = new File();
+        $file->setOriginalFilename('filename.txt');
+        $file->setFilename('filename');
+        $file->setMimeType('text/plain');
 
-        $file = $this->getMock('Oro\Bundle\AttachmentBundle\Entity\File');
-        $file->expects($this->once())
-            ->method('getOriginalFilename')
-            ->willReturn('filename.txt');
-
-        $file->expects($this->exactly(2))
-            ->method('getFilename')
-            ->willReturn('filename');
-
-        $file->expects($this->once())
-            ->method('getMimeType')
-            ->willReturn('text/plain');
-
-        $attachmentOro->expects($this->exactly(5))
-            ->method('getFile')
-            ->willReturn($file);
-
-        $fileContent = $this->getMockBuilder('Gaufrette\File')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileContent->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('getContent')
+            ->with($this->identicalTo($file))
             ->willReturn('content');
 
-        $this->filesystem->expects($this->once())
-            ->method('get')
-            ->with('filename')
-            ->willReturn($fileContent);
+        $attachmentOro = new Attachment();
+        $attachmentOro->setFile($file);
 
         $attachmentEntity = $this->emailAttachmentTransformer->oroToEntity($attachmentOro);
 

@@ -35,7 +35,8 @@ define([
             var checkboxEls = $('.parent-scope-checkbox input');
             checkboxEls.on('change', function() {
                 value = $(this).is(':checked');
-                valueEls = $(this).parents('.controls').find(':input, a.btn, button').not(checkboxEls);
+                valueEls = $(this).parents('.controls').find(':input, a.btn, button').not(checkboxEls)
+                    .not('[readonly]');
                 valueEls.each(function(i, el) {
                     $(el)
                         .prop('disabled', value)

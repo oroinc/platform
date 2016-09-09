@@ -1,0 +1,10 @@
+{
+  "expression": "true",
+  "node": {
+    "Symfony\\Component\\ExpressionLanguage\\Node\\ConstantNode": {
+      "attributes": {
+        "value": false
+      }
+    }
+  }
+}

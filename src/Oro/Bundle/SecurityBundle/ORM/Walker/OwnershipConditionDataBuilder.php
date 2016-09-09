@@ -277,7 +277,7 @@ class OwnershipConditionDataBuilder
         $result[] = $userId;
 
         foreach ($this->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
-            $userIds = $this->getTree()->getUsersAssignedToBU($buId);
+            $userIds = $this->getTree()->getUsersAssignedToBusinessUnit($buId);
             if (!empty($userIds)) {
                 $result = array_unique(array_merge($result, $userIds));
             }
@@ -299,7 +299,7 @@ class OwnershipConditionDataBuilder
         $buIds = [];
         $this->fillSubordinateBusinessUnitIds($userId, $organizationId, $buIds);
         foreach ($buIds as $buId) {
-            $userIds = $this->getTree()->getUsersAssignedToBU($buId);
+            $userIds = $this->getTree()->getUsersAssignedToBusinessUnit($buId);
             if (!empty($userIds)) {
                 $result = array_unique(array_merge($result, $userIds));
             }
@@ -311,6 +311,8 @@ class OwnershipConditionDataBuilder
      *
      * @param int|string $userId
      * @param array      $result [output]
+     *
+     * @deprecated since 1.10. This method is not used and will be removed
      */
     protected function fillOrganizationBusinessUnitIds($userId, array &$result)
     {
@@ -327,6 +329,8 @@ class OwnershipConditionDataBuilder
      *
      * @param int|string $userId
      * @param array      $result [output]
+     *
+     * @deprecated since 1.10. This method is not used and will be removed
      */
     protected function fillOrganizationUserIds($userId, array &$result)
     {

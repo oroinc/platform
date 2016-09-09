@@ -10,8 +10,9 @@ use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldBlackList;
 class Configuration implements ConfigurationInterface
 {
     const ENABLED_CONFIG_PATH           = '[inline_editing][enable]';
+    const BEHAVIOUR_CONFIG_PATH         = '[inline_editing][behaviour]';
 
-    const BEHAVIOUR_DEFAULT_VALUE       = 'enable_selected';
+    const BEHAVIOUR_ENABLE_SELECTED     = 'enable_selected';
     const BEHAVIOUR_ENABLE_ALL_VALUE    = 'enable_all';
     const DEFAULT_ROUTE                 = 'oro_api_patch_entity_data';
 
@@ -47,8 +48,8 @@ class Configuration implements ConfigurationInterface
      */
     public function __construct($root)
     {
-        $this->root  = $root;
-        $this->behaviourConfigValues = [self::BEHAVIOUR_DEFAULT_VALUE, self::BEHAVIOUR_ENABLE_ALL_VALUE];
+        $this->root = $root;
+        $this->behaviourConfigValues = [self::BEHAVIOUR_ENABLE_SELECTED, self::BEHAVIOUR_ENABLE_ALL_VALUE];
     }
 
     /**
@@ -75,7 +76,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode(self::CONFIG_ENTITY_KEY)->end()
                 ->enumNode('behaviour')
                     ->values($this->behaviourConfigValues)
-                    ->defaultValue(self::BEHAVIOUR_DEFAULT_VALUE)
+                    ->defaultValue(self::BEHAVIOUR_ENABLE_ALL_VALUE)
                 ->end()
                 ->scalarNode('plugin')->end()
                 ->scalarNode('default_editors')->end()

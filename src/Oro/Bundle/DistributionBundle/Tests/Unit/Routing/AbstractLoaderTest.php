@@ -7,6 +7,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\Routing\RouteCollection;
 
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
@@ -89,6 +90,51 @@ abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
             [],
             $this->getLoaderWithoutEventDispatcher()->load('file', 'type')->all()
         );
+    }
+
+    public function testLoadWithEmptyCache()
+    {
+        $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle->expects($this->any())->method('getPath')->willReturn($dir);
+        $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
+
+        $cache = $this->getMockBuilder('Oro\Bundle\DistributionBundle\Routing\SharedData')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $cache->expects($this->once())
+            ->method('getRoutes')
+            ->with($this->isType('string'))
+            ->willReturn(null);
+        $cache->expects($this->once())
+            ->method('setRoutes')
+            ->with($this->isType('string'), $this->isInstanceOf('Symfony\Component\Routing\RouteCollection'));
+
+        $loader = $this->getLoader();
+        $loader->setCache($cache);
+        $loader->load('file', 'type')->all();
+    }
+
+    public function testLoadWithCachedData()
+    {
+        $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle->expects($this->any())->method('getPath')->willReturn($dir);
+        $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
+
+        $cache = $this->getMockBuilder('Oro\Bundle\DistributionBundle\Routing\SharedData')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $cache->expects($this->once())
+            ->method('getRoutes')
+            ->with($this->isType('string'))
+            ->willReturn(new RouteCollection());
+        $cache->expects($this->never())
+            ->method('setRoutes');
+
+        $loader = $this->getLoader();
+        $loader->setCache($cache);
+        $loader->load('file', 'type')->all();
     }
 
     /**

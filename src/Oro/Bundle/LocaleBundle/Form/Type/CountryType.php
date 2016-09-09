@@ -4,19 +4,19 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountryType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'choices' => Intl::getRegionBundle()->getCountryNames('en'),
-            )
+            [
+                'choices' => array_flip(Intl::getRegionBundle()->getCountryNames('en')),
+            ]
         );
     }
 
@@ -32,6 +32,14 @@ class CountryType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_locale_country';
     }

@@ -2,13 +2,15 @@
     <div class="float-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append input-append-sortable collection-element-primary">
             {{ form_widget(form.label, {disabled: disabled}) }}
+            <span class="add-on ui-sortable-handle{% if disabled %} disabled{% endif %}"
+                  data-name="sortable-handle"
+                  title="{{ 'oro.entity_extend.enum_options.priority.tooltip'|trans }}">
+                <i class="icon-resize-vertical {% if disabled %} disabled{% endif %}"></i>
+                {{ form_widget(form.priority, {disabled: disabled}) }}
+            </span>
             <label class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.default.tooltip'|trans }}">
                 {{ form_widget(form.is_default, {disabled: disabled}) }}
             </label>
-            <span class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.priority.tooltip'|trans }}">
-                <i class="icon-resize-vertical ui-sortable-handle{% if disabled %} disabled{% endif %}"></i>
-                {{ form_widget(form.priority, {disabled: disabled}) }}
-            </span>
         </div>
         {{ form_errors(form.label) }}
     </div>
@@ -16,47 +18,19 @@
 {% endblock %}
 
 {% block oro_entity_extend_enum_value_collection_widget %}
-    {{ block('oro_collection_widget') }}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% if not disabled %}
-        {% set id = id ~ '_collection' %}
-        {{ _self.oro_entity_extend_enum_value_collection_js(_context) }}
+        <div class="enum-value-collection" {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/view-component',
+            options: {
+                view: 'oroentityextend/js/app/views/enum-values-view',
+                multiple: multiple,
+                autoRender: true
+            }
+        }) }}>
+            {{ block('oro_collection_widget') }}
+        </div>
+    {% else %}
+        {{ block('oro_collection_widget') }}
     {% endif %}
 {% endblock %}
-
-{% macro oro_entity_extend_enum_value_collection_js(context) %}
-    <script type="text/javascript">
-        require(['jquery', 'jquery-ui'],
-        function($){
-            $(function() {
-                var container = $('#{{ context.id }}');
-
-                {% if context.multiple == false %}
-                container.on('click', '[name$="[is_default]"]', function(e) {
-                    container.find('[name$="[is_default]"]').each(function (idx, el) {
-                        if (el.checked && el.id != e.currentTarget.id) {
-                            el.checked = false;
-                        }
-                    });
-                });
-                {% endif %}
-
-                var reindex_values = function() {
-                    var index = 1;
-                    $('#{{ context.id }} [name$="[priority]"]').each(function(i, el){
-                        $(el).val(index++);
-                    })
-                };
-
-                container.sortable({
-                    cursor: 'move',
-                    delay : 100,
-                    containment: "parent",
-                    stop  : reindex_values
-                });
-
-                reindex_values();
-                container.parent().on('click', 'a.add-list-item', reindex_values);
-            });
-        });
-    </script>
-{% endmacro %}

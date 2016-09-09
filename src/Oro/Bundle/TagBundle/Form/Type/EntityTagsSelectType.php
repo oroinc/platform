@@ -29,6 +29,14 @@ class EntityTagsSelectType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_tag_entity_tags_selector';
     }
 

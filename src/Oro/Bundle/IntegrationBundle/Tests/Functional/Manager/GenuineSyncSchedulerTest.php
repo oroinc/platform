@@ -8,20 +8,14 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class GenuineSyncSchedulerTest extends WebTestCase
 {
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-        
-        self::$loadedFixtures = [];
-        $this->rollbackTransaction();
     }
 
     public function testCouldBeGetFromContainerAsService()

@@ -14,12 +14,34 @@ input[type=number] {
 }
 
 input[type=text].hasDatepicker.ui-datepicker-dialog-is-below:focus,
+.ui-datepicker-dialog-is-below,
 .timepicker-dialog-is-below,
 .input-append.select2-drop-below,
 .controls.select2-drop-below select,
 .controls .selector.focus {
   + span.validation-failed {
     #floating-validation-message();
+  }
+}
+.loading > .input-append {
+  position: relative;
+  & .btn:focus {
+    outline: 0 none;
+  }
+  .select2-container-active .select2-choice {
+    border: 0 none;
+    box-shadow: none;
+  }
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    opacity: 0.7;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: url("../../../orodatagrid/images/preloader.gif") repeat;
   }
 }
 

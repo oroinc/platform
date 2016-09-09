@@ -69,12 +69,12 @@ class RequestType implements ToArrayInterface
     }
 
     /**
-     * @param string[] $types
+     * @param RequestType $requestType
      */
-    public function set(array $types)
+    public function set(RequestType $requestType)
     {
-        $this->types = $types;
-        $this->str   = null;
+        $this->types = $requestType->types;
+        $this->str   = $requestType->str;
     }
 
     /**

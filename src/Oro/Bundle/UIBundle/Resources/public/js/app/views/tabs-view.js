@@ -45,6 +45,7 @@ define(function(require) {
          */
         onTabSwitch: function(e) {
             e.preventDefault();
+            e.stopPropagation();
             this.$(e.currentTarget).tab('show');
         },
 

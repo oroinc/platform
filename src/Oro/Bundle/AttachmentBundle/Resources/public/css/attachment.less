@@ -1,3 +1,5 @@
+@import "oroui/css/less/mixins";
+
 .oro_attachment_file{
   border: none;
   padding: 5px 5px 0 5px;
@@ -30,6 +32,42 @@
     }
     &:hover:after {
       color:#888;
+    }
+  }
+}
+.attachment-file {
+  div.uploader {
+    border: none;
+    float: none;
+    input {
+      cursor: pointer;
+      width: 345px;
+    }
+    input:hover ~ span.action {
+      color: @linkColorHover;
+    }
+    span.action {
+      border: none;
+      background: none;
+      color: @linkColor;
+      cursor: pointer;
+    }
+    .active  span.action {
+      background: none;
+    }
+    span.filename {
+      width: 85px;
+    }
+    .focus {
+      border: none;
+      box-shadow: none;
+    }
+  }
+  div.uploader.focus {
+    border: none;
+    box-shadow: none;
+    span.action {
+      color: @linkColor;
     }
   }
 }

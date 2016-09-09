@@ -12,8 +12,6 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
-use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
@@ -58,7 +56,7 @@ class OrmFilterExtension extends AbstractExtension
             return false;
         }
 
-        return $config->getDatasourceType() == OrmDatasource::TYPE;
+        return $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
     /**
@@ -141,6 +139,7 @@ class OrmFilterExtension extends AbstractExtension
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
+            $filter->setFilterState($value);
             $metadata          = $filter->getMetadata();
             $filtersMetaData[] = array_merge(
                 $metadata,
@@ -151,7 +150,6 @@ class OrmFilterExtension extends AbstractExtension
                     'cacheId' => $this->getFilterCacheId($rawConfig, $metadata),
                 ]
             );
-
         }
 
         $data
@@ -284,27 +282,10 @@ class OrmFilterExtension extends AbstractExtension
 
         if (!$readParameters) {
             return $defaultFilters;
+        } else {
+            $currentFilters = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
+            return array_replace($defaultFilters, $currentFilters);
         }
-
-        $intersectKeys = array_intersect(
-            $this->getParameters()->keys(),
-            [
-                OrmSorterExtension::SORTERS_ROOT_PARAM,
-                PagerInterface::PAGER_ROOT_PARAM,
-                ParameterBag::ADDITIONAL_PARAMETERS,
-                ParameterBag::MINIFIED_PARAMETERS,
-                self::FILTER_ROOT_PARAM,
-                self::MINIFIED_FILTER_PARAM
-            ]
-        );
-
-        $gridHasInitialState = empty($intersectKeys);
-
-        if ($gridHasInitialState) {
-            return $defaultFilters;
-        }
-
-        return $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
     }
 
     /**
