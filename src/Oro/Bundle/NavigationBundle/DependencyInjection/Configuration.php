@@ -153,6 +153,16 @@ class Configuration implements ConfigurationInterface
             ->end()
         ->end();
 
+        $node
+            ->arrayNode('areas')
+                ->useAttributeAsKey('id')
+                    ->prototype('array')
+                        ->requiresAtLeastOneElement()
+                        ->prototype('scalar')->end()
+                    ->end()
+                ->end()
+            ->end();
+
         return $this;
     }
 }

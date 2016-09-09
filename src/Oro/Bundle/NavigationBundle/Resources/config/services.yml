@@ -403,3 +403,11 @@ services:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         tags:
             - { name: oro_menu.builder }
+
+    oro_navigation.menu_update_provider.default:
+        class: Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_navigation.menu_update_provider, area: default }

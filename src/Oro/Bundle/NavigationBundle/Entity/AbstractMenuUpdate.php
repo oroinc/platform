@@ -21,7 +21,7 @@ abstract class AbstractMenuUpdate
     /**
      * @var string
      *
-     * @ORM\Column(name="key", type="string", length=100)
+     * @ORM\Column(name="`key`", type="string", length=100)
      */
     protected $key;
 
@@ -31,6 +31,11 @@ abstract class AbstractMenuUpdate
      * @ORM\Column(name="parent_key", type="string", length=100, nullable=true)
      */
     protected $parentKey;
+
+    /**
+     * @var string
+     */
+    protected $title;
 
     /**
      * @var string
@@ -122,6 +127,25 @@ abstract class AbstractMenuUpdate
     public function setParentKey($parentKey)
     {
         $this->parentKey = $parentKey;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return AbstractMenuUpdate
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
 
         return $this;
     }
