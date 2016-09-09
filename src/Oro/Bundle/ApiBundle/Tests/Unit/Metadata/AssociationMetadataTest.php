@@ -168,6 +168,15 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($associationMetadata->isNullable());
     }
 
+    public function testCollapsed()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertFalse($associationMetadata->isCollapsed());
+        $associationMetadata->setCollapsed(true);
+        $this->assertTrue($associationMetadata->isCollapsed());
+    }
+
     public function testTargetMetadata()
     {
         $associationMetadata = new AssociationMetadata();
@@ -175,5 +184,14 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($associationMetadata->getTargetMetadata());
         $associationMetadata->setTargetMetadata($this->entityMetadata);
         $this->assertEquals($this->entityMetadata, $associationMetadata->getTargetMetadata());
+    }
+
+    public function testIsArrayAttribute()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertFalse($associationMetadata->isArrayAttribute());
+        $associationMetadata->setDataType('array');
+        $this->assertTrue($associationMetadata->isArrayAttribute());
     }
 }

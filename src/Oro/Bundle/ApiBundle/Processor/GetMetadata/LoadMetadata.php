@@ -199,6 +199,7 @@ class LoadMetadata implements ProcessorInterface
             if ($propertyPath !== $associationName) {
                 $associationMetadata->setName($associationName);
             }
+            $associationMetadata->setCollapsed($field->isCollapsed());
             $entityMetadata->addAssociation($associationMetadata);
         }
     }
@@ -290,6 +291,7 @@ class LoadMetadata implements ProcessorInterface
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsNullable(true);
+        $associationMetadata->setCollapsed($field->isCollapsed());
         if (0 !== strpos($dataType, 'association:')) {
             $associationMetadata->setDataType($dataType);
             $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
@@ -391,9 +393,12 @@ class LoadMetadata implements ProcessorInterface
                 $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
                 if (!$field->getDataType()) {
                     $this->setAssociationDataType($associationMetadata, $field);
+                } else {
+                    $associationMetadata->setDataType($field->getDataType());
                 }
                 $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
                 $associationMetadata->setIsNullable(true);
+                $associationMetadata->setCollapsed($field->isCollapsed());
                 $associationMetadata->setTargetClassName($targetClass);
                 $associationMetadata->addAcceptableTargetClassName($targetClass);
             } elseif ($field->isMetaProperty()) {

@@ -42,9 +42,15 @@ class ErrorCompleter extends AbstractErrorCompleter
                 } else {
                     $parts = explode('.', $propertyPath);
                     if (array_key_exists($parts[0], $metadata->getAssociations())) {
-                        $pointer = [JsonApiDoc::RELATIONSHIPS, $parts[0], JsonApiDoc::DATA];
+                        $association = $metadata->getAssociation($parts[0]);
+                        $pointer = $association->isArrayAttribute()
+                            ? [JsonApiDoc::ATTRIBUTES, $parts[0]]
+                            : [JsonApiDoc::RELATIONSHIPS, $parts[0], JsonApiDoc::DATA];
                         if (count($parts) > 1) {
                             $pointer[] = $parts[1];
+                            if ($association->isArrayAttribute() && !$association->isCollapsed()) {
+                                $pointer = array_merge($pointer, array_slice($parts, 2));
+                            }
                         }
                     } else {
                         $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));

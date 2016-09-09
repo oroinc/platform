@@ -8,21 +8,27 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class MetadataTypeGuesser implements FormTypeGuesserInterface
 {
-    /** @var MetadataAccessorInterface|null */
-    protected $metadataAccessor;
-
     /** @var array [data type => [form type, options], ...] */
     protected $dataTypeMappings = [];
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /** @var MetadataAccessorInterface|null */
+    protected $metadataAccessor;
+
     /**
-     * @param array $dataTypeMappings [data type => [form type, options], ...]
+     * @param array          $dataTypeMappings [data type => [form type, options], ...]
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(array $dataTypeMappings = [])
+    public function __construct(array $dataTypeMappings, DoctrineHelper $doctrineHelper)
     {
         $this->dataTypeMappings = $dataTypeMappings;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -139,9 +145,77 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      */
     protected function getTypeGuessForAssociation(AssociationMetadata $metadata)
     {
+        if ($metadata->isArrayAttribute()) {
+            return $metadata->isCollapsed()
+                ? $this->getTypeGuessForCollapsedArrayAssociation($metadata)
+                : $this->getTypeGuessForArrayAssociation($metadata);
+        }
+
         return $this->createTypeGuess(
             'oro_api_entity',
             ['metadata' => $metadata],
+            TypeGuess::HIGH_CONFIDENCE
+        );
+    }
+
+    /**
+     * @param AssociationMetadata $metadata
+     *
+     * @return TypeGuess|null
+     */
+    protected function getTypeGuessForArrayAssociation(AssociationMetadata $metadata)
+    {
+        $targetMetadata = $metadata->getTargetMetadata();
+        if (null === $targetMetadata) {
+            return null;
+        }
+
+        $formType = $this->doctrineHelper->isManageableEntityClass($targetMetadata->getClassName())
+            ? 'oro_api_entity_collection'
+            : 'oro_api_collection';
+
+        return $this->createTypeGuess(
+            $formType,
+            [
+                'entry_data_class' => $targetMetadata->getClassName(),
+            ],
+            TypeGuess::HIGH_CONFIDENCE
+        );
+    }
+
+    /**
+     * @param AssociationMetadata $metadata
+     *
+     * @return TypeGuess|null
+     */
+    protected function getTypeGuessForCollapsedArrayAssociation(AssociationMetadata $metadata)
+    {
+        $targetMetadata = $metadata->getTargetMetadata();
+        if (null === $targetMetadata) {
+            return null;
+        }
+
+        // it is expected that collapsed association must have only one field or association
+        $fieldNames = array_keys($targetMetadata->getFields());
+        $targetFieldName = reset($fieldNames);
+        if (!$targetFieldName) {
+            $associationNames = array_keys($targetMetadata->getAssociations());
+            $targetFieldName = reset($associationNames);
+        }
+        if (!$targetFieldName) {
+            return null;
+        }
+
+        $formType = $this->doctrineHelper->isManageableEntityClass($targetMetadata->getClassName())
+            ? 'oro_api_entity_scalar_collection'
+            : 'oro_api_scalar_collection';
+
+        return $this->createTypeGuess(
+            $formType,
+            [
+                'entry_data_class'    => $targetMetadata->getClassName(),
+                'entry_data_property' => $targetFieldName,
+            ],
             TypeGuess::HIGH_CONFIDENCE
         );
     }
