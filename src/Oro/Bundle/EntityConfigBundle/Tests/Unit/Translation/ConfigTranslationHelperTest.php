@@ -115,7 +115,6 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
             $this->assertTranslationServicesCalled();
         } else {
             $this->translationManager->expects($this->never())->method($this->anything());
-            $this->translationManager->expects($this->never())->method($this->anything());
         }
 
         $this->helper->saveTranslations($translations);
