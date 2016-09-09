@@ -42,7 +42,7 @@ class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $apiListenerId = (string)$listenerRef . '.' . $this->firewallName;
+        $apiListenerId = (string) $listenerRef . '.' . $this->firewallName;
         $container
             ->register($apiListenerId, SecurityFirewallContextListener::class)
             ->setArguments([$listenerRef, $sessionOptions]);
@@ -61,16 +61,18 @@ class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @param Reference[]      $listeners
      *
-     * @return array [index, Reference, Definition]
+     * @return array [index, Reference]
      */
     protected function getContextListener(ContainerBuilder $container, array $listeners)
     {
+        $securityContextListenerClass = $container->getParameter('security.context_listener.class');
+
         $index = 0;
         foreach ($listeners as $listener) {
-            $serviceId = (string)$listener;
+            $serviceId = (string) $listener;
             if ($container->hasDefinition($serviceId)) {
                 $serviceDef = $container->getDefinition($serviceId);
-                if ('Symfony\Component\Security\Http\Firewall\ContextListener' === $serviceDef->getClass()) {
+                if ($securityContextListenerClass === $serviceDef->getClass()) {
                     return [$index, $listener];
                 }
             }
