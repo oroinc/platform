@@ -81,8 +81,6 @@ Feature: Pin page
       | First Name        | First Name      |
       | Last Name         | Last Name       |
       | Primary Email     | email@test.com  |
-      | Roles             | [Administrator] |
-      | Status            | 1               |
 
   Scenario: Save form and view pinned form
     Given I fill "User" form with:
@@ -99,8 +97,6 @@ Feature: Pin page
       | First Name        | First Name      |
       | Last Name         | Last Name       |
       | Primary Email     | email@test.com  |
-      | Roles             | [Administrator] |
-      | Status            | 1               |
     And I fill "User" form with:
       | Password          | 123123q |
       | Re-Enter Password | 123123q |
