@@ -50,10 +50,10 @@ abstract class AbstractFormType extends AbstractType
      * @throws \OutOfBoundsException if the context does not contain the form accessor
      * @throws UnexpectedTypeException if the form accessor stored in the context has invalid type
      */
-    protected function getFormAccessor(ContextInterface $context, Options $options)
+    protected function getFormAccessor(ContextInterface $context, $options)
     {
         /** @var FormAccessorInterface $formAccessor */
-        if ($options->isExistsAndNotEmpty('form')) {
+        if (isset($options['form']) && !empty($options['form'])) {
             $formAccessor = $options['form'];
             if (!$formAccessor instanceof FormAccessorInterface) {
                 throw new UnexpectedTypeException(

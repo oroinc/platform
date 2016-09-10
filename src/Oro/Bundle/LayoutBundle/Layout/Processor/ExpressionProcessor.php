@@ -56,7 +56,7 @@ class ExpressionProcessor
      * @param string                $encoding
      */
     public function processExpressions(
-        Options $values,
+        &$values,
         ContextInterface $context,
         DataAccessorInterface $data = null,
         $evaluate = true,
@@ -65,10 +65,10 @@ class ExpressionProcessor
         if (!$evaluate && $encoding === null) {
             return;
         }
-        if ($values->offsetExists('data') || $values->offsetExists('context')) {
+        if (isset($values['data']) || isset($values['context'])) {
             throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
         }
-        $this->values = $values->toArray();
+        $this->values = $values instanceof Options ? $values->toArray() : $values;
         $this->processingValues = [];
         $this->processedValues = [];
         foreach ($values as $key => $value) {

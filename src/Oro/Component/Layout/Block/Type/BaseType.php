@@ -34,8 +34,7 @@ class BaseType extends AbstractType
     {
         // merge the passed variables with the existing ones
         if (!empty($options['vars'])) {
-            $replaced = array_replace($view->vars->toArray(), $options['vars']->toArray());
-            $view->vars = new Options($replaced);
+            $view->vars = array_replace($view->vars, $options['vars']->toArray());
         }
 
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
@@ -91,9 +90,9 @@ class BaseType extends AbstractType
      */
     public function finishView(BlockView $view, BlockInterface $block)
     {
-        $vars = $view->vars->toArray();
+        $vars = $view->vars;
         if (isset($vars['attr']['id']) && !isset($vars['label_attr']['for'])) {
-//          todo Andrey  $view->vars['label_attr']['for'] = $vars['attr']['id'];
+            $view->vars['label_attr']['for'] = $vars['attr']['id'];
         }
 
         $view->vars['blocks'] = $view->blocks;

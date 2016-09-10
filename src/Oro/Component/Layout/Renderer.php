@@ -164,7 +164,7 @@ class Renderer implements FormRendererInterface
 
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
-            $scopeVariables = $view->vars->toArray();
+            $scopeVariables = $view->vars;
 
             $varInit = true;
         } else {
@@ -193,15 +193,11 @@ class Renderer implements FormRendererInterface
 
         // Merge the passed with the existing attributes
         if (isset($variables['attr'], $scopeVariables['attr'])) {
-            $variables['attr'] = $variables['attr'] instanceof Options ? $variables['attr']->toArray(
-            ) : $variables['attr'];
             $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']);
         }
 
         // Merge the passed with the exist *label* attributes
         if (isset($variables['label_attr'], $scopeVariables['label_attr'])) {
-            $variables['label_attr'] = $variables['label_attr'] instanceof Options ? $variables['label_attr']->toArray(
-            ) : $variables['label_attr'];
             $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']);
         }
 

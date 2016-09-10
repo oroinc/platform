@@ -102,7 +102,7 @@ class LayoutExtension extends \Twig_Extension
      */
     public function mergeContext(BlockView $view, array $context)
     {
-        $view->vars = new Options(array_merge($view->vars->toArray(), $context));
+        $view->vars = array_merge($view->vars, $context);
 
         foreach ($view->children as $child) {
             $this->mergeContext($child, $context);

@@ -61,7 +61,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      * @param Options $options
      * @return Options
      */
-    protected function resolveValueBags(Options $options)
+    protected function resolveValueBags($options)
     {
         foreach ($options as $key => $value) {
             if ($value instanceof Expression) {

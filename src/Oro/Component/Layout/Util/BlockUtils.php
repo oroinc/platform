@@ -22,7 +22,7 @@ class BlockUtils
      */
     public static function registerPlugin(BlockView $view, $pluginName)
     {
-        $optionsArray = $view->vars['block_prefixes']->toArray();
+        $optionsArray = $view->vars['block_prefixes'];
         array_splice(
             $optionsArray,
             -1,

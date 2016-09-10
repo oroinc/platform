@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class Options implements \ArrayAccess, \Iterator
 {
