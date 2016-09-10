@@ -1,0 +1,34 @@
+config:
+    map:
+        '*':
+            'jquery': 'oroui/js/extend/jquery'
+            'chaplin': 'oroui/js/extend/chaplin'
+            'underscore': 'oroui/js/extend/underscore'
+            'backbone': 'oroui/js/extend/backbone'
+        'oroui/js/extend/jquery':
+            'jquery': 'jquery'
+        'oroui/js/extend/chaplin':
+            'chaplin': 'chaplin'
+        'oroui/js/extend/underscore':
+            'underscore': 'underscore'
+        'oroui/js/extend/backbone':
+            'backbone': 'backbone'
+        'chaplin':
+            'backbone': 'backbone'
+        'oroui/js/app/components/base/component':
+            'backbone': 'backbone'
+            'chaplin': 'chaplin'
+        'oroui/js/tools':
+            'chaplin': 'chaplin'
+    paths:
+        'json': 'bundles/oroui/lib/json2.js'
+        'jquery': 'bundles/components/jquery/jquery.js'
+        'underscore': 'bundles/components/underscore/underscore.js'
+        'backbone': 'bundles/components/backbone/backbone.js'
+        'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
+
+        'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
+
+        'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
+    appmodules:
+        - oroui/js/input-widget-manager
