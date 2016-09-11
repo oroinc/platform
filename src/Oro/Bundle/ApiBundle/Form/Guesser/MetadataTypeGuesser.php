@@ -8,6 +8,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class MetadataTypeGuesser implements FormTypeGuesserInterface
@@ -145,7 +146,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      */
     protected function getTypeGuessForAssociation(AssociationMetadata $metadata)
     {
-        if ($metadata->isArrayAttribute()) {
+        if (DataType::isAssociationAsField($metadata->getDataType())) {
             return $metadata->isCollapsed()
                 ? $this->getTypeGuessForCollapsedArrayAssociation($metadata)
                 : $this->getTypeGuessForArrayAssociation($metadata);

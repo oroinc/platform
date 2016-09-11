@@ -7,8 +7,10 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -84,10 +86,56 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
             $mapping = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
-            if (!$this->isResourceForRelatedEntityAccessible($targetMetadata, $version, $requestType)) {
+            if (!$this->isResourceForRelatedEntityAvailable($field, $targetMetadata, $version, $requestType)) {
                 $field->setExcluded();
             }
         }
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param ClassMetadata               $targetMetadata
+     * @param string                      $version
+     * @param RequestType                 $requestType
+     *
+     * @return bool
+     */
+    protected function isResourceForRelatedEntityAvailable(
+        EntityDefinitionFieldConfig $field,
+        ClassMetadata $targetMetadata,
+        $version,
+        RequestType $requestType
+    ) {
+        return DataType::isAssociationAsField($field->getDataType())
+            ? $this->isResourceForRelatedEntityKnown($targetMetadata, $version, $requestType)
+            : $this->isResourceForRelatedEntityAccessible($targetMetadata, $version, $requestType);
+    }
+
+    /**
+     * @param ClassMetadata $targetMetadata
+     * @param string        $version
+     * @param RequestType   $requestType
+     *
+     * @return bool
+     */
+    protected function isResourceForRelatedEntityKnown(
+        ClassMetadata $targetMetadata,
+        $version,
+        RequestType $requestType
+    ) {
+        if ($this->resourcesProvider->isResourceKnown($targetMetadata->name, $version, $requestType)) {
+            return true;
+        }
+        if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+            // check that at least one inherited entity has Data API resource
+            foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
+                if ($this->resourcesProvider->isResourceKnown($inheritedEntityClass, $version, $requestType)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -12,6 +12,34 @@ null_actions:
         actions: ~
     expected: []
 
+exclude_all_actions:
+    config:
+        actions: false
+    expected:
+        actions:
+            get:
+                exclude: true
+            get_list:
+                exclude: true
+            update:
+                exclude: true
+            create:
+                exclude: true
+            delete:
+                exclude: true
+            delete_list:
+                exclude: true
+            get_subresource:
+                exclude: true
+            get_relationship:
+                exclude: true
+            update_relationship:
+                exclude: true
+            add_relationship:
+                exclude: true
+            delete_relationship:
+                exclude: true
+
 description:
     config:
         actions:

@@ -58,24 +58,19 @@ class AssociationMetadata implements ToArrayInterface
      */
     public function toArray()
     {
-        $result = ['name' => $this->name];
-        if ($this->dataType) {
-            $result['data_type'] = $this->dataType;
-        }
+        $result = [
+            'name' => $this->name,
+            'data_type'        => $this->dataType,
+            'nullable'         => $this->nullable,
+            'collapsed'        => $this->collapsed,
+            'association_type' => $this->associationType,
+            'collection'       => $this->collection
+        ];
         if ($this->targetClass) {
             $result['target_class'] = $this->targetClass;
         }
         if ($this->acceptableTargetClasses) {
             $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
-        }
-        if ($this->associationType) {
-            $result['association_type'] = $this->associationType;
-        }
-        if ($this->collection) {
-            $result['collection'] = $this->collection;
-        }
-        if ($this->nullable) {
-            $result['nullable'] = $this->nullable;
         }
         if (null !== $this->targetMetadata) {
             $result['target_metadata'] = $this->targetMetadata->toArray();
@@ -292,15 +287,5 @@ class AssociationMetadata implements ToArrayInterface
     public function setCollapsed($collapsed = true)
     {
         $this->collapsed = $collapsed;
-    }
-
-    /**
-     * Checks whether the association should be represented as an array attribute.
-     *
-     * @return bool
-     */
-    public function isArrayAttribute()
-    {
-        return 'array' === $this->getDataType();
     }
 }

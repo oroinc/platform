@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -172,7 +173,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             $value = $this->getRelationshipValue($data, $name, $association);
-            if ($association->isArrayAttribute()) {
+            if (DataType::isAssociationAsField($association->getDataType())) {
                 $result[self::ATTRIBUTES][$name] = $value;
             } else {
                 $result[self::RELATIONSHIPS][$name][self::DATA] = $value;
