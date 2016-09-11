@@ -642,8 +642,11 @@ Example of usage:
 /** @var ResourcesProvider $resourcesProvider */
 $resourcesProvider = $container->get('oro_api.resources_provider');
 // get all Data API resources
+// (all resources are configured to be used in Data API, including not accessible resources)
 $resources = $resourcesProvider->getResources($version, $requestType);
-// check whether an entity type is accessible through Data API
+// check whether an entity is configured to be used in Data API
+$isKnown = $resourcesProvider->isResourceKnown($entityClass, $version, $requestType);
+// check whether an entity is accessible through Data API
 $isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
 ```
 

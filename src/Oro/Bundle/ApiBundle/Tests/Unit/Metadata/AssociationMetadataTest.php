@@ -26,6 +26,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1']);
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
+        $associationMetadata->setCollapsed(true);
         $targetEntityMetadata = new EntityMetadata();
         $targetEntityMetadata->setClassName('TargetEntityClassName');
         $associationMetadata->setTargetMetadata($targetEntityMetadata);
@@ -57,17 +58,19 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $associationMetadata->setAssociationType('manyToMany');
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
+        $associationMetadata->setCollapsed(true);
         $associationMetadata->setTargetMetadata($this->entityMetadata);
 
         $this->assertEquals(
             [
                 'name'                      => 'testName',
                 'data_type'                 => 'testDataType',
-                'target_class'              => 'targetClassName',
-                'acceptable_target_classes' => ['targetClassName1', 'targetClassName2'],
+                'nullable'                  => true,
+                'collapsed'                 => true,
                 'association_type'          => 'manyToMany',
                 'collection'                => true,
-                'nullable'                  => true,
+                'target_class'              => 'targetClassName',
+                'acceptable_target_classes' => ['targetClassName1', 'targetClassName2'],
                 'target_metadata'           => [
                     'class'     => 'entityClassName',
                     'inherited' => true
@@ -84,7 +87,12 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'name' => 'testName'
+                'name'             => 'testName',
+                'data_type'        => null,
+                'nullable'         => false,
+                'collapsed'        => false,
+                'association_type' => null,
+                'collection'       => false,
             ],
             $associationMetadata->toArray()
         );
@@ -184,14 +192,5 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($associationMetadata->getTargetMetadata());
         $associationMetadata->setTargetMetadata($this->entityMetadata);
         $this->assertEquals($this->entityMetadata, $associationMetadata->getTargetMetadata());
-    }
-
-    public function testIsArrayAttribute()
-    {
-        $associationMetadata = new AssociationMetadata();
-
-        $this->assertFalse($associationMetadata->isArrayAttribute());
-        $associationMetadata->setDataType('array');
-        $this->assertTrue($associationMetadata->isArrayAttribute());
     }
 }

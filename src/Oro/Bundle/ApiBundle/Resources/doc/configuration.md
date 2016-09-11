@@ -238,7 +238,7 @@ This section describes entity fields' configuration.
 * **meta_property** *boolean* A flag indicates whether the field represents a meta information. For JSON.API such fields will be returned in [meta](http://jsonapi.org/format/#document-meta) section. By default `false`.
 * **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
-* **depends_on** *string[]* A list of fields on which this field depends on. This option can be helpful for computed fields. These fields will be loaded from the database even if they are excluded.
+* **depends_on** *string[]* A list of fields on which this field depends on. Also `.` can be used to specify a path to an association field. This option can be helpful for computed fields. These fields will be loaded from the database even if they are excluded.
 
 Examples:
 
@@ -301,7 +301,7 @@ api:
                 # computed field
                 field9:
                     data_type: string
-                    depends_on: [field1]
+                    depends_on: [field1, association1.field11]
 ```
 
 "filters" configuration section
@@ -400,6 +400,16 @@ By default, the following permissions are used to restrict access to an entity i
 
 
 Examples of `actions` section configuration:
+
+Disable all action for an entity:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            # this entity does not have own Data API resource
+            actions: false
+```
 
 Disable `delete` action for an entity:
 

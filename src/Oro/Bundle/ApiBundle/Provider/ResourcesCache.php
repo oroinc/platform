@@ -32,7 +32,7 @@ class ResourcesCache
      * @param string      $version     The Data API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
-     * @return string[]|null The list of entity classes accessible through Data API or NULL if it is not cached yet
+     * @return array|null [entity class => accessible flag] or NULL if the list is not cached yet
      */
     public function getAccessibleResources($version, RequestType $requestType)
     {
@@ -105,9 +105,7 @@ class ResourcesCache
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
             $allResources[$entityClass] = $this->serializeApiResource($resource);
-            if (!in_array(ApiActions::GET, $resource->getExcludedActions(), true)) {
-                $accessibleResources[] = $entityClass;
-            }
+            $accessibleResources[$entityClass] = !in_array(ApiActions::GET, $resource->getExcludedActions(), true);
         }
 
         $keyIndex = $this->getCacheKeyIndex($version, $requestType);

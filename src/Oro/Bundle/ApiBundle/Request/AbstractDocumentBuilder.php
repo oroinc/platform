@@ -229,15 +229,13 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         if (array_key_exists($associationName, $data)) {
             $val = $data[$associationName];
             if (!$this->isEmptyRelationship($val, $isCollection)) {
-                if ($isCollection) {
-                    $result = $association->isArrayAttribute()
-                        ? $this->getArrayAttributeConverter()
-                            ->convertCollectionToArray($val, $association->getTargetMetadata())
-                        : $this->processRelatedCollection($val, $association);
+                if (DataType::isAssociationAsField($association->getDataType())) {
+                    $result = $isCollection
+                        ? $this->getArrayAttributeConverter()->convertCollectionToArray($val, $association)
+                        : $this->getArrayAttributeConverter()->convertObjectToArray($val, $association);
                 } else {
-                    $result = $association->isArrayAttribute()
-                        ? $this->getArrayAttributeConverter()
-                            ->convertObjectToArray($val, $association->getTargetMetadata())
+                    $result = $isCollection
+                        ? $this->processRelatedCollection($val, $association)
                         : $this->processRelatedObject($val, $association);
                 }
             }

@@ -13,13 +13,20 @@ class ConfigNormalizer extends BaseConfigNormalizer
     public function normalizeConfig(array $config, $parentField = null)
     {
         if (!empty($config[ConfigUtil::FIELDS])) {
+            $toRemove = [];
             foreach ($config[ConfigUtil::FIELDS] as $fieldName => $field) {
-                if (is_array($field)
-                    && !empty($field[FieldConfig::DEPENDS_ON])
-                    && !ConfigUtil::isExclude($field)
-                ) {
+                if (!is_array($field)) {
+                    continue;
+                }
+                if (ConfigUtil::isIgnoredField($field)) {
+                    $toRemove[] = $fieldName;
+                }
+                if (!empty($field[FieldConfig::DEPENDS_ON]) && !ConfigUtil::isExclude($field)) {
                     $this->processDependentFields($config, $field[FieldConfig::DEPENDS_ON]);
                 }
+            }
+            foreach ($toRemove as $fieldName) {
+                unset($config[ConfigUtil::FIELDS][$fieldName]);
             }
         }
 
@@ -28,15 +35,32 @@ class ConfigNormalizer extends BaseConfigNormalizer
 
     /**
      * @param array    $config
-     * @param string[] $dependsOnFieldNames
+     * @param string[] $dependsOn
      */
-    protected function processDependentFields(array &$config, array $dependsOnFieldNames)
+    protected function processDependentFields(array &$config, array $dependsOn)
     {
-        foreach ($dependsOnFieldNames as $dependsOnFieldName) {
-            if (array_key_exists($dependsOnFieldName, $config[ConfigUtil::FIELDS])
-                && is_array($config[ConfigUtil::FIELDS][$dependsOnFieldName])
-                && ConfigUtil::isExclude($config[ConfigUtil::FIELDS][$dependsOnFieldName])
-            ) {
+        foreach ($dependsOn as $dependsOnPropertyPath) {
+            $this->processDependentField($config, ConfigUtil::explodePropertyPath($dependsOnPropertyPath));
+        }
+    }
+
+    /**
+     * @param array    $config
+     * @param string[] $dependsOnPropertyPath
+     */
+    protected function processDependentField(array &$config, array $dependsOnPropertyPath)
+    {
+        $dependsOnFieldName = $dependsOnPropertyPath[0];
+        if (!array_key_exists(ConfigUtil::FIELDS, $config)) {
+            $config[ConfigUtil::FIELDS] = [];
+        }
+        if (!array_key_exists($dependsOnFieldName, $config[ConfigUtil::FIELDS])) {
+            $config[ConfigUtil::FIELDS][$dependsOnFieldName] = count($dependsOnPropertyPath) > 1
+                ? []
+                : null;
+        }
+        if (is_array($config[ConfigUtil::FIELDS][$dependsOnFieldName])) {
+            if (ConfigUtil::isExclude($config[ConfigUtil::FIELDS][$dependsOnFieldName])) {
                 $config[ConfigUtil::FIELDS][$dependsOnFieldName][ConfigUtil::EXCLUDE] = false;
                 if (!empty($config[ConfigUtil::FIELDS][$dependsOnFieldName][FieldConfig::DEPENDS_ON])) {
                     $this->processDependentFields(
@@ -44,6 +68,12 @@ class ConfigNormalizer extends BaseConfigNormalizer
                         $config[ConfigUtil::FIELDS][$dependsOnFieldName][FieldConfig::DEPENDS_ON]
                     );
                 }
+            }
+            if (count($dependsOnPropertyPath) > 1) {
+                $this->processDependentField(
+                    $config[ConfigUtil::FIELDS][$dependsOnFieldName],
+                    array_slice($dependsOnPropertyPath, 1)
+                );
             }
         }
     }
