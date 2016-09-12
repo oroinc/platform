@@ -20,7 +20,7 @@ class MenuUpdateBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $area = $this->getArea($menu->getExtra('area'));
+        $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
         $provider = $this->getProvider($area);
         $menuName = $menu->getName();
         foreach ($provider->getUpdates($menuName) as $update) {
@@ -41,16 +41,6 @@ class MenuUpdateBuilder implements BuilderInterface
         $this->providers[$area] = $provider;
 
         return $this;
-    }
-
-    /**
-     * @param string|null $area
-     *
-     * @return string
-     */
-    private function getArea($area = null)
-    {
-        return $area === null ? ConfigurationBuilder::DEFAULT_AREA : $area;
     }
 
     /**
