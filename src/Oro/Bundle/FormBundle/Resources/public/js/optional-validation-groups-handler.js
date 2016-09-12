@@ -8,37 +8,37 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
         initialize: function(formElement) {
             var self = this;
 
+            /**
+             * Avoid of multiple listener called for single change event
+             */
             var optionalValidationGroups = formElement.find('[data-validation-optional-group]');
-            optionalValidationGroups.on(
+            var rootOptionalValidationGroups = optionalValidationGroups
+                .not('[data-validation-optional-group] [data-validation-optional-group]');
+            rootOptionalValidationGroups.on(
                 'change',
                 'input, select',
                 function() {
-                    $(this)
-                        .closest('[data-validation-optional-group]')
-                        .trigger('validation-optional-group-value-changed', this);
+                    $(this).trigger('validation-optional-group-value-changed');
                 }
             );
 
             /**
              * Custom event used to not interrupt default change event
              */
-            optionalValidationGroups.on(
-                'validation-optional-group-value-changed',
-                function(event, targetElement) {
-                    var shouldBeBubbled = self.handleFormChanges($(this), $(targetElement));
-                    if (!shouldBeBubbled) {
-                        event.stopPropagation();
+            optionalValidationGroups
+                .on(
+                    'validation-optional-group-value-changed',
+                    function(event) {
+                        var shouldBeBubbled = self.handleFormChanges($(this), $(event.target));
+                        if (!shouldBeBubbled) {
+                            event.stopPropagation();
+                        }
                     }
-                }
-            ).on(
-                'validation-optional-group-initialize',
-                function(event) {
-                    var shouldBeBubbled = self.handleOptionalGroupValidationInitialize($(this));
-                    if (!shouldBeBubbled) {
-                        event.stopPropagation();
-                    }
-                }
-            ).trigger('validation-optional-group-initialize');
+                );
+
+            rootOptionalValidationGroups.each(function(index, group) {
+                self.handleOptionalGroupValidationInitialize($(group));
+            });
         },
 
         /**
@@ -59,9 +59,15 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
          * @return {boolean}
          */
         handleOptionalGroupValidationInitialize: function($group) {
-            var optionalValidationHandler = this.getHandler($group);
+            var self = this;
+            $group.children().each(function(index, child) {
+                self.handleOptionalGroupValidationInitialize($(child));
+            });
 
-            return optionalValidationHandler.initialize($group);
+            if ($group.data('validation-optional-group') !== undefined) {
+                var optionalValidationHandler = this.getHandler($group);
+                optionalValidationHandler.initialize($group);
+            }
         },
 
         /**
