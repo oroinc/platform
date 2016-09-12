@@ -21,4 +21,11 @@ class ChangePasswordTypeStub extends ChangePasswordType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+    }
 }
