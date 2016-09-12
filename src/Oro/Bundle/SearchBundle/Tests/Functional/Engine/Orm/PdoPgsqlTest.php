@@ -62,11 +62,11 @@ class PdoPgsqlTest extends AbstractDriverTest
         $this->assertCount(5, $queries);
 
         $expectedQueries = [
-            'TRUNCATE oro_search_item CASCADE',
-            'TRUNCATE oro_search_index_text CASCADE',
-            'TRUNCATE oro_search_index_integer CASCADE',
-            'TRUNCATE oro_search_index_decimal CASCADE',
-            'TRUNCATE oro_search_index_datetime CASCADE'
+            'TRUNCATE oro_search_item  CASCADE',
+            'TRUNCATE oro_search_index_text  CASCADE',
+            'TRUNCATE oro_search_index_integer  CASCADE',
+            'TRUNCATE oro_search_index_decimal  CASCADE',
+            'TRUNCATE oro_search_index_datetime  CASCADE'
         ];
 
         $this->assertEquals($expectedQueries, $queries);
