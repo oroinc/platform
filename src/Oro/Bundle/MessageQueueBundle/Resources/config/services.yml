@@ -1,6 +1,3 @@
-parameters:
-    message_queue_idle_microsec: 100000
-
 services:
     oro_message_queue.consumption.extensions:
         class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
@@ -30,15 +27,11 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
-    oro_message_queue.consumption.extension.limit_consumption_empty_queue_extension:
-        class: Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionEmptyQueueExtension
-
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
-            - '%message_queue_idle_microsec%'
 
     oro_message_queue.command.consume_messages:
         class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
