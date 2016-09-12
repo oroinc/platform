@@ -61,6 +61,7 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
         $translation = $this->strategy->process($translation);
 
         $em = $this->getEntityManager();
+        $em->persist($translation->getTranslationKey());
         $em->persist($translation);
         $em->flush();
 

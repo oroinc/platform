@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
 class LoadTranslations extends AbstractFixture implements DependentFixtureInterface
 {
@@ -43,9 +44,10 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
     protected function createTranslation(ObjectManager $manager, $key, $locale)
     {
         $translation = new Translation();
+        $translationKey = (new TranslationKey())->setDomain('test_domain')->setKey($key);
+        $manager->persist($translationKey);
         $translation
-            ->setDomain('test_domain')
-            ->setKey($key)
+            ->setTranslationKey($translationKey)
             ->setValue($key)
             ->setLanguage($this->getReference($locale));
         $manager->persist($translation);

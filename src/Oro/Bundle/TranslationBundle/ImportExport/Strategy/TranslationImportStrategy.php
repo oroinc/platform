@@ -28,9 +28,9 @@ class TranslationImportStrategy extends ConfigurableAddOrReplaceStrategy
     protected function findExistingEntity($entity, array $searchContext = [])
     {
         return $this->translationManager->findValue(
-            $entity->getTranslationKey(),
+            $entity->getTranslationKey()->getKey(),
             $entity->getLanguage()->getCode(),
-            $entity->getDomain()
+            $entity->getTranslationKey()->getDomain()
         );
     }
 }
