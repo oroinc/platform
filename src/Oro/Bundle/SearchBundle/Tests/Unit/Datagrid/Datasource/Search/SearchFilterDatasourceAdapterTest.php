@@ -91,4 +91,22 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
         $ds = new SearchFilterDatasourceAdapter($this->query);
         $alias = $ds->getFieldByAlias('name');
     }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Query not initialized properly
+     */
+    public function testGetWrappedSearchQueryNotInitialized()
+    {
+        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $query = $ds->getWrappedSearchQuery();
+    }
+
+    public function testGetWrappedSearchQuery()
+    {
+        $innerQuery = $this->getMock(Query::class);
+        $this->query->method('getQuery')->willReturn($innerQuery);
+        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $this->assertEquals($ds->getWrappedSearchQuery(), $innerQuery);
+    }
 }
