@@ -100,9 +100,9 @@ class LanguageOperationsTest extends ActionTestCase
     public function testUpdateLanguage()
     {
         /** @var Language $language */
-        $language = $this->getReference(LoadLanguages::LANGUAGE1);
+        $language = $this->getReference(LoadLanguages::LANGUAGE2);
         $tmpDir = self::$kernel->getContainer()->get('oro_translation.service_provider')->getTmpDir('oro-test-trans');
-        $tmpDir .= '/' . LoadLanguages::LANGUAGE1;
+        $tmpDir .= '/' . LoadLanguages::LANGUAGE2;
         $url = $this->getOperationDialogUrl($language, 'oro_translation_language_update');
         $languageHelper = $this->getLanguageHelperMock($tmpDir);
         $languageHelper->expects($this->any())
@@ -114,7 +114,7 @@ class LanguageOperationsTest extends ActionTestCase
         $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
 
         $form = $crawler->selectButton('Update')->form([
-            'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
+            'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE2,
         ]);
 
         // temporary file would be removed automatically
