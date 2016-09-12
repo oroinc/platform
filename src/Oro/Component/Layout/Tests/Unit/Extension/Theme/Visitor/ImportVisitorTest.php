@@ -132,6 +132,9 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $updates);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testWalkUpdatesWithMultipleImportsOrdering()
     {
         $themeName = 'oro-import';
