@@ -2,7 +2,7 @@ Config(yml) Example
 ====================
 
 ``` yaml
-oro_entity_config:
+entity_config:
     # An example of 'entity' scope configuration
     entity:                                                         # configuration scope name
         entity:                                                     # config block for Entity instance

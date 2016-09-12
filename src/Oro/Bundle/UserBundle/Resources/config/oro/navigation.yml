@@ -1,0 +1,123 @@
+navigation:
+    menu_config:
+        items:
+            system_tab:
+                label: 'oro.user.menu.system_tab.label'
+                uri: '#'
+                attributes:
+                    class: 'mobile-hide'
+                extras:
+                    position: 100
+                    icon: icon-gear
+            users_management:
+                label: 'oro.user.menu.users_management.label'
+                uri: '#'
+                extras:
+                    position: 20
+            user_list:
+                label: 'oro.user.entity_plural_label'
+                route: 'oro_user_index'
+                extras:
+                    position: 10
+                    routes: ['/^oro_user_(?!role\w+|group\w+|security\w+|reset\w+)\w+$/']
+                    description: 'oro.user.menu.user_list.description'
+            user_create:
+                label: 'oro.user.menu.user_create.label'
+                route: 'oro_user_create'
+            user_roles:
+                label: 'oro.user.role.entity_plural_label'
+                route: 'oro_user_role_index'
+                extras:
+                    position: 20
+                    routes: ['oro_user_role_*']
+                    description: 'oro.user.menu.user_roles.description'
+            user_groups:
+                label: 'oro.user.group.entity_plural_label'
+                route: 'oro_user_group_index'
+                extras:
+                    position: 30
+                    routes: ['oro_user_group_*']
+                    description: 'oro.user.menu.user_groupes.description'
+            shortcut_new_user:
+                label: 'oro.user.menu.shortcut_new_user.label'
+                route: 'oro_user_create'
+                extras:
+                    description: 'oro.user.menu.shortcut_new_user.description'
+                    isCustomAction: true
+            shortcut_list_users:
+                label: 'oro.user.menu.shortcut_list_users.label'
+                route: 'oro_user_index'
+                extras:
+                    description: 'oro.user.menu.shortcut_list_users.description'
+                    isCustomAction: true
+            shortcut_new_role:
+                label: 'oro.user.menu.shortcut_new_role.label'
+                route: 'oro_user_role_create'
+                extras:
+                    description: 'oro.user.menu.shortcut_new_role.description'
+            shortcut_new_group:
+                label: 'oro.user.menu.shortcut_new_group.label'
+                route: 'oro_user_group_create'
+                extras:
+                    description: 'oro.user.menu.shortcut_new_group.description'
+            oro_user_profile_view:
+                label: 'oro.user.menu.oro_user_profile_view.label'
+                route: 'oro_user_profile_view'
+                extras:
+                    position: 10
+            oro_user_profile_configuration:
+                label: 'oro.user.menu.oro_user_profile_configuration.label'
+                route: 'oro_user_profile_configuration'
+                extras:
+                    position: 12
+                attributes:
+                    class: 'mobile-hide'
+
+        tree:
+            application_menu:
+                children:
+                    system_tab:
+                        children:
+                            users_management:
+                                children:
+                                    user_list: ~
+                                    user_roles: ~
+                                    user_groups: ~
+            usermenu:
+                children:
+                    oro_user_profile_view: ~
+                    oro_user_profile_configuration: ~
+
+            shortcuts:
+                children:
+                    shortcut_new_user: ~
+                    shortcut_list_users: ~
+                    shortcut_new_role: ~
+                    shortcut_new_group: ~
+
+    titles:
+        oro_user_index: ~
+        oro_user_view: '%%username%%'
+        oro_user_update: '%%username%% - Edit'
+        oro_user_create: 'Create User'
+        oro_user_config: '%%username%% - Configure'
+
+        oro_user_profile_view: '%%username%%'
+        oro_user_profile_update: '%%username%% - Edit'
+        oro_user_profile_configuration: '%%username%% - Configure'
+
+        oro_user_role_index: ~
+        oro_user_role_update: '%%role%% - Edit'
+        oro_user_role_create: 'Create Role'
+
+        oro_user_security_login: 'Login'
+        oro_user_status_list: "User Status"
+        oro_user_status_create: "Add Status"
+
+        oro_user_reset_reset: 'Password Reset'
+        oro_user_reset_request: 'Forgot Password'
+        oro_user_reset_check_email: 'Password Reset - Check Email'
+
+        oro_user_group_index: ~
+        oro_user_group_create: 'Create Group'
+        oro_user_group_update: '%%group%% - Edit'

@@ -8,7 +8,7 @@ Mixin is a datagrid that contains additional(common) information for use by othe
 ## Configuration Syntax
 
 ``` yml
-datagrid:
+datagrids:
     
     # configuration mixin with column, sorter and filter for an entity identifier
     acme-demo-common-identifier-datagrid-mixin:
