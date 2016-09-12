@@ -38,7 +38,7 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
         $translation
             ->setLanguage($translationForReplace->getLanguage())
             ->setDomain($translationForReplace->getDomain())
-            ->setKey($translationForReplace->getKey())
+            ->setKey($translationForReplace->getTranslationKey())
             ->setValue('new_value');
 
         $translation = $this->processTranslation($translation);

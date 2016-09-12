@@ -80,9 +80,9 @@ class OroTranslationResetCommand extends ContainerAwareCommand
         $updated = 0;
         $em      = $this->getEntityManager();
         foreach ($customTranslations as $customTranslation) {
-            if (isset($translations[$customTranslation->getDomain()][$customTranslation->getKey()])) {
+            if (isset($translations[$customTranslation->getDomain()][$customTranslation->getTranslationKey()])) {
                 $customTranslation->setValue(
-                    $translations[$customTranslation->getDomain()][$customTranslation->getKey()]
+                    $translations[$customTranslation->getDomain()][$customTranslation->getTranslationKey()]
                 );
                 $updated++;
                 if (($updated % self::BATCH_SIZE) === 0) {
@@ -107,7 +107,7 @@ class OroTranslationResetCommand extends ContainerAwareCommand
     {
         $updated = 0;
         foreach ($customTranslations as $customTranslation) {
-            if (isset($translations[$customTranslation->getDomain()][$customTranslation->getKey()])) {
+            if (isset($translations[$customTranslation->getDomain()][$customTranslation->getTranslationKey()])) {
                 $updated++;
             }
         }

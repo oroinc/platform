@@ -30,7 +30,7 @@ class Translation
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\TranslationKey")
      * @ORM\JoinColumn(name="key_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
-    protected $key;
+    protected $translationKey;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -64,9 +64,9 @@ class Translation
      * @param TranslationKey $key
      * @return $this
      */
-    public function setKey($key)
+    public function setTranslationKey($key)
     {
-        $this->key = $key;
+        $this->translationKey = $key;
 
         return $this;
     }
@@ -74,9 +74,9 @@ class Translation
     /**
      * @return TranslationKey
      */
-    public function getKey()
+    public function getTranslationKey()
     {
-        return $this->key;
+        return $this->translationKey;
     }
 
     /**

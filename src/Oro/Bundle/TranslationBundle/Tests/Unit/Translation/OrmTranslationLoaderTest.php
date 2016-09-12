@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Component\Translation\MessageCatalogue;
 
@@ -121,25 +122,24 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $resource = new OrmTranslationResource($locale, $metadataCache);
 
+        $translationKey1 = (new TranslationKey())->setDomain($domain)->setKey('label1');
         $value1 = new Translation();
-        $value1->setKey('label1');
+        $value1->setTranslationKey($translationKey1);
         $value1->setScope(Translation::SCOPE_SYSTEM);
         $value1->setLanguage($language);
-        $value1->setDomain($domain);
         $value1->setValue('value1 (SYSTEM_SCOPE)');
 
         $value2 = new Translation();
-        $value2->setKey('label1');
+        $value2->setTranslationKey($translationKey1);
         $value2->setScope(Translation::SCOPE_UI);
         $value2->setLanguage($language);
-        $value2->setDomain($domain);
         $value2->setValue('value1 (UI_SCOPE)');
 
+        $translationKey2 = (new TranslationKey())->setDomain($domain)->setKey('label3');
         $value3 = new Translation();
-        $value3->setKey('label3');
+        $value3->setTranslationKey($translationKey2);
         $value3->setScope(Translation::SCOPE_UI);
         $value3->setLanguage($language);
-        $value3->setDomain($domain);
         $value3->setValue('value3');
 
         $values = [$value1, $value2, $value3];

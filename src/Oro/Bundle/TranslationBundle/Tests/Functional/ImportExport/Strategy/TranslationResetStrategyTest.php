@@ -22,7 +22,7 @@ class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
         $translation
             ->setLanguage($existingTranslation->getLanguage())
             ->setDomain($existingTranslation->getDomain())
-            ->setKey($existingTranslation->getKey())
+            ->setKey($existingTranslation->getTranslationKey())
             ->setValue($existingTranslation->getValue());
 
         $this->processTranslation($translation);

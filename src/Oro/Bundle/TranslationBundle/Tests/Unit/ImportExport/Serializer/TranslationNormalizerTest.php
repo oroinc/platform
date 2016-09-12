@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\ImportExport\Serializer;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
@@ -30,7 +31,7 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testDenormalize()
     {
         $language = (new Language())->setCode('test_code');
-
+        $translationKey = (new TranslationKey())->setDomain('test_domain')->setKey('test_key');
         $data = [
             'domain' => 'test_domain',
             'key' => 'test_key',
@@ -43,13 +44,17 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
             ->with('test_code')
             ->willReturn($language);
 
+        $this->translationManager->expects($this->once())
+            ->method('findTranslationKey')
+            ->with('test_key', 'test_domain')
+            ->willReturn($translationKey);
+
         $result = $this->normalizer->denormalize($data, Translation::class, null, $context);
         $translation = new Translation();
         $translation
             ->setLanguage($language)
-            ->setDomain($data['domain'])
-            ->setValue($data['value'])
-            ->setKey($data['key']);
+            ->setTranslationKey($translationKey)
+            ->setValue($data['value']);
 
         $this->assertEquals($translation, $result);
     }

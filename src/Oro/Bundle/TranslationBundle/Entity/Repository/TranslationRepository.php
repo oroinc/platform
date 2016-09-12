@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class TranslationRepository extends EntityRepository
 {
@@ -20,7 +21,7 @@ class TranslationRepository extends EntityRepository
             ->distinct(true)
             ->select('l.code', 'k.domain')
             ->join('t.language', 'l')
-            ->join('t.key', 'k');
+            ->join('t.translationKey', 'k');
 
         $qb->where($qb->expr()->in('l.code', $languages));
 
@@ -53,5 +54,26 @@ class TranslationRepository extends EntityRepository
             ->setParameter('language', $language)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * @param Language $language
+     * @param string $domain
+     *
+     * @return Translation[]
+     */
+    public function findAllByLanguageAndDomain(Language $language, $domain)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->distinct(true)
+            ->select('t')
+            ->join('t.language', 'l')
+            ->join('t.translationKey', 'k')
+            ->where('t.language = :language')
+            ->where('k.domain = :domain')
+            ->setParameter('language', $language)
+            ->setParameter('domain', $domain);
+
+        return $qb->getQuery()->getArrayResult();
     }
 }

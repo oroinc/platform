@@ -31,11 +31,11 @@ class TranslationNormalizer implements DenormalizerInterface
         }
 
         $language = $this->translationManager->getLanguageByCode($context['language_code']);
+        $translationKey = $this->translationManager->findTranslationKey($data['key'], $data['domain']);
 
         $translation = new Translation();
         $translation->setLanguage($language)
-            ->setDomain($data['domain'])
-            ->setKey($data['key'])
+            ->setTranslationKey($translationKey)
             ->setValue($data['value']);
 
         return $translation;
