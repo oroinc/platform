@@ -81,7 +81,6 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
                     $this->arrayHasKey('current_password_label'),
                     $this->arrayHasKey('plain_password_invalid_message'),
                     $this->arrayHasKey('first_options_label'),
-                    $this->arrayHasKey('first_options_tooltip'),
                     $this->arrayHasKey('second_options_label')
                 )
             );

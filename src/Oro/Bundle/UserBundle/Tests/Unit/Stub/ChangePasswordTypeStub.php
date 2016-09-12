@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
 
@@ -20,13 +19,6 @@ class ChangePasswordTypeStub extends ChangePasswordType
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
     {
     }
 }
