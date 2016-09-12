@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
@@ -87,9 +87,9 @@ class EmailGridListener
     }
 
     /**
-     * @param OrmResultAfter $event
+     * @param GridResultAfter $event
      */
-    public function onResultAfter(OrmResultAfter $event)
+    public function onResultAfter(GridResultAfter $event)
     {
         $originalRecords = $event->getRecords();
         if (!$originalRecords) {

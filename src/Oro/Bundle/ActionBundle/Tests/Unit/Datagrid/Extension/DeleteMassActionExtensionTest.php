@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class DeleteMassActionExtensionTest extends AbstractExtensionTest
@@ -81,7 +82,8 @@ class DeleteMassActionExtensionTest extends AbstractExtensionTest
                                         'alias' => 'test_entity'
                                     ]
                                 ]
-                            ]
+                            ],
+                            'type' => OrmDatasource::TYPE
                         ],
                         'actions' => $actionsConfig
                     ]
