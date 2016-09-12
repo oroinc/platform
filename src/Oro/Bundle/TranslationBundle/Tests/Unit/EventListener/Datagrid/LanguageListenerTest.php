@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\GridResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -127,7 +127,7 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $ids
-     * @return OrmResultAfter
+     * @return GridResultAfter
      */
     protected function getEvent(array $ids)
     {
@@ -136,7 +136,7 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             $records[] = new ResultRecord(['id' => $id]);
         }
 
-        return new OrmResultAfter($this->getMock(DatagridInterface::class), $records);
+        return new GridResultAfter($this->getMock(DatagridInterface::class), $records);
     }
 
     /**

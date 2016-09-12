@@ -1,0 +1,33 @@
+$default-color-palette: (
+    'primary': (
+        'main': #2d333b,
+        'base': #cc5c28,
+        'light': #d86936,
+        'dark': #1e2833
+    ),
+    'secondary': (
+        'base': #6e98dc,
+        'light': #71c018,
+        'dark': #ffa500
+    ),
+    'additional': (
+        'ultra': #fff,
+        'base': #f5f5f5,
+        'light': #ebebeb,
+        'middle': #d1d1d1,
+        'dark': #464646,
+        'darker': #000
+    ),
+    'ui': (
+        'error': #f9caca,
+        'error-dark': #7a0026,
+        'success': #d9e8d2,
+        'success-dark': #598253,
+        'warring': #fad6b7,
+        'warring-dark': #785e22,
+        'normal': #4597ca,
+        'focus': #348fc6
+    )
+);
+
+$color-palette: map_merge($color-palette, $default-color-palette);

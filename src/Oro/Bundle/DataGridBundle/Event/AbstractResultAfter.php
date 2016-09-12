@@ -6,6 +6,7 @@ use Doctrine\ORM\AbstractQuery;
 
 use Symfony\Component\EventDispatcher\Event;
 
+use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
@@ -31,8 +32,11 @@ abstract class AbstractResultAfter extends Event implements GridEventInterface
      * @param array             $records
      * @param mixed     $query
      */
-    public function __construct(DatagridInterface $datagrid, array $records = [], $query = null)
-    {
+    public function __construct(
+        DatagridInterface $datagrid,
+        array $records = [],
+        $query = null
+    ) {
         $this->datagrid = $datagrid;
         $this->records  = $records;
         $this->query    = $query;

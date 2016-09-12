@@ -84,7 +84,8 @@ class DeleteMassActionExtensionTest extends AbstractExtensionTest
                                         'alias' => 'test_entity'
                                     ]
                                 ]
-                            ]
+                            ],
+                            'type' => OrmDatasource::TYPE
                         ],
                         'actions' => $actionsConfig
                     ]
