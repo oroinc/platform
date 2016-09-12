@@ -132,6 +132,118 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $updates);
     }
 
+    public function testWalkUpdatesWithMultipleImportsOrdering()
+    {
+        $themeName = 'oro-import';
+
+        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        $context = $this->getMock(ContextInterface::class);
+        $context->expects($this->exactly(2))
+            ->method('get')
+            ->with(ThemeExtension::THEME_KEY)
+            ->will($this->returnValue($themeName));
+
+        $updateWithImports = $this->getMock(LayoutUpdateWithImports::class);
+        $updateWithImports->expects($this->once())
+            ->method('getImports')
+            ->will($this->returnValue(
+                [
+                    [
+                        ImportsAwareLayoutUpdateInterface::ID_KEY => 'first_import',
+                        ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
+                        ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace'
+                    ],
+                    [
+                        ImportsAwareLayoutUpdateInterface::ID_KEY => 'second_import',
+                        ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
+                        ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace'
+                    ]
+                ]
+            ));
+
+        $updateWithoutImports = $this->getMock(LayoutUpdateWithImports::class);
+        $updateWithoutImports->expects($this->once())
+            ->method('getImports')
+            ->will($this->returnValue([]));
+
+        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        $theme = $this->getMock(Theme::class, [], [$themeName]);
+        $theme->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($themeName));
+
+        $this->themeManager
+            ->expects($this->any())
+            ->method('getTheme')
+            ->with($themeName)
+            ->will($this->returnValue($theme));
+
+        $path = implode(
+            DIRECTORY_SEPARATOR,
+            [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'first_import']
+        );
+
+        $this->resourceProvider
+            ->expects($this->at(0))
+            ->method('findApplicableResources')
+            ->with([$path])
+            ->will($this->returnValue(['import/first_file']));
+
+        $path = implode(
+            DIRECTORY_SEPARATOR,
+            [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'second_import']
+        );
+
+        $this->resourceProvider
+            ->expects($this->at(1))
+            ->method('findApplicableResources')
+            ->with([$path])
+            ->will($this->returnValue(['import/second_file']));
+
+        /** @var ImportedLayoutUpdate|\PHPUnit_Framework_MockObject_MockObject $firstImportUpdate */
+        $firstImportUpdate = $this->getMock(ImportedLayoutUpdate::class);
+
+        /** @var ImportedLayoutUpdate|\PHPUnit_Framework_MockObject_MockObject $secondImportUpdate */
+        $secondImportUpdate = $this->getMock(ImportedLayoutUpdate::class);
+
+        $this->loader
+            ->expects($this->at(0))
+            ->method('load')
+            ->with('import/first_file')
+            ->will($this->returnValue($firstImportUpdate));
+
+        $this->loader
+            ->expects($this->at(1))
+            ->method('load')
+            ->with('import/second_file')
+            ->will($this->returnValue($secondImportUpdate));
+
+        $this->dependencyInitializer
+            ->expects($this->at(0))
+            ->method('initialize')
+            ->with($firstImportUpdate);
+
+        $this->dependencyInitializer
+            ->expects($this->at(1))
+            ->method('initialize')
+            ->with($secondImportUpdate);
+
+        $updates = ['root' => [
+            $updateWithImports,
+            $updateWithoutImports
+        ]];
+
+        $expectedResult = ['root' => [
+            $updateWithImports,
+            $secondImportUpdate,
+            $firstImportUpdate,
+            $updateWithoutImports
+        ]];
+
+        $this->visitor->walkUpdates($updates, $context);
+        $this->assertSame($expectedResult, $updates);
+    }
+
     public function testWalkUpdatesWithImportsContainedMultipleUpdates()
     {
         $themeName = 'oro-import';
