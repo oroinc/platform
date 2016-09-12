@@ -10,13 +10,12 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 
 class OroLayoutExtension extends Extension
 {
-    const UPDATE_LOADER_SERVICE_ID      = 'oro_layout.loader';
     const THEME_MANAGER_SERVICE_ID      = 'oro_layout.theme_manager';
+    const THEME_RESOURCE_PROVIDER_SERVICE_ID = 'oro_layout.theme_extension.resource_provider.theme';
 
     const RESOURCES_FOLDER_PLACEHOLDER  = '{folder}';
     const RESOURCES_FOLDER_PATTERN      = '[a-zA-Z][a-zA-Z0-9_\-:]*';
@@ -26,15 +25,18 @@ class OroLayoutExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $excludedResources = [];
+
         $resources = array_merge($this->loadThemeResources($container));
         foreach ($resources as $resource) {
             $configs[] = $this->getThemeConfig($resource);
+            $excludedResources[] = $resource;
         }
-        $excludedPaths = $this->getExcludedPaths($resources);
 
         $resources = $this->loadAdditionalResources($container);
         foreach ($resources as $resource) {
             $configs[] = $this->getAdditionalConfig($resource);
+            $excludedResources[] = $resource;
         }
 
         $configuration = new Configuration();
@@ -78,65 +80,11 @@ class OroLayoutExtension extends Extension
         $themeManagerDef = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
         $themeManagerDef->replaceArgument(1, $config['themes']);
 
-        $this->loadLayoutUpdates($container, $excludedPaths);
+        $excludedPaths = $this->getExcludedPaths($excludedResources);
+        $themeResourceProviderDef = $container->getDefinition(self::THEME_RESOURCE_PROVIDER_SERVICE_ID);
+        $themeResourceProviderDef->replaceArgument(1, $excludedPaths);
 
         $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
-    }
-
-
-    /**
-     * @param ContainerBuilder $container
-     * @param $excludedPaths
-     */
-    protected function loadLayoutUpdates(ContainerBuilder $container, $excludedPaths)
-    {
-        $foundThemeLayoutUpdates = [];
-        $updateFileExtensions    = [];
-        $updateLoaderDef         = $container->getDefinition(self::UPDATE_LOADER_SERVICE_ID);
-        foreach ($updateLoaderDef->getMethodCalls() as $methodCall) {
-            if ($methodCall[0] === 'addDriver') {
-                $updateFileExtensions[] = $methodCall[1][0];
-            }
-        }
-        $updatesLoader = new CumulativeConfigLoader(
-            'oro_layout_updates_list',
-            [new FolderContentCumulativeLoader('Resources/views/layouts/', -1, false, $updateFileExtensions)]
-        );
-
-        $resources = $updatesLoader->load($container);
-        foreach ($resources as $resource) {
-            /**
-             * $resource->data contains data in following format
-             * [
-             *    'directory-where-updates-found' => [
-             *       'found update absolute filename',
-             *       ...
-             *    ]
-             * ]
-             */
-            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($excludedPaths, $resource->data);
-            $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
-            $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resourceThemeLayoutUpdates);
-        }
-
-        $foundThemeLayoutUpdates = $this->excludeDirectories($foundThemeLayoutUpdates);
-
-        $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
-    }
-
-    /**
-     * Removes resources placed in Resources/views/layouts/{$theme}/config from layout updates
-     *
-     * @param array $foundThemeLayoutUpdates
-     * @return array
-     */
-    protected function excludeDirectories(array $foundThemeLayoutUpdates)
-    {
-        foreach ($foundThemeLayoutUpdates as $themeName => $layoutUpdates) {
-            $foundThemeLayoutUpdates[$themeName] = array_diff_key($layoutUpdates, ['config' => true]);
-        }
-
-        return $foundThemeLayoutUpdates;
     }
 
     /**
@@ -200,53 +148,6 @@ class OroLayoutExtension extends Extension
         }
 
         return $excludedPaths;
-    }
-
-    /**
-     * @param array $updates
-     * @return array
-     */
-    protected function sortThemeLayoutUpdates(array $updates)
-    {
-        $directories = [];
-        $files = [];
-        foreach ($updates as $key => $update) {
-            if (is_array($update)) {
-                $update = $this->sortThemeLayoutUpdates($update);
-                $directories[$key] = $update;
-            } else {
-                $files[] = $update;
-            }
-        }
-
-        sort($files);
-        ksort($directories);
-        $updates = array_merge($files, $directories);
-
-        return $updates;
-    }
-
-    /**
-     * @param array $existThemePaths
-     * @param array $themes
-     * @return array
-     */
-    protected function filterThemeLayoutUpdates(array $existThemePaths, array $themes)
-    {
-        foreach ($themes as $theme => $themePaths) {
-            foreach ($themePaths as $pathIndex => $path) {
-                if (is_string($path) && isset($existThemePaths[$path])) {
-                    unset($themePaths[$pathIndex]);
-                }
-            }
-            if (empty($themePaths)) {
-                unset($themes[$theme]);
-            } else {
-                $themes[$theme] = $themePaths;
-            }
-        }
-
-        return $themes;
     }
 
     /**

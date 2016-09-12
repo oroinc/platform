@@ -100,10 +100,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
         $restrictions = $this->assembleRestrictions($configuration, $steps, $attributes);
 
         $workflow = $this->createWorkflow();
-        $workflow
-            ->setName($definition->getName())
-            ->setLabel($definition->getLabel())
-            ->setDefinition($definition);
+        $workflow->setDefinition($definition);
 
         $workflow->getStepManager()
             ->setSteps($steps);

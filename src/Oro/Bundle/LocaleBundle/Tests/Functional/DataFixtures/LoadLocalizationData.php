@@ -12,6 +12,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
@@ -46,22 +47,29 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     public function load(ObjectManager $manager)
     {
+        /* @var $repository LocalizationRepository */
+        $repository = $manager->getRepository(Localization::class);
+
         $registry = [];
         foreach (self::$localizations as $item) {
             $code = $item['language'];
-            $localization = new Localization();
-            $localization
-                ->setLanguageCode($item['language'])
-                ->setFormattingCode($item['formatting'])
-                ->setName($item['title'])
-                ->setDefaultTitle($item['title']);
 
-            if ($item['parent']) {
-                $localization->setParentLocalization($registry[$item['parent']]);
+            if (null === ($localization = $repository->findOneBy(['languageCode' => $code]))) {
+                $localization = new Localization();
+                $localization
+                    ->setLanguageCode($item['language'])
+                    ->setFormattingCode($item['formatting'])
+                    ->setName($item['title'])
+                    ->setDefaultTitle($item['title']);
+
+                if ($item['parent']) {
+                    $localization->setParentLocalization($registry[$item['parent']]);
+                }
+
+                $manager->persist($localization);
             }
-            $registry[$code] = $localization;
 
-            $manager->persist($localization);
+            $registry[$code] = $localization;
 
             $this->addReference($code, $localization);
         }

@@ -93,6 +93,13 @@ services:
     # security_check
     #
 
+    oro_api.update_relationship.parent_entity_type_feature_check:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeFeatureCheck
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 20 }
+
     oro_api.update_relationship.parent_entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
@@ -168,6 +175,8 @@ services:
 
     oro_api.update_relationship.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors
+        arguments:
+            - '@oro_api.constraint_text_extractor'
         tags:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -100 }
 

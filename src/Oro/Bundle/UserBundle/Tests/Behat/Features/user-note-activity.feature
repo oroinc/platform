@@ -38,7 +38,7 @@ Scenario: Edit note in view page
     | Message    | Very good actor      |
     | Attachment | note-attachment2.jpg |
   When I press "Save"
-  Then I should see "Very good actor"
+  Then I should see "Very good actor" note in activity list
   And I should see note-attachment2.jpg text in activity
 
 Scenario: Delete note

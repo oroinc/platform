@@ -40,13 +40,14 @@ class Parser
     public function __construct($query = null)
     {
         if (null === $query) {
-            $this->query = new Query(Query::SELECT);
+            $this->query = new Query();
             $this->query->from(['*']);
         } else {
             $this->query = $query;
         }
 
         $this->keywords = [
+            Query::KEYWORD_SELECT,
             Query::KEYWORD_FROM,
             Query::KEYWORD_WHERE,
 
@@ -154,6 +155,9 @@ class Parser
     protected function parseKeywords()
     {
         switch ($this->stream->current->value) {
+            case Query::KEYWORD_SELECT:
+                $this->parseSelectExpression();
+                break;
             case Query::KEYWORD_FROM:
                 $this->parseFromExpression();
                 break;
@@ -176,6 +180,32 @@ class Parser
                         $this->stream->current->type,
                         $this->stream->current->value
                     ),
+                    $this->stream->current->cursor
+                );
+        }
+    }
+
+    /**
+     *  Parse select statement of expression and fills Query's select.
+     */
+    protected function parseSelectExpression()
+    {
+        $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_SELECT);
+        switch (true) {
+            // if got string token after "select" - pass it directly into Query
+            case (true === $this->stream->current->test(Token::STRING_TYPE)):
+                $this->query->select($this->stream->current->value);
+                $this->stream->next();
+                break;
+
+            // if got opening bracket (punctuation '(') - collect all arguments
+            case (true === $this->stream->current->test(Token::PUNCTUATION_TYPE, '(')):
+                $this->query->select($this->parseArguments());
+                break;
+
+            default:
+                throw new ExpressionSyntaxError(
+                    sprintf('Wrong "select" statement of the expression.'),
                     $this->stream->current->cursor
                 );
         }

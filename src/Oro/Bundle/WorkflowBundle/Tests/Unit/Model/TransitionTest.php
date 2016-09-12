@@ -41,7 +41,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ['preAction', $this->getMock(ActionInterface::class)],
                 ['preCondition', $this->getMock(ExpressionInterface::class)],
                 ['condition', $this->getMock(ExpressionInterface::class)],
-                ['postAction', $this->getMock(ActionInterface::class)]
+                ['action', $this->getMock(ActionInterface::class)]
             ]
         );
     }
@@ -254,15 +254,15 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->with($workflowItem)
             ->will($this->returnValue($conditionAllowed));
 
-        $postAction = $this->getMock('Oro\Component\Action\Action\ActionInterface');
-        $postAction->expects($this->never())
+        $action = $this->getMock('Oro\Component\Action\Action\ActionInterface');
+        $action->expects($this->never())
             ->method('execute');
 
         $obj = new Transition();
         $obj->setName('test');
         $obj->setPreCondition($preCondition);
         $obj->setCondition($condition);
-        $obj->setPostAction($postAction);
+        $obj->setAction($action);
         $obj->transit($workflowItem);
     }
 
@@ -321,15 +321,15 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->with($workflowItem)
             ->will($this->returnValue(true));
 
-        $postAction = $this->getMock('Oro\Component\Action\Action\ActionInterface');
-        $postAction->expects($this->once())
+        $action = $this->getMock('Oro\Component\Action\Action\ActionInterface');
+        $action->expects($this->once())
             ->method('execute')
             ->with($workflowItem);
 
         $obj = new Transition();
         $obj->setPreCondition($preCondition);
         $obj->setCondition($condition);
-        $obj->setPostAction($postAction);
+        $obj->setAction($action);
         $obj->setStepTo($step);
         $obj->transit($workflowItem);
     }

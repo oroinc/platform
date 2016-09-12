@@ -16,9 +16,13 @@ use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
 
 /**
  * @todo: https://magecore.atlassian.net/browse/BAP-2600 move job results processing outside
@@ -61,6 +65,11 @@ class JobExecutor
     protected $batchJobRepository;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @var bool
      */
     protected $validationMode = false;
@@ -84,6 +93,14 @@ class JobExecutor
     }
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher($eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * @param string $jobType
      * @param string $jobName
      * @param array $configuration
@@ -102,8 +119,8 @@ class JobExecutor
     }
 
     /**
-     * @param JobExecution $jobExecution
      * @param JobInstance $jobInstance
+     * @param JobExecution $jobExecution
      * @return JobResult
      */
     protected function doJob(JobInstance $jobInstance, JobExecution $jobExecution)
@@ -143,6 +160,8 @@ class JobExecutor
 
             $this->saveFailedJobExecution($jobExecution);
         }
+
+        $this->dispatchAfterJobExecutionEvent($jobExecution, $jobResult);
 
         return $jobResult;
     }
@@ -401,5 +420,19 @@ class JobExecutor
     public function isValidationMode()
     {
         return $this->validationMode;
+    }
+
+    /**
+     * @param JobExecution $jobExecution
+     * @param JobResult $jobResult
+     */
+    protected function dispatchAfterJobExecutionEvent(JobExecution $jobExecution, JobResult $jobResult)
+    {
+        if ($this->eventDispatcher && $this->eventDispatcher->hasListeners(Events::AFTER_JOB_EXECUTION)) {
+            $this->eventDispatcher->dispatch(
+                Events::AFTER_JOB_EXECUTION,
+                new AfterJobExecutionEvent($jobExecution, $jobResult)
+            );
+        }
     }
 }

@@ -13,29 +13,18 @@ use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
-
 class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
     const DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID = 'oro_security.wsse_nonce_cache';
     const DEFAULT_WSSE_NONCE_CACHE_CLASS = 'Oro\Bundle\SecurityBundle\Cache\WsseNoncePhpFileCache';
     const DEFAULT_WSSE_NONCE_CACHE_PATH = '%kernel.cache_dir%/security/nonces';
+    const ACLS_CONFIG_ROOT_NODE = 'acls';
 
     /**
      * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        self::getAclConfigLoader()->registerResources($container);
-
-        $parameterBag = $container->getParameterBag();
-        $aclMetadataManager = new AclAnnotationMetadataDumper(
-            $parameterBag->get('kernel.cache_dir'),
-            $parameterBag->get('kernel.environment'),
-            $parameterBag->get('kernel.name')
-        );
-        $aclMetadataManager->dump();
-
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
 
@@ -64,7 +53,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     {
         return new CumulativeConfigLoader(
             'oro_acl_config',
-            new YamlCumulativeFileLoader('Resources/config/acl.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/acls.yml')
         );
     }
 

@@ -68,18 +68,39 @@ class ExpressionProcessor
             throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
         }
         $this->values = $values;
+        $this->processingValues = [];
         $this->processedValues = [];
-        foreach ($values as $key => &$value) {
-            if (array_key_exists($key, $this->processedValues)) {
-                $value = $this->processedValues[$key];
-            } else {
-                $this->processingValues[] = $key;
-                $this->processValue($value, $context, $data, $evaluate, $encoding);
-                $this->processedValues[$key] = $value;
+        foreach ($values as $key => $value) {
+            if (!array_key_exists($key, $this->processedValues)) {
+                $this->processRootValue($key, $value, $context, $data, $evaluate, $encoding);
             }
         }
-        unset($value);
         $values = $this->processedValues;
+    }
+
+    /**
+     * @param string                $key
+     * @param mixed                 $value
+     * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
+     * @param bool                  $evaluate
+     * @param bool                  $encoding
+     * @return mixed
+     */
+    protected function processRootValue(
+        $key,
+        $value,
+        ContextInterface $context,
+        DataAccessorInterface $data,
+        $evaluate,
+        $encoding
+    ) {
+        $this->processingValues[$key] = $key;
+        $this->processValue($value, $context, $data, $evaluate, $encoding);
+        $this->processedValues[$key] = $value;
+        unset($this->processingValues[$key]);
+
+        return $value;
     }
 
     /**
@@ -109,7 +130,6 @@ class ExpressionProcessor
                     $value = substr($value, 1);
                     break;
             }
-
         } elseif (is_array($value)) {
             foreach ($value as &$item) {
                 $this->processValue($item, $context, $data, $evaluate, $encoding);
@@ -146,17 +166,15 @@ class ExpressionProcessor
     ) {
         $deps = $this->getNotProcessedDependencies($expr->getNodes());
         foreach ($deps as $key => $dep) {
-            if (in_array($key, $this->processingValues, true)) {
+            if (in_array($key, $this->processingValues, true) && !in_array($key, $this->processedValues)) {
                 $path = implode(' > ', array_merge($this->processingValues, [$key]));
                 throw new CircularReferenceException(
                     sprintf('Circular reference "%s" on expression "%s".', $path, (string)$expr)
                 );
             }
-            $this->processingValues[] = $key;
-            $this->processValue($dep, $context, $data, $evaluate, $encoding);
-            $this->processedValues[$key] = $dep;
+            $this->processRootValue($key, $dep, $context, $data, $evaluate, $encoding);
         }
-        $values = array_merge(['context' => $context, 'data' => $data,], $this->values, $this->processedValues);
+        $values = array_merge(['context' => $context, 'data' => $data], $this->values, $this->processedValues);
 
         return $evaluate
             ? $this->expressionLanguage->evaluate($expr, $values)

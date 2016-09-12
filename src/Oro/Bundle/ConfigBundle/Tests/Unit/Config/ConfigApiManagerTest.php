@@ -5,14 +5,16 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigApiManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
+use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
 class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     /** @var ConfigApiManager */
@@ -20,8 +22,8 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMock('Oro\Bundle\ConfigBundle\Provider\ProviderInterface');
-        $this->configManager  = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->configProvider = $this->getMock(ProviderInterface::class);
+        $this->configManager  = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -133,12 +135,12 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['acme.item1', false, false, 'val1'],
-                        ['acme.item2', false, false, 123],
-                        ['acme.item3', false, false, ['val1' => 1, 'val2' => true]],
-                        ['acme.item4', false, false, false],
-                        ['acme.item5', false, false, ""],
-                        ['acme.item6', false, false, "123"],
+                        ['acme.item1', false, false, null, 'val1'],
+                        ['acme.item2', false, false, null, 123],
+                        ['acme.item3', false, false, null, ['val1' => 1, 'val2' => true]],
+                        ['acme.item4', false, false, null, false],
+                        ['acme.item5', false, false, null, ''],
+                        ['acme.item6', false, false, null, '123'],
                     ]
                 )
             );
@@ -154,7 +156,7 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->assertSame(
+        $this->assertEquals(
             [
                 [
                     'key' => 'acme.item1',

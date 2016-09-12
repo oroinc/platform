@@ -24,7 +24,6 @@ services:
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
-        lazy: true
 
     oro_datagrid.extension.orm_pager:
         class: %oro_datagrid.extension.orm_pager.class%
@@ -60,6 +59,7 @@ services:
             - '@service_container'
             - '@oro_security.security_facade'
             - '@translator'
+            - '@oro_datagrid.event.dispatcher'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -73,10 +73,7 @@ services:
 
     oro_datagrid.extension.mass_action:
         class: %oro_datagrid.extension.mass_action.class%
-        arguments:
-            - '@service_container'
-            - '@oro_security.security_facade'
-            - '@translator'
+        parent: oro_datagrid.extension.action
         tags:
             - { name: oro_datagrid.extension }
 

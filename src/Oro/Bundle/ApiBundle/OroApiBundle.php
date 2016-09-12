@@ -9,7 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiSecurityFirewallCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConstraintTextExtractorConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityAliasesConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExceptionTextExtractorConfigurationCompilerPass;
@@ -29,6 +31,7 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new EntityAliasesConfigurationCompilerPass());
         $container->addCompilerPass(new ExclusionProviderConfigurationCompilerPass());
         $container->addCompilerPass(new ExceptionTextExtractorConfigurationCompilerPass());
+        $container->addCompilerPass(new ConstraintTextExtractorConfigurationCompilerPass());
         $container->addCompilerPass(
             new LoadProcessorsCompilerPass(
                 'oro_api.processor_bag',
@@ -45,6 +48,10 @@ class OroApiBundle extends Bundle
         );
         $container->addCompilerPass(
             new ApiDocConfigurationCompilerPass(),
+            PassConfig::TYPE_BEFORE_REMOVING
+        );
+        $container->addCompilerPass(
+            new ApiSecurityFirewallCompilerPass('api_wsse_secured'),
             PassConfig::TYPE_BEFORE_REMOVING
         );
     }

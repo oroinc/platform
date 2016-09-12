@@ -148,13 +148,14 @@ services:
             - [ setNamespace, [ 'oro_api_resources' ] ]
 
     oro_api.listener.update_schema:
-        class: Oro\Bundle\ApiBundle\EventListener\UpdateSchemaListener
+        class: Oro\Bundle\ApiBundle\EventListener\ApiSourceListener
         arguments:
             - '@oro_api.resources_cache'
             - '@nelmio_api_doc.extractor.api_doc_extractor'
             - '%oro_api.api_doc.views%'
         tags:
-            - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: onSchemaUpdate }
+            - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: clearCache }
+            - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: clearCache }
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
@@ -189,6 +190,11 @@ services:
         tags:
             - { name: oro_api.config_extension }
 
+    oro_api.config_extension.feature:
+        class: 'Oro\Bundle\ApiBundle\Config\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
@@ -222,6 +228,8 @@ services:
             - '@oro_api.entity_alias_loader'
             - '@oro_api.entity_alias_cache'
             - %kernel.debug%
+        calls:
+            - [ setLogger, [ '@logger' ] ]
         lazy: true
 
     oro_api.entity_alias_cache:
@@ -438,3 +446,13 @@ services:
             - '@property_accessor'
         tags:
             - { name: oro.api.filter_factory, priority: -10 }
+
+    oro_api.constraint_text_extractor:
+        class: Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor
+        public: false
+
+    oro_api.constraint_text_extractor.default:
+        class: Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor
+        public: false
+        tags:
+            - { name: oro.api.constraint_text_extractor, priority: -10 }

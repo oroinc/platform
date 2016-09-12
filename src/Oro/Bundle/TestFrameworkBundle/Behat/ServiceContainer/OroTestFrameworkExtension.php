@@ -28,6 +28,8 @@ class OroTestFrameworkExtension implements TestworkExtension
 {
     const DUMPER_TAG = 'oro_test.dumper';
 
+    const ELEMENTS_CONFIG_ROOT = 'behat_elements';
+
     /**
      * {@inheritdoc}
      */
@@ -79,6 +81,9 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
                 ->end()
+                ->scalarNode('reference_initializer_class')
+                    ->defaultValue('Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer')
+                ->end()
             ->end();
     }
 
@@ -93,14 +98,21 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
+        $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     public function processDbDumpers(ContainerBuilder $container)
     {
         $dbDumper = $this->getDbDumper($container);
         $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     /**
      * @param ContainerBuilder $container
      * @throws OutOfBoundsException When
@@ -225,17 +237,19 @@ class OroTestFrameworkExtension implements TestworkExtension
             $mappingPath = str_replace(
                 '/',
                 DIRECTORY_SEPARATOR,
-                $bundle->getPath().'/Resources/config/behat_elements.yml'
+                $bundle->getPath().'/Resources/config/oro/behat_elements.yml'
             );
 
             if (!is_file($mappingPath)) {
                 continue;
             }
 
-            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse(file_get_contents($mappingPath)));
+            $config = Yaml::parse(file_get_contents($mappingPath));
+
+            $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
         }
 
-        $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
+        $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
     }
 
     /**

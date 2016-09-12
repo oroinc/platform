@@ -98,8 +98,6 @@ class GetContextValue extends AbstractFunction
     }
 
     /**
-     * todo create paths cache, see \Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
-     *
      * @param string $value
      *
      * @return PropertyPath

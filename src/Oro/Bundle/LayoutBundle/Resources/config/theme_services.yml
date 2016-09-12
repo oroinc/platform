@@ -6,7 +6,6 @@ parameters:
 
     oro_layout.default_active_theme:    ~
     oro_layout.debug:    ~
-    oro_layout.theme_updates_resources: []
     oro_layout.cache_dir:               %kernel.cache_dir%/layouts
 
 services:
@@ -72,10 +71,35 @@ services:
     oro_layout.theme_extension:
         class: %oro_layout.theme_extension.class%
         arguments:
-            - %oro_layout.theme_updates_resources%
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
             - '@oro_layout.loader.path_provider'
+            - '@oro_layout.theme_extension.resource_provider.theme'
+        calls:
+            - [addVisitor, ['@oro_layout.theme_extension.visitor.import']]
+
+    oro_layout.theme_extension.resource_provider.theme:
+        class: Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider
+        public: false
+        arguments:
+            - '@oro_layout.loader'
+            - []
+        calls:
+            - [setCache, ['@oro_layout.theme_extension.resource_provider.cache']]
+
+    oro_layout.theme_extension.resource_provider.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [setNamespace, ['oro_layout_resources']]
+
+    oro_layout.theme_extension.visitor.import:
+        class: Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor
+        public: false
+        arguments:
+            - '@oro_layout.loader'
+            - '@oro_layout.dependency_initializer'
+            - '@oro_layout.theme_extension.resource_provider.theme'
             - '@oro_layout.theme_manager'
 
     oro_layout.data_provider.theme:
@@ -84,15 +108,6 @@ services:
             - '@oro_layout.theme_manager'
         tags:
             - { name: layout.data_provider, alias: theme }
-
-    oro_layout.yaml_updates_warmer:
-        class: Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer
-        public: false
-        arguments:
-            - %oro_layout.theme_updates_resources%
-            - '@oro_layout.loader'
-        tags:
-            - { name: kernel.cache_warmer }
 
     oro_layout.layout_update_generator.config:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
@@ -133,3 +148,17 @@ services:
             - [setDebug, [%oro_layout.debug%]]
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_layout.config.dumper:
+        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
+        public: false
+        lazy: true
+        arguments: [ %kernel.cache_dir%, %kernel.debug%, 'oro_layout_resource' ]
+
+    oro_layout.event_listener.container_listener:
+        class: Oro\Bundle\LayoutBundle\EventListener\ContainerListener
+        arguments:
+            - '@oro_layout.theme_extension.resource_provider.theme'
+            - '@oro_layout.config.dumper'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
