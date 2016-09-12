@@ -5,7 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
@@ -18,7 +17,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      }
  * )
  */
-class MenuUpdate extends ExtendMenuUpdate
+class MenuUpdate extends AbstractMenuUpdate
 {
     const OWNERSHIP_BUSINESS_UNIT = 3;
     const OWNERSHIP_USER          = 4;
