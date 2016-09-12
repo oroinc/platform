@@ -1,6 +1,4 @@
 parameters:
-    oro_user.form.type.user.class:              Oro\Bundle\UserBundle\Form\Type\UserType
-    oro_user.form.type.user.api.class:          Oro\Bundle\UserBundle\Form\Type\UserApiType
     oro_user.form.type.reset.class:             Oro\Bundle\UserBundle\Form\Type\ResetType
     oro_user.form.type.role.api.class:          Oro\Bundle\UserBundle\Form\Type\RoleApiType
     oro_user.form.type.group.class:             Oro\Bundle\UserBundle\Form\Type\GroupType
@@ -80,21 +78,23 @@ services:
 
     oro_user.form.type.user:
         scope: request
-        class:                        %oro_user.form.type.user.class%
+        class: Oro\Bundle\UserBundle\Form\Type\UserType
         arguments:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
+            - '@oro_user.form.provider.password_tooltip'
         tags:
             - { name: form.type, alias: oro_user_user }
 
     oro_user.form.type.user.api:
         scope: request
-        class:                        %oro_user.form.type.user.api.class%
+        class: Oro\Bundle\UserBundle\Form\Type\UserApiType
         arguments:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
+            - '@oro_user.form.provider.password_tooltip'
         calls:
             - [setUserConfigManager, ["@oro_config.user"]]
         tags:
