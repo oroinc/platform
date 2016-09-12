@@ -9,6 +9,12 @@ use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
+/**
+ * Class ResultAfter
+ * @package Oro\Bundle\DataGridBundle\Event
+ *
+ * This event dispatched after datagrid builder finish building result
+ */
 class GridResultAfter extends Event implements GridEventInterface
 {
     const NAME = 'oro_datagrid.orm_datasource.result.after';
@@ -24,15 +30,16 @@ class GridResultAfter extends Event implements GridEventInterface
     protected $records;
 
     /**
-     * @var mixed
+     * @var AbstractQuery
      */
     protected $query;
 
     /**
      * @param DatagridInterface $datagrid
      * @param array             $records
+     * @param AbstractQuery     $query
      */
-    public function __construct(DatagridInterface $datagrid, array $records = array(), $query = null)
+    public function __construct(DatagridInterface $datagrid, array $records = array(), AbstractQuery $query = null)
     {
         $this->datagrid = $datagrid;
         $this->records  = $records;
@@ -56,7 +63,15 @@ class GridResultAfter extends Event implements GridEventInterface
     }
 
     /**
-     * @return mixed
+     * @param array $records
+     */
+    public function setRecords(array $records)
+    {
+        $this->records = $records;
+    }
+
+    /**
+     * @return AbstractQuery
      */
     public function getQuery()
     {

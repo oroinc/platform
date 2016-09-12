@@ -1,0 +1,7 @@
+acls:
+    oro_organization_view:
+        type: entity
+        class: OroOrganizationBundle:Organization
+        permission: VIEW
+        group_name: ""
+        bindings: ~

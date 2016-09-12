@@ -3,7 +3,7 @@ layout:
         - '@setOption':
             id: widget_content
             optionName: 'attr.data-page-component-module'
-            optionValue: 'orob2bproduct/js/app/components/redirect-component'
+            optionValue: 'oroproduct/js/app/components/redirect-component'
         - '@setOption':
             id: widget_content
             optionName: 'attr.data-page-component-options.targetUrl'

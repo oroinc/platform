@@ -12,15 +12,13 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper;
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
-use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 
 class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
     const DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID = 'oro_security.wsse_nonce_cache';
     const DEFAULT_WSSE_NONCE_CACHE_CLASS = 'Oro\Bundle\SecurityBundle\Cache\WsseNoncePhpFileCache';
     const DEFAULT_WSSE_NONCE_CACHE_PATH = '%kernel.cache_dir%/security/nonces';
+    const ACLS_CONFIG_ROOT_NODE = 'acls';
 
     /**
      * {@inheritDoc}
@@ -55,7 +53,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     {
         return new CumulativeConfigLoader(
             'oro_acl_config',
-            new YamlCumulativeFileLoader('Resources/config/acl.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/acls.yml')
         );
     }
 

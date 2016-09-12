@@ -60,6 +60,14 @@ abstract class AbstractDriver implements DriverInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getUpdateFilenamePattern($fileExtension)
+    {
+        return '/\.' . $fileExtension . '$/';
+    }
+
+    /**
      * @param string $className
      * @param string $file
      *

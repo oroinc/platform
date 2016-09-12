@@ -136,7 +136,7 @@ class ProcessConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExpectedProcessConfiguration($bundleName)
     {
-        $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/process.php';
+        $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/oro/processes.php';
         $this->assertFileExists($fileName);
         return include $fileName;
     }

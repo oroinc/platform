@@ -13,7 +13,8 @@ user-interface
 * `titles` (LocalizedFallbackValues[]) - set of translatable titles of Localization
 * `languageCode` (string) - language code, for displaying full title of the language by code can be used formatter
 `Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter`
-* `formattingCode` (string) - formatting code, for displaying full title of the formatting by code can be used formatter
+* `formattingCode` (string) - for displaying full title of the formatting by code
+* `formatLocale` (string) - for displaying full title of the locale by code
 `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter`
 * `parentLocalization` (Localization) - parent Localization
 
