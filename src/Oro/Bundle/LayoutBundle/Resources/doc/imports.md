@@ -89,7 +89,7 @@ You also can provide template for block template by end identifier in layout upd
 ```
 Referencing imported blocks using block_type_widget_id
 ----------------------------------------------------
-When you need the imported block to be rendered without direct reference to its template name, you can use TWIG variable `block_type_widget_id` which refers to the twig widget id for current block type, like container_widget, menu_widget, etc.
+When you need the imported block to be rendered without direct reference to its template name, you can use TWIG variable `block_type_widget_id` which refers to the twig widget id for current block type, like `container_widget`, `menu_widget`, etc.
 
 For example, here is the customized toolbar element defined in `DataGridBundle` in the product page (`ProductBundle`): 
 ```twig
@@ -100,10 +100,10 @@ For example, here is the customized toolbar element defined in `DataGridBundle` 
     </div>
 {% endblock %}
 ```
-*Note:* By deafult, element contained the `{{ block_widget(block) }}` which renders the block as a template defined in imports. We replaced it with `block(block_type_widget_id)` to avoid mentioning the template name.
+*Note:* By default, element contained the `{{ block_widget(block) }}` which renders the block as a template defined in imports. We replaced it with `block(block_type_widget_id)` to avoid mentioning the template name.
 
 ### Additional info
-You might be wondering how the toolbar element in our example was imported and what was the deafult way it rendered. Here is the story:
+You might be wondering how the toolbar element in our example was imported and what was the default way it rendered. Here is the story:
 
 First, in `DataGridBundle`, the datagrid toolbar was imported with the following definitions:
 1) Id in the `layout.yml`:
@@ -146,7 +146,7 @@ layout:
 {% endblock %}
 ```
 
-Next, in `ProductBundle` we redefined the `imports/datagrid_toolbar/layout.html.twig` block, which resultedin the following code:
+Next, in `ProductBundle` we redefined the `imports/datagrid_toolbar/layout.html.twig` block, which resulted in the following code:
 ```twig
 {% block _datagrid_toolbar_mass_actions_widget %}
 	...
