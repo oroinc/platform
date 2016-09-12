@@ -161,7 +161,7 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
      */
     public function import(TransitionTriggerEvent $trigger)
     {
-       $this->importMainData($trigger);
+        $this->importMainData($trigger);
 
         $this->setEvent($trigger->getEvent())
             ->setEntityClass($trigger->getEntityClass())

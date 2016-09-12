@@ -28,15 +28,15 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $this->createOroWorkflowTransTriggerTable($schema);
+        $this->addOroWorkflowTransTriggerForeignKeys($schema);
+
         $preSchema = clone $schema;
 
         $table = $preSchema->getTable('oro_workflow_definition');
         $table->addColumn('active', 'boolean', ['default' => false]);
         $table->addColumn('priority', 'integer', ['default' => 0]);
         $table->addColumn('groups', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
-
-        $this->createOroWorkflowTransTriggerTable($schema);
-        $this->addOroWorkflowTransTriggerForeignKeys($schema);
 
         foreach ($this->getSchemaDiff($schema, $preSchema) as $query) {
             $queries->addQuery($query);
@@ -114,11 +114,11 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('cron', 'string', ['notnull' => false, 'length' => 100]);
-        $table->addColumn('filter', 'text', ['notnull' => false, 'length' => 65535]);
+        $table->addColumn('filter', 'text', ['notnull' => false]);
         $table->addColumn('event', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('field', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('require', 'text', ['notnull' => false, 'length' => 65535]);
-        $table->addColumn('relation', 'text', ['notnull' => false, 'length' => 65535]);
+        $table->addColumn('require', 'text', ['notnull' => false]);
+        $table->addColumn('relation', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
     }
 

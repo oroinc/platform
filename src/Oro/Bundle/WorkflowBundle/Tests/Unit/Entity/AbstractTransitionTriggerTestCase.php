@@ -30,6 +30,10 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit_Framework_Test
         ]);
     }
 
+    /**
+     * @param AbstractTransitionTrigger $trigger
+     * @return AbstractTransitionTrigger
+     */
     protected function setDataToTrigger(AbstractTransitionTrigger $trigger)
     {
         return $trigger->setTransitionName('test_transition')
