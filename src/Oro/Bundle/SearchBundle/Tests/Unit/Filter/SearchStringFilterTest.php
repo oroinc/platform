@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Filter;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
@@ -46,18 +48,25 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testAppliesConditionToQuery()
     {
+        $criteria = $this->getMock(Criteria::class);
+
         $query = $this->getMock(Query::class);
+        $query->method('getCriteria')
+            ->willReturn($criteria);
 
         $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
+        $expressionBuilder = new ExpressionBuilder();
+        $ds->method('expr')
+            ->willReturn($expressionBuilder);
+
         $ds->method('getWrappedSearchQuery')
             ->will($this->returnValue($query));
 
-        $query->expects($this->once())
-            ->method('andWhere')
-            ->with('foo', Query::OPERATOR_EQUALS, 'bar');
+        $criteria->expects($this->once())
+            ->method('andWhere');
 
         $this->filter->apply($ds, ['type' => TextFilterType::TYPE_EQUAL, 'value' => 'bar']);
     }

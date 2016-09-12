@@ -7,7 +7,7 @@ use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
-use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Filter\Form\Type\SearchStringFilterType;
 
 class SearchStringFilter extends AbstractFilter
 {
@@ -16,7 +16,7 @@ class SearchStringFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return TextFilterType::NAME;
+        return SearchStringFilterType::NAME;
     }
 
     /**
@@ -30,17 +30,23 @@ class SearchStringFilter extends AbstractFilter
 
         if ($ds instanceof SearchFilterDatasourceAdapter) {
             switch ($data['type']) {
-                case TextFilterType::TYPE_EQUAL:
-                    $ds->getWrappedSearchQuery()->andWhere($fieldName, Query::OPERATOR_EQUALS, $data['value']);
+                case SearchStringFilterType::TYPE_EQUAL:
+                    $ds->getWrappedSearchQuery()
+                        ->getCriteria()
+                        ->andWhere($ds->expr()->eq($fieldName, $data['value']));
+
                     return;
-                case TextFilterType::TYPE_NOT_EQUAL:
-                    $ds->getWrappedSearchQuery()->andWhere($fieldName, Query::OPERATOR_EQUALS, $data['value']);
+                case SearchStringFilterType::TYPE_CONTAINS:
+                    $ds->getWrappedSearchQuery()
+                        ->getCriteria()
+                        ->andWhere($ds->expr()->like($fieldName, $data['value']));
+
                     return;
-                case TextFilterType::TYPE_CONTAINS:
-                    $ds->getWrappedSearchQuery()->andWhere($fieldName, Query::OPERATOR_CONTAINS, $data['value']);
-                    return;
-                case TextFilterType::TYPE_NOT_CONTAINS:
-                    $ds->getWrappedSearchQuery()->andWhere($fieldName, Query::OPERATOR_NOT_CONTAINS, $data['value']);
+                case SearchStringFilterType::TYPE_NOT_CONTAINS:
+                    $ds->getWrappedSearchQuery()
+                        ->getCriteria()
+                        ->andWhere($ds->expr()->notLike($fieldName, $data['value']));
+
                     return;
             }
         }
