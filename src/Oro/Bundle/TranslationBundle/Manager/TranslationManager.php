@@ -219,7 +219,6 @@ class TranslationManager
                 $translationKey = new TranslationKey();
                 $translationKey->setKey($key);
                 $translationKey->setDomain($domain);
-                $this->getEntityManager(TranslationKey::class)->persist($translationKey);
             }
 
             $cache[$key . '-' . $domain] = $translationKey;
