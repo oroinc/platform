@@ -121,7 +121,7 @@ class DatagridConfiguration extends ConfigObject
 
     /**
      * @param string      $name       column name
-     * @param array       $definition definition array as in datagrid.yml
+     * @param array       $definition definition array as in datagrids.yml
      * @param null|string $select     select part for the column
      * @param array       $sorter     sorter definition
      * @param array       $filter     filter definition

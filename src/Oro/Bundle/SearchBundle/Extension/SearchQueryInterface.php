@@ -113,6 +113,8 @@ interface SearchQueryInterface
     public function from($entities);
 
     /**
+     * Get fields aliases that were set when adding fields to be selected
+     *
      * @return array
      */
     public function getSelectAliases();

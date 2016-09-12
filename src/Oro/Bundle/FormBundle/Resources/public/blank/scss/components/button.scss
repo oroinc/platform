@@ -1,0 +1,33 @@
+.button {
+    @include base-ui-element($use-base-style-for-button,
+                             $button-padding,
+                             $button-font-size,
+                             $button-font-family,
+                             $button-line-height,
+                             $button-border,
+                             $button-border-radius,
+                             $button-background-color,
+                             $button-color
+                            );
+
+    text-decoration: none;
+
+    touch-action: manipulation;
+    cursor: pointer;
+    user-select: none;
+
+    @include element-state('hover') {
+        text-decoration: none;
+
+        border-color: $button-border-color-hover-state;
+        color: $button-color-hover-state;
+    }
+
+    @include element-state('focus') {
+        border-color: $button-border-color-focus-state;
+    }
+
+    @include element-state('error') {
+        border-color: $button-border-color-error-state;
+    }
+}
