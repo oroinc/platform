@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
-use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
+use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Result;
 
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase

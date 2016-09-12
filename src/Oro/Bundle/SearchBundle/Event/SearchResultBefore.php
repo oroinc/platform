@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class SearchResultBefore extends Event
 {

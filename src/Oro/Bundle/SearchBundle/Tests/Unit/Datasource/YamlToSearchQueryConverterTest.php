@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource;
 
 use Oro\Bundle\SearchBundle\Datasource\YamlToSearchQueryConverter;
-use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
 {

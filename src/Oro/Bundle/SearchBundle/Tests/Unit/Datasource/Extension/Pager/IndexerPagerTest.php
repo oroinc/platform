@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension\Pager;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource\Extension\Pager;
 
-use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
-use Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager;
-use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
+use Oro\Bundle\SearchBundle\Query\IndexerQuery;
+use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class IndexerPagerTest extends \PHPUnit_Framework_TestCase

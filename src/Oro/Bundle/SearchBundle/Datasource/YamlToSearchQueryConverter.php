@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Datasource;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\QueryConfiguration;
 
 class YamlToSearchQueryConverter

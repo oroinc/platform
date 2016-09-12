@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension\Sorter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource\Extension\Sorter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
-use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
-use Oro\Bundle\SearchBundle\Extension\Sorter\SearchSorterExtension;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use Oro\Bundle\SearchBundle\Datagrid\Extension\Sorter\SearchSorterExtension;
 
 class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
 {

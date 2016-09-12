@@ -1,9 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Extension;
-
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Result;
+namespace Oro\Bundle\SearchBundle\Query;
 
 abstract class AbstractSearchQuery implements SearchQueryInterface
 {

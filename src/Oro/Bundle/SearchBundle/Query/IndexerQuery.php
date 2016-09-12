@@ -1,8 +1,7 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Extension;
+namespace Oro\Bundle\SearchBundle\Query;
 
-use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class IndexerQuery extends AbstractSearchQuery

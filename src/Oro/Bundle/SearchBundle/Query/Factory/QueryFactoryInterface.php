@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Query\Factory;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 interface QueryFactoryInterface
 {
@@ -12,7 +13,7 @@ interface QueryFactoryInterface
      *
      * @param DatagridInterface $grid
      * @param array             $config
-     * @return mixed
+     * @return SearchQueryInterface
      */
     public function create(DatagridInterface $grid, array $config);
 }

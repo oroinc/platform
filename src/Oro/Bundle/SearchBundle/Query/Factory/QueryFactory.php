@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Query\Factory;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
+use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 
 class QueryFactory implements QueryFactoryInterface
 {
