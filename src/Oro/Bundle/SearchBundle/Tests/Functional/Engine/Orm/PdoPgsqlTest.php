@@ -44,8 +44,13 @@ class PdoPgsqlTest extends AbstractDriverTest
     protected function assertInitConfiguration(Configuration $configuration)
     {
         $this->assertEquals(
-            'Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql\MatchAgainst',
-            $configuration->getCustomStringFunction('MATCH_AGAINST')
+            'Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsRank',
+            $configuration->getCustomStringFunction('TsRank')
+        );
+
+        $this->assertEquals(
+            'Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsvectorTsquery',
+            $configuration->getCustomStringFunction('TsvectorTsquery')
         );
     }
 
@@ -54,16 +59,14 @@ class PdoPgsqlTest extends AbstractDriverTest
      */
     protected function assertTruncateQueries(array $queries)
     {
-        $this->assertCount(7, $queries);
+        $this->assertCount(5, $queries);
 
         $expectedQueries = [
-            'SET FOREIGN_KEY_CHECKS=0',
             'TRUNCATE oro_search_item CASCADE',
             'TRUNCATE oro_search_index_text CASCADE',
             'TRUNCATE oro_search_index_integer CASCADE',
             'TRUNCATE oro_search_index_decimal CASCADE',
-            'TRUNCATE oro_search_index_datetime CASCADE',
-            'SET FOREIGN_KEY_CHECKS=1'
+            'TRUNCATE oro_search_index_datetime CASCADE'
         ];
 
         $this->assertEquals($expectedQueries, $queries);
