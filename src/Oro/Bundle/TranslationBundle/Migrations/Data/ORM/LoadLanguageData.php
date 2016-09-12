@@ -48,17 +48,31 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         $user = $this->getUser($manager);
 
         foreach ($languages as $languageCode) {
-            $language = new Language();
-            $language->setCode($languageCode)
+            $language = $this->getLanguage($manager, $languageCode);
+            $language
                 ->setEnabled(in_array($languageCode, $enabledLanguages, true) || $defaultLanguage === $languageCode)
                 ->setOwner($user)
                 ->setOrganization($user->getOrganization())
                 ->setOwner($user);
-
-            $manager->persist($language);
         }
 
         $manager->flush();
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @param string $code
+     * @return Language
+     */
+    protected function getLanguage(ObjectManager $manager, $code)
+    {
+        if (null === ($language = $manager->getRepository(Language::class)->findOneBy(['code' => $code]))) {
+            $language = new Language();
+            $language->setCode($code);
+            $manager->persist($language);
+        }
+
+        return $language;
     }
 
     /**
