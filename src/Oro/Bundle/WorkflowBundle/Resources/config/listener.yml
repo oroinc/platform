@@ -67,3 +67,6 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_workflow.changes.subscriber }
+
+    oro_workflow.event_listener.transition_triggers:
+        class:

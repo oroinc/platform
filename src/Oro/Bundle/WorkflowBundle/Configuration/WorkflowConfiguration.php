@@ -22,6 +22,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
     const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
+    const NODE_TRANSITION_TRIGGERS = 'triggers';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -283,92 +284,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode('dialog_template')
                         ->defaultNull()
                     ->end()
-                    ->arrayNode('triggers')
-                        ->prototype('array')
-                            ->children()
-                                ->enumNode('event')
-                                    ->defaultNull()
-                                    ->values(TransitionTriggerEvent::getAllowedEvents())
-                                ->end()
-                                ->scalarNode('field')
-                                    ->defaultNull()
-                                ->end()
-                                ->scalarNode('require')
-                                    ->defaultNull()
-                                ->end()
-                                ->booleanNode('queued')
-                                    ->defaultNull()
-                                ->end()
-                                ->scalarNode('entity_class')
-                                    ->defaultNull()
-                                ->end()
-                                ->scalarNode('relation')
-                                    ->defaultNull()
-                                ->end()
-                                ->scalarNode('cron')
-                                    ->defaultNull()
-                                    ->validate()
-                                    ->always(
-                                        function ($value) {
-                                            if ($value !== null) {
-                                                // validate expression string
-                                                CronExpression::factory($value);
-                                            }
-                                            return $value;
-                                        }
-                                    )
-                                    ->end()
-                                ->end()
-                                ->scalarNode('filter')
-                                    ->info('DQL "where" part to filter entities that match for cron trigger.')
-                                    ->defaultNull()
-                                ->end()
-                            ->end()
-                            ->validate()
-                                ->ifTrue(
-                                    function ($data) {
-
-                                        return $data['event'] && $data['cron'];
-                                    }
-                                )
-                                ->thenInvalid('Only one child node "event" or "cron" must be configured.')
-                            ->end()
-                            ->validate()
-                                ->always(
-                                    function ($data) {
-                                        $eventFields = ['relation', 'field', 'queued', 'entity_class', 'require'];
-                                        if ($data['cron']) {
-                                            foreach ($eventFields as $field) {
-                                                if ($data[$field]) {
-                                                    throw new \LogicException(
-                                                        sprintf('Field "%s" only allowed for event node', $field)
-                                                    );
-                                                }
-                                            }
-                                        }
-                                    }
-                                )
-                            ->end()
-                            ->validate()
-                                ->ifTrue(
-                                    function ($data) {
-
-                                        return $data['field'] &&
-                                        $data['event'] !== TransitionTriggerEvent::EVENT_UPDATE;
-                                    }
-                                )->thenInvalid('The "field" option is only allowed for update event.')
-                            ->end()
-                            ->validate()
-                                ->ifTrue(
-                                    function ($data) {
-
-                                        return $data['relation'] && !$data['entity_class'];
-                                    }
-                                )
-                                ->thenInvalid('Field `entity_class` is mandatory for custom (non-workflow related) entity.')
-                            ->end()
-                        ->end()
-                    ->end()
+                    ->append($this->getTransitionTriggers())
                 ->end()
                 ->validate()
                     ->always(
@@ -390,10 +306,10 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     /**
      * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|NodeDefinition
      */
-    protected function addTransitionTriggers()
+    protected function getTransitionTriggers()
     {
         $builder = new TreeBuilder();
-        $triggersNode = $builder->root('triggers');
+        $triggersNode = $builder->root(self::NODE_TRANSITION_TRIGGERS);
         $triggersNode
             ->prototype('array')
                 ->children()
@@ -457,6 +373,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                                     }
                                 }
                             }
+                            return $data;
                         }
                     )
                 ->end()
@@ -476,8 +393,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                             return $data['relation'] && !$data['entity_class'];
                         }
                     )
-                    ->thenInvalid('Field `entity_class` is mandatory for custom (non-workflow related) entity.')
-                ->end()
+                    ->thenInvalid(
+                        'Field `entity_class` is mandatory for custom (non-workflow related) entity.'
+                    )
                 ->end()
             ->end();
         return $triggersNode;
