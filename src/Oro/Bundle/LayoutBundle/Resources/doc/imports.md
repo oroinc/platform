@@ -143,7 +143,7 @@ And in `ProductBundle` we redefine this block:
     </div>
 {% endblock %}
 ```
-Function `block_widget(block)` will render this block as template defined in imports. But that's not what we need: to render block type properly lets use `block_type_widget_id`:
+Function `block_widget(block)` will render this block as template defined in imports. But that's not what we need: to render block type template properly lets use `block_type_widget_id`:
 
 ```twig
 {% block _datagrid_toolbar_mass_actions_widget %}
