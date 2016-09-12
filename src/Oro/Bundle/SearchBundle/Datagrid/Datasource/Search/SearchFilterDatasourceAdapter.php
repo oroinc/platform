@@ -59,7 +59,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
             return;
         }
 
-        throw new \InvalidArgumentException('Restriction not supported.');
+        throw new \BadMethodCallException('Restriction not supported.');
     }
 
     /**
@@ -68,7 +68,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function groupBy($_)
     {
-        return null;
+        throw new \BadMethodCallException('Method currently not supported.');
     }
 
     /**
@@ -77,7 +77,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function addGroupBy($_)
     {
-        return null;
+        throw new \BadMethodCallException('Method currently not supported.');
     }
 
     /**
@@ -100,7 +100,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function setParameter($key, $value, $type = null)
     {
-        return null;
+        throw new \BadMethodCallException('Method currently not supported.');
     }
 
     /**
@@ -118,7 +118,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function getFieldByAlias($fieldName)
     {
-        return null;
+        throw new \BadMethodCallException('Method currently not supported.');
     }
 
     /**
