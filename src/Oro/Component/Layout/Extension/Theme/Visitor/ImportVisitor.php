@@ -10,7 +10,6 @@ use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterf
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\LayoutUpdateImportInterface;
-use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
