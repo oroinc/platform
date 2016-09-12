@@ -14,13 +14,20 @@ use Doctrine\ORM\Configuration;
 class PdoPgsqlTest extends AbstractDriverTest
 {
     const ENTITY_TITLE = 'test-entity-title';
-    const DRIVER = DatabaseDriverInterface::DRIVER_POSTGRESQL;
     const ENVIRONMENT_NAME = 'PostgreSQL';
 
     public function testGetPlainSql()
     {
         $recordString = PdoPgsql::getPlainSql();
         $this->assertTrue(strpos($recordString, 'to_tsvector') > 0);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDriverName()
+    {
+        return DatabaseDriverInterface::DRIVER_POSTGRESQL;
     }
 
     /**
