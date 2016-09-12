@@ -24,6 +24,10 @@ system_configuration:
             title: oro.email.system_configuration.attachment_configuration.label
             priority: 70
 
+        template_configuration:
+            title: oro.email.system_configuration.template_configuration.label
+            priority: 60
+
         mailboxes:
             title: oro.email.system_configuration.mailbox_configuration.label
             priority: -10
@@ -85,7 +89,7 @@ system_configuration:
             priority: 100
             options:
                 label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
-                required: true
+                required: false
 
         oro_email.attachment_sync_enable:
             data_type: boolean
@@ -94,7 +98,7 @@ system_configuration:
             options:
                 label: oro.email.system_configuration.attachment_sync.enable.label
                 tooltip: oro.email.form.tooltip.attachment_sync.enable
-                required: true
+                required: false
 
         oro_email.attachment_sync_max_size:
             data_type: number
@@ -122,6 +126,14 @@ system_configuration:
                 label: false
                 required: false
                 resettable: false
+
+        oro_email.sanitize_html:
+            data_type: boolean
+            type: oro_config_checkbox
+            options:
+                label: oro.email.system_configuration.sanitize_html.label
+                tooltip: oro.email.system_configuration.sanitize_html.tooltip
+                required: false
 
     tree:
         system_configuration:
@@ -151,6 +163,9 @@ system_configuration:
                                             - oro_email.attachment_sync_enable
                                             - oro_email.attachment_sync_max_size
                                             - oro_email.attachment_preview_limit
+                                    template_configuration:
+                                        children:
+                                            - oro_email.sanitize_html
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid

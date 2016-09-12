@@ -15,7 +15,7 @@ system_configuration:
             options:
                 label: oro.tracking.system_configuration.fields.dynamic_tracking_enabled.label
                 tooltip: oro.tracking.form.tooltip.dynamic_tracking_enabled
-                required: true
+                required: false
 
         oro_tracking.log_rotate_interval:
             data_type: integer
