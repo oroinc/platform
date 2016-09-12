@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
-use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Form\Type\SetPasswordType;
+use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 
 class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
 {

@@ -26,9 +26,7 @@ class PasswordTooltipProvider
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     private $translator;
 
     public function __construct(ConfigManager $configManager, TranslatorInterface $translator)

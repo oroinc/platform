@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
-use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
-
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
 
 class ChangePasswordTypeStub extends ChangePasswordType
 {
