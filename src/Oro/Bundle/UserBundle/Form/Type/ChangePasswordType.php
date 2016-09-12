@@ -64,7 +64,7 @@ class ChangePasswordType extends AbstractType
                     ],
                     'first_options' => [
                         'label' => $options['first_options_label'],
-                        'tooltip' => $options['first_options_tooltip'],
+                        'tooltip' => $this->passwordTooltip->getTooltip(),
                     ],
                     'second_options' => ['label' => $options['second_options_label']],
                     'mapped' => false,
@@ -101,7 +101,6 @@ class ChangePasswordType extends AbstractType
                 'current_password_label' => 'oro.user.password.label',
                 'plain_password_invalid_message' => 'The password fields must match.',
                 'first_options_label' => 'oro.user.new_password.label',
-                'first_options_tooltip' => $this->passwordTooltip->getTooltip(),
                 'second_options_label' => 'oro.user.new_password_re.label',
             ]
         );
