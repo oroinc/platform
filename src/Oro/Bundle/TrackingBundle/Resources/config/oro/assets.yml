@@ -1,0 +1,4 @@
+assets:
+    css:
+        orotracking:
+            - 'bundles/orotracking/css/less/code.less'
