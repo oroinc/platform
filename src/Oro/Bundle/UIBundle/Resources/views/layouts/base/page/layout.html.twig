@@ -1,6 +1,6 @@
 {% block _body_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' ' ~ (isMobileVersion() ? 'mobile' : 'desktop') ~ '-version',
+        '~class': '  body ' ~ (isMobileVersion() ? 'mobile' : 'desktop') ~ '-version',
     }) %}
     <body {{ block('block_attributes') }}>
         {{ block_widget(block) }}
