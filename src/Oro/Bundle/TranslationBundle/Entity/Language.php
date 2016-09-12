@@ -136,4 +136,9 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->getCode();
+    }
 }

@@ -50,7 +50,6 @@ class TranslationManager
             [
                 'language' => $this->getLanguageByCode($locale),
                 'translationKey' => $this->findTranslationKey($key, $domain),
-                'scope' => $scope
             ]
         );
     }
@@ -205,27 +204,26 @@ class TranslationManager
          * Required to avoid unique constraint
          */
         static $cache;
+
         if (!$cache) {
             $cache = [];
         }
 
-        if (isset($cache[$key . '-' . $domain])) {
-            return $cache[$key . '-' . $domain];
+        if (!isset($cache[$key . '-' . $domain])) {
+            /** @var ObjectRepository $repo */
+            $repo = $this->getEntityRepository(TranslationKey::class);
+
+            $translationKey = $repo->findOneBy(['key' => $key, 'domain' => $domain]);
+
+            if (!$translationKey) {
+                $translationKey = new TranslationKey();
+                $translationKey->setKey($key);
+                $translationKey->setDomain($domain);
+                $this->getEntityManager(TranslationKey::class)->persist($translationKey);
+            }
+
+            $cache[$key . '-' . $domain] = $translationKey;
         }
-
-        /** @var ObjectRepository $repo */
-        $repo = $this->getEntityRepository(TranslationKey::class);
-
-        $translationKey = $repo->findOneBy(['key' => $key, 'domain' => $domain]);
-
-        if (!$translationKey) {
-            $translationKey = new TranslationKey();
-            $translationKey->setKey($key);
-            $translationKey->setDomain($key);
-            $this->getEntityManager(TranslationKey::class)->persist($translationKey);
-        }
-
-        $cache[$key . '-' . $domain] = $translationKey;
 
         return $cache[$key . '-' . $domain];
     }
