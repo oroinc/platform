@@ -6,7 +6,6 @@ use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Layout\Templating\TextHelper;
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;

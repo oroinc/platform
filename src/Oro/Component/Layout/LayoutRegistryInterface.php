@@ -99,7 +99,7 @@ interface LayoutRegistryInterface
      * @param BlockInterface $block   The block configuration
      * @param Options        $options The options
      */
-    public function finishView($name, BlockView $view, BlockInterface $block, Options $options);
+    public function finishView($name, BlockView $view, BlockInterface $block);
 
     /**
      * Executes layout updates for the given layout item.

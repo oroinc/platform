@@ -169,14 +169,14 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function finishView($name, BlockView $view, BlockInterface $block, Options $options)
+    public function finishView($name, BlockView $view, BlockInterface $block)
     {
         $extensions = isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
             : $this->loadTypeExtensions($name);
 
         foreach ($extensions as $extension) {
-            $extension->finishView($view, $block, $options);
+            $extension->finishView($view, $block);
         }
     }
 

@@ -6,8 +6,6 @@ use Symfony\Component\Form\FormRendererEngineInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 
-use Oro\Component\Layout\Block\Type\Options;
-
 /**
  * Heavily inspired by FormRenderer class
  *
