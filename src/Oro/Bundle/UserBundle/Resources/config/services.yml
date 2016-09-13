@@ -341,7 +341,6 @@ services:
         class: %oro_user.role.datagrid_helper.class%
         arguments:
             - '@security.authorization_checker'
-            - '@security.authorization_checker'
 
     oro_user.provider.role_entity_name:
         class: Oro\Bundle\UserBundle\Provider\RoleEntityNameProvider

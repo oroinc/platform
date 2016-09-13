@@ -131,7 +131,7 @@ class OroUserBundleInstaller implements
         AddEmailUserColumn::updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
-        AddImpersonationTable::AddImpersonationTable($schema);
+        AddImpersonationTable::createOroUserImpersonationTable($schema);
     }
 
     /**
