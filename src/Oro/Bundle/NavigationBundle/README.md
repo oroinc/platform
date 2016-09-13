@@ -105,6 +105,10 @@ oro_menu_config:
             display: <boolean>                # disable showing of menu item
             displayChildren: <boolean>        # disable showing of menu item children
 
+    area: #menu area identifier
+        default: <default_area_name>          # identifier area name administrative panel
+        frontend: <frontend_area_name>        # frontend identifier area name
+
     tree:
         <menu_alias>                            # menu alias
             type: <menu_type>                   # menu type code. Link to menu template section.

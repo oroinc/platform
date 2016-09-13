@@ -175,6 +175,6 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 
 ####FrontendNavigationBundle
 - Create FrontendNavigationBundle with priority `12`.
-- Added entity `Oro\Bundle\FrontendNavigationBundle\Entity\MenuUpdate`.
+- Added entity `Oro\Bundle\FrontendNavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\FrontendNavigationBundle\Model\ExtendMenuUpdate`.
 - Added class `Oro\Bundle\FrontendNavigationBundle\DependencyInjection\OroFrontendNavigationExtension` that extends `Symfony\Component\HttpKernel\DependencyInjection\Extension`.
-- Added class `Oro\Bundle\FrontendNavigationBundle\Provider\MenuUpdateProvider` that extend `Oro\Bundle\NavigationBundle\Provider\AbstractMenuUpdateProvider`.
+- Added class `Oro\Bundle\FrontendNavigationBundle\Provider\MenuUpdateProvider` that extends `Oro\Bundle\NavigationBundle\Provider\AbstractMenuUpdateProvider`.
