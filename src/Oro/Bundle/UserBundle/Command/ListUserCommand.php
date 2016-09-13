@@ -19,9 +19,9 @@ class ListUserCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:user:list')
-            ->setDescription('Create user.')
+            ->setDescription("Lists users.\nBy default shows a paginated list of the active (enabled) users.")
             ->addOption('all', 'a', InputOption::VALUE_NONE, 'Also list inactive users')
-            ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the result set', 20)
+            ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limits the number of results (-1 for all)', 20)
             ->addOption('page', 'p', InputOption::VALUE_REQUIRED, 'Page of the result set', 1)
             ->addOption(
                 'roles',
@@ -38,7 +38,11 @@ class ListUserCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $offset = ($input->getOption('page') - 1) * $input->getOption('limit');
+        $limit = (int) $input->getOption('limit');
+        $offset = ((int) $input->getOption('page') - 1) * $limit;
+        if ($offset < 0) {
+            $offset = 0;
+        }
 
         $builder = $this
             ->getContainer()
@@ -46,9 +50,13 @@ class ListUserCommand extends ContainerAwareCommand
             ->getManager()
             ->getRepository('OroUserBundle:User')
             ->createQueryBuilder('u')
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults($input->getOption('limit'))
+            ->orderBy('u.enabled', 'DESC')
+            ->addOrderBy('u.id', 'ASC')
             ->setFirstResult($offset);
+
+        if ($limit > 0) {
+            $builder->setMaxResults($limit);
+        }
 
         if (!$input->getOption('all')) {
             $builder
