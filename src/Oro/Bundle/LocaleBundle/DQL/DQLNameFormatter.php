@@ -137,7 +137,7 @@ class DQLNameFormatter
         }
 
         // join all as concat params
-        return sprintf('CONCAT(%s)', join(', ', $items));
+        return sprintf('TRIM(CONCAT(%s))', join(', ', $items));
     }
 
     /**
