@@ -203,7 +203,7 @@ class AssociationManager
             // Need to forcibly convert expression to string when the title is different type.
             // Example of error: "UNION types text and integer cannot be matched".
             if ($nameExpr) {
-                $nameExpr = sprintf('CONCAT(%s,\'\')', $nameExpr);
+                $nameExpr = sprintf('CAST(%s AS string)', $nameExpr);
             }
             $subQb    = $em->getRepository($associationOwnerClass)->createQueryBuilder('e')
                 ->select(

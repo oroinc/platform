@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -14,8 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class AssociationManagerTest extends OrmTestCase
 {
@@ -406,7 +405,7 @@ class AssociationManagerTest extends OrmTestCase
             . 'FROM ('
             . 'SELECT DISTINCT t0_.id AS id_0, t1_.id AS id_1, '
             . '\'' . $targetClass1 . '\' AS sclr_2, '
-            . 't1_.firstName || \' \' || t1_.lastName || \'\' AS sclr_3 '
+            . 'CAST(t1_.firstName || \' \' || t1_.lastName AS char) AS sclr_3 '
             . 'FROM test_owner1 t0_ '
             . 'INNER JOIN test_owner1_to_target1 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t1_ ON t1_.id = t2_.target_id '
@@ -415,7 +414,7 @@ class AssociationManagerTest extends OrmTestCase
             . ' UNION ALL '
             . 'SELECT DISTINCT t0_.id AS id_0, t1_.id AS id_1, '
             . '\'' . $targetClass2 . '\' AS sclr_2, '
-            . 't1_.firstName || \' \' || t1_.lastName || \'\' AS sclr_3 '
+            . 'CAST(t1_.firstName || \' \' || t1_.lastName AS char) AS sclr_3 '
             . 'FROM test_owner1 t0_ '
             . 'INNER JOIN test_owner1_to_target2 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target2 t1_ ON t1_.id = t2_.target_id '
