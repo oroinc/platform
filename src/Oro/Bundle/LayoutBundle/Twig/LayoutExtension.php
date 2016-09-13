@@ -111,11 +111,11 @@ class LayoutExtension extends \Twig_Extension
     }
 
     /**
-     * @param array|\Traversable $attr
+     * @param array $attr
      * @param array $defaultAttr
      * @return array
      */
-    public function defaultAttributes($attr, array $defaultAttr)
+    public function defaultAttributes(array $attr, array $defaultAttr)
     {
         foreach ($defaultAttr as $key => $value) {
             if (strpos($key, '~') === 0) {

@@ -86,6 +86,10 @@ class FormFieldsType extends AbstractFormType
         }
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
         $view->vars['form'] = $options->getOr('form');

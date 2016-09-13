@@ -22,6 +22,9 @@ class FormFieldType extends AbstractFormType
         $resolver->setRequired(['form_name', 'field_path']);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $view->vars['field_path'] = $options->get('field_path', false);

@@ -30,8 +30,6 @@ abstract class AbstractFormType extends AbstractType
 
     /**
      * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
@@ -43,7 +41,7 @@ abstract class AbstractFormType extends AbstractType
      * Returns the form accessor.
      *
      * @param ContextInterface $context
-     * @param Options          $options
+     * @param Options|array    $options
      *
      * @return FormAccessorInterface
      *

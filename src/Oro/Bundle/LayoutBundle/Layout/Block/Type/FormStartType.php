@@ -28,6 +28,9 @@ class FormStartType extends AbstractFormType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $view->vars['form_action'] = $options->getOr('form_action');
@@ -41,6 +44,9 @@ class FormStartType extends AbstractFormType
     
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function finishView(BlockView $view, BlockInterface $block)
     {
