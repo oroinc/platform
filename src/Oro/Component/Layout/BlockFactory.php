@@ -248,6 +248,12 @@ class BlockFactory implements BlockFactoryInterface
             $this->registry->buildView($type->getName(), $view, $this->block, $options);
         }
 
+        array_walk_recursive($view->vars, function (&$var){
+            if($var instanceof Options) {
+                $var = $var->toArray();
+            }
+        });
+
         return $view;
     }
 
@@ -267,8 +273,8 @@ class BlockFactory implements BlockFactoryInterface
         $this->block->initialize($id);
         // finish the view
         foreach ($types as $type) {
-            $type->finishView($view, $this->block, $options);
-            $this->registry->finishView($type->getName(), $view, $this->block, $options);
+            $type->finishView($view, $this->block);
+            $this->registry->finishView($type->getName(), $view, $this->block);
         }
     }
 

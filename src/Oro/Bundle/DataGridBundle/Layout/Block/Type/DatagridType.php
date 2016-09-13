@@ -44,12 +44,11 @@ class DatagridType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $options = $options->toArray();
-        $view->vars['grid_name'] = $options['grid_name'];
-        $view->vars['grid_parameters'] = $options['grid_parameters'];
-        $view->vars['grid_render_parameters'] = $options['grid_render_parameters'];
+        $view->vars['grid_name'] = $options->get('grid_name', false);
+        $view->vars['grid_parameters'] = $options->get('grid_parameters', false);
+        $view->vars['grid_render_parameters'] = $options->get('grid_render_parameters', false);
         if (!empty($options['grid_scope'])) {
-            $view->vars['grid_scope']     = $options['grid_scope'];
+            $view->vars['grid_scope']     = $options->get('grid_scope', false);
             $view->vars['grid_full_name'] = $this->nameStrategy->buildGridFullName(
                 $view->vars['grid_name'],
                 $view->vars['grid_scope']

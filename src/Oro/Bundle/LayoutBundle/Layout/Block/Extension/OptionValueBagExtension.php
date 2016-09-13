@@ -37,7 +37,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
         if ($options['resolve_value_bags']) {
-            $this->resolveValueBags($options);
+            $this->resolveOptions($options);
         }
     }
 
@@ -53,24 +53,28 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     {
         $exprEvaluate = $block->getContext()->getOr('expressions_evaluate');
         if ($view->vars['resolve_value_bags'] && $exprEvaluate) {
-            $this->resolveValueBags($view->vars);
+            array_walk_recursive($view->vars, function(&$var) {
+                if ($var instanceof OptionValueBag) {
+                    $var = $var->buildValue($this->getOptionsBuilder($var));
+                }
+            });
         }
     }
 
     /**
-     * @param Options $options
+     * @param  $options
      * @return Options
      */
-    protected function resolveValueBags($options)
+    protected function resolveOptions(Options $options)
     {
         foreach ($options as $key => $value) {
             if ($value instanceof Expression) {
                 continue;
             }
             if ($value instanceof Options) {
-                $options[$key] = $this->resolveValueBags($value);
+                $options[$key] = $this->resolveOptions($value);
             } elseif ($value instanceof OptionValueBag) {
-                $options[$key] = $value->buildValue($this->getOptionsBuilder($value, $options));
+                $options[$key] = $value->buildValue($this->getOptionsBuilder($value));
             }
         }
 
@@ -79,10 +83,9 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
 
     /**
      * @param OptionValueBag $valueBag
-     * @param Options $options
      * @return OptionValueBuilderInterface
      */
-    protected function getOptionsBuilder(OptionValueBag $valueBag, Options $options)
+    protected function getOptionsBuilder(OptionValueBag $valueBag)
     {
         $isArray = false;
 

@@ -7,7 +7,6 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
@@ -49,14 +48,14 @@ class ExpressionProcessor
     }
 
     /**
-     * @param Options               $values
+     * @param array                 $values
      * @param ContextInterface      $context
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
      * @param string                $encoding
      */
     public function processExpressions(
-        &$values,
+        array &$values,
         ContextInterface $context,
         DataAccessorInterface $data = null,
         $evaluate = true,
@@ -68,7 +67,7 @@ class ExpressionProcessor
         if (isset($values['data']) || isset($values['context'])) {
             throw new \InvalidArgumentException('"data" and "context" should not be used as value keys.');
         }
-        $this->values = $values instanceof Options ? $values->toArray() : $values;
+        $this->values = $values;
         $this->processingValues = [];
         $this->processedValues = [];
         foreach ($values as $key => $value) {
@@ -128,7 +127,7 @@ class ExpressionProcessor
                     $value = substr($value, 1);
                     break;
             }
-        } elseif ($value instanceof Options) {
+        } elseif (is_array($value)) {
             foreach ($value as $key => $item) {
                 $this->processValue($item, $context, $data, $evaluate, $encoding);
                 $value[$key] = $item;

@@ -14,9 +14,7 @@ class Options implements \ArrayAccess, \Iterator
      */
     public function __construct(array $data = [])
     {
-        foreach ($data as $key => $value) {
-            $this[$key] = $value;
-        }
+        $this->setMultiple($data);
     }
 
     /**
@@ -114,6 +112,16 @@ class Options implements \ArrayAccess, \Iterator
         }
 
         return $data;
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setMultiple(array $data)
+    {
+        foreach ($data as $key => $value) {
+            $this[$key] = $value;
+        }
     }
 
     /**
