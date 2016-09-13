@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Filter;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
@@ -26,10 +26,10 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         /* @var $formFactory FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $formFactory = $this->getMock(FormFactoryInterface::class);
 
         /* @var $filterUtility FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
-        $filterUtility = $this->getMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
+        $filterUtility = $this->getMock(FilterUtility::class);
 
         $this->filter = new SearchStringFilter($formFactory, $filterUtility);
         $this->filter->init('foo', [

@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 class SearchStringFilter extends AbstractFilter
 {
@@ -20,37 +21,37 @@ class SearchStringFilter extends AbstractFilter
 
     /**
      * @param FilterDatasourceAdapterInterface $ds
-     * @param mixed $data
+     * @param mixed                            $data
      * @return bool|void
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
 
-        if ($ds instanceof SearchFilterDatasourceAdapter) {
-            switch ($data['type']) {
-                case SearchStringFilterType::TYPE_EQUAL:
-                    $ds->getWrappedSearchQuery()
-                        ->getCriteria()
-                        ->andWhere($ds->expr()->eq($fieldName, $data['value']));
-
-                    return;
-                case SearchStringFilterType::TYPE_CONTAINS:
-                    $ds->getWrappedSearchQuery()
-                        ->getCriteria()
-                        ->andWhere($ds->expr()->like($fieldName, $data['value']));
-
-                    return;
-                case SearchStringFilterType::TYPE_NOT_CONTAINS:
-                    $ds->getWrappedSearchQuery()
-                        ->getCriteria()
-                        ->andWhere($ds->expr()->notLike($fieldName, $data['value']));
-
-                    return;
-            }
+        if (!$ds instanceof SearchFilterDatasourceAdapter) {
+            throw new \RuntimeException('Invalid filter datasource adapter provided: ' . get_class($ds));
         }
 
-        throw new \RuntimeException('Invalid filter datasource adapter provided to '.self::class);
+        switch ($data['type']) {
+            case SearchStringFilterType::TYPE_EQUAL:
+                $ds->getWrappedSearchQuery()
+                    ->getCriteria()
+                    ->andWhere(Criteria::expr()->eq($fieldName, $data['value']));
+
+                return;
+            case SearchStringFilterType::TYPE_CONTAINS:
+                $ds->getWrappedSearchQuery()
+                    ->getCriteria()
+                    ->andWhere(Criteria::expr()->contains($fieldName, $data['value']));
+
+                return;
+            case SearchStringFilterType::TYPE_NOT_CONTAINS:
+                $ds->getWrappedSearchQuery()
+                    ->getCriteria()
+                    ->andWhere(Criteria::expr()->notContains($fieldName, $data['value']));
+
+                return;
+        }
     }
 
     /**
