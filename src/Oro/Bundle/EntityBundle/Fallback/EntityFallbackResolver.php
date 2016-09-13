@@ -152,7 +152,7 @@ class EntityFallbackResolver
             return $fallbackValue;
         }
         // if fallback id is not provided and object has an own value, return it
-        if (is_null($fallbackValue->getFallback()) && $fallbackValue->getOwnValue()) {
+        if (is_null($fallbackValue->getFallback()) && !is_null($fallbackValue->getOwnValue())) {
             return $this->resolveValueByType($fallbackValue->getOwnValue(), $object, $objectFieldName);
         }
 

@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EntityBundle\Fallback\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityBundle\Exception\InvalidFallbackProviderArgumentException;
+use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackProviderArgumentException;
+use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 
 class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
 {
@@ -30,8 +32,12 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
         $object,
         $objectFieldName
     ) {
-        $fallbackConfig = $this->getEntityConfig($object, $objectFieldName)[self::FALLBACK_ID];
-        if (!array_key_exists(self::CONFIG_NAME_KEY, $fallbackConfig)) {
+        $fallbackConfig = $this->getEntityConfig(
+            $object,
+            $objectFieldName
+        );
+        $systemConfig = $fallbackConfig[EntityFieldFallbackValue::FALLBACK_LIST_KEY][self::FALLBACK_ID];
+        if (!array_key_exists(self::CONFIG_NAME_KEY, $systemConfig)) {
             throw new InvalidFallbackProviderArgumentException(
                 sprintf(
                     "You must define the '%s' fallback option for entity '%s' field '%s', fallback id '%s'",
@@ -43,8 +49,6 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
             );
         }
 
-        $configName = $fallbackConfig[self::CONFIG_NAME_KEY];
-
-        return $this->configManager->get($configName);
+        return $this->configManager->get($systemConfig[self::CONFIG_NAME_KEY]);
     }
 }

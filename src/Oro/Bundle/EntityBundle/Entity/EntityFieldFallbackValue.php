@@ -4,9 +4,12 @@ namespace Oro\Bundle\EntityBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 /**
  * @ORM\Table(name="oro_entity_fallback_value")
  * @ORM\Entity()
+ * @Config()
  */
 class EntityFieldFallbackValue
 {
