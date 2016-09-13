@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 
+use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
@@ -127,5 +129,102 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     public function pressCreateUserButton()
     {
         $this->getPage()->find('css', 'div.title-buttons-container a.btn-primary')->click();
+    }
+
+    /**
+     * @When /^(?:|I )click icon bars$/
+     */
+    public function clickBarsIcon()
+    {
+        $this->getPage()->find('css', 'i.icon-bars')->click();
+    }
+
+    /**
+     * @Then /^(?P<tab>(History|Most Viewed|Favorites)) must looks like:$/
+     */
+    public function historyMustLooksLike($tab, TableNode $table)
+    {
+        $content = $this->createElement($tab.' Content');
+        self::assertTrue($content->isVisible());
+
+        /** @var NodeElement $item */
+        foreach ($content->findAll('css', 'ul li a') as $key => $item) {
+            self::assertEquals(
+                $table->getRow($key)[0],
+                trim($item->getText())
+            );
+        }
+    }
+
+    /**
+     * @When /^(?:|I )choose (?P<link>(History|Most Viewed|Favorites)) tab$/
+     */
+    public function chooseQuickMenuTab($link)
+    {
+        $this->getPage()->clickLink($link);
+    }
+
+    /**
+     * @When /^(?:|I )(?P<action>(add|remove)) page (to|from) favorites$/
+     */
+    public function iAddOrRemovePageToFavorites($action)
+    {
+        $button = $this->createElement('AddToFavoritesButton');
+        self::assertTrue($button->isVisible());
+
+        $activeClass = 'gold-icon';
+
+        if ('add' === $action) {
+            if ($button->hasClass($activeClass)) {
+                self::fail('Can\'t add page to favorites, it is already in favorites');
+            }
+
+            $button->press();
+        } elseif ('remove' === $action) {
+            if (!$button->hasClass($activeClass)) {
+                self::fail('Can\'t remove page from favorites, it is not in favorites currently');
+            }
+
+            $button->press();
+        }
+    }
+
+    /**
+     * @When /^(?:|I )remove "(?P<record>[^"]+)" from favorites$/
+     */
+    public function removeFromFavorites($record)
+    {
+        $content = $this->createElement('Favorites Content');
+        self::assertTrue($content->isVisible());
+
+        $item = $content->findElementContains('QuickMenuContentItem', $record);
+        self::assertTrue($item->isVisible());
+
+        $item->find('css', 'button.close')->press();
+    }
+
+    /**
+     * @Then there are no pages in favorites
+     */
+    public function thereAreNoPagesInFavorites()
+    {
+        $content = $this->createElement('Favorites Content');
+        self::assertTrue($content->isVisible());
+
+        self::assertCount(0, $content->findAll('css', 'ul li'));
+    }
+
+    /**
+     * @Then /^(?:|I )click on "(?P<record>[^"]+)" in Favorites$/
+     */
+    public function iClickOnInFavorites($record)
+    {
+        $content = $this->createElement('Favorites Content');
+        self::assertTrue($content->isVisible());
+
+        $item = $content->findElementContains('QuickMenuContentItem', $record);
+        self::assertTrue($item->isVisible());
+
+        $item->find('css', 'a')->click();
     }
 }

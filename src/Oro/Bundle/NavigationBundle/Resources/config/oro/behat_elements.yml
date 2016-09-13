@@ -1,8 +1,28 @@
 behat_elements:
-    MainMenu:
-      selector: 'div#main-menu'
-      class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
+  MainMenu:
+    selector: 'div#main-menu'
+    class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
 
-    PinBarLink:
-      selector: '#pinbar div.list-bar .pin-holder a'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+  PinBarLink:
+    selector: '#pinbar div.list-bar .pin-holder a'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  AddToFavoritesButton:
+    selector: 'button.favorite-button'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  History Content:
+    selector: '#history-content'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  Most Viewed Content:
+    selector: '#mostviewed-content'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  Favorites Content:
+    selector: '#favorite-content'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  QuickMenuContentItem:
+    selector: 'ul li'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
