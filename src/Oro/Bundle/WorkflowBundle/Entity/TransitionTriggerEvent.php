@@ -172,10 +172,19 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
         return $this;
     }
 
-    protected function getEqualityProperties()
+    public function isEqualTo(AbstractTransitionTrigger $trigger)
     {
-        return [
-            'event', 'field', 'relation', 'require', 'entityClass', 'queued', 'workflowDefinition', 'transitionName'
-        ];
+        if (!$trigger instanceof static) {
+            return false;
+        }
+
+        return $this->workflowDefinition === $trigger->workflowDefinition
+        && $this->transitionName === $trigger->transitionName
+        && $this->entityClass === $trigger->entityClass
+        && $this->event === $trigger->event
+        && $this->field === $trigger->field
+        && $this->relation === $trigger->relation
+        && $this->require === $trigger->require
+        && $this->queued === $trigger->queued;
     }
 }

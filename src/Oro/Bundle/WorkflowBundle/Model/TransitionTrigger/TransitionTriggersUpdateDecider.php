@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 
-class TransitionTriggersUpdatePartition
+class TransitionTriggersUpdateDecider
 {
     /**
-     * @param ArrayCollection $existingTriggers
-     * @param ArrayCollection $newTriggers
-     * @return array A two elements array fist of which is a list of triggers that should be added, second - removed
+     * @param array $existingTriggers
+     * @param array $newTriggers
+     * @return array[] A two elements array fist of which is a list of triggers that should be added, second - removed
      */
-    public function partition(ArrayCollection $existingTriggers, ArrayCollection $newTriggers)
+    public function decide(array &$existingTriggers, array &$newTriggers)
     {
         $remove = [];
         $add = [];
@@ -32,7 +31,7 @@ class TransitionTriggersUpdatePartition
         return [$add, $remove];
     }
 
-    private function contains(ArrayCollection $triggers, AbstractTransitionTrigger $trigger)
+    private function contains(array &$triggers, AbstractTransitionTrigger $trigger)
     {
         foreach ($triggers as $match) {
             if ($trigger->isEqualTo($match)) {

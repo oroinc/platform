@@ -75,10 +75,16 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
         return $this;
     }
 
-    protected function getEqualityProperties()
+    public function isEqualTo(AbstractTransitionTrigger $trigger)
     {
-        return [
-            'cron', 'filter', 'workflowDefinition', 'transitionName'
-        ];
+        if (!$trigger instanceof static) {
+            return false;
+        }
+
+        return $this->cron === $trigger->cron
+        && $this->workflowDefinition === $trigger->workflowDefinition
+        && $this->queued === $trigger->queued
+        && $this->filter === $trigger->filter
+        && $this->transitionName === $trigger->transitionName;
     }
 }

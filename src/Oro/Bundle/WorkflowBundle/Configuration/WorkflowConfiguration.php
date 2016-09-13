@@ -363,7 +363,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->validate()
                     ->always(
                         function ($data) {
-                            $eventFields = ['relation', 'field', 'queued', 'entity_class', 'require'];
+                            $eventFields = ['relation', 'field', 'entity_class', 'require'];
                             if ($data['cron']) {
                                 foreach ($eventFields as $field) {
                                     if ($data[$field]) {

@@ -139,6 +139,27 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
+     * Pre persist event handler
+     *
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Pre update event handler
+     *
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
      * @param AbstractTransitionTrigger $trigger
      */
     protected function importMainData(AbstractTransitionTrigger $trigger)
@@ -148,23 +169,5 @@ abstract class AbstractTransitionTrigger
             ->setWorkflowDefinition($trigger->getWorkflowDefinition());
     }
 
-    public function isEqualTo(AbstractTransitionTrigger $trigger)
-    {
-        $class = get_class($trigger);
-        foreach ($this->getEqualityProperties() as $property) {
-            if (!property_exists($class, $property)) {
-                return false;
-            }
-            if ($this->{$property} !== $trigger->{$property}) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @return array A list of fields that should be identical to be sure triggers are equal
-     */
-    abstract protected function getEqualityProperties();
+    abstract public function isEqualTo(AbstractTransitionTrigger $trigger);
 }
