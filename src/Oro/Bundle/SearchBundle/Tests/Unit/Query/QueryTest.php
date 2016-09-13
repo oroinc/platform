@@ -211,7 +211,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $selectFieldsProperty = $reflectionObject->getProperty('select');
         $selectFieldsProperty->setAccessible(true);
 
-        $aliasesProperty = $reflectionObject->getProperty('fieldsAliases');
+        $aliasesProperty = $reflectionObject->getProperty('selectAliases');
         $aliasesProperty->setAccessible(true);
 
         $fields = $selectFieldsProperty->getValue($query);

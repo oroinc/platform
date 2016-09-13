@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Datasource\Search;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -24,19 +25,23 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testUsingStringFilter()
+    public function testInApplyFromStringFilter()
     {
         $innerQuery = $this->getMock(Query::class);
 
         $this->query->method('getQuery')->willReturn($innerQuery);
 
-        $innerQuery->expects($this->once())
+        $criteria = $this->getMock(Criteria::class);
+
+        $criteria->expects($this->once())
             ->method('andWhere')
             ->with(
-                'foo',
-                Query::OPERATOR_CONTAINS,
-                'bar'
+                Criteria::expr()->contains('foo', 'bar')
             );
+
+        $innerQuery->expects($this->once())
+            ->method('getCriteria')
+            ->willReturn($criteria);
 
         $ds = new SearchFilterDatasourceAdapter($this->query);
 
@@ -108,5 +113,15 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
         $this->query->method('getQuery')->willReturn($innerQuery);
         $ds = new SearchFilterDatasourceAdapter($this->query);
         $this->assertEquals($ds->getWrappedSearchQuery(), $innerQuery);
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Use Criteria::expr() instead.
+     */
+    public function testExpr()
+    {
+        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $expr = $ds->expr();
     }
 }
