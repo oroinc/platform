@@ -297,6 +297,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @When /^(?:|I )click on "(?P<element>[\w\s]+)"$/
+     */
+    public function iClickOn($element)
+    {
+        $this->createElement($element)->click();
+    }
+
+    /**
      * @Then /^(?:|I )should see large image$/
      */
     public function iShouldSeeLargeImage()
