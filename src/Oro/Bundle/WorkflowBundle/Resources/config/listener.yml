@@ -69,4 +69,4 @@ services:
             - { name: oro_workflow.changes.subscriber }
 
     oro_workflow.event_listener.transition_triggers:
-        class:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener'

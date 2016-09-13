@@ -73,4 +73,11 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
 
         return $this;
     }
+
+    protected function getEqualityProperties()
+    {
+        return [
+            'cron', 'filter', 'workflowDefinition', 'transitionName'
+        ];
+    }
 }

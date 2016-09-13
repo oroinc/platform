@@ -138,4 +138,11 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
 
         return $this;
     }
+
+    protected function getEqualityProperties()
+    {
+        return [
+            'event', 'field', 'relation', 'require', 'entityClass', 'queued', 'workflowDefinition', 'transitionName'
+        ];
+    }
 }

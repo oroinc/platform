@@ -163,14 +163,6 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
-     * @return string
-     */
-    public function getRelation()
-    {
-        return $this->relation;
-    }
-
-    /**
      * @param string $relation
      * @return $this
      */
@@ -282,4 +274,24 @@ abstract class AbstractTransitionTrigger
         $this->setQueued($trigger->isQueued())
             ->setWorkflowDefinition($trigger->getWorkflowDefinition());
     }
+
+    public function isEqualTo(AbstractTransitionTrigger $trigger)
+    {
+        $class = get_class($trigger);
+        foreach ($this->getEqualityProperties() as $property) {
+            if (!property_exists($class, $property)) {
+                return false;
+            }
+            if ($this->{$property} !== $trigger->{$property}) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array A list of fields that should be identical to be sure triggers are equal
+     */
+    abstract protected function getEqualityProperties();
 }
