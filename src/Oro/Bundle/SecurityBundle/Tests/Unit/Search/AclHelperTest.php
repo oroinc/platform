@@ -59,9 +59,6 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    /**
-     *  @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
     public function setUp()
     {
         $this->mappingProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Provider\SearchMappingProvider')
