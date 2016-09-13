@@ -22,10 +22,12 @@ class MenuUpdateTest extends \PHPUnit_Framework_TestCase
     public function testGetExtras()
     {
         $title = 'test title';
+        $priority = 10;
 
         $update = new MenuUpdate();
         $update->setTitle($title);
+        $update->setPriority($priority);
 
-        $this->assertEquals(['title' => $title], $update->getExtras());
+        $this->assertEquals(['title' => $title, 'position' => $priority], $update->getExtras());
     }
 }
