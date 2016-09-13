@@ -31,7 +31,6 @@ class AddImpersonationTable implements Migration
         $table->addColumn('expire_at', 'datetime', []);
         $table->addColumn('login_at', 'datetime', ['notnull' => false]);
         $table->addIndex(['token'], 'token_idx', []);
-        $table->addIndex(['user_id'], 'idx_385f2b6ca76ed395', []);
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
