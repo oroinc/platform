@@ -46,7 +46,6 @@ class GroupChoiceField extends Element
         return array_keys(array_filter($this->findChoices(), function (NodeElement $element) {
             return $element->isChecked();
         }));
-
     }
 
     /**
