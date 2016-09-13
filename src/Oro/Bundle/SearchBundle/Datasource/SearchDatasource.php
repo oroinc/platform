@@ -27,6 +27,9 @@ class SearchDatasource implements DatasourceInterface
     /** @var DatagridInterface */
     protected $datagrid;
 
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
     /**
      * @param QueryFactoryInterface    $factory
      * @param EventDispatcherInterface $eventDispatcher
