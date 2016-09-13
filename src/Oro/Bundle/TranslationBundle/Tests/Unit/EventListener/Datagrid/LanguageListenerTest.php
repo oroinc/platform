@@ -7,9 +7,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 
@@ -20,6 +24,12 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
+
+    /** @var GridConfigurationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $gridConfigurationHelper;
+
+    /** @var TranslationKeyRepository|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationKeyRepository;
 
     /** @var LanguageListener */
     protected $listener;
@@ -34,7 +44,19 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new LanguageListener($this->languageHelper, $this->doctrineHelper);
+        $this->gridConfigurationHelper = $this->getMockBuilder(GridConfigurationHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translationKeyRepository = $this->getMockBuilder(TranslationKeyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->listener = new LanguageListener(
+            $this->languageHelper,
+            $this->doctrineHelper,
+            $this->gridConfigurationHelper
+        );
     }
 
     protected function tearDown()
@@ -46,9 +68,20 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
     {
         $event = new BuildBefore($this->getMock(DatagridInterface::class), DatagridConfiguration::create([]));
 
+        $this->gridConfigurationHelper->expects($this->once())
+            ->method('getEntityRootAlias')
+            ->with($event->getConfig())
+            ->willReturn('rootAlias');
+
         $this->listener->onBuildBefore($event);
 
-        $this->assertEquals(['columns' => $this->getColumns()], $event->getConfig()->toArray());
+        $this->assertEquals(
+            [
+                'columns' => $this->getColumns(),
+                'source' => $this->getSource('rootAlias'),
+            ],
+            $event->getConfig()->toArray()
+        );
     }
 
     public function testOnBuildBeforeAndExistingDefinition()
@@ -67,13 +100,24 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             ])
         );
 
+        $this->gridConfigurationHelper->expects($this->once())
+            ->method('getEntityRootAlias')
+            ->with($event->getConfig())
+            ->willReturn('rootAlias');
+
         $this->listener->onBuildBefore($event);
 
         $columns = $this->getColumns();
         $columns[LanguageListener::COLUMN_STATUS]['label'] = 'custom_label1';
         $columns[LanguageListener::COLUMN_COVERAGE]['label'] = 'custom_label2';
 
-        $this->assertEquals(['columns' => $columns], $event->getConfig()->toArray());
+        $this->assertEquals(
+            [
+                'columns' => $columns,
+                'source' => $this->getSource('rootAlias'),
+            ],
+            $event->getConfig()->toArray()
+        );
     }
 
     public function testOnResultAfter()
@@ -88,12 +132,14 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
                 [Language::class, 2, $lang2],
             ]));
 
-        $this->languageHelper->expects($this->any())
-            ->method('getTranslationStatus')
-            ->will($this->returnValueMap([
-                [$lang1, 0],
-                [$lang2, 50],
-            ]));
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->with(TranslationKey::class)
+            ->willReturn($this->translationKeyRepository);
+
+        $this->translationKeyRepository->expects($this->once())
+            ->method('getCount')
+            ->willReturn(100);
 
         $this->languageHelper->expects($this->any())
             ->method('isAvailableUpdateTranslates')
@@ -102,7 +148,10 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
                 [$lang2, true],
             ]));
 
-        $event = $this->getEvent([1, 2]);
+        $event = $this->getEvent([
+            ['id' => 1, LanguageListener::STATS_COUNT => null],
+            ['id' => 2, LanguageListener::STATS_COUNT => 50],
+        ]);
 
         $this->listener->onResultAfter($event);
 
@@ -110,13 +159,15 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             [
                 new ResultRecord([
                     'id' => 1,
+                    LanguageListener::STATS_COUNT => null,
                     LanguageListener::STATS_COVERAGE_NAME => 0,
                     LanguageListener::STATS_INSTALLED => false,
                     LanguageListener::STATS_AVAILABLE_UPDATE => false,
                 ]),
                 new ResultRecord([
                     'id' => 2,
-                    LanguageListener::STATS_COVERAGE_NAME => 50,
+                    LanguageListener::STATS_COUNT => 50,
+                    LanguageListener::STATS_COVERAGE_NAME => 0.5,
                     LanguageListener::STATS_INSTALLED => true,
                     LanguageListener::STATS_AVAILABLE_UPDATE => true,
                 ]),
@@ -126,14 +177,14 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $ids
+     * @param array $items
      * @return OrmResultAfter
      */
-    protected function getEvent(array $ids)
+    protected function getEvent(array $items)
     {
         $records = [];
-        foreach ($ids as $id) {
-            $records[] = new ResultRecord(['id' => $id]);
+        foreach ($items as $item) {
+            $records[] = new ResultRecord($item);
         }
 
         return new OrmResultAfter($this->getMock(DatagridInterface::class), $records);
@@ -156,6 +207,31 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
                 'type' => 'twig',
                 'frontend_type' => 'html',
                 'template' => 'OroTranslationBundle:Language:Datagrid/translationCompleteness.html.twig',
+            ],
+        ];
+    }
+
+    /**
+     * @param string $rootAlias
+     * @return array
+     */
+    protected function getSource($rootAlias)
+    {
+        return [
+            'query' => [
+                'select' => [
+                    sprintf('COUNT(translation) %s', LanguageListener::STATS_COUNT),
+                ],
+                'join' => [
+                    'left' => [
+                        [
+                            'join' => Translation::class,
+                            'alias' => 'translation',
+                            'conditionType' => 'WITH',
+                            'condition' => sprintf('translation.language = %s', $rootAlias),
+                        ]
+                    ],
+                ],
             ],
         ];
     }

@@ -194,6 +194,7 @@ services:
         arguments:
             - '@oro_translation.helper.language'
             - '@oro_entity.doctrine_helper'
+            - '@oro_datagrid.grid_configuration.helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-language-grid, method: onResultAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-language-grid, method: onBuildBefore }
