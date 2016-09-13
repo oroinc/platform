@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
@@ -37,6 +38,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  */
 abstract class AbstractTransitionTrigger
 {
+    use DatesAwareTrait;
+
     /**
      * @var integer
      *
@@ -47,20 +50,13 @@ abstract class AbstractTransitionTrigger
     protected $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_class", type="string", length=255)
-     */
-    protected $entityClass;
-
-    /**
      * Whether transition should be queued or done immediately
      *
      * @var boolean
      *
      * @ORM\Column(name="queued", type="boolean")
      */
-    protected $queued = false;
+    protected $queued = true;
 
     /**
      * @var string
@@ -78,69 +74,11 @@ abstract class AbstractTransitionTrigger
     protected $workflowDefinition;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
      * @return integer
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityClass()
-    {
-        return $this->entityClass;
-    }
-
-    /**
-     * @param string $entityClass
-     * @return $this
-     */
-    public function setEntityClass($entityClass)
-    {
-        $this->entityClass = $entityClass;
-
-        return $this;
     }
 
     /**
@@ -158,17 +96,6 @@ abstract class AbstractTransitionTrigger
     public function setTransitionName($transitionName)
     {
         $this->transitionName = $transitionName;
-
-        return $this;
-    }
-
-    /**
-     * @param string $relation
-     * @return $this
-     */
-    public function setRelation($relation)
-    {
-        $this->relation = $relation;
 
         return $this;
     }
@@ -212,66 +139,12 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
-     * @param \DateTime $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     * @return $this
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->preUpdate();
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-    }
-
-    /**
      * @param AbstractTransitionTrigger $trigger
      */
-    protected function importData(AbstractTransitionTrigger $trigger)
+    protected function importMainData(AbstractTransitionTrigger $trigger)
     {
         $this->setQueued($trigger->isQueued())
+            ->setTransitionName($trigger->getTransitionName())
             ->setWorkflowDefinition($trigger->getWorkflowDefinition());
     }
 

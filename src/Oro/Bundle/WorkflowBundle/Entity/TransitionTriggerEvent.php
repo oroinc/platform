@@ -14,6 +14,15 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     const EVENT_DELETE = 'delete';
 
     /**
+     * Entity from event
+     *
+     * @var string
+     *
+     * @ORM\Column(name="entity_class", type="string", length=255)
+     */
+    protected $entityClass;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="event", type="string", length=255)
@@ -35,11 +44,32 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     protected $require;
 
     /**
+     * Expression Language condition
+     *
      * @var string
      *
      * @ORM\Column(name="relation", type="text", length=1024, nullable=true)
      */
     protected $relation;
+
+    /**
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    /**
+     * @param string $entityClass
+     * @return $this
+     */
+    public function setEntityClass($entityClass)
+    {
+        $this->entityClass = $entityClass;
+
+        return $this;
+    }
 
     /**
      * @return string
@@ -131,10 +161,13 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
      */
     public function import(TransitionTriggerEvent $trigger)
     {
-        $this->setEvent($trigger->getEvent())
-            ->setField($trigger->getField());
+        $this->importMainData($trigger);
 
-        parent::importData($trigger);
+        $this->setEvent($trigger->getEvent())
+            ->setEntityClass($trigger->getEntityClass())
+            ->setField($trigger->getField())
+            ->setRequire($trigger->getRequire())
+            ->setRelation($trigger->getRelation());
 
         return $this;
     }

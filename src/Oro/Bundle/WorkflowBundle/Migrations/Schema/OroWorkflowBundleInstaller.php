@@ -263,18 +263,18 @@ class OroWorkflowBundleInstaller implements Installation
         $table = $schema->createTable('oro_workflow_trans_trigger');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('workflow_name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('entity_class', 'string', ['length' => 255]);
+        $table->addColumn('entity_class', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('queued', 'boolean', []);
         $table->addColumn('transition_name', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('cron', 'string', ['notnull' => false, 'length' => 100]);
-        $table->addColumn('filter', 'text', ['notnull' => false, 'length' => 65535]);
+        $table->addColumn('filter', 'text', ['notnull' => false]);
         $table->addColumn('event', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('field', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('require', 'text', ['notnull' => false, 'length' => 65535]);
-        $table->addColumn('relation', 'text', ['notnull' => false, 'length' => 65535]);
+        $table->addColumn('require', 'text', ['notnull' => false]);
+        $table->addColumn('relation', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
     }
 

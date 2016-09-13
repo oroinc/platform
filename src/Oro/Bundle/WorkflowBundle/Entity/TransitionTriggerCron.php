@@ -67,9 +67,10 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
      */
     public function import(TransitionTriggerCron $trigger)
     {
-        $this->setCron($trigger->getCron());
+        $this->importMainData($trigger);
 
-        parent::importData($trigger);
+        $this->setCron($trigger->getCron())
+            ->setFilter($trigger->getFilter());
 
         return $this;
     }
