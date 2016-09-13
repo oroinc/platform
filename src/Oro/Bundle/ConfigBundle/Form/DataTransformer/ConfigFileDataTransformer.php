@@ -58,7 +58,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (null === $value) {
+        if (!$value) {
             return null;
         }
 
@@ -71,15 +71,27 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      */
     public function reverseTransform($file)
     {
-        if (null === $file || $file->isEmptyFile()) {
+        if (null === $file) {
             return '';
         }
 
         $em = $this->doctrineHelper->getEntityManagerForClass(File::class);
 
-        $httpFile = $file->getFile();
+        if ($file->isEmptyFile()) {
+            if ($file->getId()) {
+                $this->fileManager->deleteFile($file->getFilename());
+                $em->remove($file);
+                $em->flush($file);
+            }
 
-        if ($httpFile && $httpFile->isFile() && $this->isValidHttpFile($httpFile)) {
+            return '';
+        }
+
+        if (!$httpFile = $file->getFile()) {
+            return '';
+        }
+
+        if ($httpFile->isFile() && $this->isValidHttpFile($httpFile)) {
             $file = clone $file;
             $file->preUpdate();
             $em->persist($file);

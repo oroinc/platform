@@ -78,14 +78,15 @@ class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testReverseTransformNull()
     {
-        $this->assertNull($this->transformer->reverseTransform(null));
+        $this->assertEquals('', $this->transformer->reverseTransform(null));
     }
 
     public function testReverseTransformEmptyFile()
     {
-        $file = new File();
-        $file->setEmptyFile(true);
-        $file->setFilename(self::FILENAME);
+        $file = $this->prophesize(File::class);
+        $file->getId()->willReturn(1);
+        $file->isEmptyFile()->willReturn(true);
+        $file->getFilename()->willReturn(self::FILENAME);
 
         $em = $this->prepareEntityManager();
         $em->remove($file)->shouldBeCalled();
@@ -93,7 +94,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
 
         $this->fileManager->deleteFile(self::FILENAME)->shouldBeCalled();
 
-        $this->assertNull($this->transformer->reverseTransform($file));
+        $this->assertEquals('', $this->transformer->reverseTransform($file->reveal()));
     }
 
     public function testReverseTransformValidFile()

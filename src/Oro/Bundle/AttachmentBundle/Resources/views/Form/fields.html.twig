@@ -20,12 +20,14 @@
                 <div id="{{ divId }}" class="well well-small oro_attachment_file">
                     {{ oro_file_view(parentEntity, fieldName, value) }}
                     {{ form_row(form.emptyFile) }}
-                    <button id="{{ buttonId }}"
-                            class="btn btn-action btn-link delete"
-                            type="button"
-                            data-related="{{ form.emptyFile.vars.name }}"
-                            {% if form.emptyFile.vars.disabled %}disabled="disabled"{% endif %}
-                    ></button>
+                    {% if form.vars.allow_delete %}
+                        <button id="{{ buttonId }}"
+                                class="btn btn-action btn-link delete"
+                                type="button"
+                                data-related="{{ form.emptyFile.vars.name }}"
+                                {% if form.emptyFile.vars.disabled %}disabled="disabled"{% endif %}
+                        ></button>
+                    {% endif %}
                 </div>
                 <script type="text/javascript">
                     require(['jquery'],
