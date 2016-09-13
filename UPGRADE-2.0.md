@@ -112,6 +112,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Entity config `workflow.active_workflows` was removed. Use workflows configuration boolean node `defaults.active` instead.
 * Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
 * Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
+- `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
@@ -127,6 +128,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Changed signature of constructor of `Oro\Bundle\LocaleBundle\Form\Type\LanguageType` - now it takes following arguments:
     - `ConfigManager $cm`,
     - `LanguageProvider $languageProvider`.
+- `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
@@ -237,6 +239,11 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
         `ConfigManager` $configManager
 - Entity extend configuration now loads from `Resources/conig/oro/entity_extend.yml` file instead of `Resources/config/entity_extend.yml`
 - Root node for entity extend configuration in file `Resources/conig/oro/entity_extend.yml` were changed from `oro_entity_extend` to `entity_extend`
+- `Oro\Bundle\EntityExtendBundle\Command\CacheCommand::setClassAliases` no longer throws `\ReflectionException`
+- `Oro\Bundle\EntityExtendBundle\OroEntityExtendBundle::checkConfigs` and `Oro\Bundle\EntityExtendBundle\OroEntityExtendBundle::initializeCache`
+throws `\RuntimeException` if cache initialization failed. Make sure you don't autoload extended entity classes during container compilation.
+- `cache_warmer` is decorated to allow disable cache warming during extend commands calls. Tag your warmer with `oro_entity_extend.warmer`
+tag if it works with extend classes
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
@@ -267,6 +274,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 ####SearchBundle:
 - Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
 - Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
+- `oro_search.entity.repository.search_index` marked as lazy
 - Search `\Oro\Bundle\SearchBundle\Query\Query::addSelect()` and `\Oro\Bundle\SearchBundle\Query\Query::select()` have been extended to support the SQL aliasing syntax. New method `\Oro\Bundle\SearchBundle\Query\Query::getSelectAliases()` added to the public interface. 
 - `\Oro\Bundle\SearchBundle\Query\IndexerQuery` has now an interface `\Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and an abstract base class with common operations
 - `\Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager` is no longer depending on IndexerQuery
@@ -306,3 +314,40 @@ placeholders:
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` changed. Added `ConfigManager $configManager` as last argument.
+- `Oro/Bundle/EmailBundle/Cache/EntityCacheClearer` deprecated, tag on `oro_email.entity.cache.clearer` removed
+- `oro_email.email_address.entity_manager` inherits `oro_entity.abstract_entity_manager`
+- `Oro/Bundle/EmailBundle/Entity/MailboxProcessSettings` no longer inherits `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings`
+- `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` removed
+
+####EntityBundle
+- `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
+
+Before
+```
+oro_workflow.repository.workflow_item:
+    class: Doctrine\ORM\EntityRepository
+    factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+```
+
+After
+```
+oro_workflow.repository.workflow_item:
+    class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
+    parent: oro_entity.abstract_repository
+```
+
+- `oro_entity.abstract_entity_manager` introduced. Please inherit all your doctrine entity manager factory services
+
+Before
+```
+oro_email.email_address.entity_manager:
+    public: false
+    class: Doctrine\ORM\EntityManager
+    factory: ['@doctrine', getManagerForClass]
+```
+
+After
+```
+oro_email.email_address.entity_manager:
+    parent: oro_entity.abstract_entity_manager
+```

@@ -1,0 +1,23 @@
+.notifications {
+    padding: $notifications-inner-offset;
+    margin: $notifications-offset;
+
+    background-color: $notifications-color;
+    color: $notifications-text-color;
+
+    &--error {
+        background-color: $notifications-error-color;
+        color: $notifications-error-text-color;
+    }
+
+    &--success {
+        background-color: $notifications-success-color;
+        color: $notifications-success-text-color;
+    }
+
+    &--warring {
+        background-color: $notifications-warring-color;
+        color: $notifications-warring-text-color;
+
+    }
+}
