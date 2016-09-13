@@ -43,10 +43,9 @@ class TransitionTriggersUpdater
 
         $triggers = $triggersBag->getTriggers();
 
-        list($add, $remove) = $this->updateDecider->decide($this->getStoredDefinitionTriggers($definition), $triggers);
+        $existingTriggers = $this->getStoredDefinitionTriggers($definition);
 
-        var_dump($add, 'add');
-        var_dump($remove, 'rm');
+        list($add, $remove) = $this->updateDecider->decide($existingTriggers, $triggers);
 
         if (count($remove) !== 0 || count($add) !== 0) {
             $em = $this->getEntityManager();
@@ -71,7 +70,7 @@ class TransitionTriggersUpdater
     {
         return $this->doctrineHelper->getEntityRepository(AbstractTransitionTrigger::class)->findBy(
             [
-                'workflowDefinition' => $workflowDefinition
+                'workflowDefinition' => $workflowDefinition->getName()
             ]
         );
     }

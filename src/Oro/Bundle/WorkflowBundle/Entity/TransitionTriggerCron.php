@@ -87,4 +87,19 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
         && $this->filter === $trigger->filter
         && $this->transitionName === $trigger->transitionName;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf(
+            'cron: [%s:%s](%s):%s%s',
+            $this->workflowDefinition ? $this->workflowDefinition->getName() : 'null',
+            $this->transitionName,
+            $this->cron,
+            $this->filter,
+            $this->queued ? '- - ->' : '===>'
+        );
+    }
 }

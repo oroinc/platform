@@ -35,6 +35,7 @@ class TriggersBag
      */
     protected function addTrigger(AbstractTransitionTrigger $trigger)
     {
+        $trigger->setWorkflowDefinition($this->definition);
         $this->triggers[] = $trigger;
     }
 

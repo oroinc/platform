@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
 {
@@ -69,9 +70,15 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
     {
         $cases = [];
 
+        $wd1 = (new WorkflowDefinition())->setName('wd1');
+        $wd2 = (new WorkflowDefinition())->setName('wd2');
+
         $fieldsSets = [
             'cron' => ['1 * * * *', '* * * * *'],
-            'filter' => ['w = 1', 'w = 2']
+            'filter' => ['w = 1', 'w = 2'],
+            'queued' => [true, false],
+            'workflowDefinition' => [$wd1, $wd2],
+            'transitionName' => ['t1', 't2']
         ];
         $nullsExceptOne = [];
 
