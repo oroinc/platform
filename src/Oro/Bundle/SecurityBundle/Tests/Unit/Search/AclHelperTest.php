@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Search;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 
-class TestAclHelper extends \PHPUnit_Framework_TestCase
+class AclHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AclHelper */
     protected $aclHelper;
@@ -14,21 +14,61 @@ class TestAclHelper extends \PHPUnit_Framework_TestCase
     protected $mappingProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipDataBuilder;
+
+    /** @var array */
+    protected $mappings = [
+        'Oro\Test\Entity\User'      => [
+            'alias'        => 'testUser',
+            'aclCondition' => [null, null, null, null] // no access
+        ],
+        'Oro\Test\Entity\Product'   => [
+            'alias'        => 'testProduct',
+            'aclCondition' => [] // full access
+        ],
+        'Oro\Test\Entity\Price'     => [
+            'alias'        => 'testPrice',
+            'aclCondition' => [
+                'owner',
+                null // full access
+            ]
+        ],
+        'Oro\Test\Entity\OrderItem' => [
+            'alias'        => 'testOrderItem',
+            'aclCondition' => [
+                'owner',
+                [] // no access
+            ]
+        ],
+        'Oro\Test\Entity\Category'  => [
+            'alias'        => 'testCategory',
+            'aclCondition' => [
+                'owner',
+                [3]
+            ]
+        ],
+        'Oro\Test\Entity\Order'     => [
+            'alias'        => 'testOrder',
+            'aclCondition' => [
+                'owner',
+                [3, 5, 4, 6]
+            ]
+        ],
+    ];
 
     /**
      *  @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setUp()
     {
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->mappingProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Provider\SearchMappingProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityFacade->expects($this->any())
-            ->method('getOrganizationId')
-            ->willReturn(1);
 
-        $this->mappingProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Provider\SearchMappingProvider')
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -37,46 +77,18 @@ class TestAclHelper extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->aclHelper = new AclHelper($this->mappingProvider, $securityFacade, $this->ownershipDataBuilder);
+        $this->aclHelper = new AclHelper($this->mappingProvider, $this->securityFacade, $this->ownershipDataBuilder);
+    }
 
-        $mappings = [
-            'Oro\Test\Entity\User'      => [
-                'alias'        => 'testUser',
-                'aclCondition' => null // no access
-            ],
-            'Oro\Test\Entity\Product'   => [
-                'alias'        => 'testProduct',
-                'aclCondition' => [] // full access
-            ],
-            'Oro\Test\Entity\Price'     => [
-                'alias'        => 'testPrice',
-                'aclCondition' => [
-                    'owner',
-                    null // full access
-                ]
-            ],
-            'Oro\Test\Entity\OrderItem' => [
-                'alias'        => 'testOrderItem',
-                'aclCondition' => [
-                    'owner',
-                    [] // no access
-                ]
-            ],
-            'Oro\Test\Entity\Category'  => [
-                'alias'        => 'testCategory',
-                'aclCondition' => [
-                    'owner',
-                    [3]
-                ]
-            ],
-            'Oro\Test\Entity\Order'     => [
-                'alias'        => 'testOrder',
-                'aclCondition' => [
-                    'owner',
-                    [3, 5, 4, 6]
-                ]
-            ],
-        ];
+    /**
+     * @dataProvider applyTestCases
+     *
+     * @param mixed  $from
+     * @param string $expectedQuery
+     */
+    public function testApply($from, $expectedQuery)
+    {
+        $mappings = $this->mappings;
 
         $this->mappingProvider->expects($this->any())
             ->method('getEntitiesListAliases')
@@ -90,7 +102,6 @@ class TestAclHelper extends \PHPUnit_Framework_TestCase
                     return $result;
                 }
             );
-
         $this->mappingProvider->expects($this->any())
             ->method('getEntityClass')
             ->willReturnCallback(
@@ -105,6 +116,10 @@ class TestAclHelper extends \PHPUnit_Framework_TestCase
                 }
             );
 
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganizationId')
+            ->willReturn(1);
+
         $this->ownershipDataBuilder->expects($this->any())
             ->method('getAclConditionData')
             ->willReturnCallback(
@@ -118,16 +133,7 @@ class TestAclHelper extends \PHPUnit_Framework_TestCase
                     return null;
                 }
             );
-    }
 
-    /**
-     * @dataProvider applyTestCases
-     *
-     * @param mixed  $from
-     * @param string $expectedQuery
-     */
-    public function testApply($from, $expectedQuery)
-    {
         $query = new Query();
         $query->from($from);
         $this->aclHelper->apply($query);
@@ -141,7 +147,7 @@ class TestAclHelper extends \PHPUnit_Framework_TestCase
                 '*',
                 ' from testProduct, testPrice, testOrderItem, testCategory, testOrder where '
                 . '((integer testProduct_owner >= 0 or integer testPrice_owner >= 0 or integer '
-                . 'testOrderItem_owner in (0) or integer testCategory_owner = 3 or integer testOrder_owner '
+                . 'testOrderItem_owner = 0 or integer testCategory_owner = 3 or integer testOrder_owner '
                 . 'in (3, 5, 4, 6)) and integer organization in (1, 0))'
             ],
             'select with unknown alias' => [
