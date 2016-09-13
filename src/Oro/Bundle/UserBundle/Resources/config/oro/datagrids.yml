@@ -92,7 +92,7 @@ datagrids:
         filters:
             columns:
                 firstName:
-                    type: search_string
+                    type: string
                     data_name: u.firstName
                 lastName:
                     type: string
