@@ -92,10 +92,10 @@ class FormFieldsType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
-        $view->vars['form'] = $options->getOr('form');
-        $view->vars['form_name'] = $options->getOr('form_name');
-        $view->vars['form_data'] = $options->getOr('form_data');
-        $view->vars['split_to_fields'] = $options->getOr('split_to_fields');
+        $view->vars['form'] = $options->get('form', false);
+        $view->vars['form_name'] = $options->get('form_name', false);
+        $view->vars['form_data'] = $options->offsetExists('form_data') ? $options->get('form_data', false) : null;
+        $view->vars['split_to_fields'] = $options->get('split_to_fields', false);
         parent::buildView($view, $block, $options);
 
     }

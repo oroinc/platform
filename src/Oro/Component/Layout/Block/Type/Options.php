@@ -40,15 +40,6 @@ class Options implements \ArrayAccess, \Iterator
         throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $offset));
     }
 
-    public function getOr($offset, $default = null)
-    {
-        try {
-            return $this->get($offset, false);
-        } catch (\OutOfBoundsException $e) {
-            return $default;
-        }
-    }
-
     /**
      * {@inheritdoc}
      */

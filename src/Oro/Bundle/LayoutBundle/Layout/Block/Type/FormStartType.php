@@ -33,11 +33,11 @@ class FormStartType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['form_action'] = $options->getOr('form_action');
-        $view->vars['form_route_name'] = $options->getOr('form_route_name');
-        $view->vars['form_route_parameters'] = $options->getOr('form_route_parameters');
-        $view->vars['form_method'] = $options->getOr('form_method');
-        $view->vars['form_enctype'] = $options->getOr('form_enctype');
+        $view->vars['form_action'] = $options['form_action'];
+        $view->vars['form_route_name'] = $options['form_route_name'];
+        $view->vars['form_route_parameters'] = $options['form_route_parameters'];
+        $view->vars['form_method'] = $options['form_method'];
+        $view->vars['form_enctype'] = $options['form_enctype'];
 
         parent::buildView($view, $block, $options);
     }
