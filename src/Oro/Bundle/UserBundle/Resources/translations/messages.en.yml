@@ -198,7 +198,7 @@ oro:
                 numbers:        The password must contain at least one number.
                 special_chars:  The password must contain at least one special (non-alphanumeric) character.
             tooltip:
-                prefix:         Password must include:
+                prefix:         'Password must include: '
                 min_length:     at least {{ value }} characters
                 upper_case:     an upper case letter
                 numbers:        a number
