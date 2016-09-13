@@ -1,4 +1,7 @@
 parameters:
+    oro_translation.entity.language.class:                      Oro\Bundle\TranslationBundle\Entity\Language
+    oro_translation.entity.translation.class:                   Oro\Bundle\TranslationBundle\Entity\Translation
+
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
     oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
@@ -17,7 +20,6 @@ parameters:
     oro_translation.guzzle_client.class:                        Guzzle\Http\Client
 
     oro_translation.twig.translation.extension.class:           Oro\Bundle\TranslationBundle\Twig\TranslationExtension
-    oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
     oro_translation.event_listener.language_change.class:       Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener
 
@@ -138,14 +140,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_translation.twig.translation_status.extension:
-        class: %oro_translation.twig.translation_status.extension.class%
-        arguments:
-            - '@oro_config.global'
-            - '@oro_translation.statistic_provider'
-        tags:
-            - { name: twig.extension }
-
     oro_translation.distribution.package_manager.link:
         tags:
             - { name: oro_service_link,  service: oro_distribution.package_manager }
@@ -175,14 +169,59 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
 
+    oro_translation.event_listener.translation:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\TranslationListener'
+        lazy: true
+        arguments:
+            - '@oro_translation.database_translation.metadata.cache'
+            - 'import.language_translations_import_from_csv'
+        tags:
+            - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterImportTranslations}
+
     oro_translation.strategy.default:
         class: '%oro_translation.strategy.default.class%'
         public: false
         arguments:
-            - '@oro_locale.settings'
+            - '@oro_config.global'
             - '%installed%'
 
     oro_translation.strategy.provider:
         class: '%oro_translation.strategy.provider.class%'
         arguments:
             - '@oro_translation.strategy.default'
+
+    oro_translation.listener.datagrid.language:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener'
+        arguments:
+            - '@oro_translation.helper.language'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-language-grid, method: onResultAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-language-grid, method: onBuildBefore }
+
+    oro_translation.repository.language:
+        class: Doctrine\ORM\EntityRepository
+        public: false
+        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        arguments:
+            - '%oro_translation.entity.language.class%'
+
+    oro_translation.provider.language:
+        class: 'Oro\Bundle\TranslationBundle\Provider\LanguageProvider'
+        arguments:
+            - '@oro_translation.repository.language'
+            - '@oro_locale.settings'
+
+    oro_translation.helper.language:
+        class: 'Oro\Bundle\TranslationBundle\Helper\LanguageHelper'
+        arguments:
+            - '@oro_translation.statistic_provider'
+            - '@oro_translation.packages_provider'
+            - '@oro_translation.oro_translation_adapter'
+            - '@oro_translation.service_provider'
+            - '@oro_config.global'
+
+    oro_translation.form.type.import:
+        class: 'Oro\Bundle\TranslationBundle\Form\Type\TranslationImportType'
+        tags:
+            - { name: form.type, alias: oro_translation_import }

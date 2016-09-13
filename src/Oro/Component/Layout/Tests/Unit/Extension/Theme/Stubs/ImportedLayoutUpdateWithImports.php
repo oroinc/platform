@@ -14,6 +14,10 @@ class ImportedLayoutUpdateWithImports implements
     LayoutUpdateImportInterface,
     ImportsAwareLayoutUpdateInterface
 {
+    public function getImport()
+    {
+    }
+
     public function setImport(LayoutUpdateImport $import)
     {
     }

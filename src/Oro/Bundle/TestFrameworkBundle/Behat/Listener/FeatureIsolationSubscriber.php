@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
-use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;

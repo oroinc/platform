@@ -182,8 +182,8 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     protected function assertWorkflowManagerCalled($result, $class = null)
     {
         $mocker = $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowsByEntityClass')
-            ->willReturn(new ArrayCollection($result ? ['non Empty'] : []));
+            ->method('hasActiveWorkflowsByEntityClass')
+            ->willReturn($result);
 
         if ($class) {
             $mocker->with($class);

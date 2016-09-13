@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Extension;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Platforms\SQLServer2005Platform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -19,8 +22,11 @@ class RenameExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider renameTableProvider
+     *
+     * @param AbstractPlatform $platform
+     * @param string $expectedSql
      */
-    public function testRenameTable($platform, $expectedSql)
+    public function testRenameTable(AbstractPlatform $platform, $expectedSql)
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
@@ -34,6 +40,37 @@ class RenameExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedSql, $query->getDescription());
     }
+
+    /**
+     * @dataProvider renameTableWithSequencesProvider
+     *
+     * @param AbstractPlatform $platform
+     * @param array $expectedSql
+     */
+    public function testRenameTableWithSequences(AbstractPlatform $platform, array $expectedSql)
+    {
+        $extension = new RenameExtension();
+        $extension->setDatabasePlatform($platform);
+
+        $table = new Table('old_table', [new Column('id', Type::getType(Type::INTEGER))]);
+        $table->setPrimaryKey(['id']);
+
+        $sequence = new Sequence($platform->getIdentitySequenceName('old_table', 'id'));
+
+        $schema  = new Schema([$table], [$sequence]);
+        $queries = new QueryBag();
+
+        $extension->renameTable($schema, $queries, 'old_table', 'new_table');
+
+        $actualQueries = array_map(
+            function (MigrationQuery $query) {
+                return $query->getDescription();
+            },
+            $queries->getPostQueries()
+        );
+        $this->assertEquals($expectedSql, $actualQueries);
+    }
+
 
     /**
      * @dataProvider renameColumnProvider
@@ -136,10 +173,8 @@ class RenameExtensionTest extends \PHPUnit_Framework_TestCase
     public function renameTableProvider()
     {
         return [
-            [new MySqlPlatform(), 'ALTER TABLE old_table RENAME TO new_table'],
-            [new PostgreSqlPlatform(), 'ALTER TABLE old_table RENAME TO new_table'],
-            [new OraclePlatform(), 'ALTER TABLE old_table RENAME TO new_table'],
-            [
+            'mysql' => [new MySqlPlatform(), 'ALTER TABLE old_table RENAME TO new_table'],
+            'mssql' => [
                 new SQLServer2005Platform(),
                 [
                     "sp_RENAME 'old_table', 'new_table'",
@@ -149,6 +184,25 @@ class RenameExtensionTest extends \PHPUnit_Framework_TestCase
                     . "FROM sys.default_constraints dc JOIN sys.tables tbl ON dc.parent_object_id = tbl.object_id "
                     . "WHERE tbl.name = 'new_table';"
                     . "EXEC sp_executesql @sql"
+                ]
+            ],
+        ];
+    }
+
+    public function renameTableWithSequencesProvider()
+    {
+        return [
+            'postgre' => [
+                new PostgreSqlPlatform(),
+                [
+                    'ALTER TABLE old_table RENAME TO new_table',
+                    'ALTER SEQUENCE old_table_id_seq RENAME TO new_table_id_seq'
+                ]
+            ],
+            'oracle' => [
+                new OraclePlatform(),
+                [
+                    'ALTER TABLE old_table RENAME TO new_table'
                 ]
             ],
         ];

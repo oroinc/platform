@@ -22,6 +22,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function shouldSeeRecordInActivityList($content)
     {
+        $this->getSession()->getDriver()->waitForAjax();
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('ActivityList');
         $activityList->getActivityListItem($content);
@@ -181,6 +182,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function emailShouldHaveThreadIcon($content)
     {
+        $this->getSession()->getDriver()->waitForAjax();
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('ActivityList');
         $item = $activityList->getActivityListItem($content);

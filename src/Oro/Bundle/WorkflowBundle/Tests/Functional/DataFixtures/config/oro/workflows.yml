@@ -1,0 +1,188 @@
+workflows:
+    test_flow:
+        label: 'Test Flow'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 60
+        steps:
+            open:
+                label: 'Open'
+                order: 10
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                label: 'Start transition'
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
+
+    test_start_step_flow:
+        label: 'Test Flow With Start Step'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 20
+        start_step: open
+        steps:
+            open:
+                label: 'Open'
+                order: 10
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                label: 'Start transition'
+                step_to: open
+                transition_definition: start_transiotion_definition
+                schedule:
+                    cron: '* * * * *'
+                    filter: 'e.id = 7'
+
+    test_multistep_flow:
+        label: 'Test MultiStep Flow'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 50
+        start_step: starting_point
+        steps:
+            starting_point:
+                 label: '(Start)'
+                 order: -1
+                 _is_start: true
+                 allowed_transitions: ['starting_point_transition']
+            second_point:
+                  label: '(Second)'
+                  order: 0
+                  allowed_transitions: ['second_point_transition']
+            third_point:
+                  label: '(Final)'
+                  order: 1
+                  is_final: true
+                  allowed_transitions: ['second_point_transition']
+        transition_definitions:
+            starting_point_transition_definition: ~
+            second_point_transition_definition: ~
+        transitions:
+            starting_point_transition:
+                 label: 'Start transition'
+                 step_to: second_point
+                 is_start: true
+                 transition_definition: starting_point_transition_definition
+            second_point_transition:
+                 label: 'Start transition'
+                 step_to: third_point
+                 transition_definition: second_point_transition_definition
+
+    test_groups_flow1:
+        label: 'Test Groups Flow 1'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        start_step: starting_point
+        priority: 40
+        exclusive_active_groups:
+            - active_group1
+            - active_group2
+        exclusive_record_groups:
+            - record_group1
+            - record_group2
+        steps:
+            starting_point:
+                 label: '(Start)'
+                 order: -1
+                 _is_start: true
+                 allowed_transitions: ['starting_point_transition']
+            second_point:
+                  label: '(Second)'
+                  order: 0
+                  allowed_transitions: ['second_point_transition']
+            third_point:
+                  label: '(Final)'
+                  order: 1
+                  is_final: true
+                  allowed_transitions: ['ssecond_point_transition']
+        transition_definitions:
+            starting_point_transition_definition: ~
+            second_point_transition_definition: ~
+        transitions:
+            starting_point_transition:
+                 label: 'Start transition'
+                 step_to: second_point
+                 is_start: true
+                 transition_definition: starting_point_transition_definition
+            second_point_transition:
+                 label: 'Start transition'
+                 step_to: third_point
+                 transition_definition: second_point_transition_definition
+
+    test_groups_flow2:
+        label: 'Test Groups Flow 2'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        start_step: starting_point
+        exclusive_active_groups:
+            - active_group1
+            - active_group2
+        exclusive_record_groups:
+            - record_group1
+            - record_group2
+        steps:
+            starting_point:
+                 label: '(Start)'
+                 order: -1
+                 _is_start: true
+                 allowed_transitions: ['starting_point_transition']
+            second_point:
+                  label: '(Second)'
+                  order: 0
+                  allowed_transitions: ['second_point_transition']
+            third_point:
+                  label: '(Final)'
+                  order: 1
+                  is_final: true
+                  allowed_transitions: ['ssecond_point_transition']
+        transition_definitions:
+            starting_point_transition_definition: ~
+            second_point_transition_definition: ~
+        transitions:
+            starting_point_transition:
+                 label: 'Start transition'
+                 step_to: second_point
+                 is_start: true
+                 transition_definition: starting_point_transition_definition
+            second_point_transition:
+                 label: 'Start transition'
+                 step_to: third_point
+                 transition_definition: second_point_transition_definition
+                 
+    test_active_flow1:
+        label: 'Test Active Flow1'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults:
+            active: true
+        priority: 20
+        steps:
+            step1:
+                label: 'Step1'
+        transitions:
+            transition1:
+                label: 'Transition1'
+                step_to: step1
+                transition_definition: definition1
+                is_start: true
+        transition_definitions:
+            definition1: ~
+
+    test_active_flow2:
+        label: 'Test Active Flow2'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults:
+            active: true
+        priority: 10
+        steps:
+            step1:
+                label: 'Step1'
+        transitions:
+            transition1:
+                label: 'Transition1'
+                step_to: step1
+                transition_definition: definition1
+                is_start: true
+        transition_definitions:
+            definition1: ~

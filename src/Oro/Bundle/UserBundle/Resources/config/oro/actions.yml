@@ -88,7 +88,7 @@ operations:
         groups:
             - view_navButtons
         button_options:
-            icon: icon-pencil
+            icon: icon-edit
         actions:
             - '@redirect':
                 parameters:

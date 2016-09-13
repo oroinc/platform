@@ -1,0 +1,9 @@
+placeholders:
+    placeholders:
+        oro_user_login_form:
+            items:
+                oauth_login: ~
+
+    items:
+        oauth_login:
+            template: OroSSOBundle:Security:oauthLogin.html.twig
