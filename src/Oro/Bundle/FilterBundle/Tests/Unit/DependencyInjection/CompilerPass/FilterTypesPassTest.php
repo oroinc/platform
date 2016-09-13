@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 use Oro\Bundle\FilterBundle\DependencyInjection\CompilerPass\FilterTypesPass;
 
@@ -16,12 +18,12 @@ class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
     protected $filterTypePass;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder
      */
     protected $containerMock;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|Definition
      */
     protected $definitionMock;
 
@@ -29,11 +31,11 @@ class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
     {
         $this->filterTypePass = new FilterTypesPass();
 
-        $this->definitionMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $this->definitionMock = $this->getMockBuilder(Definition::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->containerMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+        $this->containerMock = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -63,7 +65,7 @@ class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
             ->with(FilterTypesPass::FILTER_EXTENSION_ID)
             ->willReturn($this->definitionMock);
 
-        $definitionMock2 = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $definitionMock2 = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
         $definitionMock2
