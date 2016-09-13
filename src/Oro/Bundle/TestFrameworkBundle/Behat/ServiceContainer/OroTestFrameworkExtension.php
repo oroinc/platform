@@ -8,6 +8,7 @@ use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\Cli\ServiceContainer\CliExtension;
+use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
@@ -99,6 +100,9 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
+        // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
+        $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
+            ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
     }
 
     /**

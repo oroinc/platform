@@ -26,9 +26,11 @@ class Form extends Element
     {
         foreach ($table->getRows() as $row) {
             $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
-            $expectedValue = $this->normalizeValue($row[1]);
-            $fieldValue = $this->normalizeValue($this->findField($locator)->getValue());
+            $field = $this->findField($locator);
+            self::assertNotNull($field, "Field with '$locator' locator not found");
 
+            $expectedValue = $this->normalizeValue($row[1]);
+            $fieldValue = $this->normalizeValue($field->getValue());
             self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
         }
     }

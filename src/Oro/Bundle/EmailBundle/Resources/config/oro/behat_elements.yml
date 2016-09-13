@@ -1,4 +1,33 @@
 behat_elements:
   EmailForm:
     selector: "form[id^='oro_email_email']"
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
+  EmailFormView:
+    selector: "form[id^='oro_email_email']"
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+    options:
+      mapping:
+        To: "div[id^='s2id_oro_email_email'] > ul > li.select2-search-choice > div"
+        From: "div[id^='s2id_oro_email_email_from'] > a > span.select2-chosen"
+        Subject: "input[id^='oro_email_email_subject']"
+
+  EmailNotificationLink:
+    selector: 'a.email-notification-icon'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  ShortEmailList:
+    selector: 'div.short-emails-list'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  EmailListItem:
+    selector: 'ul.items li'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  EmailTitle:
+    selector: 'div.title'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  ReadUnreadIcon:
+    selector: 'i.icon-envelope'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
