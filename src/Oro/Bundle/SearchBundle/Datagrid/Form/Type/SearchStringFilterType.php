@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Filter\Form\Type;
+namespace Oro\Bundle\SearchBundle\Datagrid\Form\Type;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -29,5 +29,13 @@ class SearchStringFilterType extends TextFilterType
                 'operator_choices' => $choices,
             )
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+        return self::NAME;
     }
 }

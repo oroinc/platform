@@ -1,13 +1,12 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Filter;
+namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
-use Oro\Bundle\SearchBundle\Filter\Form\Type\SearchStringFilterType;
+use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType;
 
 class SearchStringFilter extends AbstractFilter
 {

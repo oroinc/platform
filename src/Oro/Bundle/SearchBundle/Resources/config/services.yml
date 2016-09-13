@@ -242,3 +242,9 @@ services:
         class: %oro_search.extension.search_sorter.class%
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_search.form.type.filter.search_string:
+        class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_search_string_filter }
