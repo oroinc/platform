@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Validator;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 
 /**
