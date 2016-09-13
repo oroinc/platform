@@ -145,14 +145,14 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'select from *'             => [
                 '*',
-                ' from testProduct, testPrice, testOrderItem, testCategory, testOrder where '
+                'from testProduct, testPrice, testOrderItem, testCategory, testOrder where '
                 . '((integer testProduct_owner >= 0 or integer testPrice_owner >= 0 or integer '
                 . 'testOrderItem_owner = 0 or integer testCategory_owner = 3 or integer testOrder_owner '
                 . 'in (3, 5, 4, 6)) and integer organization in (1, 0))'
             ],
             'select with unknown alias' => [
                 ['testProduct', 'badAlias'],
-                ' from testProduct where ((integer testProduct_owner >= 0) and integer organization in (1, 0))'
+                'from testProduct where ((integer testProduct_owner >= 0) and integer organization in (1, 0))'
             ]
         ];
     }
