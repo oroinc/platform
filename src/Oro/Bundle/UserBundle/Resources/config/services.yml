@@ -143,7 +143,14 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.token.factory.username_password_organization'
+            - '@event_dispatcher'
+
+    oro_user.event_listener.impersonation_success_listener:
+        class: Oro\Bundle\UserBundle\EventListener\ImpersonationSuccessListener
+        arguments:
             - '@oro_user.mailer.processor'
+        tags:
+            - { name: kernel.event_listener, event: oro_user.impersonation_success, method: onImpersonationSuccess }
 
     # Autocomplete acl user search handler
     oro_user.autocomplete.user.search_acl_handler.abstract:

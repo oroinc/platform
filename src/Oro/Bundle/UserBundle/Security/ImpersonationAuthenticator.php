@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Security;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -17,41 +18,36 @@ use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
-use Oro\Bundle\UserBundle\Mailer\Processor as MailProcessor;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
 
 class ImpersonationAuthenticator implements GuardAuthenticatorInterface
 {
     const TOKEN_PARAMETER = '_impersonation_token';
     const NOTIFY_PARAMETER = '_impersonation_notify';
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var UsernamePasswordOrganizationTokenFactoryInterface
-     */
+    /** @var UsernamePasswordOrganizationTokenFactoryInterface */
     protected $tokenFactory;
 
-    /**
-     * @var MailProcessor
-     */
-    protected $mailProcessor;
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
     /**
      * @param EntityManager $em
      * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     * @param MailProcessor $mailProcessor
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EntityManager $em,
         UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
-        MailProcessor $mailProcessor
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->em = $em;
         $this->tokenFactory = $tokenFactory;
-        $this->mailProcessor = $mailProcessor;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -67,7 +63,7 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        // always returns a Impersonation object or throws an exception
+        // always returns an Impersonation object or throws an exception
         return $this->getImpersonation($credentials)->getUser();
     }
 
@@ -86,10 +82,9 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         if ($request->query->get(static::NOTIFY_PARAMETER)) {
-            $this->mailProcessor->sendImpersonateEmail($token->getUser());
+            $event = new ImpersonationSuccessEvent($token->getUser());
+            $this->eventDispatcher->dispatch(ImpersonationSuccessEvent::EVENT_NAME, $event);
         }
-
-        return null;
     }
 
     /**
@@ -124,19 +119,14 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     public function createAuthenticatedToken(UserInterface $user, $providerKey)
     {
         $guesser = new UserOrganizationGuesser();
+        /** @var User $user */
         $organization = $guesser->guessByUser($user);
 
         if (!$organization) {
             throw new BadCredentialsException("You don't have active organization assigned.");
         }
 
-        return $this->tokenFactory->create(
-            $user,
-            null,
-            $providerKey,
-            $organization,
-            $user->getRoles()
-        );
+        return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getRoles());
     }
 
     protected function getImpersonation($token)
