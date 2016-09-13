@@ -74,6 +74,8 @@ class MultipleChoice extends AbstractGridFilterItem
     {
         if ($dropDownMask = $this->getPage()->find('css', '.oro-dropdown-mask')) {
             $dropDownMask->click();
+        } else if ($this->isOpen()) {
+            $this->find('css', '.filter-criteria-selector span.caret')->click();
         }
     }
 }
