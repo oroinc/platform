@@ -122,17 +122,6 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
                 'expected' => 2,
 
             ],
-            '3 rules - invalid' => [
-                'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
-                ],
-                'value' => 'password',
-                'expected' => 3,
-
-            ],
             'all rules - invalid' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 10],
