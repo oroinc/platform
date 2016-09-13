@@ -22,3 +22,16 @@ oro:
         pins:
             button: Minimize
             button.title: Pin/unpin the page
+        menuupdate:
+            entity_label: Menu Update
+            entity_plural_label: Menu Update
+            id.label: Id
+            key.label: Key
+            parent_key.label: Parent Key
+            menu.label: Menu
+            title.label: Title
+            uri.label: Uri
+            active.label: Active
+            priority.label: Priority
+            ownership_type.label: Ownership Type
+            owner_id.label: Owner Id
