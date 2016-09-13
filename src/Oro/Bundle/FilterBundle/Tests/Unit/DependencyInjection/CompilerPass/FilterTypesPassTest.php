@@ -65,7 +65,7 @@ class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
             ->with(FilterTypesPass::FILTER_EXTENSION_ID)
             ->willReturn($this->definitionMock);
 
-        $definitionMock2 = $this->getMockBuilder(ContainerBuilder::class)
+        $definitionMock2 = $this->getMockBuilder(Definition::class)
             ->disableOriginalConstructor()
             ->getMock();
         $definitionMock2
