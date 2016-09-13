@@ -283,6 +283,7 @@ tag if it works with extend classes
 - using own, customized Query wrappers, instead of IndexerQuery now possible, by replacing QueryFactory with own factory `\Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface` object.
 - new Extensions added: `\Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\SearchPagerExtension` (extending the Orm version), `\Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension` (common part with the Orm version).
 - `\Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension` makes it possible to use search filters together with a new `\Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter`.
+- `\Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter` does not rely on the Doctrine's ExpressionBuilder. Using `expr()` discouraged in favor of `Criteria::expr()`.
 - filters are now loaded per Datasource, by specifying the `datasource` attribute. Currently supported values are `orm` and `search`.
 - custom Search filter added: `\Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter`.
 - `\Oro\Bundle\SearchBundle\Query\Result\Item` is now compatible with the default backend datagrid templates.
