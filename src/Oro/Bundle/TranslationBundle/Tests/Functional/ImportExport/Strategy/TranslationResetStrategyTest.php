@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 /**
  * @dbIsolation
  */
-class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
+class TranslationResetStrategyTest extends AbstractTranslationImportStrategyTest
 {
     public function testProcess()
     {
@@ -31,9 +31,11 @@ class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
 
         $translation = new Translation();
         $translationKey = new TranslationKey();
+        $translationKey = $this->processTranslationKey($translationKey->setDomain('new_domain')->setKey('new_key'));
+
         $translation
             ->setLanguage($this->getReference(LoadLanguages::LANGUAGE1))
-            ->setTranslationKey($translationKey->setDomain('new_domain')->setKey('new_key'))
+            ->setTranslationKey($translationKey)
             ->setValue('new_value');
 
         $this->processTranslation($translation);

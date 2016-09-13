@@ -200,31 +200,23 @@ class TranslationManager
      */
     public function findTranslationKey($key, $domain = self::DEFAULT_DOMAIN)
     {
-        /**
-         * Required to avoid unique constraint
-         */
-        static $cache;
+        /** @var ObjectRepository $repo */
+        $repo = $this->getEntityRepository(TranslationKey::class);
 
-        if (!$cache) {
-            $cache = [];
+        /** @var EntityManager $em */
+        $em = $this->getEntityManager(TranslationKey::class);
+
+        $translationKey = $repo->findOneBy(['key' => $key, 'domain' => $domain]);
+
+        if (!$translationKey) {
+            $translationKey = new TranslationKey();
+            $translationKey->setKey($key);
+            $translationKey->setDomain($domain);
+            $em->persist($translationKey);
+            $em->flush($translationKey);
         }
 
-        if (!isset($cache[$key . '-' . $domain])) {
-            /** @var ObjectRepository $repo */
-            $repo = $this->getEntityRepository(TranslationKey::class);
-
-            $translationKey = $repo->findOneBy(['key' => $key, 'domain' => $domain]);
-
-            if (!$translationKey) {
-                $translationKey = new TranslationKey();
-                $translationKey->setKey($key);
-                $translationKey->setDomain($domain);
-            }
-
-            $cache[$key . '-' . $domain] = $translationKey;
-        }
-
-        return $cache[$key . '-' . $domain];
+        return $translationKey;
     }
 
     /**
@@ -245,5 +237,13 @@ class TranslationManager
     protected function getEntityRepository($class)
     {
         return $this->getEntityManager($class)->getRepository($class);
+    }
+
+    /**
+     * Clears
+     */
+    public function clear()
+    {
+        $this->getEntityManager(Translation::class)->clear();
     }
 }
