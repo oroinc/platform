@@ -60,7 +60,7 @@ class Query
     protected $fields;
 
     /** @var array */
-    protected $fieldsAliases = [];
+    protected $selectAliases = [];
 
     /** @var Criteria */
     protected $criteria;
@@ -559,7 +559,7 @@ class Query
      */
     public function getSelectAliases()
     {
-        return $this->fieldsAliases;
+        return $this->selectAliases;
     }
 
     /**
@@ -692,7 +692,7 @@ class Query
 
             $alias = strrev($part[0]);
 
-            $this->fieldsAliases[$field] = $alias;
+            $this->selectAliases[$field] = $alias;
         }
 
         return $field;
