@@ -23,31 +23,14 @@ class YamlToSearchQueryConverter
         $processor = new Processor();
         $config    = $processor->processConfiguration(new QueryConfiguration(), $config);
 
-        $this->validateSections($config);
-
         foreach ((array)$config['from'] as $from) {
             $query->from($from['alias']);
         }
 
-        foreach ($config['select'] as $select) {
+        foreach ((array)$config['select'] as $select) {
             $query->addSelect($select);
         }
 
         return $query;
-    }
-
-    /**
-     * @param array $config
-     * @return array
-     */
-    private function validateSections(array $config)
-    {
-        if (!isset($config['select'])) {
-            throw new InvalidConfigurationException('Missing mandatory "select" section');
-        }
-
-        if (!isset($config['from'])) {
-            throw new InvalidConfigurationException('Missing mandatory "from" section');
-        }
     }
 }
