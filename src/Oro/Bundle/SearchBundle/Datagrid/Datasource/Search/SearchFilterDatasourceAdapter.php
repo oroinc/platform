@@ -18,11 +18,6 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     private $query;
 
     /**
-     * @var ExpressionBuilder
-     */
-    private $expressionBuilder;
-
-    /**
      * @param SearchQueryInterface $query
      */
     public function __construct(SearchQueryInterface $query)
@@ -82,14 +77,11 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 
     /**
      * @return ExpressionBuilder
+     * @deprecated Use Criteria::expr() instead.
      */
     public function expr()
     {
-        if ($this->expressionBuilder === null) {
-            $this->expressionBuilder = new ExpressionBuilder();
-        }
-
-        return $this->expressionBuilder;
+        throw new \BadMethodCallException('Use Criteria::expr() instead.');
     }
 
     /**
