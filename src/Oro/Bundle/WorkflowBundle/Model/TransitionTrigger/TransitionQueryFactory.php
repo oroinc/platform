@@ -6,12 +6,12 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class TransitionQueryFactory
 {
