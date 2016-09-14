@@ -271,3 +271,11 @@ services:
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
             - '%oro_workflow.workflow_item.entity.class%'
+
+    oro_workflow.transition_trigger.update_decider:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider
+        public: false
+
+    oro_workflow.transition_trigger_updater:
+    	class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater
+    	arguments: ['@oro_entity.doctrine_helper', '@oro_workflow.transition_trigger.update_decider']

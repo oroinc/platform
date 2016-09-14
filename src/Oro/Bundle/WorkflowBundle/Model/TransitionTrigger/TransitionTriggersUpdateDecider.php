@@ -11,7 +11,7 @@ class TransitionTriggersUpdateDecider
      * @param array $newTriggers
      * @return array[] A two elements array fist of which is a list of triggers that should be added, second - removed
      */
-    public function decide(array &$existingTriggers, array &$newTriggers)
+    public function decide(array $existingTriggers, array $newTriggers)
     {
         $remove = [];
         $add = [];
@@ -31,6 +31,11 @@ class TransitionTriggersUpdateDecider
         return [$add, $remove];
     }
 
+    /**
+     * @param array $triggers
+     * @param AbstractTransitionTrigger $trigger
+     * @return bool
+     */
     private function contains(array &$triggers, AbstractTransitionTrigger $trigger)
     {
         foreach ($triggers as $match) {

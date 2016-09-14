@@ -2,58 +2,57 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTriggerAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 
 class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var WorkflowTransitionTriggersListener */
     private $listener;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
-    private $doctrineHelper;
+    /** @var TransitionTriggersUpdater|\PHPUnit_Framework_MockObject_MockObject */
+    private $updater;
 
-    /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionTriggerAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTransitionTriggersAssembler|\PHPUnit_Framework_MockObject_MockObject */
     private $assembler;
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
-        $this->assembler = $this->getMockBuilder(TransitionTriggerAssembler::class)
+        $this->assembler = $this->getMockBuilder(WorkflowTransitionTriggersAssembler::class)
             ->disableOriginalConstructor()->getMock();
-        $this->listener = new WorkflowTransitionTriggersListener($this->doctrineHelper);
+
+        $this->updater = $this->getMockBuilder(TransitionTriggersUpdater::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $this->listener = new WorkflowTransitionTriggersListener($this->assembler, $this->updater);
     }
 
     public function testGetSubscribedEvents()
     {
         $this->assertEquals(
             [
-                WorkflowEvents::WORKFLOW_AFTER_CREATE => 'triggersCreate',
+                WorkflowEvents::WORKFLOW_AFTER_CREATE => 'triggersUpdate',
                 WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'triggersUpdate',
                 WorkflowEvents::WORKFLOW_AFTER_DELETE => 'triggersDelete',
-                WorkflowEvents::WORKFLOW_ACTIVATED => 'triggersCreate',
+                WorkflowEvents::WORKFLOW_ACTIVATED => 'triggersUpdate',
                 WorkflowEvents::WORKFLOW_DEACTIVATED => 'triggersDelete'
             ],
             WorkflowTransitionTriggersListener::getSubscribedEvents()
         );
 
-        $listener = new WorkflowTransitionTriggersListener();
-
-        foreach (WorkflowTransitionTriggersListener::getSubscribedEvents() as $method) {
-            $this->assertTrue(method_exists($listener, $method));
+        foreach (array_unique(array_values(WorkflowTransitionTriggersListener::getSubscribedEvents())) as $method) {
+            $this->assertTrue(method_exists($this->listener, $method));
         }
     }
 
-    public function testTriggersCreate()
+    public function testTriggersUpdate()
     {
         $definition = new WorkflowDefinition();
 
@@ -68,49 +67,21 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $em = $this->entityManagerRetrieval();
+        $this->updater->expects($this->once())
+            ->method('updateTriggers')
+            ->with(new TriggersBag($definition, [$trigger1, $trigger2]));
 
-        $em->expects($this->exactly(2))->method('persist')->withConsecutive([
-            [$this->equalTo($trigger1)],
-            [$this->equalTo($trigger2)]
-        ]);
-
-        $em->expects($this->once())->method('flush');
-
-        $this->listener->triggersCreate($event);
+        $this->listener->triggersUpdate($event);
     }
 
-    public function testTriggersCreateWithoutTriggers()
+    public function testTriggersDelete()
     {
         $definition = new WorkflowDefinition();
-
         $event = new WorkflowChangesEvent($definition);
 
-        $this->assembler->expects($this->once())->method('assembleTriggers')->with($definition)->willReturn([]);
+        $this->updater->expects($this->once())
+            ->method('removeTriggers')->with($definition);
 
-        $em = $this->entityManagerRetrieval();
-
-        $em->expects($this->never())->method('persist');
-        $em->expects($this->never())->method('flush');
-
-        $this->listener->triggersCreate($event);
-    }
-
-    public function testTriggersUpdate()
-    {
-        $definition = new WorkflowDefinition();
-
-    }
-
-    /**
-     * @return EntityManager|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private function entityManagerRetrieval()
-    {
-        $em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper->expects($this->once())->method('getManagerForClass')
-            ->with(AbstractTransitionTrigger::class)->willReturn($em);
-
-        return $em;
+        $this->listener->triggersDelete($event);
     }
 }

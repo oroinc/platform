@@ -198,9 +198,9 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
             $this->workflowDefinition ? $this->workflowDefinition->getName() : 'null',
             $this->transitionName,
             $this->event,
-            $this->field?'['.$this->field.']':'',
-            $this->relation?'+'.$this->relation:'',
-            $this->require?'expr('.$this->require.')':'',
+            $this->field ? '[' . $this->field . ']' : '',
+            $this->relation ? '=>' . $this->relation : '',
+            $this->require ? 'expr(' . $this->require . ')' : '',
             $this->queued ? 'MQ' : 'RUNTIME'
         );
     }

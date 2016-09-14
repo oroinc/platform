@@ -9,43 +9,36 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TransitionTriggersUpdater
 {
-    /**
-     * @var EntityManager
-     */
-    private $emCache;
+    /** @var EntityManager */
+    private $em;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @var TransitionTriggersUpdateDecider
-     */
+    /** @var TransitionTriggersUpdateDecider */
     private $updateDecider;
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param TransitionTriggersUpdateDecider $decider
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, TransitionTriggersUpdateDecider $decider)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->updateDecider = new TransitionTriggersUpdateDecider();
+        $this->updateDecider = $decider;
     }
 
     /**
      * Overrides triggers by TriggersBag. Flushes data into database.
      * @param TriggersBag $triggersBag
      */
-    public function update(TriggersBag $triggersBag)
+    public function updateTriggers(TriggersBag $triggersBag)
     {
         $definition = $triggersBag->getDefinition();
 
-        $triggers = $triggersBag->getTriggers();
-
         $existingTriggers = $this->getStoredDefinitionTriggers($definition);
 
-        list($add, $remove) = $this->updateDecider->decide($existingTriggers, $triggers);
+        list($add, $remove) = $this->updateDecider->decide($existingTriggers, $triggersBag->getTriggers());
 
         if (count($remove) !== 0 || count($add) !== 0) {
             $em = $this->getEntityManager();
@@ -64,11 +57,26 @@ class TransitionTriggersUpdater
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @return array|AbstractTransitionTrigger
+     */
+    public function removeTriggers(WorkflowDefinition $workflowDefinition)
+    {
+        $triggers = $this->getStoredDefinitionTriggers($workflowDefinition);
+        if (count($triggers) !== 0) {
+            $em = $this->getEntityManager();
+            foreach ($triggers as $trigger) {
+                $em->remove($trigger);
+            }
+            $em->flush();
+        }
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array|AbstractTransitionTrigger[]
      */
     private function getStoredDefinitionTriggers(WorkflowDefinition $workflowDefinition)
     {
-        return $this->doctrineHelper->getEntityRepository(AbstractTransitionTrigger::class)->findBy(
+        return $this->doctrineHelper->getEntityRepositoryForClass(AbstractTransitionTrigger::class)->findBy(
             [
                 'workflowDefinition' => $workflowDefinition->getName()
             ]
@@ -80,10 +88,10 @@ class TransitionTriggersUpdater
      */
     private function getEntityManager()
     {
-        if ($this->emCache) {
-            return $this->emCache;
+        if ($this->em) {
+            return $this->em;
         }
 
-        return $this->emCache = $this->doctrineHelper->getEntityManagerForClass(AbstractTransitionTrigger::class);
+        return $this->em = $this->doctrineHelper->getEntityManagerForClass(AbstractTransitionTrigger::class);
     }
 }

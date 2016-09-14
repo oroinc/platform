@@ -25,7 +25,6 @@ class TriggersBag
     {
         $this->definition = $definition;
         foreach ($triggers as $trigger) {
-            //verify trigger instance
             $this->addTrigger($trigger);
         }
     }
@@ -35,7 +34,6 @@ class TriggersBag
      */
     protected function addTrigger(AbstractTransitionTrigger $trigger)
     {
-        $trigger->setWorkflowDefinition($this->definition);
         $this->triggers[] = $trigger;
     }
 

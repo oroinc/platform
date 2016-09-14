@@ -99,7 +99,7 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
             $this->transitionName,
             $this->cron,
             $this->filter,
-            $this->queued ? '- - ->' : '===>'
+            $this->queued ? 'MQ' : 'RUNTIME'
         );
     }
 }

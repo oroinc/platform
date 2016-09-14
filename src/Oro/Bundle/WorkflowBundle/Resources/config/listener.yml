@@ -70,3 +70,6 @@ services:
 
     oro_workflow.event_listener.transition_triggers:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener'
+        arguments:
+            - '@oro_workflow.transition_trigger_assembler'
+            - '@oro_workflow.transition_trigger_updater'

@@ -63,5 +63,8 @@ services:
         calls:
             - [addConfigurationPass,  ['@oro_workflow.configuration_pass.replace_property_path']]
 
+    oro_workflow.transition_trigger_assembler:
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler'
+
     oro_workflow.restriction_assembler:
-        class: Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler
+        class: 'Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler'
