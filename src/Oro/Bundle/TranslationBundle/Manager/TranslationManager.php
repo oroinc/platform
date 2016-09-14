@@ -34,8 +34,8 @@ class TranslationManager
     }
 
     /**
-     * @param $key
-     * @param $locale
+     * @param string $key
+     * @param string $locale
      * @param string $domain
      *
      * @return Translation|null
@@ -103,7 +103,7 @@ class TranslationManager
      */
     public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
-        if (null === ($translationValue = $this->findValue($key, $locale, $domain, $scope))) {
+        if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
             $translationValue = $this->createValue($key, $value, $locale, $domain, $scope);
         }
 
