@@ -34,9 +34,15 @@ class MenuUpdate extends AbstractMenuUpdate
      */
     public function getExtras()
     {
-        return [
-            'title' => $this->title
+        $extras = [
+            'title' => $this->getTitle()
         ];
+
+        if ($this->getPriority() !== null) {
+            $extras['position'] = $this->getPriority();
+        }
+
+        return $extras;
     }
 
     /**

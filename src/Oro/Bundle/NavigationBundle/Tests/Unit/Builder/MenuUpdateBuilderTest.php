@@ -3,12 +3,15 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Builder;
 
 use Knp\Menu\ItemInterface;
+
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
-use Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 
 class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    use MenuItemTestTrait;
+
     /** @var MenuUpdateBuilder */
     protected $builder;
 
@@ -18,95 +21,57 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->builder = new MenuUpdateBuilder();
+        $this->prepareMenu();
     }
 
-    public function testBuild()
+    /**
+     * @dataProvider menuUpdateProvider
+     *
+     * @param $expectedData
+     * @param $updateData
+     */
+    public function testBuild($expectedData, $updateData)
     {
-        /** @var AbstractMenuUpdate|\PHPUnit_Framework_MockObject_MockObject $update */
-        $update = $this->getMock(AbstractMenuUpdate::class);
-        $update->expects($this->once())
-            ->method('getMenu')
-            ->will($this->returnValue('menu_key'));
-        $update->expects($this->any())
-            ->method('getKey')
-            ->will($this->returnValue('key'));
-        $update->expects($this->any())
-            ->method('getParentKey')
-            ->will($this->returnValue(null));
-        $update->expects($this->any())
-            ->method('getUri')
-            ->will($this->returnValue('#'));
-        $update->expects($this->once())
-            ->method('isActive')
-            ->will($this->returnValue(true));
-        $update->expects($this->once())
-            ->method('getExtras')
-            ->will($this->returnValue(['extra_key' => 'extra_value']));
-        $update->expects($this->any())
-            ->method('getPriority')
-            ->will($this->returnValue(10));
+        $menuUpdate = $this->getMenuUpdate($updateData);
 
         /** @var MenuUpdateProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
         $provider = $this->getMock(MenuUpdateProviderInterface::class);
         $provider->expects($this->once())
             ->method('getUpdates')
-            ->will($this->returnValue([$update]));
+            ->will($this->returnValue([$menuUpdate]));
 
         $this->builder->addProvider('default', $provider);
 
-        /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject $resultItem */
-        $resultItem = $this->getMock(ItemInterface::class);
-        /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject $nestedItem */
-        $nestedItem = $this->getMock(ItemInterface::class);
-        $nestedItem->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('nested_name'));
+        $this->menu->setExtra('area', 'default');
 
-        $resultItem->expects($this->any())
-            ->method('getParent')
-            ->will($this->returnValue($nestedItem));
-        $resultItem->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('key'));
-        $resultItem->expects($this->once())
-            ->method('setUri')
-            ->with('#');
-        $resultItem->expects($this->once())
-            ->method('setDisplay')
-            ->with(true);
-        $resultItem->expects($this->any())
-            ->method('setExtra');
+        if (!$expectedData['predefined']) {
+            $this->assertNull($this->menu->getChild($menuUpdate->getKey()));
+        }
 
-        $nestedItem->expects($this->once())
-            ->method('getChild')
-            ->with('key')
-            ->will($this->returnValue($resultItem));
-        $nestedItem->expects($this->once())
-            ->method('removeChild')
-            ->with('key');
+        /** @var ItemInterface $parentMenu */
+        $parentMenu = $this->{$updateData['parent']};
+        if (!$expectedData['predefined']) {
+            $this->assertNull($parentMenu->getChild($menuUpdate->getKey()));
+        }
 
-        /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject $menu */
-        $menu = $this->getMock(ItemInterface::class);
-        $menu->expects($this->once())
-            ->method('getExtra')
-            ->with('area')
-            ->will($this->returnValue('default'));
-        $menu->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('menu_key'));
-        $menu->expects($this->once())
-            ->method('getChild')
-            ->with('key')
-            ->will($this->returnValue(null));
-        $menu->expects($this->once())
-            ->method('getChildren')
-            ->will($this->returnValue([$nestedItem]));
-        $menu->expects($this->once())
-            ->method('addChild')
-            ->with($resultItem)
-            ->will($this->returnValue($resultItem));
+        $this->builder->build($this->menu);
 
-        $this->builder->build($menu);
+        $parentMenu = $this->{$expectedData['parent']};
+        if (!$expectedData['predefined']) {
+            $this->assertNotNull($parentMenu->getChild($menuUpdate->getKey()));
+        }
+
+        $childMenu = $parentMenu->getChild($menuUpdate->getKey());
+
+        $this->assertEquals($expectedData['parent_name'], $childMenu->getParent()->getName());
+
+        $this->assertEquals($expectedData['label'], $childMenu->getLabel());
+        $this->assertEquals($expectedData['uri'], $childMenu->getUri());
+        $this->assertEquals($expectedData['display'], $childMenu->isDisplayed());
+
+        foreach ($expectedData['extras'] as $extraKey => $extraValue) {
+            $this->assertEquals($extraValue, $childMenu->getExtra($extraKey));
+        }
     }
 
     /**
@@ -120,13 +85,111 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->builder->addProvider('default', $provider);
 
-        /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject $menu */
-        $menu = $this->getMock(ItemInterface::class);
-        $menu->expects($this->once())
-            ->method('getExtra')
-            ->with('area')
-            ->will($this->returnValue('custom'));
+        $this->menu->setExtra('area', 'custom');
 
-        $this->builder->build($menu);
+        $this->builder->build($this->menu);
+    }
+
+    /**
+     * @return array
+     */
+    public function menuUpdateProvider()
+    {
+        return [
+            'update_existing_item_without_move' => [
+                'result_data' => [
+                    'parent' => 'menu',
+                    'predefined' => true,
+                    'label' => 'Title 1',
+                    'parent_name' => 'Root Menu',
+                    'uri' => 'Uri 1',
+                    'display' => true,
+                    'extras' => [
+                        'extra_1' => 'Extra 1'
+                    ]
+                ],
+                'update_data' => [
+                    'parent' => 'menu',
+                    'title' => 'Title 1',
+                    'key' => 'Parent 1',
+                    'parent_key' => null,
+                    'menu_key'  => 'Root Menu',
+                    'uri' => 'Uri 1',
+                    'active' => true,
+                    'extras' => [
+                        'extra_1' => 'Extra 1'
+                    ]
+                ]
+            ],
+            'create_new_item' => [
+                'result_data' => [
+                    'parent' => 'menu',
+                    'predefined' => false,
+                    'label' => 'Title 2',
+                    'parent_name' => 'Root Menu',
+                    'uri' => 'Uri 2',
+                    'display' => false,
+                    'extras' => [
+                        'extra_2' => 'Extra 2'
+                    ]
+                ],
+                'update_data' => [
+                    'parent' => 'menu',
+                    'title' => 'Title 2',
+                    'key' => 'Parent N',
+                    'parent_key' => null,
+                    'menu_key'  => 'Root Menu',
+                    'uri' => 'Uri 2',
+                    'active' => false,
+                    'extras' => [
+                        'extra_2' => 'Extra 2'
+                    ]
+                ]
+            ],
+            'update_existing_item_with_move' => [
+                'result_data' => [
+                    'parent' => 'pt2',
+                    'predefined' => true,
+                    'label' => 'Title 3',
+                    'parent_name' => 'Parent 2',
+                    'uri' => 'Uri 3',
+                    'display' => true,
+                    'extras' => [
+                        'extra_3' => 'Extra 3'
+                    ]
+                ],
+                'update_data' => [
+                    'parent' => 'pt1',
+                    'title' => 'Title 3',
+                    'key' => 'Child 1',
+                    'parent_key' => 'Parent 2',
+                    'menu_key'  => 'Root Menu',
+                    'uri' => 'Uri 3',
+                    'active' => true,
+                    'extras' => [
+                        'extra_3' => 'Extra 3'
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @param array $updateData
+     *
+     * @return MenuUpdateStub
+     */
+    protected function getMenuUpdate(array $updateData)
+    {
+        $update = new MenuUpdateStub();
+        $update->setTitle($updateData['title']);
+        $update->setKey($updateData['key']);
+        $update->setParentKey($updateData['parent_key']);
+        $update->setMenu($updateData['menu_key']);
+        $update->setUri($updateData['uri']);
+        $update->setActive($updateData['active']);
+        $update->setExtras($updateData['extras']);
+
+        return $update;
     }
 }
