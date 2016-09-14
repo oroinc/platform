@@ -1,24 +1,19 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Processor;
-
-use Doctrine\ORM\EntityManager;
-
-use JMS\JobQueueBundle\Entity\Job;
-
-use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
-use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
-use Psr\Log\LoggerInterface;
+namespace Oro\Bundle\NotificationBundle\Manager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
-use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
+use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 
-class EmailNotificationProcessor extends AbstractNotificationProcessor
+use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
+use Psr\Log\LoggerInterface;
+
+class EmailNotificationManager extends AbstractNotificationManager
 {
-    const SEND_COMMAND = 'swiftmailer:spool:send';
+    const TOPIC = Topics::SEND_NOTIFICATION_EMAIL;
 
     /** @var EmailRenderer */
     private $renderer;
@@ -26,14 +21,8 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     /** @var \Swift_Mailer */
     private $mailer;
 
-    /** @var string */
-    private $messageLimit = 100;
-
     /** @var ConfigManager */
     private $cm;
-
-    /** @var string */
-    private $env = 'prod';
 
     /** @var Processor */
     private $processor;
@@ -42,8 +31,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * Constructor
      *
      * @param LoggerInterface   $logger
-     * @param EntityManager     $em
-     * @param EntityPool        $entityPool
      * @param EmailRenderer     $emailRenderer
      * @param \Swift_Mailer     $mailer
      * @param ConfigManager     $cm
@@ -51,14 +38,12 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      */
     public function __construct(
         LoggerInterface $logger,
-        EntityManager $em,
-        EntityPool $entityPool,
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
         ConfigManager $cm,
         Processor $processor
     ) {
-        parent::__construct($logger, $em, $entityPool);
+        parent::__construct($logger);
         $this->renderer          = $emailRenderer;
         $this->mailer            = $mailer;
         $this->cm                = $cm;
@@ -66,34 +51,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     }
 
     /**
-     * Set message limit
-     *
-     * @param int $messageLimit
-     */
-    public function setMessageLimit($messageLimit)
-    {
-        $this->messageLimit = $messageLimit;
-    }
-
-    /**
-     * Set environment
-     *
-     * @param string $env
-     */
-    public function setEnv($env)
-    {
-        $this->env = $env;
-    }
-
-    /**
-     * Applies the given notifications to the given object
-     *
-     * @param mixed                        $object
-     * @param EmailNotificationInterface[] $notifications
-     * @param LoggerInterface              $logger Override for default logger. If this parameter is specified
-     *                                             this logger will be used instead of a logger specified
-     *                                             in the constructor
-     * @param array                        $params Additional params for template renderer
+     * @inheritdoc
      */
     public function process($object, $notifications, LoggerInterface $logger = null, $params = [])
     {
@@ -101,6 +59,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $logger = $this->logger;
         }
 
+        /** @var EmailNotificationInterface $notification */
         foreach ($notifications as $notification) {
             $emailTemplate = $notification->getTemplate();
             try {
@@ -121,7 +80,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             }
 
             $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
-            $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
+            $senderName = $this->cm->get('oro_notification.email_notification_sender_name');
             if ($notification instanceof SenderAwareEmailNotificationInterface && $notification->getSenderEmail()) {
                 $senderEmail = $notification->getSenderEmail();
                 $senderName = $notification->getSenderName();
@@ -145,43 +104,5 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
 
             $this->addJob(self::SEND_COMMAND);
         }
-    }
-
-    /**
-     * Add log type to log email sending
-     *
-     * @param string $logType
-     */
-    public function addLogType($logType)
-    {
-        $transport = $this->mailer->getTransport();
-        if ($transport instanceof \Swift_Transport_SpoolTransport) {
-            $spool = $transport->getSpool();
-            if ($spool instanceof DbSpool) {
-                $spool->setLogType($logType);
-            }
-        }
-    }
-
-    /**
-     * Add swift mailer spool send task to job queue if it has not been added earlier
-     *
-     * @param string $command
-     * @param array  $commandArgs
-     *
-     * @return Job
-     */
-    protected function createJob($command, $commandArgs = [])
-    {
-        $commandArgs = array_merge(
-            [
-                '--message-limit=' . $this->messageLimit,
-                '--env=' . $this->env,
-                '--mailer=db_spool_mailer',
-            ],
-            $commandArgs
-        );
-
-        return parent::createJob($command, $commandArgs);
     }
 }

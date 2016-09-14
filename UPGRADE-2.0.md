@@ -200,3 +200,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
         `EntityMetadataHelper` $entityMetadataHelper,
         `FieldTypeHelper` $fieldTypeHelper,
         `ConfigManager` $configManager
+
+####NotificationBundle
+- Moved interface `Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
+- Moved interface `Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace

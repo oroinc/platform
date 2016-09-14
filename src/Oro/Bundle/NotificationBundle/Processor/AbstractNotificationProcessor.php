@@ -12,8 +12,6 @@ use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
 abstract class AbstractNotificationProcessor
 {
-    const JOB_ENTITY        = 'JMS\JobQueueBundle\Entity\Job';
-    const SPOOL_ITEM_ENTITY = 'Oro\Bundle\NotificationBundle\Entity\SpoolItem';
 
     /**
      * @var LoggerInterface

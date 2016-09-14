@@ -126,7 +126,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
         if ($data['senderAware']) {
             $notification = $this->getMock(
-                'Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface'
+                'Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface'
             );
             if ($data['fromEmail']) {
                 $notification->expects($this->once())
@@ -141,7 +141,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(null));
             }
         } else {
-            $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
+            $notification = $this->getMock('Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface');
         }
 
         $notification->expects($this->once())
@@ -261,7 +261,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessErrors()
     {
         $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
+        $notification = $this->getMock('Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface');
         $notifications = array($notification);
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');

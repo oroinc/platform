@@ -4,13 +4,14 @@ namespace Oro\Bundle\NotificationBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
-use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class MassNotificationSender
 {
@@ -100,8 +101,8 @@ class MassNotificationSender
      */
     protected function getTemplate($subject)
     {
-        $template = $this->cm->get('oro_notification.mass_notification_template');
-        $template = $this->em->getRepository('OroEmailBundle:EmailTemplate')->findByName($template);
+        $templateName = $this->cm->get('oro_notification.mass_notification_template');
+        $template = $this->getEmailTemplateRepository()->findByName($templateName);
         $templateModel = new EmailTemplate();
         if ($template) {
             /* convert template entity into template model */
@@ -142,7 +143,7 @@ class MassNotificationSender
      */
     protected function getRecipientsFromDB()
     {
-        $qb = $this->em->getRepository('OroUserBundle:User')->getPrimaryEmailsQb(
+        $qb = $this->getUserRepository()->getPrimaryEmailsQb(
             $this->dqlNameFormatter->getFormattedNameDQL('u', 'Oro\Bundle\UserBundle\Entity\User')
         );
         $qb->andWhere('u.enabled = :enabled')->setParameter('enabled', true);
@@ -152,5 +153,21 @@ class MassNotificationSender
         }, $users);
 
         return $users;
+    }
+
+    /**
+     * @return EmailTemplateRepository
+     */
+    private function getEmailTemplateRepository()
+    {
+        return $this->em->getRepository('OroEmailBundle:EmailTemplate');
+    }
+
+    /**
+     * @return UserRepository
+     */
+    private function getUserRepository()
+    {
+        return $this->em->getRepository('OroUserBundle:User');
     }
 }
