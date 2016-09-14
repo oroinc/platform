@@ -151,8 +151,7 @@ return [
                 'actions' => [
                     ['@custom_action2' => null],
                     ['@custom_action' => null],
-                ],
-                'triggers' => []
+                ]
             ]
         ],
         'entity_restrictions' => [],
@@ -198,6 +197,7 @@ return [
                 'form_options' => [],
                 'page_template' => null,
                 'dialog_template' => null,
+                'triggers' => []
             ]
         ],
         'transition_definitions' => [

@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 
 class WorkflowTransitionTriggersAssembler
 {
@@ -44,9 +45,21 @@ class WorkflowTransitionTriggersAssembler
      * @param string $transitionName
      * @param WorkflowDefinition $workflowDefinition
      * @return AbstractTransitionTrigger
+     * @throws AssemblerException
      */
-    private function assembleTrigger(array $options, $transitionName, WorkflowDefinition $workflowDefinition)
+    protected function assembleTrigger(array $options, $transitionName, WorkflowDefinition $workflowDefinition)
     {
+        if (empty($options['event']) && empty($options['cron'])) {
+            throw new AssemblerException(
+                sprintf(
+                    'Either `event` or `cron` type of triggers must be specified.' .
+                    'Got none in `%s` workflow configuration for `%s` transition triggers.',
+                    $workflowDefinition->getName(),
+                    $transitionName
+                )
+            );
+        }
+
         /**@var AbstractTransitionTrigger $trigger */
         $trigger = !empty($options['event'])
             ? $this->createEventTrigger($options, $workflowDefinition)
