@@ -107,7 +107,7 @@ class CalendarEventHandler
                 // Contexts handling should be moved to common for activities form handler
                 if ($this->form->has('contexts')) {
                     $contexts = $this->form->get('contexts')->getData();
-                    $owner = $entity->getCalendar()->getOwner();
+                    $owner = $entity->getCalendar() ? $entity->getCalendar()->getOwner() : null;
                     if ($owner && $owner->getId()) {
                         $contexts = array_merge($contexts, [$owner]);
                     }
