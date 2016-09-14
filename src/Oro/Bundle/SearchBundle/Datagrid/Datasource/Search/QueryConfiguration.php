@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Datasource;
+namespace Oro\Bundle\SearchBundle\Datagrid\Datasource\Search;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -30,16 +30,11 @@ class QueryConfiguration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
-                ->arrayNode('join')
-                    ->append($this->addJoinNode('left'))
-                    ->append($this->addJoinNode('inner'))
-                ->end()
                 ->arrayNode('where')
                     ->append($this->addWhereNode('and'))
                     ->append($this->addWhereNode('or'))
                 ->end()
                 ->scalarNode('groupBy')->end()
-                ->scalarNode('having')->end()
                 ->arrayNode('orderBy')
                     ->prototype('array')
                         ->children()

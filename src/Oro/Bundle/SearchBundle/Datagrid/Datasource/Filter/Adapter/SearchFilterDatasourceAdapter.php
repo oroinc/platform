@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Datagrid\Datasource\Search;
+namespace Oro\Bundle\SearchBundle\Datagrid\Datasource\Filter\Adapter;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 

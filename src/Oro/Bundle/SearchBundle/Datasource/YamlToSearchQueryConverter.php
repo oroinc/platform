@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Datasource;
 
 use Symfony\Component\Config\Definition\Processor;
 
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\QueryConfiguration;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class YamlToSearchQueryConverter
