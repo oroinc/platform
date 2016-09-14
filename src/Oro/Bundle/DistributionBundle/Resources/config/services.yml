@@ -10,8 +10,11 @@ parameters:
     oro_distribution.composer.json_file.class:                Composer\Json\JsonFile
     oro_distribution.composer_json:                           %kernel.root_dir%/../composer.json
 
-    oro_distribution.listener.navigation_listener.class:      Oro\Bundle\DistributionBundle\EventListener\NavigationListener
-    oro_distribution.entry_point:                             ~
+    #
+    # BAP-10865: Hide "Package Manager" from menu
+    #
+    #oro_distribution.listener.navigation_listener.class:      Oro\Bundle\DistributionBundle\EventListener\NavigationListener
+    #oro_distribution.entry_point:                             ~
 
     oro_distribution.security.access_denied_listener.class:   Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
 
@@ -110,17 +113,19 @@ services:
         class: %oro_distribution.composer.json_file.class%
         arguments:
           - %oro_distribution.composer_json%
-
+    #
+    # BAP-10865: Hide "Package Manager" from menu
+    #
     ### Menu
-    oro_distribution.listener.navigation_listener:
-        class: %oro_distribution.listener.navigation_listener.class%
-        arguments:
-            - '@security.context'
-            - %oro_distribution.entry_point%
-        tags:
-            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
-        calls:
-            - [setRequest, ["@?request="]]
+    #oro_distribution.listener.navigation_listener:
+    #    class: %oro_distribution.listener.navigation_listener.class%
+    #    arguments:
+    #        - '@security.context'
+    #        - %oro_distribution.entry_point%
+    #    tags:
+    #        - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+    #    calls:
+    #        - [setRequest, ["@?request="]]
 
     ### Form
     oro_distribution.form.type.composer_config:

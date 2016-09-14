@@ -59,10 +59,11 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param string $name Element name
+     * @param Element $context
      *
      * @return Element
      */
-    public function createElement($name)
+    public function createElement($name, Element $context = null)
     {
         if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
@@ -71,10 +72,32 @@ class OroElementFactory implements SuiteAwareInterface
             ));
         }
 
-        $element = $this->instantiateElement($this->configuration[$name]);
+        $elementConfig = $this->configuration[$name];
+
+        if ($context) {
+            $elementConfig['selector'] = $this->prepend($elementConfig['selector'], $context);
+        }
+
+        $element = $this->instantiateElement($elementConfig);
         $this->injectSuite($element);
 
         return $element;
+    }
+
+    /**
+     * @param $selector String or array
+     * @param Element $element Context element xpath of which will prepend before given selector
+     *
+     * @return array Xpath selector ['type' => 'xpath', 'locator' => '//']
+     */
+    protected function prepend($selector, Element $element)
+    {
+        $xpath = $this->selectorManipulator->prepend(
+            $this->selectorManipulator->getSelectorAsXpath($this->selectorsHandler, $selector),
+            $element->getXpath()
+        );
+
+        return ['type' => 'xpath', 'locator' => $xpath];
     }
 
     /**
@@ -110,10 +133,11 @@ class OroElementFactory implements SuiteAwareInterface
     /**
      * @param string $name Element name
      * @param string $text Text that contains in element node
+     * @param Element $context
      *
      * @return Element
      */
-    public function findElementContains($name, $text)
+    public function findElementContains($name, $text, Element $context = null)
     {
         if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
@@ -127,6 +151,10 @@ class OroElementFactory implements SuiteAwareInterface
             $this->configuration[$name]['selector'],
             $text
         );
+
+        if ($context) {
+            $elementSelector = $this->prepend($elementSelector, $context);
+        }
 
         $element = new $elementClass($this->mink->getSession(), $this, $elementSelector);
 

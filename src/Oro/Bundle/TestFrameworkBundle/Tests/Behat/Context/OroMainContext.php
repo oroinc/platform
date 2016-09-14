@@ -43,20 +43,36 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title)
     {
-        $this->spin(function (MinkContext $context) use ($title) {
-            $context->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
-
-            return true;
+        $messageElement = $this->spin(function (MinkContext $context) {
+            return $context->getSession()->getPage()->find('css', '.flash-messages-holder div.alert');
         });
+
+        self::assertNotFalse($messageElement, 'Flash message not found on page');
+        $flashMessage = $messageElement->getText();
+        $messageElement->find('css', 'button.close')->press();
+
+        self::assertContains($title, $flashMessage, sprintf(
+            'Expect that "%s" flash message contains "%s" string, but it isn\'t',
+            $flashMessage,
+            $title
+        ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function assertPageContainsText($text)
     {
-        $this->spin(function (MinkContext $context) use ($text) {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
             $context->assertSession()->pageTextContains($this->fixStepArgument($text));
 
             return true;
         });
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was not found anywhere in the text of the current page.', $text)
+        );
     }
 
     /**
@@ -67,21 +83,34 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeErrorMessage($title)
     {
-        $this->spin(function (MinkContext $context) use ($title) {
-            $context->assertSession()->elementTextContains('css', '.alert-error', $title);
-
-            return true;
+        $errorElement = $this->spin(function (MinkContext $context) {
+            return $context->getSession()->getPage()->find('css', '.alert-error');
         });
+
+        self::assertNotFalse($errorElement, 'Error message not found on page');
+        $message = $errorElement->getText();
+        $errorElement->find('css', 'button.close')->press();
+
+        self::assertContains($title, $message, sprintf(
+            'Expect that "%s" error message contains "%s" string, but it isn\'t',
+            $message,
+            $title
+        ));
     }
 
-    public function spin($lambda)
+    /**
+     * @param \Closure $lambda
+     * @return false|mixed Return false if closure throw error or return not true value.
+     *                     Return value that return closure
+     */
+    public function spin(\Closure $lambda)
     {
         $time = 60;
 
         while ($time > 0) {
             try {
-                if ($lambda($this)) {
-                    return true;
+                if ($result = $lambda($this)) {
+                    return $result;
                 }
             } catch (\Exception $e) {
                 // do nothing
@@ -90,6 +119,8 @@ class OroMainContext extends MinkContext implements
             usleep(250000);
             $time -= 0.25;
         }
+
+        return false;
     }
 
     /**
@@ -199,7 +230,7 @@ class OroMainContext extends MinkContext implements
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
-        $this->getSession()->getDriver()->waitForAjax();
+        $this->waitForAjax();
         $form = $fieldSet->getLastSet();
         $form->fill($table);
     }
@@ -210,7 +241,8 @@ class OroMainContext extends MinkContext implements
      */
     public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
     {
-        $this->visit('user/login');
+        $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
+        $this->visit($uri);
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
@@ -451,5 +483,13 @@ class OroMainContext extends MinkContext implements
             default:
                 return (int) $count;
         }
+    }
+
+    /**
+     * @param int $time
+     */
+    protected function waitForAjax($time = 60000)
+    {
+        return $this->getSession()->getDriver()->waitForAjax($time);
     }
 }

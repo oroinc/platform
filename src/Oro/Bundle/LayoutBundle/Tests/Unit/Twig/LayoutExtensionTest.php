@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 
 class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
@@ -22,7 +21,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->renderer   = $this->getMock('Symfony\Bridge\Twig\Form\TwigRendererInterface');
+        $this->renderer   = $this->getMock('Oro\Bundle\LayoutBundle\Form\TwigRendererInterface');
         $this->textHelper = $this->getMockBuilder('Oro\Component\Layout\Templating\TextHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -64,7 +63,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $functions = $this->extension->getFunctions();
 
-        $this->assertCount(4, $functions);
+        $this->assertCount(5, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $this->assertInstanceOf('Twig_SimpleFunction', $functions[0]);
@@ -81,6 +80,10 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($function->getCallable());
         $this->assertEquals(LayoutExtension::RENDER_BLOCK_NODE_CLASS, $function->getNodeClass());
         $function = $functions[3];
+        $this->assertEquals('parent_block_widget', $function->getName());
+        $this->assertNull($function->getCallable());
+        $this->assertEquals(LayoutExtension::RENDER_BLOCK_NODE_CLASS, $function->getNodeClass());
+        $function = $functions[4];
         $this->assertEquals('layout_attr_defaults', $function->getName());
         $this->assertNotNull($function->getCallable());
         $this->assertEquals([$this->extension, 'defaultAttributes'], $function->getCallable());

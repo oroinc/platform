@@ -1,0 +1,7 @@
+.link {
+    color: $link-color;
+
+    &:hover {
+        color: $link-color-hover;
+    }
+}

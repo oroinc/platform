@@ -1,0 +1,13 @@
+features:
+    feature1:
+        label: "Feature 1"
+        toggle: toggle1
+        description: "Description 1"
+        dependencies:
+            - 'feature2'
+        routes:
+            - f1_route1
+            - f1_route2
+        configuration:
+            - config_section1
+            - config_leaf1

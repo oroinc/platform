@@ -1,0 +1,7 @@
+acls:
+    oro_message_queue_job:
+        label: oro.message_queue_job.action.job_management
+        type: action
+        group_name: ""
+        bindings: ~
+        category: "application"

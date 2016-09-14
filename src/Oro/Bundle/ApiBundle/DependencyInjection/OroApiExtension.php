@@ -181,7 +181,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $config = [];
         foreach ($resources as $resource) {
-            $config[] = $resource->data['oro_api'];
+            $config[] = $resource->data[ApiConfiguration::ROOT_NODE];
         }
         $config = $this->processConfiguration(
             new ApiConfiguration($container->get(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)),

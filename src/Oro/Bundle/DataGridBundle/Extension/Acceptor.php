@@ -60,7 +60,7 @@ class Acceptor
     }
 
     /**
-     * Add extension that applicable to datagrid and resort all added extensions
+     * Adds an extension that applicable to datagrid
      *
      * @param ExtensionVisitorInterface $extension
      *
@@ -70,6 +70,14 @@ class Acceptor
     {
         $this->extensions[] = $extension;
 
+        return $this;
+    }
+
+    /**
+     * Sorts extensions by priority
+     */
+    public function sortExtensionsByPriority()
+    {
         $comparisonClosure = function (ExtensionVisitorInterface $a, ExtensionVisitorInterface $b) {
             if ($a->getPriority() === $b->getPriority()) {
                 return 0;
