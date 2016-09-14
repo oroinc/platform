@@ -339,3 +339,6 @@ After
 oro_email.email_address.entity_manager:
     parent: oro_entity.abstract_entity_manager
 ```
+
+####InstallerBundle
+- `oro:platform:update` command now automatically clears cache after application update
