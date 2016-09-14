@@ -80,7 +80,7 @@ class Translation
     }
 
     /**
-     * @param mixed $value
+     * @param string $value
      * @return $this
      */
     public function setValue($value)
@@ -91,7 +91,7 @@ class Translation
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getValue()
     {
