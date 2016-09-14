@@ -23,8 +23,8 @@ oro:
             button: Minimize
             button.title: Pin/unpin the page
         menuupdate:
-            entity_label: Menu Update
-            entity_plural_label: Menu Update
+            entity_label: Menu Item
+            entity_plural_label: Menu Item
             id.label: Id
             key.label: Key
             parent_key.label: Parent Key
@@ -35,3 +35,4 @@ oro:
             priority.label: Priority
             ownership_type.label: Ownership Type
             owner_id.label: Owner Id
+            saved_message: Menu item saved successfully.

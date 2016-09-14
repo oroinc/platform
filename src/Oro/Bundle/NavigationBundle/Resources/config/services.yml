@@ -3,6 +3,7 @@ parameters:
     oro_navigation.entity.navigation_history_item.class:       Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem
     oro_navigation.entity.pinbar_tab.class:                    Oro\Bundle\NavigationBundle\Entity\PinbarTab
     oro_navigation.entity.page_state.class:                    Oro\Bundle\NavigationBundle\Entity\PageState
+    oro_navigation.entity.menu_update.class:                   Oro\Bundle\NavigationBundle\Entity\MenuUpdate
 
     oro_menu.factory.acl_extension.class:                      Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
@@ -20,6 +21,7 @@ parameters:
     oro_navigation.item.builder.history.class:                 Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder
     oro_navigation.item.factory.class:                         Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
     oro_navigation.item.pinbar.post_persist_listener.class:    Oro\Bundle\NavigationBundle\Entity\Listener\PinbarPostPersist
+    oro_navigation.menu_update.pre_persist_listener.class:     Oro\Bundle\NavigationBundle\Entity\Listener\MenuUpdatePrePersist
 
     oro_navigation.event.response_history.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
     oro_navigation.event.response_hashnav.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
@@ -156,6 +158,12 @@ services:
             - [ setClassName, [ %oro_navigation.entity.pinbar_tab.class% ]]
         tags:
             - { name: doctrine.event_listener, event: postPersist }
+
+    oro_navigation.menu_update.pre_persist_listener:
+        class: %oro_navigation.menu_update.pre_persist_listener.class%
+        public: false
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: %oro_navigation.entity.menu_update.class%, event: prePersist }
 
     oro_navigation.pinbar_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%

@@ -72,6 +72,7 @@ class OroNavigationExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('content_providers.yml');
+        $loader->load('form_types.yml');
 
         $container
             ->getDefinition('oro_menu.configuration_builder')

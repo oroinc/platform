@@ -10,3 +10,11 @@ Oro\Bundle\NavigationBundle\Entity\PageState:
             - NotBlank:     ~
         data:
             - NotBlank:     ~
+
+Oro\Bundle\NavigationBundle\Entity\MenuUpdate:
+    properties:
+        titles:
+            - Valid: ~
+        uri:
+            - NotBlank:
+                groups: [Create]

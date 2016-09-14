@@ -1,0 +1,77 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% set formAction = app.request.uri %}
+
+{% oro_title_set({params : {"%entity.key%": entity.key, "%entityName%": 'oro.navigation.menuupdate.entity_label'|trans }}) %}
+{% set entityId = entity.id %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_navigation_menu_update_update') %}
+        {% set html = UI.saveAndCloseButton({
+            'route': 'oro_navigation_menu_update_update',
+            'params': {'menu': '$menu', 'key': '$key'}
+        }) %}
+    {% endif %}
+    {% if resource_granted('oro_navigation_menu_update_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_navigation_menu_update_create',
+            'params': {'menu': '$menu', 'parentKey': '$parentKey'}
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% if entityId %}
+        {% set breadcrumbs = {
+            'entity': entity,
+            'indexPath': app.request.uri,
+            'indexLabel': 'oro.navigation.menuupdate.entity_plural_label'|trans,
+            'entityTitle': entity.key
+        } %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'menu-update-form' %}
+
+    {% set dataBlocks = [{
+        'title': 'General Information'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.titles),
+                    form_row(form.uri),
+                    form_row(form.active)
+                ]
+            }
+        ]
+    }] %}
+
+    {% set additionalData = [] %}
+    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+        {% set additionalData = additionalData|merge([form_row(child)]) %}
+    {% endfor %}
+    {% if additionalData is not empty %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'Additional'|trans,
+            'subblocks': [{
+                'title': '',
+                'useSpan': false,
+                'data' : additionalData
+            }]
+        }] ) %}
+    {% endif %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock content_data %}
