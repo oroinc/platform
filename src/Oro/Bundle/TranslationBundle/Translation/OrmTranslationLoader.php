@@ -43,16 +43,9 @@ class OrmTranslationLoader implements LoaderInterface
 
         if ($this->checkDatabase()) {
             $messages = [];
-            /** @var Translation[] $translations */
             $translations = $this->translationManager->findValues($locale, $domain);
             foreach ($translations as $translation) {
-                // UI scope should override SYSTEM values if exist
-                if ($translation->getScope() == Translation::SCOPE_UI
-                    ||
-                    !isset($messages[$translation->getTranslationKey()->getKey()])
-                ) {
-                    $messages[$translation->getTranslationKey()->getKey()] = $translation->getValue();
-                }
+                $messages[$translation->getTranslationKey()->getKey()] = $translation->getValue();
             }
 
             $catalogue->add($messages, $domain);

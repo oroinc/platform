@@ -17,9 +17,12 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
     {
         $oldTranslationsCnt = $this->getTranslationsByLocaleCount(LoadLanguages::LANGUAGE1);
         $translation = new Translation();
+        $translationKey = (new TranslationKey())->setKey('new_key')->setDomain('new_domain');
+        $translationKey = $this->processTranslationKey($translationKey);
+
         $translation
             ->setLanguage($this->getReference(LoadLanguages::LANGUAGE1))
-            ->setTranslationKey((new TranslationKey())->setKey('new_key')->setDomain('new_domain'))
+            ->setTranslationKey($translationKey)
             ->setValue('new_value');
 
         $this->processTranslation($translation);

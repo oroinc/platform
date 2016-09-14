@@ -118,7 +118,7 @@ class LanguageOperationsTest extends ActionTestCase
         ]);
 
         // temporary file would be removed automatically
-        copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
+        copy(__DIR__ . '/../DataFixtures/Translations/fr_FR.zip', $tmpDir . '.zip');
 
         $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');
         $client = $this->mockLanguageHelper($languageHelper);

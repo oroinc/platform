@@ -70,7 +70,7 @@ class DatabasePersister
                     }
 
                     $writeCount++;
-                    $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
+                    $this->toWrite[] = $this->translationManager->saveValue($key, $translation, $locale, $domain);
                     if (0 === $writeCount % $this->batchSize) {
                         $this->write($this->toWrite);
 
@@ -95,37 +95,11 @@ class DatabasePersister
     }
 
     /**
-     * Do persist into EntityManager
-     *
-     * @param array $items
+     * Flush all changes
      */
-    private function write(array $items)
+    private function write()
     {
-        foreach ($items as $item) {
-            $this->getEntityManager()->persist($item);
-        }
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
-    }
-
-    /**
-     * Find existing translation in database
-     *
-     * @param string $key
-     * @param string $locale
-     * @param string $domain
-     * @param string $value
-     *
-     * @return Translation
-     */
-    private function getTranslationObject($key, $locale, $domain, $value)
-    {
-        if (null === ($object = $this->translationManager->findValue($key, $locale, $domain))) {
-            $object = $this->translationManager->createValue($key, $value, $locale, $domain);
-        }
-
-        $object->setValue($value);
-
-        return $object;
+        $this->translationManager->flush();
+        $this->translationManager->clear();
     }
 }

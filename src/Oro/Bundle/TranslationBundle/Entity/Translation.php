@@ -27,7 +27,7 @@ class Translation
     /**
      * @var TranslationKey
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\TranslationKey", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\TranslationKey")
      * @ORM\JoinColumn(name="key_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
     protected $translationKey;
