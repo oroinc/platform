@@ -428,4 +428,13 @@ abstract class AbstractScopeManager
 
         return $identifier;
     }
+
+    /**
+     * Clear all data stored in cache and internal storage
+     */
+    public function clearCache()
+    {
+        $this->cache->deleteAll();
+        $this->storedSettings = [];
+    }
 }

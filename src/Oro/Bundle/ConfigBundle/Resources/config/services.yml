@@ -14,6 +14,8 @@ parameters:
     oro_config.type.config_checkbox.class:                                       Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
     oro_config.type.parent_scope_checkbox.class:                                 Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox
 
+    oro_config.migration.post_up.listener.class:                                 Oro\Bundle\ConfigBundle\EventListener\PostUpMigrationListener
+
     oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
 
     oro_config.manager.class:                                                    Oro\Bundle\ConfigBundle\Config\ConfigManager
@@ -127,3 +129,10 @@ services:
         class: %oro_config.manager.api.class%
         arguments:
             - '@oro_config.provider.system_configuration.form_provider'
+
+    oro_config.migration.post_up.listener:
+        class: %oro_config.migration.post_up.listener.class%
+        arguments:
+            - @oro_config.manager
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: updateConfigs, priority: 0 }

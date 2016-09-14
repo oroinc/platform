@@ -500,6 +500,20 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([33 => 'val1', 55 => 'val2'], $this->manager->getValues($parameterName, $entities));
     }
 
+    public function testClearCache()
+    {
+        $this->manager->set('first.second', 'value');
+        $this->assertNotEmpty($this->manager->get('first.second'));
+
+        $this->userScopeManager->expects($this->once())
+            ->method('clearCache');
+        $this->globalScopeManager->expects($this->once())
+            ->method('clearCache');
+
+        $this->manager->clearCache();
+        $this->assertEmpty($this->manager->get('first.second'));
+    }
+
     /**
      * @return array
      */

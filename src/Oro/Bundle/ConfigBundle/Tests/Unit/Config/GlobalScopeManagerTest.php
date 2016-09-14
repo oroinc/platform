@@ -38,7 +38,7 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->disableOriginalConstructor()
-            ->setMethods(['fetch', 'save'])
+            ->setMethods(['fetch', 'save', 'deleteAll'])
             ->getMockForAbstractClass();
 
         $doctrine->expects($this->any())
@@ -236,5 +236,17 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('updated value', $this->manager->getSettingValue('oro_user.update'));
         $this->assertNull($this->manager->getSettingValue('oro_user.remove'));
         $this->assertEquals('new value', $this->manager->getSettingValue('oro_user.add'));
+    }
+
+    public function testClearCache()
+    {
+        $this->manager->set('first.second', 'value');
+        $this->assertAttributeNotEmpty('storedSettings', $this->manager);
+
+        $this->cache->expects($this->once())
+            ->method('deleteAll');
+
+        $this->manager->clearCache();
+        $this->assertAttributeEmpty('storedSettings', $this->manager);
     }
 }
