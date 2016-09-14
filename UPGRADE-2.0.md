@@ -7,7 +7,7 @@ UPGRADE FROM 1.10 to 2.0
 - Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
 
 ####WorkflowBundle
-- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` 
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
     - construction signature was changed now it takes next arguments:
         - `WorkflowRegistry` $workflowRegistry,
         - `DoctrineHelper` $doctrineHelper,
@@ -25,7 +25,7 @@ UPGRADE FROM 1.10 to 2.0
         - now the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_DEACTIVATED` if workflow was deactivated.
     - method `resetWorkflowData` was added with `WorkflowDefinition $workflowDefinition` as single argument. It removes from database all workflow items related to corresponding workflow.
     - method `resetWorkflowItem` was removed
-- Entity configuration (`@Config()` annotation) sub-node `workflow.active_workflow` was removed in favor of `WorkflowDefinition` field `active`. Now for proper workflow activation through configuration you should use `defaults.active: true` in corresponded workflow YAML config. 
+- Entity configuration (`@Config()` annotation) sub-node `workflow.active_workflow` was removed in favor of `WorkflowDefinition` field `active`. Now for proper workflow activation through configuration you should use `defaults.active: true` in corresponded workflow YAML config.
 - Class `Oro\Bundle\WorkflowBundle\Model\Workflow` changed constructor signature. First argument `EntityConnector` was replaced by `DoctrineHelper`
     - method `resetWorkflowData` was removed - use `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::resetWorkflowData` instead.
 - Repository `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository` signature was changed for method `resetWorkflowData` :
@@ -40,11 +40,11 @@ UPGRADE FROM 1.10 to 2.0
 - Service `oro_workflow.entity_connector` (`Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector`) was added with purpose to check whether entity can be used in workflow as related.
 - Now entity can have more than one active workflows.
 - Activation of workflows now provided through `WorkflowManager::activateWorkflow` and `WorkflowManager::deactivateWorkflow` methods as well as with workflow YAML configuration boolean node `defaults.active` to load default activation state from configuration.
-    
+
     **NOTE**: Please pay attention to make activations only through corresponded `WorkflowManager` methods.
-            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter. 
+            Do **NOT** make direct changes in `WorkflowDefinition::setActive` setter.
             As `WorkflowManager` is responsive for activation events emitting described above.
-     
+
 - Added trait `Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait` with methods:
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder trough specified workflowItem alias
@@ -53,8 +53,6 @@ UPGRADE FROM 1.10 to 2.0
         Note: `joinWorkflowStep` internally checks for workflowItem alias join to be already present in QueryBuilder instance to use it or creates new one otherwise.
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
 * Now entity can have more than one active workflows.
-* Entity config for `workflow.active_workflow` node were changed to `workflow.active_workflows` array as it now supports multiple active workflows.
-* Added single point of workflow activation/deactivation through `@oro_workflow.manager.system_config` (`Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager`) that emits corresponding events (`'oro.workflow.activated'`, `'oro.workflow.deactivated'`).
 * Activation or deactivation of workflow now triggers removal for all data in affected entity flows. So when workflow is deactivated or reactivated - WorkflowItems will be removed from storage.
 * Controllers methods (REST as well) for activation/deactivation now takes `workflowName` as `WorkflowDefinition` identifier instead of related entity class string.
 * Steps retrieval for an entity now returns steps for all currently active workflows for related entity with `workflow` node in each as name of corresponding workflow for steps in `stepsData`. Example: `{"workflowName":{"workflow": "workflowName", "steps":["step1", "step2"], "currentStep": "step1"}}`
@@ -100,7 +98,7 @@ UPGRADE FROM 1.10 to 2.0
 * Added `actions` to transition definition for use instead of `post_actions`
 * Definitions `pre_conditions`, `init_actions`, `post_actions` marked as deprecated
 - Added workflow definition configuration node `exclusive_active_groups` to determine exclusiveness of active state in case with conflicting workflows in system.
-- Added workflow definition configuration node `exclusive_record_groups` to determine exclusiveness of currently running workflow for an related entity by named group.  
+- Added workflow definition configuration node `exclusive_record_groups` to determine exclusiveness of currently running workflow for an related entity by named group.
 - Added `WorkflowDefinition` property with workflow YAML configuration node `priority` to be able regulate order of workflow acceptance in cases with cross-functionality.
     For example `workflow_record_group` with two workflows in one group and auto start transition will be sorted by priority and started only one with higher priority value.
 * Removed service `@oro_workflow.manager.system_config` and its class `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` as now there no entity configuration for active workflows. Activation and deactivation of a workflow now should be managed through WorkflowManager (`Oro\Bundle\WorkflowBundle\Model\WorkflowManager`- `@@oro_workflow.manager`)
@@ -110,10 +108,13 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Added `priority` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` and workflow configuration to be able configure priorities in workflow applications.
 * Added `isActive` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instead of EntityConfig
 * Added `groups` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` that contains `WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE` and `WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD` nodes of array with corresponded groups that `WorkflowDefintiion` is belongs to.
-* Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` 
+* Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * `getName`, `getLabel` and `isActive` methods of `Oro\Bundle\WorkflowBundle\Model\Workflow` now are proxy methods to its `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instance.
 * Removed method `getStartTransitions` from `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` -  `$workflow->getTransitionManager()->getStartTransitions()` can be used instead
-* Entity config `workflow.active_workflows` was removed. Use workfow configuration boolean node `defaults.active` instead.
+* Entity config `workflow.active_workflows` was removed. Use workflows configuration boolean node `defaults.active` instead.
+* Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
+* Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
+- `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
@@ -126,6 +127,10 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added ExpressionFunction `localized_value` to `Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider` - can be used in Layouts
 - Added Localization Settings page in System configuration
 - Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values
+- Changed signature of constructor of `Oro\Bundle\LocaleBundle\Form\Type\LanguageType` - now it takes following arguments:
+    - `ConfigManager $cm`,
+    - `LanguageProvider $languageProvider`.
+- `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
@@ -145,14 +150,35 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added methods `Oro\Component\Layout\Model\LayoutUpdateImport::getParent` and `Oro\Component\Layout\Model\LayoutUpdateImport::setParent` that contains parent `Oro\Component\Layout\Model\LayoutUpdateImport` for nested imports.
 - Renamed option for `Oro\Component\Layout\Block\Type\BaseType` from `additional_block_prefix` to `additional_block_prefixes`, from now it contains array.
 - Added methods `getRoot`, `getReplacement`, `getNamespace` and `getAdditionalBlockPrefixes` to `Oro\Component\Layout\ImportLayoutManipulator` for working with nested imports.
+- Added method `Oro\Component\Layout\Templating\Helper\LayoutHelper::parentBlockWidget` for rendering parent block widget.
+- Added method `getUpdateFileNamePatterns` to `Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface`.
+- Added method `getUpdateFilenamePattern` to `Oro\Component\Layout\Loader\Driver\DriverInterface`.
+- Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list. 
 
-####ConfigBundle
+####LayoutBundle
+- Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
+- Added class `Oro\Bundle\LayoutBundle\EventListener\ContainerListener`, register event `onKernelRequest` that helps to warm cache for layout updates resources.
+- Moved layout updates from container to `oro.cache.abstract`
+- Added new Twig function `parent_block_widget` to `Oro\Bundle\LayoutBundle\Twig\LayoutExtension` for rendering parent block widget.
+- Added interface `Oro\Component\Layout\Form\FormRendererInterface` to add fourth argument `$renderParentBlock` to method `searchAndRenderBlock` that tells renderer to search for widget in parent theme resources.
+- Added interface `Oro\Bundle\LayoutBundle\Form\TwigRendererInterface` that extends new `Oro\Component\Layout\Form\FormRendererInterface`.
+- Added interface `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface` that extends `Symfony\Component\Form\FormRendererEngineInterface` to add new method `switchToNextParentResource` needed for `parent_block_widget`.
+- Added interface `Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface` that extends new `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface` for using it everywhere in LayoutBundle instead of `Symfony\Bridge\Twig\Form\TwigRendererEngineInterface`.
+- Added class `Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine` that extends `Symfony\Bridge\Twig\Form\TwigRendererEngine` and implements new `Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface`.
+- Updated class `Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine` to extend new `Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine`.
+- Updated class `Oro\Bundle\LayoutBundle\Form\RendererEngine\TemplatingRendererEngine` that extends `Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine` and implements `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface`.
+- Updated class `Oro\Bundle\LayoutBundle\Form\TwigRendererEngine` to extend new `Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine`.
+- Updated class `Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer` to implement `Oro\Bundle\LayoutBundle\Form\TwigRendererInterface`.
+
+####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
 - Class `Oro\Bundle\ConfigBundle\Config\ConfigManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `get`, `getInfo`, `set`, `reset`, `flush`, `save`, `calculateChangeSet`, `reload`, `getValue`, `buildChangeSet`
 - Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
+- System configuration now loads from `Resources/config/oro/system_configuration.yml` instead of `Resources/config/system_configuration.yml` file.
+- Root node for system configuration in `Resources/config/oro/system_configuration.yml` file were changed from `oro_system_configuration` to `system_configuration`.
 
 ####DatagridBundle:
-- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php` 
+- Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
     - construction signature was changed now it takes next arguments:
         - `SystemAwareResolver` $resolver,
         - `CacheProvider` $cache
@@ -161,11 +187,160 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - method `getDatagridConfigurationLoader` was added to get loader for datagrid.yml files.
     - method `ensureConfigurationLoaded` was added to check if datagrid config need to be loaded to cache.
     - You can find example of refreshing datagrid cache in `Oro/Bundle/DataGridBundle/EventListener/ContainerListener.php`
-  
+- Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts.
+- Configuration files for datagrids now loads from `Resources/config/oro/datagrids.yml` file instead of `Resources/config/datagrid.yml`.
+- Configuration files root node now changed to its plural form `datagrids: ...`.
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ExportAction`
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ImportAction`
+- Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\AbstractImportExportAction`
+
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
 - Added layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator`.
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
+- ACLs configuration file now loads from `Resources/config/oro/acls.yml` file instead of `Resources/config/oro/acls.yml` file
+- ACLs configuration file now has root node in their structure named `acls`. So all ACLs should be placed under the root.
+
+####ImportExportBundle
+- Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
+- For `Oro\Bundle\ImportExportBundle\Job\JobExecutor` added new public method `setEventDispatcher` for setting Event Dispatcher.
+
+####TranslationBundle
+- Added controller `Oro\Bundle\TranslationBundle\Controller\LanguageController` for manage Languages.
+- Removed controller `Oro\Bundle\TranslationBundle\Controller\ServiceController`.
+- Added entity `Oro\Bundle\TranslationBundle\Entity\Language`.
+- Added import and export features for translations.
+- Added class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` for getting available and enabled languages.
+- Added class `Oro\Bundle\TranslationBundle\Helper\LanguageHelper` with helpers-methods for managing Languages.
+- Class `Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider`:
+    - In method `download` removed argument `$toApply` and the class accepts following arguments now:
+        - `string $pathToSave`,
+        - `array $projects`,
+        - `string $locale (default null)`.
+    - Added method `loadTranslatesFromFile` for loading translations from file. Arguments:
+        - `string $pathToSave`,
+        - `string $locale (default null)`.
+- Removed form `Oro\Bundle\TranslationBundle\Form\Type\AvailableTranslationsConfigurationType`.
+- Removed twig extension `Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension`.
+
+####EntityExtendBundle
+- `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
+    - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
+    - removed property `tableToClassMap` in favour of `tableToClassesMap`
+- `Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsBuilder
+    - construction signature was changed now it takes next arguments:
+        `EntityMetadataHelper` $entityMetadataHelper,
+        `FieldTypeHelper` $fieldTypeHelper,
+        `ConfigManager` $configManager
+    - removed property `tableToEntityMap` in favour of `tableToEntitiesMap`
+    - renamed method `getEntityClassName` in favour of `getEntityClassNames`
+- `Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser`
+    - construction signature was changed now it takes next arguments:
+        `EntityMetadataHelper` $entityMetadataHelper,
+        `FieldTypeHelper` $fieldTypeHelper,
+        `ConfigManager` $configManager
+- Entity extend configuration now loads from `Resources/conig/oro/entity_extend.yml` file instead of `Resources/config/entity_extend.yml`
+- Root node for entity extend configuration in file `Resources/conig/oro/entity_extend.yml` were changed from `oro_entity_extend` to `entity_extend`
+- `Oro\Bundle\EntityExtendBundle\Command\CacheCommand::setClassAliases` no longer throws `\ReflectionException`
+- `Oro\Bundle\EntityExtendBundle\OroEntityExtendBundle::checkConfigs` and `Oro\Bundle\EntityExtendBundle\OroEntityExtendBundle::initializeCache`
+throws `\RuntimeException` if cache initialization failed. Make sure you don't autoload extended entity classes during container compilation.
+- `cache_warmer` is decorated to allow disable cache warming during extend commands calls. Tag your warmer with `oro_entity_extend.warmer`
+tag if it works with extend classes
+
+####ApiBundle:
+- API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
+- `Resources/config/oro/api.yml` root node were renamed from `oro_api` to `api`.
+
+####QueryDesignerBundle:
+- YAML Configuration for query designer now loads from `Resources/config/oro/query_designer.yml` file instead of `Resources/config/query_designer.yml`.
+
+####TestFrameworkBundle:
+- Behat elements now loads from `Resources/config/oro/behat_elements.yml` file instead of `Resources/config/behat_elements.yml`.
+
+####ChartBundle:
+- Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
+- Root node for charts configuration in `Resources/config/oro/charts.yml` file were changed from `oro_chart` to `charts`.
+
+####IntegrationBundle:
+- Integration configuration file now loads from `Resources/config/oro/integrations.yml` file instead of `Resources/config/integration_settings.yml`.
+- Root node for integration config file `Resources/config/oro/integrations.yml` were changed from `oro_integration` to `integrations`.
+
+####EntityConfigBundle:
+- Entity configuration now loads from `Resources/config/oro/entity_config.yml` file instead of `Resources/config/entity_config.yml`.
+- Root node for entity configuration in file `Resources/config/oro/entity_config.yml` were changed from `oro_entity_config` to `entity_config`.
+
+####HelpBundle:
+- Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
+- Root node `help` were added for help configuration in `Resources/config/oro/help.yml` file.
+ 
+####SearchBundle:
+- Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
+- Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
+- `oro_search.entity.repository.search_index` marked as lazy
+
+####UiBundle:
+- Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
+- Additional common root node `placeholders` were added for placeholders configurations in `Resources/config/oro/placeholders.yml` file.
+   *Please node* that your configuration now should have two `placeholders` nodes (one nested in other) instead of single one.
+```YAML
+placeholders:
+    placeholders: ...
+    items: ...
+```
+
+####DashboardBundle:
+- Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
+- Root node for dashboards configuration in `Resources/config/oro/dashboards.yml` file were changed from `oro_dashboard_config` to `dashboards`.
+
+####NavigationBundle:
+- Navigation configuration now loads form `Resources/config/oro/navigation.yml` instead of `Resources/config/navigation.yml` file.
+- Configuration nodes in `Resources/config/oro/navigation.yml` were nested under single root node `navigation`.
+- Configuration nodes in `Resources/config/oro/navigation.yml` were renamed:
+    * `oro_titles` to `titles`
+    * `oro_menu_config` to `menu_config`
+    * `oro_navigation_elements` to `navigation_elements`
+    
+####EmailBundle
+- Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
+- Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
+- Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` changed. Added `ConfigManager $configManager` as last argument.
+- `Oro/Bundle/EmailBundle/Cache/EntityCacheClearer` deprecated, tag on `oro_email.entity.cache.clearer` removed
+- `oro_email.email_address.entity_manager` inherits `oro_entity.abstract_entity_manager`
+- `Oro/Bundle/EmailBundle/Entity/MailboxProcessSettings` no longer inherits `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings`
+- `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` removed
+
+####EntityBundle
+- `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
+
+Before
+```
+oro_workflow.repository.workflow_item:
+    class: Doctrine\ORM\EntityRepository
+    factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+```
+
+After
+```
+oro_workflow.repository.workflow_item:
+    class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
+    parent: oro_entity.abstract_repository
+```
+
+- `oro_entity.abstract_entity_manager` introduced. Please inherit all your doctrine entity manager factory services
+
+Before
+```
+oro_email.email_address.entity_manager:
+    public: false
+    class: Doctrine\ORM\EntityManager
+    factory: ['@doctrine', getManagerForClass]
+```
+
+After
+```
+oro_email.email_address.entity_manager:
+    parent: oro_entity.abstract_entity_manager
+```
 
 ####DataAuditBundle
 - LoggableManager was removed. Some logic moved to SendChangedEntitiesToMessageQueueListener class and some backend processors.
@@ -174,3 +349,4 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - AnnotationDriver was removed.
 - ExtendMetadataFactory was removed.
 - Loggable and Versioned annotations were removed. Use entity config auditable option instead.
+

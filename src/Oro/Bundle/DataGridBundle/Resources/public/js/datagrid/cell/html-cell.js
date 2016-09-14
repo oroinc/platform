@@ -18,7 +18,7 @@ define([
          * model's raw value for this cell's column.
          */
         render: function() {
-            this.$el.empty().html(this.formatter.fromRaw(this.model.get(this.column.get('name'))));
+            this.$el.empty().html(this.model.get(this.column.get('name')));
             return this;
         }
     });

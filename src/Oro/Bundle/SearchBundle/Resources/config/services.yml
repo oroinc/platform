@@ -195,6 +195,7 @@ services:
             - 'search'
         calls:
             - [setRegistry,  ['@doctrine']]
+        lazy: true
 
     oro_search.cache.search_mapping_cache:
         class: %oro_search.cache.search_mapping_cache.class%

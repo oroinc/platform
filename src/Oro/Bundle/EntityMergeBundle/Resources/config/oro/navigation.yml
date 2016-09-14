@@ -1,0 +1,4 @@
+navigation:
+    titles:
+        oro_entity_merge_massaction: oro.entity_merge.action.merge
+        oro_entity_merge: oro.entity_merge.action.merge

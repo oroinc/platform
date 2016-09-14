@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
+use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction;
 
 class MergeMassActionTest extends \PHPUnit_Framework_TestCase
@@ -16,29 +17,21 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $metadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
+        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $metadata
-            ->expects($this->any())
-            ->method('getMaxEntitiesCount')
-            ->will($this->returnValue(self::MAX_ENTITIES_COUNT));
-
-        $metadataRegistry = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadataRegistry
-            ->expects($this->any())
-            ->method('getEntityMetadata')
-            ->will($this->returnValue($metadata));
+        $entityConfig = new EntityConfig(
+            $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
+            ['max_element_count' => self::MAX_ENTITIES_COUNT]
+        );
+        $entityConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->with('SomeEntityClass')
+            ->willReturn($entityConfig);
 
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->target = new MergeMassAction($metadataRegistry, $translator);
+        $this->target = new MergeMassAction($entityConfigProvider, $translator);
     }
 
     /**

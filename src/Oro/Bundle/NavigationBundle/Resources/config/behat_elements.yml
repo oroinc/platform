@@ -1,3 +1,0 @@
-MainMenu:
-  selector: 'div#main-menu'
-  class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
