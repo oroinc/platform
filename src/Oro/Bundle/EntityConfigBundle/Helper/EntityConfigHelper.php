@@ -50,13 +50,24 @@ class EntityConfigHelper
     /**
      * @param string|object $class
      * @param string $name
+     * @param bool $strict
      * @return mixed
      */
-    public function getConfigValue($class, $name)
+    public function getConfigValue($class, $name, $strict = false)
     {
-        $config = $this->configProvider->getConfig($class);
+        $data = null;
 
-        return $config->get($name);
+        try {
+            $config = $this->configProvider->getConfig($class);
+
+            $data = $config->get($name);
+        } catch (\RuntimeException $e) {
+            if ($strict) {
+                throw $e;
+            }
+        }
+
+        return $data;
     }
 
     /**
