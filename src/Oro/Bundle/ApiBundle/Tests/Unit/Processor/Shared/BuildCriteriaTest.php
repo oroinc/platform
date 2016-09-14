@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria;
@@ -20,7 +21,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {
     const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
 
-    /** @var  BuildCriteria */
+    /** @var BuildCriteria */
     protected $processor;
 
     protected function setUp()
@@ -29,7 +30,16 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->setAction('get_list');
 
-        $this->processor = new BuildCriteria($this->configProvider, $this->doctrineHelper);
+        $filterFactory = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $filterFactory->expects($this->any())
+            ->method('createFilter')
+            ->willReturnMap(
+                [
+                    ['string', $this->createFilter('string')],
+                ]
+            );
+
+        $this->processor = new BuildCriteria($this->configProvider, $this->doctrineHelper, $filterFactory);
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -175,6 +185,66 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
             $this->context->getCriteria()->getWhereExpression()
         );
         $this->assertCount(0, $this->context->getErrors());
+    }
+
+    public function testProcessFilteringByRelatedEntityFieldWithNotEqualOperator()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category.name]!=test');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn(
+                $this->getConfig(
+                    ['name'],
+                    ['name' => 'string']
+                )
+            );
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            new Comparison('category.name', '<>', 'test'),
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertCount(0, $this->context->getErrors());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unsupported operator: "!=". Field: "groups.name".
+     */
+    public function testProcessFilteringByToManyRelatedEntityFieldWithNotEqualOperator()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'groups']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[groups.name]!=test');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn(
+                $this->getConfig(
+                    ['name'],
+                    ['name' => 'string']
+                )
+            );
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
     }
 
     public function testProcessFilteringByRelatedEntityFieldWhenAssociationDoesNotExist()
@@ -390,5 +460,18 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
             ->getMock();
 
         return new Criteria($resolver);
+    }
+
+    /**
+     * @param string $dataType
+     *
+     * @return ComparisonFilter
+     */
+    protected function createFilter($dataType)
+    {
+        $filter = new ComparisonFilter($dataType);
+        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+
+        return $filter;
     }
 }

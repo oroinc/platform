@@ -363,7 +363,7 @@ class LoadMetadata implements ProcessorInterface
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->isExcluded()) {
-                $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                $propertyPath = $field->getPropertyPath($fieldName);
                 $result[$propertyPath] = $fieldName;
             }
         }

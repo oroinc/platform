@@ -98,7 +98,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
             if ($metadata->hasAssociation($propertyPath)) {
                 $linkedMetadata = $this->doctrineHelper->getEntityMetadataForClass(
                     $metadata->getAssociationTargetClass($propertyPath)
