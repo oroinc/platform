@@ -3,29 +3,18 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class TranslationTest extends \PHPUnit_Framework_TestCase
+class TranslationKeyTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  TranslationKey */
-    protected $translationKey;
+    use EntityTestCaseTrait;
 
-    protected function setUp()
+    public function testAccessors()
     {
-        $this->translationKey = new TranslationKey();
-    }
-
-    public function testGettersAndSetters()
-    {
-        $this->assertNull($this->translationKey->getId());
-        $this->assertNull($this->translationKey->getKey());
-        $this->assertNull($this->translationKey->getDomain());
-
-        $this->translationKey
-            ->setDomain('Test Domain')
-            ->setKey('Test Key');
-
-        $this->assertNull($this->translationKey->getId());
-        $this->assertEquals('Test Domain', $this->translationKey->getDomain());
-        $this->assertEquals('Test Key', $this->translationKey->getKey());
+        $this->assertPropertyAccessors(new TranslationKey(), [
+            ['id', 1],
+            ['key', 'test_key'],
+            ['domain', 'test_domain'],
+        ]);
     }
 }

@@ -10,6 +10,25 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 class TranslationRepository extends EntityRepository
 {
     /**
+     * @param string $key
+     * @param string $locale
+     * @param string $domain
+     * @return Translation|null
+     */
+    public function findValue($key, $locale, $domain)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->join('t.language', 'l')
+            ->join('t.translationKey', 'k')
+            ->where('l.code = :code AND k.key = :key AND k.domain = :domain')
+            ->setParameter('code', $locale)
+            ->setParameter('key', $key)
+            ->setParameter('domain', $domain);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
      * Returns the list of all existing in the database translation domains for the given locales.
      *
      * @param Language[] $languages
