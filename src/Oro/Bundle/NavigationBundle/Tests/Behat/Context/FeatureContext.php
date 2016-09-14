@@ -145,6 +145,11 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     public function historyMustLooksLike($tab, TableNode $table)
     {
         $content = $this->createElement($tab.' Content');
+
+        if (!$content->isVisible()) {
+            $this->chooseQuickMenuTab($tab);
+        }
+
         self::assertTrue($content->isVisible());
 
         /** @var NodeElement $item */
@@ -157,11 +162,33 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     }
 
     /**
+     * @Then /^(?P<tab>(History|Most Viewed|Favorites)) is empty$/
+     */
+    public function tabContentIsEmpty($tab)
+    {
+        $content = $this->createElement($tab.' Content');
+
+        if (!$content->isVisible()) {
+            $this->chooseQuickMenuTab($tab);
+        }
+
+        self::assertTrue($content->isVisible());
+        self::assertCount(0, $content->findAll('css', 'ul li a'));
+    }
+
+    /**
      * @When /^(?:|I )choose (?P<link>(History|Most Viewed|Favorites)) tab$/
      */
     public function chooseQuickMenuTab($link)
     {
-        $this->getPage()->clickLink($link);
+        $linkElement = $this->getPage()->findLink($link);
+        self::assertNotNull($linkElement);
+
+        if (!$linkElement->isVisible()) {
+            $this->clickBarsIcon();
+        }
+
+        $linkElement->click();
     }
 
     /**

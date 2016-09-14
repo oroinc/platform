@@ -5,14 +5,28 @@ Feature: Quick access menu
 
   Scenario: History
     Given I login as administrator
+    And History is empty
     And I go to System/ User Management/ Users
+    And History is empty
     And go to Reports & Segments/ Manage Custom Reports
+    And History must looks like:
+      | Users - User Management - System |
     And go to System/ User Management/ Users
+    And History must looks like:
+      | Manage Custom Reports - Reports & Segments |
     And go to System/ Configuration
+    And History must looks like:
+      | Users - User Management - System           |
+      | Manage Custom Reports - Reports & Segments |
     And go to System/ User Management/ Users
+    Then History must looks like:
+      | Configuration - System                     |
+      | Manage Custom Reports - Reports & Segments |
     And go to System/ Configuration
+    Then History must looks like:
+      | Users - User Management - System           |
+      | Manage Custom Reports - Reports & Segments |
     And go to Dashboards/ Dashboard
-    When I click icon bars
     Then History must looks like:
       | Configuration - System                     |
       | Users - User Management - System           |
