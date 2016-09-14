@@ -77,13 +77,12 @@ class OroTranslationBundleInstaller implements Installation
     protected function createOroTranslationKeyTable(Schema $schema)
     {
         $table = $schema->createTable('oro_translation_key');
-        $table->addOption('collate', 'utf8_bin');
-        
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('key', 'string', ['length' => 255]);
         $table->addColumn('domain', 'string', ['default' => 'messages', 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['key', 'domain'], 'key_domain_uniq');
+        $table->addOption('collate', 'utf8_bin');
     }
 
     /**
