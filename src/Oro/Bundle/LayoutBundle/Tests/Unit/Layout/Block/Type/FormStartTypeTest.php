@@ -88,7 +88,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formView, $view->vars['form']);
         $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
-        $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']->toArray());
+        $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']);
         $this->assertSame($formMethod, $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
@@ -125,7 +125,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formView, $view->vars['form']);
         $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
-        $this->assertSame([], $view->vars['action_route_parameters']->toArray());
+        $this->assertSame([], $view->vars['action_route_parameters']);
         $this->assertSame($formMethod, $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
@@ -245,7 +245,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formView, $view->vars['form']);
         $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
-        $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']->toArray());
+        $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']);
         $this->assertSame(strtoupper($formMethod), $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
@@ -287,7 +287,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formView, $view->vars['form']);
         $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
-        $this->assertSame([], $view->vars['action_route_parameters']->toArray());
+        $this->assertSame([], $view->vars['action_route_parameters']);
         $this->assertSame(strtoupper($formMethod), $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }

@@ -31,7 +31,7 @@ class TitleTypeTest extends BlockTypeTestCase
 
         $view = $this->getBlockView(TitleType::NAME, ['value' => $title, 'separator' => $separator, 'reverse' => true]);
 
-        $this->assertEquals(new Options($title), $view->vars['value']);
+        $this->assertEquals($title, $view->vars['value']);
         $this->assertEquals(' > ', $view->vars['separator']);
         $this->assertTrue($view->vars['reverse']);
     }
@@ -44,7 +44,7 @@ class TitleTypeTest extends BlockTypeTestCase
 
         $view = $this->getBlockView(TitleType::NAME, ['value' => $optionBag]);
 
-        $this->assertEquals(new Options(['second']), $view->vars['value']);
+        $this->assertEquals(['second'], $view->vars['value']);
     }
 
     public function testGetName()

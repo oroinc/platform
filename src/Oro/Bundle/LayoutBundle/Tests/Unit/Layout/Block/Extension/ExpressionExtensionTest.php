@@ -41,7 +41,7 @@ class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->expects($this->once())
             ->method('processExpressions')
-            ->with($options, $context, null, true, null);
+            ->with([], $context, null, true, null);
 
         $this->extension->normalizeOptions($options, $context, $data);
     }
@@ -65,7 +65,7 @@ class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('processExpressions')
             ->with($view->vars, $context, $data, true, 'json');
 
-        $this->extension->finishView($view, $block, new Options());
+        $this->extension->finishView($view, $block);
     }
 
     /**
