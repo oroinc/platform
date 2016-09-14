@@ -20,6 +20,5 @@ response:
                 recordUrl: http://localhost/search/
                 selectedData:
                     item:
-                        -
-                            key: aliasOfStringValue
-                            value: 'item1@mail.com'
+                        key: aliasOfStringValue
+                        value: 'item1@mail.com'
