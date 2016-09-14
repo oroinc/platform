@@ -114,30 +114,7 @@ class CalendarEventHandler
                     $this->activityManager->setActivityTargets($entity, $contexts);
                 }
 
-                $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($this->request);
-                if ($targetEntityClass) {
-                    $targetEntityId = $this->entityRoutingHelper->getEntityId($this->request);
-                    $targetEntity   = $this->entityRoutingHelper->getEntityReference(
-                        $targetEntityClass,
-                        $targetEntityId
-                    );
-
-                    $action = $this->entityRoutingHelper->getAction($this->request);
-                    if ($action === 'activity') {
-                        $this->activityManager->addActivityTarget($entity, $targetEntity);
-                    }
-
-                    if ($action === 'assign'
-                        && $targetEntity instanceof User
-                        && $targetEntityId !== $this->securityFacade->getLoggedUserId()
-                    ) {
-                        /** @var Calendar $defaultCalendar */
-                        $defaultCalendar = $this->manager
-                            ->getRepository('OroCalendarBundle:Calendar')
-                            ->findDefaultCalendar($targetEntity->getId(), $targetEntity->getOrganization()->getId());
-                        $entity->setCalendar($defaultCalendar);
-                    }
-                }
+                $this->processTargetEntity($entity);
 
                 $notifyInvitedUsers = $this->form->has('notifyInvitedUsers')
                     ? $this->form->get('notifyInvitedUsers')->getData() === 'true'
@@ -214,5 +191,40 @@ class CalendarEventHandler
         if ($entity->getParent() !== null) {
             throw new AccessDeniedException();
         }
+    }
+
+    /**
+     * @param $entity
+     *
+     * @return CalendarEventHandler
+     */
+    protected function processTargetEntity($entity)
+    {
+        $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($this->request);
+        if ($targetEntityClass) {
+            $targetEntityId = $this->entityRoutingHelper->getEntityId($this->request);
+            $targetEntity   = $this->entityRoutingHelper->getEntityReference(
+                $targetEntityClass,
+                $targetEntityId
+            );
+
+            $action = $this->entityRoutingHelper->getAction($this->request);
+            if ($action === 'activity') {
+                $this->activityManager->addActivityTarget($entity, $targetEntity);
+            }
+
+            if ($action === 'assign'
+                && $targetEntity instanceof User
+                && $targetEntityId !== $this->securityFacade->getLoggedUserId()
+            ) {
+                /** @var Calendar $defaultCalendar */
+                $defaultCalendar = $this->manager
+                    ->getRepository('OroCalendarBundle:Calendar')
+                    ->findDefaultCalendar($targetEntity->getId(), $targetEntity->getOrganization()->getId());
+                $entity->setCalendar($defaultCalendar);
+            }
+        }
+
+        return $this;
     }
 }
