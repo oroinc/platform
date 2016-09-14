@@ -17,7 +17,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
  *         @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"})
  *     },
  *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="idx_oro_audit_version", columns={"object_id, object_class, version"})
+ *         @ORM\UniqueConstraint(name="idx_oro_audit_version", columns={"object_id", "object_class", "version"})
  *     }
  * )
  * @ORM\InheritanceType("SINGLE_TABLE")
