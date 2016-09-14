@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Datasource;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-use Oro\Bundle\SearchBundle\Extension\SearchQueryInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\QueryConfiguration;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\QueryConfiguration;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class YamlToSearchQueryConverter
 {
@@ -20,16 +19,15 @@ class YamlToSearchQueryConverter
         if (!isset($config['query'])) {
             return null;
         }
-        $processor = new Processor();
-        $config    = $processor->processConfiguration(new QueryConfiguration(), $config);
 
-        $this->validateSections($config);
+        $processor = new Processor();
+        $config    = $processor->processConfiguration(new QueryConfiguration(), $this->preProcessConfig($config));
 
         foreach ((array)$config['from'] as $from) {
-            $query->from($from['alias']);
+            $query->from($from);
         }
 
-        foreach ($config['select'] as $select) {
+        foreach ((array)$config['select'] as $select) {
             $query->addSelect($select);
         }
 
@@ -40,14 +38,9 @@ class YamlToSearchQueryConverter
      * @param array $config
      * @return array
      */
-    private function validateSections(array $config)
+    protected function preProcessConfig(array $config)
     {
-        if (!isset($config['select'])) {
-            throw new InvalidConfigurationException('Missing mandatory "select" section');
-        }
-
-        if (!isset($config['from'])) {
-            throw new InvalidConfigurationException('Missing mandatory "from" section');
-        }
+        unset($config['type']);
+        return $config;
     }
 }

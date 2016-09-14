@@ -25,6 +25,7 @@ class Query
     const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
     const KEYWORD_ORDER_BY    = 'order_by';
+    const KEYWORD_AS          = 'as';
 
     const OPERATOR_EQUALS              = '=';
     const OPERATOR_NOT_EQUALS          = '!=';
@@ -60,7 +61,7 @@ class Query
     protected $fields;
 
     /** @var array */
-    protected $fieldsAliases = [];
+    protected $selectAliases = [];
 
     /** @var Criteria */
     protected $criteria;
@@ -559,7 +560,7 @@ class Query
      */
     public function getSelectAliases()
     {
-        return $this->fieldsAliases;
+        return $this->selectAliases;
     }
 
     /**
@@ -692,7 +693,7 @@ class Query
 
             $alias = strrev($part[0]);
 
-            $this->fieldsAliases[$field] = $alias;
+            $this->selectAliases[$field] = $alias;
         }
 
         return $field;

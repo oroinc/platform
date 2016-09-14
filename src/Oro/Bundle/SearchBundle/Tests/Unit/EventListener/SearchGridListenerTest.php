@@ -71,7 +71,7 @@ class SearchGridListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->willReturn($config);
 
-        $queryMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Extension\SearchQueryInterface')
+        $queryMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\SearchQueryInterface')
             ->getMock();
         $queryMock
             ->expects($this->once())

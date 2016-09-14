@@ -10,7 +10,7 @@ use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension;
 use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
-use Oro\Bundle\SearchBundle\Extension\IndexerQuery;
+use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
@@ -133,16 +133,10 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isSubmitted')
             ->will($this->returnValue(false));
 
-        if (is_array($expected)) {
-            $form
-                ->expects($this->once())
-                ->method('submit')
-                ->with($this->equalTo($expected));
-        } else {
-            $form
-                ->expects($this->never())
-                ->method('submit');
-        }
+        $form
+            ->expects($this->once())
+            ->method('submit')
+            ->with($this->equalTo($expected));
 
         $filter
             ->expects($this->any())
@@ -162,7 +156,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
     public function valuesDataProvider()
     {
         return [
-            'default_filter_no_parameters_modified_grid' => [
+            'default_filter_no_parameters_modified_grid'          => [
                 [
                     'filters' => [
                         'columns' => [
@@ -184,7 +178,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['value' => 'filter-value']
             ],
-            'default_filter_no_parameters_new_grid' => [
+            'default_filter_no_parameters_new_grid'               => [
                 [
                     'filters' => [
                         'columns' => [
@@ -224,7 +218,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['value' => 'filter-value']
             ],
-            'parametrized_without_default_filters' => [
+            'parametrized_without_default_filters'                => [
                 [
                     'filters' => [
                         'columns' => [
@@ -243,7 +237,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['value' => 'filter-value']
             ],
-            'override_default_filters' => [
+            'override_default_filters'                            => [
                 [
                     'filters' => [
                         'columns' => [
@@ -267,7 +261,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['value' => 'override-value']
             ],
-            'empty_parametrized_overrides_default_filter' => [
+            'empty_parametrized_overrides_default_filter'         => [
                 [
                     'filters' => [
                         'columns' => [
