@@ -65,14 +65,15 @@ class TransitionTriggerEventHelper
         $workflowDefinition = $trigger->getWorkflowDefinition();
         if ($relation = $trigger->getRelation()) {
             $mainEntity = $this->propertyAccessor->getValue($entity, $trigger->getRelation());
-            $mainEntityClass = $workflowDefinition->getRelatedEntity();
-            if (!$mainEntity instanceof $mainEntityClass) {
-                throw new \RuntimeException(
-                    sprintf('Can\'t get main entity using relation "%s"', $relation)
-                );
-            }
         } else {
             $mainEntity = $entity;
+        }
+
+        $mainEntityClass = $workflowDefinition->getRelatedEntity();
+        if (!$mainEntity instanceof $mainEntityClass) {
+            throw new \RuntimeException(
+                sprintf('Can\'t get main entity using relation "%s"', $relation)
+            );
         }
 
         $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $workflowDefinition->getName());
