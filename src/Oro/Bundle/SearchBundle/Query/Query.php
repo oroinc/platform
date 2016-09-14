@@ -25,6 +25,7 @@ class Query
     const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
     const KEYWORD_ORDER_BY    = 'order_by';
+    const KEYWORD_AS          = 'as';
 
     const OPERATOR_EQUALS              = '=';
     const OPERATOR_NOT_EQUALS          = '!=';
