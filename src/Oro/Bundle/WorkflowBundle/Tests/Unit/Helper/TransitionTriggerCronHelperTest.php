@@ -49,7 +49,7 @@ class TransitionTriggerCronHelperTest extends \PHPUnit_Framework_TestCase
     {
         $workflowName = 'test_workflow';
         $transitionName = 'test_transition';
-        $filter = 'schedule_filter != null';
+        $filter = 'filter != null';
         $this->trigger->setFilter($filter);
 
         /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject $query */

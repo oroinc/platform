@@ -38,7 +38,7 @@ class TransitionQueryFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateQuery()
     {
-        $transitionName = 'transition_with_schedule';
+        $transitionName = 'transition_with_trigger';
         $additionalWhereClauseDql = 'e.id = 42';
         $relatedEntity = EntityStub::class;
 
