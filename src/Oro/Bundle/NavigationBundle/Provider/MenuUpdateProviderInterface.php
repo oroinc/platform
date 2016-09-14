@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 
 interface MenuUpdateProviderInterface
 {
@@ -11,7 +11,7 @@ interface MenuUpdateProviderInterface
      *
      * @param string $menu
      *
-     * @return AbstractMenuUpdate[]
+     * @return MenuUpdateInterface[]
      */
     public function getUpdates($menu);
 }

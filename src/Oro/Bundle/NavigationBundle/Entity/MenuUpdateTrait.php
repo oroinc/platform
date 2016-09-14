@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-abstract class AbstractMenuUpdate
-{
-    const OWNERSHIP_GLOBAL        = 1;
-    const OWNERSHIP_ORGANIZATION  = 2;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
+trait MenuUpdateTrait
+{
     /**
      * @var int
      *
@@ -33,9 +33,9 @@ abstract class AbstractMenuUpdate
     protected $parentKey;
 
     /**
-     * @var string
+     * @var Collection|LocalizedFallbackValue[]
      */
-    protected $title;
+    protected $titles;
 
     /**
      * @var string
@@ -80,12 +80,6 @@ abstract class AbstractMenuUpdate
     protected $priority;
 
     /**
-     * Get array of extra data that is not declared in AbstractMenuUpdate model
-     * @return array
-     */
-    abstract public function getExtras();
-
-    /**
      * @return int
      */
     public function getId()
@@ -103,7 +97,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param string $key
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setKey($key)
     {
@@ -122,7 +117,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param string $parentKey
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setParentKey($parentKey)
     {
@@ -132,20 +128,37 @@ abstract class AbstractMenuUpdate
     }
 
     /**
-     * @return string
+     * @return Collection|LocalizedFallbackValue[]
      */
-    public function getTitle()
+    public function getTitles()
     {
-        return $this->title;
+        return $this->titles;
     }
 
     /**
-     * @param string $title
-     * @return AbstractMenuUpdate
+     * @param LocalizedFallbackValue $title
+     *
+     * @return MenuUpdateInterface
      */
-    public function setTitle($title)
+    public function addTitle(LocalizedFallbackValue $title)
     {
-        $this->title = $title;
+        if (!$this->titles->contains($title)) {
+            $this->titles->add($title);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $title
+     *
+     * @return MenuUpdateInterface
+     */
+    public function removeTitle(LocalizedFallbackValue $title)
+    {
+        if ($this->titles->contains($title)) {
+            $this->titles->removeElement($title);
+        }
 
         return $this;
     }
@@ -160,7 +173,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param string $uri
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setUri($uri)
     {
@@ -179,7 +193,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param string $menu
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setMenu($menu)
     {
@@ -198,7 +213,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param int $ownershipType
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setOwnershipType($ownershipType)
     {
@@ -217,7 +233,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param int $ownerId
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setOwnerId($ownerId)
     {
@@ -236,7 +253,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param boolean $active
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setActive($active)
     {
@@ -255,7 +273,8 @@ abstract class AbstractMenuUpdate
 
     /**
      * @param int $priority
-     * @return AbstractMenuUpdate
+     *
+     * @return MenuUpdateInterface
      */
     public function setPriority($priority)
     {

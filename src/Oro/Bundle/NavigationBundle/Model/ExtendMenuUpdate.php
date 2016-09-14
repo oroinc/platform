@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Model;
 
-use Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
-abstract class ExtendMenuUpdate extends AbstractMenuUpdate
+/**
+ * @method LocalizedFallbackValue getTitle(Localization $localization = null)
+ * @method LocalizedFallbackValue getDefaultTitle()
+ */
+abstract class ExtendMenuUpdate
 {
     /**
      * Constructor
