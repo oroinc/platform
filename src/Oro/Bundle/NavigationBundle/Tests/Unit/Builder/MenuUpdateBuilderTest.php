@@ -96,9 +96,8 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
     public function menuUpdateProvider()
     {
         return [
-            // update menu item using existing key without changing parent
-            [
-                [
+            'update_existing_item_without_move' => [
+                'result_data' => [
                     'parent' => 'menu',
                     'predefined' => true,
                     'label' => 'Title 1',
@@ -109,7 +108,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
                         'extra_1' => 'Extra 1'
                     ]
                 ],
-                [
+                'update_data' => [
                     'parent' => 'menu',
                     'title' => 'Title 1',
                     'key' => 'Parent 1',
@@ -122,9 +121,8 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            // create new menu item and add to Root Menu
-            [
-                [
+            'create_new_item' => [
+                'result_data' => [
                     'parent' => 'menu',
                     'predefined' => false,
                     'label' => 'Title 2',
@@ -135,7 +133,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
                         'extra_2' => 'Extra 2'
                     ]
                 ],
-                [
+                'update_data' => [
                     'parent' => 'menu',
                     'title' => 'Title 2',
                     'key' => 'Parent N',
@@ -148,9 +146,8 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            // change parent from Parent 1 to Parent 2
-            [
-                [
+            'update_existing_item_with_move' => [
+                'result_data' => [
                     'parent' => 'pt2',
                     'predefined' => true,
                     'label' => 'Title 3',
@@ -161,7 +158,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
                         'extra_3' => 'Extra 3'
                     ]
                 ],
-                [
+                'update_data' => [
                     'parent' => 'pt1',
                     'title' => 'Title 3',
                     'key' => 'Child 1',
