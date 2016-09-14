@@ -36,19 +36,16 @@ class MenuUpdateRepositoryTest extends WebTestCase
      *
      * @param int $expectedCount
      * @param bool $useOrganizationScope
-     * @param bool $useBusinessUnitScope
      * @param bool $useUserScope
      */
     public function testGetMenuUpdates(
         $expectedCount,
         $useOrganizationScope = false,
-        $useBusinessUnitScope = false,
         $useUserScope = false
     ) {
         $updates = $this->repository->getMenuUpdates(
             MenuUpdateData::MENU,
             $useOrganizationScope ? $this->getReference(MenuUpdateData::ORGANIZATION) : null,
-            $useBusinessUnitScope ? $this->getReference(MenuUpdateData::BUSINESS_UNIT) : null,
             $useUserScope ? $this->getReference(MenuUpdateData::USER) : null
         );
         $this->assertCount($expectedCount, $updates);
@@ -70,19 +67,16 @@ class MenuUpdateRepositoryTest extends WebTestCase
             'business unit scope' => [
                 'expectedCount' => 2,
                 'useOrganizationScope' => false,
-                'useBusinessUnitScope' => true,
                 'useUserScope' => false,
             ],
             'user scope' => [
                 'expectedCount' => 2,
                 'useOrganizationScope' => false,
-                'useBusinessUnitScope' => false,
                 'useUserScope' => true,
             ],
             'all scopes' => [
                 'expectedCount' => 4,
                 'useOrganizationScope' => true,
-                'useBusinessUnitScope' => true,
                 'useUserScope' => true,
             ],
         ];

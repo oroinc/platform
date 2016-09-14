@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Builder;
 
 use Knp\Menu\ItemInterface;
 
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
@@ -15,12 +17,18 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var MenuUpdateBuilder */
     protected $builder;
 
+    /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationHelper;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->builder = new MenuUpdateBuilder();
+        $this->localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
+
+        $this->builder = new MenuUpdateBuilder($this->localizationHelper);
+            
         $this->prepareMenu();
     }
 
@@ -53,6 +61,12 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         if (!$expectedData['predefined']) {
             $this->assertNull($parentMenu->getChild($menuUpdate->getKey()));
         }
+
+        $this->localizationHelper
+            ->expects($this->once())
+            ->method('getLocalizedValue')
+            ->with($menuUpdate->getTitles())
+            ->will($this->returnValue($menuUpdate->getTitles()->first()));
 
         $this->builder->build($this->menu);
 
@@ -185,7 +199,11 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
     protected function getMenuUpdate(array $updateData)
     {
         $update = new MenuUpdateStub();
-        $update->setTitle($updateData['title']);
+
+        $title = new LocalizedFallbackValue();
+        $title->setString($updateData['title']);
+
+        $update->addTitle($title);
         $update->setKey($updateData['key']);
         $update->setParentKey($updateData['parent_key']);
         $update->setMenu($updateData['menu_key']);

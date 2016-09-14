@@ -401,6 +401,8 @@ services:
 
     oro_navigation.menu_update.builder:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+        arguments:
+            - '@oro_locale.helper.localization'
         tags:
             - { name: oro_menu.builder }
 

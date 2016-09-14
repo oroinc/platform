@@ -4,7 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
@@ -14,6 +15,17 @@ class MenuUpdateBuilder implements BuilderInterface
 {
     /** @var MenuUpdateProviderInterface[] */
     private $providers = [];
+    
+    /** @var LocalizationHelper */
+    private $localizationHelper;
+
+    /**
+     * @param LocalizationHelper $localizationHelper
+     */
+    public function __construct(LocalizationHelper $localizationHelper)
+    {
+        $this->localizationHelper = $localizationHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -59,9 +71,9 @@ class MenuUpdateBuilder implements BuilderInterface
 
     /**
      * @param ItemInterface $menu
-     * @param AbstractMenuUpdate $update
+     * @param MenuUpdateInterface $update
      */
-    private function applyUpdate(ItemInterface $menu, AbstractMenuUpdate $update)
+    private function applyUpdate(ItemInterface $menu, MenuUpdateInterface $update)
     {
         $item = $this->findMenuItem($menu, $update->getKey());
         $parentItem = $this->findMenuItem($menu, $update->getParentKey());
@@ -75,9 +87,10 @@ class MenuUpdateBuilder implements BuilderInterface
             $item->getParent()->removeChild($item->getName());
             $item = $parentItem->addChild($item);
         }
-
-        if ($update->getTitle()) {
-            $item->setLabel($update->getTitle());
+        
+        if ($update->getTitles()->count()) {
+            $title = $this->localizationHelper->getLocalizedValue($update->getTitles());
+            $item->setLabel($title->getString());
         }
 
         if ($update->getUri()) {

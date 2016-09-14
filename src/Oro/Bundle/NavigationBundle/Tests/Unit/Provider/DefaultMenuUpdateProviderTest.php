@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
+use Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,18 +49,9 @@ class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $businessUnit = $this->getMockBuilder(BusinessUnit::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $user = $this->getMockBuilder(User::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $businessUnit->expects($this->any())->method('getOrganization')->will($this->returnValue($organization));
-        $businessUnits = new ArrayCollection([$businessUnit]);
-
-        $user->expects($this->any())->method('getBusinessUnits')->will($this->returnValue($businessUnits));
 
         $this->securityFacade->expects($this->any())->method('getOrganization')
             ->will($this->returnValue($organization));
@@ -76,7 +64,7 @@ class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
 
         $menuUpdateRepository->expects($this->once())
             ->method('getMenuUpdates')
-            ->with(MenuUpdateData::MENU, $organization, $businessUnit, $user)
+            ->with(MenuUpdateData::MENU, $organization, $user)
             ->will($this->returnValue($result));
 
         $this->doctrineHelper->expects($this->once())

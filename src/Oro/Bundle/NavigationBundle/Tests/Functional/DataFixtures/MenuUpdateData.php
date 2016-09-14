@@ -14,7 +14,6 @@ class MenuUpdateData extends AbstractFixture
 
     const MENU = 'default_menu';
     const ORGANIZATION = 'default_organization';
-    const BUSINESS_UNIT = 'default_unit';
     const USER = 'default_user';
 
     /**
@@ -25,10 +24,6 @@ class MenuUpdateData extends AbstractFixture
         $this->addReference(
             self::ORGANIZATION,
             $manager->getRepository('OroOrganizationBundle:Organization')->getFirst()
-        );
-        $this->addReference(
-            self::BUSINESS_UNIT,
-            $manager->getRepository('OroOrganizationBundle:BusinessUnit')->getFirst()
         );
         $this->addReference(
             self::USER,
@@ -45,11 +40,6 @@ class MenuUpdateData extends AbstractFixture
                 'ownershipType' => MenuUpdate::OWNERSHIP_ORGANIZATION,
                 'ownerId' => $this->getReference(self::ORGANIZATION)->getId(),
                 'key' => 'product'
-            ],
-            [
-                'ownershipType' => MenuUpdate::OWNERSHIP_BUSINESS_UNIT,
-                'ownerId' => $this->getReference(self::BUSINESS_UNIT)->getId(),
-                'key' => 'quotes'
             ],
             [
                 'ownershipType' => MenuUpdate::OWNERSHIP_USER,
