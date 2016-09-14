@@ -1,0 +1,184 @@
+.oro-select2 {
+    display: inline-block;
+
+    background: $base-white-color;
+
+    @include base-ui-element-style;
+
+    padding: 0 !important; //TODO: After remove .input classes from select delete !important
+
+    // Update styles for select2 from platform styles
+    a.select2-choice {
+        height: auto;
+
+        padding: $oro-select2-size-l;
+
+        line-height: inherit;
+
+        .select2-arrow {
+            // TODO: Remove !important when it possible
+            top: 50% !important;
+            right: $oro-select2-size-l;
+
+            height: $oro-select2-arrow-height;
+            width: $oro-select2-arrow-size * 2;
+
+            margin-top: -($oro-select2-arrow-height / 2);
+
+            overflow: inherit;
+
+            transition: transform .2s linear;
+
+            &:before {
+                top: 50%;
+
+                margin-top: -($oro-select2-arrow-size - 2);
+
+                border-top: ($oro-select2-arrow-size + 1) solid $base-font-color-lighter;
+                border-left: $oro-select2-arrow-size solid transparent;
+                border-right: $oro-select2-arrow-size solid transparent;
+
+                @include after;
+            }
+        }
+
+        .select2-chosen {
+            max-width: inherit;
+
+            margin-right: 4px;
+            padding: 0 26px 0 0;
+        }
+    }
+
+    .select2-choices {
+        min-height: 18px;
+    }
+
+    .select2-search-choice {
+        margin: 3px 5px 3px 5px;
+    }
+
+    .select2-search-field input {
+        padding: 0;
+    }
+
+    .select2-search input {
+        padding: 11px 9px;
+
+        font-size: $font-size;
+        line-height: 1;
+
+        border: 1px solid $base-border-color;
+        border-radius: 5px;
+    }
+
+    .select2-search-choice-close:before{
+        top: -1px;
+    }
+
+    &__dropdown {
+        margin-top: -4px;
+
+        font-size: 13px;
+
+        border: 0.1rem solid $base-border-color;
+        border-top-color: transparent;
+        box-shadow: 0 3px 5px rgba(0,0,0,.15);
+
+        .select2-results {
+            margin: 0;
+            padding: 0;
+
+            color: $base-font-color;
+        }
+
+        .select2-no-results {
+            padding: 0 ($offset-x-m / 2) ($offset-y-m / 2);
+        }
+
+        .select2-highlighted {
+            background-color: $theme-blue-color;
+        }
+
+        .select2-result-label {
+            padding: 5px 14px;
+
+            line-height: 24px;
+
+            white-space: nowrap;
+        }
+
+        // Open up
+        &.select2-drop-above {
+            border-top-color: $base-border-color;
+            border-bottom-color: transparent;
+            box-shadow: 0 -3px 5px rgba(0,0,0,0.15)
+        }
+
+        // Search block
+        .select2-search {
+            padding: 0 ($offset-x-m / 2) ($offset-y-m / 2);
+            margin-bottom: ($offset-y-m /2);
+
+            border-bottom: 0.1rem solid $base-topbar-background-color;
+        }
+
+        .select2-input {
+            @include base-ui-element;
+
+            padding: 6px 8px;
+
+            font-size: inherit;
+        }
+    }
+
+    &--size {
+        &-m {
+            // Update styles for select2 from platform styles
+            a.select2-choice {
+                padding: $oro-select2-size-m;
+
+                .select2-arrow {
+                    right: $oro-select2-size-m;
+                }
+            }
+            .select2-chosen {
+                padding-right: 16px !important;
+            }
+        }
+
+        &-s {
+            // Update styles for select2 from platform styles
+            a.select2-choice {
+                padding: $oro-select2-size-s;
+
+                .select2-arrow {
+                    right: $oro-select2-size-s;
+                }
+            }
+            .select2-chosen {
+                padding-right: 16px !important;
+            }
+        }
+    }
+
+    &.error {
+        border-color: $color-error;
+
+        color: $base-font-color;
+    }
+
+    // Open select
+    &.select2-container-active {
+        border: 1px solid $base-border-color;
+        box-shadow: 0 1px 5px rgba(0,0,0,.15);
+    }
+
+    &.select2-dropdown-open {
+
+
+        .select2-arrow {
+            transform: rotate(180deg);
+        }
+    }
+}
