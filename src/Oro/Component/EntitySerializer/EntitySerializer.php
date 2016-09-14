@@ -347,7 +347,7 @@ class EntitySerializer
                 }
                 $result[$field] = $value;
             } elseif (null !== $fieldConfig) {
-                $propertyPath = $fieldConfig->getPropertyPath() ?: $field;
+                $propertyPath = $fieldConfig->getPropertyPath($field);
                 if (ConfigUtil::isMetadataProperty($propertyPath)) {
                     $result[$field] = $this->fieldAccessor->getMetadataProperty(
                         $entity,
@@ -612,7 +612,7 @@ class EntitySerializer
             return null;
         }
 
-        $propertyPath = $field->getPropertyPath() ?: $fieldName;
+        $propertyPath = $field->getPropertyPath($fieldName);
         if ($this->doctrineHelper->getEntityIdFieldName($entityClass) !== $propertyPath) {
             return null;
         }

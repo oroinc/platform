@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -29,16 +30,22 @@ class BuildCriteria implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var FilterFactoryInterface */
+    protected $filterFactory;
+
     /**
-     * @param ConfigProvider $configProvider
-     * @param DoctrineHelper $doctrineHelper
+     * @param ConfigProvider         $configProvider
+     * @param DoctrineHelper         $doctrineHelper
+     * @param FilterFactoryInterface $filterFactory
      */
     public function __construct(
         ConfigProvider $configProvider,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        FilterFactoryInterface $filterFactory
     ) {
         $this->configProvider = $configProvider;
         $this->doctrineHelper = $doctrineHelper;
+        $this->filterFactory = $filterFactory;
     }
 
     /**
@@ -114,9 +121,10 @@ class BuildCriteria implements ProcessorInterface
         $fieldName = $filterValue->getPath();
         $path = explode('.', $fieldName);
         $associations = null;
+        $equalOnly = false;
         if (count($path) > 1) {
             $fieldName = array_pop($path);
-            list($filtersConfig, $associations) = $this->getAssociationFilters($path, $context, $metadata);
+            list($filtersConfig, $associations, $equalOnly) = $this->getAssociationFilters($path, $context, $metadata);
         } else {
             $filtersConfig = $context->getConfigOfFilters();
         }
@@ -128,13 +136,20 @@ class BuildCriteria implements ProcessorInterface
             return null;
         }
 
-        $filterValueField = $filterConfig->getPropertyPath() ?: $fieldName;
+        $filterValueField = $filterConfig->getPropertyPath($fieldName);
         if ($associations) {
             $filterValueField = $associations . '.' . $filterValueField;
         }
 
-        $filter = new ComparisonFilter($filterConfig->getDataType());
+        $filter = $this->filterFactory->createFilter($filterConfig->getDataType());
+        if (null === $filter || !$filter instanceof ComparisonFilter) {
+            return null;
+        }
+
         $filter->setField($filterValueField);
+        if ($equalOnly) {
+            $filter->setSupportedOperators([ComparisonFilter::EQ]);
+        }
 
         return $filter;
     }
@@ -144,7 +159,7 @@ class BuildCriteria implements ProcessorInterface
      * @param Context       $context
      * @param ClassMetadata $metadata
      *
-     * @return array [filters config, associations]
+     * @return array [filters config, associations, equalOnly]
      */
     protected function getAssociationFilters(array $path, Context $context, ClassMetadata $metadata)
     {
@@ -156,21 +171,26 @@ class BuildCriteria implements ProcessorInterface
         $config = $context->getConfig();
         $filters = null;
         $associations = [];
+        $equalOnly = false;
 
         foreach ($path as $fieldName) {
             if (!$config->hasField($fieldName)) {
-                return [null, null];
+                return [null, null, null];
             }
 
-            $associationName = $config->getField($fieldName)->getPropertyPath() ?: $fieldName;
-            if (!$metadata->hasAssociation($associationName)) {
-                return [null, null];
+            $associationName = $config->getField($fieldName)->getPropertyPath($fieldName);
+            if (!$associationName || !$metadata->hasAssociation($associationName)) {
+                return [null, null, null];
+            }
+
+            if (!$equalOnly && $metadata->isCollectionValuedAssociation($associationName)) {
+                $equalOnly = true;
             }
 
             $targetClass = $metadata->getAssociationTargetClass($associationName);
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass, false);
             if (!$metadata) {
-                return [null, null];
+                return [null, null, null];
             }
 
             $targetConfig = $this->configProvider->getConfig(
@@ -180,7 +200,7 @@ class BuildCriteria implements ProcessorInterface
                 $targetConfigExtras
             );
             if (!$targetConfig->hasDefinition()) {
-                return [null, null];
+                return [null, null, null];
             }
 
             $config = $targetConfig->getDefinition();
@@ -188,6 +208,6 @@ class BuildCriteria implements ProcessorInterface
             $associations[] = $associationName;
         }
 
-        return [$filters, implode('.', $associations)];
+        return [$filters, implode('.', $associations), $equalOnly];
     }
 }

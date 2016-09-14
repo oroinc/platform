@@ -76,7 +76,7 @@ class RegisterFilters implements ProcessorInterface
             $filter->setArrayAllowed($field->isArrayAllowed());
             $filter->setDescription($field->getDescription());
             if ($filter instanceof ComparisonFilter) {
-                $filter->setField($field->getPropertyPath() ?: $fieldName);
+                $filter->setField($field->getPropertyPath($fieldName));
             }
         }
 

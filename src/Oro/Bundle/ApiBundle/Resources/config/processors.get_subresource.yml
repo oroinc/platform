@@ -186,6 +186,7 @@ services:
         arguments:
             - '@oro_api.config_provider'
             - '@oro_api.doctrine_helper'
+            - '@oro_api.filter_factory'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: 50 }
 

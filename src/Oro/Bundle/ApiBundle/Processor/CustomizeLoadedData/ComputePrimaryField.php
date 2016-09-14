@@ -79,7 +79,7 @@ class ComputePrimaryField implements ProcessorInterface
         $result = null;
         $association = $config->getField($this->associationName);
         if (null !== $association) {
-            $associationName = $association->getPropertyPath() ?: $this->associationName;
+            $associationName = $association->getPropertyPath($this->associationName);
             if (!empty($data[$associationName]) && is_array($data[$associationName])) {
                 $associationTargetConfig = $association->getTargetEntity();
                 if (null !== $associationTargetConfig) {
@@ -132,6 +132,6 @@ class ComputePrimaryField implements ProcessorInterface
             return $fieldName;
         }
 
-        return $field->getPropertyPath() ?: $fieldName;
+        return $field->getPropertyPath($fieldName);
     }
 }

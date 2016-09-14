@@ -148,7 +148,7 @@ class ObjectNormalizer
             }
 
             $value = null;
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
             if (ConfigUtil::isMetadataProperty($propertyPath)) {
                 $value = $this->getMetadataProperty($entityClass, $propertyPath);
             } elseif ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {

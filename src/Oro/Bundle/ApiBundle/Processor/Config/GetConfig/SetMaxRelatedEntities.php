@@ -67,7 +67,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
     {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
             if ($metadata->hasAssociation($propertyPath)) {
                 $this->setEntityFieldLimit($field, $metadata, $propertyPath, $limit);
             }

@@ -79,7 +79,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
                 continue;
             }
 
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
             if (!$metadata->hasAssociation($propertyPath)) {
                 continue;
             }
