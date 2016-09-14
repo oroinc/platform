@@ -113,6 +113,11 @@ interface SearchQueryInterface
     public function from($entities);
 
     /**
+     * Returning the aliases found in the select expressions.
+     * When adding a select field using addSelect(), a special SQL
+     * syntax is supported for renaming fields. This method returns
+     * the alias=>original field association array.
+     *
      * @return array
      */
     public function getSelectAliases();
