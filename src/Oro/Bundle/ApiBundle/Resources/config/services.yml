@@ -123,6 +123,13 @@ services:
             - '@oro_api.processor_bag'
             - customize_loaded_data
 
+    oro_api.customize_form_data.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormDataProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - customize_form_data
+
     oro_api.resources_provider:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesProvider
         arguments:
