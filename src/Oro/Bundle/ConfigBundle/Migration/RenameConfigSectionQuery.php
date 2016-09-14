@@ -7,22 +7,22 @@ use Psr\Log\LoggerInterface;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class RenameConfigSettingsQuery extends ParametrizedMigrationQuery
+class RenameConfigSectionQuery extends ParametrizedMigrationQuery
 {
     /** @var string */
-    private $oldName;
+    private $oldSection;
 
     /** @var string */
-    private $newName;
+    private $newSection;
 
     /**
-     * @param string $oldName
-     * @param string $newName
+     * @param string $oldSection
+     * @param string $newSection
      */
-    public function __construct($oldName, $newName)
+    public function __construct($oldSection, $newSection)
     {
-        $this->oldName = $oldName;
-        $this->newName = $newName;
+        $this->oldSection = $oldSection;
+        $this->newSection = $newSection;
     }
 
     /**
@@ -50,8 +50,8 @@ class RenameConfigSettingsQuery extends ParametrizedMigrationQuery
      */
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
-        $query = 'UPDATE oro_config_value SET name = ? WHERE name = ?';
-        $parameters = [$this->newName, $this->oldName];
+        $query = 'UPDATE oro_config_value SET section = ? WHERE section = ?';
+        $parameters = [$this->newSection, $this->oldSection];
 
         $this->logQuery($logger, $query, $parameters);
         if (!$dryRun) {
