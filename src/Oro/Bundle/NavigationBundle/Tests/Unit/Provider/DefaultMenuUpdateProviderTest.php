@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -45,6 +46,8 @@ class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUpdates()
     {
+        $result = [new MenuUpdate(), new MenuUpdate()];
+
         $organization = $this->getMockBuilder(Organization::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -73,13 +76,14 @@ class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
 
         $menuUpdateRepository->expects($this->once())
             ->method('getMenuUpdates')
-            ->with(MenuUpdateData::MENU, $organization, $businessUnit, $user);
+            ->with(MenuUpdateData::MENU, $organization, $businessUnit, $user)
+            ->will($this->returnValue($result));
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with('OroNavigationBundle:MenuUpdate')
             ->willReturn($menuUpdateRepository);
 
-        $this->defaultMenuUpdateProvider->getUpdates(MenuUpdateData::MENU);
+        $this->assertEquals($result, $this->defaultMenuUpdateProvider->getUpdates(MenuUpdateData::MENU));
     }
 }
