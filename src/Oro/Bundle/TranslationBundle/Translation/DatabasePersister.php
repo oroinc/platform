@@ -95,11 +95,11 @@ class DatabasePersister
     }
 
     /**
-     * Writes all changes to DataBase
+     * Flush all changes
      */
     private function write()
     {
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->translationManager->flush();
+        $this->translationManager->clear();
     }
 }

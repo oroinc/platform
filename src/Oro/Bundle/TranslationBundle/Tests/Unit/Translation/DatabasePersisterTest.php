@@ -83,62 +83,16 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
     public function testPersist()
     {
         $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->exactly(5))->method('persist');
-        $this->em->expects($this->exactly(3))->method('flush');
-        $this->em->expects($this->exactly(3))->method('clear');
         $this->em->expects($this->once())->method('commit');
         $this->em->expects($this->never())->method('rollback');
 
-        $this->translationManager->expects($this->exactly(5))->method('findValue')->willReturn(null);
-        $this->translationManager->expects($this->exactly(5))->method('createValue')->willReturn(new Translation());
+        $this->translationManager->expects($this->exactly(5))->method('saveValue')->willReturn(new Translation());
+        $this->translationManager->expects($this->exactly(3))->method('flush');
+        $this->translationManager->expects($this->exactly(3))->method('clear');
 
         $this->translationManager->expects($this->once())->method('invalidateCache')->with($this->testLocale);
 
         $this->persister->persist($this->testLocale, $this->testData);
-    }
-
-    public function testPersistUpdateScenario()
-    {
-        $testValue         = 'some Value';
-        $existsTranslation = new Translation();
-        $existsTranslation->setValue($testValue);
-
-        $this->translationManager->expects($this->any())->method('findValue')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['key_1', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, null],
-                        ['key_2', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, null],
-                        ['key_3', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, null],
-                        ['key_1', $this->testLocale, 'validators', Translation::SCOPE_SYSTEM, $existsTranslation],
-                        ['key_2', $this->testLocale, 'validators', Translation::SCOPE_SYSTEM, null],
-                    ]
-                )
-            );
-
-        $this->translationManager->expects($this->any())->method('createValue')
-            ->will(
-                $this->returnValueMap([
-                    ['key_1', 'value_1', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, new Translation()],
-                    ['key_2', 'value_2', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, new Translation()],
-                    ['key_3', 'value_3', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, new Translation()],
-                    ['key_2', 'value_2', $this->testLocale, 'validators', Translation::SCOPE_SYSTEM, new Translation()],
-                ])
-            );
-
-        $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->exactly(5))->method('persist');
-        $this->em->expects($this->exactly(3))->method('flush');
-        $this->em->expects($this->exactly(3))->method('clear');
-        $this->em->expects($this->once())->method('commit');
-        $this->em->expects($this->never())->method('rollback');
-
-        $this->translationManager->expects($this->once())->method('invalidateCache')->with($this->testLocale);
-
-        $this->persister->persist($this->testLocale, $this->testData);
-
-        $this->assertSame($this->testData['validators']['key_1'], $existsTranslation->getValue());
-        $this->assertNotSame($testValue, $existsTranslation->getValue());
     }
 
     public function testExceptionScenario()
@@ -148,15 +102,13 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $exception = new $exceptionClass();
 
         $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->exactly(5))->method('persist');
-        $this->em->expects($this->exactly(3))->method('flush');
-        $this->em->expects($this->exactly(3))->method('clear');
         $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
         $this->em->expects($this->once())->method('rollback');
 
-        $this->translationManager->expects($this->exactly(5))->method('findValue')->willReturn(null);
-        $this->translationManager->expects($this->exactly(5))->method('createValue')->willReturn(new Translation());
-        
+        $this->translationManager->expects($this->exactly(5))->method('saveValue')->willReturn(new Translation());
+        $this->translationManager->expects($this->exactly(3))->method('flush');
+        $this->translationManager->expects($this->exactly(3))->method('clear');
+
         $this->translationManager->expects($this->never())->method('invalidateCache');
 
         $this->persister->persist($this->testLocale, $this->testData);

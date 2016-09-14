@@ -32,6 +32,12 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $language = (new Language())->setCode('test_code');
         $translationKey = (new TranslationKey())->setDomain('test_domain')->setKey('test_key');
+        $translation = new Translation();
+        $translation
+            ->setLanguage($language)
+            ->setTranslationKey($translationKey)
+            ->setValue('test_value');
+
         $data = [
             'domain' => 'test_domain',
             'key' => 'test_key',
@@ -40,23 +46,13 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
         $context = ['language_code' => 'test_code'];
 
         $this->translationManager->expects($this->once())
-            ->method('getLanguageByCode')
-            ->with('test_code')
-            ->willReturn($language);
-
-        $this->translationManager->expects($this->once())
-            ->method('findTranslationKey')
-            ->with('test_key', 'test_domain')
-            ->willReturn($translationKey);
+            ->method('createValue')
+            ->with('test_key', 'test_value', 'test_code', 'test_domain')
+            ->willReturn($translation);
 
         $result = $this->normalizer->denormalize($data, Translation::class, null, $context);
-        $translation = new Translation();
-        $translation
-            ->setLanguage($language)
-            ->setTranslationKey($translationKey)
-            ->setValue($data['value']);
 
-        $this->assertEquals($translation, $result);
+        $this->assertSame($translation, $result);
     }
 
     /**
