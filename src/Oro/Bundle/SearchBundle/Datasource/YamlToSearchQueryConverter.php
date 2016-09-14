@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Datasource;
 use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\QueryConfiguration;
 
 class YamlToSearchQueryConverter
 {
@@ -21,10 +20,10 @@ class YamlToSearchQueryConverter
         }
 
         $processor = new Processor();
-        $config    = $processor->processConfiguration(new QueryConfiguration(), $config);
+        $config    = $processor->processConfiguration(new QueryConfiguration(), $this->preProcessConfig($config));
 
         foreach ((array)$config['from'] as $from) {
-            $query->from($from['alias']);
+            $query->from($from);
         }
 
         foreach ((array)$config['select'] as $select) {
@@ -32,5 +31,14 @@ class YamlToSearchQueryConverter
         }
 
         return $query;
+    }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    protected function preProcessConfig(array $config) {
+        unset($config['type']);
+        return $config;
     }
 }

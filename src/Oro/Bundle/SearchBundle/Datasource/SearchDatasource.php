@@ -65,7 +65,6 @@ class SearchDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $this->yamlToSearchQueryConverter->process($this->query, $config);
         $results = $this->query->execute();
         /** @var Item[] $results */
 
