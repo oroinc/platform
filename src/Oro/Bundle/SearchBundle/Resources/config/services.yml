@@ -133,7 +133,7 @@ services:
     oro_search.event_listener.search_grid_listener:
         class: %oro_search.event_listener.search_results_listener.class%
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter }
+#          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter }
 
     oro_search.query_factory:
         class: %oro_search.query_factory.class%
