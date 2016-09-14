@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Builds the form builder based on the entity metadata and configuration
@@ -129,7 +130,11 @@ class BuildFormBuilder implements ProcessorInterface
         }
         $propertyPath = $fieldConfig->getPropertyPath();
         if ($propertyPath) {
-            $options['property_path'] = $propertyPath;
+            if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
+                $options['mapped'] = false;
+            } else {
+                $options['property_path'] = $propertyPath;
+            }
         }
 
         return $options;

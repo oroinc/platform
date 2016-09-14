@@ -29,6 +29,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     const COLLECT_RESOURCES_PROCESSOR_SERVICE_ID      = 'oro_api.collect_resources.processor';
     const COLLECT_SUBRESOURCES_PROCESSOR_SERVICE_ID   = 'oro_api.collect_subresources.processor';
     const CUSTOMIZE_LOADED_DATA_PROCESSOR_SERVICE_ID  = 'oro_api.customize_loaded_data.processor';
+    const CUSTOMIZE_FORM_DATA_PROCESSOR_SERVICE_ID    = 'oro_api.customize_form_data.processor';
     const GET_CONFIG_PROCESSOR_SERVICE_ID             = 'oro_api.get_config.processor';
     const GET_RELATION_CONFIG_PROCESSOR_SERVICE_ID    = 'oro_api.get_relation_config.processor';
     const GET_METADATA_PROCESSOR_SERVICE_ID           = 'oro_api.get_metadata.processor';
@@ -149,6 +150,10 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         DependencyInjectionUtil::registerDebugService(
             $container,
             self::CUSTOMIZE_LOADED_DATA_PROCESSOR_SERVICE_ID
+        );
+        DependencyInjectionUtil::registerDebugService(
+            $container,
+            self::CUSTOMIZE_FORM_DATA_PROCESSOR_SERVICE_ID
         );
         DependencyInjectionUtil::registerDebugService(
             $container,
