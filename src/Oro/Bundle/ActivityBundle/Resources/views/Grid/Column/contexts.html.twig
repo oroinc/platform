@@ -3,9 +3,9 @@
         <span class="context-item">
             <span class="{{ item.icon }}"></span>
             {% if item.link %}
-                <a href="{{ item.link }}" class="context-label">{{ item.title|trim }}</a>
+                <a href="{{ item.link }}" class="context-label">{{ item.title }}</a>
             {% else %}
-                <span class="context-label">{{ item.title|trim }}</span>
+                <span class="context-label">{{ item.title }}</span>
             {% endif %}
         </span>
     {% endspaceless %}
