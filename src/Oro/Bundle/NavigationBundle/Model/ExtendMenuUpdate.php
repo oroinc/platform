@@ -6,8 +6,8 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
- * @method LocalizedFallbackValue getName(Localization $localization = null)
- * @method LocalizedFallbackValue getDefaultName()
+ * @method LocalizedFallbackValue getTitle(Localization $localization = null)
+ * @method LocalizedFallbackValue getDefaultTitle()
  */
 abstract class ExtendMenuUpdate
 {

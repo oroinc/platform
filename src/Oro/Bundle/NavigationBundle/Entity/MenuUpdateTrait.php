@@ -80,13 +80,6 @@ trait MenuUpdateTrait
     protected $priority;
 
     /**
-     * Get array of extra data that is not declared in MenuUpdateInterface model
-     *
-     * @return array
-     */
-    abstract public function getExtras();
-
-    /**
      * @return int
      */
     public function getId()
