@@ -1,16 +1,16 @@
 <?php
 
-namespace Oro\Bundle\FilterBundle\Tests\Unit\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-use Oro\Bundle\FilterBundle\DependencyInjection\CompilerPass\FilterTypesPass;
+use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\FilterTypesPass;
 
 class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_TAG_ATTRIBUTE_TYPE = 'TEST_TAG_ATTRIBUTE_TYPE';
-    const TEST_SERVICE_ID = 'TEST_SERVICE_ID';
+    const TEST_SERVICE_ID         = 'TEST_SERVICE_ID';
 
     /**
      * @var FilterTypesPass
@@ -40,18 +40,22 @@ class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testProcessOrm()
+    public function testProcessSearch()
     {
         $this->containerMock
             ->expects($this->once())
             ->method('findTaggedServiceIds')
             ->with(FilterTypesPass::TAG_NAME)
-            ->willReturn([
-                self::TEST_SERVICE_ID => [ [
-                    'datasource' => 'orm',
-                    'type'       =>  self::TEST_TAG_ATTRIBUTE_TYPE,
-                ] ]
-            ]);
+            ->willReturn(
+                [
+                    self::TEST_SERVICE_ID => [
+                        [
+                            'datasource' => 'search',
+                            'type'       => self::TEST_TAG_ATTRIBUTE_TYPE,
+                        ]
+                    ]
+                ]
+            );
 
         $this->containerMock
             ->expects($this->once())
@@ -86,18 +90,22 @@ class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
         $this->filterTypePass->process($this->containerMock);
     }
 
-    public function testProcessNonOrm()
+    public function testProcessNonSearch()
     {
         $this->containerMock
             ->expects($this->once())
             ->method('findTaggedServiceIds')
             ->with(FilterTypesPass::TAG_NAME)
-            ->willReturn([
-                self::TEST_SERVICE_ID => [ [
-                    'datasource' => 'non_orm',
-                    'type'       =>  self::TEST_TAG_ATTRIBUTE_TYPE,
-                ] ]
-            ]);
+            ->willReturn(
+                [
+                    self::TEST_SERVICE_ID => [
+                        [
+                            'datasource' => 'orm',
+                            'type'       => self::TEST_TAG_ATTRIBUTE_TYPE,
+                        ]
+                    ]
+                ]
+            );
 
         $this->containerMock
             ->expects($this->never())

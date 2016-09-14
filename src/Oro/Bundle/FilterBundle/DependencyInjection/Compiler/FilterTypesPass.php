@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FilterBundle\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\FilterBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
