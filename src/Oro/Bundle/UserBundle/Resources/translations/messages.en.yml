@@ -180,7 +180,9 @@ oro:
         password:
             change_dialog.title: Change password
             reset_dialog.title: Reset password
+            prompt_password_reset_dialog.title: Prompt password reset
             reset_password.label: Reset password
+            prompt_password_reset.label: Prompt password reset
             change_password.label: Change password
             new_password.label: New password
             enter_new_password.label: Enter new password
@@ -190,6 +192,8 @@ oro:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
+                success.message: Password reset request has been sent.
+                failure.message: Password reset request has failed.
         action:
             password_management:
                 label: Manage passwords

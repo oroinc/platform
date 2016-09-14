@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -101,6 +102,46 @@ class ResetController extends Controller
         } else {
             $params['formAction'] = $this->get('router')->generate(
                 'oro_user_reset_send_email_as_admin',
+                ['id' => $user->getId()]
+            );
+        }
+
+        return $params;
+    }
+
+    /**
+     * @Route(
+     *     "/send-forced-password-reset-email/{id}",
+     *     name="oro_user_send_forced_password_reset_email",
+     *     requirements={"id"="\d+"}
+     * )
+     * @AclAncestor("password_management")
+     * @Template("OroUserBundle:Reset/widget:sendEmailConfirmation.html.twig")
+     */
+    public function sendForcedResetEmailAction(Request $request, User $user)
+    {
+        $params = [
+            'entity' => $user
+        ];
+        if ($request->isMethod('POST')) {
+            if (null === $user->getConfirmationToken()) {
+                $user->setConfirmationToken($user->generateToken());
+            }
+
+            $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
+            try {
+                $this->get('oro_user.mailer.processor')->sendForcedResetPasswordAsAdminEmail($user);
+            } catch (\Exception $e) {
+                $params['processed'] = false;
+                $params['error'] = $this->get('translator')->trans('oro.email.handler.unable_to_send_email');
+                return $params;
+            }
+            $user->setLoginDisabled(true);
+            $this->get('oro_user.manager')->updateUser($user);
+            $params['processed'] = true;
+        } else {
+            $params['formAction'] = $this->get('router')->generate(
+                'oro_user_send_forced_password_reset_email',
                 ['id' => $user->getId()]
             );
         }

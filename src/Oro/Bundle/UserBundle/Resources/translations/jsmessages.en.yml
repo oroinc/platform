@@ -6,6 +6,9 @@ oro:
         reset_password:
             flash:
                 success: Reset password email has been sent to user
+            popup:
+                question: User {{ user }} will receive reset password by email.
+                title: Reset password
         change_password:
             flash:
                 success: The password has been changed

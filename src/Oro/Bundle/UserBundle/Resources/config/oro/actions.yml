@@ -4,6 +4,7 @@ operations:
             - owner-users-select-grid
         exclude_entities:
             - Oro\Bundle\UserBundle\Entity\Role
+            - Oro\Bundle\UserBundle\Entity\User
     clone_role:
         extends: CLONE
         order: 4
@@ -95,3 +96,70 @@ operations:
                     route: oro_user_role_update
                     route_parameters:
                         id: $id
+    reset_password:
+        label: oro.user.password.reset_password.label
+        entities:
+            - Oro\Bundle\UserBundle\Entity\User
+        groups:
+            - update_navButtons
+            - datagridRowAction
+        datagrids:
+            - users-grid
+        routes:
+            - oro_user_index
+            - oro_user_view
+        order: 50
+        acl_resource: [EDIT, entity:Oro\Bundle\UserBundle\Entity\User]
+        button_options:
+            icon: icon-shield
+        frontend_options:
+            confirmation:
+                title: oro.user.reset_password.popup.title
+                okText: oro.user.password.reset.label
+                message: oro.user.reset_password.popup.question
+                message_parameters:
+                    user: $.data.username
+        actions:
+            - '@call_method':
+                object: $.data
+                method: setLoginDisabled
+                method_parameters: [true]
+            - '@call_method':
+                object: $.data
+                method: getConfirmationToken
+                attribute: $.token
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@empty': $.token
+                actions:
+                    - '@call_method':
+                        object: $.data
+                        method: generateToken
+                        attribute: $.token
+                    - '@call_method':
+                        object: $.data
+                        method: setConfirmationToken
+                        method_parameters: [$.token]
+            - '@flush_entity': $.data
+            - '@call_service_method':
+                service: oro_user.mailer.processor
+                method: sendForcedResetPasswordAsAdminEmail
+                method_parameters: [$.data]
+                attribute: $.sent
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@eq': [$.sent, true]
+                actions:
+                    - '@flash_message':
+                        message: oro.user.password.reset.success.message
+                        type: 'success'
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@eq': [$.sent, false]
+                actions:
+                    - '@flash_message':
+                        message: oro.user.password.reset.failure.message
+                        type: 'error'
