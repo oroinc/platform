@@ -6,43 +6,44 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
-use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 
 class MergeMassAction extends AbstractMassAction
 {
-    /**
-     * @var MetadataRegistry
-     */
-    protected $metadataRegistry;
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**
-     * @param MetadataRegistry    $metadataRegistry
+     * @param ConfigProvider      $entityConfigProvider
      * @param TranslatorInterface $translator
      */
-    public function __construct(MetadataRegistry $metadataRegistry, TranslatorInterface $translator)
-    {
-        $this->metadataRegistry = $metadataRegistry;
-        $this->translator       = $translator;
+    public function __construct(
+        ConfigProvider $entityConfigProvider,
+        TranslatorInterface $translator
+    ) {
+        parent::__construct();
+
+        $this->entityConfigProvider = $entityConfigProvider;
+        $this->translator = $translator;
     }
 
     /** @var array */
     protected $requiredOptions = ['route', 'entity_name', 'data_identifier', 'max_element_count'];
 
     /** @var array */
-    protected $defaultOptions = array(
-        'frontend_handle' => 'redirect',
-        'handler' => 'oro_entity_merge.mass_action.data_handler',
-        'icon' => 'random',
-        'frontend_type' => 'merge-mass',
-        'route' => 'oro_entity_merge_massaction',
-        'data_identifier' => 'id',
-        'route_parameters' => array(),
-    );
+    protected $defaultOptions = [
+        'frontend_handle'  => 'redirect',
+        'handler'          => 'oro_entity_merge.mass_action.data_handler',
+        'icon'             => 'random',
+        'frontend_type'    => 'merge-mass',
+        'route'            => 'oro_entity_merge_massaction',
+        'data_identifier'  => 'id',
+        'route_parameters' => [],
+    ];
 
     /**
      * {@inheritdoc}
@@ -52,17 +53,17 @@ class MergeMassAction extends AbstractMassAction
         $this->setDefaultOptions($options);
 
         if (isset($options['entity_name'])) {
-            $metadata = $this
-                ->metadataRegistry
-                ->getEntityMetadata($options['entity_name']);
+            $entityConfig = $this->entityConfigProvider->getConfig($options['entity_name']);
+            $options['max_element_count'] = $entityConfig->get(
+                'max_element_count',
+                false,
+                EntityMetadata::MAX_ENTITIES_COUNT
+            );
 
-            $options['max_element_count'] = $metadata->getMaxEntitiesCount();
-
-            $options['label'] = $this->translator
-                ->trans(
-                    'oro.entity_merge.action.merge',
-                    ['{{ label }}' => $this->translator->trans($metadata->get('label'))]
-                );
+            $options['label'] = $this->translator->trans(
+                'oro.entity_merge.action.merge',
+                ['{{ label }}' => $this->translator->trans($entityConfig->get('label'))]
+            );
         }
 
         return parent::setOptions($options);

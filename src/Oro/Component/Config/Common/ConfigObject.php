@@ -59,15 +59,29 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      * throws exception if current object is unnamed
      *
      * @return string
-     * @throws LogicException
+     * @throws \LogicException
      */
     public function getName()
     {
         if (!isset($this[self::NAME_KEY])) {
-            throw new \LogicException("Trying to get name of unnamed object");
+            throw new \LogicException('Trying to get name of unnamed object');
         }
 
         return $this[self::NAME_KEY];
+    }
+
+    /**
+     * Set Object name
+     *
+     * $param string $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this[self::NAME_KEY] = $name;
+
+        return $this;
     }
 
     /**
@@ -147,11 +161,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
             return $default;
         }
 
-        if ($default === null && $value !== null) {
-            return $value;
-        }
-
-        return $value ? : $default;
+        return null !== $value ? $value : $default;
     }
 
     /**

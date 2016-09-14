@@ -57,6 +57,8 @@ class EmailTypeTest extends TypeTestCase
             ->getMockBuilder('Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper')
             ->disableOriginalConstructor()->getMock();
         $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -64,7 +66,12 @@ class EmailTypeTest extends TypeTestCase
      */
     protected function createEmailType()
     {
-        return new EmailType($this->securityContext, $this->emailRenderer, $this->emailModelBuilderHelper);
+        return new EmailType(
+            $this->securityContext,
+            $this->emailRenderer,
+            $this->emailModelBuilderHelper,
+            $this->configManager
+        );
     }
 
     /**

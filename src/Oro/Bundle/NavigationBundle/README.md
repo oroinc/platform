@@ -39,8 +39,7 @@ services:
 ```
 All menu Builders must implement Oro\Menu\BuilderInterface with build() method. In build() method Bundles manipulate
 menu items. All builders are collected in ChainBuilderProvider which is registered in system as Knp\Menu Provider.
-ChainBuilderProvider also include ConfigurationBuilder which leverages menu items with information from oro_menu.yml
-configuration files. Configurations are collected in Extension and passed into Configuration class. In future more
+Configurations are collected in Extension and passed into Configuration class. In future more
 addition Configurations may be created, for example for getting menu configurations from annotations or some persistent
 storage like database. After menu structure created oro_menu.configure.<menu_alias> event dispatched, with MenuItem
 and MenuFactory available.
@@ -64,14 +63,13 @@ class MainMenuBuilder implements BuilderInterface
     }
 }
 ```
-
 ### Menu declaration in YAML
-YAML file with default menu declaration is located in /Oro/NavigationBundle/Resources/config/menu.yml.
-In addition to it, each bundle may have their own menu which must be located in /SomeBundleName/Resource/menu.yml.
+YAML file with default menu declaration is located in /Oro/NavigationBundle/Resources/config/oro/navigation.yml.
+In addition to it, each bundle may have their own menu which must be located in /SomeBundleName/Resource/config/oro/navigation.yml.
 Both types of declaration files have the same format:
 
 ```yaml
-oro_menu_config:
+menu_config:
     templates:
         <menu_type>:                          # menu type code
             template: <template>              # path to custom template for renderer
@@ -133,7 +131,7 @@ options via sorting bundles in AppKernel.php.
 Navigation bundle helps to manage page titles for all routes and supports titles translation.
 Rout titles can be defined in navigation.yml file:
 ```yaml
-oro_titles:
+titles:
     route_name_1: "%%parameter%% - Title"
     route_name_2: "Edit %%parameter%% record"
     route_name_3: "Static title"
