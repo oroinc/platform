@@ -8,6 +8,13 @@ workflows:
         entity: First\Entity
         start_step: first_step
         entity_attribute: my_entity
+        priority: 1
+        defaults:
+            active: true
+        exclusive_active_groups:
+            - 'active_group1'
+        exclusive_record_groups:
+            - 'record_group1'
         steps_display_ordered: true
         steps:
             first_step:
@@ -43,6 +50,26 @@ workflows:
                             label: 'First Attribute'
                             options:
                                 required: true
+                triggers:
+                    -
+                        event: create
+                        entity_class: Other\Entity
+                        relation: 'firstEntity'
+                        require: 'entity.firstEntity.id === main_entity.id'
+                        queued: true
+                    -
+                        event: update
+                        field: description
+                        require: 'entity === main_entity'
+                    -
+                        event: delete
+                        entity_class: Other\Entity
+                        relation: 'firstEntity'
+                        require: 'not empty(entity.firstEntity) && attributes["first_attribute"] == "ok"'
+                    -
+                        cron: 1 * * * *
+                        filter: e.text = "string"
+
         transition_definitions:
             first_transition_definition:
                 preactions:
