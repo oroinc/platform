@@ -44,13 +44,13 @@ class TransitionTriggerEventHelper
      */
     public function checkRequire(TransitionTriggerEvent $trigger, $entity)
     {
-        $filter = $trigger->getRequire();
-        if (!$filter) {
+        $require = $trigger->getRequire();
+        if (!$require) {
             return true;
         }
 
         return !empty($this->expressionLanguage->evaluate(
-            $filter,
+            $require,
             $this->getExpressionValues($trigger, $entity)
         ));
     }
