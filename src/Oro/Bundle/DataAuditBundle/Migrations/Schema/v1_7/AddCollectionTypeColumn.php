@@ -13,7 +13,7 @@ class AddCollectionTypeColumn implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $auditFieldTable = $schema->createTable('oro_audit_field');
+        $auditFieldTable = $schema->getTable('oro_audit_field');
         $auditFieldTable->addColumn('collection_diffs', 'json_array', [
             'notnull' => false,
             'comment' => '(DC2Type:json_array)',
