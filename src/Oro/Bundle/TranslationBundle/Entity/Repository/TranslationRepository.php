@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -21,9 +22,9 @@ class TranslationRepository extends EntityRepository
             ->join('t.language', 'l')
             ->join('t.translationKey', 'k')
             ->where('l.code = :code AND k.key = :key AND k.domain = :domain')
-            ->setParameter('code', $locale)
-            ->setParameter('key', $key)
-            ->setParameter('domain', $domain);
+            ->setParameter('code', $locale, Type::STRING)
+            ->setParameter('key', $key, Type::STRING)
+            ->setParameter('domain', $domain, Type::STRING);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
@@ -92,7 +93,7 @@ class TranslationRepository extends EntityRepository
             ->where('t.language = :language')
             ->andWhere('k.domain = :domain')
             ->setParameter('language', $language)
-            ->setParameter('domain', $domain);
+            ->setParameter('domain', $domain, Type::STRING);
 
         return $qb->getQuery()->getResult();
     }
