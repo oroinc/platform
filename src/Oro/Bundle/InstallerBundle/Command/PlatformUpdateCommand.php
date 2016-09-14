@@ -81,8 +81,6 @@ class PlatformUpdateCommand extends AbstractCommand
                         array('--ignore-errors' => true, '--process-isolation' => true)
                     );
             }
-
-            $commandExecutor->runCommand('cache:clear', array('--process-isolation' => true));
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'
