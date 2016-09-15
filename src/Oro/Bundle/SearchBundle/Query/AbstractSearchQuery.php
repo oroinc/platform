@@ -4,7 +4,8 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 abstract class AbstractSearchQuery implements SearchQueryInterface
 {
-    const WHERE_OR = 'or';
+    const WHERE_AND = 'and';
+    const WHERE_OR  = 'or';
 
     /**
      * @var Query
@@ -153,7 +154,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    abstract public function setWhere($expression, $type = null);
+    abstract public function setWhere($expression, $type = self::WHERE_AND);
 
     /**
      * {@inheritdoc}
