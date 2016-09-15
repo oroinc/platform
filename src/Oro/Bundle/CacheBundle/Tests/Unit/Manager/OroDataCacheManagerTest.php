@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
-use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 
 class OroDataCacheManagerTest extends \PHPUnit_Framework_TestCase
 {
