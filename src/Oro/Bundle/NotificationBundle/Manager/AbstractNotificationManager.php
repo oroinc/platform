@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Manager;
 
+use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\Model\NotificationInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -15,24 +16,9 @@ abstract class AbstractNotificationManager
     protected $producer;
 
     /**
-     * @var string
-     */
-    protected $topic;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
-
-    /**
-     * Constructor
-     *
-     * @param LoggerInterface $logger
-     */
-    protected function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
 
     /**
      * Sends the notifications
@@ -47,10 +33,9 @@ abstract class AbstractNotificationManager
     abstract public function process($object, $notifications, LoggerInterface $logger = null, $params = []);
 
     /**
+     * Sends a MQ message
+     *
      * @param array $messageParams
      */
-    protected function sendMessage($messageParams = [])
-    {
-        $this->producer->send($this->topic, $messageParams);
-    }
+    abstract protected function sendQueryMessage($messageParams = []);
 }

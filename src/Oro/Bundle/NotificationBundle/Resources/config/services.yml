@@ -212,3 +212,24 @@ services:
             - '@doctrine.orm.entity_manager'
         tags:
             - { name: kernel.event_listener, event: oro.notification.event.notification_send_after, method: logMassNotification}
+
+
+    # message queue
+
+    oro_notification.async.processor.email_sending:
+        class: 'Oro\Bundle\NotificationBundle\Async\EmailSendingMessageProcessor'
+        arguments:
+            - '@oro_email.direct_mailer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+
+    oro_notifications.manager.email_notification:
+        class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager'
+        arguments:
+            - '@oro_config.user'
+            - '@oro_email.email_renderer'
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+

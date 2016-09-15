@@ -7,8 +7,9 @@ use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
-
 use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+
 use Psr\Log\LoggerInterface;
 
 class EmailNotificationManager extends AbstractNotificationManager
@@ -18,40 +19,39 @@ class EmailNotificationManager extends AbstractNotificationManager
     /** @var EmailRenderer */
     private $renderer;
 
-    /** @var \Swift_Mailer */
-    private $mailer;
-
     /** @var ConfigManager */
     private $cm;
 
-    /** @var Processor */
-    private $processor;
 
     /**
-     * Constructor
+     * EmailNotificationManager constructor.
      *
-     * @param LoggerInterface   $logger
-     * @param EmailRenderer     $emailRenderer
-     * @param \Swift_Mailer     $mailer
-     * @param ConfigManager     $cm
-     * @param Processor         $processor
+     * @param EmailRenderer $emailRenderer
+     * @param ConfigManager $cm
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        LoggerInterface $logger,
         EmailRenderer $emailRenderer,
-        \Swift_Mailer $mailer,
         ConfigManager $cm,
-        Processor $processor
+        MessageProducerInterface $producer,
+        LoggerInterface $logger
     ) {
-        parent::__construct($logger);
-        $this->renderer          = $emailRenderer;
-        $this->mailer            = $mailer;
-        $this->cm                = $cm;
-        $this->processor         = $processor;
+        $this->renderer = $emailRenderer;
+        $this->cm = $cm;
+        $this->producer = $producer;
+        $this->logger = $logger;
     }
 
     /**
-     * @inheritdoc
+     * Sends the email notifications
+     *
+     * @param mixed                        $object
+     * @param EmailNotificationInterface[] $notifications
+     * @param LoggerInterface              $logger Override for default logger. If this parameter is specified
+     *                                             this logger will be used instead of a logger specified
+     *                                             in the constructor
+     * @param array                        $params Additional params for template renderer
      */
     public function process($object, $notifications, LoggerInterface $logger = null, $params = [])
     {
@@ -59,7 +59,6 @@ class EmailNotificationManager extends AbstractNotificationManager
             $logger = $this->logger;
         }
 
-        /** @var EmailNotificationInterface $notification */
         foreach ($notifications as $notification) {
             $emailTemplate = $notification->getTemplate();
             try {
@@ -79,30 +78,38 @@ class EmailNotificationManager extends AbstractNotificationManager
                 continue;
             }
 
-            $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
-            $senderName = $this->cm->get('oro_notification.email_notification_sender_name');
             if ($notification instanceof SenderAwareEmailNotificationInterface && $notification->getSenderEmail()) {
                 $senderEmail = $notification->getSenderEmail();
                 $senderName = $notification->getSenderName();
-            }
-
-            if ($emailTemplate->getType() == 'txt') {
-                $type = 'text/plain';
             } else {
-                $type = 'text/html';
+                $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
+                $senderName = $this->cm->get('oro_notification.email_notification_sender_name');
             }
 
-            foreach ((array)$notification->getRecipientEmails() as $email) {
-                $message = \Swift_Message::newInstance()
-                    ->setSubject($subjectRendered)
-                    ->setFrom($senderEmail, $senderName)
-                    ->setTo($email)
-                    ->setBody($templateRendered, $type);
-                $this->processor->processEmbeddedImages($message);
-                $this->mailer->send($message);
-            }
+            $type = 'txt' == $emailTemplate->getType() ? 'text/plain' : 'text/html';
 
-            $this->addJob(self::SEND_COMMAND);
+            foreach ($notification->getRecipientEmails() as $email) {
+                $this->sendQueryMessage([
+                    'from' => [
+                        'email' => $senderEmail,
+                        'name' => $senderName,
+                    ],
+                    'to' => $email,
+                    'subject' => $subjectRendered,
+                    'body' => [
+                        'body' => $templateRendered,
+                        'contentType' => $type
+                    ]
+                ]);
+            }
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function sendQueryMessage($messageParams = [])
+    {
+        $this->producer->send(self::TOPIC, $messageParams);
     }
 }
