@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Datasource\Search;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Datasource\Filter\Adapter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -9,7 +9,7 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase

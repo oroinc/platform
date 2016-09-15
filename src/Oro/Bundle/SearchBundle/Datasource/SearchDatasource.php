@@ -30,6 +30,9 @@ class SearchDatasource implements DatasourceInterface
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
+    /** @var YamlToSearchQueryConverter */
+    protected $yamlToSearchQueryConverter;
+
     /**
      * @param QueryFactoryInterface    $factory
      * @param EventDispatcherInterface $eventDispatcher
@@ -38,8 +41,9 @@ class SearchDatasource implements DatasourceInterface
         QueryFactoryInterface $factory,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->queryFactory = $factory;
-        $this->dispatcher   = $eventDispatcher;
+        $this->queryFactory               = $factory;
+        $this->dispatcher                 = $eventDispatcher;
+        $this->yamlToSearchQueryConverter = new YamlToSearchQueryConverter();
     }
 
     /**
@@ -50,6 +54,8 @@ class SearchDatasource implements DatasourceInterface
         $this->datagrid = $grid;
 
         $this->query = $this->queryFactory->create($grid, $config);
+
+        $this->yamlToSearchQueryConverter->process($this->query, $config);
 
         $grid->setDatasource(clone $this);
     }
