@@ -82,6 +82,11 @@ class OroTranslationBundleInstaller implements Installation
         $table->addColumn('domain', 'string', ['default' => 'messages', 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['key', 'domain'], 'key_domain_uniq');
+        /**
+         * Required to support Case Sensitive keys in MySQL
+         */
+        $table->addOption('charset', 'utf8');
+        $table->addOption('collate', 'utf8_bin');
     }
 
     /**
