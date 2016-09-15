@@ -14,6 +14,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Psr\Log\LoggerInterface;
 
 class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,14 +37,19 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCouldBeConstructedWithDoctrineHelperAndProcessHandler()
     {
-        new ExecuteProcessJobProcessor($this->createDoctrineHelperStub(), $this->createProcessHandlerMock());
+        new ExecuteProcessJobProcessor(
+            $this->createDoctrineHelperStub(),
+            $this->createProcessHandlerMock(),
+            $this->createLoggerMock()
+        );
     }
 
     public function testThrowIfMessageBodyIsNotValidJson()
     {
         $processor = new ExecuteProcessJobProcessor(
             $this->createDoctrineHelperStub(),
-            $this->createProcessHandlerMock()
+            $this->createProcessHandlerMock(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
@@ -57,7 +63,8 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new ExecuteProcessJobProcessor(
             $this->createDoctrineHelperStub(),
-            $this->createProcessHandlerMock()
+            $this->createProcessHandlerMock(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
@@ -82,7 +89,11 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
 
-        $processor = new ExecuteProcessJobProcessor($doctrineHelper, $this->createProcessHandlerMock());
+        $processor = new ExecuteProcessJobProcessor(
+            $doctrineHelper,
+            $this->createProcessHandlerMock(),
+            $this->createLoggerMock()
+        );
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
@@ -124,7 +135,11 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
 
-        $processor = new ExecuteProcessJobProcessor($doctrineHelper, $processHandle);
+        $processor = new ExecuteProcessJobProcessor(
+            $doctrineHelper,
+            $processHandle,
+            $this->createLoggerMock()
+        );
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
@@ -156,6 +171,14 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
     private function createEntityRepositoryMock()
     {
         return $this->getMock(EntityRepository::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     */
+    private function createLoggerMock()
+    {
+        return $this->getMock(LoggerInterface::class);
     }
 
     /**

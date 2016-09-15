@@ -277,5 +277,6 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.process.process_handler'
+            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
