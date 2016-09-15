@@ -49,13 +49,19 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
                 'getMaxResults',
                 'getOrderBy',
                 'getOrderDirection',
+                'getCriteria',
+                'getOrderings'
             ),
             array(),
             '',
             false
         );
 
+        $this->searchQuery->method('getCriteria')
+            ->willReturnSelf();
+
         $this->query = new IndexerQuery($this->searchIndexer, $this->searchQuery);
+
     }
 
     protected function tearDown()
@@ -147,8 +153,8 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
     public function testGetSortBy()
     {
         $this->searchQuery->expects($this->once())
-            ->method('getOrderBy')
-            ->will($this->returnValue(self::TEST_VALUE));
+            ->method('getOrderings')
+            ->will($this->returnValue([self::TEST_VALUE => self::TEST_VALUE]));
 
         $this->assertEquals(self::TEST_VALUE, $this->query->getSortBy());
     }
@@ -156,9 +162,9 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
     public function testGetSortOrder()
     {
         $this->searchQuery->expects($this->once())
-            ->method('getOrderDirection')
-            ->will($this->returnValue(self::TEST_VALUE));
+            ->method('getOrderings')
+            ->will($this->returnValue([self::TEST_VALUE => 'ASC']));
 
-        $this->assertEquals(self::TEST_VALUE, $this->query->getSortOrder());
+        $this->assertEquals('ASC', $this->query->getSortOrder());
     }
 }
