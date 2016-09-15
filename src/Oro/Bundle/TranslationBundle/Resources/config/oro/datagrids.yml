@@ -81,12 +81,20 @@ datagrids:
                     - translationKey.key
                     - translationKey.domain
                 from:
-                    - { table: %oro_translation.entity.translation.class%, alias: translation }
+                    - { table: '%oro_translation.entity.language.class%', alias: language }
                 join:
                     inner:
-                        - { join: translation.language, alias: language }
+                        -
+                            join: '%oro_translation.entity.translation_key.class%'
+                            alias: translationKey
+                            conditionType: WITH
+                            condition: 1 = 1
                     left:
-                        - { join: translation.translationKey, alias: translationKey }
+                        -
+                            join: '%oro_translation.entity.translation.class%'
+                            alias: translation
+                            conditionType: WITH
+                            condition: translation.language = language AND translation.translationKey = translationKey
         columns:
             code:
                 label: oro.translation.translation.language.label
@@ -119,8 +127,6 @@ datagrids:
                     options:
                         field_options:
                             choices: "@oro_translation.provider.language->getAvailableLanguages"
-#                domain: ~
-#                key: ~
         properties:
             id: ~
 
