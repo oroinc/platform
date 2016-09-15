@@ -16,6 +16,8 @@ class BatchLogHandler extends AkeneoBatchLogHandler
 
     /**
      * {@inheritDoc}
+     *
+     * todo: Remove after update AkeneoBatchBundle to version without call of Monolog\Handler\StreamHandler constructor
      */
     public function __construct($logDir)
     {
