@@ -153,7 +153,7 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
                 []
             ],
             'wf definitions' => [
-                false,
+                true,
                 ['workflowDefinition' => $workflowDefinitionTwo],
                 ['workflowDefinition' => $workflowDefinitionSemiTwo],
             ]

@@ -76,17 +76,6 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function isEqualTo(AbstractTransitionTrigger $trigger)
-    {
-        return $trigger instanceof static
-            && parent::isEqualTo($trigger)
-            && $this->cron === $trigger->getCron()
-            && $this->filter === $trigger->getFilter();
-    }
-
-    /**
      * @return string
      */
     public function __toString()
@@ -99,5 +88,15 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
             $this->filter,
             $this->queued ? 'MQ' : 'RUNTIME'
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isEqualAdditionalFields(AbstractTransitionTrigger $trigger)
+    {
+        return $trigger instanceof static
+            && $this->cron === $trigger->getCron()
+            && $this->filter === $trigger->getFilter();
     }
 }

@@ -173,20 +173,6 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function isEqualTo(AbstractTransitionTrigger $trigger)
-    {
-        return $trigger instanceof static
-            && parent::isEqualTo($trigger)
-            && $this->entityClass === $trigger->getEntityClass()
-            && $this->event === $trigger->getEvent()
-            && $this->field === $trigger->getField()
-            && $this->relation === $trigger->getRelation()
-            && $this->require === $trigger->getRequire();
-    }
-
-    /**
      * @return string
      */
     public function __toString()
@@ -201,5 +187,18 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
             $this->require ? ':expr(' . $this->require . ')' : '',
             $this->queued ? 'MQ' : 'RUNTIME'
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isEqualAdditionalFields(AbstractTransitionTrigger $trigger)
+    {
+        return $trigger instanceof static
+            && $this->entityClass === $trigger->getEntityClass()
+            && $this->event === $trigger->getEvent()
+            && $this->field === $trigger->getField()
+            && $this->relation === $trigger->getRelation()
+            && $this->require === $trigger->getRequire();
     }
 }
