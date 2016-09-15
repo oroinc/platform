@@ -25,12 +25,11 @@ class ApplicationsHelper
     }
 
     /**
-     * @param Operation $operation
+     * @param array $applications
      * @return bool
      */
-    public function isApplicationsValid(Operation $operation)
+    public function isApplicationsValid(array $applications)
     {
-        $applications = $operation->getDefinition()->getApplications();
         if (empty($applications)) {
             return true;
         }

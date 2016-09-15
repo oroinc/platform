@@ -23,8 +23,11 @@ class OperationRegistry
     /** @var array|Operation[] */
     protected $operations;
 
-    /* @var ArraySubstitution */
+    /** @var ArraySubstitution */
     protected $substitution;
+
+    /** @var array */
+    protected $configuration;
 
     /**
      * @param ConfigurationProviderInterface $configurationProvider
@@ -51,22 +54,31 @@ class OperationRegistry
      */
     public function find($entityClass, $route, $datagrid, $group = null)
     {
-        $this->loadOperations();
+        $this->loadConfiguration();
 
-        $allOperations = $this->filterByGroup($group);
+        $configurations = $this->filterByGroup($group);
+
         $operations = [];
+        $replacements = [];
 
-        foreach ($allOperations as $operation) {
-            $definition = $operation->getDefinition();
+        foreach ($configurations as $name => $config) {
+            if (!$this->isApplicable($config, $entityClass, $route, $datagrid)) {
+                continue;
+            }
 
-            if ($this->isEntityClassMatched($entityClass, $definition) ||
-                ($route && in_array($route, $definition->getRoutes(), true)) ||
-                $this->isDatagridMatched($datagrid, $definition)
-            ) {
-                $operations[$operation->getName()] = $operation;
+            if (!isset($this->operations[$name])) {
+                $this->operations[$name] = $this->assembler->createOperation($name, $config);
+            }
+
+            $operations[$name] = $this->operations[$name];
+
+            $substitutionTarget = $operations[$name]->getDefinition()->getSubstituteOperation();
+            if ($substitutionTarget) {
+                $replacements[$substitutionTarget] = $name;
             }
         }
 
+        $this->substitution->setMap($replacements);
         $this->substitution->apply($operations);
 
         return $operations;
@@ -78,91 +90,106 @@ class OperationRegistry
      */
     public function findByName($name)
     {
-        $this->loadOperations();
+        $this->loadConfiguration();
 
-        return array_key_exists($name, $this->operations) ? $this->operations[$name] : null;
+        $operation = null;
+        if (array_key_exists($name, $this->operations)) {
+            $operation = $this->operations[$name];
+
+            if (!$operation instanceof Operation) {
+                $operation = $this->assembler->createOperation($name, $this->configuration[$name]);
+
+                $this->operations[$name] = $operation;
+            }
+        }
+
+        return $operation;
     }
 
-    protected function loadOperations()
+    protected function loadConfiguration()
     {
-        if ($this->operations !== null) {
+        if ($this->configuration !== null && $this->operations !== null) {
             return;
         }
 
-        $this->operations = [];
-
-        $replacements = [];
-
-        $configuration = $this->configurationProvider->getConfiguration();
-        $operations = $this->assembler->assemble($configuration);
-
-        foreach ($operations as $operation) {
-            if (!$operation->isEnabled()) {
-                continue;
-            }
-
-            if (!$this->applicationsHelper->isApplicationsValid($operation)) {
-                continue;
-            }
-
-            $operationName = $operation->getName();
-
-            $this->operations[$operationName] = $operation;
-
-            $substitutionTarget = $operation->getDefinition()->getSubstituteOperation();
-            if ($substitutionTarget) {
-                $replacements[$substitutionTarget] = $operationName;
-            }
-        }
-
-        $this->substitution->setMap($replacements);
+        $this->configuration = $this->configurationProvider->getConfiguration();
+        $this->operations = array_fill_keys(array_keys($this->configuration), null);
     }
 
     /**
      * @param string|array|null $group
-     * @return array|Operation[]
+     * @return array
      */
     protected function filterByGroup($group = null)
     {
-        $this->normalizeGroup($group);
+        $expected = $this->normalizeGroups($group);
 
-        return array_filter($this->operations, function (Operation $operation) use ($group) {
-            $matchedGroups = array_intersect(
-                $group,
-                $operation->getDefinition()->getGroups() ?: [static::DEFAULT_GROUP]
-            );
+        return array_filter($this->configuration, function (array $operation) use ($expected) {
+            $groups = (array)$operation['groups'] ?: [static::DEFAULT_GROUP];
 
-            return 0 !== count($matchedGroups);
+            return 0 !== count(array_intersect($expected, $groups));
         });
     }
 
     /**
-     * @param string $className
-     * @param OperationDefinition $definition
+     * @param array $config
+     * @param string|null $entityClass
+     * @param string|null $route
+     * @param string|null $datagrid
      * @return bool
      */
-    protected function isEntityClassMatched($className, OperationDefinition $definition)
+    protected function isApplicable(array $config, $entityClass, $route, $datagrid)
+    {
+        if (!(bool)$config['enabled']) {
+            return false;
+        }
+
+        if (!$this->applicationsHelper->isApplicationsValid((array)$config['applications'])) {
+            return false;
+        }
+
+        return $this->isEntityClassMatched($entityClass, $config) ||
+            $this->isRouteMatched($route, $config) ||
+            $this->isDatagridMatched($datagrid, $config);
+    }
+
+    /**
+     * @param string $className
+     * @param array $config
+     * @return bool
+     */
+    private function isEntityClassMatched($className, array $config)
     {
         return $this->match(
             $className,
-            $definition->getEntities(),
-            $definition->getExcludeEntities(),
-            $definition->isForAllEntities()
+            (array)$config['entities'],
+            (array)$config['exclude_entities'],
+            (bool)$config['for_all_entities']
         );
     }
 
     /**
-     * @param string $datagrid
-     * @param OperationDefinition $definition
+     * @param string $route
+     * @param array $config
      * @return bool
      */
-    protected function isDatagridMatched($datagrid, OperationDefinition $definition)
+    private function isRouteMatched($route, array $config)
+    {
+        return $route && in_array($route, $config['routes'], true);
+    }
+
+    /**
+     * @param string $datagrid
+     * @param array $config
+     * @return bool
+     */
+    private function isDatagridMatched($datagrid, array $config)
     {
         return $this->match(
             $datagrid,
-            $definition->getDatagrids(),
-            $definition->getExcludeDatagrids(),
-            $definition->isForAllDatagrids()
+            (array)$config['datagrids'],
+            (array)$config['exclude_datagrids'],
+            (bool)$config['for_all_datagrids']
         );
     }
 
@@ -184,15 +211,21 @@ class OperationRegistry
 
     /**
      * @param string|array|null $group
+     * @return array
      */
-    protected function normalizeGroup(&$group)
+    protected function normalizeGroups($group)
     {
-        if (!is_array($group)) {
-            $group = empty($group) ? [static::DEFAULT_GROUP] : [(string)$group];
-        } else {
-            foreach ($group as $key => $value) {
-                $group[$key] = (string)$value;
-            }
+        $groups = (array)$group;
+
+        if (!$groups) {
+            $groups = [static::DEFAULT_GROUP];
         }
+
+        return array_map(
+            function ($group) {
+                return (string)$group;
+            },
+            $groups
+        );
     }
 }

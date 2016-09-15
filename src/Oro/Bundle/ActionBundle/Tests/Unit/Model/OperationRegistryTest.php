@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
@@ -43,6 +44,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var OperationRegistry */
     protected $registry;
 
+    /** @var ContextHelper */
     private $contextHelper;
 
     protected function setUp()
@@ -76,12 +78,12 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
         $this->applicationsHelper->expects($this->any())
             ->method('isApplicationsValid')
             ->willReturnCallback(
-                function (Operation $operation) {
-                    if (count($operation->getDefinition()->getApplications()) === 0) {
+                function (array $applications) {
+                    if (count($applications) === 0) {
                         return true;
                     }
 
-                    return in_array('default', $operation->getDefinition()->getApplications(), true);
+                    return in_array('default', $applications, true);
                 }
             );
 
@@ -313,7 +315,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConfiguration()
     {
-        return [
+        $configuration = [
             'operation1' => [
                 'label' => 'Label1'
             ],
@@ -430,5 +432,26 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'groups' => ['limited']
             ],
         ];
+
+        return array_map(
+            function ($config) {
+                return array_merge(
+                    [
+                        'enabled' => true,
+                        'applications' => [],
+                        'groups' => [],
+                        'entities' => [],
+                        'exclude_entities' => [],
+                        'for_all_entities' => false,
+                        'routes' => [],
+                        'datagrids' => [],
+                        'exclude_datagrids' => [],
+                        'for_all_datagrids' => false
+                    ],
+                    $config
+                );
+            },
+            $configuration
+        );
     }
 }
