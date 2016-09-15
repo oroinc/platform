@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
+use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 
 class OroDataCacheManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,5 +20,21 @@ class OroDataCacheManagerTest extends \PHPUnit_Framework_TestCase
         $manager->registerCacheProvider($notSyncProvider);
 
         $manager->sync();
+    }
+
+    public function testClear()
+    {
+        $clearableProvider = $this->getMock('Doctrine\Common\Cache\ClearableCache');
+        $clearableProvider->expects($this->once())
+            ->method('deleteAll');
+
+        $notClearableProvider = $this->getMock('Doctrine\Common\Cache\Cache');
+        $notClearableProvider->expects($this->never())
+            ->method($this->anything());
+
+        $manager = new OroDataCacheManager();
+        $manager->registerCacheProvider($clearableProvider);
+        $manager->registerCacheProvider($notClearableProvider);
+        $manager->clear();
     }
 }

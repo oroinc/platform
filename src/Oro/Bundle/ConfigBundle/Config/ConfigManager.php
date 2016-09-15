@@ -539,16 +539,4 @@ class ConfigManager
     {
         return $this->getScopeManager()->resolveIdentifier($scopeIdentifier);
     }
-
-    /**
-     * Clear cache at all related managers and clear internal storage
-     */
-    public function clearCache()
-    {
-        foreach ($this->managers as $manager) {
-            $manager->clearCache();
-        }
-
-        $this->localCache->clear();
-    }
 }
