@@ -98,6 +98,7 @@ services:
             - '@oro_api.entity_description_provider'
             - '@oro_api.resource_doc_provider'
             - '@translator'
+            - '@file_locator'
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -210 }
 

@@ -1,0 +1,19 @@
+<h4>Output</h4>
+<table class='fullwidth'>
+    <thead>
+    <tr>
+        <th>Parameter</th>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+        <tbody>
+        {% for name, infos in data %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ infos.dataType }}</td>
+                <td>{{ infos.description|extra_markdown }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+</table>

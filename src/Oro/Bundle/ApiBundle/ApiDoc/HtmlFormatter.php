@@ -184,7 +184,7 @@ class HtmlFormatter extends AbstractFormatter
     {
         return $this->engine->render('NelmioApiDocBundle::resources.html.twig', array_merge(
             [
-                'resources' => $collection,
+                'resources' => $this->reformatDocData($collection),
             ],
             $this->getGlobalVars()
         ));
@@ -244,5 +244,33 @@ class HtmlFormatter extends AbstractFormatter
     protected function getFileContent($path)
     {
         return file_get_contents($this->fileLocator->locate($path));
+    }
+
+    protected function reformatDocData($collection)
+    {
+        foreach ($collection as $resourceBlockName => $resourceGroupBlock) {
+            foreach ($resourceGroupBlock as $resourceUrl => $resourceBlock) {
+                foreach ($resourceBlock as $resourceId => $resource) {
+                    if (array_key_exists('parameters', $resource)) {
+                        $collection[$resourceBlockName][$resourceUrl][$resourceId]['documentation'] .= $this->engine
+                            ->render(
+                                'OroApiBundle:ApiDoc:input.html.twig',
+                                ['data' => $resource['response']]
+                            );
+                        unset($collection[$resourceBlockName][$resourceUrl][$resourceId]['parameters']);
+                    }
+                    if (array_key_exists('response', $resource)) {
+                        $collection[$resourceBlockName][$resourceUrl][$resourceId]['documentation'] .= $this->engine
+                            ->render(
+                                'OroApiBundle:ApiDoc:response.html.twig',
+                                ['data' => $resource['response']]
+                            );
+                        $collection[$resourceBlockName][$resourceUrl][$resourceId]['parsedResponseMap'] = [];
+                    }
+                }
+            }
+        }
+
+        return $collection;
     }
 }
