@@ -136,9 +136,4 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     {
         $this->kernelServiceFactory->shutdown();
     }
-
-    protected function refreshDependencies()
-    {
-        $this->referenceRepositoryInitializer->refresh();
-    }
 }

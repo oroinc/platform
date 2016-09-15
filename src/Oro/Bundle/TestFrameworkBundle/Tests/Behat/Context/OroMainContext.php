@@ -459,6 +459,15 @@ class OroMainContext extends MinkContext implements
         $this->createOroForm()->selectFieldOption($select, $option);
     }
 
+    /**
+     * @Then /^(?P<label>[\w\s]+) is a required field$/
+     */
+    public function fieldIsRequired($label)
+    {
+        $labelElement = $this->getPage()->findElementContains('Label', $label);
+        self::assertTrue($labelElement->hasClass('required'));
+    }
+
     /**.
      * @return OroForm
      */

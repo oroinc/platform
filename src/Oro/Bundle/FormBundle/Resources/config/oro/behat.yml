@@ -3,6 +3,10 @@ elements:
     selector: 'form'
     class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm
 
+  Label:
+    selector: 'label'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
   Action Button Chooser:
     selector: 'div.title-buttons-container a.dropdown-toggle'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
