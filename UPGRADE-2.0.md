@@ -288,6 +288,7 @@ tag if it works with extend classes
 - custom Search filter added: `\Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter`.
 - `\Oro\Bundle\SearchBundle\Query\Result\Item` is now compatible with the default backend datagrid templates.
 - `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` can now be defined as the datasource of any datagrid (both frontend and backend).
+- Datagrids having search datasource expect an indexed array of search indexes in 'from' part of datagrid configuration, as opposed to ORM format
 
 ####UiBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
