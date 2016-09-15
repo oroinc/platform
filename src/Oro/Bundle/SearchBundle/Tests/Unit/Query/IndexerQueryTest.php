@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase
@@ -16,52 +19,53 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
     protected $query;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Indexer|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $searchIndexer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Query|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $searchQuery;
+    protected $innerQuery;
 
     /**
      * @var array
      */
-    protected $testElements = array(1, 2, 3);
+    protected $testElements = [1, 2, 3];
 
     protected function setUp()
     {
         $this->searchIndexer = $this->getMock(
-            'Oro\Bundle\SearchBundle\Engine\Indexer',
-            array('query'),
-            array(),
+            Indexer::class,
+            ['query'],
+            [],
             '',
             false
         );
 
-        $this->searchQuery = $this->getMock(
-            'Oro\Bundle\SearchBundle\Query\Query',
-            array(
+        $this->innerQuery = $this->getMock(
+            Query::class,
+            [
                 'setFirstResult',
                 'getFirstResult',
                 'setMaxResults',
                 'getMaxResults',
                 'getOrderBy',
                 'getOrderDirection',
-            ),
-            array(),
+                'getCriteria',
+            ],
+            [],
             '',
             false
         );
 
-        $this->query = new IndexerQuery($this->searchIndexer, $this->searchQuery);
+        $this->query = new IndexerQuery($this->searchIndexer, $this->innerQuery);
     }
 
     protected function tearDown()
     {
         unset($this->searchIndexer);
-        unset($this->searchQuery);
+        unset($this->innerQuery);
         unset($this->query);
     }
 
@@ -70,12 +74,12 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
      */
     protected function prepareResult()
     {
-        return new Result($this->searchQuery, $this->testElements, self::TEST_COUNT);
+        return new Result($this->innerQuery, $this->testElements, self::TEST_COUNT);
     }
 
     public function testCall()
     {
-        $this->searchQuery->expects($this->once())
+        $this->innerQuery->expects($this->once())
             ->method('getOrderDirection')
             ->will($this->returnValue(self::TEST_VALUE));
 
@@ -88,7 +92,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
         $this->searchIndexer->expects($this->once())
             ->method('query')
-            ->with($this->searchQuery)
+            ->with($this->innerQuery)
             ->will($this->returnValue($result));
 
         // two calls to assert lazy load
@@ -98,7 +102,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testSetFirstResult()
     {
-        $this->searchQuery->expects($this->once())
+        $this->innerQuery->expects($this->once())
             ->method('setFirstResult')
             ->with(self::TEST_VALUE);
 
@@ -107,7 +111,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFirstResult()
     {
-        $this->searchQuery->expects($this->once())
+        $this->innerQuery->expects($this->once())
             ->method('getFirstResult')
             ->will($this->returnValue(self::TEST_VALUE));
 
@@ -116,7 +120,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testSetMaxResults()
     {
-        $this->searchQuery->expects($this->once())
+        $this->innerQuery->expects($this->once())
             ->method('setMaxResults')
             ->with(self::TEST_VALUE);
 
@@ -125,7 +129,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMaxResults()
     {
-        $this->searchQuery->expects($this->once())
+        $this->innerQuery->expects($this->once())
             ->method('getMaxResults')
             ->will($this->returnValue(self::TEST_VALUE));
 
@@ -138,7 +142,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
         $this->searchIndexer->expects($this->once())
             ->method('query')
-            ->with($this->searchQuery)
+            ->with($this->innerQuery)
             ->will($this->returnValue($result));
 
         $this->assertEquals(self::TEST_COUNT, $this->query->getTotalCount());
@@ -146,7 +150,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSortBy()
     {
-        $this->searchQuery->expects($this->once())
+        $this->innerQuery->expects($this->once())
             ->method('getOrderBy')
             ->will($this->returnValue(self::TEST_VALUE));
 
@@ -155,10 +159,29 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSortOrder()
     {
-        $this->searchQuery->expects($this->once())
+        $this->innerQuery->expects($this->once())
             ->method('getOrderDirection')
             ->will($this->returnValue(self::TEST_VALUE));
 
         $this->assertEquals(self::TEST_VALUE, $this->query->getSortOrder());
+    }
+
+    public function testSetWhere()
+    {
+        $expression = Criteria::expr()->eq('field', 'value');
+
+        $criteria = $this->getMock(
+            Criteria::class
+        );
+
+        $criteria->expects($this->once())
+            ->method('andWhere')
+            ->with($expression);
+
+        $this->innerQuery->expects($this->once())
+            ->method('getCriteria')
+            ->will($this->returnValue($criteria));
+
+        $this->query->setWhere($expression);
     }
 }

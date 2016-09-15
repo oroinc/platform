@@ -113,6 +113,22 @@ interface SearchQueryInterface
     public function from($entities);
 
     /**
+     * Same as from(). Added for clarity.
+     *
+     * @param $entities
+     * @return SearchQueryInterface
+     */
+    public function setFrom($entities);
+
+    /**
+     * Adding an expression to WHERE.
+     *
+     * @param $expression
+     * @return SearchQueryInterface
+     */
+    public function setWhere($expression);
+
+    /**
      * Returning the aliases found in the select expressions.
      * When adding a select field using addSelect(), a special SQL
      * syntax is supported for renaming fields. This method returns
