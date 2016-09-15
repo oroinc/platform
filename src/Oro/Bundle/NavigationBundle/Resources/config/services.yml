@@ -419,3 +419,10 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_navigation.menu_update_provider, area: default }
+
+    oro_navigation.extension.datasource.menu:
+        class: Oro\Bundle\NavigationBundle\Extension\PlatformMenuDatasource
+        arguments:
+            - '@oro_menu.builder_chain'
+        tags:
+            - { name: oro_datagrid.datasource, type: platform_menu }

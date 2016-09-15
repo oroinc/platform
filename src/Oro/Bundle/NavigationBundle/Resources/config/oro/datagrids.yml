@@ -1,0 +1,40 @@
+datagrids:
+    menu-update-grid:
+        options:
+            toolbarOptions:
+                hide: true
+                pagination:
+                    onePage: true
+        source:
+            type: platform_menu
+        columns:
+            title:
+                label: oro.menu.menuitem.titles.label
+        properties:
+            id: ~
+            title:
+                type: localized_value
+                data_name: titles
+            view_link:
+                type: url
+                route: oro_menu_item_view
+                params:
+                    - id
+        sorters:
+            columns:
+                title:
+                    data_name: title
+
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: title
+        actions:
+            view:
+                type:          navigate
+                label:         oro.grid.action.view
+                link:          view_link
+                icon:          eye-open
+                acl_resource:  oro_menu_item_view
+                rowAction:     true

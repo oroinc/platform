@@ -23,6 +23,7 @@ oro:
             button: Minimize
             button.title: Pin/unpin the page
         menuupdate:
+            menus: All Menus
             entity_label: Menu Update
             entity_plural_label: Menu Update
             id.label: Id

@@ -192,7 +192,7 @@ class BuilderChainProvider implements MenuProviderInterface
      * Returns menu titles for area
      *
      * @param  string $area
-
+     *
      * @return array|null
      */
     public function getMenusForArea($area)
