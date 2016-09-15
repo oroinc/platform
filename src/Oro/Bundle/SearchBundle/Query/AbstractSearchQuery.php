@@ -65,7 +65,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setFirstResult($firstResult)
     {
-        $this->query->setFirstResult($firstResult);
+        $this->query->getCriteria()->setFirstResult($firstResult);
     }
 
     /**
@@ -73,7 +73,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getFirstResult()
     {
-        return $this->query->getFirstResult();
+        return $this->query->getCriteria()->getFirstResult();
     }
 
     /**
@@ -81,7 +81,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setMaxResults($maxResults)
     {
-        $this->query->setMaxResults($maxResults);
+        $this->query->getCriteria()->setMaxResults($maxResults);
     }
 
     /**
@@ -89,7 +89,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getMaxResults()
     {
-        return $this->query->getMaxResults();
+        return $this->query->getCriteria()->getMaxResults();
     }
 
     /**
@@ -105,7 +105,10 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getSortBy()
     {
-        return $this->query->getOrderBy();
+        $orders    = array_keys($this->query->getCriteria()->getOrderings());
+        $fieldName = array_pop($orders);
+
+        return $fieldName === null ? null : Criteria::explodeFieldTypeName($fieldName)[1];
     }
 
     /**
