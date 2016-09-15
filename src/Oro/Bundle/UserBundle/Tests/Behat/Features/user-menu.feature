@@ -22,7 +22,8 @@ Feature: User menu
       | To      | John                          |
       | Body    | This is very simple test mail |
     And press "Send"
-    Then number of records should be 1
+    Then I should see "The email was sent" flash message
+    And number of records should be 1
 
   Scenario: My Calendar
     Given I click My Calendar in user menu
