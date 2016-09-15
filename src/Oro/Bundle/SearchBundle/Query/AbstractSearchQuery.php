@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+
 abstract class AbstractSearchQuery implements SearchQueryInterface
 {
     /**
@@ -65,7 +67,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setFirstResult($firstResult)
     {
-        $this->query->setFirstResult($firstResult);
+        $this->query->getCriteria()->setFirstResult($firstResult);
     }
 
     /**
@@ -73,7 +75,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getFirstResult()
     {
-        return $this->query->getFirstResult();
+        return $this->query->getCriteria()->getFirstResult();
     }
 
     /**
@@ -81,7 +83,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setMaxResults($maxResults)
     {
-        $this->query->setMaxResults($maxResults);
+        $this->query->getCriteria()->setMaxResults($maxResults);
     }
 
     /**
@@ -89,7 +91,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getMaxResults()
     {
-        return $this->query->getMaxResults();
+        return $this->query->getCriteria()->getMaxResults();
     }
 
     /**
@@ -105,7 +107,16 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getSortBy()
     {
-        return $this->query->getOrderBy();
+        $orderings = $this->query->getCriteria()->getOrderings();
+
+        if (empty($orderings)) {
+            return null;
+        }
+
+        $orders    = array_keys($orderings);
+        $fieldName = array_pop($orders);
+
+        return $fieldName === null ? null : Criteria::explodeFieldTypeName($fieldName)[1];
     }
 
     /**
@@ -113,7 +124,15 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getSortOrder()
     {
-        return $this->query->getOrderDirection();
+        $orders = $this->query
+            ->getCriteria()
+            ->getOrderings();
+
+        if (empty($orders)) {
+            return null;
+        }
+
+        return array_pop($orders);
     }
 
     /**
@@ -121,7 +140,11 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
     {
-        return $this->query->setOrderBy($fieldName, $direction, $type);
+        $field = $type . '.' . $fieldName;
+
+        $this->query
+            ->getCriteria()
+            ->orderBy([$field => $direction]);
     }
 
     /**
