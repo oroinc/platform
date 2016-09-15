@@ -9,7 +9,7 @@ class TransitionTriggersUpdateDecider
     /**
      * @param array $existingTriggers
      * @param array $newTriggers
-     * @return array[] A two elements array fist of which is a list of triggers that should be added, second - removed
+     * @return array[] A two elements array first of which is a list of triggers that should be added, second - removed
      */
     public function decide(array $existingTriggers, array $newTriggers)
     {

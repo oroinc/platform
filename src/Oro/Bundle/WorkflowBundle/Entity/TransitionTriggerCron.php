@@ -75,17 +75,15 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isEqualTo(AbstractTransitionTrigger $trigger)
     {
-        if (!$trigger instanceof static) {
-            return false;
-        }
-
-        return $this->cron === $trigger->cron
-        && $this->workflowDefinition === $trigger->workflowDefinition
-        && $this->queued === $trigger->queued
-        && $this->filter === $trigger->filter
-        && $this->transitionName === $trigger->transitionName;
+        return $trigger instanceof static
+            && parent::isEqualTo($trigger)
+            && $this->cron === $trigger->getCron()
+            && $this->filter === $trigger->getFilter();
     }
 
     /**
@@ -94,7 +92,7 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
     public function __toString()
     {
         return sprintf(
-            'cron: [%s:%s](%s):%s%s',
+            'cron: [%s:%s](%s):%s:%s',
             $this->workflowDefinition ? $this->workflowDefinition->getName() : 'null',
             $this->transitionName,
             $this->cron,

@@ -146,7 +146,7 @@ abstract class AbstractTransitionTrigger
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->preUpdate();
     }
 
     /**
@@ -169,5 +169,14 @@ abstract class AbstractTransitionTrigger
             ->setWorkflowDefinition($trigger->getWorkflowDefinition());
     }
 
-    abstract public function isEqualTo(AbstractTransitionTrigger $trigger);
+    /**
+     * @param AbstractTransitionTrigger $trigger
+     * @return bool
+     */
+    public function isEqualTo(AbstractTransitionTrigger $trigger)
+    {
+        return $this->workflowDefinition === $trigger->getWorkflowDefinition()
+            && $this->queued === $trigger->isQueued()
+            && $this->transitionName === $trigger->getTransitionName();
+    }
 }

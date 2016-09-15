@@ -93,7 +93,7 @@ return [
                         'event' => 'update',
                         'field' => 'description',
                         'require' => 'entity === main_entity',
-                        'queued' => null,
+                        'queued' => true,
                         'entity_class' => null,
                         'relation' => null,
                         'cron' => null,
@@ -104,7 +104,7 @@ return [
                         'entity_class' => 'Other\Entity',
                         'relation' => 'firstEntity',
                         'require' => 'not empty(entity.firstEntity) && attributes["first_attribute"] == "ok"',
-                        'queued' => null,
+                        'queued' => true,
                         'field' => null,
                         'cron' => null,
                         'filter' => null
@@ -112,7 +112,7 @@ return [
                     [
                         'cron' => '1 * * * *',
                         'filter' => 'e.text = "string"',
-                        'queued' => null,
+                        'queued' => true,
                         'entity_class' => null,
                         'relation' => null,
                         'event' => null,

@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WorkflowTransitionTriggersListener implements EventSubscriberInterface
 {
@@ -33,6 +34,9 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
         $this->triggersUpdater = $triggersUpdater;
     }
 
+    /**
+     * @param WorkflowChangesEvent $event
+     */
     public function triggersUpdate(WorkflowChangesEvent $event)
     {
         $triggers = $this->assembler->assembleTriggers($event->getDefinition());
@@ -42,6 +46,9 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
         $this->triggersUpdater->updateTriggers($triggersBag);
     }
 
+    /**
+     * @param WorkflowChangesEvent $event
+     */
     public function triggersDelete(WorkflowChangesEvent $event)
     {
         $this->triggersUpdater->removeTriggers($event->getDefinition());

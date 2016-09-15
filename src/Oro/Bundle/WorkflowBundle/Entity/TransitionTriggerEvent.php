@@ -39,7 +39,7 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     /**
      * @var string
      *
-     * @ORM\Column(name="require", type="text", length=1024, nullable=true)
+     * @ORM\Column(name="`require`", type="text", length=1024, nullable=true)
      */
     protected $require;
 
@@ -172,20 +172,18 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isEqualTo(AbstractTransitionTrigger $trigger)
     {
-        if (!$trigger instanceof static) {
-            return false;
-        }
-
-        return $this->workflowDefinition === $trigger->workflowDefinition
-        && $this->transitionName === $trigger->transitionName
-        && $this->entityClass === $trigger->entityClass
-        && $this->event === $trigger->event
-        && $this->field === $trigger->field
-        && $this->relation === $trigger->relation
-        && $this->require === $trigger->require
-        && $this->queued === $trigger->queued;
+        return $trigger instanceof static
+            && parent::isEqualTo($trigger)
+            && $this->entityClass === $trigger->getEntityClass()
+            && $this->event === $trigger->getEvent()
+            && $this->field === $trigger->getField()
+            && $this->relation === $trigger->getRelation()
+            && $this->require === $trigger->getRequire();
     }
 
     /**
@@ -194,13 +192,13 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     public function __toString()
     {
         return sprintf(
-            'event: [%s:%s](on:%s%s):%s%s%s',
+            'event: [%s:%s](on:%s%s)%s%s:%s',
             $this->workflowDefinition ? $this->workflowDefinition->getName() : 'null',
             $this->transitionName,
             $this->event,
             $this->field ? '[' . $this->field . ']' : '',
-            $this->relation ? '=>' . $this->relation : '',
-            $this->require ? 'expr(' . $this->require . ')' : '',
+            $this->relation ? ':=>' . $this->relation : '',
+            $this->require ? ':expr(' . $this->require . ')' : '',
             $this->queued ? 'MQ' : 'RUNTIME'
         );
     }

@@ -73,3 +73,5 @@ services:
         arguments:
             - '@oro_workflow.transition_trigger_assembler'
             - '@oro_workflow.transition_trigger_updater'
+        tags:
+            - { name: oro_workflow.changes.subscriber }

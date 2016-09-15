@@ -32,7 +32,50 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
     }
 
     /**
-     * @dataProvider equalityData
+     * @dataProvider toStringDataProvider
+     *
+     * @param array $data
+     * @param string $expected
+     */
+    public function testToString(array $data, $expected)
+    {
+        $this->assertEquals($expected, (string) $this->createTriggerCron($data));
+    }
+
+    /**
+     * @return array
+     */
+    public function toStringDataProvider()
+    {
+        $wd1 = (new WorkflowDefinition())->setName('wd1');
+
+        return [
+            'not queued' => [
+                'data' => [
+                    'cron' => '1 * * * *',
+                    'filter' => 'w = 1',
+                    'queued' => false,
+                    'workflowDefinition' => $wd1,
+                    'transitionName' => 't1'
+                ],
+                'expected' => 'cron: [wd1:t1](1 * * * *):w = 1:RUNTIME',
+            ],
+            'queued' => [
+                'data' => [
+                    'cron' => '1 * * * *',
+                    'filter' => 'w = 1',
+                    'queued' => true,
+                    'workflowDefinition' => $wd1,
+                    'transitionName' => 't1'
+                ],
+                'expected' => 'cron: [wd1:t1](1 * * * *):w = 1:MQ',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider equalityDataProvider
+     *
      * @param bool $expected
      * @param array $match
      * @param array $against
@@ -48,25 +91,9 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
     }
 
     /**
-     * @param array $attributes
-     * @return TransitionTriggerCron
-     */
-    protected function createTriggerCron(array $attributes)
-    {
-        $trigger = new TransitionTriggerCron();
-
-        foreach ($attributes as $name => $value) {
-            $method = 'set' . ucfirst($name);
-            $trigger->$method($value);
-        }
-
-        return $trigger;
-    }
-
-    /**
      * @return array
      */
-    public function equalityData()
+    public function equalityDataProvider()
     {
         $cases = [];
 
@@ -124,6 +151,22 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
         $cases = array_merge($cases, $oneDiffers);
 
         return $cases;
+    }
+
+    /**
+     * @param array $attributes
+     * @return TransitionTriggerCron
+     */
+    protected function createTriggerCron(array $attributes)
+    {
+        $trigger = new TransitionTriggerCron();
+
+        foreach ($attributes as $name => $value) {
+            $method = 'set' . ucfirst($name);
+            $trigger->$method($value);
+        }
+
+        return $trigger;
     }
 
     /**

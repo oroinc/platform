@@ -41,7 +41,53 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
     }
 
     /**
-     * @dataProvider equalityData
+     * @dataProvider toStringDataProvider
+     *
+     * @param array $data
+     * @param string $expected
+     */
+    public function testToString(array $data, $expected)
+    {
+        $this->assertEquals($expected, (string) $this->createTriggerEvent($data));
+    }
+
+    /**
+     * @return array
+     */
+    public function toStringDataProvider()
+    {
+        $wd1 = (new WorkflowDefinition())->setName('wd1');
+
+        return [
+            'not queued' => [
+                'data' => [
+                    'event' => 'create',
+                    'field' => 'property_one',
+                    'entityClass' => 'class1',
+                    'require' => 'expr1',
+                    'relation' => 'path1',
+                    'queued' => false,
+                    'workflowDefinition' => $wd1,
+                    'transitionName' => 't1'
+                ],
+                'expected' => 'event: [wd1:t1](on:create[property_one]):=>path1:expr(expr1):RUNTIME',
+            ],
+            'queued, no require, no relation' => [
+                'data' => [
+                    'event' => 'create',
+                    'field' => 'property_one',
+                    'entityClass' => 'class1',
+                    'queued' => true,
+                    'workflowDefinition' => $wd1,
+                    'transitionName' => 't1'
+                ],
+                'expected' => 'event: [wd1:t1](on:create[property_one]):MQ',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider equalityDataProvider
      * @param bool $expected
      * @param array $match
      * @param array $against
@@ -60,7 +106,7 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
     /**
      * @return array
      */
-    public function equalityData()
+    public function equalityDataProvider()
     {
         $workflowDefinitionOne = (new WorkflowDefinition())->setName('one');
         $workflowDefinitionTwo = (new WorkflowDefinition())->setName('two');

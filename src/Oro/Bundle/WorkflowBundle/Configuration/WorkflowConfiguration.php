@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Cron\CronExpression;
+
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -304,7 +306,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     }
 
     /**
-     * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|NodeDefinition
+     * @return ArrayNodeDefinition|NodeDefinition
      */
     protected function getTransitionTriggers()
     {
@@ -324,7 +326,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultNull()
                     ->end()
                     ->booleanNode('queued')
-                        ->defaultNull()
+                        ->defaultTrue()
                     ->end()
                     ->scalarNode('entity_class')
                         ->defaultNull()
@@ -354,7 +356,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->validate()
                     ->ifTrue(
                         function ($data) {
-
                             return $data['event'] && $data['cron'];
                         }
                     )
@@ -373,6 +374,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                                     }
                                 }
                             }
+
                             return $data;
                         }
                     )
@@ -380,16 +382,13 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->validate()
                     ->ifTrue(
                         function ($data) {
-
-                            return $data['field'] &&
-                            $data['event'] !== TransitionTriggerEvent::EVENT_UPDATE;
+                            return $data['field'] && $data['event'] !== TransitionTriggerEvent::EVENT_UPDATE;
                         }
                     )->thenInvalid('The "field" option is only allowed for update event.')
                 ->end()
                 ->validate()
                     ->ifTrue(
                         function ($data) {
-
                             return $data['relation'] && !$data['entity_class'];
                         }
                     )
@@ -398,6 +397,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     )
                 ->end()
             ->end();
+
         return $triggersNode;
     }
     /**
@@ -483,6 +483,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     }
 
     /**
+     * @param string $nodeName
      * @return NodeDefinition
      */
     protected function getGroupsNode($nodeName)
