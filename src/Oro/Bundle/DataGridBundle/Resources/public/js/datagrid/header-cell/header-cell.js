@@ -1,7 +1,9 @@
 define([
     'underscore',
-    'backgrid'
-], function(_, Backgrid) {
+    'jquery',
+    'backgrid',
+    'oroui/js/tools/text-util'
+], function(_, $, Backgrid, textUtil) {
     'use strict';
 
     var HeaderCell;
@@ -18,19 +20,30 @@ define([
         /** @property */
         template: _.template(
             '<% if (sortable) { %>' +
-                '<a href="#">' +
-                    '<%- label %> ' +
+                '<a class="grid-header-cell-link" href="#">' +
+                    '<span class="grid-header-cell-label"><%- label %></span>' +
                     '<span class="caret"></span>' +
                 '</a>' +
             '<% } else { %>' +
-                '<span><%- label %></span>' + // wrap label into span otherwise underscore will not render it
+                '<span class="grid-header-cell-label-container">' +
+                    '<span class="grid-header-cell-label"><%- label %></span>' +
+                '</span>' +
             '<% } %>'
         ),
 
         /** @property {Boolean} */
         allowNoSorting: true,
 
+        /** @property {Number} */
+        minWordsToAbbreviate: 4,
+
         keepElement: false,
+
+        events: {
+            mouseenter: 'onMouseEnter',
+            mouseleave: 'onMouseLeave',
+            click: 'onClick'
+        },
 
         /**
          * Initialize.
@@ -95,8 +108,15 @@ define([
         render: function() {
             this.$el.empty();
 
+            var label = this.column.get('label');
+            var abbreviation = textUtil.abbreviate(label, this.minWordsToAbbreviate);
+
+            this.isLabelAbbreviated = abbreviation !== label;
+
+            this.$el.toggleClass('abbreviated', this.isLabelAbbreviated);
+
             this.$el.append(this.template({
-                label: this.column.get('label'),
+                label: abbreviation,
                 sortable: this.column.get('sortable')
             }));
 
@@ -155,6 +175,49 @@ define([
                     cycleSort(this, column);
                 }
             }
+        },
+
+        onMouseEnter: function(e) {
+            var _this = this;
+            var $label = this.$('.grid-header-cell-label');
+
+            // measure text content
+            var realWidth = $label[0].clientWidth;
+            $label.css({overflow: 'visible'});
+            var fullWidth = $label[0].clientWidth;
+            $label.css({overflow: ''});
+
+            if (!this.isLabelAbbreviated && fullWidth === realWidth) {
+                // hint is not required all text is visible
+                return;
+            }
+
+            this.popoverAdded = true;
+
+            $label.popover({
+                content: _this.column.get('label'),
+                trigger: 'manual',
+                placement: 'bottom',
+                animation: 'false',
+                container: 'body',
+                template: '<div class="popover" role="tooltip">' +
+                              '<div class="arrow"></div>' +
+                              '<h3 class="popover-title"></h3>' +
+                              '<div class="popover-content popover-no-close-button"></div>' +
+                          '</div>'
+            });
+
+            this.hintTimeout = setTimeout(function addHeaderCellHint() {
+                $label.popover('show');
+            }, 300);
+        },
+
+        onMouseLeave: function(e) {
+            clearTimeout(this.hintTimeout);
+            var $label = this.$('.grid-header-cell-label');
+            $label.popover('hide');
+            $label.popover('destroy');
+            this.popoverAdded = false;
         }
     });
 
