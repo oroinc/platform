@@ -191,18 +191,24 @@ oro:
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
 
+        # password tooltip for different rules
         password_complexity:
-            validator:
-                min_length:     The password must be at least {{ length }} characters long.
-                upper_case:     The password must contain at least one upper case letter.
-                numbers:        The password must contain at least one number.
-                special_chars:  The password must contain at least one special (non-alphanumeric) character.
-            tooltip:
-                prefix:         'Password must include: '
-                min_length:     at least {{ value }} characters
-                upper_case:     an upper case letter
-                numbers:        a number
-                special_chars:  a special character
+            unrestricted: ~
+            min_length: The password must be at least {{ length }} characters long
+            upper_case: The password must include an uppercase letter
+            numbers:    The password must include a number
+            special_chars:  The password must include a special character
+            min_length_upper_case: The password must be at least {{ length }} characters long and include an uppercase letter
+            min_length_numbers: The password must be at least {{ length }} characters long and include a number
+            min_length_special_chars: The password must be at least {{ length }} characters long and include a special character
+            min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an uppercase letter and a number
+            min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter and a special character
+            min_length_numbers_special_chars: The password must be at least {{ length }} characters long and include a number and a special character
+            min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter, a number, and a special character
+            upper_case_numbers: The password must include an uppercase letter and a number
+            upper_case_special_chars: The password must include an uppercase letter and a special character
+            numbers_special_chars: The password must include a number and a special character
+            upper_case_numbers_special_chars: The password must include an uppercase letter, a number and a special character
 
         action:
             password_management:
@@ -239,11 +245,10 @@ oro:
 
         system_configuration:
             groups:
-                security.title: Security
-                password_complexity.title: Password complexity
-                password_complexity_rules.title: Rules
+                security_options.title: Security options
+                password_complexity_rules.title: Password complexity restrictions
             fields:
-                password_min_length.label: Reqiuire minimal length
-                password_numbers.label: Require numbers
-                password_upper_case.label: Require upper case
-                password_special_chars.label: Require special chars
+                password_min_length.label: Minimal password length
+                password_numbers.label: Require a number
+                password_upper_case.label: Require an uppercase letter
+                password_special_chars.label: Require a special character

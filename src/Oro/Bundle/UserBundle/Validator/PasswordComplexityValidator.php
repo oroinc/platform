@@ -41,24 +41,31 @@ class PasswordComplexityValidator extends ConstraintValidator
             return;
         }
 
+        // collect all messages
+        $messages = [];
         if (!$this->validMinLength($value)) {
-            $this->addViolation(
-                $constraint->tooShortMessage,
-                $value,
-                ['{{ length }}' => $this->configManager->get(self::CONFIG_MIN_LENGTH)]
-            );
+            $messages[] = $constraint->requireMinLengthKey;
         }
 
         if (!$this->validUpperCase($value)) {
-            $this->addViolation($constraint->requireUpperCaseMessage, $value);
+            $messages[] = $constraint->requireUpperCaseKey;
         }
 
         if (!$this->validNumbers($value)) {
-            $this->addViolation($constraint->requireNumbersMessage, $value);
+            $messages[] = $constraint->requireNumbersKey;
         }
 
         if (!$this->validSpecialChars($value)) {
-            $this->addViolation($constraint->requireSpecialCharacterMessage, $value);
+            $messages[] = $constraint->requireSpecialCharacterKey;
+        }
+
+        if (count($messages) > 0) {
+            // construct an error message translation key
+            $message = $constraint->baseKey . join('_', $messages);
+            $this->context->buildViolation($message)
+                ->setParameters(['{{ length }}' => $this->configManager->get(self::CONFIG_MIN_LENGTH)])
+                ->setInvalidValue($value)
+                ->addViolation();
         }
     }
 
@@ -108,20 +115,5 @@ class PasswordComplexityValidator extends ConstraintValidator
     protected function validSpecialChars($value)
     {
         return !$this->configManager->get(self::CONFIG_SPECIAL_CHARS) || preg_match(self::REGEX_SPECIAL_CHARS, $value);
-    }
-
-    /**
-     * Add violation to the current context
-     *
-     * @param $message
-     * @param $value
-     * @param array $params
-     */
-    protected function addViolation($message, $value, $params = [])
-    {
-        $this->context->buildViolation($message)
-            ->setParameters($params)
-            ->setInvalidValue($value)
-            ->addViolation();
     }
 }

@@ -48,7 +48,7 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
-                'expected' => PasswordTooltipProvider::TOOLTIP_PREFIX,
+                'expected' => PasswordTooltipProvider::UNRESTRICTED,
             ],
             'min length rule' => [
                 'configMap' => [
@@ -57,8 +57,8 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
-                'expected' => PasswordTooltipProvider::TOOLTIP_PREFIX .
-                              PasswordTooltipProvider::TOOLTIP_MIN_LENGTH,
+                'expected' => PasswordTooltipProvider::BASE .
+                              PasswordTooltipProvider::MIN_LENGTH,
 
             ],
             'some rules' => [
@@ -68,10 +68,10 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
-                'expected' => PasswordTooltipProvider::TOOLTIP_PREFIX .
-                              PasswordTooltipProvider::TOOLTIP_UPPER_CASE .
-                              PasswordTooltipProvider::TOOLTIP_SEPARATOR .
-                              PasswordTooltipProvider::TOOLTIP_SPECIAL_CHARS,
+                'expected' => PasswordTooltipProvider::BASE .
+                              PasswordTooltipProvider::UPPER_CASE .
+                              PasswordTooltipProvider::SEPARATOR .
+                              PasswordTooltipProvider::SPECIAL_CHARS,
 
             ],
             'all rules' => [
@@ -81,14 +81,14 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
-                'expected' => PasswordTooltipProvider::TOOLTIP_PREFIX .
-                              PasswordTooltipProvider::TOOLTIP_MIN_LENGTH .
-                              PasswordTooltipProvider::TOOLTIP_SEPARATOR .
-                              PasswordTooltipProvider::TOOLTIP_UPPER_CASE .
-                              PasswordTooltipProvider::TOOLTIP_SEPARATOR .
-                              PasswordTooltipProvider::TOOLTIP_NUMBERS .
-                              PasswordTooltipProvider::TOOLTIP_SEPARATOR .
-                              PasswordTooltipProvider::TOOLTIP_SPECIAL_CHARS,
+                'expected' => PasswordTooltipProvider::BASE .
+                              PasswordTooltipProvider::MIN_LENGTH .
+                              PasswordTooltipProvider::SEPARATOR .
+                              PasswordTooltipProvider::UPPER_CASE .
+                              PasswordTooltipProvider::SEPARATOR .
+                              PasswordTooltipProvider::NUMBERS .
+                              PasswordTooltipProvider::SEPARATOR .
+                              PasswordTooltipProvider::SPECIAL_CHARS,
             ],
         ];
     }

@@ -12,21 +12,22 @@ use Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator;
  */
 class PasswordTooltipProvider
 {
-    const TOOLTIP_PREFIX = 'oro.user.password_complexity.tooltip.prefix';
-    const TOOLTIP_SEPARATOR = ', ';
-    const TOOLTIP_MIN_LENGTH = 'oro.user.password_complexity.tooltip.min_length';
-    const TOOLTIP_UPPER_CASE = 'oro.user.password_complexity.tooltip.upper_case';
-    const TOOLTIP_NUMBERS = 'oro.user.password_complexity.tooltip.numbers';
-    const TOOLTIP_SPECIAL_CHARS = 'oro.user.password_complexity.tooltip.special_chars';
+    const BASE = 'oro.user.password_complexity.';
+    const UNRESTRICTED = 'oro.user.password_complexity.unrestricted';
+    const MIN_LENGTH = 'min_length';
+    const UPPER_CASE = 'upper_case';
+    const NUMBERS = 'numbers';
+    const SPECIAL_CHARS = 'special_chars';
+    const SEPARATOR = '_';
 
     /**
      * @var array Map of the config keys and their corresponding tooltip translation keys
      */
     public static $tooltipPartsMap = [
-        PasswordComplexityValidator::CONFIG_MIN_LENGTH => self::TOOLTIP_MIN_LENGTH,
-        PasswordComplexityValidator::CONFIG_UPPER_CASE => self::TOOLTIP_UPPER_CASE,
-        PasswordComplexityValidator::CONFIG_NUMBERS => self::TOOLTIP_NUMBERS,
-        PasswordComplexityValidator::CONFIG_SPECIAL_CHARS => self::TOOLTIP_SPECIAL_CHARS,
+        PasswordComplexityValidator::CONFIG_MIN_LENGTH => self::MIN_LENGTH,
+        PasswordComplexityValidator::CONFIG_UPPER_CASE => self::UPPER_CASE,
+        PasswordComplexityValidator::CONFIG_NUMBERS => self::NUMBERS,
+        PasswordComplexityValidator::CONFIG_SPECIAL_CHARS => self::SPECIAL_CHARS,
     ];
 
     /** @var ConfigManager */
@@ -48,14 +49,20 @@ class PasswordTooltipProvider
      */
     public function getTooltip()
     {
-        $tooltips = [];
-        foreach (self::$tooltipPartsMap as $configKey => $transKey) {
+        $parts = [];
+        foreach (self::$tooltipPartsMap as $configKey => $partKey) {
             $config = $this->configManager->get($configKey);
             if ($config) {
-                $tooltips[] = $this->translator->trans($transKey, ['{{ value }}' => $config]);
+                $parts[] = $partKey;
             }
         }
+        $minLength = $this->configManager->get(PasswordComplexityValidator::CONFIG_MIN_LENGTH);
+        $transKey = self::UNRESTRICTED;
 
-        return $this->translator->trans(self::TOOLTIP_PREFIX) . join(self::TOOLTIP_SEPARATOR, $tooltips);
+        if (count($parts) > 0) {
+            $transKey = self::BASE . join(self::SEPARATOR, $parts);
+        }
+
+        return $this->translator->trans($transKey, ['{{ length }}' => $minLength]);
     }
 }

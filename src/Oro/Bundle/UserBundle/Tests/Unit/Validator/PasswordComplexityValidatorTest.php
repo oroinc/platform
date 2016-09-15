@@ -31,19 +31,20 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider validateDataProvider
+     * @dataProvider validateInvalidDataProvider
      *
      * @param array $configMap System config
      * @param string $value    Testing password
-     * @param string $expected Expected violations count
+     * @param string $message  Expected message param
      */
-    public function testValidate(array $configMap, $value, $expected)
+    public function testValidateInvalid(array $configMap, $value, $message)
     {
         $validator = new PasswordComplexityValidator($this->getConfigManager($configMap));
         $context = $this->getMockBuilder(ExecutionContextInterface::class)->disableOriginalConstructor()->getMock();
 
-        $context->expects($this->exactly($expected))
+        $context->expects($this->once())
             ->method('buildViolation')
+            ->with($message)
             ->willReturn($this->violationBuilder);
 
         /** @var ExecutionContext $context */
@@ -52,22 +53,33 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider validateValidDataProvider
+     *
+     * @param array $configMap System config
+     * @param string $value    Testing password
+     */
+    public function testValidateValid(array $configMap, $value)
+    {
+        $validator = new PasswordComplexityValidator($this->getConfigManager($configMap));
+        $context = $this->getMockBuilder(ExecutionContextInterface::class)->disableOriginalConstructor()->getMock();
+
+        $context->expects($this->never())
+            ->method('buildViolation');
+
+        /** @var ExecutionContext $context */
+        $validator->initialize($context);
+        $validator->validate($value, $this->constraint);
+    }
+
+    /**
+     * Different rules enabled, invalid value provided
+     *
      * @return array
      */
-    public function validateDataProvider()
+    public function validateInvalidDataProvider()
     {
         return [
-            'no rules enabled' => [
-                'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
-                ],
-                'value' => 'password',
-                'expected' => 0,
-            ],
-            'min length - invalid value' => [
+            'min length' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 10],
                     [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
@@ -75,10 +87,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
-                'expected' => 1,
+                'message' => 'oro.user.message.invalid_password.min_length',
 
             ],
-            'upper case  - invalid value' => [
+            'upper case' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
                     [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
@@ -86,32 +98,32 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
-                'expected' => 1,
+                'message' => 'oro.user.message.invalid_password.upper_case',
 
             ],
-            'numbers  - invalid value' => [
+            'numbers' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
-                'expected' => 1,
+                'message' => 'oro.user.message.invalid_password.numbers',
 
             ],
-            'special chars  - invalid value' => [
+            'special chars' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
                     [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'value' => 'password',
-                'expected' => 1,
+                'message' => 'oro.user.message.invalid_password.special_chars',
 
             ],
-            '2 rules - invalid' => [
+            'upper case and numbers' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
                     [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
@@ -119,10 +131,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
-                'expected' => 2,
+                'message' => 'oro.user.message.invalid_password.upper_case_numbers',
 
             ],
-            'all rules - invalid' => [
+            'all rules - invalid value' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 10],
                     [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
@@ -130,9 +142,55 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'value' => 'password',
-                'expected' => 4,
+                'message' => 'oro.user.message.invalid_password.min_length_upper_case_numbers_special_chars',
             ],
-            'all rules - valid' => [
+            'all rules - invalid length and numbers' => [
+                'configMap' => [
+                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 10],
+                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
+                ],
+                'value' => 'paSsword!',
+                'message' => 'oro.user.message.invalid_password.min_length_numbers',
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validateValidDataProvider()
+    {
+        return [
+            'all rules disabled' => [
+                'configMap' => [
+                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                ],
+                'value' => 'password',
+            ],
+            'min length - valid password' => [
+                'configMap' => [
+                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 8],
+                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                ],
+                'value' => 'paSsw0rd!',
+            ],
+            'numbers - valid password' => [
+                'configMap' => [
+                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                ],
+                'value' => '1',
+            ],
+            'all rules - valid password' => [
                 'configMap' => [
                     [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 8],
                     [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
@@ -140,7 +198,6 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'value' => 'paSsw0rd!',
-                'expected' => 0,
             ],
         ];
     }

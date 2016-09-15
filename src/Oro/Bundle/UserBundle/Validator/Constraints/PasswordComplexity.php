@@ -9,13 +9,18 @@ use Symfony\Component\Validator\Constraint;
  */
 class PasswordComplexity extends Constraint
 {
-    public $tooShortMessage = 'oro.user.message.password_min_length';
+    /**
+     * @var string Base key of the message, the trans key is constructed by concatenation of the required rule keys
+     */
+    public $baseKey = 'oro.user.message.invalid_password.';
 
-    public $requireUpperCaseMessage = 'oro.user.message.password_upper_case';
+    public $requireMinLengthKey = 'min_length';
 
-    public $requireNumbersMessage = 'oro.user.message.password_numbers';
+    public $requireUpperCaseKey = 'upper_case';
 
-    public $requireSpecialCharacterMessage = 'oro.user.message.password_special_chars';
+    public $requireNumbersKey = 'numbers';
+
+    public $requireSpecialCharacterKey = 'special_chars';
 
     /**
      * {@inheritdoc}
