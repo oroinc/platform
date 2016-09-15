@@ -54,8 +54,16 @@
         }
     }
 
+    &__column {
+        float: left;
+
+        box-sizing: border-box;
+
+        padding: 0 9px;
+    }
+
     @for $i from 1 through $grid-count {
-        &__column-#{$i} {
+        &__column--#{$i} {
             width: (($i* 100%) / $grid-count);
         }
     }
