@@ -100,14 +100,14 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
-            $this->formOptionsAssembler,
-            $this->doctrineHelper
+            $this->formOptionsAssembler
         );
 
         $this->registry = new OperationRegistry(
             $this->configurationProvider,
             $this->assembler,
-            $this->applicationsHelper
+            $this->applicationsHelper,
+            $this->doctrineHelper
         );
     }
 

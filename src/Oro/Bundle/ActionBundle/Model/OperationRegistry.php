@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+use Doctrine\ORM\ORMException;
+
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class OperationRegistry
 {
@@ -20,6 +23,9 @@ class OperationRegistry
     /** @var ApplicationsHelper */
     protected $applicationsHelper;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var array|Operation[] */
     protected $operations;
 
@@ -29,19 +35,25 @@ class OperationRegistry
     /** @var array */
     protected $configuration;
 
+    /** @var array */
+    private $entityNames = [];
+
     /**
      * @param ConfigurationProviderInterface $configurationProvider
      * @param OperationAssembler $assembler
      * @param ApplicationsHelper $applicationsHelper
+     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ConfigurationProviderInterface $configurationProvider,
         OperationAssembler $assembler,
-        ApplicationsHelper $applicationsHelper
+        ApplicationsHelper $applicationsHelper,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
         $this->applicationsHelper = $applicationsHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->substitution = new ArraySubstitution();
     }
 
@@ -162,8 +174,8 @@ class OperationRegistry
     {
         return $this->match(
             $className,
-            (array)$config['entities'],
-            (array)$config['exclude_entities'],
+            $this->filterEntities((array)$config['entities']),
+            $this->filterEntities((array)$config['exclude_entities']),
             (bool)$config['for_all_entities']
         );
     }
@@ -227,5 +239,36 @@ class OperationRegistry
             },
             $groups
         );
+    }
+
+    /**
+     * @param array $entities
+     * @return array
+     */
+    protected function filterEntities(array $entities)
+    {
+        return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
+    }
+
+    /**
+     * @param string $entityName
+     * @return string|bool
+     */
+    protected function getEntityClassName($entityName)
+    {
+        if (!array_key_exists($entityName, $this->entityNames)) {
+            $this->entityNames[$entityName] = null;
+
+            try {
+                $entityClass = $this->doctrineHelper->getEntityClass($entityName);
+
+                if (class_exists($entityClass, true)) {
+                    $this->entityNames[$entityName] = ltrim($entityClass, '\\');
+                }
+            } catch (ORMException $e) {
+            }
+        }
+
+        return $this->entityNames[$entityName];
     }
 }
