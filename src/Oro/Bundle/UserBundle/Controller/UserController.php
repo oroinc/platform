@@ -236,4 +236,3 @@ class UserController extends Controller
         return $isDeleteAllowed;
     }
 }
-
