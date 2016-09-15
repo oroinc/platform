@@ -107,7 +107,13 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getSortBy()
     {
-        $orders    = array_keys($this->query->getCriteria()->getOrderings());
+        $orderings = $this->query->getCriteria()->getOrderings();
+
+        if (empty($orderings)) {
+            return null;
+        }
+
+        $orders    = array_keys($orderings);
         $fieldName = array_pop($orders);
 
         return $fieldName === null ? null : Criteria::explodeFieldTypeName($fieldName)[1];
@@ -118,7 +124,15 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function getSortOrder()
     {
-        return $this->query->getOrderDirection();
+        $orders = $this->query
+            ->getCriteria()
+            ->getOrderings();
+
+        if (empty($orders)) {
+            return null;
+        }
+
+        return array_pop($orders);
     }
 
     /**
@@ -126,7 +140,11 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
     {
-        return $this->query->setOrderBy($fieldName, $direction, $type);
+        $field = $type . '.' . $fieldName;
+
+        $this->query
+            ->getCriteria()
+            ->orderBy([$field => $direction]);
     }
 
     /**
