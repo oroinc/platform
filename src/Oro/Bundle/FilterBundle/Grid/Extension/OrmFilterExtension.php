@@ -37,12 +37,12 @@ class OrmFilterExtension extends AbstractExtension
 
     /**
      * @param ConfigurationProvider $configurationProvider
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface   $translator
      */
     public function __construct(ConfigurationProvider $configurationProvider, TranslatorInterface $translator)
     {
         $this->configurationProvider = $configurationProvider;
-        $this->translator = $translator;
+        $this->translator            = $translator;
     }
 
     /**
@@ -85,6 +85,11 @@ class OrmFilterExtension extends AbstractExtension
         $filters = $this->getFiltersToApply($config);
         $values  = $this->getValuesToApply($config);
         /** @var OrmDatasource $datasource */
+        $countQb        = $datasource->getCountQb();
+        $countQbAdapter = null;
+        if ($countQb) {
+            $countQbAdapter = new OrmFilterDatasourceAdapter($countQb);
+        }
         $datasourceAdapter = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
 
         foreach ($filters as $filter) {
@@ -104,7 +109,10 @@ class OrmFilterExtension extends AbstractExtension
                     if (isset($value['value']['end'])) {
                         $data['value']['end_original'] = $value['value']['end'];
                     }
-                    $filter->apply($datasourceAdapter, $data);
+                    $filter->apply($datasourceAdapter, array_merge($data, ['not_count_query' => true]));
+                    if ($countQbAdapter) {
+                        $filter->apply($countQbAdapter, $data);
+                    }
                 }
             }
         }
@@ -132,9 +140,9 @@ class OrmFilterExtension extends AbstractExtension
             if (!$lazy) {
                 $filter->resolveOptions();
             }
-            $name             = $filter->getName();
-            $value            = $this->getFilterValue($values, $name);
-            $initialValue     = $this->getFilterValue($initialValues, $name);
+            $name                = $filter->getName();
+            $value               = $this->getFilterValue($values, $name);
+            $initialValue        = $this->getFilterValue($initialValues, $name);
             $filtersState        = $this->updateFilterStateEnabled($name, $filtersParams, $filtersState);
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
@@ -144,7 +152,7 @@ class OrmFilterExtension extends AbstractExtension
             $filtersMetaData[] = array_merge(
                 $metadata,
                 [
-                    'label' => $metadata[FilterUtility::TRANSLATABLE_KEY]
+                    'label'   => $metadata[FilterUtility::TRANSLATABLE_KEY]
                         ? $this->translator->trans($metadata['label'])
                         : $metadata['label'],
                     'cacheId' => $this->getFilterCacheId($rawConfig, $metadata),
@@ -284,6 +292,7 @@ class OrmFilterExtension extends AbstractExtension
             return $defaultFilters;
         } else {
             $currentFilters = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
+
             return array_replace($defaultFilters, $currentFilters);
         }
     }

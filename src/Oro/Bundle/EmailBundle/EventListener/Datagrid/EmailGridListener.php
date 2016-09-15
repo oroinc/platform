@@ -7,12 +7,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
-use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
 class EmailGridListener
 {
@@ -53,10 +49,14 @@ class EmailGridListener
     {
         /** @var OrmDatasource $ormDataSource */
         $ormDataSource = $event->getDatagrid()->getDatasource();
-        $queryBuilder = $ormDataSource->getQueryBuilder();
-        $parameters = $event->getDatagrid()->getParameters();
+        $queryBuilder  = $ormDataSource->getQueryBuilder();
+        $countQb       = $ormDataSource->getCountQb();
+        $parameters    = $event->getDatagrid()->getParameters();
 
         $this->factory->applyAcl($queryBuilder);
+        if ($countQb) {
+            $this->factory->applyAcl($countQb);
+        }
 
         if ($parameters->has('emailIds')) {
             $emailIds = $parameters->get('emailIds');
@@ -66,58 +66,7 @@ class EmailGridListener
             $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
         }
 
-        $this->prepareQueryToFilter($parameters, $queryBuilder);
-    }
-
-    /**
-     * @param OrmResultBeforeQuery $event
-     */
-    public function onResultBeforeQuery(OrmResultBeforeQuery $event)
-    {
-        $this->qb = $event->getQueryBuilder();
-
-        $selectParts = $this->qb->getDQLPart('select');
-        $stringSelectParts = [];
-        foreach ($selectParts as $selectPart) {
-            $stringSelectParts[] = (string) $selectPart;
-        }
-        $this->select = implode(', ', $stringSelectParts);
-
-        $this->qb->select('eu.id');
-    }
-
-    /**
-     * @param OrmResultAfter $event
-     */
-    public function onResultAfter(OrmResultAfter $event)
-    {
-        $originalRecords = $event->getRecords();
-        if (!$originalRecords) {
-            return;
-        }
-
-        $ids = [];
-        foreach ($originalRecords as $record) {
-            $ids[] = $record->getValue('id');
-        }
-
-        $this->qb
-            ->select($this->select)
-            ->resetDQLPart('groupBy')
-            ->where($this->qb->expr()->in('eu.id', ':ids'))
-            ->setMaxResults(null)
-            ->setFirstResult(null)
-            ->setParameter('ids', $ids);
-        QueryUtils::removeUnusedParameters($this->qb);
-        $result = $this->qb
-            ->getQuery()
-            ->getResult();
-
-        $records = [];
-        foreach ($result as $row) {
-            $records[] = new ResultRecord($row);
-        }
-        $event->setRecords($records);
+        $this->prepareQueryToFilter($parameters, $queryBuilder, $countQb);
     }
 
     /**
@@ -125,15 +74,42 @@ class EmailGridListener
      *
      * @param ParameterBag $parameters
      * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder $countQb
      */
-    protected function prepareQueryToFilter($parameters, $queryBuilder)
+    protected function prepareQueryToFilter($parameters, QueryBuilder $queryBuilder, QueryBuilder $countQb = null)
     {
         $filters = $parameters->get('_filter');
-        if ($filters && array_key_exists('cc', $filters)) {
-            $queryBuilder->leftJoin('e.recipients', 'r_cc', 'WITH', "r_cc.type = 'cc'");
+        if (!$filters || !is_array($filters)) {
+            return;
         }
-        if ($filters && array_key_exists('bcc', $filters)) {
-            $queryBuilder->leftJoin('e.recipients', 'r_bcc', 'WITH', "r_bcc.type = 'bcc'");
+        $groupByFilters = ['cc', 'bcc', 'to', 'folders', 'folder', 'mailbox'];
+        // @TODO Remove this after removing joins
+        // which affect rows and do not need will be implemented(folders, recipients)
+        if (array_intersect_key($filters, array_flip($groupByFilters))) {
+            // do not added to countQb cos it already added in grid config
+            $queryBuilder->groupBy('eu.id');
+        }
+        $rFilters = [
+            'cc'  => ['r_cc', 'WITH', 'r_cc.type = :ccType', ['ccType' => 'cc']],
+            'bcc' => ['r_bcc', 'WITH', 'r_bcc.type = :bccType', ['bccType' => 'bcc']],
+            'to'  => ['r_to', null, null, []],
+        ];
+        $rParams  = [];
+        // Add join for each filter which is based on e.recipients table
+        foreach ($rFilters as $rKey => $rFilter) {
+            if (array_key_exists($rKey, $filters)) {
+                $queryBuilder->leftJoin('e.recipients', $rFilter[0], $rFilter[1], $rFilter[2]);
+                $countQb->leftJoin('e.recipients', $rFilter[0], $rFilter[1], $rFilter[2]);
+                $rParams = array_merge($rParams, $rFilter[3]);
+            }
+        }
+        foreach ($rParams as $rParam => $rParamValue) {
+            $queryBuilder->setParameter($rParam, $rParamValue);
+            $countQb->setParameter($rParam, $rParamValue);
+        }
+        $fFilters = ['folder', 'folders', 'mailbox'];
+        if (array_intersect_key($filters, array_flip($fFilters))) {
+            $queryBuilder->leftJoin('eu.folders', 'f');
         }
     }
 }
