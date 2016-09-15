@@ -25,7 +25,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
                     'text.name'
                 ],
                 'from' => [
-                    [ 'table' => 'product', 'alias' => 'p' ]
+                    'p'
                 ]
             ]
         ];
