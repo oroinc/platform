@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
+use Doctrine\Common\Collections\Criteria;
+
 abstract class AbstractSearchQuery implements SearchQueryInterface
 {
     /**
