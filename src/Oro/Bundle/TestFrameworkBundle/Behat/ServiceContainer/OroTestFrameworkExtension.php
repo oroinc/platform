@@ -29,7 +29,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 {
     const DUMPER_TAG = 'oro_test.dumper';
 
-    const ELEMENTS_CONFIG_ROOT = 'behat_elements';
+    const ELEMENTS_CONFIG_ROOT = 'elements';
 
     /**
      * {@inheritdoc}
@@ -241,7 +241,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             $mappingPath = str_replace(
                 '/',
                 DIRECTORY_SEPARATOR,
-                $bundle->getPath().'/Resources/config/oro/behat_elements.yml'
+                $bundle->getPath().'/Resources/config/oro/behat.yml'
             );
 
             if (!is_file($mappingPath)) {
