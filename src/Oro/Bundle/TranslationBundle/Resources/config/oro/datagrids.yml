@@ -109,6 +109,8 @@ datagrids:
             value: ~
             key: ~
             domain: ~
+            context: 
+                label: oro.translation.translation.context.label
         sorters:
             columns:
                 key:
@@ -129,4 +131,8 @@ datagrids:
                             choices: "@oro_translation.provider.language->getAvailableLanguages"
         properties:
             id: ~
-
+            context: 
+                type: callback
+                callable: ["@oro_translation.provider.translation_context", "resolveContext"]
+                params: 
+                    - key

@@ -52,7 +52,8 @@ oro.translation:
         language.label: 'Language'
         value.label: 'Value'
         original_value.label: 'Original Value'
-        translation_key.label: 'Translation Ket'
+        translation_key.label: 'Translation Key'
+        context.label: 'Context'
         status:
             translated: 'Translated'
             untranslated: 'Untranslated'

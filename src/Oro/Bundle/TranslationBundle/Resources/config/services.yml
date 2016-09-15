@@ -206,6 +206,14 @@ services:
         arguments:
             - '%oro_translation.entity.language.class%'
 
+    oro_translation.provider.translation_context:
+        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider'
+
+    oro_translation.extension.translation_context_resolver:
+        class: 'Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver'
+        tags:
+            - { name: oro_translation.extension.translation_context_resolver, priority: 100 }
+
     oro_translation.provider.language:
         class: 'Oro\Bundle\TranslationBundle\Provider\LanguageProvider'
         arguments:
