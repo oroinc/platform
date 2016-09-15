@@ -677,3 +677,21 @@
         {{ form_widget(form) }}
     </div>
 {% endblock %}
+
+{% block form_widget_simple %}
+    {{ parent() }}
+    {% if hint is defined and hint %}
+        <div{{ block('hint_attr') }}>{{ hint }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block hint_attr %}
+    {{- " " -}}
+    {%- for attrname, attrvalue in hint_attr -%}
+        {%- if attrvalue is same as(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not same as(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{% endblock hint_attr %}
