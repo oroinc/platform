@@ -6,6 +6,9 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 abstract class AbstractSearchQuery implements SearchQueryInterface
 {
+    const WHERE_AND = 'and';
+    const WHERE_OR  = 'or';
+
     /**
      * @var Query
      */
@@ -162,6 +165,19 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         return $this->query->from($entities);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFrom($entities)
+    {
+        return $this->from($entities);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function setWhere($expression, $type = self::WHERE_AND);
 
     /**
      * {@inheritdoc}
