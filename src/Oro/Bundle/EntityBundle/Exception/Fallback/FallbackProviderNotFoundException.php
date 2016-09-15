@@ -15,7 +15,7 @@ class FallbackProviderNotFoundException extends \Exception
             'Fallback provider for fallback with identification key "%s" not found. 
             Please make sure to register a provider with tag: name:"%s" and id:"%s"',
             $fallbackKey,
-            EntityFallbackCompilerPass::PROVIDER_TAGS,
+            EntityFallbackCompilerPass::PROVIDER_TAG,
             $fallbackKey
         );
         parent::__construct($message);

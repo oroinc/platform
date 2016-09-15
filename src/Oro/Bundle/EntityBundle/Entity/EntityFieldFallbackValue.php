@@ -176,6 +176,9 @@ class EntityFieldFallbackValue
         return $this->arrayValue;
     }
 
+    /**
+     * @return mixed
+     */
     public function __toString()
     {
         return $this->scalarValue;

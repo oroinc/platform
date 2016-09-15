@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Fallback\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackProviderArgumentException;
-use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 
 class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
 {

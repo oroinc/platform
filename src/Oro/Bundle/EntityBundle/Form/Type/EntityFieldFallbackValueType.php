@@ -107,16 +107,18 @@ class EntityFieldFallbackValueType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
 
+                $valueType = $this->getValueFormType($form);
                 $form->add(
                     'viewValue',
-                    $this->getValueFormType($form),
-                    $this->getValueFormOptions($form)
+                    $valueType,
+                    $this->getValueFormOptions($form, $valueType)
                 );
 
+                $fallbackType = $this->getFallbackFormType($form);
                 $form->add(
                     'fallback',
-                    $this->getFallbackFormType($form),
-                    $this->getFallbackFormOptions($form)
+                    $fallbackType,
+                    $this->getFallbackFormOptions($form, $fallbackType)
                 );
             }
         );
@@ -159,13 +161,14 @@ class EntityFieldFallbackValueType extends AbstractType
 
     /**
      * @param FormInterface $form
+     * @param mixed $valueType
      * @return array
      */
-    protected function getValueFormOptions(FormInterface $form)
+    protected function getValueFormOptions(FormInterface $form, $valueType)
     {
         // add some default options
         $valueOptions = array_merge(
-            ['required' => false, 'empty_value' => false],
+            $this->getDefaultOptions($valueType),
             $form->getConfig()->getOptions()['value_options']
         );
 
@@ -198,18 +201,19 @@ class EntityFieldFallbackValueType extends AbstractType
 
     /**
      * @param FormInterface $form
+     * @param mixed $fallbackType
      * @return array
      */
-    protected function getFallbackFormOptions(FormInterface $form)
+    protected function getFallbackFormOptions(FormInterface $form, $fallbackType)
     {
         // add some default options
         $fallbackOptions = array_merge(
-            ['required' => false, 'empty_value' => false],
+            $this->getDefaultOptions($fallbackType),
             $form->getConfig()->getOption('fallback_options')
         );
 
         // if developer specified custom choices, return current options
-        if (isset($fallbackOptions['choices'])) {
+        if (!in_array($fallbackType, [ChoiceType::class, 'choice']) || isset($fallbackOptions['choices'])) {
             return $fallbackOptions;
         }
 
@@ -224,7 +228,7 @@ class EntityFieldFallbackValueType extends AbstractType
         );
 
         // generate choices from fallback list
-        foreach ($fallbackList as $fallbackId => $fallbackField) {
+        foreach ($fallbackList as $fallbackId => $fallbackConfig) {
             if (!$this->fallbackResolver->isFallbackSupported(
                 $form->getParent()->getData(),
                 $form->getConfig()->getName(),
@@ -253,5 +257,19 @@ class EntityFieldFallbackValueType extends AbstractType
         $prefix = (substr($labelPrefix, -1) == '.') ? $labelPrefix : $labelPrefix . '.';
 
         return $prefix . $labelSuffix;
+    }
+
+    /**
+     * @param mixed $formTypeName
+     * @return array
+     */
+    protected function getDefaultOptions($formTypeName)
+    {
+        $options = ['required' => false];
+        if (in_array($formTypeName, [ChoiceType::class, 'choice'])) {
+            $options['placeholder'] = false;
+        }
+
+        return $options;
     }
 }
