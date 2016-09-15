@@ -169,6 +169,8 @@ class Query
     public function select($field, $enforcedFieldType = null)
     {
         $this->select = [];
+        // TODO: Should be fixed
+//        $this->selectAliases = [];
 
         if (is_array($field)) {
             foreach ($field as $_field) {

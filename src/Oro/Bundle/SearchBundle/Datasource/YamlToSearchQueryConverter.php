@@ -40,7 +40,7 @@ class YamlToSearchQueryConverter
      */
     protected function preProcessConfig(array $config)
     {
-        unset($config['type']);
+        unset($config['type'], $config['search_index']);
         return $config;
     }
 }
