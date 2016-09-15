@@ -28,7 +28,7 @@ class SetPasswordType extends AbstractType
         $builder->add('password', 'password', [
             'required'      => true,
             'label'         => 'oro.user.new_password.label',
-            'tooltip'       => $this->passwordTooltip->getTooltip(),
+            'hint'       => $this->passwordTooltip->getTooltip(),
             'constraints'   => [
                 new NotBlank(),
                 new PasswordComplexity(),

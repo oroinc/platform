@@ -35,7 +35,7 @@ class ResetType extends AbstractType
             'required'        => true,
             'first_options' => [
                 'label' => 'oro.user.password.enter_new_password.label',
-                'tooltip' => $this->passwordTooltip->getTooltip(),
+                'hint' => $this->passwordTooltip->getTooltip(),
             ],
             'second_options'  => ['label' => 'oro.user.password.enter_new_password_again.label'],
         ]);

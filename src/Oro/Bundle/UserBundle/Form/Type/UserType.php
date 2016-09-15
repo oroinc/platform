@@ -118,7 +118,7 @@ class UserType extends AbstractType
                     'required'       => true,
                     'first_options' => [
                         'label' => 'oro.user.password.label',
-                        'tooltip' => $this->passwordTooltip->getTooltip(),
+                        'hint' => $this->passwordTooltip->getTooltip(),
                     ],
                     'second_options' => ['label' => 'oro.user.password_re.label'],
                 ]

@@ -64,7 +64,7 @@ class ChangePasswordType extends AbstractType
                     ],
                     'first_options' => [
                         'label' => $options['first_options_label'],
-                        'tooltip' => $this->passwordTooltip->getTooltip(),
+                        'hint' => $this->passwordTooltip->getTooltip(),
                     ],
                     'second_options' => ['label' => $options['second_options_label']],
                     'mapped' => false,
