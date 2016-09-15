@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
+use Knp\Menu\MenuItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Knp\Menu\FactoryInterface;
@@ -185,5 +186,26 @@ class BuilderChainProvider implements MenuProviderInterface
         if (empty($alias)) {
             throw new \InvalidArgumentException('Menu alias was not set.');
         }
+    }
+
+    /**
+     * Returns menu titles for area
+     *
+     * @param  string $area
+
+     * @return array|null
+     */
+    public function getMenusForArea($area)
+    {
+        $menuWithAlias = [];
+
+        /** @var MenuItem $menu */
+        foreach ($this->menus as $menu) {
+            if ($menu->getExtra('area') == $area) {
+                $menuWithAlias[] = $menu->getName();
+            }
+        }
+
+        return $menuWithAlias;
     }
 }
