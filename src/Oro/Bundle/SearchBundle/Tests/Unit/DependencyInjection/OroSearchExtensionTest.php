@@ -264,6 +264,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $expectedResourceFiles = [
             $this->getSearchBundleResource('services.yml'),
+            $this->getSearchBundleResource('filters.yml'),
             $this->getResourcePath('FirstESEngineBundle', 'elastic_search.yml'),
             $this->getResourcePath('SecondESEngineBundle', 'elastic_search.yml')
         ];
