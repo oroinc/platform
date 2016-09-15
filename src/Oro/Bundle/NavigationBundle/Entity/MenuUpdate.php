@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
- * @ORM\Table(name="oro_navigation_menu_update")
+ * @ORM\Table(name="oro_navigation_menu_upd")
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -18,44 +21,54 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      }
  * )
  */
-class MenuUpdate extends ExtendMenuUpdate
+class MenuUpdate extends ExtendMenuUpdate implements
+    MenuUpdateInterface
 {
-    const OWNERSHIP_BUSINESS_UNIT = 3;
-    const OWNERSHIP_USER          = 4;
+    use MenuUpdateTrait;
+    
+    const OWNERSHIP_USER            = 3;
 
     /**
-     * @var string
+     * @var Collection|LocalizedFallbackValue[]
      *
-     * @ORM\Column(name="title", type="string", nullable=true)
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
+     *      cascade={"ALL"},
+     *      orphanRemoval=true
+     * )
+     * @ORM\JoinTable(
+     *      name="oro_navigation_menu_upd_title",
+     *      joinColumns={
+     *          @ORM\JoinColumn(name="menu_update_id", referencedColumnName="id", onDelete="CASCADE")
+     *      },
+     *      inverseJoinColumns={
+     *          @ORM\JoinColumn(name="localized_value_id", referencedColumnName="id", onDelete="CASCADE", unique=true)
+     *      }
+     * )
      */
-    protected $title;
+    protected $titles;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->titles = new ArrayCollection();
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getExtras()
     {
-        return [
-            'title' => $this->title
-        ];
-    }
+        $extras = [];
 
-    /**
-     * @return mixed
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
+        if ($this->getPriority() !== null) {
+            $extras['position'] = $this->getPriority();
+        }
 
-    /**
-     * @param mixed $title
-     * @return MenuUpdate
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-
-        return $this;
+        return $extras;
     }
 }

@@ -5,26 +5,20 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class MenuUpdateRepository extends EntityRepository
 {
     /**
      * @param string $menu
      * @param Organization|null $organization
-     * @param BusinessUnit|null $businessUnit
      * @param User|null $user
      *
      * @return MenuUpdate[]
      */
-    public function getMenuUpdates(
-        $menu,
-        Organization $organization = null,
-        BusinessUnit $businessUnit = null,
-        User $user = null
-    ) {
+    public function getMenuUpdates($menu, Organization $organization = null, User $user = null)
+    {
         $qb = $this->createQueryBuilder('mu');
         $exprs = [
             $qb->expr()->andX(
@@ -38,16 +32,10 @@ class MenuUpdateRepository extends EntityRepository
                 $qb->expr()->eq('mu.ownerId', $organization->getId())
             );
         }
-        if ($businessUnit !== null) {
-            $exprs[] = $qb->expr()->andX(
-                $qb->expr()->eq('mu.ownershipType', MenuUpdate::OWNERSHIP_BUSINESS_UNIT),
-                $qb->expr()->eq('mu.ownerId', $businessUnit->getId())
-            );
-        }
         if ($user !== null) {
             $exprs[] = $qb->expr()->andX(
                 $qb->expr()->eq('mu.ownershipType', MenuUpdate::OWNERSHIP_USER),
-                $qb->expr()->eq('mu.owner_id', $user->getId())
+                $qb->expr()->eq('mu.ownerId', $user->getId())
             );
         }
 
@@ -59,7 +47,7 @@ class MenuUpdateRepository extends EntityRepository
 
         return $qb
             ->setParameter('menu', $menu)
-            ->orderBy('mu.ownership_type', 'ASC')
+            ->orderBy('mu.ownershipType', 'ASC')
             ->addOrderBy('mu.id', 'ASC')
             ->getQuery()
             ->getResult();

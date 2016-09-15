@@ -4,22 +4,36 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Entity\AbstractMenuUpdate;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
 {
     /** @var MenuUpdateProviderInterface[] */
     private $providers = [];
+    
+    /** @var LocalizationHelper */
+    private $localizationHelper;
+
+    /**
+     * @param LocalizationHelper $localizationHelper
+     */
+    public function __construct(LocalizationHelper $localizationHelper)
+    {
+        $this->localizationHelper = $localizationHelper;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $provider = $this->getProvider($menu->getExtra('area'));
+        $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
+        $provider = $this->getProvider($area);
         $menuName = $menu->getName();
         foreach ($provider->getUpdates($menuName) as $update) {
             if ($update->getMenu() == $menuName) {
@@ -57,12 +71,13 @@ class MenuUpdateBuilder implements BuilderInterface
 
     /**
      * @param ItemInterface $menu
-     * @param AbstractMenuUpdate $update
+     * @param MenuUpdateInterface $update
      */
-    private function applyUpdate(ItemInterface $menu, AbstractMenuUpdate $update)
+    private function applyUpdate(ItemInterface $menu, MenuUpdateInterface $update)
     {
         $item = $this->findMenuItem($menu, $update->getKey());
-        $parentItem = !$update->getParentKey() ? $menu : $this->findMenuItem($menu, $update->getParentKey());
+        $parentItem = $this->findMenuItem($menu, $update->getParentKey());
+        $parentItem = $parentItem === null ? $menu : $parentItem;
 
         if (!$item instanceof ItemInterface) {
             $item = $parentItem->addChild($update->getKey());
@@ -72,9 +87,10 @@ class MenuUpdateBuilder implements BuilderInterface
             $item->getParent()->removeChild($item->getName());
             $item = $parentItem->addChild($item);
         }
-
-        if ($update->getTitle()) {
-            $item->setLabel($update->getTitle());
+        
+        if ($update->getTitles()->count()) {
+            $title = $this->localizationHelper->getLocalizedValue($update->getTitles());
+            $item->setLabel($title->getString());
         }
 
         if ($update->getUri()) {
@@ -85,10 +101,6 @@ class MenuUpdateBuilder implements BuilderInterface
 
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
-        }
-
-        if ($update->getPriority() !== null) {
-            $item->setExtra('position', $update->getPriority());
         }
     }
 
