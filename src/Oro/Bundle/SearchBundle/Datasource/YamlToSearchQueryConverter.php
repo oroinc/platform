@@ -40,7 +40,8 @@ class YamlToSearchQueryConverter
      */
     protected function preProcessConfig(array $config)
     {
-        unset($config['type']);
-        return $config;
+        return [
+            'query' => $config['query']
+        ];
     }
 }
