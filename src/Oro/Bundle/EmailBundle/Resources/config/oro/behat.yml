@@ -1,4 +1,4 @@
-behat_elements:
+elements:
   EmailForm:
     selector: "form[id^='oro_email_email']"
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
