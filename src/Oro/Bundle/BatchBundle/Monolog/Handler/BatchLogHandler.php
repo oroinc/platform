@@ -4,6 +4,8 @@ namespace Oro\Bundle\BatchBundle\Monolog\Handler;
 
 use Akeneo\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler as AkeneoBatchLogHandler;
 
+use Monolog\Logger;
+
 /**
  * Write the log into a separate log file
  */
@@ -11,6 +13,20 @@ class BatchLogHandler extends AkeneoBatchLogHandler
 {
     /** @var bool */
     protected $isActive = false;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct($logDir)
+    {
+        $this->logDir = $logDir;
+
+        $this->filePermission = null;
+        $this->useLocking = false;
+
+        $this->setLevel(Logger::DEBUG);
+        $this->bubble = true;
+    }
 
     /**
      * @param boolean $isActive
