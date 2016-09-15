@@ -69,3 +69,58 @@ datagrids:
                     enabled:   false
         properties:
             id: ~
+    oro-translation-translations-grid:
+        acl_resource: oro_translation_translation_index
+        source:
+            type: orm
+            query:
+                select:
+                    - translation.id
+                    - language.code
+                    - translation.value
+                    - translationKey.key
+                    - translationKey.domain
+                from:
+                    - { table: %oro_translation.entity.translation.class%, alias: translation }
+                join:
+                    inner:
+                        - { join: translation.language, alias: language }
+                    left:
+                        - { join: translation.translationKey, alias: translationKey }
+        columns:
+            code:
+                label: oro.translation.translation.language.label
+                type: twig
+                frontend_type: html
+                template: OroTranslationBundle:Language:Datagrid/code.html.twig
+            originalValue:
+                label: oro.translation.translation.original_value.label
+                type: twig
+                frontend_type: html
+                template: OroTranslationBundle:Translation:Datagrid/originalValue.html.twig
+            value: ~
+            key: ~
+            domain: ~
+        sorters:
+            columns:
+                key:
+                    data_name: translationKey.key
+                domain:
+                    data_name: translationKey.domain
+                value:
+                    data_name: translation.value
+            default:
+                code: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+        filters:
+            columns:
+                code:
+                    type: choice
+                    data_name: language.code
+                    options:
+                        field_options:
+                            choices: "@oro_translation.provider.language->getAvailableLanguages"
+#                domain: ~
+#                key: ~
+        properties:
+            id: ~
+

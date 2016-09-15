@@ -103,15 +103,25 @@ class TranslationManager
      */
     public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
-        if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
-            $translationValue = $this->createValue($key, $value, $locale, $domain, $scope);
+        static $cache;
+        if (!$cache) {
+            $cache = [];
+        }
+        $index = strtolower(sprintf('%s-%s-%s', $key, $value, $domain));
+
+        if (!isset($cache[$index])) {
+            if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
+                $translationValue = $this->createValue($key, $value, $locale, $domain, $scope);
+            }
+
+            $translationValue->setValue($value);
+
+            $this->getEntityManager(Translation::class)->persist($translationValue);
+
+            $cache[$index] = $translationValue;
         }
 
-        $translationValue->setValue($value);
-
-        $this->getEntityManager(Translation::class)->persist($translationValue);
-
-        return $translationValue;
+        return $cache[$index];
     }
 
     /**

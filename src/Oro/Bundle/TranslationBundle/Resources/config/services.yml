@@ -1,6 +1,7 @@
 parameters:
     oro_translation.entity.language.class:                      Oro\Bundle\TranslationBundle\Entity\Language
     oro_translation.entity.translation.class:                   Oro\Bundle\TranslationBundle\Entity\Translation
+    oro_translation.entity.translation_key.class:               Oro\Bundle\TranslationBundle\Entity\TranslationKey
 
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
     oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker

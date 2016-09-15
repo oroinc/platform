@@ -44,9 +44,22 @@ oro.translation:
         error:
             install: 'Language not installed'
             update: 'Language not updated'
+    translation:
+        entity_label: 'Translation'
+        entity_plural_label: 'Translations'
+
+        id.label: 'Id'
+        language.label: 'Language'
+        value.label: 'Value'
+        original_value.label: 'Original Value'
+        translation_key.label: 'Translation Ket'
+        status:
+            translated: 'Translated'
+            untranslated: 'Untranslated'
 
     menu:
         languages.label: Languages
+        translations.label: Translations
 
     form:
         tooltip:
