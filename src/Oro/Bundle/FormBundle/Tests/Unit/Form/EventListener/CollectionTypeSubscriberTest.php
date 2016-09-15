@@ -127,10 +127,8 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $data
      * @param array $expected
-     * @param bool $checkIsNew
-     * @param mixed $parentDataId
      */
-    public function testPreSubmit(array $data, array $expected, $checkIsNew = false, $parentDataId = null)
+    public function testPreSubmit(array $data, array $expected)
     {
         $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
@@ -140,19 +138,6 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with('handle_primary')
             ->will($this->returnValue(true));
 
-        if ($checkIsNew) {
-            $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-            $parentFormData = $this->getMock('SomeClass', array('getId'));
-
-            $form->expects($this->once())->method('getParent')
-                ->will($this->returnValue($parentForm));
-
-            $parentForm->expects($this->once())->method('getData')
-                ->will($this->returnValue($parentFormData));
-
-            $parentFormData->expects($this->once())->method('getId')
-                ->will($this->returnValue($parentDataId));
-        }
 
         $event = $this->createEvent($data, $form);
         $this->subscriber->preSubmit($event);
@@ -165,20 +150,14 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
             'set_primary_for_new_data' => array(
                 'data' => array(array('k' => 'v')),
                 'expected' => array(array('k' => 'v', 'primary' => true)),
-                'check_is_new' => true,
-                'parent_data_id' => null
             ),
             'set_primary_for_one_item' => array(
                 'data' => array(array('k' => 'v')),
                 'expected' => array(array('k' => 'v', 'primary' => true)),
-                'check_is_new' => true,
-                'parent_data_id' => 1
             ),
-            'not_set_primary_for_not_new_data' => array(
+            'not_set_primary_for_two_items' => array(
                 'data' => array(array('k' => 'v'), array('k2' => 'v2')),
                 'expected' => array(array('k' => 'v'), array('k2' => 'v2')),
-                'check_is_new' => true,
-                'parent_data_id' => 1
             ),
             'primary_is_already_set' => array(
                 'data' => array(array('primary' => true), array(array('k' => 'v'))),

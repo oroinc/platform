@@ -1,0 +1,29 @@
+{% extends 'OroActionBundle:Operation:form.html.twig' %}
+
+{% block form_widget %}
+    {% set translationCompleteness = context.stat.translationStatus %}
+
+    <div>
+        <div class="pull-left">
+            <i class="icon-info-sign tooltip-icon"
+               data-toggle="popover"
+               data-content="<div class='oro-popover-content'>{{ 'oro.translation.form.tooltip.translation_completeness'|trans }}</div>"
+            ></i>
+            {{ 'oro.translation.action.translation_completeness.label'|trans }}&nbsp;</div>
+        <div class="">
+            {% if translationCompleteness is not null %}
+                <div class="oro-translation-languages">
+                    <div class="translation-completeness">
+                        <div class="progress">
+                            <div class="bar bar-success" style="width: {{ translationCompleteness }}%;"></div>
+                        </div>
+                        <b>{{ (translationCompleteness / 100)|oro_format_percent }}</b>
+                    </div>
+                </div>
+            {% else %}
+                {{ 'N/A'|trans }}
+            {% endif %}
+        </div>
+    </div>
+    {{ form_widget(form) }}
+{% endblock %}
