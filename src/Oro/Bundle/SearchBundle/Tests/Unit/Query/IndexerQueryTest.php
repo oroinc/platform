@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -183,5 +184,24 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($criteria));
 
         $this->query->setWhere($expression);
+    }
+
+    public function testSetWhereOr()
+    {
+        $expression = Criteria::expr()->eq('field', 'value');
+
+        $criteria = $this->getMock(
+            Criteria::class
+        );
+
+        $criteria->expects($this->once())
+            ->method('orWhere')
+            ->with($expression);
+
+        $this->innerQuery->expects($this->once())
+            ->method('getCriteria')
+            ->will($this->returnValue($criteria));
+
+        $this->query->setWhere($expression, AbstractSearchQuery::WHERE_OR);
     }
 }

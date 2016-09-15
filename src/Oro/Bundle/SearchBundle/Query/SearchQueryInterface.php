@@ -123,10 +123,11 @@ interface SearchQueryInterface
     /**
      * Adding an expression to WHERE.
      *
-     * @param $expression
+     * @param      $expression
+     * @param null $type
      * @return SearchQueryInterface
      */
-    public function setWhere($expression);
+    public function setWhere($expression, $type = null);
 
     /**
      * Returning the aliases found in the select expressions.

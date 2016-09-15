@@ -32,9 +32,17 @@ class IndexerQuery extends AbstractSearchQuery
     /**
      * {@inheritdoc}
      */
-    public function setWhere($expression)
+    public function setWhere($expression, $type = null)
     {
+        if (self::WHERE_OR === $type) {
+            $this->query->getCriteria()->orWhere($expression);
+
+            return $this;
+        }
+
         $this->query->getCriteria()->andWhere($expression);
+
+        return $this;
     }
 
     /**
