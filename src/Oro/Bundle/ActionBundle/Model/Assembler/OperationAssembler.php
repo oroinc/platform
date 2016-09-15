@@ -54,21 +54,6 @@ class OperationAssembler extends AbstractAssembler
     }
 
     /**
-     * @param array $configuration
-     * @return Operation[]
-     */
-    public function assemble(array $configuration)
-    {
-        $operations = [];
-
-        foreach ($configuration as $operationName => $options) {
-            $operations[$operationName] = $this->createOperation($operationName, $options);
-        }
-
-        return $operations;
-    }
-
-    /**
      * @param string $name
      * @param array $configuration
      * @return Operation

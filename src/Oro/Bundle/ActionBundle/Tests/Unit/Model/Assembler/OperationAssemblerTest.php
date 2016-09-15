@@ -52,27 +52,12 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider assembleProvider
      */
-    public function testAssemble(array $configuration, array $expected)
-    {
-        $definitions = $this->assembler->assemble($configuration);
-
-        $this->assertEquals($expected, $definitions);
-    }
-
-    /**
-     * @param array $configuration
-     * @param array $expected
-     *
-     * @dataProvider assembleProvider
-     */
     public function testCreateOperation(array $configuration, array $expected)
     {
-        if ($configuration && $expected) {
-            foreach ($configuration as $name => $config) {
-                $operation = $this->assembler->createOperation($name, $config);
+        foreach ($configuration as $name => $config) {
+            $operation = $this->assembler->createOperation($name, $config);
 
-                $this->assertEquals($expected[$name], $operation);
-            }
+            $this->assertEquals($expected[$name], $operation);
         }
     }
 
@@ -80,13 +65,9 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException
      * @expectedExceptionMessage Option "label" is required
      */
-    public function testAssembleWithMissedRequiredOptions()
+    public function testCreateOperationWithMissedRequiredOptions()
     {
-        $configuration = [
-            'test_config' => [],
-        ];
-
-        $this->assembler->assemble($configuration);
+        $this->assembler->createOperation('test', []);
     }
 
     /**
@@ -179,10 +160,6 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFormType(OperationType::NAME);
 
         return [
-            'no data' => [
-                [],
-                'expected' => [],
-            ],
             'minimum data' => [
                 [
                     'minimum_name' => [
