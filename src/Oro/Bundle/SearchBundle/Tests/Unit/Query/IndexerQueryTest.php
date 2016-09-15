@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase
@@ -10,25 +14,20 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
     const TEST_VALUE = 'test_value';
     const TEST_COUNT = 42;
 
-    /**
-     * @var IndexerQuery
-     */
+    /** @var IndexerQuery */
     protected $query;
 
-    /**
-     * @var Indexer|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Indexer|\PHPUnit_Framework_MockObject_MockObject */
     protected $searchIndexer;
 
-    /**
-     * @var Query|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Query|\PHPUnit_Framework_MockObject_MockObject */
     protected $innerQuery;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $testElements = [1, 2, 3];
+
+    /** @var Criteria|\PHPUnit_Framework_MockObject_MockObject */
+    protected $criteria;
 
     protected function setUp()
     {
@@ -51,14 +50,16 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
                 'getOrderDirection',
                 'getCriteria',
                 'getOrderings'
-            ),
+            ],
             [],
             '',
             false
         );
 
+        $this->criteria = $this->getMock(Criteria::class);
+
         $this->innerQuery->method('getCriteria')
-            ->willReturnSelf();
+            ->willReturn($this->criteria);
 
         $this->query = new IndexerQuery($this->searchIndexer, $this->innerQuery);
     }
@@ -103,7 +104,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testSetFirstResult()
     {
-        $this->innerQuery->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('setFirstResult')
             ->with(self::TEST_VALUE);
 
@@ -112,7 +113,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFirstResult()
     {
-        $this->innerQuery->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('getFirstResult')
             ->will($this->returnValue(self::TEST_VALUE));
 
@@ -121,7 +122,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testSetMaxResults()
     {
-        $this->innerQuery->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('setMaxResults')
             ->with(self::TEST_VALUE);
 
@@ -130,7 +131,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMaxResults()
     {
-        $this->innerQuery->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('getMaxResults')
             ->will($this->returnValue(self::TEST_VALUE));
 
@@ -151,7 +152,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSortBy()
     {
-        $this->innerQuery->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('getOrderings')
             ->will($this->returnValue([self::TEST_VALUE => self::TEST_VALUE]));
 
@@ -160,7 +161,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSortOrder()
     {
-        $this->innerQuery->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('getOrderings')
             ->will($this->returnValue([self::TEST_VALUE => 'ASC']));
 
@@ -171,17 +172,9 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
     {
         $expression = Criteria::expr()->eq('field', 'value');
 
-        $criteria = $this->getMock(
-            Criteria::class
-        );
-
-        $criteria->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('andWhere')
             ->with($expression);
-
-        $this->innerQuery->expects($this->once())
-            ->method('getCriteria')
-            ->will($this->returnValue($criteria));
 
         $this->query->setWhere($expression);
     }
@@ -190,17 +183,13 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
     {
         $expression = Criteria::expr()->eq('field', 'value');
 
-        $criteria = $this->getMock(
-            Criteria::class
-        );
-
-        $criteria->expects($this->once())
+        $this->criteria->expects($this->once())
             ->method('orWhere')
             ->with($expression);
 
         $this->innerQuery->expects($this->once())
             ->method('getCriteria')
-            ->will($this->returnValue($criteria));
+            ->will($this->returnValue($this->criteria));
 
         $this->query->setWhere($expression, AbstractSearchQuery::WHERE_OR);
     }
