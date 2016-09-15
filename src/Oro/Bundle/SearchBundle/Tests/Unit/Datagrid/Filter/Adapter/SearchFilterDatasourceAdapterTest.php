@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Datasource\Filter\Adapter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Filter\Adapter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
