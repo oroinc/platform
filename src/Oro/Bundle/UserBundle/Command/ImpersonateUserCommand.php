@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -22,11 +21,20 @@ class ImpersonateUserCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:user:impersonate')
-            ->setDescription('Generate impersonation link for a given user')
+            ->setDescription(
+                'Generates one-time impersonation link for a given user.' . PHP_EOL .
+                'Unused tokens expire after the specified time.'
+            )
             ->addArgument('username', InputArgument::REQUIRED, 'The username of the user.')
-            ->addOption('lifetime', 't', InputOption::VALUE_REQUIRED, 'Token lifetime (strtotime format)', '1 day')
+            ->addOption(
+                'lifetime',
+                't',
+                InputOption::VALUE_REQUIRED,
+                'Token lifetime (seconds or strtotime format)',
+                '1 day'
+            )
             ->addOption('route', 'r', InputOption::VALUE_REQUIRED, 'The route of generated URL', 'oro_default')
-            ->addOption('notify', 'f', InputOption::VALUE_NONE, 'Send notification to impersonated user')
+            ->addOption('silent', 'S', InputOption::VALUE_NONE, 'Do not send email to the impersonated user')
         ;
     }
 
@@ -40,13 +48,17 @@ class ImpersonateUserCommand extends ContainerAwareCommand
         $url = $this->generateUrl(
             $input->getOption('route'),
             $impersonation->getToken(),
-            $input->getOption('notify')
+            !$input->getOption('silent')
         );
 
-        $output->writeln(sprintf(
-            '<info>To login as user "%s" open the following URL:</info>',
-            $user->getUsername()
-        ));
+        $output->writeln(
+            sprintf(
+                '<info>To login as user <comment>%s</comment> open the following URL ' .
+                '(expires <comment>%s</comment>):</info>',
+                $user->getUsername(),
+                $impersonation->getExpireAt()->format('Y-m-d h:i:s e')
+            )
+        );
         $output->writeln($url);
 
         return 0;
