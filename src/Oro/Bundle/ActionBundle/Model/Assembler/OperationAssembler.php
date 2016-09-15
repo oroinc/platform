@@ -62,16 +62,26 @@ class OperationAssembler extends AbstractAssembler
         $operations = [];
 
         foreach ($configuration as $operationName => $options) {
-            $operations[$operationName] = new Operation(
-                $this->actionFactory,
-                $this->conditionFactory,
-                $this->attributeAssembler,
-                $this->formOptionsAssembler,
-                $this->assembleDefinition($operationName, $options)
-            );
+            $operations[$operationName] = $this->createOperation($operationName, $options);
         }
 
         return $operations;
+    }
+
+    /**
+     * @param string $name
+     * @param array $configuration
+     * @return Operation
+     */
+    public function createOperation($name, array $configuration)
+    {
+        return new Operation(
+            $this->actionFactory,
+            $this->conditionFactory,
+            $this->attributeAssembler,
+            $this->formOptionsAssembler,
+            $this->assembleDefinition($name, $configuration)
+        );
     }
 
     /**

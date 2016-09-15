@@ -60,6 +60,23 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $configuration
+     * @param array $expected
+     *
+     * @dataProvider assembleProvider
+     */
+    public function testCreateOperation(array $configuration, array $expected)
+    {
+        if ($configuration && $expected) {
+            foreach ($configuration as $name => $config) {
+                $operation = $this->assembler->createOperation($name, $config);
+
+                $this->assertEquals($expected[$name], $operation);
+            }
+        }
+    }
+
+    /**
      * @expectedException \Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException
      * @expectedExceptionMessage Option "label" is required
      */
