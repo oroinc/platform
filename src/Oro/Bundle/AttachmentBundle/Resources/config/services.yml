@@ -230,4 +230,5 @@ services:
             - '@oro_attachment.file_manager'
             - '@oro_attachment.image_factory'
             - '%oro_attachment.imagine.cache.resolver.custom_web_path.name%'
-
+        calls:
+            - [setLogger, ['@logger']]
