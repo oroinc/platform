@@ -255,7 +255,7 @@ tag if it works with extend classes
 - YAML Configuration for query designer now loads from `Resources/config/oro/query_designer.yml` file instead of `Resources/config/query_designer.yml`.
 
 ####TestFrameworkBundle:
-- Behat elements now loads from `Resources/config/oro/behat_elements.yml` file instead of `Resources/config/behat_elements.yml`.
+- Behat elements now loads from `Resources/config/oro/behat.yml` file instead of `Resources/config/behat_elements.yml`.
 
 ####ChartBundle:
 - Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
@@ -342,6 +342,12 @@ oro_email.email_address.entity_manager:
     parent: oro_entity.abstract_entity_manager
 ```
 
+####CacheBundle
+- `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers
+
+####MigrationBundle
+- `Oro\Bundle\MigrationBundle\Migration\MigrationExecutor` now clears cache at all cache providers after successful migration load
+
 ####DataAuditBundle
 - LoggableManager was removed. Some logic moved to SendChangedEntitiesToMessageQueueListener class and some backend processors.
 - EntityListener was removed. Similar logic could be found in SendChangedEntitiesToMessageQueueListener class.
@@ -349,4 +355,3 @@ oro_email.email_address.entity_manager:
 - AnnotationDriver was removed.
 - ExtendMetadataFactory was removed.
 - Loggable and Versioned annotations were removed. Use entity config auditable option instead.
-

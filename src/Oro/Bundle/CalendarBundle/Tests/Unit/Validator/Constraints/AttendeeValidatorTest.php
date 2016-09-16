@@ -4,7 +4,9 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Validator\Constraints;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Attendee as AttendeeEntity;
+use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Validator\Constraints\AttendeeValidator;
 use Oro\Bundle\CalendarBundle\Validator\Constraints\Attendee;
 
@@ -41,15 +43,22 @@ class AttendeeValidatorTest extends \PHPUnit_Framework_TestCase
             [
                 (new AttendeeEntity())
                     ->setEmail('email@example.com')
+                    ->setCalendarEvent(new CalendarEvent(1))
             ],
             [
                 (new AttendeeEntity())
                     ->setDisplayName('name')
+                    ->setCalendarEvent(new CalendarEvent(2))
             ],
             [
                 (new AttendeeEntity())
                     ->setDisplayName('name')
                     ->setEmail('email@example.com')
+                    ->setCalendarEvent(new CalendarEvent(3))
+            ],
+            [
+                (new AttendeeEntity())
+                    ->setCalendarEvent((new CalendarEvent(4))->setSystemCalendar(new SystemCalendar()))
             ],
         ];
     }
@@ -69,7 +78,7 @@ class AttendeeValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValuesProvider()
     {
         return [
-            [(new AttendeeEntity())]
+            [(new AttendeeEntity())->setCalendarEvent(new CalendarEvent(1))]
         ];
     }
 }
