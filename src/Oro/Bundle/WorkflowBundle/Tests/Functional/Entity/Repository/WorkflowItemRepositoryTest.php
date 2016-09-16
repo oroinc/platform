@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 
@@ -357,5 +358,25 @@ class WorkflowItemRepositoryTest extends WebTestCase
             'Doctrine\ORM\QueryBuilder',
             $this->repository->getEntityWorkflowStepUpgradeQueryBuilder($definition)
         );
+    }
+
+    public function testGetIdsByStepNamesAndEntityClass()
+    {
+        $ids = $this->repository->getIdsByStepNamesAndEntityClass(
+            new ArrayCollection(['starting_point']),
+            WorkflowAwareEntity::class
+        );
+
+        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $ids);
+
+        $expected = [];
+        // 21 because "test_multistep_flow" was second loaded workflows in fistures
+        for ($i = 21; $i < 21 + LoadWorkflowAwareEntities::COUNT; $i++) {
+            /** @var WorkflowItem $item */
+            $item = $this->getReference('test_multistep_flow_item.' . $i);
+            $expected[] = $item->getId();
+        }
+
+        $this->assertEquals($expected, $ids);
     }
 }
