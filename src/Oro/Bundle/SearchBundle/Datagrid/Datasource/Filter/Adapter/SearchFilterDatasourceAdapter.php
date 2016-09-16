@@ -34,7 +34,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * Adds a new WHERE or HAVING restriction depends on the given parameters.
+     * Adds a new WHERE restriction
      *
      * @param mixed  $restriction The restriction to add.
      * @param string $condition   The condition.

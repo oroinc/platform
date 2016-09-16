@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Result;
+use Doctrine\Common\Collections\Expr\Expression;
 
 interface SearchQueryInterface
 {
@@ -111,6 +110,23 @@ interface SearchQueryInterface
      * @return SearchQueryInterface
      */
     public function from($entities);
+
+    /**
+     * Same as from(). Added for clarity.
+     *
+     * @param array|string $entities
+     * @return SearchQueryInterface
+     */
+    public function setFrom($entities);
+
+    /**
+     * Adding an expression to WHERE.
+     *
+     * @param Expression  $expression
+     * @param null|string $type
+     * @return SearchQueryInterface
+     */
+    public function setWhere($expression, $type = AbstractSearchQuery::WHERE_AND);
 
     /**
      * Returning the aliases found in the select expressions.

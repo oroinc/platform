@@ -190,12 +190,14 @@ search services.
 Also engine configuration can override existing services to support some specific use cases of search engine
 (f.e. ORM engine overrides index listener to support single flush).
 
+
 Datagrid configuration
 ----------------------
 
 The SearchBundle supplies a datasource, that can be used interchangeably with the default Orm datasource. This datasource feeds pure search index data,  bypassing the default DBMS, thus allowing pure index storage layer driven datagrids to be built.
 
-An example of a DatagridBundle's configuration entry in the `datagrids.yml` file, that builds a simple user datagrid, using search index data only:
+An example of a DatagridBundle's configuration entry in the `Resources/config/oro/datagrids.yml` file, 
+that builds a simple user datagrid, using search index data only:
  
      user-search-grid:
          source:
@@ -219,8 +221,10 @@ An example of a DatagridBundle's configuration entry in the `datagrids.yml` file
                      data_name: username
                      type: string
                  email:
-                     data_name: username
+                     data_name: email
                      type: string
+             default:
+                 name: ASC
          filters:
              columns:
                  quick_search:

@@ -282,7 +282,7 @@ tag if it works with extend classes
 - Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
 - `oro_search.entity.repository.search_index` marked as lazy
 - Search `\Oro\Bundle\SearchBundle\Query\Query::addSelect()` and `\Oro\Bundle\SearchBundle\Query\Query::select()` have been extended to support the SQL aliasing syntax.
-- `\Oro\Bundle\SearchBundle\Query\IndexerQuery` has now an interface `\Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and an abstract base class with common operations.
+- `\Oro\Bundle\SearchBundle\Query\IndexerQuery` has grown to have an interface `\Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and an abstract base class with common operations. New operations in the interface, highly encouraged to use them: `addSelect`, `setFrom`, `setWhere`.
 - `\Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager` is no longer depending on IndexerQuery.
 - `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` has now improved alignment with the `\Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource` and is moved to the `Oro\Bundle\SearchBundle\Datasource` namespace.
 - Search Query is now created by `\Oro\Bundle\SearchBundle\Query\Factory\QueryFactory`.
@@ -294,6 +294,7 @@ tag if it works with extend classes
 - custom Search filter added: `\Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter`.
 - `\Oro\Bundle\SearchBundle\Query\Result\Item` is now compatible with the default backend datagrid templates.
 - `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` can now be defined as the datasource of any datagrid (both frontend and backend).
+- Datagrids having search datasource expect an indexed array of search indexes in 'from' part of datagrid configuration, as opposed to ORM format
 
 ####UiBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.

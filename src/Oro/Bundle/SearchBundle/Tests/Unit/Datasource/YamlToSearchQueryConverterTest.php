@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource;
 
 use Oro\Bundle\SearchBundle\Datasource\YamlToSearchQueryConverter;
+use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
@@ -16,7 +17,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
     }
 
-    public function testSelectFromInConverter()
+    public function testProcessSelectFrom()
     {
         $config = [
             'query' => [
@@ -24,21 +25,42 @@ class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
                     'text.sku',
                     'text.name'
                 ],
-                'from' => [
-                    'p'
-                ]
+                'from' => ['product']
             ]
         ];
 
         $this->query->expects($this->at(0))
             ->method('from')
-            ->with('p');
+            ->with('product');
         $this->query->expects($this->at(1))
             ->method('addSelect')
             ->with('text.sku');
         $this->query->expects($this->at(2))
             ->method('addSelect')
             ->with('text.name');
+
+        $testable = new YamlToSearchQueryConverter();
+        $testable->process($this->query, $config);
+    }
+
+    public function testProcessWhere()
+    {
+        $config = [
+            'query' => [
+                'where' => [
+                    'and' => ['product.id <> :parent'],
+                    'or' => ['product.id <> :parent2']
+                ]
+            ]
+        ];
+
+        $this->query->expects($this->at(0))
+            ->method('setWhere')
+            ->with('product.id <> :parent');
+
+        $this->query->expects($this->at(1))
+            ->method('setWhere')
+            ->with('product.id <> :parent2', AbstractSearchQuery::WHERE_OR);
 
         $testable = new YamlToSearchQueryConverter();
         $testable->process($this->query, $config);
