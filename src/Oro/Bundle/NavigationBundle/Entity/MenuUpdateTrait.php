@@ -34,6 +34,12 @@ trait MenuUpdateTrait
 
     /**
      * @var Collection|LocalizedFallbackValue[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
+     *      cascade={"ALL"},
+     *      orphanRemoval=true
+     * )
      */
     protected $titles;
 
