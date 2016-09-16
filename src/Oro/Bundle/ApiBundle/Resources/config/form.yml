@@ -34,6 +34,11 @@ services:
         tags:
             - { name: oro.api.form.type, alias: oro_api_entity }
 
+    oro_api.form.type.compound_entity:
+        class: Oro\Bundle\ApiBundle\Form\Type\CompoundEntityType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_compound_entity }
+
     oro_api.form.type.collection:
         class: Oro\Bundle\ApiBundle\Form\Type\CollectionType
         tags:
