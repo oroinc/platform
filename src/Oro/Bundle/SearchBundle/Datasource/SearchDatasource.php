@@ -74,18 +74,16 @@ class SearchDatasource implements DatasourceInterface
         $rows = [];
         foreach ($results as $result) {
             $resultRecord = new ResultRecord($result);
-            if ($result instanceof Item) {
-                $resultRecord->addData(
-                    array_merge(['id' => $result->getId()], $result->getSelectedData())
-                );
-            }
+            $resultRecord->addData(
+                array_merge(['id' => $result->getId()], $result->getSelectedData())
+            );
             $rows[] = $resultRecord;
         }
 
         $event = new SearchResultAfter($this->datagrid, $rows, $this->query);
         $this->dispatcher->dispatch(SearchResultAfter::NAME, $event);
 
-        return $rows;
+        return $event->getRecords();
     }
 
     /**

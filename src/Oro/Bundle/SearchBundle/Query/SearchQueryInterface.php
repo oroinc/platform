@@ -4,6 +4,8 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Collections\Expr\Expression;
 
+use Oro\Bundle\SearchBundle\Query\Result\Item;
+
 interface SearchQueryInterface
 {
     /**
@@ -17,7 +19,7 @@ interface SearchQueryInterface
     /**
      * Execute the query() and return postprocessed data.
      *
-     * @return mixed
+     * @return Item[]
      */
     public function execute();
 
