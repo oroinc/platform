@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
-use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackProviderArgumentException;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
 use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -45,7 +45,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFallbackHolderEntityThrowsExceptionIfNoConfigFound()
     {
-        $this->setExpectedException(InvalidFallbackProviderArgumentException::class);
+        $this->setExpectedException(FallbackFieldConfigurationMissingException::class);
         $entityConfig = $this->getEntityConfiguration();
         $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST_KEY][SystemConfigFallbackProvider::FALLBACK_ID] = [];
         $this->setUpFallbackConfig($entityConfig);

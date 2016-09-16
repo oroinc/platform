@@ -5,8 +5,6 @@ namespace Oro\Bundle\EntityBundle\Exception\Fallback;
 class InvalidFallbackArgumentException extends \Exception
 {
     /**
-     * InvalidFallbackArgumentException constructor.
-     *
      * @param string $argumentInfo
      * @param string $providerName
      */

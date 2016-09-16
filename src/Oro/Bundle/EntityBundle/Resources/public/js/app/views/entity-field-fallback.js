@@ -9,7 +9,7 @@ define(function(require) {
     /**
      * @export orolocale/js/app/views/fallback-view
      * @extends oroui.app.views.base.View
-     * @class orolocale.app.views.FallbackView
+     * @class oroentity.app.views.EntityFallbackView
      */
     EntityFallbackView = BaseView.extend({
         /**

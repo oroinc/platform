@@ -166,3 +166,13 @@ The options and types of those 3 fields can be overridden `value_options`, `fall
 
 #### EntityFieldFallbackValue table content ####
 ![alt text](./images/fallback_table.png "Fallback table content")
+
+If the `fallback` column contains a value, it means entity uses the fallback value
+If it is null and `scalar_value` or `array_value` column contains data, it means entity has it's own value
+ 
+The bundle also exposes a twig function to get the fallback compatible value of a field, which internally uses the 
+[EntityFallbackResolver](../../Fallback/EntityFallbackResolver.php).
+
+```twig
+{{ oro_get_fallback(entity, 'manageInventory') }}
+```

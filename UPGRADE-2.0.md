@@ -340,6 +340,14 @@ oro_email.email_address.entity_manager:
     parent: oro_entity.abstract_entity_manager
 ```
 
+- Added entity fallback functionality
+- Added EntityFieldFallbackValue entity to store fallback information
+- Added EntityFallbackResolver service which handles fallback resolution
+- Added SystemConfigFallbackProvider service which handles `systemConfig` fallback type
+- Added GetEntityFallbackExtension service which reads fallback values of entities in twig
+- Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer 
+to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
+
 ####CacheBundle
 - `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers
 

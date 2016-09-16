@@ -13,8 +13,8 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityFieldFallbackTransformer;
 
 class EntityFieldFallbackValueType extends AbstractType
@@ -27,8 +27,6 @@ class EntityFieldFallbackValueType extends AbstractType
     protected $fallbackResolver;
 
     /**
-     * EntityFieldFallbackValueType constructor.
-     *
      * @param EntityFallbackResolver $fallbackResolver
      */
     public function __construct(EntityFallbackResolver $fallbackResolver)
@@ -249,7 +247,6 @@ class EntityFieldFallbackValueType extends AbstractType
     /**
      * @param string $labelPrefix
      * @param string $labelSuffix
-     *
      * @return string
      */
     protected function getCorrectFallbackLabel($labelPrefix, $labelSuffix)
