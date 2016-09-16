@@ -146,13 +146,17 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldExecuteProcessJob()
     {
+
+        $processJob = new ProcessJob();
+
         $entityManager = $this->createEntityManagerMock();
         $entityManager
             ->expects(self::once())
             ->method('transactional')
+            ->willReturnCallback(function ($callback) use ($entityManager){
+                $callback($entityManager);
+            })
         ;
-
-        $processJob = new ProcessJob();
 
         $entityRepository = $this->createEntityRepositoryMock();
         $entityRepository
