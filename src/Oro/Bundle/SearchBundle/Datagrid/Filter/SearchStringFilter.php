@@ -5,14 +5,15 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\Filter\Adapter\SearchFilterDatasourceAdapter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 class SearchStringFilter extends AbstractFilter
 {
     /**
-     * @return string
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
@@ -20,36 +21,28 @@ class SearchStringFilter extends AbstractFilter
     }
 
     /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param mixed                            $data
-     * @return bool|void
+     * {@inheritDoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
             throw new \RuntimeException('Invalid filter datasource adapter provided: ' . get_class($ds));
         }
 
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        $builder = Criteria::expr();
+
         switch ($data['type']) {
-            case SearchStringFilterType::TYPE_EQUAL:
-                $ds->getWrappedSearchQuery()
-                    ->getCriteria()
-                    ->andWhere(Criteria::expr()->eq($fieldName, $data['value']));
-
+            case TextFilterType::TYPE_EQUAL:
+                $ds->addRestriction($builder->eq($fieldName, $data['value']), FilterUtility::CONDITION_AND);
                 return;
-            case SearchStringFilterType::TYPE_CONTAINS:
-                $ds->getWrappedSearchQuery()
-                    ->getCriteria()
-                    ->andWhere(Criteria::expr()->contains($fieldName, $data['value']));
 
+            case TextFilterType::TYPE_CONTAINS:
+                $ds->addRestriction($builder->contains($fieldName, $data['value']), FilterUtility::CONDITION_AND);
                 return;
-            case SearchStringFilterType::TYPE_NOT_CONTAINS:
-                $ds->getWrappedSearchQuery()
-                    ->getCriteria()
-                    ->andWhere(Criteria::expr()->notContains($fieldName, $data['value']));
 
+            case TextFilterType::TYPE_NOT_CONTAINS:
+                $ds->addRestriction($builder->notContains($fieldName, $data['value']), FilterUtility::CONDITION_AND);
                 return;
         }
     }

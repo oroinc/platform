@@ -242,4 +242,4 @@ services:
         class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType
         arguments: ["@translator"]
         tags:
-            - { name: form.type, alias: oro_type_search_string_filter }
+            - { name: form.type, alias: oro_search_type_string_filter }

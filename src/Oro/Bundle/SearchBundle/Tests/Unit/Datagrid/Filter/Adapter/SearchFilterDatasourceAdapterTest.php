@@ -4,56 +4,110 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Filter\Adapter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
-use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\Filter\Adapter\SearchFilterDatasourceAdapter;
+use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var IndexerQuery|\PHPUnit_Framework_MockObject_MockObject */
-    protected $query;
+    /** @var SearchQueryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $searchQuery;
 
     protected function setUp()
     {
-        $this->query = $this->getMockBuilder(IndexerQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getQuery'])
-            ->getMock();
+        $this->searchQuery = $this->getMock(SearchQueryInterface::class);
+    }
+
+    public function testAddRestrictionAndCondition()
+    {
+        $restriction = Criteria::expr()->eq('foo', 'bar');
+
+        $criteria = $this->getMock(Criteria::class);
+        $criteria->expects($this->once())
+            ->method('andWhere')
+            ->with($restriction);
+
+        $query = $this->getMock(Query::class);
+        $query->expects($this->once())
+            ->method('getCriteria')
+            ->willReturn($criteria);
+
+        $this->searchQuery->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $adapter = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $adapter->addRestriction($restriction, FilterUtility::CONDITION_AND);
+    }
+
+    public function testAddRestrictionOrCondition()
+    {
+        $restriction = Criteria::expr()->eq('foo', 'bar');
+
+        $criteria = $this->getMock(Criteria::class);
+        $criteria->expects($this->once())
+            ->method('orWhere')
+            ->with($restriction);
+
+        $query = $this->getMock(Query::class);
+        $query->expects($this->once())
+            ->method('getCriteria')
+            ->willReturn($criteria);
+
+        $this->searchQuery->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $adapter = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $adapter->addRestriction($restriction, FilterUtility::CONDITION_OR);
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Restriction not supported.
+     */
+    public function testAddRestrictionInvalidCondition()
+    {
+        $adapter = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $adapter->addRestriction(Criteria::expr()->eq('foo', 'bar'), 'invalid_condition');
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Restriction not supported.
+     */
+    public function testAddRestrictionInvalidRestriction()
+    {
+        $adapter = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $adapter->addRestriction('foo = bar', FilterUtility::CONDITION_OR);
     }
 
     public function testInApplyFromStringFilter()
     {
-        $innerQuery = $this->getMock(Query::class);
-
-        $this->query->method('getQuery')->willReturn($innerQuery);
-
         $criteria = $this->getMock(Criteria::class);
-
         $criteria->expects($this->once())
             ->method('andWhere')
-            ->with(
-                Criteria::expr()->contains('foo', 'bar')
-            );
+            ->with(Criteria::expr()->contains('foo', 'bar'));
 
-        $innerQuery->expects($this->once())
+        $query = $this->getMock(Query::class);
+        $query->expects($this->once())
             ->method('getCriteria')
             ->willReturn($criteria);
 
-        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $this->searchQuery->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
 
         $formFactory = $this->getMock(FormFactoryInterface::class);
 
-        $filterUtility = new FilterUtility();
+        $stringFilter = new SearchStringFilter($formFactory, new FilterUtility());
+        $stringFilter->init('test', [FilterUtility::DATA_NAME_KEY => 'foo']);
 
-        $stringFilter = new SearchStringFilter($formFactory, $filterUtility);
-        $stringFilter->init('test', [
-            FilterUtility::DATA_NAME_KEY => 'foo',
-        ]);
-
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $stringFilter->apply($ds, ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'bar']);
     }
 
@@ -63,7 +117,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGroupBy()
     {
-        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->groupBy('name');
     }
 
@@ -73,7 +127,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddGroupBy()
     {
-        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->addGroupBy('name');
     }
 
@@ -83,7 +137,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetParameter()
     {
-        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->setParameter('key', 'value');
     }
 
@@ -93,7 +147,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFieldByAlias()
     {
-        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->getFieldByAlias('name');
     }
 
@@ -103,16 +157,19 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWrappedSearchQueryNotInitialized()
     {
-        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->getWrappedSearchQuery();
     }
 
     public function testGetWrappedSearchQuery()
     {
-        $innerQuery = $this->getMock(Query::class);
-        $this->query->method('getQuery')->willReturn($innerQuery);
-        $ds = new SearchFilterDatasourceAdapter($this->query);
-        $this->assertEquals($ds->getWrappedSearchQuery(), $innerQuery);
+        $query = $this->getMock(Query::class);
+        $this->searchQuery->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $this->assertEquals($ds->getWrappedSearchQuery(), $query);
     }
 
     /**
@@ -121,7 +178,31 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpr()
     {
-        $ds = new SearchFilterDatasourceAdapter($this->query);
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->expr();
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method currently not supported.
+     */
+    public function testGetDatabasePlatform()
+    {
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $ds->getDatabasePlatform();
+    }
+
+    public function testGenerateParameterName()
+    {
+        $name = 'testName';
+
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $this->assertEquals($name, $ds->generateParameterName($name));
+    }
+
+    public function testGetQuery()
+    {
+        $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
+        $this->assertEquals($this->searchQuery, $ds->getQuery());
     }
 }

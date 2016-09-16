@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
@@ -17,7 +18,12 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator             = $this->createMockTranslator();
-        $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
+        $this->formExtensions[] = new CustomFormExtension(
+            [
+                new FilterType($translator),
+                new TextFilterType($translator)
+            ]
+        );
 
         parent::setUp();
         $this->type = new SearchStringFilterType($translator);
@@ -41,18 +47,17 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
      */
     public function setDefaultOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
-                    'field_type'       => 'text',
-                    'operator_choices' => array(
-                        SearchStringFilterType::TYPE_CONTAINS     => 'oro.filter.form.label_type_contains',
-                        SearchStringFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
-                        SearchStringFilterType::TYPE_EQUAL        => 'oro.filter.form.label_type_equals',
-                    )
-                )
-            )
-        );
+        return [
+            [
+                'defaultOptions' => [
+                    'operator_choices' => [
+                        TextFilterType::TYPE_CONTAINS     => 'oro.filter.form.label_type_contains',
+                        TextFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
+                        TextFilterType::TYPE_EQUAL        => 'oro.filter.form.label_type_equals',
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -60,14 +65,14 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'simple text' => array(
-                'bindData' => array('type' => SearchStringFilterType::TYPE_CONTAINS, 'value' => 'text'),
-                'formData' => array('type' => SearchStringFilterType::TYPE_CONTAINS, 'value' => 'text'),
-                'viewData' => array(
-                    'value' => array('type' => SearchStringFilterType::TYPE_CONTAINS, 'value' => 'text'),
-                ),
-            ),
-        );
+        return [
+            'simple text' => [
+                'bindData' => ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'],
+                'formData' => ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'],
+                'viewData' => [
+                    'value' => ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'],
+                ],
+            ],
+        ];
     }
 }
