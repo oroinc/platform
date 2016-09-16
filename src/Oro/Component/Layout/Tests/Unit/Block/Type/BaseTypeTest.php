@@ -49,7 +49,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
 
         $this->assertBlockView(
             [
-                'vars' => new Options([
+                'vars' => [
                     'id'                   => 'test:block--1',
                     'block_type'           => 'block',
                     'block_type_widget_id' => 'block_widget',
@@ -60,7 +60,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                     ],
                     'cache_key'            => '_test:block--1_block',
                     'translation_domain'   => 'messages'
-                ])
+                ]
             ],
             $view,
             false
@@ -86,7 +86,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
 
         $this->assertBlockView(
             [
-                'vars' => new Options([
+                'vars' => [
                     'id'                   => 'block_id',
                     'block_type'           => 'block',
                     'block_type_widget_id' => 'block_widget',
@@ -103,7 +103,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                     'label'                => 'Test Label',
                     'label_attr'           => ['test_label_attr' => 'test_label_attr_val'],
                     'test_var'             => 'test_var_val'
-                ])
+                ]
             ],
             $view,
             false

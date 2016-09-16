@@ -287,7 +287,6 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
         $name    = 'test';
         $view    = new BlockView();
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $options = new Options(['foo' => 'bar']);
 
         $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
@@ -301,9 +300,9 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$typeExtension]));
         $typeExtension->expects($this->once())
             ->method('finishView')
-            ->with($this->identicalTo($view), $this->identicalTo($block), $options);
+            ->with($this->identicalTo($view), $this->identicalTo($block));
 
-        $this->registry->finishView($name, $view, $block, $options);
+        $this->registry->finishView($name, $view, $block);
     }
 
     public function testUpdateLayout()

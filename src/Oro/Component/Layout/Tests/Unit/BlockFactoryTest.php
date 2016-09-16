@@ -85,13 +85,13 @@ class BlockFactoryTest extends LayoutTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'test'])
+                                'vars' => ['id' => 'logo', 'title' => 'test']
                             ]
                         ]
                     ]
@@ -110,7 +110,7 @@ class BlockFactoryTest extends LayoutTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options([
+                'vars'     => [
                     'id'                   => 'rootId',
                     'block_type'           => 'root',
                     'block_type_widget_id' => 'root_widget',
@@ -123,7 +123,7 @@ class BlockFactoryTest extends LayoutTestCase
                         '_rootId'
                     ],
                     'cache_key'            => '_rootId_root'
-                ]),
+                ],
                 'children' => []
             ],
             $view,
@@ -142,7 +142,7 @@ class BlockFactoryTest extends LayoutTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options([
+                'vars'     => [
                     'id'                   => 'rootId',
                     'block_type'           => 'root',
                     'block_type_widget_id' => 'root_widget',
@@ -155,10 +155,10 @@ class BlockFactoryTest extends LayoutTestCase
                         '_rootId'
                     ],
                     'cache_key'            => '_rootId_root'
-                ]),
+                ],
                 'children' => [
                     [ // header
-                        'vars'     => new Options([
+                        'vars'     => [
                             'id'                   => 'headerId',
                             'block_type'           => 'header',
                             'block_type_widget_id' => 'header_widget',
@@ -171,10 +171,10 @@ class BlockFactoryTest extends LayoutTestCase
                                 '_headerId'
                             ],
                             'cache_key'            => '_headerId_header'
-                        ]),
+                        ],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'                   => 'logoId',
                                     'block_type'           => 'logo',
                                     'block_type_widget_id' => 'logo_widget',
@@ -187,7 +187,7 @@ class BlockFactoryTest extends LayoutTestCase
                                     ],
                                     'cache_key'            => '_logoId_logo',
                                     'title'                => 'test'
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -295,7 +295,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('finishView')
             ->will(
                 $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block, Options $options) {
+                    function (BlockView $view, BlockInterface $block) {
                         if (isset($view['test'])) {
                             $view['test']->vars['processed_by_header_extension'] = true;
                         }
@@ -324,28 +324,28 @@ class BlockFactoryTest extends LayoutTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options([
+                        'vars'     => [
                             'id'   => 'header',
                             'attr' => [
                                 'block_id'   => 'header',
                                 'logo_moved' => true,
                                 'background' => 'red'
                             ]
-                        ]),
+                        ],
                         'children' => [
                             [ // test
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'                            => 'test',
                                     'processed_by_header_extension' => true
-                                ])
+                                ]
                             ]
                         ]
                     ],
                     [ // logo
-                        'vars' => new Options(['id' => 'logo', 'title' => 'test'])
+                        'vars' => ['id' => 'logo', 'title' => 'test']
                     ]
                 ]
             ],

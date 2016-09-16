@@ -1,6 +1,6 @@
 <?php
 
-namespace LayoutBundle\Tests\Unit\Layout\Processor;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Processor;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;

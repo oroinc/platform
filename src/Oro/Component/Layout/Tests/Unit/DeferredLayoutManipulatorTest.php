@@ -63,13 +63,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'test'])
+                                'vars' => ['id' => 'logo', 'title' => 'test']
                             ]
                         ]
                     ]
@@ -90,13 +90,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'test'])
+                                'vars' => ['id' => 'logo', 'title' => 'test']
                             ]
                         ]
                     ]
@@ -117,13 +117,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'test'])
+                                'vars' => ['id' => 'logo', 'title' => 'test']
                             ],
                         ]
                     ]
@@ -145,16 +145,16 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => 'logo1'])
+                                'vars' => ['id' => 'logo1', 'title' => 'logo1']
                             ],
                             [ // logo2
-                                'vars' => new Options(['id' => 'logo2', 'title' => 'logo2'])
+                                'vars' => ['id' => 'logo2', 'title' => 'logo2']
                             ]
                         ]
                     ]
@@ -177,16 +177,16 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => 'logo1'])
+                                'vars' => ['id' => 'logo1', 'title' => 'logo1']
                             ],
                             [ // logo2
-                                'vars' => new Options(['id' => 'logo2', 'title' => 'logo2'])
+                                'vars' => ['id' => 'logo2', 'title' => 'logo2']
                             ]
                         ]
                     ]
@@ -207,7 +207,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -225,7 +225,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -243,7 +243,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -259,7 +259,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -277,7 +277,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -299,13 +299,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'logo'])
+                                'vars' => ['id' => 'logo', 'title' => 'logo']
                             ]
                         ]
                     ]
@@ -331,13 +331,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'logo'])
+                                'vars' => ['id' => 'logo', 'title' => 'logo']
                             ]
                         ]
                     ]
@@ -360,13 +360,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'new_logo'])
+                                'vars' => ['id' => 'logo', 'title' => 'new_logo']
                             ]
                         ]
                     ]
@@ -391,13 +391,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'new_logo'])
+                                'vars' => ['id' => 'logo', 'title' => 'new_logo']
                             ]
                         ]
                     ]
@@ -420,10 +420,10 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // logo
-                        'vars' => new Options(['id' => 'logo', 'title' => 'new_logo'])
+                        'vars' => ['id' => 'logo', 'title' => 'new_logo']
                     ]
                 ]
             ],
@@ -461,19 +461,19 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ],
                             [ // logo2
-                                'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                'vars' => ['id' => 'logo2', 'title' => '']
                             ],
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ]
                         ]
                     ]
@@ -496,19 +496,19 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ],
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ],
                             [ // logo2
-                                'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                'vars' => ['id' => 'logo2', 'title' => '']
                             ]
                         ]
                     ]
@@ -533,24 +533,24 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars'     => new Options(['id' => 'header1']),
+                        'vars'     => ['id' => 'header1'],
                         'children' => [
                             [ // logo2
-                                'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                'vars' => ['id' => 'logo2', 'title' => '']
                             ],
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ],
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ]
                         ]
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => []
                     ]
                 ]
@@ -574,24 +574,24 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars'     => new Options(['id' => 'header1']),
+                        'vars'     => ['id' => 'header1'],
                         'children' => [
                             [ // logo2
-                                'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                'vars' => ['id' => 'logo2', 'title' => '']
                             ],
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ],
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ]
                         ]
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => []
                     ]
                 ]
@@ -612,13 +612,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'test1'])
+                                'vars' => ['id' => 'logo', 'title' => 'test1']
                             ]
                         ]
                     ]
@@ -640,13 +640,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => '', 'attr' => ['class' => 'test_class']])
+                                'vars' => ['id' => 'logo', 'title' => '', 'attr' => ['class' => 'test_class']]
                             ]
                         ]
                     ]
@@ -668,17 +668,17 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
                                     'attr'  => ['class' => 'test_class1 test_class2']
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -700,17 +700,17 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
                                     'attr'  => ['class' => 'test_class2']
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -732,17 +732,17 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
                                     'attr'  => ['class' => 'test_class1']
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -764,16 +764,16 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => ''
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -795,17 +795,17 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
                                     'attr'  => ['class' => 'new_class1 test_class2']
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -827,17 +827,17 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
                                     'attr'  => ['class' => 'test_class1 test_class2']
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -859,13 +859,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     =>  new Options(['id' => 'header']),
+                        'vars'     =>  ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => ''])
+                                'vars' => ['id' => 'logo', 'title' => '']
                             ]
                         ]
                     ]
@@ -887,13 +887,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => '', 'attr' => []])
+                                'vars' => ['id' => 'logo', 'title' => '', 'attr' => []]
                             ]
                         ]
                     ]
@@ -916,7 +916,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -935,7 +935,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -954,7 +954,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -973,7 +973,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -992,7 +992,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars' => new Options(['id' => 'root']),
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -1015,17 +1015,17 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
                                     'attr'  => ['class' => 'replaced_class2']
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -1048,17 +1048,17 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options([
+                                'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
                                     'attr'  => ['class' => 'test_class1']
-                                ])
+                                ]
                             ]
                         ]
                     ]
@@ -1087,10 +1087,10 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header with changed block type
-                        'vars' => new Options(['id' => 'header', 'title' => 'test'])
+                        'vars' => ['id' => 'header', 'title' => 'test']
                     ]
                 ]
             ],
@@ -1110,13 +1110,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => ''])
+                                'vars' => ['id' => 'logo', 'title' => '']
                             ]
                         ]
                     ]
@@ -1138,13 +1138,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => ''])
+                                'vars' => ['id' => 'logo', 'title' => '']
                             ]
                         ]
                     ]
@@ -1170,29 +1170,29 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars' => new Options(['id' => 'header1'])
+                        'vars' => ['id' => 'header1']
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // container2
-                                'vars'     => new Options(['id' => 'container2']),
+                                'vars'     => ['id' => 'container2'],
                                 'children' => [
                                     [ // logo2
-                                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                        'vars' => ['id' => 'logo2', 'title' => '']
                                     ]
                                 ]
                             ]
                         ]
                     ],
                     [ // container1
-                        'vars'     => new Options(['id' => 'container1']),
+                        'vars'     => ['id' => 'container1'],
                         'children' => [
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ]
                         ]
                     ]
@@ -1218,27 +1218,27 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars' => new Options(['id' => 'header1'])
+                        'vars' => ['id' => 'header1']
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // container2
-                                'vars'     => new Options(['id' => 'container2']),
+                                'vars'     => ['id' => 'container2'],
                                 'children' => [
                                     [ // logo2
-                                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                        'vars' => ['id' => 'logo2', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container1
-                                'vars'     => new Options(['id' => 'container1']),
+                                'vars'     => ['id' => 'container1'],
                                 'children' => [
                                     [ // logo1
-                                        'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                        'vars' => ['id' => 'logo1', 'title' => '']
                                     ]
                                 ]
                             ]
@@ -1268,35 +1268,35 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars' => new Options(['id' => 'header1'])
+                        'vars' => ['id' => 'header1']
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // container2
-                                'vars'     => new Options(['id' => 'container2']),
+                                'vars'     => ['id' => 'container2'],
                                 'children' => [
                                     [ // logo2
-                                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                        'vars' => ['id' => 'logo2', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container1
-                                'vars'     => new Options(['id' => 'container1']),
+                                'vars'     => ['id' => 'container1'],
                                 'children' => [
                                     [ // logo1
-                                        'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                        'vars' => ['id' => 'logo1', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container3
-                                'vars'     => new Options(['id' => 'container3']),
+                                'vars'     => ['id' => 'container3'],
                                 'children' => [
                                     [ // logo3
-                                        'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                        'vars' => ['id' => 'logo3', 'title' => '']
                                     ]
                                 ]
                             ],
@@ -1326,35 +1326,35 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars' => new Options(['id' => 'header1'])
+                        'vars' => ['id' => 'header1']
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // container2
-                                'vars'     => new Options(['id' => 'container2']),
+                                'vars'     => ['id' => 'container2'],
                                 'children' => [
                                     [ // logo2
-                                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                        'vars' => ['id' => 'logo2', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container1
-                                'vars'     => new Options(['id' => 'container1']),
+                                'vars'     => ['id' => 'container1'],
                                 'children' => [
                                     [ // logo1
-                                        'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                        'vars' => ['id' => 'logo1', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container3
-                                'vars'     => new Options(['id' => 'container3']),
+                                'vars'     => ['id' => 'container3'],
                                 'children' => [
                                     [ // logo3
-                                        'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                        'vars' => ['id' => 'logo3', 'title' => '']
                                     ]
                                 ]
                             ],
@@ -1384,35 +1384,35 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars' => new Options(['id' => 'header1'])
+                        'vars' => ['id' => 'header1']
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // container1
-                                'vars'     => new Options(['id' => 'container1']),
+                                'vars'     => ['id' => 'container1'],
                                 'children' => [
                                     [ // logo1
-                                        'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                        'vars' => ['id' => 'logo1', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container2
-                                'vars'     => new Options(['id' => 'container2']),
+                                'vars'     => ['id' => 'container2'],
                                 'children' => [
                                     [ // logo2
-                                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                        'vars' => ['id' => 'logo2', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container3
-                                'vars'     => new Options(['id' => 'container3']),
+                                'vars'     => ['id' => 'container3'],
                                 'children' => [
                                     [ // logo3
-                                        'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                        'vars' => ['id' => 'logo3', 'title' => '']
                                     ]
                                 ]
                             ],
@@ -1442,35 +1442,35 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header1
-                        'vars' => new Options(['id' => 'header1'])
+                        'vars' => ['id' => 'header1']
                     ],
                     [ // header2
-                        'vars'     => new Options(['id' => 'header2']),
+                        'vars'     => ['id' => 'header2'],
                         'children' => [
                             [ // container2
-                                'vars'     => new Options(['id' => 'container2']),
+                                'vars'     => ['id' => 'container2'],
                                 'children' => [
                                     [ // logo2
-                                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                        'vars' => ['id' => 'logo2', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container3
-                                'vars'     => new Options(['id' => 'container3']),
+                                'vars'     => ['id' => 'container3'],
                                 'children' => [
                                     [ // logo3
-                                        'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                        'vars' => ['id' => 'logo3', 'title' => '']
                                     ]
                                 ]
                             ],
                             [ // container1
-                                'vars'     => new Options(['id' => 'container1']),
+                                'vars'     => ['id' => 'container1'],
                                 'children' => [
                                     [ // logo1
-                                        'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                        'vars' => ['id' => 'logo1', 'title' => '']
                                     ]
                                 ]
                             ],
@@ -1503,16 +1503,16 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo2
-                                'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                                'vars' => ['id' => 'logo2', 'title' => '']
                             ],
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ]
                         ]
                     ]
@@ -1534,19 +1534,19 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => 'test'])
+                                'vars' => ['id' => 'logo', 'title' => 'test']
                             ],
                             [ // test_container
-                                'vars'     => new Options(['id' => 'test_container']),
+                                'vars'     => ['id' => 'test_container'],
                                 'children' => [
                                     [ // logo added by 'test_self_building_container' block type
-                                        'vars' => new Options(['id' => 'test_container_logo', 'title' => ''])
+                                        'vars' => ['id' => 'test_container_logo', 'title' => '']
                                     ],
                                 ]
                             ]
@@ -1572,13 +1572,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => new Options(['id' => 'logo', 'title' => ''])
+                                'vars' => ['id' => 'logo', 'title' => '']
                             ]
                         ]
                     ]
@@ -1680,21 +1680,21 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ],
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ]
                         ]
                     ],
                     [ // logo2
-                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                        'vars' => ['id' => 'logo2', 'title' => '']
                     ]
                 ]
             ],
@@ -1736,21 +1736,21 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ],
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ]
                         ]
                     ],
                     [ // logo2
-                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                        'vars' => ['id' => 'logo2', 'title' => '']
                     ]
                 ]
             ],
@@ -1822,24 +1822,24 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ],
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ],
                             [ // logo4
-                                'vars' => new Options(['id' => 'logo4', 'title' => ''])
+                                'vars' => ['id' => 'logo4', 'title' => '']
                             ]
                         ]
                     ],
                     [ // logo2
-                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                        'vars' => ['id' => 'logo2', 'title' => '']
                     ]
                 ]
             ],
@@ -1880,24 +1880,24 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
-                'vars'     => new Options(['id' => 'root']),
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => new Options(['id' => 'header']),
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo3
-                                'vars' => new Options(['id' => 'logo3', 'title' => ''])
+                                'vars' => ['id' => 'logo3', 'title' => '']
                             ],
                             [ // logo1
-                                'vars' => new Options(['id' => 'logo1', 'title' => ''])
+                                'vars' => ['id' => 'logo1', 'title' => '']
                             ],
                             [ // logo4
-                                'vars' => new Options(['id' => 'logo4', 'title' => ''])
+                                'vars' => ['id' => 'logo4', 'title' => '']
                             ]
                         ]
                     ],
                     [ // logo2
-                        'vars' => new Options(['id' => 'logo2', 'title' => ''])
+                        'vars' => ['id' => 'logo2', 'title' => '']
                     ]
                 ]
             ],

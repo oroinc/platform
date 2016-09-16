@@ -175,7 +175,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $type = $this->getBlockType(FormFieldsType::NAME);
         $options = $this->resolveOptions(
             $type,
-            ['form_name' => 'test_form']
+            ['form_name' => 'test_form', 'split_to_fields' => true]
         );
         $type->buildBlock($builder, new Options($options));
     }
@@ -201,7 +201,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $type = $this->getBlockType(FormFieldsType::NAME);
         $options = $this->resolveOptions(
             $type,
-            ['form_name' => $formName]
+            ['form_name' => $formName, 'split_to_fields' => true]
         );
         $type->buildBlock($builder, new Options($options));
     }
@@ -213,23 +213,13 @@ class FormFieldsTypeTest extends BlockTypeTestCase
 
         $view = new BlockView();
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface');
-        $context = new LayoutContext();
         $formView = new FormView();
-
-        $context->set('form', $formAccessor);
-
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $formAccessor->expects($this->any())
-            ->method('getView')
-            ->will($this->returnValue($formView));
+         // todo test buildView
 
         $type->buildView(
             $view,
             $block,
-            new Options(['form_name' => 'form', 'split_to_fields' => false])
+            new Options(['form'=> null, 'form_name' => 'form', 'split_to_fields' => false])
         );
         $this->assertSame($formView, $view->vars['form']);
     }
@@ -261,11 +251,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                 $this->returnValue([])
             );
 
-        $type->finishView(
-            $view,
-            $block,
-            new Options(['form_name' => $formName, 'split_to_fields' => true])
-        );
+        $type->finishView($view, $block);
 
         $this->assertFalse($formView->isRendered());
     }
@@ -321,11 +307,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                 )
             );
 
-        $type->finishView(
-            $view,
-            $block,
-            new Options(['form_name' => $formName, 'split_to_fields' => true])
-        );
+        $type->finishView($view, $block);
 
         $this->assertFalse($formView->isRendered());
         $this->assertFalse($formView['field1']->isRendered());
@@ -379,11 +361,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                 )
             );
 
-        $type->finishView(
-            $view,
-            $block,
-            new Options(['form_name' => $formName, 'split_to_fields' => true])
-        );
+        $type->finishView($view, $block);
 
         $this->assertFalse($formView->isRendered());
         $this->assertFalse($formView['field1']->isRendered());

@@ -18,7 +18,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['block', 'container', 'my_plugin', '_my_container'],
-            $view->vars['block_prefixes']->toArray()
+            $view->vars['block_prefixes']
         );
     }
 
@@ -143,7 +143,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayNotHasKey('path', $view->vars);
         $this->assertEquals('test_route', $view->vars['route_name']);
-        $this->assertEquals(new Options(), $view->vars['route_parameters']);
+        $this->assertEquals([], $view->vars['route_parameters']);
     }
 
     public function testProcessUrlWithPrefixAndRoute()
@@ -158,7 +158,7 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayNotHasKey('test_path', $view->vars);
         $this->assertEquals('test_route', $view->vars['test_route_name']);
-        $this->assertEquals(new Options(), $view->vars['test_route_parameters']);
+        $this->assertEquals([], $view->vars['test_route_parameters']);
     }
 
     public function testProcessUrlWithRouteParameters()
