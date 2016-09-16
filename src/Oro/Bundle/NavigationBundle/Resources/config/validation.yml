@@ -16,5 +16,4 @@ Oro\Bundle\NavigationBundle\Entity\MenuUpdate:
         titles:
             - Valid: ~
         uri:
-            - NotBlank:
-                groups: [Create]
+            - NotBlank: ~

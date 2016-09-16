@@ -33,9 +33,7 @@ class MenuUpdateController extends Controller
      */
     public function createAction($menu, $parentKey)
     {
-        $menuUpdate = $this->createMenuUpdate($menu, null, $parentKey);
-
-        return $this->update($menuUpdate, ['validation_groups' => ['Create']]);
+        return $this->update(new MenuUpdate());
     }
 
     /**
@@ -55,55 +53,21 @@ class MenuUpdateController extends Controller
      */
     public function updateAction($menu, $key, $parentKey)
     {
-        $menuUpdate = $this->getDoctrine()
-            ->getManagerForClass('OroNavigationBundle:MenuUpdate')
-            ->getRepository('OroNavigationBundle:MenuUpdate')
-            ->getMenuUpdateByMenuAndKey($menu, $key);
-        if ($menuUpdate !== null) {
-            return $this->update($menuUpdate);
-        }
-
-        $menuUpdate = $this->createMenuUpdate($menu, $key, $parentKey);
-
-        return $this->update($menuUpdate, ['validation_groups' => ['Create']]);
+        return $this->update(new MenuUpdate());
     }
 
     /**
      * @param MenuUpdate $menuUpdate
-     * @param array $formOptions
      * @return array|RedirectResponse
      */
-    private function update(MenuUpdate $menuUpdate, $formOptions = [])
+    private function update(MenuUpdate $menuUpdate)
     {
-        $form = $this->createForm(
-            MenuUpdateType::NAME,
-            $menuUpdate,
-            array_merge_recursive(['validation_groups' => ['Default']], $formOptions)
-        );
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
 
         return $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
             $form,
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
-    }
-
-    /**
-     * @param string $menu
-     * @param string $key
-     * @param string $parentKey
-     * @return MenuUpdate
-     */
-    private function createMenuUpdate($menu, $key, $parentKey)
-    {
-        $menuUpdate = new MenuUpdate();
-        $menuUpdate
-            ->setOwnershipType(MenuUpdate::OWNERSHIP_GLOBAL)
-            ->setMenu($menu)
-            ->setKey($key)
-            ->setParentKey($parentKey)
-        ;
-
-        return $menuUpdate;
     }
 }
