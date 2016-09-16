@@ -402,7 +402,6 @@ abstract class BaseDriver
     protected function applySelectToQB(Query $query, QueryBuilder $qb)
     {
         $selects = $query->getSelect();
-        $aliases = $query->getSelectAliases();
 
         if (empty($selects)) {
             return;
@@ -420,9 +419,7 @@ abstract class BaseDriver
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
                 ->setParameter('param' . $uniqIndex, $name);
 
-            $alias = isset($aliases[$select]) ? $aliases[$select] : $name;
-
-            $qb->addSelect($joinAlias . '.value as ' . $alias);
+            $qb->addSelect($joinAlias . '.value as ' . $name);
         }
     }
 
