@@ -75,7 +75,9 @@ class OrmPagerExtension extends AbstractExtension
         } elseif ($onePage && $perPageLimit) {
             // one page with limit
             $this->pager->setPage(0);
-            $this->pager->adjustTotalCount($perPageCount);
+            if ($config->offsetGetByPath(ToolbarExtension::TOOLBAR_HIDE_OPTION_PATH)) {
+                $this->pager->adjustTotalCount($perPageCount);
+            }
             $this->pager->setMaxPerPage($perPageCount);
         } else {
             $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
