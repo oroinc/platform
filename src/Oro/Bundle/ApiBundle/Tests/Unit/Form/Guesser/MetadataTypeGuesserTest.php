@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Guesser;
 
 use Symfony\Component\Form\Guess\TypeGuess;
 
+use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -33,7 +35,6 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             $this->doctrineHelper
         );
-        $this->typeGuesser->setMetadataAccessor(null);
     }
 
     /**
@@ -56,6 +57,29 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         }
 
         return $metadataAccessor;
+    }
+
+    /**
+     * @param string                      $className
+     * @param EntityDefinitionConfig|null $config
+     *
+     * @return ConfigAccessorInterface
+     */
+    protected function getConfigAccessor($className, EntityDefinitionConfig $config = null)
+    {
+        $configAccessor = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+        if (null === $config) {
+            $configAccessor->expects($this->once())
+                ->method('getConfig')
+                ->willReturn(null);
+        } else {
+            $configAccessor->expects($this->once())
+                ->method('getConfig')
+                ->with($className)
+                ->willReturn($config);
+        }
+
+        return $configAccessor;
     }
 
     /**
@@ -224,7 +248,11 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         );
         $metadata->addAssociation($associationMetadata);
 
+        $config = new EntityDefinitionConfig();
+        $config->addField(self::TEST_PROPERTY);
+
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertNull(
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
@@ -246,16 +274,28 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $targetMetadata->setClassName('Test\TargetEntity');
         $associationMetadata->setTargetMetadata($targetMetadata);
 
+        $config = new EntityDefinitionConfig();
+        $associationConfig = $config->addField(self::TEST_PROPERTY)->getOrCreateTargetEntity();
+        $associationConfig->addField('childField');
+
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
             ->with('Test\TargetEntity')
             ->willReturn(false);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_collection',
-                ['entry_data_class' => 'Test\TargetEntity'],
+                [
+                    'entry_data_class' => 'Test\TargetEntity',
+                    'entry_type'       => 'oro_api_compound_entity',
+                    'entry_options'    => [
+                        'metadata' => $targetMetadata,
+                        'config'   => $associationConfig
+                    ]
+                ],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -278,16 +318,28 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $targetMetadata->setClassName('Test\TargetEntity');
         $associationMetadata->setTargetMetadata($targetMetadata);
 
+        $config = new EntityDefinitionConfig();
+        $associationConfig = $config->addField(self::TEST_PROPERTY)->getOrCreateTargetEntity();
+        $associationConfig->addField('childField');
+
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
             ->with('Test\TargetEntity')
             ->willReturn(true);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_entity_collection',
-                ['entry_data_class' => 'Test\TargetEntity'],
+                [
+                    'entry_data_class' => 'Test\TargetEntity',
+                    'entry_type'       => 'oro_api_compound_entity',
+                    'entry_options'    => [
+                        'metadata' => $targetMetadata,
+                        'config'   => $associationConfig
+                    ]
+                ],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
