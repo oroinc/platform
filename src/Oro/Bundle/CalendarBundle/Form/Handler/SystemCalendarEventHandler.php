@@ -72,7 +72,7 @@ class SystemCalendarEventHandler
                 if ($this->form->has('contexts')) {
                     $contexts = $this->form->get('contexts')->getData();
                     if ($entity->getCalendar()) {
-                        $owner = $entity->getCalendar()->getOwner();
+                        $owner = $entity->getCalendar() ? $entity->getCalendar()->getOwner() : null;
                         if ($owner && $owner->getId()) {
                             $contexts = array_merge($contexts, [$owner]);
                         }
