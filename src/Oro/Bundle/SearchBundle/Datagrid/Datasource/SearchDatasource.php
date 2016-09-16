@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Datasource;
+namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -22,7 +22,7 @@ class SearchDatasource implements DatasourceInterface
     protected $queryFactory;
 
     /** @var SearchQueryInterface */
-    protected $query;
+    protected $searchQuery;
 
     /** @var DatagridInterface */
     protected $datagrid;
@@ -53,9 +53,9 @@ class SearchDatasource implements DatasourceInterface
     {
         $this->datagrid = $grid;
 
-        $this->query = $this->queryFactory->create($grid, $config);
+        $this->searchQuery = $this->queryFactory->create($grid, $config);
 
-        $this->yamlToSearchQueryConverter->process($this->query, $config);
+        $this->yamlToSearchQueryConverter->process($this->searchQuery, $config);
 
         $grid->setDatasource(clone $this);
     }
@@ -65,10 +65,10 @@ class SearchDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $results = $this->query->execute();
+        $results = $this->searchQuery->execute();
         /** @var Item[] $results */
 
-        $event = new SearchResultBefore($this->datagrid, $this->query);
+        $event = new SearchResultBefore($this->datagrid, $this->searchQuery);
         $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
 
         $rows = [];
@@ -80,7 +80,7 @@ class SearchDatasource implements DatasourceInterface
             $rows[] = $resultRecord;
         }
 
-        $event = new SearchResultAfter($this->datagrid, $rows, $this->query);
+        $event = new SearchResultAfter($this->datagrid, $rows, $this->searchQuery);
         $this->dispatcher->dispatch(SearchResultAfter::NAME, $event);
 
         return $event->getRecords();
@@ -89,18 +89,8 @@ class SearchDatasource implements DatasourceInterface
     /**
      * @return SearchQueryInterface
      */
-    public function getQuery()
+    public function getSearchQuery()
     {
-        return $this->query;
-    }
-
-    /**
-     * The SearchQuery is a builder itself.
-     *
-     * @return SearchQueryInterface
-     */
-    public function getQueryBuilder()
-    {
-        return $this->getQuery();
+        return $this->searchQuery;
     }
 }

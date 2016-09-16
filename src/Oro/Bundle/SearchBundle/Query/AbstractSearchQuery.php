@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
+use Doctrine\Common\Collections\Expr\Expression;
+
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 abstract class AbstractSearchQuery implements SearchQueryInterface
@@ -161,7 +163,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    public function from($entities)
+    public function setFrom($entities)
     {
         return $this->query->from($entities);
     }
@@ -169,15 +171,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    public function setFrom($entities)
-    {
-        return $this->from($entities);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function setWhere($expression, $type = self::WHERE_AND);
+    abstract public function addWhere(Expression $expression, $type = self::WHERE_AND);
 
     /**
      * {@inheritdoc}

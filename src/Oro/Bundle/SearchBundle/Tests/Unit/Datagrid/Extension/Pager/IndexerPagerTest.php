@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource\Extension\Pager;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Pager;
 
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;

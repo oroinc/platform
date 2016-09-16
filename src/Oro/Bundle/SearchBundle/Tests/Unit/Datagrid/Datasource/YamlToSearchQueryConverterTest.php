@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Datasource;
 
-use Oro\Bundle\SearchBundle\Datasource\YamlToSearchQueryConverter;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\YamlToSearchQueryConverter;
 use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
+use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
@@ -30,7 +31,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->query->expects($this->at(0))
-            ->method('from')
+            ->method('setFrom')
             ->with('product');
         $this->query->expects($this->at(1))
             ->method('addSelect')
@@ -48,19 +49,25 @@ class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
         $config = [
             'query' => [
                 'where' => [
-                    'and' => ['product.id <> :parent'],
-                    'or' => ['product.id <> :parent2']
+                    'and' => ['id != parent'],
+                    'or' => ['name = test']
                 ]
             ]
         ];
 
         $this->query->expects($this->at(0))
-            ->method('setWhere')
-            ->with('product.id <> :parent');
+            ->method('addWhere')
+            ->with(
+                new Comparison('id', '!=', 'parent'),
+                AbstractSearchQuery::WHERE_AND
+            );
 
         $this->query->expects($this->at(1))
-            ->method('setWhere')
-            ->with('product.id <> :parent2', AbstractSearchQuery::WHERE_OR);
+            ->method('addWhere')
+            ->with(
+                new Comparison('name', '=', 'test'),
+                AbstractSearchQuery::WHERE_OR
+            );
 
         $testable = new YamlToSearchQueryConverter();
         $testable->process($this->query, $config);

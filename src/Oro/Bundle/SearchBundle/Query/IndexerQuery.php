@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
+use Doctrine\Common\Collections\Expr\Expression;
+
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class IndexerQuery extends AbstractSearchQuery
@@ -32,15 +34,13 @@ class IndexerQuery extends AbstractSearchQuery
     /**
      * {@inheritdoc}
      */
-    public function setWhere($expression, $type = self::WHERE_AND)
+    public function addWhere(Expression $expression, $type = self::WHERE_AND)
     {
-        if (self::WHERE_OR === $type) {
+        if (self::WHERE_AND === $type) {
+            $this->query->getCriteria()->andWhere($expression);
+        } elseif (self::WHERE_OR === $type) {
             $this->query->getCriteria()->orWhere($expression);
-
-            return $this;
         }
-
-        $this->query->getCriteria()->andWhere($expression);
 
         return $this;
     }

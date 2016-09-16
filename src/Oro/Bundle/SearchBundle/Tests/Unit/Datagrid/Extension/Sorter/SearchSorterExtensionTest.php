@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datasource\Extension\Sorter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Sorter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Sorter\SearchSorterExtension;
 
