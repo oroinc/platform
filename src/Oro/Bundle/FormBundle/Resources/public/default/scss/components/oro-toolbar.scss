@@ -1,95 +1,95 @@
 .oro-toolbar {
-  position: relative;
+    position: relative;
 
-  display: inline-block;
-  vertical-align: top;
-
-  &__icon {
     display: inline-block;
     vertical-align: top;
 
-    margin-left: 3px;
-  }
+    &__icon {
+        display: inline-block;
+        vertical-align: top;
 
-  &__content {
-    min-width: $oro-toolbar-content-min-width;
-
-    padding: 0 $offset-y-m;
-
-    line-height: ($font-size - 0.1) * 2;
-    font-family: $roboto-font;
-    text-align: center;
-
-    cursor: pointer;
-  }
-
-  &__dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    left: auto;
-    margin: 0;
-
-    z-index: 80;
-
-    display: none;
-
-    min-width: $oro-toolbar-toolbar-min-width;
-
-    padding: 10px 15px;
-
-    background: $base-background-color;
-    border-radius: 2px;
-    box-shadow: 0 4px 5px 0 rgba(0,0,0,.4);
-  }
-
-  &__list {
-    text-align: left;
-
-    white-space: nowrap;
-
-    @include list-normalize;
-
-
-    &-item {
-      margin-top: 2px;
-
-      &:first-child {
-        margin-top: 0;
-      }
-    }
-  }
-
-  &__link {
-    display: block;
-
-    line-height: 2;
-
-    color: $base-font-color;
-
-    &:hover {
-      color: $base-font-color;
-    }
-  }
-
-  &__currency,
-  &__text {
-    display: inline-block;
-    vertical-align: baseline;
-  }
-
-  &__currency {
-    margin-right: $offset-y-m / 2;
-  }
-
-  // toolbar open
-  &.active {
-    .oro-toolbar__content {
-      box-shadow: inset 1px 1px 3px 0 rgba(0,0,0,.3);
+        margin-left: 3px;
     }
 
-    .oro-toolbar__dropdown {
-      display: block;
+    &__content {
+        min-width: $oro-toolbar-content-min-width;
+
+        padding: 0 $offset-y-m;
+
+        line-height: ($font-size - 0.1) * 2;
+        font-family: $roboto-font;
+        text-align: center;
+
+        cursor: pointer;
     }
-  }
+
+    &__dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: auto;
+        margin: 0;
+
+        z-index: 80;
+
+        display: none;
+
+        min-width: $oro-toolbar-toolbar-min-width;
+
+        padding: 10px 15px;
+
+        background: $base-background-color;
+        border-radius: 2px;
+        box-shadow: 0 4px 5px 0 rgba(0,0,0,.4);
+    }
+
+    &__list {
+        text-align: left;
+
+        white-space: nowrap;
+
+        @include list-normalize;
+
+
+        &-item {
+            margin-top: 2px;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+
+    &__link {
+        display: block;
+
+        line-height: 2;
+
+        color: $base-font-color;
+
+        &:hover {
+            color: $base-font-color;
+        }
+    }
+
+    &__currency,
+    &__text {
+        display: inline-block;
+        vertical-align: baseline;
+    }
+
+    &__currency {
+        margin-right: $offset-y-m / 2;
+    }
+
+    // toolbar open
+    &.active {
+        .oro-toolbar__content {
+            box-shadow: inset 1px 1px 3px 0 rgba(0,0,0,.3);
+        }
+
+        .oro-toolbar__dropdown {
+            display: block;
+        }
+    }
 }

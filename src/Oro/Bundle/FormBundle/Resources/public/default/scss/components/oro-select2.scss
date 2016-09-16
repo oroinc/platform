@@ -3,7 +3,11 @@
 
     background: $base-white-color;
 
-    @include base-ui-element-style;
+    font-size: $font-size;
+    line-height: 1;
+
+    border: 1px solid $base-border-color;
+    border-radius: 5px;
 
     padding: 0 !important; //TODO: After remove .input classes from select delete !important
 
@@ -124,11 +128,40 @@
         }
 
         .select2-input {
-            @include base-ui-element;
+            @include element-state('focus') {
+                border-color: $color-focus;
+                box-shadow: inset 0 0.1rem 0.1rem rgba(0, 0, 0, 0.075),
+                                  0 0 0.8rem rgba(102, 175, 233, 0.6);
+
+                outline: 0;
+            }
+
+            @include element-state('error') {
+                border: .1rem solid $color-error;
+                box-shadow: 0 .1rem .7rem 0 rgba(223,96,96,.6);
+            }
+
+            @include element-state('warning') {
+                border: .1rem solid $color-warring;
+                box-shadow: 0 .1rem .7rem 0 rgba(126,166,164,.35);
+            }
+
+            @include element-state('success') {
+                border: .1rem solid $color-success;
+            }
+
+            font-size: $font-size;
+            line-height: 1;
+
+            border: 1px solid $base-border-color;
+            border-radius: 5px;
 
             padding: 6px 8px;
 
-            font-size: inherit;
+            &--full,
+            &.full {
+                width: 100%;
+            }
         }
     }
 
