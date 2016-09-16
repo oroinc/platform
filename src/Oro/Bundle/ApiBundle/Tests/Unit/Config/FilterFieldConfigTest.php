@@ -135,4 +135,46 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($config->isArrayAllowed());
         $this->assertEquals([], $config->toArray());
     }
+
+    public function testType()
+    {
+        $config = new FilterFieldConfig();
+        $this->assertNull($config->getType());
+
+        $config->setType('test');
+        $this->assertEquals('test', $config->getType());
+        $this->assertEquals(['type' => 'test'], $config->toArray());
+
+        $config->setType(null);
+        $this->assertNull($config->getType());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testOptions()
+    {
+        $config = new FilterFieldConfig();
+        $this->assertNull($config->getOptions());
+
+        $config->setOptions(['key' => 'val']);
+        $this->assertEquals(['key' => 'val'], $config->getOptions());
+        $this->assertEquals(['options' => ['key' => 'val']], $config->toArray());
+
+        $config->setOptions(null);
+        $this->assertNull($config->getOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testOperators()
+    {
+        $config = new FilterFieldConfig();
+        $this->assertNull($config->getOperators());
+
+        $config->setOperators(['=', '!=']);
+        $this->assertEquals(['=', '!='], $config->getOperators());
+        $this->assertEquals(['operators' => ['=', '!=']], $config->toArray());
+
+        $config->setOperators(null);
+        $this->assertNull($config->getOperators());
+        $this->assertEquals([], $config->toArray());
+    }
 }
