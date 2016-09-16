@@ -4,8 +4,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Stub;
 
 class FallbackContainingEntity
 {
+    /**
+     * @var mixed|null
+     */
     public $testProperty;
 
+    /**
+     * @var mixed|null
+     */
     public $testProperty2;
 
     /**

@@ -41,8 +41,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         ];
         $parentObject = new FallbackParentStub();
         $parentObject->valueWithFallback = new EntityFieldFallbackValue();
-        $this->fallbackResolver->expects($this->any())
-            ->method('getFallbackConfig')->willReturn([]);
+        $this->fallbackResolver->expects($this->any())->method('getFallbackConfig')->willReturn([]);
         $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $options);
         $fallbackFormType = $this->getChildForm($form);
         $this->assertEquals(

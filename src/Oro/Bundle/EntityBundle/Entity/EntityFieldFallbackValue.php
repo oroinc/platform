@@ -74,7 +74,6 @@ class EntityFieldFallbackValue
 
     /**
      * @param string $fallback
-     *
      * @return $this
      */
     public function setFallback($fallback)
@@ -94,7 +93,6 @@ class EntityFieldFallbackValue
 
     /**
      * @param boolean $useFallback
-     *
      * @return $this
      */
     public function setUseFallback($useFallback)
@@ -114,7 +112,6 @@ class EntityFieldFallbackValue
 
     /**
      * @param mixed $scalarValue
-     *
      * @return $this
      */
     public function setScalarValue($scalarValue)
@@ -134,7 +131,6 @@ class EntityFieldFallbackValue
 
     /**
      * @param array $arrayValue
-     *
      * @return $this
      */
     public function setArrayValue($arrayValue)
@@ -154,7 +150,6 @@ class EntityFieldFallbackValue
 
     /**
      * @param mixed $viewValue
-     *
      * @return $this
      */
     public function setViewValue($viewValue)
@@ -181,6 +176,6 @@ class EntityFieldFallbackValue
      */
     public function __toString()
     {
-        return $this->scalarValue;
+        return (string)$this->scalarValue;
     }
 }

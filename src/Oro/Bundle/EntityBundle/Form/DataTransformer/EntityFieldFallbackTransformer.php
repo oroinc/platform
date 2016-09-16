@@ -29,7 +29,10 @@ class EntityFieldFallbackTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        /** @var EntityFieldFallbackValue $value */
+        if (!$value instanceof EntityFieldFallbackValue) {
+            return $value;
+        }
+
         // set entity value to null, so entity will use fallback value
         if ($value->isUseFallback() && $value->getFallback()) {
             $value->setScalarValue(null);

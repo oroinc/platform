@@ -3,18 +3,19 @@
 namespace Oro\Bundle\EntityBundle\Fallback;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
-use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
-use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
 use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackProviderNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackKeyException;
+use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException;
 use Oro\Bundle\EntityBundle\Fallback\Provider\EntityFallbackProviderInterface;
+use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class EntityFallbackResolver
 {
@@ -52,6 +53,11 @@ class EntityFallbackResolver
     protected $configBag;
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $accessor;
+
+    /**
      * EntityFallbackResolver constructor.
      *
      * @param ConfigProvider $entityConfigProvider
@@ -87,7 +93,7 @@ class EntityFallbackResolver
             return $formDescription['data_type'];
         }
 
-        // try to read it from object field name configuration
+        // try to read it from object's field name @ConfigField configuration
         $fallbackType = $this->getFallbackConfig($object, $objectFieldName, EntityFieldFallbackValue::FALLBACK_TYPE);
 
         if (!in_array($fallbackType, static::$allowedTypes)) {
@@ -116,11 +122,13 @@ class EntityFallbackResolver
             EntityFieldFallbackValue::FALLBACK_LIST_KEY
         );
 
-        if (!$configName = $this->getSystemFallbackConfigName($fallbackList)) {
+        $configName = $this->getSystemFallbackConfigName($fallbackList);
+        if (!$configName) {
             return [];
         }
 
-        if (empty($formDescription = $this->configBag->getFieldsRoot($configName))) {
+        $formDescription = $this->configBag->getFieldsRoot($configName);
+        if (empty($formDescription)) {
             return [];
         }
 
