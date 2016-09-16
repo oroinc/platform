@@ -75,7 +75,9 @@ class SearchDatasource implements DatasourceInterface
         foreach ($results as $result) {
             $resultRecord = new ResultRecord([]);
             if ($result instanceof Item) {
-                $resultRecord->addData($result->getSelectedData());
+                $resultRecord->addData(
+                    array_merge(['id' => $result->getId()], $result->getSelectedData())
+                );
             } else {
                 $resultRecord->addData($result);
             }
