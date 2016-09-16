@@ -47,14 +47,16 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
     {
         $body = array_replace_recursive(['process_job_id' => null, ], JSON::decode($message->getBody()));
         if (false == $body['process_job_id']) {
-            $this->logger->critical('[ExecuteProcessJobProcessor] Process Job Id not set');
+            $this->logger->critical(
+                sprintf('[ExecuteProcessJobProcessor] Process Job Id not set: "%s"', $message->getBody())
+            );
 
             return self::REJECT;
         }
 
         $entityManager = $this->doctrineHelper->getEntityManager(ProcessJob::class);
         if (null == $entityManager) {
-            $this->logger->critical('[ExecuteProcessJobProcessor] Cannot get Entity Manager');
+            $this->logger->critical('[ExecuteProcessJobProcessor] Cannot get Entity Manager for entity ProcessJob');
 
             return self::REJECT;
         }
@@ -69,11 +71,20 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
             return self::REJECT;
         }
 
-        $entityManager->transactional(function (EntityManagerInterface $entityManager) use ($processJob) {
+        $entityManager->beginTransaction();
+
+        try {
             $this->processHandler->handleJob($processJob);
             $entityManager->remove($processJob);
+            $entityManager->flush();
+
             $this->processHandler->finishJob($processJob);
-        });
+            $entityManager->commit();
+        } catch (\Exception $e) {
+            $entityManager->rollback();
+
+            throw  $e;
+        }
 
         return self::ACK;
     }

@@ -152,10 +152,8 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         $entityManager = $this->createEntityManagerMock();
         $entityManager
             ->expects(self::once())
-            ->method('transactional')
-            ->willReturnCallback(function ($callback) use ($entityManager) {
-                $callback($entityManager);
-            });
+            ->method('commit')
+        ;
 
         $entityRepository = $this->createEntityRepositoryMock();
         $entityRepository
