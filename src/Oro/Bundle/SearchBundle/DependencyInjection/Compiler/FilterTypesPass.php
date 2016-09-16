@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FilterBundle\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\SearchBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class FilterTypesPass implements CompilerPassInterface
 {
-    const FILTER_EXTENSION_ID = 'oro_filter.extension.orm_filter';
-    const TAG_NAME            = 'oro_filter.extension.orm_filter.filter';
+    const FILTER_EXTENSION_ID = 'oro_search.extension.search_filter';
+    const TAG_NAME            = 'oro_search.extension.search_filter.filter';
 
     /**
      * {@inheritDoc}
@@ -23,11 +23,14 @@ class FilterTypesPass implements CompilerPassInterface
         if ($extension) {
             $filters = $container->findTaggedServiceIds(self::TAG_NAME);
             foreach ($filters as $serviceId => $tags) {
+                $tagAttrs = reset($tags);
+                if (!isset($tagAttrs['datasource']) || 'search' !== $tagAttrs['datasource']) {
+                    continue;
+                }
                 if ($container->hasDefinition($serviceId)) {
                     $container->getDefinition($serviceId)->setPublic(false);
                 }
-                $tagAttrs = reset($tags);
-                $extension->addMethodCall('addFilter', array($tagAttrs['type'], new Reference($serviceId)));
+                $extension->addMethodCall('addFilter', [$tagAttrs['type'], new Reference($serviceId)]);
             }
         }
     }
