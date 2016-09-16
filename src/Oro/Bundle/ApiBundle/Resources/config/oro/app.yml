@@ -40,6 +40,8 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        primaryField:
+            class: Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
 
     form_types:
         - form.type.form

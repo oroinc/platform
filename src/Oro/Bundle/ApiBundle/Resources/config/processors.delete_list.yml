@@ -37,10 +37,11 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 10 }
 
-    oro_api.delete_list.register_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterFilters
+    oro_api.delete_list.register_configured_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters
         arguments:
             - '@oro_api.filter_factory'
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -50 }
 
@@ -50,6 +51,15 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -55 }
+
+    oro_api.delete_list.register_dynamic_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
+        arguments:
+            - '@oro_api.filter_factory'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: -60 }
 
     #
     # normalize_input
@@ -99,10 +109,6 @@ services:
 
     oro_api.delete_list.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
-        arguments:
-            - '@oro_api.config_provider'
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.filter_factory'
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: 50 }
 
