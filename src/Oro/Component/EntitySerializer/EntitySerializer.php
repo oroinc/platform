@@ -699,7 +699,7 @@ class EntitySerializer
                 }
             }
         } else {
-            $fields = $this->fieldAccessor->getFieldsToSerialize($entityClass, $config);
+            $fields = $this->fieldAccessor->getFieldsToSelect($entityClass, $config);
             foreach ($fields as $field) {
                 $qb->addSelect(sprintf('r.%s', $field));
             }
