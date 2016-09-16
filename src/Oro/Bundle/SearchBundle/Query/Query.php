@@ -315,9 +315,7 @@ class Query
      */
     public function getSelect()
     {
-        $result = array_values($this->select);
-
-        return $result;
+        return array_values($this->select);
     }
 
     /**

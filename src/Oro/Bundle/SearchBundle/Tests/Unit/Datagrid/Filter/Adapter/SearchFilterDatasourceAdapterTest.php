@@ -94,7 +94,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldByAlias()
     {
         $ds = new SearchFilterDatasourceAdapter($this->query);
-        $alias = $ds->getFieldByAlias('name');
+        $ds->getFieldByAlias('name');
     }
 
     /**
@@ -104,7 +104,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
     public function testGetWrappedSearchQueryNotInitialized()
     {
         $ds = new SearchFilterDatasourceAdapter($this->query);
-        $query = $ds->getWrappedSearchQuery();
+        $ds->getWrappedSearchQuery();
     }
 
     public function testGetWrappedSearchQuery()
@@ -122,6 +122,6 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
     public function testExpr()
     {
         $ds = new SearchFilterDatasourceAdapter($this->query);
-        $expr = $ds->expr();
+        $ds->expr();
     }
 }

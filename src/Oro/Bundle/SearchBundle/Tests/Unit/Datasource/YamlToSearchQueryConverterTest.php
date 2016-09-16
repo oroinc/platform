@@ -17,7 +17,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
     }
 
-    public function testSelectFromInConverter()
+    public function testProcessSelectFrom()
     {
         $config = [
             'query' => [
@@ -43,7 +43,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
         $testable->process($this->query, $config);
     }
 
-    public function testWhereInConverter()
+    public function testProcessWhere()
     {
         $config = [
             'query' => [
