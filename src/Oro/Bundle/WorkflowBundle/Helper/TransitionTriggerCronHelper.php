@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionQueryFactory;
+use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class TransitionTriggerCronHelper
@@ -11,17 +12,17 @@ class TransitionTriggerCronHelper
     /** @var WorkflowManager */
     private $workflowManager;
 
-    /** @var TransitionQueryFactory */
-    private $queryFactory;
+    /** @var WorkflowItemRepository */
+    private $repository;
 
     /**
-     * @param TransitionQueryFactory $queryFactory
+     * @param WorkflowItemRepository $repository
      * @param WorkflowManager $workflowManager
      */
-    public function __construct(TransitionQueryFactory $queryFactory, WorkflowManager $workflowManager)
+    public function __construct(WorkflowManager $workflowManager, WorkflowItemRepository $repository)
     {
-        $this->queryFactory = $queryFactory;
         $this->workflowManager = $workflowManager;
+        $this->repository = $repository;
     }
 
     /**
@@ -32,12 +33,18 @@ class TransitionTriggerCronHelper
     {
         $workflow = $this->workflowManager->getWorkflow($trigger->getWorkflowDefinition()->getName());
 
-        $query = $this->queryFactory->create(
-            $workflow,
-            $trigger->getTransitionName(),
+        $steps = $workflow->getStepManager()
+            ->getRelatedTransitionSteps($trigger->getTransitionName())
+            ->map(
+                function (Step $step) {
+                    return $step->getName();
+                }
+            );
+
+        return $this->repository->getWorkflowItemsIdsByStepsAndEntityClass(
+            $steps,
+            $workflow->getDefinition()->getRelatedEntity(),
             $trigger->getFilter()
         );
-
-        return array_column($query->getArrayResult(), 'id');
     }
 }

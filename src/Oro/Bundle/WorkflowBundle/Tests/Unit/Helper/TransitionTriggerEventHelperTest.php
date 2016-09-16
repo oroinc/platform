@@ -20,18 +20,15 @@ class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+
+        $this->helper = new TransitionTriggerEventHelper($this->workflowManager);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName('test_workflow')->setRelatedEntity('stdClass');
-        $this->trigger = new TransitionTriggerEvent();
-        $this->trigger
-            ->setWorkflowDefinition($workflowDefinition)
-            ->setTransitionName('test_transition');
 
-        $this->helper = new TransitionTriggerEventHelper($this->workflowManager);
+        $this->trigger = new TransitionTriggerEvent();
+        $this->trigger->setWorkflowDefinition($workflowDefinition)->setTransitionName('test_transition');
     }
 
     /**
@@ -48,9 +45,8 @@ class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
         $entity2 = new \stdClass();
         $entity2->testField2 = 'test value 2';
         $entity2->mainEntity = $entity1;
-        $this->trigger
-            ->setRequire($require)
-            ->setRelation('mainEntity');
+
+        $this->trigger->setRequire($require)->setRelation('mainEntity');
 
         $this->assertEquals($expected, $this->helper->checkRequire($this->trigger, $entity2));
     }
@@ -94,15 +90,14 @@ class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckRequireWrongEntity()
     {
-        $entity1 = new \DateTime();
+        $entity = new \stdClass();
+        $entity->testField2 = 'test value 2';
+        $entity->mainEntity = null;
 
-        $entity2 = new \stdClass();
-        $entity2->testField2 = 'test value 2';
-        $entity2->mainEntity = $entity1;
         $this->trigger
             ->setRequire('testField2 == "test value 2"')
             ->setRelation('mainEntity');
 
-        $this->helper->checkRequire($this->trigger, $entity2);
+        $this->helper->checkRequire($this->trigger, $entity);
     }
 }

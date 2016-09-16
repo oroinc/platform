@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
-use Doctrine\ORM\Query;
-
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
@@ -21,20 +19,12 @@ class TransitionTriggerEventHelper
     /** @var WorkflowManager */
     private $workflowManager;
 
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
-
-    /** @var ExpressionLanguage */
-    private $expressionLanguage;
-
     /**
      * @param WorkflowManager $workflowManager
      */
     public function __construct(WorkflowManager $workflowManager)
     {
         $this->workflowManager = $workflowManager;
-        $this->propertyAccessor = new PropertyAccessor();
-        $this->expressionLanguage = new ExpressionLanguage();
     }
 
     /**
@@ -49,10 +39,11 @@ class TransitionTriggerEventHelper
             return true;
         }
 
-        return !empty($this->expressionLanguage->evaluate(
-            $require,
-            $this->getExpressionValues($trigger, $entity)
-        ));
+        $expressionLanguage = new ExpressionLanguage();
+
+        $result = $expressionLanguage->evaluate($require, $this->getExpressionValues($trigger, $entity));
+
+        return !empty($result);
     }
 
     /**
@@ -62,12 +53,16 @@ class TransitionTriggerEventHelper
      */
     private function getExpressionValues(TransitionTriggerEvent $trigger, $entity)
     {
-        $workflowDefinition = $trigger->getWorkflowDefinition();
-        if ($relation = $trigger->getRelation()) {
-            $mainEntity = $this->propertyAccessor->getValue($entity, $trigger->getRelation());
+        $relation = $trigger->getRelation();
+        if ($relation) {
+            $propertyAccessor = new PropertyAccessor();
+
+            $mainEntity = $propertyAccessor->getValue($entity, $trigger->getRelation());
         } else {
             $mainEntity = $entity;
         }
+
+        $workflowDefinition = $trigger->getWorkflowDefinition();
 
         $mainEntityClass = $workflowDefinition->getRelatedEntity();
         if (!$mainEntity instanceof $mainEntityClass) {

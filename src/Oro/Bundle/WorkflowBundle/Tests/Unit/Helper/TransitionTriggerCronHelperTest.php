@@ -2,88 +2,97 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
-use Doctrine\ORM\AbstractQuery;
+use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerCronHelper;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionQueryFactory;
+use Oro\Bundle\WorkflowBundle\Model\Step;
+use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class TransitionTriggerCronHelperTest extends \PHPUnit_Framework_TestCase
 {
+    const TRANSITION_NAME = 'test_transition';
+    const RELATED_CLASS_NAME = 'stdClass';
+    const WORKFLOW_NAME = 'test_workflow';
+    const FILTER = 'filter != null';
+
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowManager;
 
-    /** @var TransitionQueryFactory|\PHPUnit_Framework_MockObject_MockObject */
-    protected $queryFactory;
-
-    /** @var TransitionTriggerCron */
-    protected $trigger;
+    /** @var WorkflowItemRepository|\PHPUnit_Framework_MockObject_MockObject */
+    protected $repository;
 
     /** @var TransitionTriggerCronHelper */
     protected $helper;
 
+    /** @var WorkflowDefinition */
+    protected $workflowDefinition;
+
+    /** @var TransitionTriggerCron */
+    protected $trigger;
+
     protected function setUp()
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+
+        $this->repository = $this->getMockBuilder(WorkflowItemRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->queryFactory = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionQueryFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->helper = new TransitionTriggerCronHelper($this->workflowManager, $this->repository);
 
-        $workflowDefinition = new WorkflowDefinition();
-        $workflowDefinition->setName('test_workflow');
+        $this->workflowDefinition = new WorkflowDefinition();
+        $this->workflowDefinition->setName(self::WORKFLOW_NAME)->setRelatedEntity(self::RELATED_CLASS_NAME);
+
         $this->trigger = new TransitionTriggerCron();
-        $this->trigger->setWorkflowDefinition($workflowDefinition);
-        $this->trigger->setTransitionName('test_transition');
-
-        $this->helper = new TransitionTriggerCronHelper($this->queryFactory, $this->workflowManager);
+        $this->trigger->setWorkflowDefinition($this->workflowDefinition)
+            ->setTransitionName(self::TRANSITION_NAME)
+            ->setFilter(self::FILTER);
     }
 
     public function testFetchWorkflowItemsIds()
     {
-        $workflowName = 'test_workflow';
-        $transitionName = 'test_transition';
-        $filter = 'filter != null';
-        $this->trigger->setFilter($filter);
+        $data = [1, 2, 3, 4, 5];
+        $steps = ['step1', 'step2'];
 
-        /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject $query */
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->setMethods(['getArrayResult'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->setUpWorkflowManager(self::WORKFLOW_NAME, $steps);
 
-        $query->expects($this->once())->method('getArrayResult')->willReturn([['id' => 1], ['id' => 2]]);
+        $this->repository->expects($this->once())
+            ->method('getWorkflowItemsIdsByStepsAndEntityClass')
+            ->with(new ArrayCollection(array_combine($steps, $steps)), self::RELATED_CLASS_NAME, self::FILTER)
+            ->willReturn($data);
 
-        $workflow = $this->prepareMocks($workflowName);
-
-        $this->queryFactory->expects($this->once())
-            ->method('create')
-            ->with($workflow, $transitionName, $filter)
-            ->willReturn($query);
-
-        $this->assertEquals([1, 2], $this->helper->fetchWorkflowItemsIdsForTrigger($this->trigger));
+        $this->assertEquals($data, $this->helper->fetchWorkflowItemsIdsForTrigger($this->trigger));
     }
 
     /**
      * @param string $workflowName
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @param array $steps
      */
-    private function prepareMocks($workflowName)
+    private function setUpWorkflowManager($workflowName, array $steps = [])
     {
+        $steps = array_map(
+            function ($name) {
+                $step = new Step();
+                $step->setName($name)->setAllowedTransitions([self::TRANSITION_NAME]);
+
+                return $step;
+            },
+            $steps
+        );
+
         /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        $workflow->expects($this->any())->method('getStepManager')->willReturn(new StepManager($steps));
+        $workflow->expects($this->any())->method('getDefinition')->willReturn($this->workflowDefinition);
 
-        $this->workflowManager->expects($this->once())->method('getWorkflow')->with($workflowName)
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflow')
+            ->with($workflowName)
             ->willReturn($workflow);
-
-        return $workflow;
     }
 }
