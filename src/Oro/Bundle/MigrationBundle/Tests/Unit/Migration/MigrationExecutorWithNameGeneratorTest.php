@@ -25,7 +25,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
         $this->nameGenerator = new DbIdentifierNameGenerator();
 
-        $this->executor = new MigrationExecutorWithNameGenerator($this->queryExecutor);
+        $this->executor = new MigrationExecutorWithNameGenerator($this->queryExecutor, $this->cacheManager);
         $this->executor->setLogger($this->logger);
         $this->executor->setNameGenerator($this->nameGenerator);
     }
