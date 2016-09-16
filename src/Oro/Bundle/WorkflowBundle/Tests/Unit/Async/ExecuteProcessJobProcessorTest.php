@@ -149,7 +149,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         $entityManager = $this->createEntityManagerMock();
         $entityManager
             ->expects(self::once())
-            ->method('commit')
+            ->method('transactional')
         ;
 
         $processJob = new ProcessJob();
