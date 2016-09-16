@@ -69,7 +69,7 @@ abstract class AbstractTransitionTrigger
      * @var WorkflowDefinition
      *
      * @ORM\ManyToOne(targetEntity="WorkflowDefinition")
-     * @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE", nullable=false)
      */
     protected $workflowDefinition;
 
@@ -175,8 +175,20 @@ abstract class AbstractTransitionTrigger
      */
     public function isEqualTo(AbstractTransitionTrigger $trigger)
     {
-        return $this->workflowDefinition === $trigger->getWorkflowDefinition()
+        $expectedWorkflowName = $this->workflowDefinition ? $this->workflowDefinition->getName() : null;
+        $actualWorkflowName = $trigger->workflowDefinition ? $trigger->workflowDefinition->getName() : null;
+
+        return $expectedWorkflowName === $actualWorkflowName
             && $this->queued === $trigger->isQueued()
-            && $this->transitionName === $trigger->getTransitionName();
+            && $this->transitionName === $trigger->getTransitionName()
+            && $this->isEqualAdditionalFields($trigger);
     }
+
+    /**
+     * Compare additional fields of triggers
+     *
+     * @param AbstractTransitionTrigger $trigger
+     * @return bool
+     */
+    abstract protected function isEqualAdditionalFields(AbstractTransitionTrigger $trigger);
 }
