@@ -62,7 +62,7 @@ class TransitionTriggerCronHelperTest extends \PHPUnit_Framework_TestCase
         $this->setUpWorkflowManager(self::WORKFLOW_NAME, $steps);
 
         $this->repository->expects($this->once())
-            ->method('getWorkflowItemsIdsByStepsAndEntityClass')
+            ->method('getIdsByStepNamesAndEntityClass')
             ->with(new ArrayCollection(array_combine($steps, $steps)), self::RELATED_CLASS_NAME, self::FILTER)
             ->willReturn($data);
 

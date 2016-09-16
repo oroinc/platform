@@ -246,17 +246,17 @@ class WorkflowItemRepository extends EntityRepository
     }
 
     /**
-     * @param Collection $steps
+     * @param Collection $stepNames
      * @param string $entityClass
      * @param null $dqlFilter
      * @return array
      */
-    public function getWorkflowItemsIdsByStepsAndEntityClass(Collection $steps, $entityClass, $dqlFilter = null)
+    public function getIdsByStepNamesAndEntityClass(Collection $stepNames, $entityClass, $dqlFilter = null)
     {
         $identifier = $this->getIdentifierField($entityClass);
 
         $queryBuilder = $this->createQueryBuilder('wi')
-            ->select('wi.id')
+            ->select('wi, wi.id')
             ->innerJoin('wi.definition', 'wd')
             ->innerJoin('wi.currentStep', 'ws')
             ->innerJoin(
@@ -267,7 +267,7 @@ class WorkflowItemRepository extends EntityRepository
             );
 
         $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
-            ->setParameter('workflowSteps', $steps->getValues());
+            ->setParameter('workflowSteps', $stepNames->getValues());
 
         $queryBuilder->andWhere('wd.relatedEntity = :entityClass')
             ->setParameter('entityClass', $entityClass);

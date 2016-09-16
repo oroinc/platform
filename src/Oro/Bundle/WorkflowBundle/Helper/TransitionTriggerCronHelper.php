@@ -41,7 +41,7 @@ class TransitionTriggerCronHelper
                 }
             );
 
-        return $this->repository->getWorkflowItemsIdsByStepsAndEntityClass(
+        return $this->repository->getIdsByStepNamesAndEntityClass(
             $steps,
             $workflow->getDefinition()->getRelatedEntity(),
             $trigger->getFilter()
