@@ -20,9 +20,18 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $class = $visitContext->getClass();
         $class->addUseStatement('Oro\Component\Layout\ImportLayoutManipulator');
         $class->addInterfaceName('Oro\Component\Layout\LayoutUpdateImportInterface');
+        $class->addInterfaceName('Oro\Component\Layout\IsApplicableLayoutUpdateInterface');
 
+        $setFactoryMethod = PhpMethod::create('isApplicable');
+        $setFactoryMethod->addParameter(
+            PhpParameter::create('context')
+                ->setType('\Oro\Component\Layout\ContextInterface')
+        );
+        $setFactoryMethod->setBody($writer->reset()->write('return true;')->getContent());
+        $class->setMethod($setFactoryMethod);
+        
         $setFactoryMethod = PhpMethod::create('getImport');
-        $setFactoryMethod->setBody($writer->write('return $this->import;')->getContent());
+        $setFactoryMethod->setBody($writer->reset()->write('return $this->import;')->getContent());
         $class->setMethod($setFactoryMethod);
 
         $setFactoryMethod = PhpMethod::create('setImport');
@@ -52,21 +61,23 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
         $class->setProperty($factoryProperty);
 
-
         $visitContext->getUpdateMethodWriter()
             ->writeln('if (null === $this->import) {')
+            ->indent()
             ->writeln(
-                '    throw new \\RuntimeException(\'Missing import configuration for layout update\');'
+                'throw new \\RuntimeException(\'Missing import configuration for layout update\');'
             )
+            ->outdent()
             ->writeln('}')
             ->writeln('')
             ->writeln('if ($this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface')
-            ->writeln('    && !$this->parentLayoutUpdate->isApplicable()) {')
-            ->writeln('    return;')
+            ->indent()
+            ->writeln('&& !$this->parentLayoutUpdate->isApplicable($item->getContext())) {')
+            ->writeln('return;')
+            ->outdent()
             ->writeln('}')
             ->writeln('')
-            ->writeln('$layoutManipulator  = new ImportLayoutManipulator($layoutManipulator, $this->import);')
-            ->indent();
+            ->writeln('$layoutManipulator  = new ImportLayoutManipulator($layoutManipulator, $this->import);');
     }
 
     /**

@@ -2,8 +2,8 @@
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
-use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Router\Recipient;
+use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class Router implements RecipientListRouterInterface
@@ -114,7 +114,7 @@ class Router implements RecipientListRouterInterface
         $properties[Config::PARAMETER_PROCESSOR_NAME] = $processorName;
         $properties[Config::PARAMETER_QUEUE_NAME] = $queueName;
 
-        $newMessage = $this->driver->createMessage();
+        $newMessage = $this->driver->createTransportMessage();
         $newMessage->setProperties($properties);
         $newMessage->setHeaders($message->getHeaders());
         $newMessage->setBody($message->getBody());
