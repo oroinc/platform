@@ -108,6 +108,7 @@ abstract class AbstractFilter implements FilterInterface
                 $subQb = clone $qb;
                 $subQb
                     ->resetDQLPart('orderBy')
+                    ->resetDQLPart('where')
                     ->select($fieldExpr)
                     ->andWhere($comparisonExpr)
                     ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));

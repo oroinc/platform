@@ -192,8 +192,8 @@ datagrids:
                 where:
                     and:
                         - e.head = true
-        # joins for filters to, cc, bcc, folders, folder and mailbox are added in
-        # Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener dynamically for performance reasons
+        # joins for filters to, cc, bcc, folders, folder and mailbox processes dynamically in
+        # Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener for performance reasons
         filters:
             columns:
                 subject: { type: string,   data_name: e.subject }

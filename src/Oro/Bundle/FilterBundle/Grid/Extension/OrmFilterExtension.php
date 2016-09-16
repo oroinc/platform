@@ -109,7 +109,7 @@ class OrmFilterExtension extends AbstractExtension
                     if (isset($value['value']['end'])) {
                         $data['value']['end_original'] = $value['value']['end'];
                     }
-                    $filter->apply($datasourceAdapter, array_merge($data, ['not_count_query' => true]));
+                    $filter->apply($datasourceAdapter, $data);
                     if ($countQbAdapter) {
                         $filter->apply($countQbAdapter, $data);
                     }
