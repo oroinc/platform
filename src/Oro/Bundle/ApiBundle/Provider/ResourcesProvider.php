@@ -51,9 +51,35 @@ class ResourcesProvider
         $this->processor->process($context);
 
         $resources = array_values($context->getResult()->toArray());
-        $this->resourcesCache->saveResources($version, $requestType, $resources);
+        $this->resourcesCache->saveResources(
+            $version,
+            $requestType,
+            $resources,
+            $context->getAccessibleResources()
+        );
 
         return $resources;
+    }
+
+    /**
+     * Gets a list of resources accessible through Data API.
+     *
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return string[] The list of class names
+     */
+    public function getAccessibleResources($version, RequestType $requestType)
+    {
+        $result = [];
+        $accessibleResources = $this->loadAccessibleResources($version, $requestType);
+        foreach ($accessibleResources as $entityClass => $isAccessible) {
+            if ($isAccessible) {
+                $result[] = $entityClass;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -67,7 +93,7 @@ class ResourcesProvider
      */
     public function isResourceAccessible($entityClass, $version, RequestType $requestType)
     {
-        $accessibleResources = $this->getAccessibleResources($version, $requestType);
+        $accessibleResources = $this->loadAccessibleResources($version, $requestType);
 
         return
             array_key_exists($entityClass, $accessibleResources)
@@ -85,7 +111,7 @@ class ResourcesProvider
      */
     public function isResourceKnown($entityClass, $version, RequestType $requestType)
     {
-        $accessibleResources = $this->getAccessibleResources($version, $requestType);
+        $accessibleResources = $this->loadAccessibleResources($version, $requestType);
 
         return array_key_exists($entityClass, $accessibleResources);
     }
@@ -96,7 +122,7 @@ class ResourcesProvider
      *
      * @return array [entity class => accessible flag]
      */
-    protected function getAccessibleResources($version, RequestType $requestType)
+    protected function loadAccessibleResources($version, RequestType $requestType)
     {
         if (null === $this->accessibleResources) {
             $this->accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
