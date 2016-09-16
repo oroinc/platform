@@ -34,8 +34,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
         DoctrineHelper $doctrineHelper,
         ProcessHandler $processHandler,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->processHandler = $processHandler;
         $this->logger = $logger;
@@ -54,7 +53,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         $entityManager = $this->doctrineHelper->getEntityManager(ProcessJob::class);
-        if(null == $entityManager){
+        if (null == $entityManager) {
             $this->logger->critical('[ExecuteProcessJobProcessor] Cannot get Entity Manager');
 
             return self::REJECT;
@@ -70,7 +69,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
             return self::REJECT;
         }
 
-        $entityManager->transactional(function (EntityManagerInterface $entityManager) use ($processJob){
+        $entityManager->transactional(function (EntityManagerInterface $entityManager) use ($processJob) {
             $this->processHandler->handleJob($processJob);
             $entityManager->remove($processJob);
             $this->processHandler->finishJob($processJob);

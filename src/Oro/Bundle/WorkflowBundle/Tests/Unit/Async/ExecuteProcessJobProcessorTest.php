@@ -153,10 +153,9 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         $entityManager
             ->expects(self::once())
             ->method('transactional')
-            ->willReturnCallback(function ($callback) use ($entityManager){
+            ->willReturnCallback(function ($callback) use ($entityManager) {
                 $callback($entityManager);
-            })
-        ;
+            });
 
         $entityRepository = $this->createEntityRepositoryMock();
         $entityRepository
@@ -172,6 +171,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('handleJob')
             ->with(self::identicalTo($processJob))
         ;
+
         $processHandle
             ->expects($this->once())
             ->method('finishJob')
