@@ -1,3 +1,0 @@
-SystemConfigForm:
-  selector: form
-  class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm

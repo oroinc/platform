@@ -74,6 +74,9 @@ oro:
                 label: System Mailboxes
                 add_mailbox.label: Add Mailbox
 
+            template_configuration:
+                label: HTML in templates
+
             show_recent_emails_in_user_bar:
                 label: Show recent emails
 
@@ -84,6 +87,10 @@ oro:
                     label: Maximum sync attachment size, Mb
                 preview_limit:
                     label: Attachments preview limit
+
+            sanitize_html:
+                label: Enable HTML purifier
+                tooltip: Disabling HTML purifier will allow users to paste any HTML code into template or email body editor without tag stripping.
 
         emailtemplate:
             entity_label:        Template

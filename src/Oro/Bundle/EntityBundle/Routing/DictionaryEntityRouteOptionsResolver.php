@@ -7,12 +7,18 @@ use Symfony\Component\Routing\Route;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
-class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+
+class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     const ROUTE_GROUP = 'dictionary_entity';
     const ENTITY_ATTRIBUTE = 'dictionary';
     const ENTITY_PLACEHOLDER = '{dictionary}';
@@ -74,10 +80,16 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 
             $this->supportedEntities = [];
             foreach ($entities as $className) {
-                $this->supportedEntities[] = [
-                    $this->entityAliasResolver->getPluralAlias($className),
-                    $this->entityClassNameHelper->getUrlSafeClassName($className)
-                ];
+                try {
+                    $this->supportedEntities[] = [
+                        $this->entityAliasResolver->getPluralAlias($className),
+                        $this->entityClassNameHelper->getUrlSafeClassName($className)
+                    ];
+                } catch (EntityAliasNotFoundException $e) {
+                    if ($this->logger) {
+                        $this->logger->error($e->getMessage(), ['exception' => $e]);
+                    }
+                }
             }
         }
 

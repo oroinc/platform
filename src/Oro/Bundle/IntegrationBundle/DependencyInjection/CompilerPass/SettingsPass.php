@@ -15,6 +15,8 @@ class SettingsPass implements CompilerPassInterface
 {
     const SETTINGS_PROVIDER_ID = 'oro_integration.provider.settings_provider';
 
+    const INTEGRATIONS_FILE_ROOT_NODE = 'integrations';
+
     /**
      * {@inheritDoc}
      */
@@ -25,11 +27,11 @@ class SettingsPass implements CompilerPassInterface
         $configs      = [];
         $configLoader = new CumulativeConfigLoader(
             'oro_integration_settings',
-            new YamlCumulativeFileLoader('Resources/config/integration_settings.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/integrations.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $configs[] = $resource->data[IntegrationConfiguration::ROOT_NODE_NAME];
+            $configs[] = $resource->data[self::INTEGRATIONS_FILE_ROOT_NODE];
         }
 
         $processor = new Processor();

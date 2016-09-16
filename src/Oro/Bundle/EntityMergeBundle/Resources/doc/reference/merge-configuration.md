@@ -19,7 +19,7 @@ Entity can be configure on entity level and on fields level
 Entity level configuration
 
 ```
-oro_entity_config:
+entity_config:
     # Scope of entity merge
     merge:
         # Attributes applicable on entity level
@@ -54,7 +54,7 @@ Example:
 Fields Level configuration
 
 ```
-oro_entity_config:
+entity_config:
     # Scope of entity merge
     merge:
         # Attributes applicable on entity fields level
@@ -142,7 +142,7 @@ class Account
 Example of merge mass action:
 
 ```
-datagrid:
+datagrids:
     accounts-grid:
         mass_actions:
             merge:

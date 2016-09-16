@@ -1,0 +1,21 @@
+navigation:
+    menu_config:
+        items:
+            languages:
+                label: 'oro.translation.menu.languages.label'
+                route: 'oro_translation_language_index'
+                extras:
+                    position: 200
+                    routes: ['/^oro_translation_language/']
+
+        tree:
+            application_menu:
+                children:
+                    system_tab:
+                        children:
+                            localization:
+                                children:
+                                    languages: ~
+
+    titles:
+        oro_translation_language_index: ~
