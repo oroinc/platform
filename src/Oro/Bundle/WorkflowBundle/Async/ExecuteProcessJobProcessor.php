@@ -56,7 +56,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
 
         $entityManager = $this->doctrineHelper->getEntityManager(ProcessJob::class);
         if (null == $entityManager) {
-            $this->logger->critical('[ExecuteProcessJobProcessor] Cannot get Entity Manager for entity ProcessJob');
+            $this->logger->critical('[ExecuteProcessJobProcessor] Cannot get Entity Manager for ProcessJob::class');
 
             return self::REJECT;
         }
