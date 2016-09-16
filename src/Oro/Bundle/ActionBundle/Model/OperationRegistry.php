@@ -70,6 +70,7 @@ class OperationRegistry
 
         $configurations = $this->filterByGroup($group);
 
+        /** @var Operation[] $operations */
         $operations = [];
         $replacements = [];
 

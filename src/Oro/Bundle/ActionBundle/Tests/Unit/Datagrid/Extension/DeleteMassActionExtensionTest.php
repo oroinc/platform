@@ -96,7 +96,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->setGroups(['test_group']);
 
-        $this->assertEquals($hasOperation, $this->extension->isApplicable($this->getDatagridCinfiguration()));
+        $this->assertEquals($hasOperation, $this->extension->isApplicable($this->getDatagridConfiguration()));
     }
 
     /**
@@ -113,7 +113,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @return DatagridConfiguration
      */
-    private function getDatagridCinfiguration()
+    private function getDatagridConfiguration()
     {
         return DatagridConfiguration::createNamed(
             'test-grid',
