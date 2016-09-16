@@ -14,7 +14,7 @@ class ApplicationsHelper
     protected $tokenStorage;
 
     /** @var string */
-    protected $currentApplication;
+    protected $currentApplication = false;
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -34,7 +34,7 @@ class ApplicationsHelper
             return true;
         }
 
-        if (null === $this->currentApplication) {
+        if ($this->currentApplication === false) {
             $this->currentApplication = $this->getCurrentApplication();
         }
 
