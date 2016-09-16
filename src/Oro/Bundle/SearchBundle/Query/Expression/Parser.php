@@ -69,7 +69,8 @@ class Parser
             Query::OPERATOR_IN,
             Query::OPERATOR_NOT_IN,
             Query::OPERATOR_CONTAINS,
-            Query::OPERATOR_NOT_CONTAINS
+            Query::OPERATOR_NOT_CONTAINS,
+            Query::OPERATOR_IS_NULL,
         ];
 
         $this->types = [
@@ -85,6 +86,7 @@ class Parser
                 Query::OPERATOR_NOT_CONTAINS,
                 Query::OPERATOR_EQUALS,
                 Query::OPERATOR_NOT_EQUALS,
+                Query::OPERATOR_IS_NULL,
             ],
             QUERY::TYPE_INTEGER  => [
                 Query::OPERATOR_GREATER_THAN,
@@ -95,6 +97,7 @@ class Parser
                 Query::OPERATOR_NOT_EQUALS,
                 Query::OPERATOR_IN,
                 Query::OPERATOR_NOT_IN,
+                Query::OPERATOR_IS_NULL,
             ],
             QUERY::TYPE_DECIMAL  => [
                 Query::OPERATOR_GREATER_THAN,
@@ -105,6 +108,7 @@ class Parser
                 Query::OPERATOR_NOT_EQUALS,
                 Query::OPERATOR_IN,
                 Query::OPERATOR_NOT_IN,
+                Query::OPERATOR_IS_NULL,
             ],
             QUERY::TYPE_DATETIME => [
                 Query::OPERATOR_GREATER_THAN,
@@ -115,6 +119,7 @@ class Parser
                 Query::OPERATOR_NOT_EQUALS,
                 Query::OPERATOR_IN,
                 Query::OPERATOR_NOT_IN,
+                Query::OPERATOR_IS_NULL,
             ]
         ];
 

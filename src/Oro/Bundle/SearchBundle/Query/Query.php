@@ -36,6 +36,7 @@ class Query
     const OPERATOR_NOT_CONTAINS        = '!~';
     const OPERATOR_IN                  = 'in';
     const OPERATOR_NOT_IN              = '!in';
+    const OPERATOR_IS_NULL             = 'isnull';
 
     const TYPE_TEXT     = 'text';
     const TYPE_INTEGER  = 'integer';
@@ -291,6 +292,9 @@ class Query
                 break;
             case self::OPERATOR_NOT_IN:
                 $expr = $expr->notIn($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_IS_NULL:
+                $expr = $expr->isNull($fieldName);
                 break;
             default:
                 throw new ExpressionSyntaxError(
