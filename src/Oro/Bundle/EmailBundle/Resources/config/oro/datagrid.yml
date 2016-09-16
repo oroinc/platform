@@ -325,6 +325,8 @@ datagrid:
             entityHint: email
             toolbarOptions:
                 hide: true
+                pagination:
+                    onePage: true
                 pageSize:
                     items: [10]
                     default_per_page: 10
