@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository")
  * @ORM\Table(name="oro_translation_key", uniqueConstraints={
  *      @ORM\UniqueConstraint(name="key_domain_uniq", columns={"key", "domain"})
  * })

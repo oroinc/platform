@@ -104,10 +104,12 @@ class TranslationManager
     public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
         static $cache;
+
         if (!$cache) {
             $cache = [];
         }
-        $index = strtolower(sprintf('%s-%s-%s', $key, $value, $domain));
+
+        $index = sprintf('%s-%s-%s', $key, $value, $locale);
 
         if (!isset($cache[$index])) {
             if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
