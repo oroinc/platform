@@ -1,0 +1,18 @@
+navigation:
+    menu_config:
+        items:
+            oro_platform_system_info:
+                label: 'oro.platform.system_info'
+                extras:
+                    position: 120
+                route: 'oro_platform_system_info'
+
+        tree:
+            application_menu:
+                children:
+                    system_tab:
+                        children:
+                            oro_platform_system_info: ~
+
+    titles:
+        oro_platform_system_info:  ~

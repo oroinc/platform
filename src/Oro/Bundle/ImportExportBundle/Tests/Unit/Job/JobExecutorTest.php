@@ -7,6 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 
 class JobExecutorTest extends \PHPUnit_Framework_TestCase
@@ -179,6 +183,18 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('getJob')
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'))
             ->will($this->returnValue($job));
+
+        $dispatcher = $this->getMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->once())
+            ->method('hasListeners')
+            ->with(Events::AFTER_JOB_EXECUTION)
+            ->willReturn(true);
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::AFTER_JOB_EXECUTION, $this->isInstanceOf(AfterJobExecutionEvent::class));
+
+        $this->executor->setEventDispatcher($dispatcher);
+
         $result = $this->executor->executeJob('import', 'test', $configuration);
         $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
         $this->assertTrue($result->isSuccessful());
@@ -242,6 +258,16 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('getJob')
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'))
             ->will($this->returnValue($job));
+
+        $dispatcher = $this->getMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->once())
+            ->method('hasListeners')
+            ->with(Events::AFTER_JOB_EXECUTION)
+            ->willReturn(false);
+        $dispatcher->expects($this->never())->method('dispatch');
+
+        $this->executor->setEventDispatcher($dispatcher);
+
         $result = $this->executor->executeJob('import', 'test', $configuration);
         $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
         $this->assertTrue($result->isSuccessful());

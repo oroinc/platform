@@ -13,6 +13,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class OroDashboardExtension extends Extension
 {
+    const CONFIG_ROOT_NODE = 'dashboards';
     /**
      * {@inheritDoc}
      */
@@ -22,11 +23,11 @@ class OroDashboardExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_dashboard',
-            new YamlCumulativeFileLoader('Resources/config/dashboard.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/dashboards.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $dashboardConfigs[] = $resource->data['oro_dashboard_config'];
+            $dashboardConfigs[] = $resource->data[self::CONFIG_ROOT_NODE];
         }
 
         foreach ($configs as $config) {

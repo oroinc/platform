@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +15,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
@@ -27,7 +29,7 @@ class ImportExportController extends Controller
      *
      * @Route("/import", name="oro_importexport_import_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:importForm.html.twig")
      *
      * @param Request $request
      *
@@ -39,10 +41,10 @@ class ImportExportController extends Controller
         $importJob = $request->get('importJob');
         $importValidateJob = $request->get('importValidateJob');
 
-        $importForm = $this->createForm('oro_importexport_import', null, ['entityName' => $entityName]);
+        $importForm = $this->getImportForm($entityName);
 
         if ($request->isMethod('POST')) {
-            $importForm->submit($this->getRequest());
+            $importForm->submit($request);
 
             if ($importForm->isValid()) {
                 /** @var ImportData $data */
@@ -70,11 +72,20 @@ class ImportExportController extends Controller
     }
 
     /**
+     * @param string $entityName
+     * @return FormInterface
+     */
+    protected function getImportForm($entityName)
+    {
+        return $this->createForm(ImportType::NAME, null, ['entityName' => $entityName]);
+    }
+
+    /**
      * Validate import data
      *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:importValidate.html.twig")
      *
      * @param Request $request
      * @param string $processorAlias
@@ -130,7 +141,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
-     *
+     * @param Request $request
      * @return Response
      */
     public function instantExportAction($processorAlias, Request $request)
@@ -142,7 +153,7 @@ class ImportExportController extends Controller
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT,
             'csv',
-            null,
+            $request->get('filePrefix', null),
             array_merge(
                 $this->getOptionsFromRequest(),
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
@@ -153,7 +164,7 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/config", name="oro_importexport_export_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:configurableExport.html.twig")
      *
      * @param Request $request
      *
@@ -193,7 +204,7 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/template/config", name="oro_importexport_export_template_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template
+     * @Template("OroImportExportBundle:ImportExport:configurableTemplateExport.html.twig")
      *
      * @param Request $request
      * @return array|Response

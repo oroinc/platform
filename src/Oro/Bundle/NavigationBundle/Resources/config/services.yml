@@ -68,9 +68,15 @@ services:
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
 
+    oro_menu_feature_extension:
+        class: 'Oro\Bundle\NavigationBundle\Menu\FeatureAwareMenuFactoryExtension'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+
     oro_menu.factory:
         class: %oro_menu.factory.class%
         calls:
+            - [ addExtension, [ '@oro_menu_feature_extension' ] ]
             - [ addExtension, [ '@oro_menu_acl_extension' ] ]
 
     oro_menu.builder_chain:

@@ -1,4 +1,4 @@
-oro_api:
+api:
     entities:
         Oro\Bundle\ApiBundle\Model\EntityIdentifier:
             identifier_field_names: [id]
