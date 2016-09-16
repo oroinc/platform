@@ -175,10 +175,10 @@ abstract class AbstractTransitionTrigger
      */
     public function isEqualTo(AbstractTransitionTrigger $trigger)
     {
-        $workflowName1 = $this->workflowDefinition ? $this->workflowDefinition->getName() : null;
-        $workflowName2 = $trigger->workflowDefinition ? $trigger->workflowDefinition->getName() : null;
+        $expectedWorkflowName = $this->workflowDefinition ? $this->workflowDefinition->getName() : null;
+        $actualWorkflowName = $trigger->workflowDefinition ? $trigger->workflowDefinition->getName() : null;
 
-        return $workflowName1 === $workflowName2
+        return $expectedWorkflowName === $actualWorkflowName
             && $this->queued === $trigger->isQueued()
             && $this->transitionName === $trigger->getTransitionName()
             && $this->isEqualAdditionalFields($trigger);
