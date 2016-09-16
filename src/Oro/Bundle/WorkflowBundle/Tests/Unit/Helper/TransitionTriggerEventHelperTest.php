@@ -37,7 +37,7 @@ class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
      * @param string $require
      * @param bool $expected
      */
-    public function testCheckRequire($require, $expected)
+    public function testIsRequirePass($require, $expected)
     {
         $entity1 = new \stdClass();
         $entity1->testField1 = 'test value 1';
@@ -48,7 +48,7 @@ class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->trigger->setRequire($require)->setRelation('mainEntity');
 
-        $this->assertEquals($expected, $this->helper->checkRequire($this->trigger, $entity2));
+        $this->assertEquals($expected, $this->helper->isRequirePass($this->trigger, $entity2));
     }
 
     /**
@@ -88,7 +88,7 @@ class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Can't get main entity using relation "mainEntity"
      */
-    public function testCheckRequireWrongEntity()
+    public function testIsRequirePassWrongEntity()
     {
         $entity = new \stdClass();
         $entity->testField2 = 'test value 2';
@@ -98,6 +98,6 @@ class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
             ->setRequire('testField2 == "test value 2"')
             ->setRelation('mainEntity');
 
-        $this->helper->checkRequire($this->trigger, $entity);
+        $this->helper->isRequirePass($this->trigger, $entity);
     }
 }
