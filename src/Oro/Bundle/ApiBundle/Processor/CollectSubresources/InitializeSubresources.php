@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -54,6 +55,7 @@ class InitializeSubresources implements ProcessorInterface
         $configExtras = $this->getConfigExtras();
         $metadataExtras = $this->getMetadataExtras();
 
+        $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
         $resources = $context->getResources();
         foreach ($resources as $resource) {
             $subresources->add(
@@ -62,7 +64,8 @@ class InitializeSubresources implements ProcessorInterface
                     $version,
                     $requestType,
                     $configExtras,
-                    $metadataExtras
+                    $metadataExtras,
+                    $accessibleResources
                 )
             );
         }
@@ -90,6 +93,7 @@ class InitializeSubresources implements ProcessorInterface
      * @param RequestType              $requestType
      * @param ConfigExtraInterface[]   $configExtras
      * @param MetadataExtraInterface[] $metadataExtras
+     * @param array                    $accessibleResources
      *
      * @return ApiResourceSubresources
      */
@@ -98,7 +102,8 @@ class InitializeSubresources implements ProcessorInterface
         $version,
         RequestType $requestType,
         array $configExtras,
-        array $metadataExtras
+        array $metadataExtras,
+        array $accessibleResources
     ) {
         $entityClass = $resource->getEntityClass();
         $config = $this->configProvider->getConfig(
@@ -130,17 +135,25 @@ class InitializeSubresources implements ProcessorInterface
             $subresource->setTargetClassName($association->getTargetClassName());
             $subresource->setAcceptableTargetClassNames($association->getAcceptableTargetClassNames());
             $subresource->setIsCollection($association->isCollection());
-            if (!$association->isCollection()) {
-                $excludedActions = $subresourceExcludedActions;
-                if (!in_array(ApiActions::ADD_RELATIONSHIP, $excludedActions, true)) {
-                    $excludedActions[] = ApiActions::ADD_RELATIONSHIP;
+            if ($association->isCollection()) {
+                if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
+                    $subresource->setExcludedActions($this->getToManyRelationshipsActions());
+                } elseif (!empty($subresourceExcludedActions)) {
+                    $subresource->setExcludedActions($subresourceExcludedActions);
                 }
-                if (!in_array(ApiActions::DELETE_RELATIONSHIP, $excludedActions, true)) {
-                    $excludedActions[] = ApiActions::DELETE_RELATIONSHIP;
+            } else {
+                if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
+                    $subresource->setExcludedActions($this->getToOneRelationshipsActions());
+                } else {
+                    $excludedActions = $subresourceExcludedActions;
+                    if (!in_array(ApiActions::ADD_RELATIONSHIP, $excludedActions, true)) {
+                        $excludedActions[] = ApiActions::ADD_RELATIONSHIP;
+                    }
+                    if (!in_array(ApiActions::DELETE_RELATIONSHIP, $excludedActions, true)) {
+                        $excludedActions[] = ApiActions::DELETE_RELATIONSHIP;
+                    }
+                    $subresource->setExcludedActions($excludedActions);
                 }
-                $subresource->setExcludedActions($excludedActions);
-            } elseif (!empty($subresourceExcludedActions)) {
-                $subresource->setExcludedActions($subresourceExcludedActions);
             }
         }
 
@@ -179,5 +192,49 @@ class InitializeSubresources implements ProcessorInterface
         }
 
         return array_values($result);
+    }
+
+    /**
+     * @param AssociationMetadata $association
+     * @param array               $accessibleResources
+     *
+     * @return bool
+     */
+    protected function isAccessibleAssociation(AssociationMetadata $association, array $accessibleResources)
+    {
+        $targetClassNames = $association->getAcceptableTargetClassNames();
+        foreach ($targetClassNames as $className) {
+            if (isset($accessibleResources[$className])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getToOneRelationshipsActions()
+    {
+        return [
+            ApiActions::GET_SUBRESOURCE,
+            ApiActions::GET_RELATIONSHIP,
+            ApiActions::UPDATE_RELATIONSHIP
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getToManyRelationshipsActions()
+    {
+        return [
+            ApiActions::GET_SUBRESOURCE,
+            ApiActions::GET_RELATIONSHIP,
+            ApiActions::UPDATE_RELATIONSHIP,
+            ApiActions::ADD_RELATIONSHIP,
+            ApiActions::DELETE_RELATIONSHIP
+        ];
     }
 }

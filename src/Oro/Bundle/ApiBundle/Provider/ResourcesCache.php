@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -94,23 +93,26 @@ class ResourcesCache
     /**
      * Puts Data API resources into the cache.
      *
-     * @param string        $version     The Data API version
-     * @param RequestType   $requestType The request type, for example "rest", "soap", etc.
-     * @param ApiResource[] $resources   The list of Data API resources
+     * @param string        $version             The Data API version
+     * @param RequestType   $requestType         The request type, for example "rest", "soap", etc.
+     * @param ApiResource[] $resources           The list of Data API resources
+     * @param string[]      $accessibleResources The list of resources accessible through Data API
      */
-    public function saveResources($version, RequestType $requestType, array $resources)
+    public function saveResources($version, RequestType $requestType, array $resources, array $accessibleResources)
     {
         $allResources = [];
-        $accessibleResources = [];
+        $accessibleResourcesData = array_fill_keys($accessibleResources, true);
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
             $allResources[$entityClass] = $this->serializeApiResource($resource);
-            $accessibleResources[$entityClass] = !in_array(ApiActions::GET, $resource->getExcludedActions(), true);
+            if (!isset($accessibleResourcesData[$entityClass])) {
+                $accessibleResourcesData[$entityClass] = false;
+            }
         }
 
         $keyIndex = $this->getCacheKeyIndex($version, $requestType);
         $this->cache->save(self::RESOURCES_KEY_PREFIX . $keyIndex, $allResources);
-        $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResources);
+        $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResourcesData);
     }
 
     /**
