@@ -18,11 +18,15 @@ services:
             - ['addAuditEntryClass', ['%oro_user.entity.class%', '%oro_dataaudit.loggable.entity.class%']]
             - ['addAuditEntryFieldClass', ['%oro_user.entity.class%', '%oro_dataaudit.loggable.entity_field.class%']]
 
+    oro_dataaudit.listener.convert_entity_to_array_for_message_queue:
+        class: 'Oro\Bundle\DataAuditBundle\EventListener\ConvertEntityToArrayForMessageQueueService'
+
     oro_dataaudit.listener.send_changed_entities_to_message_queue:
         class: 'Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener'
         arguments:
             - '@oro_message_queue.message_producer'
             - '@security.token_storage'
+            - '@oro_dataaudit.listener.convert_entity_to_array_for_message_queue'
         tags:
             - { name: 'doctrine.event_subscriber', priority: -255 }
 

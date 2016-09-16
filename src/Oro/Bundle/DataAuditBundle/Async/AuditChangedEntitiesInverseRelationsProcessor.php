@@ -71,7 +71,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
         $this->processManyToOneAndManyToManyAndOneToOneRelations($sourceEntitiesData, $map);
         $this->processEntityFromCollectionUpdated($body['entities_updated'], $map);
 
-
         $this->convertEntityChangesToAuditService->convert(
             $map,
             $transactionId,
@@ -94,7 +93,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
 
             foreach ($sourceEntityData['change_set'] as $sourceFieldName => $sourceChange) {
-                list($old, $new) = $sourceChange;
 
                 if (false == isset($sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'])) {
                     continue;
@@ -109,94 +107,177 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                     $entityMeta->isCollectionValuedAssociation($fieldName)
                 ) {
                     // many to one
-                    if ($old) {
-                        $entityId = $old['entity_id'];
-
-                        $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                        $change[1]['deleted'][] = [
-                            'entity_class' => $sourceEntityClass,
-                            'entity_id' => $sourceEntityId,
-                            'change_set' => [],
-                        ];
-
-                        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                    }
-
-                    if ($new) {
-                        $entityId = $new['entity_id'];
-
-                        $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                        $change[1]['inserted'][] = [
-                            'entity_class' => $sourceEntityClass,
-                            'entity_id' => $sourceEntityId,
-                            'change_set' => [],
-                        ];
-
-                        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                    }
+                    $this->processManyToOneRelation(
+                        $sourceChange,
+                        $entityClass,
+                        $fieldName,
+                        $sourceEntityClass,
+                        $sourceEntityId,
+                        $map
+                    );
                 } elseif ($sourceEntityMeta->isCollectionValuedAssociation($sourceFieldName) &&
                     $entityMeta->isCollectionValuedAssociation($fieldName)
                 ) {
                     // many to many
-
-                    foreach ($new['inserted'] as $insertedEntityData) {
-                        $entityId = $insertedEntityData['entity_id'];
-
-                        $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                        $change[1]['inserted'][] = [
-                            'entity_class' => $sourceEntityClass,
-                            'entity_id' => $sourceEntityId,
-                            'change_set' => [],
-                        ];
-
-                        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                    }
-
-                    foreach ($new['deleted'] as $deletedEntityData) {
-                        $entityId = $deletedEntityData['entity_id'];
-
-                        $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                        $change[1]['deleted'][] = [
-                            'entity_class' => $sourceEntityClass,
-                            'entity_id' => $sourceEntityId,
-                            'change_set' => [],
-                        ];
-
-                        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                    }
+                    $this->processManyToManyRelation(
+                        $sourceChange,
+                        $entityClass,
+                        $fieldName,
+                        $sourceEntityClass,
+                        $sourceEntityId,
+                        $map
+                    );
                 } elseif ($sourceEntityMeta->isSingleValuedAssociation($sourceFieldName) &&
                     $entityMeta->isSingleValuedAssociation($fieldName)
                 ) {
                     // one to one
-                    if ($old) {
-                        $entityId = $old['entity_id'];
-
-                        $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                        $change[0] = [
-                            'entity_class' => $sourceEntityClass,
-                            'entity_id' => $sourceEntityId,
-                            'change_set' => [],
-                        ];
-
-                        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                    }
-
-                    if ($new) {
-                        $entityId = $new['entity_id'];
-
-                        $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                        $change[1] = [
-                            'entity_class' => $sourceEntityClass,
-                            'entity_id' => $sourceEntityId,
-                            'change_set' => [],
-                        ];
-
-                        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                    }
+                    $this->processOneToOneRelations(
+                        $sourceChange,
+                        $entityClass,
+                        $fieldName,
+                        $sourceEntityClass,
+                        $sourceEntityId,
+                        $map
+                    );
                 } else {
                     throw new \LogicException('Unexpected old value');
                 }
             }
+        }
+    }
+
+    /**
+     * @param array $sourceChange
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param string $sourceEntityClass
+     * @param int $sourceEntityId
+     * @param array $map
+     */
+    private function processManyToOneRelation(
+        $sourceChange,
+        $entityClass,
+        $fieldName,
+        $sourceEntityClass,
+        $sourceEntityId,
+        &$map
+    ) {
+        list($old, $new) = $sourceChange;
+
+        if ($old) {
+            $entityId = $old['entity_id'];
+
+            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+            $change[1]['deleted'][] = [
+                'entity_class' => $sourceEntityClass,
+                'entity_id' => $sourceEntityId,
+                'change_set' => [],
+            ];
+
+            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+        }
+
+        if ($new) {
+            $entityId = $new['entity_id'];
+
+            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+            $change[1]['inserted'][] = [
+                'entity_class' => $sourceEntityClass,
+                'entity_id' => $sourceEntityId,
+                'change_set' => [],
+            ];
+
+            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+        }
+    }
+
+    /**
+     * @param array $sourceChange
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param string $sourceEntityClass
+     * @param int $sourceEntityId
+     * @param array $map
+     */
+    private function processManyToManyRelation(
+        $sourceChange,
+        $entityClass,
+        $fieldName,
+        $sourceEntityClass,
+        $sourceEntityId,
+        &$map
+    ) {
+        list($old, $new) = $sourceChange;
+
+        foreach ($new['inserted'] as $insertedEntityData) {
+            $entityId = $insertedEntityData['entity_id'];
+
+            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+            $change[1]['inserted'][] = [
+                'entity_class' => $sourceEntityClass,
+                'entity_id' => $sourceEntityId,
+                'change_set' => [],
+            ];
+
+            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+        }
+
+        foreach ($new['deleted'] as $deletedEntityData) {
+            $entityId = $deletedEntityData['entity_id'];
+
+            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+            $change[1]['deleted'][] = [
+                'entity_class' => $sourceEntityClass,
+                'entity_id' => $sourceEntityId,
+                'change_set' => [],
+            ];
+
+            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+        }
+    }
+
+    /**
+     * @param array $sourceChange
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param string $sourceEntityClass
+     * @param int $sourceEntityId
+     * @param array $map
+     */
+    private function processOneToOneRelations(
+        $sourceChange,
+        $entityClass,
+        $fieldName,
+        $sourceEntityClass,
+        $sourceEntityId,
+        &$map
+    ) {
+        list($old, $new) = $sourceChange;
+
+        if ($old) {
+            $entityId = $old['entity_id'];
+
+            $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+            $change[0] = [
+                'entity_class' => $sourceEntityClass,
+                'entity_id' => $sourceEntityId,
+                'change_set' => [],
+            ];
+
+            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+        }
+
+        if ($new) {
+            $entityId = $new['entity_id'];
+
+            $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+            $change[1] = [
+                'entity_class' => $sourceEntityClass,
+                'entity_id' => $sourceEntityId,
+                'change_set' => [],
+            ];
+
+            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
         }
     }
 
