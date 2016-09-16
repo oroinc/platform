@@ -15,4 +15,10 @@ class IndexText extends AbstractIndexText
     const HYPHEN_SUBSTITUTION = ' ';
 
     const TABLE_NAME = 'oro_search_index_text';
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Item", inversedBy="textFields")
+     * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
+     */
+    protected $item;
 }
