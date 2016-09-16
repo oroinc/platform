@@ -14,14 +14,14 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     /**
      * @var SearchQueryInterface
      */
-    private $query;
+    private $searchQuery;
 
     /**
      * @param SearchQueryInterface $query
      */
     public function __construct(SearchQueryInterface $query)
     {
-        $this->query = $query;
+        $this->searchQuery = $query;
     }
 
     /**
@@ -32,11 +32,11 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         if ($restriction instanceof Expression) {
             switch ($condition) {
                 case FilterUtility::CONDITION_AND:
-                    $this->query->getQuery()->getCriteria()->andWhere($restriction);
+                    $this->searchQuery->getQuery()->getCriteria()->andWhere($restriction);
                     return;
 
                 case FilterUtility::CONDITION_OR:
-                    $this->query->getQuery()->getCriteria()->orWhere($restriction);
+                    $this->searchQuery->getQuery()->getCriteria()->orWhere($restriction);
                     return;
             }
         }
@@ -45,19 +45,11 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function generateParameterName($filterName)
-    {
-        return $filterName;
-    }
-
-    /**
      * @return SearchQueryInterface
      */
-    public function getQuery()
+    public function getSearchQuery()
     {
-        return $this->query;
+        return $this->searchQuery;
     }
 
     /**
@@ -65,11 +57,19 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function getWrappedSearchQuery()
     {
-        if (!$this->query || !$this->query->getQuery()) {
+        if (!$this->searchQuery || !$this->searchQuery->getQuery()) {
             throw new \RuntimeException('Query not initialized properly');
         }
 
-        return $this->query->getQuery();
+        return $this->searchQuery->getQuery();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateParameterName($filterName)
+    {
+        return $filterName;
     }
 
     /**

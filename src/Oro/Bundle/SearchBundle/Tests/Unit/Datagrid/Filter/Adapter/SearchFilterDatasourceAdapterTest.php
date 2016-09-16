@@ -203,6 +203,6 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
     public function testGetQuery()
     {
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
-        $this->assertEquals($this->searchQuery, $ds->getQuery());
+        $this->assertEquals($this->searchQuery, $ds->getSearchQuery());
     }
 }

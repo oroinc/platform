@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Filter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
-use Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension;
+use Oro\Bundle\SearchBundle\Datagrid\Extension\Filter\SearchFilterExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -107,14 +107,17 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getQuery'])
             ->getMock();
 
-        $query->method('getQuery')->willReturn($innerQuery);
+        $query->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($innerQuery);
 
         $dataSource = $this
             ->getMockBuilder(SearchDatasource::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $dataSource->method('getQuery')
+        $dataSource->expects($this->any())
+            ->method('getSearchQuery')
             ->will($this->returnValue($query));
 
         $filter = $this->getMock('Oro\Bundle\FilterBundle\Filter\FilterInterface');

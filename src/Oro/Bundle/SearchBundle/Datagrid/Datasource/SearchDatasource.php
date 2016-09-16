@@ -7,12 +7,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SearchBundle\Event\SearchResultAfter;
-use Oro\Bundle\SearchBundle\Event\SearchResultBefore;
+use Oro\Bundle\SearchBundle\Datagrid\Event\SearchResultAfter;
+use Oro\Bundle\SearchBundle\Datagrid\Event\SearchResultBefore;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class SearchDatasource implements DatasourceInterface
 {
@@ -37,10 +35,8 @@ class SearchDatasource implements DatasourceInterface
      * @param QueryFactoryInterface    $factory
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(
-        QueryFactoryInterface $factory,
-        EventDispatcherInterface $eventDispatcher
-    ) {
+    public function __construct(QueryFactoryInterface $factory, EventDispatcherInterface $eventDispatcher)
+    {
         $this->queryFactory               = $factory;
         $this->dispatcher                 = $eventDispatcher;
         $this->yamlToSearchQueryConverter = new YamlToSearchQueryConverter();
@@ -61,12 +57,11 @@ class SearchDatasource implements DatasourceInterface
     }
 
     /**
-     * @return ResultRecordInterface[]
+     * {@inheritDoc}
      */
     public function getResults()
     {
         $results = $this->searchQuery->execute();
-        /** @var Item[] $results */
 
         $event = new SearchResultBefore($this->datagrid, $this->searchQuery);
         $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
@@ -80,7 +75,7 @@ class SearchDatasource implements DatasourceInterface
             $rows[] = $resultRecord;
         }
 
-        $event = new SearchResultAfter($this->datagrid, $rows, $this->searchQuery);
+        $event = new SearchResultAfter($this->datagrid, $this->searchQuery, $rows);
         $this->dispatcher->dispatch(SearchResultAfter::NAME, $event);
 
         return $event->getRecords();

@@ -270,18 +270,16 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
-            ->getMock()
-        ;
+            ->getMock();
 
         $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
+
         $mockDatasource
             ->expects($this->once())
-            ->method('getQuery')
-            ->willReturn($mockQuery)
-        ;
+            ->method('getSearchQuery')
+            ->willReturn($mockQuery);
 
         $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
             ->disableOriginalConstructor()
@@ -308,7 +306,7 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException
+     * @expectedException \Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException
      */
     public function testVisitDatasourceWithInvalidType()
     {
@@ -325,15 +323,13 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
 
         $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
-        $this->sorter->setParameters($mockParameterBag);
+            ->getMock();
 
+        $this->sorter->setParameters($mockParameterBag);
         $this->sorter->visitDatasource($config, $mockDatasource);
     }
 }

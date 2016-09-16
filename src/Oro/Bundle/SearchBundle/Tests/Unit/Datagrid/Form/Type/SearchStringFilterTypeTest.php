@@ -18,6 +18,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator             = $this->createMockTranslator();
+
         $this->formExtensions[] = new CustomFormExtension(
             [
                 new FilterType($translator),
@@ -26,6 +27,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
         );
 
         parent::setUp();
+
         $this->type = new SearchStringFilterType($translator);
     }
 
@@ -40,6 +42,16 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     public function testGetName()
     {
         $this->assertEquals(SearchStringFilterType::NAME, $this->type->getName());
+    }
+
+    public function testGetBlockPrefix()
+    {
+        $this->assertEquals(SearchStringFilterType::NAME, $this->type->getBlockPrefix());
+    }
+
+    public function testGetParent()
+    {
+        $this->assertEquals(TextFilterType::NAME, $this->type->getParent());
     }
 
     /**
