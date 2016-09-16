@@ -25,3 +25,11 @@ elements:
 
   GroupChoiceField:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\GroupChoiceField
+
+  EntitySelector:
+    selector: '.select2-chosen'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  SelectToResultLabel:
+    selector: 'div.select2-result-label'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
