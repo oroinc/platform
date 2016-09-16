@@ -200,7 +200,6 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
 
             if ($body['entities_inserted'] || $body['entities_updated'] ||
                 $body['entities_deleted'] || $body['collections_updated']) {
-
                 $message = new Message();
                 $message->setPriority(MessagePriority::VERY_LOW);
                 $message->setBody($body);

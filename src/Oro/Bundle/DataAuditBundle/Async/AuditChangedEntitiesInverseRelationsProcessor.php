@@ -93,7 +93,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
 
             foreach ($sourceEntityData['change_set'] as $sourceFieldName => $sourceChange) {
-
                 if (false == isset($sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'])) {
                     continue;
                 }
