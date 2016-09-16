@@ -6,6 +6,16 @@
 {% set entityId = entity.id %}
 
 {% block navButtons %}
+    {% if resource_granted('DELETE', entity) %}
+        {{ UI.deleteButton({
+            'dataUrl': '',
+            'dataRedirect': path('oro_navigation_menu_update_view', {menu: app.request.get('menu')}),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-attribute',
+            'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
     {% if resource_granted('oro_navigation_menu_update_update') %}
         {% set html = UI.saveAndCloseButton({
             'route': 'oro_navigation_menu_update_update',

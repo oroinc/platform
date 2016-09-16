@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 
@@ -18,7 +19,12 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 class MenuUpdateController extends Controller
 {
     /**
-     * @Route("/{menu}/create/{parentKey}", name="oro_navigation_menu_update_create", defaults={"parentKey" = null})
+     * @Route(
+     *     "/{menu}/create/{parentKey}",
+     *     name="oro_navigation_menu_update_create",
+     *     defaults={"parentKey" = null},
+     *     requirements={"menu" = "[-_\w]+", "parentKey" = "[-_w]+"}
+     * )
      * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
      * @Acl(
      *     id="oro_navigation_menu_update_create",
@@ -37,7 +43,12 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @Route("/{menu}/update/{key}/{parentKey}", name="oro_navigation_menu_update_update", defaults={"parentKey" = null})
+     * @Route(
+     *     "/{menu}/update/{key}/{parentKey}",
+     *     name="oro_navigation_menu_update_update",
+     *     defaults={"parentKey" = null},
+     *     requirements={"menu" = "[-_\w]+", "parentKey" = "[-_w]+"}
+     * )
      * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_update",
@@ -69,5 +80,35 @@ class MenuUpdateController extends Controller
             $form,
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
+    }
+
+    /**
+     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Template()
+     * @Acl(
+     *     id="oro_navigation_menu_update_view",
+     *     type="entity",
+     *     class="OroNavigationBundle:MenuUpdate",
+     *     permission="VIEW"
+     * )
+     *
+     * @return array
+     */
+    public function indexAction()
+    {
+        return [];
+    }
+
+    /**
+     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
+     * @Template()
+     * @AclAncestor("oro_navigation_menu_update_view")
+     *
+     * @param string $menu
+     * @return array
+     */
+    public function viewAction($menu)
+    {
+        return [];
     }
 }
