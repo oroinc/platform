@@ -65,6 +65,8 @@ services:
 
     oro_workflow.transition_trigger_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler'
+        arguments:
+            - '@oro_workflow.transition_trigger.trigger_cron_verifier'
 
     oro_workflow.restriction_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler'

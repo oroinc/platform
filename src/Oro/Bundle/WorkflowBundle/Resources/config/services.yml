@@ -249,12 +249,6 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.repository.workflow_item'
 
-    oro_workflow.transition_trigger.query_factory:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionQueryFactory
-        public: false
-        arguments:
-            - '@doctrine'
-
     oro_workflow.helper.transition_trigger_event:
         class: Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerEventHelper
         public: false
@@ -300,3 +294,13 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.transition_trigger.update_decider'
+
+    oro_workflow.transition_trigger.trigger_cron_verifier:
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier'
+        public: false
+        arguments:
+            - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.repository.workflow_item'
+        calls:
+            - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
+            - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]

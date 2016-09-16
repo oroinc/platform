@@ -8,9 +8,23 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier;
 
 class WorkflowTransitionTriggersAssembler
 {
+    /**
+     * @var TransitionTriggerCronVerifier
+     */
+    protected $triggerCronVerifier;
+
+    /**
+     * @param TransitionTriggerCronVerifier $triggerCronVerifier
+     */
+    public function __construct(TransitionTriggerCronVerifier $triggerCronVerifier)
+    {
+        $this->triggerCronVerifier = $triggerCronVerifier;
+    }
+
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @return array|AbstractTransitionTrigger[]
@@ -60,15 +74,22 @@ class WorkflowTransitionTriggersAssembler
             );
         }
 
+        // @todo: try to separate it in BAP-11764 - maybe create 2 fabrics
         /**@var AbstractTransitionTrigger $trigger */
         $trigger = !empty($options['event'])
             ? $this->createEventTrigger($options, $workflowDefinition)
             : $this->createCronTrigger($options);
 
-        return $trigger
+        $trigger
             ->setWorkflowDefinition($workflowDefinition)
             ->setTransitionName($transitionName)
             ->setQueued($this->getOption($options, 'queued', true));
+
+        if ($trigger instanceof TransitionTriggerCron) {
+            $this->triggerCronVerifier->verify($trigger);
+        }
+
+        return $trigger;
     }
 
     /**

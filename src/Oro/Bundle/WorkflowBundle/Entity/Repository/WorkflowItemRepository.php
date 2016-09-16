@@ -249,9 +249,9 @@ class WorkflowItemRepository extends EntityRepository
      * @param Collection $stepNames
      * @param string $entityClass
      * @param null $dqlFilter
-     * @return array
+     * @return QueryBuilder
      */
-    public function getIdsByStepNamesAndEntityClass(Collection $stepNames, $entityClass, $dqlFilter = null)
+    public function getIdsByStepNamesAndEntityClassQueryBuilder(Collection $stepNames, $entityClass, $dqlFilter = null)
     {
         $identifier = $this->getIdentifierField($entityClass);
 
@@ -275,6 +275,19 @@ class WorkflowItemRepository extends EntityRepository
         if ($dqlFilter) {
             $queryBuilder->andWhere($dqlFilter);
         }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param Collection $stepNames
+     * @param string $entityClass
+     * @param null $dqlFilter
+     * @return array
+     */
+    public function getIdsByStepNamesAndEntityClass(Collection $stepNames, $entityClass, $dqlFilter = null)
+    {
+        $queryBuilder = $this->getIdsByStepNamesAndEntityClassQueryBuilder($stepNames, $entityClass, $dqlFilter);
 
         return array_column($queryBuilder->getQuery()->getArrayResult(), 'id');
     }
