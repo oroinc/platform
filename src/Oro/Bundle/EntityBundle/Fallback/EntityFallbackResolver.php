@@ -164,6 +164,11 @@ class EntityFallbackResolver
         );
 
         $objectFallbackKey = $fallbackValue->getFallback();
+
+        if (!$objectFallbackKey) {
+            return null;
+        }
+
         if (!array_key_exists($objectFallbackKey, $fallbackConfiguration)) {
             throw new InvalidFallbackKeyException($objectFallbackKey);
         }

@@ -56,3 +56,11 @@ oro:
 
         fallback:
             use_fallback.label: Use
+
+        entityfieldfallbackvalue:
+            entity_label: Entity fallback value
+            entity_plural_label: Entity fallback values
+            array_value.label: Array value
+            fallback.label: Fallback
+            id.label: Id
+            scalar_value.label: Scalar value

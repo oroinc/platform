@@ -4,6 +4,7 @@ define(function(require) {
     var EntityFallbackView;
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
+    var _ = require('underscore');
 
     /**
      * @export orolocale/js/app/views/fallback-view

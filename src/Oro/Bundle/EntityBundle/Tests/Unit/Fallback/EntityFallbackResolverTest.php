@@ -274,7 +274,8 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $fallbackValue->setFallback(self::TEST_FALLBACK);
         $entity = new FallbackContainingEntity($fallbackValue);
         $entityConfig = $this->getEntityConfiguration();
-        $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST_KEY][self::TEST_FALLBACK] = ['fieldName' => 'testProperty'];
+        $listKey = EntityFieldFallbackValue::FALLBACK_LIST_KEY;
+        $entityConfig[$listKey][self::TEST_FALLBACK] = ['fieldName' => 'testProperty'];
         $entityConfig[EntityFieldFallbackValue::FALLBACK_TYPE] = 'string';
         $entityConfigMock = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $entityConfigMock->expects($this->any())
@@ -301,14 +302,15 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $entity2 = new FallbackContainingEntity(null, 'expectedValue');
 
         $entityConfig = $this->getEntityConfiguration();
-        $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST_KEY][self::TEST_FALLBACK] = ['fieldName' => 'testProperty2'];
+        $listKey = EntityFieldFallbackValue::FALLBACK_LIST_KEY;
+        $entityConfig[$listKey][self::TEST_FALLBACK] = ['fieldName' => 'testProperty2'];
         $entityConfigMock = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $entityConfigMock->expects($this->any())
             ->method('getValues')
             ->willReturn($entityConfig);
 
         $entity2Config = $this->getEntityConfiguration();
-        $entity2Config[EntityFieldFallbackValue::FALLBACK_LIST_KEY][self::TEST_FALLBACK] = ['fieldName' => 'testProperty2'];
+        $entity2Config[$listKey][self::TEST_FALLBACK] = ['fieldName' => 'testProperty2'];
         $entity2ConfigMock = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $entity2ConfigMock->expects($this->any())
             ->method('getValues')
