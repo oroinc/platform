@@ -1,0 +1,56 @@
+.grid {
+    &__row {
+        margin-bottom: $offset-y;
+
+        @include clearfix;
+
+        &--offset {
+            &-none {
+                margin-bottom: 0;
+            }
+
+            &-s {
+                margin-bottom: $offset-y-s;
+            }
+
+            &-m {
+                margin-bottom: $offset-y-m;
+            }
+        }
+    }
+
+    &__column {
+        &-half {
+            width: (100% - $grid-offset) / 2;
+
+            float: left;
+
+            &:first-child {
+                margin-right: $grid-offset;
+            }
+
+            @include breakpoint('tablet') {
+                width: 100%;
+                margin-right: auto;
+
+                clear: left;
+            }
+        }
+
+        &--both {
+            clear: both;
+        }
+
+        &--offset {
+            &-m {
+                margin-right: $grid-offset;
+            }
+        }
+    }
+
+    @for $i from 1 through $grid-count {
+        &__column-#{$i} {
+            width: (($i* 100%) / $grid-count);
+        }
+    }
+}

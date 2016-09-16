@@ -15,6 +15,18 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_entity.abstract_repository:
+        class: Doctrine\ORM\EntityRepository
+        factory: ['@oro_entity.doctrine_helper', getEntityRepository]
+        abstract: true
+        lazy: true
+
+    oro_entity.abstract_entity_manager:
+        class: Doctrine\ORM\EntityManager
+        factory: ['@oro_entity.doctrine_helper', getEntityManagerForClass]
+        abstract: true
+        lazy: true
+
     oro_entity.entity_identifier_accessor:
         class: %oro_entity.entity_identifier_accessor.class%
         arguments:

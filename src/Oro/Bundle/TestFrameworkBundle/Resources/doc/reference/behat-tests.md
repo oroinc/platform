@@ -167,17 +167,17 @@ Every bundle that has configured suite in configuration file will not be autoloa
 
 #### Page elements
 
-Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/oro/behat_elements.yml``` in way:
+Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/oro/behat.yml``` in way:
 
 ```yml
-behat_elements:
-    Login:
-      selector: '#login-form'
-      class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
-      options:
-        mapping:
-          Username: '_username'
-          Password: '_password'
+elements:
+  Login:
+    selector: '#login-form'
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
+    options:
+      mapping:
+        Username: '_username'
+        Password: '_password'
 ```
 
 1. ```Login``` is an element name. It must be unique.
