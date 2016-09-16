@@ -250,6 +250,17 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $this->resolver->getFallbackValue($entity, 'testProperty'));
     }
 
+    public function testGetFallbackValueReturnsOwnArray()
+    {
+        $this->setDefaultConfigInterfaceMock();
+        $fallbackValue = new EntityFieldFallbackValue();
+        $fallbackValue->setArrayValue(['test']);
+        $entity = new FallbackContainingEntity($fallbackValue);
+
+        $this->setUpTypeResolution('array');
+        $this->assertEquals(['test'], $this->resolver->getFallbackValue($entity, 'testProperty'));
+    }
+
     public function testGetFallbackValueThrowsInvalidKeyException()
     {
         $this->setExpectedException(InvalidFallbackKeyException::class);

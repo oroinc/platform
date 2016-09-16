@@ -21,9 +21,10 @@ class EntityFallbackResolver
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_STRING = 'string';
     const TYPE_INTEGER = 'integer';
+    const TYPE_ARRAY = 'array';
 
     /** @var array */
-    public static $allowedTypes = [self::TYPE_BOOLEAN, self::TYPE_STRING, self::TYPE_INTEGER];
+    public static $allowedTypes = [self::TYPE_BOOLEAN, self::TYPE_STRING, self::TYPE_INTEGER, self::TYPE_ARRAY];
 
     /**
      * @var EntityFallbackProviderInterface[]
@@ -277,6 +278,8 @@ class EntityFallbackResolver
                 return (string)$value;
             case static::TYPE_INTEGER:
                 return (int)$value;
+            case static::TYPE_ARRAY:
+                return $value;
         }
 
         return $value;
