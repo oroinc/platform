@@ -61,10 +61,17 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldRejectMessageIfProcessJobIdNotSet()
     {
+        $logger = $this->createLoggerMock();
+
+        $logger
+            ->expects(self::once())
+            ->method('critical')
+        ;
+
         $processor = new ExecuteProcessJobProcessor(
             $this->createDoctrineHelperStub(),
             $this->createProcessHandlerMock(),
-            $this->createLoggerMock()
+            $logger
         );
 
         $message = new NullMessage();
@@ -89,10 +96,44 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
 
+        $logger = $this->createLoggerMock();
+
+        $logger
+            ->expects(self::once())
+            ->method('critical')
+        ;
+
         $processor = new ExecuteProcessJobProcessor(
             $doctrineHelper,
             $this->createProcessHandlerMock(),
-            $this->createLoggerMock()
+            $logger
+        );
+
+        $message = new NullMessage();
+        $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
+
+        $status = $processor->process($message, new NullSession());
+
+        self::assertEquals(MessageProcessorInterface::REJECT, $status);
+    }
+
+    public function testShouldRejectMessageIfEntityManagerNotExist()
+    {
+        $doctrineHelper = $this->createDoctrineHelperStub();
+
+        $processHandle = $this->createProcessHandlerMock();
+
+        $logger = $this->createLoggerMock();
+
+        $logger
+            ->expects(self::once())
+            ->method('critical')
+         ;
+
+        $processor = new ExecuteProcessJobProcessor(
+            $doctrineHelper,
+            $processHandle,
+            $logger
         );
 
         $message = new NullMessage();
