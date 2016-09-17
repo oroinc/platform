@@ -28,9 +28,6 @@ class ConfigUtil extends BaseConfigUtil
     const INHERIT = 'inherit';
 
     /**
-     * @todo mark it deprecated in BAP-10066
-     *
-     * This is a temporary solution till ORM is used in EntitySerializer component.
      * You can use this constant as a property path for computed field
      * to avoid collisions with existing getters.
      * Example of usage:
@@ -39,22 +36,9 @@ class ConfigUtil extends BaseConfigUtil
      *  ]
      * In this example a value of primaryPhone will not be loaded
      * even if an entity has getPrimaryPhone method.
+     * Also such field will be marked as not mapped for Symfony forms.
      */
     const IGNORE_PROPERTY_PATH = '_';
-
-    /**
-     * @todo mark it deprecated in BAP-10066
-     *
-     * @param array $config The config of a field
-     *
-     * @return bool
-     */
-    public static function isIgnoredField(array $config)
-    {
-        return
-            !empty($config[self::PROPERTY_PATH])
-            && self::IGNORE_PROPERTY_PATH === $config[self::PROPERTY_PATH];
-    }
 
     /**
      * Gets a native PHP array representation of each object in a given array.
