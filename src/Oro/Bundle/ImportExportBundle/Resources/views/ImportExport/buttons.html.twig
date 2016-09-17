@@ -20,34 +20,39 @@
 
 {% set exportTemplateLabel = exportTemplatelabel|default('oro.importexport.export_template.label'|trans) %}
 
-{% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 {% if exportAllowed or importAllowed %}
-    {% if options is not defined %}
-        {% set options = {} %}
-    {% endif %}
+    <span class="pull-left"
+        data-page-component-module="oroui/js/app/components/view-component"
+        data-page-component-options="{{ {
+            view: 'oroimportexport/js/app/views/import-export-buttons-view',
+            data: {
+                entity: entity_class,
+                routeOptions: options|default({}),
 
-    {% set defaultRouteParams = {'options': options} %}
+                importTitle: importTitle|default(importLabel),
+                importJob: importJob|default(null),
+                importValidateJob: importValidateJob|default(null),
 
-    {% if importJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'importJob': importJob}) %}
-    {% endif %}
-    {% if importValidateJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'importValidateJob': importValidateJob}) %}
-    {% endif %}
-    {% if exportJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'exportJob': exportJob}) %}
-    {% endif %}
-    {% if exportTemplateJob is defined %}
-        {% set defaultRouteParams = defaultRouteParams|merge({'exportTemplateJob': exportTemplateJob}) %}
-    {% endif %}
+                exportTitle: exportTitle|default(exportLabel),
+                exportJob: exportJob|default(null),
+                exportProcessor: exportProcessor|default(null),
+                isExportPopupRequired: isExportPopupRequired|default(false),
 
+                exportTemplateTitle: exportTemplateLabel|default(exportLabel),
+                exportTemplateJob: exportTemplateJob|default(null),
+                exportTemplateProcessor: exportTemplateProcessor|default(null),
+                isExportTemplatePopupRequired: isExportTemplatePopupRequired|default(false),
+
+                filePrefix: filePrefix|default(null),
+                dataGridName: dataGridName|default(null),
+                afterRefreshPageMessage: afterRefreshPageMessage|default(null),
+                refreshPageOnSuccess: refreshPageOnSuccess|default(false),
+            }
+        }|json_encode }}"
+    >
     {% if exportAllowed %}
-        {% set exportRoute = isExportPopupRequired ? 'oro_importexport_export_config' : 'oro_importexport_export_instant' %}
-
         <div class="btn-group">
-            <a type="button"
-               class="btn export-btn icons-holder-text no-hash"
-               href="{{ path(exportRoute, defaultRouteParams|merge({'processorAlias': exportProcessor, 'entity': entity_class})) }}">
+            <a type="button" class="btn export-btn icons-holder-text no-hash" href="#">
                 <i class="icon-upload-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
@@ -56,17 +61,11 @@
     {% if importAllowed %}
         <div class="btn-group">
             {% set buttonsHtml %}
-                <a type="button"
-                   class="btn import-btn icons-holder-text no-hash"
-                   href="{{ path('oro_importexport_import_form', defaultRouteParams|merge({'entity': entity_class})) }}">
+                <a type="button" class="btn import-btn icons-holder-text no-hash" href="#">
                     <i class="icon-download-alt hide-text">{{ importLabel }}</i>{{ importLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}
-                    {% set exportTemplateRoute = isExportTemplatePopupRequired ? 'oro_importexport_export_template_config' : 'oro_importexport_export_template' %}
-                    <a type="button"
-                       class="btn template-btn icons-holder-text no-hash"
-                       {% if not isExportTemplatePopupRequired %}target="_blank" {% endif %}
-                       href="{{ path(exportTemplateRoute, defaultRouteParams|merge({'processorAlias': exportTemplateProcessor, 'entity': entity_class})) }}">
+                    <a type="button" class="btn template-btn icons-holder-text no-hash" href="#">
                         <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
                     </a>
                 {% endif %}
@@ -78,94 +77,5 @@
             {{ UI.pinnedDropdownButton(parameters) }}
         </div>
     {% endif %}
-
-    <script type="text/javascript">
-        require(['jquery', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/mediator', 'oroimportexport/js/export-handler', 'ready!app'],
-        function($, __, DialogWidget, mediator, exportHandler) {
-            {% if hasImportProcessor %}
-            $('.import-btn').on('click', function(e) {
-                e.preventDefault();
-
-                var widget = new DialogWidget({
-                    'url': this.href,
-                    'title': {{ importTitle|default(importLabel)|json_encode|raw }},
-                    'stateEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'width': 650,
-                        'autoResize': true,
-                        'modal': true,
-                        'minHeight': 100
-                    }
-                });
-                widget.render();
-
-                {% if dataGridName is defined or refreshPageOnSuccess %}
-                widget.on('importComplete', function (data) {
-                    if (data.success) {
-                        {% if refreshPageOnSuccess %}
-                            {% if afterRefreshPageMessage is defined and afterRefreshPageMessage is not empty %}
-                                mediator.once('page:afterChange', function() {
-                                    mediator.execute('showFlashMessage', 'warning', {{ afterRefreshPageMessage|json_encode|raw }});
-                                });
-                            {% endif %}
-                            mediator.execute('refreshPage');
-                        {% elseif dataGridName is defined %}
-                            mediator.trigger('datagrid:doRefresh:' + {{ dataGridName|json_encode|raw }});
-                        {% endif %}
-                    }
-                });
-                {% endif %}
-            });
-            {% endif %}
-
-            {% if hasExportTemplateProcessor and isExportTemplatePopupRequired is defined and isExportTemplatePopupRequired  %}
-                $('.template-btn').on('click', function(e) {
-                    e.preventDefault();
-
-                    var widget = new DialogWidget({
-                        'url': this.href,
-                        'title': {{ exportTemplateLabel|default(exportLabel)|json_encode|raw }},
-                        'stateEnabled': false,
-                        'incrementalPosition': false,
-                        'dialogOptions': {
-                            'width': 650,
-                            'autoResize': true,
-                            'modal': true,
-                            'minHeight': 100
-                        }
-                    });
-                    widget.render();
-                });
-            {% endif %}
-
-            {% if hasExportProcessor %}
-                $('.export-btn').on('click', function(e) {
-                    e.preventDefault();
-
-                    {% if isExportPopupRequired %}
-                        var widget = new DialogWidget({
-                            'url': this.href,
-                            'title': {{ exportTitle|default(exportLabel)|json_encode|raw }},
-                            'stateEnabled': false,
-                            'incrementalPosition': false,
-                            'dialogOptions': {
-                                'width': 650,
-                                'autoResize': true,
-                                'modal': true,
-                                'minHeight': 100
-                            }
-                        });
-                        widget.render();
-                    {% else %}
-                        var exportStartedMessage = exportHandler.startExportNotificationMessage();
-                        $.getJSON(this.href, function(data) {
-                            exportStartedMessage.close();
-                            exportHandler.handleExportResponse(data);
-                        });
-                    {% endif %}
-                });
-            {% endif %}
-        });
-    </script>
+    </span>
 {% endif %}

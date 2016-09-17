@@ -1,0 +1,3 @@
+placeholders:
+    placeholders:
+        test_merge_block: ~ # already loaded items should not be removed

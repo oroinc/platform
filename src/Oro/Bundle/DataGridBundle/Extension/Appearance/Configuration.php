@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Appearance;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
 
 class Configuration implements ConfigurationInterface
 {

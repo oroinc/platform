@@ -149,6 +149,12 @@ MESSAGE;
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 
+    public function testGetUpdateFilenamePattern()
+    {
+        $loader = $this->getLoader(null, false, $this->cacheDir);
+        $this->assertEquals('/\.yml$/', $loader->getUpdateFilenamePattern('yml'));
+    }
+
     /**
      * @param string $className
      *

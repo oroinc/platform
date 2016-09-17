@@ -1,0 +1,5 @@
+$use-basic-styles: true;
+
+$body-bg-color: get-color('additional', 'ultra');
+$body-color: get-color('additional', 'darker');
+$body-min-width: $breakpoint-mobile;

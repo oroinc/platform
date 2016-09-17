@@ -18,7 +18,7 @@ class ConfigProvider
     protected $eventDispatcher;
 
     /**
-     * Array of oro_dashboard_config config section
+     * Array of dashboards config section
      *
      * @var array
      */

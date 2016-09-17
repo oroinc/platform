@@ -131,8 +131,8 @@ class ExpressionProcessor
                     $value = substr($value, 1);
                     break;
             }
-        } elseif ($value instanceof Options) {
-            foreach ($value as $key => $item) {
+        } elseif (is_array($value)) {
+            foreach ($value as &$item) {
                 $this->processValue($item, $context, $data, $evaluate, $encoding);
                 $value[$key] = $item;
             }
@@ -173,7 +173,7 @@ class ExpressionProcessor
         }
 
         foreach ($deps as $key => $dep) {
-            if (in_array($key, $this->processingValues, true)) {
+            if (in_array($key, $this->processingValues, true) && !in_array($key, $this->processedValues)) {
                 $path = implode(' > ', array_merge($this->processingValues, [$key]));
                 throw new CircularReferenceException(
                     sprintf('Circular reference "%s" on expression "%s".', $path, (string)$expr)
