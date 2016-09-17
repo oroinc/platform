@@ -45,7 +45,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('api_doc_views')
                 ->info('All supported ApiDoc views')
                 ->prototype('scalar')->end()
-                ->isRequired()
+                ->defaultValue(['default'])
             ->end();
     }
 
