@@ -1,9 +1,3 @@
-parameters:
-    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
-    oro_api.config.max_nesting_level: 3
-    # all supported ApiDoc views
-    oro_api.api_doc.views: ['default', 'rest_json_api', 'rest_plain']
-
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -167,7 +161,7 @@ services:
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
         arguments:
-            - %oro_api.config.max_nesting_level%
+            - 0 # config_max_nesting_level; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.config_extension.filters:
         class: Oro\Bundle\ApiBundle\Config\FiltersConfigExtension

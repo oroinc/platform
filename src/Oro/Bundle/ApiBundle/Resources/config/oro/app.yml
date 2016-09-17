@@ -25,6 +25,8 @@ security:
             context: main
 
 oro_api:
+    api_doc_views: ['default', 'rest_json_api', 'rest_plain']
+
     filters:
         string: ~
         boolean: ~
