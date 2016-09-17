@@ -73,7 +73,7 @@ class ParameterBag
      */
     public function get($key, $default = null)
     {
-        return $this->has($key) ? $this->parameters[$key] : $default;
+        return array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
     }
 
     /**

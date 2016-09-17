@@ -2,27 +2,45 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
-use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\Block\Type\AbstractContainerType;
+use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
-use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
-
-class DatagridType extends AbstractType
+class DatagridType extends AbstractContainerType
 {
     const NAME = 'datagrid';
 
     /** @var NameStrategyInterface */
     protected $nameStrategy;
 
+    /** @var ManagerInterface */
+    protected $manager;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param NameStrategyInterface $nameStrategy
+     * @param ManagerInterface $manager
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(NameStrategyInterface $nameStrategy)
-    {
+    public function __construct(
+        NameStrategyInterface $nameStrategy,
+        ManagerInterface $manager,
+        SecurityFacade $securityFacade
+    ) {
         $this->nameStrategy = $nameStrategy;
+        $this->manager = $manager;
+        $this->securityFacade = $securityFacade;
+
     }
 
     /**
@@ -35,8 +53,42 @@ class DatagridType extends AbstractType
             ->setDefined(['grid_scope'])
             ->setDefaults([
                 'grid_parameters' => [],
-                'grid_render_parameters' => []
+                'grid_render_parameters' => [],
+                'split_to_cells' => false
             ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBlock(BlockBuilderInterface $builder, Options $options)
+    {
+        if ($options['split_to_cells']) {
+            $columns = $this->getGridColumns($options['grid_name']);
+            if ($columns) {
+                $id = $builder->getId();
+
+                $headerRowId = $this->generateName([$id, 'header', 'row']);
+                $builder->getLayoutManipulator()->add($headerRowId, $id, 'datagrid_header_row');
+
+                $rowId = $this->generateName([$id, 'row']);
+                $builder->getLayoutManipulator()->add($rowId, $id, 'datagrid_row');
+
+                foreach ($columns as $columnName => $column) {
+                    $headerCellId = $this->generateName([$id, 'header', 'cell', $columnName]);
+                    $builder->getLayoutManipulator()
+                        ->add($headerCellId, $headerRowId, 'datagrid_header_cell', ['column_name' => $columnName]);
+
+                    $cellId = $this->generateName([$id, 'cell', $columnName]);
+                    $builder->getLayoutManipulator()
+                        ->add($cellId, $rowId, 'datagrid_cell', ['column_name' => $columnName]);
+
+                    $cellValueId = $this->generateName([$id, 'cell', $columnName, 'value']);
+                    $builder->getLayoutManipulator()
+                        ->add($cellValueId, $cellId, 'datagrid_cell_value', ['column_name' => $columnName]);
+                }
+            }
+        }
     }
 
     /**
@@ -44,6 +96,7 @@ class DatagridType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
+        $view->vars['split_to_cells'] = $options['split_to_cells'];
         $view->vars['grid_name'] = $options->get('grid_name', false);
         $view->vars['grid_parameters'] = $options->get('grid_parameters', false);
         $view->vars['grid_render_parameters'] = $options->get('grid_render_parameters', false);
@@ -64,5 +117,50 @@ class DatagridType extends AbstractType
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * @param string $gridName
+     *
+     * @return DatagridInterface
+     */
+    private function getGridColumns($gridName)
+    {
+        if ($this->isAclGrantedForGridName($gridName)) {
+            return $this->manager->getConfigurationForGrid($gridName)->offsetGet('columns');
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $gridName
+     *
+     * @return bool
+     */
+    private function isAclGrantedForGridName($gridName)
+    {
+        $gridConfig = $this->manager->getConfigurationForGrid($gridName);
+
+        if ($gridConfig) {
+            $aclResource = $gridConfig->getAclResource();
+            if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $parts
+     *
+     * @return string
+     */
+    private function generateName($parts = [])
+    {
+        return implode('_', $parts);
     }
 }

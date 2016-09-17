@@ -23,6 +23,7 @@ define(function(require) {
          */
         options: {
             widgetAlias: 'action_buttons_widget',
+            fullRedirect: false,
             redirectUrl: '',
             dialogUrl: '',
             executionUrl: '',
@@ -167,7 +168,7 @@ define(function(require) {
         },
 
         doPageReload: function() {
-            mediator.execute('refreshPage');
+            mediator.execute('refreshPage', {fullRedirect: this.options.fullRedirect});
         },
 
         doWidgetReload: function() {

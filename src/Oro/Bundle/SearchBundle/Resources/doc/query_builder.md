@@ -16,7 +16,14 @@ Syntax of Query builder is close to Doctrine 2.
 
 * **select()** - accepts a string or array of strings, that represent field names in the search index. 
 The values of those fields will be returned in the *selected_data* key of the response items.
-**NOTE**: If you don't want to overwrite this setting, use the *addSelect()* method instead.
+The select() parser will also accept SQL fieldname aliasing syntax, for example:
+
+```
+$query = (new Query())
+        ->select('fieldvalue as name')
+```
+
+**NOTE**: If you don't want to overwrite existing fields, use the *addSelect()* method.
 * **from()** - takes array or string of entity aliases to search from. If argument was `*`,
 then search will be performed for all entities.
 

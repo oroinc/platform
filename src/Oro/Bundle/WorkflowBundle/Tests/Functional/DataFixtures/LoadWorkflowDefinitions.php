@@ -69,6 +69,6 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
      */
     protected function getWorkflowConfiguration()
     {
-        return Yaml::parse(file_get_contents(__DIR__ . '/config/workflows.yml')) ? : [];
+        return Yaml::parse(file_get_contents(__DIR__ . '/config/oro/workflows.yml')) ? : [];
     }
 }

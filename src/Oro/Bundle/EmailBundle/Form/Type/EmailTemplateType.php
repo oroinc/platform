@@ -8,8 +8,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EmailTemplateType extends AbstractType
 {
@@ -79,6 +80,7 @@ class EmailTemplateType extends AbstractType
                 'required' => false,
                 'locales'  => $this->getLanguages(),
                 'labels'   => $this->getLocaleLabels(),
+                'content_options' => ['wysiwyg_options' => $this->getWysiwygOptions()],
             )
         );
         $builder->add(
@@ -179,5 +181,20 @@ class EmailTemplateType extends AbstractType
     protected function getLocaleLabels()
     {
         return $this->localeSettings->getLocalesByCodes($this->getLanguages(), $this->localeSettings->getLanguage());
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWysiwygOptions()
+    {
+        if ($this->userConfig->get('oro_email.sanitize_html')) {
+            return [];
+        }
+
+        return [
+            'valid_elements' => null, //all elements are valid
+            'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
+        ];
     }
 }

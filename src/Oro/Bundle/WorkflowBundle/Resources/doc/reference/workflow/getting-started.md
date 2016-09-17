@@ -276,7 +276,7 @@ Following diagram shows this logic in graphical representation.
 ![Workflow Diagram](../../images/getting-started_workflow-diagram.png)
 
 **Note:** If you want to test this flow in real application, you can put this configuration in file
-Oro/Bundle/UserBundle/Resources/config/workflow.yml, reload definitions using console command
+Oro/Bundle/UserBundle/Resources/config/oro/workflows.yml, reload definitions using console command
 ``app/console oro:workflow:definitions:load`` and activate it from UI -
 after that you can go to User view page and test it.
 
