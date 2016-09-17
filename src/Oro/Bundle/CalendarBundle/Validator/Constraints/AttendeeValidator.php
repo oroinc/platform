@@ -15,7 +15,7 @@ class AttendeeValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if ($value->getDisplayName() || $value->getEmail()) {
+        if ($value->getCalendarEvent()->getSystemCalendar() || $value->getDisplayName() || $value->getEmail()) {
             return;
         }
 
