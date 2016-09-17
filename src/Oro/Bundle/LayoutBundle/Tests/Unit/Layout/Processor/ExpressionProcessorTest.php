@@ -128,7 +128,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame(
             ['item1' => 'val1', 'item2' => true],
-            $values['array_with_expr']->toArray(),
+            $values['array_with_expr'],
             'Failed asserting that an expression is parsed and evaluated in nested array'
         );
     }

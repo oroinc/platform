@@ -119,7 +119,6 @@ class FormFieldsType extends AbstractFormType
         if (!$view->vars['split_to_fields']) {
             return;
         }
-        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
 
         // prevent form fields rendering by form_rest() method,
         // if the corresponding layout block has been removed

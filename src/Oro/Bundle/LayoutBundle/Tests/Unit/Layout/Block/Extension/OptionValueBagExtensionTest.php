@@ -32,7 +32,7 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $actual
      * @param array $expected
-     * @dataProvider optionsDataProvider
+     * @dataProvider normalizeOptionsDataProvider
      */
     public function testNormalizeOptions(array $actual, array $expected)
     {
@@ -50,7 +50,7 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $actual
      * @param array $expected
      * @param bool $isApplied
-     * @dataProvider optionsDataProvider
+     * @dataProvider normalizeOptionsDataProvider
      */
     public function testFinishView(array $actual, array $expected, $isApplied = true)
     {
@@ -58,7 +58,8 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
         $context['expressions_evaluate'] = $isApplied;
 
         $view = new BlockView();
-        $view->vars = new Options($actual);
+
+        $view->vars = $actual;
 
         /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
@@ -68,16 +69,15 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->finishView(
             $view,
-            $block,
-            new Options(['resolve_value_bags' => $actual['resolve_value_bags']])
+            $block
         );
-        $this->assertEquals($expected, $view->vars->toArray());
+        $this->assertEquals($expected, $view->vars);
     }
 
     /**
      * @return array
      */
-    public function optionsDataProvider()
+    public function normalizeOptionsDataProvider()
     {
         return [
             'not applied' => [

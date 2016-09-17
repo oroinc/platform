@@ -73,6 +73,8 @@ class ExpressionProcessor
         foreach ($values as $key => $value) {
             if (!array_key_exists($key, $this->processedValues)) {
                 $this->processRootValue($key, $value, $context, $data, $evaluate, $encoding);
+            } else {
+                $value = $this->processedValues[$key];
             }
             $values[$key] = $value;
         }
