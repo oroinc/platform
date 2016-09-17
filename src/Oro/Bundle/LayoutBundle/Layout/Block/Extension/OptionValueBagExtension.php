@@ -53,11 +53,14 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     {
         $exprEvaluate = $block->getContext()->getOr('expressions_evaluate');
         if ($view->vars['resolve_value_bags'] && $exprEvaluate) {
-            array_walk_recursive($view->vars, function(&$var) {
-                if ($var instanceof OptionValueBag) {
-                    $var = $var->buildValue($this->getOptionsBuilder($var));
+            array_walk_recursive(
+                $view->vars,
+                function (&$var) {
+                    if ($var instanceof OptionValueBag) {
+                        $var = $var->buildValue($this->getOptionsBuilder($var));
+                    }
                 }
-            });
+            );
         }
     }
 

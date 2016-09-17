@@ -52,7 +52,7 @@ class ExpressionProcessor
      * @param ContextInterface      $context
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
-     * @param string                $encoding
+     * @param string|null           $encoding
      */
     public function processExpressions(
         array &$values,
@@ -86,15 +86,15 @@ class ExpressionProcessor
      * @param ContextInterface      $context
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
-     * @param bool                  $encoding
+     * @param string|null           $encoding
      */
     protected function processRootValue(
         $key,
         &$value,
         ContextInterface $context,
         DataAccessorInterface $data = null,
-        $evaluate,
-        $encoding
+        $evaluate = true,
+        $encoding = null
     ) {
         $this->processingValues[$key] = $key;
         $this->processValue($value, $context, $data, $evaluate, $encoding);
@@ -106,8 +106,8 @@ class ExpressionProcessor
      * @param                       $value
      * @param ContextInterface      $context
      * @param DataAccessorInterface $data
-     * @param                       $evaluate
-     * @param                       $encoding
+     * @param bool                  $evaluate
+     * @param string|null           $encoding
      */
     protected function processValue(
         &$value,
