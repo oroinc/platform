@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root('oro_api');
 
         $node = $rootNode->children();
+        $this->appendConfigOptions($node);
         $this->appendActionsNode($node);
         $this->appendFiltersNode($node);
         $this->appendFormTypesNode($node);
@@ -25,6 +26,27 @@ class Configuration implements ConfigurationInterface
         $this->appendFormTypeGuessesNode($node);
 
         return $treeBuilder;
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    protected function appendConfigOptions(NodeBuilder $node)
+    {
+        $node
+            ->integerNode('config_max_nesting_level')
+                ->info(
+                    'The maximum number of nesting target entities'
+                    . ' that can be specified in "Resources/config/oro/api.yml"'
+                )
+                ->min(0)
+                ->defaultValue(3)
+            ->end()
+            ->arrayNode('api_doc_views')
+                ->info('All supported ApiDoc views')
+                ->prototype('scalar')->end()
+                ->isRequired()
+            ->end();
     }
 
     /**

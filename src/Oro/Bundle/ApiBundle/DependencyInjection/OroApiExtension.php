@@ -19,6 +19,8 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
+    const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
+
     const ACTION_PROCESSOR_BAG_SERVICE_ID             = 'oro_api.action_processor_bag';
     const ACTION_PROCESSOR_TAG                        = 'oro.api.action_processor';
     const CONFIG_EXTENSION_REGISTRY_SERVICE_ID        = 'oro_api.config_extension_registry';
@@ -44,6 +46,8 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('data_transformers.yml');
@@ -74,6 +78,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
          * To load configuration we need fully configured config tree builder,
          * that's why the action processors bag and all configuration extensions should be registered before.
          */
+        $this->registerConfigParameters($container, $config);
         $this->registerActionProcessors($container);
         $this->registerConfigExtensions($container);
 
@@ -212,6 +217,18 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $chainProviderDef = $container->getDefinition(self::ENTITY_EXCLUSION_PROVIDER_SERVICE_ID);
         $chainProviderDef->replaceArgument(1, $inclusions);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    protected function registerConfigParameters(ContainerBuilder $container, array $config)
+    {
+        $container
+            ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
+            ->replaceArgument(0, $config['config_max_nesting_level']);
+        $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, $config['api_doc_views']);
     }
 
     /**

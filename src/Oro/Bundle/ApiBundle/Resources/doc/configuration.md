@@ -50,12 +50,13 @@ By default this command shows configuration of nesting entities. To simplify the
 php app/console oro:api:config:dump-reference --max-nesting-level=0
 ```
 
-The default nesting level is `3`. It is specified in [services.yml](../config/services.yml) via the `oro_api.config.max_nesting_level` parameter. So, if needed, you can easily change this value.
+The default nesting level is `3`. It is specified in the configuration of ApiBundle via the `config_max_nesting_level` parameter. So, if needed, you can easily change this value, for example:
 
 ```yaml
-parameters:
-    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
-    oro_api.config.max_nesting_level: 3
+# app/config/config.yml
+
+oro_api:
+    config_max_nesting_level: 3
 ```
 
 The first level sections of configuration are:
