@@ -18,7 +18,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
                 if (!is_array($field)) {
                     continue;
                 }
-                if (ConfigUtil::isIgnoredField($field)) {
+                if ($this->isIgnoredField($field)) {
                     $toRemove[] = $fieldName;
                 }
                 if (!empty($field[FieldConfig::DEPENDS_ON]) && !ConfigUtil::isExclude($field)) {
@@ -76,5 +76,17 @@ class ConfigNormalizer extends BaseConfigNormalizer
                 );
             }
         }
+    }
+
+    /**
+     * @param array $config The config of a field
+     *
+     * @return bool
+     */
+    protected function isIgnoredField(array $config)
+    {
+        return
+            !empty($config[ConfigUtil::PROPERTY_PATH])
+            && ConfigUtil::IGNORE_PROPERTY_PATH === $config[ConfigUtil::PROPERTY_PATH];
     }
 }
