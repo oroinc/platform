@@ -34,14 +34,14 @@ class ACLContext extends OroFeatureContext implements OroElementFactoryAware, Ke
 
     //@codingStandardsIgnoreStart
     /**
-     * Set access level for action for specified entity for admin user
-     * Example: Given my permissions on Delete Cases is set to System
-     * @Given /^(?P<user>(I|my|user)) have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entity$/
-     * @Given /^my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) is set to (?P<accessLevel>(?:[^"]|\\")*)$/
-     * @When /^(?:|I )set my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) to (?P<accessLevel>(?:[^"]|\\")*)$/
+     * Set access level for action for specified entity for role
+     * Example: Given user permissions on Delete Cases is set to System
+     * @Given /^(?P<user>(administrator|user)) have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entity$/
+     * @Given /^(?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) is set to (?P<accessLevel>(?:[^"]|\\")*)$/
+     * @When /^(?:|I )set (?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) to (?P<accessLevel>(?:[^"]|\\")*)$/
      */
     //@codingStandardsIgnoreEnd
-    public function iHavePermissionsForEntity($entity, $action, $accessLevel, $user = 'I')
+    public function iHavePermissionsForEntity($entity, $action, $accessLevel, $user)
     {
         $role = $this->getRole($user);
         $this->getMink()->setDefaultSessionName('second_session');
@@ -61,10 +61,10 @@ class ACLContext extends OroFeatureContext implements OroElementFactoryAware, Ke
 
     //@codingStandardsIgnoreStart
     /**
-     * Set access level for several actions for specified entity for admin user
-     * Example: Given my permissions on View Accounts as User and on Delete as System
-     * Example: Given my permissions on View Cases as System and on Delete as User
-     * @Given /^my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) as (?P<accessLevel1>(?:[^"]|\\")*) and on (?P<action2>(?:|View|Create|Edit|Delete|Assign|Share)) as (?P<accessLevel2>(?:[^"]|\\")*)$/
+     * Set access level for several actions for specified entity for role
+     * Example: Given user permissions on View Accounts as User and on Delete as System
+     * Example: Given administrator permissions on View Cases as System and on Delete as User
+     * @Given /^(?P<user>(administrator|user)) permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) as (?P<accessLevel1>(?:[^"]|\\")*) and on (?P<action2>(?:|View|Create|Edit|Delete|Assign|Share)) as (?P<accessLevel2>(?:[^"]|\\")*)$/
      */
     //@codingStandardsIgnoreEnd
     public function iHaveSeveralPermissionsForEntity($entity, $action1, $accessLevel1, $action2, $accessLevel2)
@@ -126,8 +126,11 @@ class ACLContext extends OroFeatureContext implements OroElementFactoryAware, Ke
 
     protected function getRole($user)
     {
-        if ('I' === $user || 'my' === $user) {
-            return $this->getContainer()->get('security.token_storage')->getToken()->getUser()->getRole()->getLabel();
+        if ('administrator' === $user) {
+            return $this->getContainer()
+                ->get('oro_entity.doctrine_helper')
+                ->getEntityRepositoryForClass(Role::class)
+                ->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
         } elseif ('user' === $user) {
             return $this->getContainer()
                 ->get('oro_entity.doctrine_helper')
