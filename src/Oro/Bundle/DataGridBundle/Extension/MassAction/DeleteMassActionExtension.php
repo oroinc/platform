@@ -93,7 +93,7 @@ class DeleteMassActionExtension extends AbstractExtension
     {
         $actions = $config->offsetGetOr($key, []);
         foreach ($actions as $action) {
-            if ($action[static::ACTION_TYPE_KEY] == static::ACTION_TYPE_DELETE) {
+            if ($action[static::ACTION_TYPE_KEY] === static::ACTION_TYPE_DELETE) {
                 return true;
             }
         }
