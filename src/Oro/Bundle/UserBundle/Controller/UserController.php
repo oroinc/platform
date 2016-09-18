@@ -235,21 +235,4 @@ class UserController extends Controller
 
         return $isDeleteAllowed;
     }
-
-    /**
-     * @TODO Test, please remove before merge
-     *
-     * @Route(
-     *      "/index_search_grid",
-     *      name="oro_user_index_search_grid",
-     * )
-     * @Template
-     * @AclAncestor("oro_user_user_view")
-     */
-    public function indexSearchGridAction()
-    {
-        return array(
-            'entity_class' => $this->container->getParameter('oro_user.entity.class')
-        );
-    }
 }

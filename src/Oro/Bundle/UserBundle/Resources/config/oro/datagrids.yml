@@ -743,33 +743,3 @@ datagrids:
                             choices:
                                 2: Inactive
                                 1: Active
-
-    # TODO test, please remove before merge
-    user-search-grid:
-        source:
-            type: search
-            query:
-                select:
-                    - text.username
-                    - text.email
-
-                # from part must be string or array of string, each string is an index alias name
-                from:
-                    - oro_user
-        columns:
-            username:
-                data_name: username
-            email:
-                data_name: email
-        sorters:
-            columns:
-                username:
-                    data_name: username
-                    type: string
-        filters:
-            columns:
-                username:
-                    type: string
-                    data_name: username
-                    label: oro.user.username.label
-        actions:
