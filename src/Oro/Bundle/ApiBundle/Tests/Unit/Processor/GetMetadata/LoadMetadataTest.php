@@ -226,6 +226,42 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
+    public function testProcessForNotManageableEntityWithExcludedProperties()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['field1'],
+            'fields'                 => [
+                'field1'        => [
+                    'data_type' => 'string'
+                ],
+                'field2'        => [
+                    'data_type' => 'string',
+                    'exclude'   => true
+                ],
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->context->setWithExcludedProperties(true);
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'string'))->setIsNullable(false);
+        $expectedMetadata->addField($this->createFieldMetadata('field2', 'string'))->setIsNullable(true);
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
     public function testProcessCollapsedArrayAssociationForNotManageableEntity()
     {
         $config = [
@@ -449,6 +485,85 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 ['Test\Association3Target1', 'Test\Association3Target2']
             )
         );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testProcessForManageableEntityWithExcludedProperties()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'        => null,
+                'field2'        => [
+                    'exclude' => true
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true
+                ],
+                'metaProperty2' => [
+                    'meta_property' => true,
+                    'exclude'       => true
+                ],
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(
+                [
+                    'field1',
+                    'field2',
+                    'metaProperty1',
+                    'metaProperty2',
+                ]
+            );
+        $classMetadata->expects($this->exactly(4))
+            ->method('getTypeOfField')
+            ->willReturnMap(
+                [
+                    ['field1', 'string'],
+                    ['field2', 'string'],
+                    ['metaProperty1', 'string'],
+                    ['metaProperty2', 'string'],
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->context->setWithExcludedProperties(true);
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'string'));
+        $expectedMetadata->addField($this->createFieldMetadata('field2', 'string'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'string'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty2', 'string'));
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }

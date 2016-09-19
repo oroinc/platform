@@ -181,6 +181,39 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
+    public function testProcessWhenExcludedPropertiesShouldNotBeRemoved()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'        => null,
+                'field2'        => [
+                    'exclude' => true
+                ],
+            ]
+        ];
+
+        $metadata = new EntityMetadata();
+        $metadata->addField($this->createFieldMetadata('field1'));
+        $metadata->addField($this->createFieldMetadata('field2'));
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->context->setResult($metadata);
+        $this->context->setWithExcludedProperties(true);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->addField($this->createFieldMetadata('field1'));
+        $expectedMetadata->addField($this->createFieldMetadata('field2'));
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -287,18 +320,15 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
 
         $this->metadataProvider->expects($this->once())
             ->method('getMetadata')
-            ->willReturnMap(
-                [
-                    [
-                        'Test\Association411Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $configObject->getField('association4')->getTargetEntity(),
-                        $this->context->getExtras(),
-                        $association411TargetMetadata
-                    ]
-                ]
-            );
+            ->with(
+                'Test\Association411Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $configObject->getField('association4')->getTargetEntity(),
+                $this->context->getExtras(),
+                false
+            )
+            ->willReturn($association411TargetMetadata);
 
         $this->context->setConfig($configObject);
         $this->context->setResult($metadata);
@@ -415,22 +445,19 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
 
         $this->metadataProvider->expects($this->once())
             ->method('getMetadata')
-            ->willReturnMap(
-                [
-                    [
-                        'Test\Association11Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $configObject
-                            ->getField('association1')
-                            ->getTargetEntity()
-                            ->getField('association11')
-                            ->getTargetEntity(),
-                        $this->context->getExtras(),
-                        $association11TargetMetadata
-                    ]
-                ]
-            );
+            ->with(
+                'Test\Association11Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $configObject
+                    ->getField('association1')
+                    ->getTargetEntity()
+                    ->getField('association11')
+                    ->getTargetEntity(),
+                $this->context->getExtras(),
+                false
+            )
+         ->willReturn($association11TargetMetadata);
 
         $this->context->setConfig($configObject);
         $this->context->setResult($metadata);
@@ -541,22 +568,19 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
 
         $this->metadataProvider->expects($this->once())
             ->method('getMetadata')
-            ->willReturnMap(
-                [
-                    [
-                        'Test\Association11Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $configObject
-                            ->getField('association1')
-                            ->getTargetEntity()
-                            ->getField('association11')
-                            ->getTargetEntity(),
-                        $this->context->getExtras(),
-                        $association11TargetMetadata
-                    ]
-                ]
-            );
+            ->with(
+                'Test\Association11Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $configObject
+                    ->getField('association1')
+                    ->getTargetEntity()
+                    ->getField('association11')
+                    ->getTargetEntity(),
+                $this->context->getExtras(),
+                false
+            )
+            ->willReturn($association11TargetMetadata);
 
         $this->context->setConfig($configObject);
         $this->context->setResult($metadata);
