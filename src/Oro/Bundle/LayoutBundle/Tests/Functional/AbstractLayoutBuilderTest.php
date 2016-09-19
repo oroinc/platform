@@ -15,7 +15,7 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 
-class LayoutBuilderTest extends WebTestCase
+abstract class AbstractLayoutBuilderTest extends WebTestCase
 {
     /**
      * {@inheritdoc}
@@ -23,44 +23,6 @@ class LayoutBuilderTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-    }
-
-    public function testLayoutNestedImportsRendering()
-    {
-        $expectedRender = <<<HTML
-<!DOCTYPE html>
-<html>
-    <head></head>
-    <body>
-        <div class="base-wrapper">
-            <div class="first-wrapper">
-            <div class="second-wrapper">
-            <div class="third-wrapper">
-        </div>
-    </div>
-    </div>
-    </div>
-    </body>
-</html>
-HTML;
-        $expectedTree = [
-            'head' => [],
-            'body' => [
-                'wrapper' => [
-                    'first_wrapper' => [
-                        'first_second_wrapper' => [
-                            'first_second_third_wrapper' => []
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        $layout = $this->getLayout('nested_imports');
-
-        $tree = $this->getBlockViewTree($layout->getView());
-
-        $this->assertEquals($expectedTree, $tree);
-        $this->assertEquals($expectedRender, $layout->render());
     }
 
     /**
