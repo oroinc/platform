@@ -11,7 +11,7 @@ datagrids:
                     - language.createdAt
                     - language.updatedAt
                 from:
-                    - { table: %oro_translation.entity.language.class%, alias: language }
+                    - { table: '%oro_translation.entity.language.class%', alias: language }
         columns:
             code:
                 label: oro.translation.language.entity_label
@@ -42,7 +42,7 @@ datagrids:
                 updatedAt:
                     data_name: language.updatedAt
             default:
-                code: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                code: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         filters:
             columns:
                 code:
@@ -77,7 +77,7 @@ datagrids:
                 select:
                     - translation.id
                     - language.code
-                    - translation.value
+                    - translation.value as _value
                     - translationKey.key as _key
                     - translationKey.domain as _domain
                     - (CASE WHEN translation.value IS NULL THEN 0 ELSE 1 END) as _status
@@ -96,12 +96,9 @@ datagrids:
                             alias: translation
                             conditionType: WITH
                             condition: 'translation.language = language AND translation.translationKey = translationKey'
-                where:
-                    and:
-                        - translationKey = translationKey
         columns:
             id:
-                label: oro.translation.translation.id
+                label: oro.translation.translation.id.label
                 renderable: false
             code:
                 label: oro.translation.translation.language.label
@@ -113,19 +110,19 @@ datagrids:
                 type: twig
                 frontend_type: html
                 template: OroTranslationBundle:Translation:Datagrid/status.html.twig
-                renderable: false
             originalValue:
                 label: oro.translation.translation.original_value.label
                 type: twig
                 frontend_type: html
                 template: OroTranslationBundle:Translation:Datagrid/originalValue.html.twig
-            value:
+            _value:
                 label: oro.translation.translation.value.label
             _key:
                 label: oro.translation.translation_key.key.label
-                renderable: false
             _domain:
                 label: oro.translation.translation_key.domain.label
+            context:
+                label: oro.translation.translation.context.label
                 renderable: false
         sorters:
             multiple_sorting: true
@@ -134,14 +131,14 @@ datagrids:
                     data_name: language.code
                 _status:
                     data_name: _status
-                value:
-                    data_name: translation.value
+                _value:
+                    data_name: _value
                 _key:
                     data_name: _key
                 _domain:
                     data_name: _domain
             default:
-                code: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                code: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         filters:
             columns:
                 code:
@@ -158,20 +155,23 @@ datagrids:
                             choices:
                                 true: 'oro.translation.translation.status.translated'
                                 false: 'oro.translation.translation.status.untranslated'
-                value:
+                _value:
                     type: string
-                    data_name: translation.value
+                    data_name: _value
                 _key:
                     type: string
-                    enabled: false
                     data_name: _key
                 _domain:
                     type: choice
                     data_name: _domain
-                    enabled: false
+                    enabled: true
                     options:
                         field_options:
                             choices: "@oro_translation.manager.translation->getAvailableDomains"
         properties:
             id: ~
-
+            context:
+                type: callback
+                callable: ["@oro_translation.provider.translation_context", "resolveContext"]
+                params:
+                    - key
