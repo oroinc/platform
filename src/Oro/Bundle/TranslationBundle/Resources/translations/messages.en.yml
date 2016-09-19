@@ -14,6 +14,7 @@ oro.translation:
         translation_completeness.label: 'Translation Completeness:'
         install.title: 'Install "%language%" language'
         update.title: 'Update "%language%" language'
+        rebuild_cache.label: 'Rebuild Cache'
 
     language:
         entity_label: 'Language'
@@ -50,13 +51,15 @@ oro.translation:
 
         id.label: 'Id'
         language.label: 'Language'
-        value.label: 'Value'
+        value.label: 'Translated Value'
         original_value.label: 'Original Value'
         context.label: 'Context'
         status:
             label: 'Status'
             translated: 'Translated'
             untranslated: 'Untranslated'
+        message:
+            rebuild_cache: 'Translation Cache has been rebuilt'
 
     translation_key:
         entity_label: 'Translation Key'

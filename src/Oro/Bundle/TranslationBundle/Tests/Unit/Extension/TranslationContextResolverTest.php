@@ -19,6 +19,6 @@ class TranslationContextResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolve()
     {
-        $this->assertEquals('UI:Label', $this->extension->resolve('Translation Key'));
+        $this->assertEquals('UI Label', $this->extension->resolve('Translation Key'));
     }
 }
