@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Extension;
+namespace Oro\Bundle\SearchBundle\Datagrid\Extension;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Security\Core\Util\ClassUtils;

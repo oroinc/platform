@@ -1,8 +1,10 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension\Pager;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Pager;
 
-use Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager;
+use Oro\Bundle\SearchBundle\Query\IndexerQuery;
+use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class IndexerPagerTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +26,7 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetQuery()
     {
-        $indexerQuery = $this->getMockBuilder('Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery')
+        $indexerQuery = $this->getMockBuilder(SearchQueryInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -46,9 +48,9 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
         $totalCount = 123;
 
         $indexerQuery = $this->getMock(
-            'Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery',
-            array('getTotalCount'),
-            array(),
+            IndexerQuery::class,
+            ['getTotalCount'],
+            [],
             '',
             false
         );
@@ -67,18 +69,18 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
      */
     public function maxPerPageDataProvider()
     {
-        return array(
-            'fixed' => array(
+        return [
+            'fixed'    => [
                 '$maxPerPage'  => 12,
                 '$maxResults'  => 12,
                 '$firstResult' => 0,
-            ),
-            'infinite' => array(
+            ],
+            'infinite' => [
                 '$maxPerPage'  => 0,
                 '$maxResults'  => Query::INFINITY,
                 '$firstResult' => 0,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -91,9 +93,9 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
     public function testSetGetMaxPerPage($maxPerPage, $maxResults, $firstResult)
     {
         $indexerQuery = $this->getMock(
-            'Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery',
-            array('setMaxResults', 'setFirstResult'),
-            array(),
+            IndexerQuery::class,
+            ['setMaxResults', 'setFirstResult'],
+            [],
             '',
             false
         );
@@ -113,13 +115,13 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetGetPage()
     {
-        $page = 2;
+        $page        = 2;
         $firstResult = 10;
 
         $indexerQuery = $this->getMock(
-            'Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery',
-            array('setFirstResult'),
-            array(),
+            IndexerQuery::class,
+            ['setFirstResult'],
+            [],
             '',
             false
         );
@@ -145,9 +147,9 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
         $nextPage     = 3;
 
         $indexerQuery = $this->getMock(
-            'Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery',
-            array('getTotalCount', 'setMaxResults', 'setFirstResult'),
-            array(),
+            IndexerQuery::class,
+            ['getTotalCount', 'setMaxResults', 'setFirstResult'],
+            [],
             '',
             false
         );
@@ -172,26 +174,26 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
      */
     public function haveToPaginateDataProvider()
     {
-        return array(
-            'no_data' => array(
+        return [
+            'no_data'      => [
                 '$expected'   => false,
                 '$page'       => 1,
                 '$maxPerPage' => 0,
                 '$totalCount' => 0
-            ),
-            'one_page' => array(
+            ],
+            'one_page'     => [
                 '$expected'   => false,
                 '$page'       => 1,
                 '$maxPerPage' => 10,
                 '$totalCount' => 5
-            ),
-            'several_page' => array(
+            ],
+            'several_page' => [
                 '$expected'   => true,
                 '$page'       => 1,
                 '$maxPerPage' => 10,
                 '$totalCount' => 15
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -205,9 +207,9 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
     public function testHaveToPaginate($expected, $page, $maxPerPage, $totalCount)
     {
         $indexerQuery = $this->getMock(
-            'Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery',
-            array('getTotalCount', 'setMaxResults', 'setFirstResult'),
-            array(),
+            IndexerQuery::class,
+            ['getTotalCount', 'setMaxResults', 'setFirstResult'],
+            [],
             '',
             false
         );
