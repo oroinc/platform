@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 
@@ -19,7 +20,12 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 class MenuUpdateController extends Controller
 {
     /**
-     * @Route("/{menu}/create/{parentKey}", name="oro_navigation_menu_update_create", defaults={"parentKey" = null})
+     * @Route(
+     *     "/{menu}/create/{parentKey}",
+     *     name="oro_navigation_menu_update_create",
+     *     defaults={"parentKey" = null},
+     *     requirements={"menu" = "[-_\w]+", "parentKey" = "[-_w]+"}
+     * )
      * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
      * @Acl(
      *     id="oro_navigation_menu_update_create",
@@ -34,13 +40,16 @@ class MenuUpdateController extends Controller
      */
     public function createAction($menu, $parentKey)
     {
-        $menuUpdate = $this->createMenuUpdate($menu, null, $parentKey);
-
-        return $this->update($menuUpdate, ['validation_groups' => ['Create']]);
+        return $this->update(new MenuUpdate());
     }
 
     /**
-     * @Route("/{menu}/update/{key}/{parentKey}", name="oro_navigation_menu_update_update", defaults={"parentKey" = null})
+     * @Route(
+     *     "/{menu}/update/{key}/{parentKey}",
+     *     name="oro_navigation_menu_update_update",
+     *     defaults={"parentKey" = null},
+     *     requirements={"menu" = "[-_\w]+", "parentKey" = "[-_w]+"}
+     * )
      * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_update",
@@ -56,31 +65,16 @@ class MenuUpdateController extends Controller
      */
     public function updateAction($menu, $key, $parentKey)
     {
-        $menuUpdate = $this->getDoctrine()
-            ->getManagerForClass('OroNavigationBundle:MenuUpdate')
-            ->getRepository('OroNavigationBundle:MenuUpdate')
-            ->getMenuUpdateByMenuAndKey($menu, $key);
-        if ($menuUpdate !== null) {
-            return $this->update($menuUpdate);
-        }
-
-        $menuUpdate = $this->createMenuUpdate($menu, $key, $parentKey);
-
-        return $this->update($menuUpdate, ['validation_groups' => ['Create']]);
+        return $this->update(new MenuUpdate());
     }
 
     /**
      * @param MenuUpdate $menuUpdate
-     * @param array $formOptions
      * @return array|RedirectResponse
      */
-    private function update(MenuUpdate $menuUpdate, $formOptions = [])
+    private function update(MenuUpdate $menuUpdate)
     {
-        $form = $this->createForm(
-            MenuUpdateType::NAME,
-            $menuUpdate,
-            array_merge_recursive(['validation_groups' => ['Default']], $formOptions)
-        );
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
 
         return $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
@@ -90,22 +84,33 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @param string $menu
-     * @param string $key
-     * @param string $parentKey
-     * @return MenuUpdate
+     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Template()
+     * @Acl(
+     *     id="oro_navigation_menu_update_view",
+     *     type="entity",
+     *     class="OroNavigationBundle:MenuUpdate",
+     *     permission="VIEW"
+     * )
+     *
+     * @return array
      */
-    private function createMenuUpdate($menu, $key, $parentKey)
+    public function indexAction()
     {
-        $menuUpdate = new MenuUpdate();
-        $menuUpdate
-            ->setOwnershipType(MenuUpdate::OWNERSHIP_GLOBAL)
-            ->setMenu($menu)
-            ->setKey($key)
-            ->setParentKey($parentKey)
-        ;
+        return [];
+    }
 
-        return $menuUpdate;
+    /**
+     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
+     * @Template()
+     * @AclAncestor("oro_navigation_menu_update_view")
+     *
+     * @param string $menu
+     * @return array
+     */
+    public function viewAction($menu)
+    {
+        return [];
     }
 
     /**

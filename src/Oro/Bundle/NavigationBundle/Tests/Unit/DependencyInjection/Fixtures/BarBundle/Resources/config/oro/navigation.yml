@@ -1,22 +1,23 @@
-oro_menu_config:
-    areas:
-        default:
-            - application_menu
-        frontend:
-            - shortcuts
-    tree:
-        application_menu:
-            type: application_menu
+navigation:
+    menu_config:
+        areas:
+            default:
+                - application_menu
+            custom:
+                - shortcuts
+        tree:
+            application_menu:
+                type: application_menu
 
-        shortcuts:
-            type: shortcuts
+            shortcuts:
+                type: shortcuts
 
-oro_navigation_elements:
-    favoriteButton:
-        default: true
-        routes:
-            call_list: false
-    shortcutsPanel:
-        default: false
-        routes:
-            call_list: true
+    navigation_elements:
+        favoriteButton:
+            default: true
+            routes:
+                call_list: false
+        shortcutsPanel:
+            default: false
+            routes:
+                call_list: true

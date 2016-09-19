@@ -40,12 +40,11 @@ class MenuUpdateTypeTest extends WebTestCase
     /**
      * @dataProvider submitProvider
      *
-     * @param array $formOptions
      * @param array $submitData
      * @param bool $expectedFormIsValid
      * @param bool $doAssertEntity
      */
-    public function testSubmit($formOptions, $submitData, $expectedFormIsValid, $doAssertEntity)
+    public function testSubmit($submitData, $expectedFormIsValid, $doAssertEntity)
     {
         $doctrine = $this->getContainer()->get('doctrine');
         $localizationRepository = $doctrine->getRepository('OroLocaleBundle:Localization');
@@ -66,7 +65,7 @@ class MenuUpdateTypeTest extends WebTestCase
             ];
         }
 
-        $form = $this->formFactory->create(MenuUpdateType::NAME, new MenuUpdate(), $formOptions);
+        $form = $this->formFactory->create(MenuUpdateType::NAME, new MenuUpdate());
         $form->submit($submitData);
         $this->assertEquals($expectedFormIsValid, $form->isValid());
 
@@ -86,8 +85,7 @@ class MenuUpdateTypeTest extends WebTestCase
     public function submitProvider()
     {
         return [
-            'update existing menu update' => [
-                'formOptions' => ['validation_groups' => ['Default']],
+            'update' => [
                 'submitData' => [
                     'titles' => ['values' => ['default' => 'Item Title']],
                     'uri'    => '/some/path',
@@ -95,28 +93,18 @@ class MenuUpdateTypeTest extends WebTestCase
                 'expectedFormIsValid' => true,
                 'doAssertEntity' => true,
             ],
-            'update existing menu update without uri' => [
-                'formOptions' => ['validation_groups' => ['Default']],
+            'update without titles should fail' => [
+                'submitData' => [
+                    'titles' => null,
+                    'uri'    => '/some/path',
+                ],
+                'expectedFormIsValid' => false,
+                'doAssertEntity' => false,
+            ],
+            'update without uri should fail' => [
                 'submitData' => [
                     'titles' => ['values' => ['default' => 'Item Title']],
                     'uri'    => null,
-                ],
-                'expectedFormIsValid' => true,
-                'doAssertEntity' => true,
-            ],
-            'create new menu update' => [
-                'formOptions' => ['validation_groups' => ['Default', 'Create']],
-                'submitData' => [
-                    'titles' => ['values' => ['default' => 'Item Title']],
-                    'uri'    => '/some/path',
-                ],
-                'expectedFormIsValid' => true,
-                'doAssertEntity' => true,
-            ],
-            'create new menu update without title should fail' => [
-                'formOptions' => ['validation_groups' => ['Default', 'Create']],
-                'submitData' => [
-                    'uri'    => '/some/path',
                 ],
                 'expectedFormIsValid' => false,
                 'doAssertEntity' => false,

@@ -81,13 +81,4 @@ class MenuUpdateRepositoryTest extends WebTestCase
             ],
         ];
     }
-
-    public function testGetMenuUpdateByMenuAndKey()
-    {
-        $update = $this->repository->getMenuUpdateByMenuAndKey(
-            MenuUpdateData::MENU,
-            'activity'
-        );
-        $this->assertInstanceOf('Oro\Bundle\NavigationBundle\Entity\MenuUpdate', $update);
-    }
 }

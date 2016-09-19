@@ -192,7 +192,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                 'expectedMenu' => array(
                     'areas' => array(
                         'default' => array('application_menu', 'quicklinks'),
-                        'frontend' => array('shortcuts'),
+                        'custom' => array('shortcuts'),
                     ),
                     'items' => array(
                         'customers_tab' => array_merge(array('label' => 'Customers'), $defaultItemParameters),

@@ -28,7 +28,7 @@ class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
 
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
 
-        $this->executor = new ExtendMigrationExecutor($this->queryExecutor);
+        $this->executor = new ExtendMigrationExecutor($this->queryExecutor, $this->cacheManager);
         $this->executor->setLogger($this->logger);
         $this->executor->setNameGenerator($this->nameGenerator);
         $this->executor->setExtendOptionsManager($extendOptionManager);

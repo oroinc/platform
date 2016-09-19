@@ -19,30 +19,30 @@ class MenuUpdateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $isCreate = is_array($options['validation_groups']) &&
-            in_array('Create', $options['validation_groups']);
-
         $builder
             ->add(
                 'titles',
                 LocalizedFallbackValueCollectionType::NAME,
                 [
-                    'required' => $isCreate,
+                    'required' => true,
                     'label' => 'oro.navigation.menuupdate.title.label',
-                    'options' => $isCreate ? ['constraints' => [new NotBlank()]] : []
+                    'options' => ['constraints' => [new NotBlank()]]
                 ]
             )
             ->add(
                 'uri',
                 'text',
                 [
-                    'required' => $isCreate,
+                    'required' => true,
                     'label' => 'oro.navigation.menuupdate.uri.label',
-                    'validation_groups' => $isCreate ? ['Create'] : false,
                 ]
             )
             ->add(
-                'active'
+                'active',
+                null,
+                [
+                    'label' => 'oro.navigation.menuupdate.active.label',
+                ]
             )
         ;
     }
@@ -53,7 +53,6 @@ class MenuUpdateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'create_new' => false,
             'data_class' => MenuUpdate::class,
         ]);
     }
