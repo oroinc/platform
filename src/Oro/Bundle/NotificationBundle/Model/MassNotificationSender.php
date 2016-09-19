@@ -9,8 +9,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
-use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class MassNotificationSender
@@ -20,9 +19,9 @@ class MassNotificationSender
     const NOTIFICATION_LOG_TYPE = 'mass';
 
     /**
-     * @var EmailNotificationProcessor
+     * @var EmailNotificationManager
      */
-    protected $processor;
+    protected $emailNotificationManager;
 
     /** @var ConfigManager */
     protected $cm;
@@ -41,20 +40,20 @@ class MassNotificationSender
     protected $dqlNameFormatter;
 
     /**
-     * @param EmailNotificationProcessor $emailNotificationProcessor
+     * @param EmailNotificationManager $emailNotificationManager
      * @param ConfigManager $cm
      * @param EntityManager $em
      * @param EntityPool $entityPool
      * @param DQLNameFormatter $dqlNameFormatter
      */
     public function __construct(
-        EmailNotificationProcessor $emailNotificationProcessor,
+        EmailNotificationManager $emailNotificationManager,
         ConfigManager $cm,
         EntityManager $em,
         EntityPool $entityPool,
         DQLNameFormatter $dqlNameFormatter
     ) {
-        $this->processor = $emailNotificationProcessor;
+        $this->emailNotificationManager = $emailNotificationManager;
         $this->cm = $cm;
         $this->em = $em;
         $this->entityPool = $entityPool;
@@ -82,9 +81,7 @@ class MassNotificationSender
 
         $massNotification = new MassNotification($senderName, $senderEmail, $recipients, $template);
 
-        $this->processor->addLogType(self::NOTIFICATION_LOG_TYPE);
-        $this->processor->setMessageLimit(0);
-        $this->processor->process(null, [$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
+        $this->emailNotificationManager->process(null, [$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
         //persist and flush sending job entity
         $this->entityPool->persistAndFlush($this->em);
 

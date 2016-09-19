@@ -270,7 +270,7 @@ services:
     oro_calendar.send_processor.email:
         class: %oro_calendar.send_processor.email.class%
         arguments:
-            - '@oro_notification.email_processor'
+            - '@oro_notifications.manager.email_notification'
             - '@doctrine.orm.entity_manager'
             - '@oro_security.security_facade'
 
