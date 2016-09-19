@@ -91,10 +91,12 @@ class EmailGridListener
         }
         $this->filterJoins = [];
         $groupByFilters = ['cc', 'bcc', 'to', 'folders', 'folder', 'mailbox'];
-        // @TODO Remove this after removing joins
-        // which affect rows and do not need will be implemented(folders, recipients)
+
+        // As now optimizer could not automatically remove joins for these filters
+        // (they do not affect number of rows)
+        // adding group by statement
         if (array_intersect_key($filters, array_flip($groupByFilters))) {
-            // do not added to countQb cos it already added in grid config
+            // CountQb doesn't need group by statement cos it already added in grid config
             $queryBuilder->addGroupBy('eu.id');
         }
         $rFilters = [
