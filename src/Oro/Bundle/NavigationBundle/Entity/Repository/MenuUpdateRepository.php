@@ -52,4 +52,22 @@ class MenuUpdateRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @param string $menu
+     * @param string $key
+     * @return MenuUpdate|null
+     */
+    public function getMenuUpdateByMenuAndKey($menu, $key)
+    {
+        return $this->createQueryBuilder('mu')
+            ->where('mu.menu = :menu')
+            ->andWhere('mu.key = :key')
+            ->setParameters([
+                'menu' => $menu,
+                'key' => $key
+            ])
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

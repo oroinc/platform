@@ -11,6 +11,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
  * @ORM\Table(name="oro_navigation_menu_upd")
+ * @ORM\HasLifecycleCallbacks
  * @ORM\AssociationOverrides({
  *      @ORM\AssociationOverride(
  *          name="titles",
@@ -46,7 +47,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
     MenuUpdateInterface
 {
     use MenuUpdateTrait;
-    
+
     const OWNERSHIP_USER            = 3;
 
     /**
@@ -71,5 +72,15 @@ class MenuUpdate extends ExtendMenuUpdate implements
         }
 
         return $extras;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setKeyIfEmpty()
+    {
+        if ($this->getKey() === null) {
+            $this->setKey(uniqid());
+        }
     }
 }
