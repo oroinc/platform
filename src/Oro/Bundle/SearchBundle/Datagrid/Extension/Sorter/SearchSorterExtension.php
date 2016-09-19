@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
-use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 
 class SearchSorterExtension extends AbstractSorterExtension
@@ -37,10 +37,10 @@ class SearchSorterExtension extends AbstractSorterExtension
         if (array_key_exists(PropertyInterface::TYPE_KEY, $sorter)) {
             // pass type if specified
             $type = $this->mapType($sorter[PropertyInterface::TYPE_KEY]);
-            $datasource->getQuery()->setOrderBy($sortKey, $direction, $type);
+            $datasource->getSearchQuery()->setOrderBy($sortKey, $direction, $type);
         } else {
             // otherwise use default type
-            $datasource->getQuery()->setOrderBy($sortKey, $direction);
+            $datasource->getSearchQuery()->setOrderBy($sortKey, $direction);
         }
     }
 

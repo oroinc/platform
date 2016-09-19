@@ -1,18 +1,16 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Datasource;
+namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SearchBundle\Event\SearchResultAfter;
-use Oro\Bundle\SearchBundle\Event\SearchResultBefore;
+use Oro\Bundle\SearchBundle\Datagrid\Event\SearchResultAfter;
+use Oro\Bundle\SearchBundle\Datagrid\Event\SearchResultBefore;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class SearchDatasource implements DatasourceInterface
 {
@@ -22,7 +20,7 @@ class SearchDatasource implements DatasourceInterface
     protected $queryFactory;
 
     /** @var SearchQueryInterface */
-    protected $query;
+    protected $searchQuery;
 
     /** @var DatagridInterface */
     protected $datagrid;
@@ -37,10 +35,8 @@ class SearchDatasource implements DatasourceInterface
      * @param QueryFactoryInterface    $factory
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(
-        QueryFactoryInterface $factory,
-        EventDispatcherInterface $eventDispatcher
-    ) {
+    public function __construct(QueryFactoryInterface $factory, EventDispatcherInterface $eventDispatcher)
+    {
         $this->queryFactory               = $factory;
         $this->dispatcher                 = $eventDispatcher;
         $this->yamlToSearchQueryConverter = new YamlToSearchQueryConverter();
@@ -53,58 +49,43 @@ class SearchDatasource implements DatasourceInterface
     {
         $this->datagrid = $grid;
 
-        $this->query = $this->queryFactory->create($grid, $config);
+        $this->searchQuery = $this->queryFactory->create($grid, $config);
 
-        $this->yamlToSearchQueryConverter->process($this->query, $config);
+        $this->yamlToSearchQueryConverter->process($this->searchQuery, $config);
 
         $grid->setDatasource(clone $this);
     }
 
     /**
-     * @return ResultRecordInterface[]
+     * {@inheritDoc}
      */
     public function getResults()
     {
-        $results = $this->query->execute();
-        /** @var Item[] $results */
+        $results = $this->searchQuery->execute();
 
-        $event = new SearchResultBefore($this->datagrid, $this->query);
+        $event = new SearchResultBefore($this->datagrid, $this->searchQuery);
         $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
 
         $rows = [];
         foreach ($results as $result) {
-            $resultRecord = new ResultRecord([]);
-            if ($result instanceof Item) {
-                $resultRecord->addData(
-                    array_merge(['id' => $result->getId()], $result->getSelectedData())
-                );
-            } else {
-                $resultRecord->addData($result);
-            }
+            $resultRecord = new ResultRecord($result);
+            $resultRecord->addData(
+                array_merge(['id' => $result->getId()], $result->getSelectedData())
+            );
             $rows[] = $resultRecord;
         }
 
-        $event = new SearchResultAfter($this->datagrid, $rows, $this->query);
+        $event = new SearchResultAfter($this->datagrid, $this->searchQuery, $rows);
         $this->dispatcher->dispatch(SearchResultAfter::NAME, $event);
 
-        return $rows;
+        return $event->getRecords();
     }
 
     /**
      * @return SearchQueryInterface
      */
-    public function getQuery()
+    public function getSearchQuery()
     {
-        return $this->query;
-    }
-
-    /**
-     * The SearchQuery is a builder itself.
-     *
-     * @return SearchQueryInterface
-     */
-    public function getQueryBuilder()
-    {
-        return $this->getQuery();
+        return $this->searchQuery;
     }
 }

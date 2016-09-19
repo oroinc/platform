@@ -359,3 +359,9 @@ After
 oro_email.email_address.entity_manager:
     parent: oro_entity.abstract_entity_manager
 ```
+
+####CacheBundle
+- `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers
+
+####MigrationBundle
+- `Oro\Bundle\MigrationBundle\Migration\MigrationExecutor` now clears cache at all cache providers after successful migration load

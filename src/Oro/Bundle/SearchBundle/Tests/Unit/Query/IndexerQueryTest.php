@@ -176,7 +176,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->method('andWhere')
             ->with($expression);
 
-        $this->query->setWhere($expression);
+        $this->query->addWhere($expression);
     }
 
     public function testSetWhereOr()
@@ -191,6 +191,6 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->method('getCriteria')
             ->will($this->returnValue($this->criteria));
 
-        $this->query->setWhere($expression, AbstractSearchQuery::WHERE_OR);
+        $this->query->addWhere($expression, AbstractSearchQuery::WHERE_OR);
     }
 }

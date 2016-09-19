@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Datagrid\Extension;
+namespace Oro\Bundle\SearchBundle\Datagrid\Extension\Filter;
 
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\Filter\Adapter\SearchFilterDatasourceAdapter;
-use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 
@@ -33,7 +33,7 @@ class SearchFilterExtension extends AbstractFilterExtension
         $datasourceAdapter = null;
 
         if ($datasource instanceof SearchDatasource) {
-            $datasourceAdapter = new SearchFilterDatasourceAdapter($datasource->getQuery());
+            $datasourceAdapter = new SearchFilterDatasourceAdapter($datasource->getSearchQuery());
         }
 
         if ($datasourceAdapter === null) {

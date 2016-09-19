@@ -2,33 +2,41 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Form\Type;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class SearchStringFilterType extends TextFilterType
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+
+class SearchStringFilterType extends AbstractType
 {
-    const TYPE_CONTAINS     = 1;
-    const TYPE_NOT_CONTAINS = 2;
-    const TYPE_EQUAL        = 3;
-    const NAME              = 'oro_type_search_string_filter';
+    const NAME = 'oro_search_type_string_filter';
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $choices = array(
-            self::TYPE_CONTAINS           => $this->translator->trans('oro.filter.form.label_type_contains'),
-            self::TYPE_NOT_CONTAINS       => $this->translator->trans('oro.filter.form.label_type_not_contains'),
-            self::TYPE_EQUAL              => $this->translator->trans('oro.filter.form.label_type_equals')
-        );
+        $choices = [
+            TextFilterType::TYPE_CONTAINS     => $this->translator->trans('oro.filter.form.label_type_contains'),
+            TextFilterType::TYPE_NOT_CONTAINS => $this->translator->trans('oro.filter.form.label_type_not_contains'),
+            TextFilterType::TYPE_EQUAL        => $this->translator->trans('oro.filter.form.label_type_equals'),
+        ];
 
-        $resolver->setDefaults(
-            array(
-                'field_type'       => 'text',
-                'operator_choices' => $choices,
-            )
-        );
+        $resolver->setDefaults(['operator_choices' => $choices]);
     }
 
     /**
@@ -36,6 +44,22 @@ class SearchStringFilterType extends TextFilterType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return self::NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParent()
+    {
+        return TextFilterType::NAME;
     }
 }
