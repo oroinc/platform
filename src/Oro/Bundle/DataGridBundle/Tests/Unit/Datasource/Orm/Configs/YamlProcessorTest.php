@@ -73,10 +73,12 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\DataGridBundle\Exception\DatasourceException
      * @expectedExceptionMessage Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor expects to be configured with query or repository method
      */
+    // @codingStandardsIgnoreEnd
     public function testNoQueryAndRepositoryConfigsShouldThrowException()
     {
         $configs      = [
