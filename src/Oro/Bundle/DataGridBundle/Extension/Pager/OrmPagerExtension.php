@@ -32,6 +32,9 @@ class OrmPagerExtension extends AbstractPagerExtension
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
         /** @var $datasource OrmDatasource */
+        if ($datasource->getCountQb()) {
+            $this->pager->setCountQb($datasource->getCountQb());
+        }
         $this->pager->setQueryBuilder($datasource->getQueryBuilder());
         $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
         $this->pager->setAclPermission($config->getDatasourceAclApplyPermission());
