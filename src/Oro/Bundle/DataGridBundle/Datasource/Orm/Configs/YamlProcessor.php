@@ -84,7 +84,7 @@ class YamlProcessor implements ConfigProcessorInterface
      *
      * @return array
      */
-    public function mergeQueryConfigs(array $config)
+    protected function mergeQueryConfigs(array $config)
     {
         return array_merge($config['query'], $config['count_query']);
     }
