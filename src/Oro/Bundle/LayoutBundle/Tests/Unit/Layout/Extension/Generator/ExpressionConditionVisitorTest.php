@@ -49,20 +49,17 @@ class ExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
 <<<CLASS
 class LayoutUpdateClass implements \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {
-    private \$applicable = false;
-
     public function updateLayout(\$layoutManipulator, \$item)
     {
-        \$context = \$item->getContext();
-        if ((true == \$context["enabled"])) {
-            \$this->applicable = true;
-            echo 123;
+        if (!\$this->isApplicable(\$item->getContext())) {
+            return;
         }
+        echo 123;
     }
 
-    public function isApplicable()
+    public function isApplicable(\Oro\Component\Layout\ContextInterface \$context)
     {
-        return \$this->applicable;
+        return (true == \$context["enabled"]);
     }
 }
 CLASS

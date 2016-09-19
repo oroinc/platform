@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
@@ -79,11 +81,13 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     }
 
     /**
-     * @return OptionsResolverInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createMockOptionsResolver()
     {
-        return $this->getMockForAbstractClass('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        return $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -149,7 +153,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     abstract public function bindDataProvider();
 
     /**
-     * @return FormTypeInterface
+     * @return AbstractType
      */
     abstract protected function getTestFormType();
 
