@@ -101,7 +101,7 @@ datagrids:
                         - translationKey = translationKey
         columns:
             id:
-                label: oro.translation.translation.id
+                label: oro.translation.translation.id.label
                 renderable: false
             code:
                 label: oro.translation.translation.language.label
