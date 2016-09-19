@@ -52,10 +52,20 @@ navigation:
                 extras:
                     icon: 'icon-flag'
                 uri: '#'
+            menus_list:
+                label: 'oro.navigation.menuupdate.roots_plural_label'
+                route: 'oro_navigation_menu_update_index'
+                extras:
+                    position: 90
+                    routes: ['/^oro_navigation_menu_update\w+$/']
 
         tree:
             application_menu:
                 type: application_menu
+                children:
+                    system_tab:
+                        children:
+                            menus_list: ~
 
             dots_menu:
                 type: dots_menu
