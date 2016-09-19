@@ -273,6 +273,23 @@ operations:
         preconditions:
             '@equal': [$.isAvailableUpdate, true]
 
+    oro_translation_rebuild_cache:
+            label: oro.translation.action.rebuild_cache.label
+            applications: [default]
+            routes:
+                - oro_translation_translation_index
+            button_options:
+                icon: icon-refresh
+            acl_resource: ['EDIT', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
+            actions:
+                - '@call_service_method':
+                    service: oro_translation.manager.translation
+                    method: invalidateCache
+                - '@flash_message':
+                    message: oro.translation.translation.message.rebuild_cache
+                    type: 'success'
+                - '@refresh_grid': oro-translation-translations-grid
+
 action_groups:
     oro_translation_language_set_enabled:
         parameters:
