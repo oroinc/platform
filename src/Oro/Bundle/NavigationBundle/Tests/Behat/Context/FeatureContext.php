@@ -4,15 +4,20 @@ namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
+use Behat\Symfony2Extension\Context\KernelAwareContext;
+use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
-class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
+class FeatureContext extends OroFeatureContext implements OroElementFactoryAware, KernelAwareContext
 {
-    use ElementFactoryDictionary;
+    use ElementFactoryDictionary, KernelDictionary;
 
     /**
      * @Given uncheck Use Default for :label field
@@ -145,13 +150,35 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
      */
     public function goToPages(TableNode $table)
     {
+        /** @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine')->getManager();
         /** @var MainMenu $menu */
         $menu = $this->createElement('MainMenu');
+        $count = $this->getPageTransitionCount($em);
 
         foreach ($table->getRows() as $row) {
             $menu->openAndClick($row[0]);
+            $count++;
+            $this->spin(function () use ($em, $count) {
+                return $count === $this->getPageTransitionCount($em);
+            });
             $this->waitForAjax();
         }
+    }
+
+    /**
+     * @param EntityManager $em
+     * @return int
+     */
+    protected function getPageTransitionCount(EntityManager $em)
+    {
+        /** @var HistoryItemRepository $repository */
+        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+
+        return array_sum(array_map(function (NavigationHistoryItem $item) use ($em) {
+            $em->detach($item);
+            return $item->getVisitCount();
+        }, $repository->findAll()));
     }
 
     /**
