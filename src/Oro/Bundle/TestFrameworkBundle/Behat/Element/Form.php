@@ -101,6 +101,10 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('Checkbox', $field);
             }
 
+            if ($field->hasClass('select2-offscreen')) {
+                return $this->elementFactory->wrapElement('Select2Entity', $field);
+            }
+
             return $field;
         }
 

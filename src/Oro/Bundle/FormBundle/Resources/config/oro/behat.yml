@@ -33,3 +33,7 @@ elements:
   SelectToResultLabel:
     selector: 'div.select2-result-label'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  Select2Entity:
+    selector: '.select2-offscreen'
+    class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity

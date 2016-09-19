@@ -131,3 +131,5 @@ services:
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
+        calls:
+            - [setDoctrine, ['@doctrine']]
