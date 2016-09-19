@@ -52,10 +52,18 @@ oro.translation:
         language.label: 'Language'
         value.label: 'Value'
         original_value.label: 'Original Value'
-        translation_key.label: 'Translation Ket'
+
         status:
+            label: 'Status'
             translated: 'Translated'
             untranslated: 'Untranslated'
+    translation_key:
+        entity_label: 'Translation Key'
+        entity_plural_label: 'Translation Keys'
+
+        id.label: 'Id'
+        key.label: 'Key'
+        domain.label: 'Domain'
 
     menu:
         languages.label: Languages

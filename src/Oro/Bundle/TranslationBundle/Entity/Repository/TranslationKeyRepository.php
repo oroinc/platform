@@ -12,8 +12,26 @@ class TranslationKeyRepository extends EntityRepository
     public function getCount()
     {
         $qb = $this->createQueryBuilder('k')
-            ->select('count(k.id)');
+            ->select('count(k.id)')
+        ;
 
         return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Returns the list of all existing in the database translation domains.
+     *
+     * @return array [['code' = '...', 'domain' => '...'], ...]
+     */
+    public function findAvailableDomains()
+    {
+        $qb = $this->createQueryBuilder('k')
+            ->distinct(true)
+            ->select('k.domain')
+        ;
+
+        $data = array_values(array_column($qb->getQuery()->getArrayResult(), 'domain'));
+
+        return array_combine($data, $data);
     }
 }
