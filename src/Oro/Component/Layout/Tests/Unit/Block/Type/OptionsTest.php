@@ -51,4 +51,11 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame(['value' => 'test'], $this->options->toArray());
     }
+
+    public function testSetMultiple()
+    {
+        $values = ['value'=> 'test1', 'value2'=> 'test2', 'value3'=> 'test3'];
+        $this->options->setMultiple($values);
+        $this->assertEquals($values, $this->options->toArray());
+    }
 }
