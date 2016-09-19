@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Extension;
+namespace Oro\Bundle\SearchBundle\Datagrid\Extension;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
