@@ -349,3 +349,10 @@ oro_email.email_address.entity_manager:
 ####NotificationBundle
 - Moved interface `Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
 - Moved interface `Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
+- Removed class `Oro\Bundle\NotificationBundle\Processor\AbstractNotificationProcessor`
+- Removed class `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+- Interface `Oro\Bundle\NotificationBundle\Model\NotificationInterface` introduced
+- Added class `Oro\Bundle\NotificationBundle\Manager\AbstractNotificationManager`
+- Added class `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager`; some logic from `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor` was moved there
+- Added class `Oro\Bundle\NotificationBundle\Async\Topics`
+- Added class `Oro\Bundle\NotificationBundle\Async\EmailSendingMessageProcessor`

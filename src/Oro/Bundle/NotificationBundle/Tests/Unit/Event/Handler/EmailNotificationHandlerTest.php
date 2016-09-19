@@ -2,8 +2,16 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
+use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\TagBundle\Entity\Taggable;
+
 
 class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,34 +20,39 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandle()
     {
-        $entity = $this->getMock('Oro\Bundle\TagBundle\Entity\ContainAuthorInterface');
-        $event = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Event\NotificationEvent')
+        $entity = $this->getMock(Taggable::class);
+        /** @var NotificationEvent | \PHPUnit_Framework_MockObject_MockObject $event */
+        $event = $this->getMockBuilder(NotificationEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $event->expects($this->once())
             ->method('getEntity')
             ->will($this->returnValue($entity));
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        /** @var EntityManager $em */
+        $em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        /** @var ConfigProvider $configProvider */
+        $configProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $notification = $this->getMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
+        /** @var EmailNotification $notification */
+        $notification = $this->getMock(EmailNotification::class);
         $notifications = array($notification);
-        $notificationsForProcessor = array(new EmailNotificationAdapter($entity, $notification, $em, $configProvider));
+        $notificationsForManager = array(new EmailNotificationAdapter($entity, $notification, $em, $configProvider));
 
-        $processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor')
+        /** @var EmailNotificationManager | \PHPUnit_Framework_MockObject_MockObject $manager */
+        $manager = $this->getMockBuilder(EmailNotificationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $processor->expects($this->once())
+        $manager->expects($this->once())
             ->method('process')
-            ->with($this->identicalTo($entity), $this->equalTo($notificationsForProcessor));
+            ->with($this->identicalTo($entity), $this->equalTo($notificationsForManager));
 
-        $handler = new EmailNotificationHandler($processor, $em, $configProvider);
+        $handler = new EmailNotificationHandler($manager, $em, $configProvider);
         $handler->handle($event, $notifications);
     }
 }
