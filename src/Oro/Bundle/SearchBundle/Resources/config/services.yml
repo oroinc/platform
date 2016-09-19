@@ -138,7 +138,7 @@ services:
         class: %oro_search.datasource.search.class%
         arguments:
             - '@oro_search.query_factory'
-            - '@event_dispatcher'
+            - '@oro_datagrid.event.dispatcher'
         tags:
             - { name: oro_datagrid.datasource, type: search }
 
