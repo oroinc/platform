@@ -110,30 +110,6 @@ class MenuUpdateController extends Controller
      */
     public function viewAction($menu)
     {
-        return [];
-    }
-
-    /**
-     * @Route("/", name="oro_navigation_menu_update_index")
-     * @Template()
-     *
-     * @return array
-     */
-    public function indexAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/{menu}", name="oro_navigation_menu_update_view")
-     * @Template()
-     *
-     * @param string $menu
-     *
-     * @return array
-     */
-    public function viewAction($menu)
-    {
         return [
             'entity' => $this->get('oro_menu.builder_chain')->get($menu)
         ];
