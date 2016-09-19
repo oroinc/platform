@@ -115,10 +115,25 @@ operations:
         frontend_options:
             confirmation:
                 title: oro.user.reset_password.popup.title
-                okText: oro.user.password.reset.label
+                okText: oro.user.reset_password.popup.label
                 message: oro.user.reset_password.popup.question
                 message_parameters:
                     user: $.data.username
+        datagrid_options:
+            mass_action:
+                type: resetpassword
+                label: oro.user.password.reset_password.label
+                icon: shield
+                route: oro_user_mass_password_reset
+                data_identifier: u.id
+                confirmation: true
+                frontend_options:
+                    title: oro.user.reset_password.popup.title
+                    dialogOptions:
+                        modal: true
+                messages:
+                    - success: oro.user.password.reset.mass_action.success
+                    - failure: oro.user.password.reset.mass_action.failure
         actions:
             - '@call_method':
                 object: $.data

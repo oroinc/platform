@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -9,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -147,6 +149,31 @@ class ResetController extends Controller
         }
 
         return $params;
+    }
+
+    /**
+     * @Route(
+     *     "/mass-password-reset/",
+     *     name="oro_user_mass_password_reset"
+     * )
+     * @AclAncestor("password_management")
+     */
+    public function massPasswordResetAction(Request $request)
+    {
+        $gridName = $request->get('gridName');
+        $actionName = $request->get('actionName');
+
+        /** @var MassActionDispatcher $massActionDispatcher */
+        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
+
+        $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
+
+        $data = [
+            'successful' => $response->isSuccessful(),
+            'message' => $response->getMessage()
+        ];
+
+        return new JsonResponse(array_merge($data, $response->getOptions()));
     }
 
     /**

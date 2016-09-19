@@ -194,6 +194,8 @@ oro:
                 popup.question: Are you sure you want to proceed?
                 success.message: Password reset request has been sent.
                 failure.message: Password reset request has failed.
+                mass_action.success: Password reset completed successfully.
+                mass_action.failure: Mass reset action has failed.
         action:
             password_management:
                 label: Manage passwords
