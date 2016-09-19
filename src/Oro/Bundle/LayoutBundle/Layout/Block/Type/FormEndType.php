@@ -6,6 +6,7 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class FormEndType extends AbstractFormType
 {
@@ -25,7 +26,7 @@ class FormEndType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['render_rest'] = $options->get('render_rest', false);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['render_rest']);
         parent::buildView($view, $block, $options);
     }
 

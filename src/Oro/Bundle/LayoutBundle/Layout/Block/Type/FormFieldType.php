@@ -8,6 +8,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class FormFieldType extends AbstractFormType
 {
@@ -27,7 +28,7 @@ class FormFieldType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['field_path'] = $options->get('field_path', false);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['field_path']);
         parent::buildView($view, $block, $options);
 
     }

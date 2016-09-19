@@ -6,6 +6,7 @@ use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class BaseType extends AbstractType
 {
@@ -32,19 +33,17 @@ class BaseType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
+        BlockUtils::setViewVarsFromOptions(
+            $view,
+            $options,
+            ['translation_domain', 'additional_block_prefixes', 'class_prefix']
+        );
+
         // merge the passed variables with the existing ones
         if (!empty($options['vars'])) {
-            $view->vars = array_replace($view->vars, $options['vars']->toArray());
-        }
-
-        // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
-        $view->vars['block'] = $view;
-
-        $view->vars['class_prefix'] = null;
-        if ($options->offsetExists('class_prefix')) {
-            $view->vars['class_prefix'] = $options['class_prefix'];
-        } elseif ($view->parent) {
-            $view->vars['class_prefix'] = $view->parent->vars['class_prefix'];
+            foreach ($options['vars'] as $name => $value) {
+                $view->vars[$name] = $value;
+            }
         }
 
         // replace attributes if specified ('attr' variable always exists in a view because it is added by FormView)
@@ -54,15 +53,28 @@ class BaseType extends AbstractType
 
         // add label text and attributes if specified
         if (isset($options['label'])) {
-            $view->vars['label'] = $options['label'];
+            $view->vars['label'] = $options->get('label', false);
             $view->vars['label_attr'] = [];
             if (isset($options['label_attr'])) {
-                $view->vars['label_attr'] = $options['label_attr'];
+                $view->vars['label_attr'] = $options->get('label_attr', false);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block)
+    {
+        if (empty($view->vars['class_prefix']) && $view->parent) {
+            $view->vars['class_prefix'] = $view->parent->vars['class_prefix'];
+        }
+
+        // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
+        $view->vars['block'] = $view;
 
         // add the translation domain
-        $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
+        $view->vars['translation_domain'] = $this->getTranslationDomain($view);
 
         // add core variables to the block view, like id, block type and variables required for rendering engine
         $id   = $block->getId();
@@ -72,9 +84,12 @@ class BaseType extends AbstractType
         // due to limitations of block names in TWIG
         $uniqueBlockPrefix = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $id);
         $blockPrefixes     = $block->getTypeHelper()->getTypeNames($name);
-        if (isset($options['additional_block_prefixes'])) {
-            $blockPrefixes = array_merge($blockPrefixes, $options['additional_block_prefixes']->toArray());
+
+        if (!empty($view->vars['additional_block_prefixes'])) {
+            $blockPrefixes = array_merge($blockPrefixes, $view->vars['additional_block_prefixes']);
         }
+        unset($view->vars['additional_block_prefixes']);
+
         $blockPrefixes[]   = $uniqueBlockPrefix;
 
         $view->vars['id']                   = $id;
@@ -83,16 +98,9 @@ class BaseType extends AbstractType
         $view->vars['unique_block_prefix']  = $uniqueBlockPrefix;
         $view->vars['block_prefixes']       = $blockPrefixes;
         $view->vars['cache_key']            = sprintf('_%s_%s', $id, $name);
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(BlockView $view, BlockInterface $block)
-    {
-        $vars = $view->vars;
-        if (isset($vars['attr']['id']) && !isset($vars['label_attr']['for'])) {
-            $view->vars['label_attr']['for'] = $vars['attr']['id'];
+        if (isset($view->vars['attr']['id']) && !isset($view->vars['label_attr']['for'])) {
+            $view->vars['label_attr']['for'] = $view->vars['attr']['id'];
         }
 
         $view->vars['blocks'] = $view->blocks;
@@ -120,11 +128,9 @@ class BaseType extends AbstractType
      *
      * @return string
      */
-    protected function getTranslationDomain(BlockView $view, Options $options)
+    protected function getTranslationDomain(BlockView $view)
     {
-        $translationDomain = isset($options['translation_domain'])
-            ? $options['translation_domain']
-            : null;
+        $translationDomain = $view->vars['translation_domain'];
         if (!$translationDomain && $view->parent) {
             $translationDomain = $view->parent->vars['translation_domain'];
         }

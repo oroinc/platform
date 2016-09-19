@@ -9,6 +9,7 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class TitleType extends AbstractType
 {
@@ -32,9 +33,7 @@ class TitleType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        foreach (['value', 'separator', 'reverse'] as $optionName) {
-            $view->vars[$optionName] = $options->get($optionName, false);
-        }
+        BlockUtils::setViewVarsFromOptions($view, $options, ['value', 'separator', 'reverse']);
     }
 
     /**

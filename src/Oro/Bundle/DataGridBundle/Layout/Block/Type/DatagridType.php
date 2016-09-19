@@ -13,6 +13,7 @@ use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class DatagridType extends AbstractContainerType
 {
@@ -96,10 +97,9 @@ class DatagridType extends AbstractContainerType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
+        BlockUtils::setViewVarsFromOptions($view, $options, ['grid_name', 'grid_parameters', 'grid_render_parameters']);
+
         $view->vars['split_to_cells'] = $options['split_to_cells'];
-        $view->vars['grid_name'] = $options->get('grid_name', false);
-        $view->vars['grid_parameters'] = $options->get('grid_parameters', false);
-        $view->vars['grid_render_parameters'] = $options->get('grid_render_parameters', false);
         if (!empty($options['grid_scope'])) {
             $view->vars['grid_scope']     = $options->get('grid_scope', false);
             $view->vars['grid_full_name'] = $this->nameStrategy->buildGridFullName(

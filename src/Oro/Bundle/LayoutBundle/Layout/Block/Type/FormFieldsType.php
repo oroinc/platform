@@ -11,6 +11,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options as LayoutOptions;
+use Oro\Component\Layout\Util\BlockUtils;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
@@ -92,10 +93,7 @@ class FormFieldsType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
-        $view->vars['form'] = $options->get('form', false);
-        $view->vars['form_name'] = $options->get('form_name', false);
-        $view->vars['form_data'] = $options->offsetExists('form_data') ? $options->get('form_data', false) : null;
-        $view->vars['split_to_fields'] = $options->get('split_to_fields', false);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['form_data', 'split_to_fields']);
         parent::buildView($view, $block, $options);
 
     }

@@ -83,6 +83,18 @@ class BlockUtils
     }
 
     /**
+     * @param BlockView $view
+     * @param Options   $options
+     * @param array     $optionNames
+     */
+    public static function setViewVarsFromOptions(BlockView $view, Options $options, array $optionNames)
+    {
+        foreach ($optionNames as $optionName) {
+            $view->vars[$optionName] = isset($options[$optionName]) ? $options->get($optionName, false) : null;
+        }
+    }
+
+    /**
      * This class cannot be instantiated.
      */
     private function __construct()

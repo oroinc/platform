@@ -224,4 +224,22 @@ class BlockUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayNotHasKey('test_route_name', $view->vars);
         $this->assertArrayNotHasKey('test_route_parameters', $view->vars);
     }
+
+    public function testSetViewVarsFromOptions()
+    {
+        $view = new BlockView();
+        BlockUtils::setViewVarsFromOptions(
+            $view,
+            new Options(
+                [
+                    'test_path' => 'http://example.com',
+                    'test_route_name' => 'test_route',
+                    'test_route_parameters' => ['foo' => 'bar']
+                ]
+            ),
+            ['test_route_name', 'test_path']
+        );
+        $this->assertEquals('http://example.com', $view->vars['test_path']);
+        $this->assertEquals('test_route', $view->vars['test_route_name']);
+    }
 }

@@ -9,6 +9,7 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Util\BlockUtils;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface;
 
@@ -33,8 +34,7 @@ abstract class AbstractFormType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['form'] = $options->get('form', false);
-        $view->vars['form_name'] = $options->get('form_name', false);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['form', 'form_name']);
     }
 
     /**
@@ -51,7 +51,7 @@ abstract class AbstractFormType extends AbstractType
     protected function getFormAccessor(ContextInterface $context, $options)
     {
         /** @var FormAccessorInterface $formAccessor */
-        if (isset($options['form']) && !empty($options['form'])) {
+        if (!empty($options['form'])) {
             $formAccessor = $options['form'];
             if (!$formAccessor instanceof FormAccessorInterface) {
                 throw new UnexpectedTypeException(

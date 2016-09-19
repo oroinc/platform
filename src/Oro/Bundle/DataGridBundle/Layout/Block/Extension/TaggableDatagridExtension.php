@@ -28,7 +28,7 @@ class TaggableDatagridExtension extends AbstractBlockTypeExtension
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['enable_tagging'] = $options['enable_tagging'];
+        BlockUtils::setViewVarsFromOptions($view, $options, ['enable_tagging']);
     }
 
     /**

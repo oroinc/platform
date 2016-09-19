@@ -17,6 +17,7 @@ use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\OptionValueBuilderInterface;
 use Oro\Component\Layout\StringOptionValueBuilder;
+use Oro\Component\Layout\Util\BlockUtils;
 
 /**
  * Automatically converts OptionValueBag to an appropriate data representation
@@ -43,7 +44,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
 
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['resolve_value_bags'] = $options->get('resolve_value_bags', false);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['resolve_value_bags']);
     }
 
     /**

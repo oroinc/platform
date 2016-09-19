@@ -6,6 +6,7 @@ use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class FormStartType extends AbstractFormType
 {
@@ -33,12 +34,11 @@ class FormStartType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['form_action'] = $options['form_action'];
-        $view->vars['form_route_name'] = $options['form_route_name'];
-        $view->vars['form_route_parameters'] = $options['form_route_parameters'];
-        $view->vars['form_method'] = $options['form_method'];
-        $view->vars['form_enctype'] = $options['form_enctype'];
-
+        BlockUtils::setViewVarsFromOptions(
+            $view,
+            $options,
+            ['form_action', 'form_route_name', 'form_route_parameters', 'form_method', 'form_enctype']
+        );
         parent::buildView($view, $block, $options);
     }
     
@@ -53,16 +53,16 @@ class FormStartType extends AbstractFormType
         $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
 
         // form action
-        if (isset($view->vars['form_action'])) {
+        if (!empty($view->vars['form_action'])) {
             $path = $view->vars['form_action'];
             if ($path) {
                 $view->vars['action_path'] = $path;
             }
-        } elseif (isset($view->vars['form_route_name'])) {
+        } elseif (!empty($view->vars['form_route_name'])) {
             $routeName = $view->vars['form_route_name'];
             if ($routeName) {
                 $view->vars['action_route_name']       = $routeName;
-                $view->vars['action_route_parameters'] = isset($view->vars['form_route_parameters'])
+                $view->vars['action_route_parameters'] = !empty($view->vars['form_route_parameters'])
                     ? $view->vars['form_route_parameters']
                     : [];
             }
