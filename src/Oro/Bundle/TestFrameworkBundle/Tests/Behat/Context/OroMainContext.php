@@ -345,7 +345,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I go to System/ Channels
      * Example: And go to System/ User Management/ Users
      *
-     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)([^"]*)))$/
+     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)([^":]*)))$/
      */
     public function iOpenTheMenuAndClick($path)
     {

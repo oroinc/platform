@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
+use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
@@ -137,6 +138,20 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     public function clickBarsIcon()
     {
         $this->getPage()->find('css', 'i.icon-bars')->click();
+    }
+
+    /**
+     * @When /^(?:|I )go to next pages:$/
+     */
+    public function goToPages(TableNode $table)
+    {
+        /** @var MainMenu $menu */
+        $menu = $this->createElement('MainMenu');
+
+        foreach ($table->getRows() as $row) {
+            $menu->openAndClick($row[0]);
+            $this->waitForAjax();
+        }
     }
 
     /**
