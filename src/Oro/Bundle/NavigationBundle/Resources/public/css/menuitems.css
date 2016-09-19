@@ -1,0 +1,19 @@
+.menuitem-container {
+    position: relative;
+}
+.menuitem-container .menuitem-tree {
+    position: absolute;
+    border-top: 1px solid #f2f2f2;
+    width: 334px;
+    overflow: auto;
+}
+.menuitem-tree {
+    padding-left: 10px;
+}
+.menuitem-tree-form-type {
+    margin-left: -10px;
+}
+.menuitem-data {
+    margin-left: 334px;
+    border-left: 1px solid #f2f2f2;
+}

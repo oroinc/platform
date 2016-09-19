@@ -127,7 +127,9 @@
                 {%  endif %}
             </div>
         </div>
-        {% placeholder page_title_after with {entity: entity} %}
+        {% block workflowsListContainer %}
+            {% placeholder page_title_after with {entity: entity} %}
+        {% endblock %}
     </div>
 
     <div class="layout-content scrollable-container">

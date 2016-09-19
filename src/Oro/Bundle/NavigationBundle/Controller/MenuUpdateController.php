@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -105,5 +106,31 @@ class MenuUpdateController extends Controller
         ;
 
         return $menuUpdate;
+    }
+
+    /**
+     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Template()
+     *
+     * @return array
+     */
+    public function indexAction()
+    {
+        return [];
+    }
+
+    /**
+     * @Route("/{menu}", name="oro_navigation_menu_update_view")
+     * @Template()
+     *
+     * @param string $menu
+     *
+     * @return array
+     */
+    public function viewAction($menu)
+    {
+        return [
+            'entity' => $this->get('oro_menu.builder_chain')->get($menu)
+        ];
     }
 }
