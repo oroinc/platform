@@ -79,12 +79,6 @@
         }) %}
     {% endif %}
 
-    {% if id is defined and id is not empty %}
-        {% set attr = attr|merge({
-            id: id
-        }) %}
-    {% endif %}
-
     {% if placeholder is defined %}
         {% set attr = attr|merge({
             placeholder: placeholder|block_text(translation_domain)
