@@ -39,7 +39,7 @@ class AsyncIndexer implements IndexerInterface
         $this->sendAsyncIndexerMessage(
             self::TOPIC_SAVE,
             [
-                'entity' => $this->getOneOrManyEntitiesScalarRepresentation($entity),
+                'entity' => $this->getEntityData($entity),
                 'context' => $context
             ]
         );
@@ -53,7 +53,7 @@ class AsyncIndexer implements IndexerInterface
         $this->sendAsyncIndexerMessage(
             self::TOPIC_DELETE,
             [
-                'entity' => $this->getOneOrManyEntitiesScalarRepresentation($entity),
+                'entity' => $this->getEntityData($entity),
                 'context' => $context
             ]
         );
@@ -113,7 +113,7 @@ class AsyncIndexer implements IndexerInterface
      * @param object|object[] $entity
      * @return array
      */
-    private function getOneOrManyEntitiesScalarRepresentation($entity)
+    private function getEntityData($entity)
     {
         if (is_array($entity)) {
             $result = [];
