@@ -174,5 +174,5 @@ The bundle also exposes a twig function to get the fallback compatible value of 
 [EntityFallbackResolver](../../Fallback/EntityFallbackResolver.php).
 
 ```twig
-{{ oro_get_fallback(entity, 'manageInventory') }}
+{{ oro_entity_fallback_value(entity, 'manageInventory') }}
 ```

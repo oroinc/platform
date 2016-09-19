@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Twig;
 
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 
-class GetEntityFallbackExtension extends \Twig_Extension
+class EntityFallbackExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_fallback_extension';
 
@@ -14,8 +14,6 @@ class GetEntityFallbackExtension extends \Twig_Extension
     protected $fallbackResolver;
 
     /**
-     * GetEntityFallbackExtension constructor.
-     *
      * @param $fallbackResolver
      */
     public function __construct(EntityFallbackResolver $fallbackResolver)
@@ -30,7 +28,7 @@ class GetEntityFallbackExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction(
-                'oro_get_fallback',
+                'oro_entity_fallback_value',
                 [$this->fallbackResolver, 'getFallbackValue']
             ),
         ];

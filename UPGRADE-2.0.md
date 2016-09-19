@@ -359,7 +359,7 @@ oro_email.email_address.entity_manager:
 - Added EntityFallbackResolver service which handles fallback resolution
 - Added SystemConfigFallbackProvider service which handles `systemConfig` fallback type
 - Added GetEntityFallbackExtension service which reads fallback values of entities in twig
-- Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer 
+- Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer
 to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
 
 ####CacheBundle
