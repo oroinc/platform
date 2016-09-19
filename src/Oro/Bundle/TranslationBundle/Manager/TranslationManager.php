@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -104,10 +105,12 @@ class TranslationManager
     public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
         static $cache;
+
         if (!$cache) {
             $cache = [];
         }
-        $index = strtolower(sprintf('%s-%s-%s', $key, $value, $domain));
+
+        $index = sprintf('%s-%s-%s', $key, $value, $locale);
 
         if (!isset($cache[$index])) {
             if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
@@ -176,6 +179,19 @@ class TranslationManager
         $repo = $this->getEntityRepository(Translation::class);
 
         return $repo->findAvailableDomainsForLocales($locales);
+    }
+
+    /**
+     * Returns the list of all existing in the database translation domains
+     *
+     * @return array
+     */
+    public function getAvailableDomains()
+    {
+        /** @var TranslationKeyRepository $repo */
+        $repo = $this->getEntityRepository(TranslationKey::class);
+
+        return $repo->findAvailableDomains();
     }
 
     /**
