@@ -14,7 +14,7 @@ define(['jquery'], function($) {
         initialize: function($group) {
             var self = this;
 
-            var labels = this.findCurrentGroupInputLabels($group);
+            var labels = this.getGroupElements($group, $group.find('label[data-required]'));
             labels.addClass('required');
 
             var labelAsterisk = labels.find('em');
@@ -32,17 +32,6 @@ define(['jquery'], function($) {
 
         /**
          * @param {jQuery} $group
-         * @return {jQuery}
-         */
-        findCurrentGroupInputLabels: function($group) {
-            console.log($group);
-            console.log($group.find('label[data-required]'));
-            console.log($group.find('label[data-required]:not([data-validation-optional-group] label)'));
-            return $group.find('label[data-required]:not([data-validation-optional-group] label)');
-        },
-
-        /**
-         * @param {jQuery} $group
          * @returns {boolean}
          */
         hasNotEmptyDescendantGroup: function($group) {
@@ -54,7 +43,11 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         hasNotEmptyInput: function($group) {
-            var checkedElements = this.findCurrentGroupInputs($group);
+            var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
+                ' input[type="radio"][data-required]:checked,' +
+                ' input[type="checkbox"][data-required]:checked';
+
+            var checkedElements = this.getGroupElements($group, $group.find(elementsSelector));
             for (var i = 0; i < checkedElements.length; i++) {
                 if (!this.isValueEmpty($(checkedElements[i]).val())) {
                     return true;
@@ -69,7 +62,7 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         hasNotEmptySelect: function($group) {
-            var elements = this.findCurrentGroupSelects($group);
+            var elements = this.getGroupElements($group, $group.find('select'));
             for (var i = 0; i < elements.length; i++) {
                 if (!this.isValueEmpty($(elements[i]).find('option:selected').val())) {
                     return true;
@@ -123,11 +116,12 @@ define(['jquery'], function($) {
         handleGroupRequire: function($group, value) {
             if (this.isValueEmpty(value)) {
                 $group.find('label[data-required] em').hide();
-                this.clearValidationErrors($group);
+                this.clearValidationErrorsAndDisableValidation($group);
                 $group.data('group-validation-required', false);
             } else {
                 $group.find('label[data-required] em').show();
-                $group.find('input, select').data('ignore-validation', false);
+                var inputs = this.getGroupElements($group, $group.find('input, select'));
+                inputs.data('ignore-validation', false);
                 $group.data('group-validation-required', true);
             }
         },
@@ -144,11 +138,9 @@ define(['jquery'], function($) {
         /**
          * @param {jQuery} $group
          */
-        clearValidationErrors: function($group) {
+        clearValidationErrorsAndDisableValidation: function($group) {
             var validator = $group.validate();
-            var inputs = this.findCurrentGroupInputs($group)
-                .add(this.findCurrentGroupSelects($group));
-
+            var inputs = this.getGroupElements($group, $group.find('input, select'));
             inputs.data('ignore-validation', true);
             inputs.each(function(key, element) {
                     validator.hideElementErrors($(element));
@@ -157,22 +149,16 @@ define(['jquery'], function($) {
 
         /**
          * @param {jQuery} $group
+         * @param {jQuery} $elements
+         *
          * @return {jQuery}
          */
-        findCurrentGroupInputs: function($group) {
-            var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
-                ' input[type="radio"][data-required]:checked,' +
-                ' input[type="checkbox"][data-required]:checked';
+        getGroupElements: function($group, $elements) {
+            $elements.filter(function(key, element) {
+                return $(element).closest('[data-validation-optional-group]').get(0) === $group.get(0);
+            });
 
-            return $group.find(elementsSelector).not('[data-validation-optional-group] input');
-        },
-
-        /**
-         * @param {jQuery} $group
-         * @return {jQuery}
-         */
-        findCurrentGroupSelects: function($group) {
-            return $group.find('select:not([data-validation-optional-group] select)');
+            return $elements;
         }
     };
 });
