@@ -38,6 +38,10 @@ placeholders:
             items:
                 routing_requirejs_config:
                     order: 100
+        view_navButtons_before:
+            items:
+                menus_configuration_button:
+                    order: 100
 
     items:
        dot_menu_js:
@@ -61,3 +65,6 @@ placeholders:
        pin_button:
             template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+       menus_configuration_button:
+            template: OroNavigationBundle:User:menusConfigurationButton.html.twig
+            applicable: "@oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)"
