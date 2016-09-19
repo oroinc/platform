@@ -10,20 +10,19 @@ class Select2Entity extends Element
     public function setValue($value)
     {
         $this->open();
-
-        /** @var NodeElement $input */
-        foreach ($this->findAll('xpath', '//div[contains(@class, "select2-search")]/input') as $input) {
-            if ($input->isVisible()) {
-                $input->setValue($value);
+        /** @var NodeElement[] $inputs */
+        $inputs = array_filter(
+            $this->getPage()->findAll('css', '.select2-search input'),
+            function (NodeElement $element) {
+                return $element->isVisible();
             }
-        }
+        );
 
-        $this->getDriver()->waitForAjax();
-        $this->waitFor(60, function () {
-            return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
-        });
+        self::assertCount(1, $inputs);
+        array_shift($inputs)->setValue($value);
 
         $results = $this->getSuggestedValues();
+
         if (1 < count($results)) {
             /** @var NodeElement $result */
             foreach ($results as $result) {
@@ -43,25 +42,24 @@ class Select2Entity extends Element
         $this->getDriver()->waitForAjax();
     }
 
-//    public function getSuggestedValues()
-//    {
-//        $this->open();
-//        $this->waitFor(60, function () {
-//            return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
-//        });
-//
-//        return $this->getPage()->findAll('css', '.select2-results li');
-//    }
-
     /**
      * @return string[]
      */
     public function getSuggestedValues()
     {
         $this->open();
+        $this->getDriver()->waitForAjax();
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
+        $this->getDriver()->waitForAjax();
+
+        /** @var NodeElement $resultSet */
+        foreach ($this->getPage()->findAll('css', '.select2-results') as $resultSet) {
+            if ($resultSet->isVisible()) {
+                return $resultSet->findAll('css', 'li');
+            }
+        }
 
 //        $resultsHoldersXpaths = [
 //            '//ul[contains(@class, "select2-result-sub")]',
@@ -77,8 +75,7 @@ class Select2Entity extends Element
 //            }
 //        }
 //
-//        return [];
-        return $this->getPage()->findAll('css', '.select2-results li');
+        return [];
     }
 
     public function open()
@@ -101,7 +98,7 @@ class Select2Entity extends Element
     public function isOpen()
     {
         return 0 !== count(array_filter(
-            $this->getPage()->findAll('css', 'select2-search'),
+            $this->getPage()->findAll('css', '.select2-search'),
             function (NodeElement $element) {
                 return $element->isVisible();
             }

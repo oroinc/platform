@@ -61,7 +61,15 @@ class OroSelenium2Driver extends Selenium2Driver
             $classes = explode(' ', $element->attribute('class'));
 
             if (true === in_array('select2-input', $classes, true)) {
-                $this->fillSelect2Entities($xpath, $value);
+                $parent = $this->findElement($this->xpathManipulator->prepend('/../../..', $xpath));
+
+                if (in_array('select2-container-multi', explode(' ', $parent->attribute('class')), true)) {
+                    $this->fillSelect2Entities($xpath, $value);
+
+                    return;
+                }
+
+                $this->findElement($xpath)->postValue(['value' => [$value]]);
 
                 return;
             } elseif ('text' === $element->attribute('type')) {

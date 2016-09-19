@@ -85,6 +85,8 @@ class Form extends Element
 
     /**
      * {@inheritdoc}
+     * @todo Move behat elements to Driver layer. BAP-11887.
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function findField($locator)
     {
