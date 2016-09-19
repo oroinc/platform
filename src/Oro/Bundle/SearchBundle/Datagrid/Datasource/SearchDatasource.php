@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -62,6 +63,7 @@ class SearchDatasource implements DatasourceInterface
     public function getResults()
     {
         $results = $this->searchQuery->execute();
+        /** @var Item[] $results */
 
         $event = new SearchResultBefore($this->datagrid, $this->searchQuery);
         $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
@@ -69,16 +71,18 @@ class SearchDatasource implements DatasourceInterface
         $rows = [];
         foreach ($results as $result) {
             $resultRecord = new ResultRecord($result);
-            $resultRecord->addData(
-                array_merge(['id' => $result->getId()], $result->getSelectedData())
-            );
+            if ($result instanceof Item) {
+                $resultRecord->addData(
+                    array_merge(['id' => $result->getId()], $result->getSelectedData())
+                );
+            }
             $rows[] = $resultRecord;
         }
 
         $event = new SearchResultAfter($this->datagrid, $this->searchQuery, $rows);
         $this->dispatcher->dispatch(SearchResultAfter::NAME, $event);
 
-        return $event->getRecords();
+        return $rows;
     }
 
     /**
