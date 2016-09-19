@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -52,7 +53,8 @@ class RestrictionsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $this->parameters->get(Manager::REQUIRE_ALL_EXTENSIONS, true) &&
+        return $config->getDatasourceType() === OrmDatasource::TYPE &&
+               $this->parameters->get(Manager::REQUIRE_ALL_EXTENSIONS, true) &&
                null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
                $this->hasEntityClassRestrictions($config);
     }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Extension\Pager;
+namespace Oro\Bundle\SearchBundle\Datagrid\Extension\Pager;
 
-use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class IndexerPager
@@ -23,14 +23,14 @@ class IndexerPager
     protected $nbResults = 0;
 
     /**
-     * @var IndexerQuery
+     * @var SearchQueryInterface
      */
     protected $query;
 
     /**
-     * @param IndexerQuery $query
+     * @param SearchQueryInterface $query
      */
-    public function setQuery(IndexerQuery $query)
+    public function setQuery(SearchQueryInterface $query)
     {
         $this->query = $query;
     }

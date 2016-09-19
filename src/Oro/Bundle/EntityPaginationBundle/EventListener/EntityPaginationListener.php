@@ -6,7 +6,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 
