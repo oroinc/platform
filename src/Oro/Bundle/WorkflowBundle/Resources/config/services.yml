@@ -16,6 +16,9 @@ parameters:
     oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
     oro_workflow.handler.start_transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler
 
+    oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron
+    oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent
+
 services:
     oro_workflow.attribute_guesser:
         class: %oro_workflow.attribute_guesser.class%
