@@ -65,3 +65,5 @@ oro_email.email_address.entity_manager:
         `QueryHintResolver` $queryHintResolver
 - Added class `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor`
 - Added interface `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface`
+- `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource::getParameterBinder` was deprecated
+- `Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface::getParameterBinder` was deprecated

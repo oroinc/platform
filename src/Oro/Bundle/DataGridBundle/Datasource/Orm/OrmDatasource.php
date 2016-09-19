@@ -146,7 +146,7 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
 
     /**
      * {@inheritdoc}
-     *  @deprecated since 1.10.
+     *  @deprecated since 1.10.3.
      */
     public function getParameterBinder()
     {

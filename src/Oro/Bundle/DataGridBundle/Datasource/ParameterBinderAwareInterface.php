@@ -10,7 +10,7 @@ interface ParameterBinderAwareInterface
     /**
      * Gets parameter binder.
      *
-     * @deprecated since 1.10.
+     * @deprecated since 1.10.3.
      *
      * @return ParameterBinderInterface
      */
