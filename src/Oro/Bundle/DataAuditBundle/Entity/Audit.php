@@ -29,7 +29,7 @@ class Audit extends AbstractAudit
     /**
      * @var string $loggedAt
      *
-     * @ORM\Column(name="logged_at", type="datetime")
+     * @ORM\Column(name="logged_at", type="datetime", nullable=true)
      * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $loggedAt;
@@ -53,7 +53,7 @@ class Audit extends AbstractAudit
     /**
      * @var string $objectName
      *
-     * @ORM\Column(name="object_name", type="string", length=255)
+     * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $objectName;
@@ -61,7 +61,7 @@ class Audit extends AbstractAudit
     /**
      * @var integer $version
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $version;

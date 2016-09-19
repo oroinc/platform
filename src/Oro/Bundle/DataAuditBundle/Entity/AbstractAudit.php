@@ -42,21 +42,21 @@ abstract class AbstractAudit
     /**
      * @var string $action
      *
-     * @ORM\Column(type="string", length=8)
+     * @ORM\Column(type="string", length=8, nullable=true)
      */
     protected $action;
 
     /**
      * @var string $loggedAt
      *
-     * @ORM\Column(name="logged_at", type="datetime")
+     * @ORM\Column(name="logged_at", type="datetime", nullable=true)
      */
     protected $loggedAt;
 
     /**
      * @var string $objectId
      *
-     * @ORM\Column(name="object_id", length=64, nullable=true)
+     * @ORM\Column(name="object_id", type="integer", nullable=true)
      */
     protected $objectId;
 
@@ -70,14 +70,14 @@ abstract class AbstractAudit
     /**
      * @var string $objectName
      *
-     * @ORM\Column(name="object_name", type="string", length=255)
+     * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
      */
     protected $objectName;
 
     /**
      * @var integer $version
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     protected $version;
 
