@@ -94,8 +94,6 @@ class OroSelenium2Driver extends Selenium2Driver
 
         if (in_array($elementName, array('input', 'textarea'))) {
             $existingValueLength = strlen($element->attribute('value'));
-            // Add the TAB key to ensure we unfocus the field as browsers are triggering the change event only
-            // after leaving the field.
             $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
         }
 

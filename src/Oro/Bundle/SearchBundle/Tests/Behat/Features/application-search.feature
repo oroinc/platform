@@ -1,4 +1,4 @@
-#@fixture-searchEntities.yml
+@fixture-searchEntities.yml
 Feature: Application search
   In order to decrease time for search some common entities
   As a user
