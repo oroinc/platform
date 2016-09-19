@@ -87,9 +87,10 @@ class NormalizeMetadata implements ProcessorInterface
         MetadataContext $context
     ) {
         $linkedPropertyNames = [];
+        $withExcludedProperties = $context->getWithExcludedProperties();
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
+            if (!$withExcludedProperties && $field->isExcluded()) {
                 $entityMetadata->removeProperty($fieldName);
             } else {
                 $propertyPath = $field->getPropertyPath();

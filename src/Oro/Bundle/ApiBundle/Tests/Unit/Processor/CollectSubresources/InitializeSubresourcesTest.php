@@ -52,6 +52,57 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testProcessForExcludedAssociation()
+    {
+        $resource = new ApiResource('Test\Class');
+
+        $resourceConfig = new Config();
+        $resourceConfig->setDefinition(new EntityDefinitionConfig());
+        $resourceConfig->getDefinition()->addField('association1')->setExcluded();
+        $resourceMetadata = new EntityMetadata();
+        $association = new AssociationMetadata();
+        $association->setName('association1');
+        $association->setTargetClassName('Test\Association1Target');
+        $association->setAcceptableTargetClassNames(['Test\Association1Target']);
+        $association->setIsCollection(false);
+        $resourceMetadata->addAssociation($association);
+
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setVersion('1.1');
+        $this->context->setResources([$resource]);
+        $this->context->setAccessibleResources([]);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($resourceConfig);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
+                [],
+                true
+            )
+            ->willReturn($resourceMetadata);
+
+        $this->processor->process($this->context);
+
+        $expectedSubresources = new ApiResourceSubresources($resource->getEntityClass());
+
+        $this->assertEquals(
+            ['Test\Class' => $expectedSubresources],
+            $this->context->getResult()->toArray()
+        );
+    }
+
     public function testProcessForToOneAssociationForNotAccessibleResource()
     {
         $resource = new ApiResource('Test\Class');
@@ -87,7 +138,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -150,7 +202,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -215,7 +268,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -272,7 +326,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -329,7 +384,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -387,7 +443,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -444,7 +501,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -504,7 +562,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn($resourceMetadata);
 
@@ -560,7 +619,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 $resourceConfig->getDefinition(),
-                []
+                [],
+                true
             )
             ->willReturn(null);
 
