@@ -16,6 +16,9 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var QueryBuilder */
     protected $qb;
 
+    /** @var QueryBuilder */
+    protected $countQb;
+
     /** @var boolean */
     protected $isTotalCalculated = false;
 
@@ -46,7 +49,7 @@ class Pager extends AbstractPager implements PagerInterface
         $this->qb = $qb;
         parent::__construct($maxPerPage);
 
-        $this->aclHelper = $aclHelper;
+        $this->aclHelper                  = $aclHelper;
         $this->countQueryBuilderOptimizer = $countQueryOptimizer;
     }
 
@@ -57,7 +60,7 @@ class Pager extends AbstractPager implements PagerInterface
      */
     public function setQueryBuilder(QueryBuilder $qb)
     {
-        $this->qb = $qb;
+        $this->qb                = $qb;
         $this->isTotalCalculated = false;
 
         return $this;
@@ -72,14 +75,24 @@ class Pager extends AbstractPager implements PagerInterface
     }
 
     /**
+     * @param QueryBuilder $countQb
+     */
+    public function setCountQb(QueryBuilder $countQb)
+    {
+        $this->countQb           = $countQb;
+        $this->isTotalCalculated = false;
+    }
+
+    /**
      * Calculates count
      *
      * @return int
      */
     public function computeNbResult()
     {
-        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
-        $query = $countQb->getQuery();
+        $countQb = $this->countQb ? : $this->qb;
+        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($countQb);
+        $query   = $countQb->getQuery();
         if (!$this->skipAclCheck) {
             $query = $this->aclHelper->apply($query, $this->aclPermission);
         }
@@ -88,6 +101,7 @@ class Pager extends AbstractPager implements PagerInterface
         if ($this->skipCountWalker !== null) {
             $useWalker = !$this->skipCountWalker;
         }
+
         return QueryCountCalculator::calculateCount($query, $useWalker);
     }
 

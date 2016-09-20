@@ -54,6 +54,9 @@ class OrmPagerExtension extends AbstractExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if ($datasource instanceof OrmDatasource) {
+            if ($datasource->getCountQb()) {
+                $this->pager->setCountQb($datasource->getCountQb());
+            }
             $this->pager->setQueryBuilder($datasource->getQueryBuilder());
             $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
             $this->pager->setAclPermission($config->getDatasourceAclApplyPermission());
