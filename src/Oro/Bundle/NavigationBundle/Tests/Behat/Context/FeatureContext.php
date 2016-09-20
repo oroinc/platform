@@ -153,11 +153,14 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     {
         /** @var MainMenu $menu */
         $menu = $this->createElement('MainMenu');
+        /** @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine')->getManager();
         $pages = $table->getColumn(0);
 
         $firstPage = array_shift($pages);
         $menu->openAndClick($firstPage);
         $this->waitForAjax();
+        $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
@@ -165,6 +168,13 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
 
             $menu->openAndClick($page);
             $this->waitForAjax();
+            $actualCount++;
+
+            $result = $this->spin(function (FeatureContext $context) use ($actualCount, $em) {
+                return $actualCount === $context->getPageTransitionCount($em);
+            });
+
+            self::assertNotFalse($result, 'New page was not persisted in the database');
 
             $result = $this->spin(function (FeatureContext $context) use ($actualTitle) {
                 $lastHistoryLink = $context->getLastHistoryLink();
@@ -181,6 +191,25 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
         }
     }
 
+    /**
+     * @param EntityManager $em
+     * @return int
+     */
+    protected function getPageTransitionCount(EntityManager $em)
+    {
+        /** @var HistoryItemRepository $repository */
+        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+
+        return array_sum(array_map(function (NavigationHistoryItem $item) use ($em) {
+            $em->detach($item);
+
+            return $item->getVisitCount();
+        }, $repository->findAll()));
+    }
+
+    /**
+     * @return string
+     */
     private function getLastHistoryLink()
     {
         $this->chooseQuickMenuTab('History');
