@@ -31,6 +31,11 @@ class OrmFilterExtension extends AbstractFilterExtension
         $filters = $this->getFiltersToApply($config);
         $values  = $this->getValuesToApply($config);
         /** @var OrmDatasource $datasource */
+        $countQb        = $datasource->getCountQb();
+        $countQbAdapter = null;
+        if ($countQb) {
+            $countQbAdapter = new OrmFilterDatasourceAdapter($countQb);
+        }
         $datasourceAdapter = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
 
         foreach ($filters as $filter) {
@@ -51,6 +56,9 @@ class OrmFilterExtension extends AbstractFilterExtension
                         $data['value']['end_original'] = $value['value']['end'];
                     }
                     $filter->apply($datasourceAdapter, $data);
+                    if ($countQbAdapter) {
+                        $filter->apply($countQbAdapter, $data);
+                    }
                 }
             }
         }
