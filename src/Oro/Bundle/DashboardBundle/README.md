@@ -143,7 +143,7 @@ datagrids:
                 type: twig
                 label: ~
                 frontend_type: html
-                template: OroCRMCallBundle:Datagrid:Column/direction.html.twig
+                template: OroCallBundle:Datagrid:Column/direction.html.twig
             dateTime:
                 label: orocrm.call.datagrid.date_time
                 frontend_type: datetime
@@ -151,7 +151,7 @@ datagrids:
                 type: twig
                 label: orocrm.call.subject.label
                 frontend_type: html
-                template: OroCRMCallBundle:Datagrid:Column/subject.html.twig
+                template: OroCallBundle:Datagrid:Column/subject.html.twig
             phone:
                 label: orocrm.call.phone_number.label
         sorters:
@@ -198,7 +198,7 @@ dashboards:
         recent_calls:                               # register a widget
             label:      orocrm.dashboard.recent_calls.title
             route:      oro_dashboard_widget        # you can use existing controller to render your TWIG template
-            route_parameters: { bundle: OroCRMCallBundle, name: recentCalls }   # just specify a bundle and a TWIG template name
+            route_parameters: { bundle: OroCallBundle, name: recentCalls }   # just specify a bundle and a TWIG template name
             acl:        oro_call_view
 ```
  
