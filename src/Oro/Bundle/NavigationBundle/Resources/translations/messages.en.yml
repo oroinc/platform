@@ -24,15 +24,16 @@ oro:
             button.title: Pin/unpin the page
         menuupdate:
             menus: All Menus
-            entity_label: Menu Update
-            entity_plural_label: Menu Update
+            entity_label: Menu Item
+            entity_plural_label: Menu Item
             id.label: Id
             key.label: Key
             parent_key.label: Parent Key
             menu.label: Menu
-            title.label: Title
+            titles.label: Title
             uri.label: Uri
             active.label: Active
             priority.label: Priority
             ownership_type.label: Ownership Type
             owner_id.label: Owner Id
+            saved_message: Menu item saved successfully.
