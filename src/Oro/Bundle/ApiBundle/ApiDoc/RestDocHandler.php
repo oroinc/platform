@@ -8,8 +8,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
 use Oro\Component\PhpUtils\ReflectionUtil;
-use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocFieldsDefinition;
-use Oro\Bundle\ApiBundle\ApiDoc\Parser\FieldDoc;
+use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
@@ -89,79 +88,91 @@ class RestDocHandler implements HandlerInterface
             if ($statusCodes) {
                 $this->setStatusCodes($annotation, $statusCodes);
             }
-            $actionMetadata = $actionContext->getMetadata();
+
             if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
                 if ($associationName) {
                     $this->addIdRequirement($annotation, $route, $actionContext->getParentMetadata());
                 } else {
-                    $this->addIdRequirement($annotation, $route, $actionMetadata);
+                    $this->addIdRequirement($annotation, $route, $actionContext->getMetadata());
                 }
             }
             $filters = $actionContext->getFilters();
             if (!$filters->isEmpty()) {
-                $this->addFilters($annotation, $filters,$actionMetadata);
+                $this->addFilters($annotation, $filters, $actionContext->getMetadata());
             }
             $this->sortFilters($annotation);
 
-            if (ApiActions::isOutputAction($action)) {
-                $data = [
-                    'class' => ApiDocFieldsDefinition::class,
-                    'options' => [
-                        'data' => $this->getApiDocFieldsDefinition(
-                            $actionMetadata,
-                            $config,
-                            ApiActions::isIdentificatorNeededForAction($action)
-                        )
-                    ]
-                ];
-                $this->setDirectionParameter($annotation, $data, 'output');
-
-                if (ApiActions::isInputAction($action)) {
-                    $this->setDirectionParameter($annotation, $data, 'input');
-                }
-            }
+            $this->addApiMetadataToAnnotation(
+                $annotation,
+                $actionContext->getMetadata(),
+                $config,
+                $action,
+                $entityClass,
+                $associationName
+            );
         }
     }
 
     /**
-     * @param EntityMetadata         $metadata
-     * @param EntityDefinitionConfig $config
-     * @param bool                   $addIdentificators
+     * Adds API Metadata to input and output parameters of annotation.
      *
-     * @return ApiDocFieldsDefinition
+     * @param ApiDoc                 $annotation
+     * @param EntityMetadata         $actionMetadata
+     * @param EntityDefinitionConfig $config
+     * @param string                 $action
+     * @param string                 $entityClass
+     * @param string                 $associationName
      */
-    protected function getApiDocFieldsDefinition(
-        EntityMetadata $metadata,
+    protected function addApiMetadataToAnnotation(
+        ApiDoc $annotation,
+        EntityMetadata $actionMetadata,
         EntityDefinitionConfig $config,
-        $addIdentificators = true
+        $action,
+        $entityClass,
+        $associationName = null
     ) {
-        $fieldsDefinition = new ApiDocFieldsDefinition();
-        $identifiers = $metadata->getIdentifierFieldNames();
-        // process fields
-        foreach ($metadata->getFields() as $fieldName => $fieldMetadata) {
-            $fieldData = new FieldDoc();
-            $fieldData->setFieldName($fieldName);
-            $fieldData->setRequired(!$fieldMetadata->isNullable());
-            $fieldData->setDataType($fieldMetadata->getDataType());
-            $fieldData->setDescription($config->getField($fieldName)->getDescription());
-            $fieldData->setReadonly(!$addIdentificators && in_array($fieldName, $identifiers, true));
-            $fieldsDefinition->add($fieldData);
+        // add metadata for input
+        $requestType = $this->docViewDetector->getRequestType();
+        if (ApiActions::isInputAction($action)) {
+            // unfortunately there is no other way to update input parameter except to use the reflection
+            $directionProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'input');
+            $directionProperty->setAccessible(true);
+            $directionProperty->setValue(
+                $annotation,
+                [
+                    'class' => ApiDocMetadata::class,
+                    'options' => [
+                        'metadata' => new ApiDocMetadata($action, $actionMetadata, $config, $requestType)
+                    ]
+                ]
+            );
         }
-        // process relations
-        foreach ($metadata->getAssociations() as $associationName => $associationMetadata) {
-            $fieldData = new FieldDoc();
-            $fieldData->setFieldName($associationName);
-            $fieldData->setRequired(!$associationMetadata->isNullable());
-            $type = $this->getEntityType($associationMetadata->getTargetClassName());
-            if ($associationMetadata->isCollection()) {
-                $type ='[ ' . $type . ' ]';
+
+        // add metadata for output
+        if (ApiActions::isOutputAction($action)) {
+            $entityMetadata = $actionMetadata;
+
+            // check if output format should be taken from another action type. In this case Entity metadata
+            // will be taken for the action, those format should be used.
+            $outputFormatData = ApiActions::getActionOutputFormatActionType($action);
+            if ($action !== $outputFormatData) {
+                $entityMetadata = $this->getContext($outputFormatData, $entityClass, $associationName)
+                    ->getMetadata();
             }
-            $fieldData->setDataType($type);
-            $fieldData->setDescription($config->getField($associationName)->getDescription());
-            $fieldData->setReadonly(!$addIdentificators && in_array($associationName, $identifiers, true));
-            $fieldsDefinition->add($fieldData);
+
+            // unfortunately there is no other way to update output parameter except to use the reflection
+            $directionProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'output');
+            $directionProperty->setAccessible(true);
+            $directionProperty->setValue(
+                $annotation,
+                [
+                    'class' => ApiDocMetadata::class,
+                    'options' => [
+                        'metadata' => new ApiDocMetadata($action, $entityMetadata, $config, $requestType)
+                    ]
+                ]
+            );
         }
-        return $fieldsDefinition;
     }
 
     /**
@@ -390,14 +401,6 @@ class RestDocHandler implements HandlerInterface
             $filtersProperty->setAccessible(true);
             $filtersProperty->setValue($annotation, $filters);
         }
-    }
-
-    protected function setDirectionParameter(ApiDoc $annotation, $directionData, $direction)
-    {
-        // unfortunately there is no other way to update filters except to use the reflection
-        $directionProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), $direction);
-        $directionProperty->setAccessible(true);
-        $directionProperty->setValue($annotation, $directionData);
     }
 
     /**

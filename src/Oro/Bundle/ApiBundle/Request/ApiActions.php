@@ -28,7 +28,7 @@ class ApiActions
      */
     public static function isInputAction($action)
     {
-        return in_array($action, [self::CREATE, self::UPDATE], true);
+        return in_array($action, [self::CREATE, self::UPDATE, self::UPDATE_RELATIONSHIP, self::ADD_RELATIONSHIP], true);
     }
 
     /**
@@ -40,7 +40,11 @@ class ApiActions
      */
     public static function isOutputAction($action)
     {
-        return in_array($action, [self::GET, self::GET_LIST, self::CREATE, self::UPDATE], true);
+        return !in_array(
+            $action,
+            [self::DELETE, self::DELETE_LIST, self::DELETE_RELATIONSHIP],
+            true
+        );
     }
 
     /**
@@ -53,5 +57,19 @@ class ApiActions
     public static function isIdentificatorNeededForAction($action)
     {
         return $action !== self::CREATE;
+    }
+
+    /**
+     * Returns output action whose format of data will be returned as result for the given action
+     *
+     * @param string $action
+     *
+     * @return string
+     */
+    public static function getActionOutputFormatActionType($action)
+    {
+        return in_array($action, [self::CREATE, self::UPDATE], true)
+            ? self::GET
+            : $action;
     }
 }
