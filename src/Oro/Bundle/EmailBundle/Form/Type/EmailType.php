@@ -9,11 +9,13 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class EmailType extends AbstractType
@@ -31,23 +33,31 @@ class EmailType extends AbstractType
     /** @var EmailModelBuilderHelper */
     protected $emailModelBuilderHelper;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param SecurityContextInterface $securityContext
      * @param EmailRenderer $emailRenderer
      * @param EmailModelBuilderHelper $emailModelBuilderHelper
+     * @param ConfigManager $configManager
      */
     public function __construct(
         SecurityContextInterface $securityContext,
         EmailRenderer $emailRenderer,
-        EmailModelBuilderHelper $emailModelBuilderHelper
+        EmailModelBuilderHelper $emailModelBuilderHelper,
+        ConfigManager $configManager
     ) {
         $this->securityContext = $securityContext;
         $this->emailRenderer = $emailRenderer;
         $this->emailModelBuilderHelper = $emailModelBuilderHelper;
+        $this->configManager = $configManager;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -83,7 +93,15 @@ class EmailType extends AbstractType
                 ['required' => false, 'attr' => ['class' => 'taggable-field']]
             )
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
-            ->add('body', 'oro_resizeable_rich_text', ['required' => false, 'label' => 'oro.email.email_body.label'])
+            ->add(
+                'body',
+                'oro_resizeable_rich_text',
+                [
+                    'required' => false,
+                    'label' => 'oro.email.email_body.label',
+                    'wysiwyg_options' => $this->getWysiwygOptions(),
+                ]
+            )
             ->add(
                 'template',
                 'oro_email_template_list',
@@ -243,5 +261,20 @@ class EmailType extends AbstractType
     public function getBlockPrefix()
     {
         return 'oro_email_email';
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWysiwygOptions()
+    {
+        if ($this->configManager->get('oro_email.sanitize_html')) {
+            return [];
+        }
+
+        return [
+            'valid_elements' => null, //all elements are valid
+            'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
+        ];
     }
 }

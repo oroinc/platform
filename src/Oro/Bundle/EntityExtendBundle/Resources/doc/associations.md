@@ -169,10 +169,10 @@ class Note extends ExtendNote
 }
 ```
 
-After that you entity is ready to be the owning side of an association, but you need to do some more configuration of your association. Add `Resources/config/entity_config.yml` file in your bundle:
+After that you entity is ready to be the owning side of an association, but you need to do some more configuration of your association. Add `Resources/config/oro/entity_config.yml` file in your bundle:
 
 ``` yaml
-oro_entity_config:
+entity_config:
     note:
         entity:
             items:
@@ -444,10 +444,10 @@ class Email extends ExtendEmail
 }
 ```
 
-The second step you need to do is to declare possible entity configuration attributes. To do this you need to create `Resources/config/entity_config.yml` file in your bundle. Usually you need to declare only several attributes like **enabled** and **immutable**. But it detends of your needs. For example the Oro ActivityBundle declares **activities** attribute instead of **enabled** attribute because as it was mentioned above the owning side of activity association can be any entity marked as an activity.
+The second step you need to do is to declare possible entity configuration attributes. To do this you need to create `Resources/config/oro/entity_config.yml` file in your bundle. Usually you need to declare only several attributes like **enabled** and **immutable**. But it detends of your needs. For example the Oro ActivityBundle declares **activities** attribute instead of **enabled** attribute because as it was mentioned above the owning side of activity association can be any entity marked as an activity.
 
 ``` yaml
-oro_entity_config:
+entity_config:
     activity:
         entity:
             items:

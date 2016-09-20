@@ -1,7 +1,10 @@
 parameters:
     # the time in milliseconds determines how often a ping service being called
-    # set 0 or false to disable a pinging
+    # set 0 or false to disable pinging
     oro_wamp.ping.interval: 60000 # 1 minute
+    # the time in milliseconds determines how often a ping service being called
+    # set 0 or false to disable pinging
+    oro_wamp.client_ping.interval: 45000 # 45 seconds
 
     oro_wamp.publisher.class:             Oro\Bundle\SyncBundle\Wamp\TopicPublisher
     oro_wamp.twig.class:                  Oro\Bundle\SyncBundle\Twig\OroSyncExtension
@@ -9,10 +12,10 @@ parameters:
 
 services:
     oro_wamp.publisher:
-        class:                            %oro_wamp.publisher.class%
+        class: %oro_wamp.publisher.class%
         arguments:
-            - %websocket_backend_host%
-            - %websocket_backend_port%
+            - "%websocket_backend_host%"
+            - "%websocket_backend_port%"
 
     # this service is used as a workaround for "2006 MySQL server has gone away" error
     # do not rename it because "oro_wamp.ping.{session_handler_type}" naming convention
@@ -23,15 +26,24 @@ services:
         arguments:
             - "@?doctrine.dbal.session_connection.wrapped"
 
+    # this service is used to broadcast messages to clients to prevent connection loose
+    # by default, the connection could be closed if no data were transmitted between client and server
+    # for more details see http://nginx.org/en/docs/http/websocket.html
+    oro_wamp.client.ping:
+        class: Oro\Bundle\SyncBundle\Wamp\ClientPing
+        arguments:
+            - "@oro_wamp.publisher"
+            - "@logger"
+
     oro_wamp.twig.sync_extension:
-        class:                            %oro_wamp.twig.class%
+        class: %oro_wamp.twig.class%
         arguments:
             - "@oro_wamp.publisher"
         tags:
             - { name: twig.extension }
 
     kernel.listener.maintenance.event:
-        class:                            %oro_wamp.listener.maintenance.class%
+        class: %oro_wamp.listener.maintenance.class%
         arguments:
             - "@oro_wamp.publisher"
             - "@oro_security.security_facade"

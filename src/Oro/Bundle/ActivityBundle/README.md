@@ -107,7 +107,7 @@ Before the new activity entity can be used in ORO platform you need to configure
  - [The activity list section](#how-to-configure-ui-for-activity-list-section)
  - [The add activity button](#how-to-configure-ui-for-activity-button)
 
-Also please take a look at [all configuration options](./Resources/config/entity_config.yml) for the activity scope before you continue reading.
+Also please take a look at [all configuration options](./Resources/config/oro/entity_config.yml) for the activity scope before you continue reading.
 
 ### How to configure UI for activity list section
 
@@ -116,7 +116,7 @@ Please pay attention that:
 
  - The controller action must accept two parameters: `$entityClass` and `$entityId`.
  - The entity class name can be encoded to avoid routing collisions. So you need to use `oro_entity.routing_helper` service to get the entity by it's class name and id.
- - In the following example the `activity-email-grid` datagrid is used to render the list of activities. This grid is defined in *datagrid.yml* file.
+ - In the following example the `activity-email-grid` datagrid is used to render the list of activities. This grid is defined in *datagrids.yml* file.
 
 An example:
 
@@ -246,13 +246,14 @@ activityLink.html.twig
 Register these templates in *placeholders.yml*, for example:
 
 ``` yml
-items:
-    oro_send_email_button:
-        template: OroEmailBundle:Email:activityButton.html.twig
-        acl: oro_email_email_create
-    oro_send_email_link:
-        template: OroEmailBundle:Email:activityLink.html.twig
-        acl: oro_email_email_create
+placeholders:
+    items:
+        oro_send_email_button:
+            template: OroEmailBundle:Email:activityButton.html.twig
+            acl: oro_email_email_create
+        oro_send_email_link:
+            template: OroEmailBundle:Email:activityLink.html.twig
+            acl: oro_email_email_create
 ```
 
 Bind items declared in *placeholders.yml* to the activity entity using `action_button_widget` and `action_link_widget` attribute. For example:

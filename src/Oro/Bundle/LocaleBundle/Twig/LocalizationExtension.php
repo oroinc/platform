@@ -52,6 +52,11 @@ class LocalizationExtension extends \Twig_Extension
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
+                'oro_locale_code_title',
+                [$this->languageCodeFormatter, 'formatLocale'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFilter(
                 'oro_formatting_code_title',
                 [$this, 'getFormattingTitleByCode'],
                 ['is_safe' => ['html']]
