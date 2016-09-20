@@ -69,18 +69,20 @@ datagrids:
                     enabled:   false
         properties:
             id: ~
+
     oro-translation-translations-grid:
         acl_resource: oro_translation_translation_index
         source:
             type: orm
             query:
+                # aliases `value`, `key` and `domain` is required for filters and building right condition
                 select:
                     - translation.id
                     - language.code
-                    - translation.value as _value
-                    - translationKey.key as _key
-                    - translationKey.domain as _domain
-                    - (CASE WHEN translation.value IS NULL THEN 0 ELSE 1 END) as _status
+                    - translation.value as value
+                    - translationKey.key as key
+                    - translationKey.domain as domain
+                    - (CASE WHEN translation.value IS NULL THEN 0 ELSE 1 END) as status
                 from:
                     - { table: '%oro_translation.entity.language.class%', alias: language }
                 join:
@@ -89,16 +91,13 @@ datagrids:
                             join: '%oro_translation.entity.translation_key.class%'
                             alias: translationKey
                             conditionType: WITH
-                            condition: 1 = 1
+                            condition: 1 = 1 # always true (this node is required)
                     left:
                         -
                             join: '%oro_translation.entity.translation.class%'
                             alias: translation
                             conditionType: WITH
                             condition: 'translation.language = language AND translation.translationKey = translationKey'
-                where:
-                    and:
-                        - translationKey = translationKey
         columns:
             id:
                 label: oro.translation.translation.id.label
@@ -108,7 +107,7 @@ datagrids:
                 type: twig
                 frontend_type: html
                 template: OroTranslationBundle:Language:Datagrid/code.html.twig
-            _status:
+            status:
                 label: oro.translation.translation.status.label
                 type: twig
                 frontend_type: html
@@ -118,25 +117,23 @@ datagrids:
                 type: twig
                 frontend_type: html
                 template: OroTranslationBundle:Translation:Datagrid/originalValue.html.twig
-            _value:
+            value:
                 label: oro.translation.translation.value.label
-            _key:
+            key:
                 label: oro.translation.translation_key.key.label
-            _domain:
+            domain:
                 label: oro.translation.translation_key.domain.label
         sorters:
             multiple_sorting: true
             columns:
-                code:
-                    data_name: language.code
-                _status:
-                    data_name: _status
-                _value:
-                    data_name: _value
-                _key:
-                    data_name: _key
-                _domain:
-                    data_name: _domain
+                status:
+                    data_name: status
+                value:
+                    data_name: value
+                key:
+                    data_name: key
+                domain:
+                    data_name: domain
             default:
                 code: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
         filters:
@@ -147,23 +144,23 @@ datagrids:
                     options:
                         field_options:
                             choices: "@oro_translation.provider.language->getAvailableLanguages"
-                _status:
+                status:
                     type: choice
-                    data_name: CAST(_status as int)
+                    data_name: CAST(status as int)
                     options:
                         field_options:
                             choices:
                                 true: 'oro.translation.translation.status.translated'
                                 false: 'oro.translation.translation.status.untranslated'
-                _value:
+                value:
                     type: string
-                    data_name: _value
-                _key:
+                    data_name: value
+                key:
                     type: string
-                    data_name: _key
-                _domain:
+                    data_name: key
+                domain:
                     type: choice
-                    data_name: _domain
+                    data_name: domain
                     enabled: true
                     options:
                         field_options:
