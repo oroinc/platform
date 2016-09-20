@@ -457,8 +457,10 @@ services:
         tags:
             - { name: oro.api.constraint_text_extractor, priority: -10 }
 
-    oro_api.api_doc.fields_config_parser:
-        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\FieldConfigParser
+    oro_api.api_doc.metadata_parser:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser
+        arguments:
+            - '@oro_api.value_normalizer'
         tags:
             - { name: nelmio_api_doc.extractor.parser }
 
