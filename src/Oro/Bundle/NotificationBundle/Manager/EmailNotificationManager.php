@@ -18,25 +18,25 @@ class EmailNotificationManager extends AbstractNotificationManager
     private $renderer;
 
     /** @var ConfigManager */
-    private $cm;
+    private $configManager;
 
 
     /**
      * EmailNotificationManager constructor.
      *
      * @param EmailRenderer $emailRenderer
-     * @param ConfigManager $cm
+     * @param ConfigManager $configManager
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
      */
     public function __construct(
         EmailRenderer $emailRenderer,
-        ConfigManager $cm,
+        ConfigManager $configManager,
         MessageProducerInterface $producer,
         LoggerInterface $logger
     ) {
         $this->renderer = $emailRenderer;
-        $this->cm = $cm;
+        $this->configManager = $configManager;
         $this->producer = $producer;
         $this->logger = $logger;
     }
@@ -53,7 +53,7 @@ class EmailNotificationManager extends AbstractNotificationManager
      */
     public function process($object, $notifications, LoggerInterface $logger = null, $params = [])
     {
-        if (!$logger) {
+        if (null == $logger) {
             $logger = $this->logger;
         }
 
@@ -64,6 +64,31 @@ class EmailNotificationManager extends AbstractNotificationManager
                     $emailTemplate,
                     ['entity' => $object] + $params
                 );
+
+                if ($notification instanceof SenderAwareEmailNotificationInterface && $notification->getSenderEmail()) {
+                    $senderEmail = $notification->getSenderEmail();
+                    $senderName = $notification->getSenderName();
+                } else {
+                    $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
+                    $senderName = $this->configManager->get('oro_notification.email_notification_sender_name');
+                }
+
+                $type = 'txt' == $emailTemplate->getType() ? 'text/plain' : 'text/html';
+
+                foreach ($notification->getRecipientEmails() as $email) {
+                    $this->sendQueryMessage([
+                        'from' => [
+                            'email' => $senderEmail,
+                            'name' => $senderName,
+                        ],
+                        'to' => $email,
+                        'subject' => $subjectRendered,
+                        'body' => [
+                            'body' => $templateRendered,
+                            'contentType' => $type
+                        ]
+                    ]);
+                }
             } catch (\Twig_Error $e) {
                 $identity = method_exists($emailTemplate, '__toString')
                     ? (string)$emailTemplate : $emailTemplate->getSubject();
@@ -72,33 +97,6 @@ class EmailNotificationManager extends AbstractNotificationManager
                     sprintf('Rendering of email template "%s" failed. %s', $identity, $e->getMessage()),
                     ['exception' => $e]
                 );
-
-                continue;
-            }
-
-            if ($notification instanceof SenderAwareEmailNotificationInterface && $notification->getSenderEmail()) {
-                $senderEmail = $notification->getSenderEmail();
-                $senderName = $notification->getSenderName();
-            } else {
-                $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
-                $senderName = $this->cm->get('oro_notification.email_notification_sender_name');
-            }
-
-            $type = 'txt' == $emailTemplate->getType() ? 'text/plain' : 'text/html';
-
-            foreach ($notification->getRecipientEmails() as $email) {
-                $this->sendQueryMessage([
-                    'from' => [
-                        'email' => $senderEmail,
-                        'name' => $senderName,
-                    ],
-                    'to' => $email,
-                    'subject' => $subjectRendered,
-                    'body' => [
-                        'body' => $templateRendered,
-                        'contentType' => $type
-                    ]
-                ]);
             }
         }
     }

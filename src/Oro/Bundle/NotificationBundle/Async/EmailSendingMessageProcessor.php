@@ -40,6 +40,30 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
     {
         $data = JSON::decode($message->getBody());
 
+        if (empty($data['from']) || (false == is_array($data['from']))) {
+            $this->logger->critical(
+                sprintf('[EmailSendingMessageProcessor] Empty email sender field: "%s"', $message->getBody())
+            );
+
+            return self::REJECT;
+        }
+
+        if (empty($data['to'])) {
+            $this->logger->critical(
+                sprintf('[EmailSendingMessageProcessor] Empty email receiver field: "%s"', $message->getBody())
+            );
+
+            return self::REJECT;
+        }
+
+        if (empty($data['body']) || false == is_array($data['body'])) {
+            $this->logger->critical(
+                sprintf('[EmailSendingMessageProcessor] Empty email body field: "%s"', $message->getBody())
+            );
+
+            return self::REJECT;
+        }
+
         $emailMessage = new \Swift_Message(
             $data['subject'],
             $data['body']['body'],
