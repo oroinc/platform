@@ -162,27 +162,18 @@ class ObjectMapper extends AbstractMapper
      */
     public function mapSelectedData(Query $query, $item)
     {
-        $selects = $query->getSelect();
+        $dataFields = $query->getSelectDataFields();
 
-        if (empty($selects)) {
+        if (empty($dataFields)) {
             return null;
         }
 
         $result = [];
-        $selectAliases = $query->getSelectAliases();
 
-        foreach ($selects as $select) {
-            list ($type, $name) = Criteria::explodeFieldTypeName($select);
+        foreach ($dataFields as $dataField) {
+            list ($type, $name) = Criteria::explodeFieldTypeName($dataField);
 
-            if (isset($selectAliases[$name])) {
-                $resultName = $selectAliases[$name];
-            } elseif (isset($selectAliases[$select])) {
-                $resultName = $selectAliases[$select];
-            } else {
-                $resultName = $name;
-            }
-
-            $result[$resultName] = '';
+            $result[$name] = '';
 
             if (isset($item[$name])) {
                 $value = $item[$name];
@@ -190,7 +181,7 @@ class ObjectMapper extends AbstractMapper
                     $value = array_shift($value);
                 }
 
-                $result[$resultName] = $value;
+                $result[$name] = $value;
             }
         }
 

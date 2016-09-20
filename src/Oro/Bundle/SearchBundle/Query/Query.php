@@ -188,7 +188,7 @@ class Query
      */
     public function addSelect($fieldNames, $enforcedFieldType = null)
     {
-        foreach ((array) $fieldNames as $fieldName) {
+        foreach ((array)$fieldNames as $fieldName) {
             $fieldName = $this->parseFieldAliasing($fieldName);
 
             $this->addToSelect($fieldName, $enforcedFieldType);
@@ -562,7 +562,44 @@ class Query
     }
 
     /**
-     * @param $fieldName
+     * Returns a combination of getSelect() and getSelectAlias().
+     * Returns an array of fields that will be returned in the
+     * dataset.
+     *
+     * @return array
+     */
+    public function getSelectDataFields()
+    {
+        if (empty($this->selectAliases)) {
+            return $this->getSelect();
+        }
+
+        if (empty($this->select)) {
+            return [];
+        }
+
+        $aliases = $this->selectAliases;
+        $result  = [];
+
+        foreach ($this->select as $select) {
+            list ($fieldType, $fieldName) = Criteria::explodeFieldTypeName($select);
+            if (isset($aliases[$fieldName])) {
+                $resultName = $aliases[$fieldName];
+            } elseif (isset($aliases[$select])) {
+                $resultName = $aliases[$select];
+            } else {
+                $resultName = $fieldName;
+            }
+
+            $result[] = sprintf('%s.%s', $fieldType, $resultName);
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param      $fieldName
      * @param null $enforcedFieldType
      * @return $this
      */
@@ -595,7 +632,6 @@ class Query
 
         return $this;
     }
-
 
     /**
      * Returns the WHERE string part for getStringQuery.
@@ -685,8 +721,8 @@ class Query
         $part = preg_split('/ sa /im', $part, 2);
         if (count($part) > 1) {
             // splitting with ' ' and taking first word as a field name - does not allow spaces in field name
-            $rev = strrev($part[1]);
-            $rev = explode(' ', $rev);
+            $rev   = strrev($part[1]);
+            $rev   = explode(' ', $rev);
             $field = array_shift($rev);
 
             $alias = strrev($part[0]);

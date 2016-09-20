@@ -249,4 +249,20 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $aliases);
     }
+
+    public function testGetSelectDataFields()
+    {
+        $query = new Query();
+        $this->assertSame([], $query->getSelectDataFields());
+
+        $query->addSelect('text.notes');
+        $this->assertSame(['text.notes'], $query->getSelectDataFields());
+
+        $query->addSelect('text.foo as name');
+        $query->addSelect('text.faa as surname');
+
+        $fields = $query->getSelectDataFields();
+
+        $this->assertSame(['text.notes', 'text.name', 'text.surname'], $fields);
+    }
 }
