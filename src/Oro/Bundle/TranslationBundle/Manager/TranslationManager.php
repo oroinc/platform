@@ -24,6 +24,15 @@ class TranslationManager
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
+    /** @var Language[] */
+    protected $languages = [];
+
+    /** @var TranslationKey[] */
+    protected $translationKeys = [];
+
+    /** @var Translation[] */
+    protected $createdTranslationValues = [];
+
     /**
      * @param Registry $registry
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
@@ -70,7 +79,7 @@ class TranslationManager
      * @param string $value
      * @param string $locale
      * @param string $domain
-     * @param int $scope
+     * @param bool $persist
      *
      * @return Translation
      */
@@ -79,16 +88,24 @@ class TranslationManager
         $value,
         $locale,
         $domain = self::DEFAULT_DOMAIN,
-        $scope = Translation::SCOPE_SYSTEM
+        $persist = false
     ) {
-        $translationValue = new Translation();
-        $translationValue
-            ->setTranslationKey($this->findTranslationKey($key, $domain))
-            ->setLanguage($this->getLanguageByCode($locale))
-            ->setScope($scope)
-            ->setValue($value);
+        $cacheKey = sprintf('%s-%s-%s', $locale, $domain, $key);
+        if (!array_key_exists($cacheKey, $this->createdTranslationValues)) {
+            $translationValue = new Translation();
+            $translationValue
+                ->setTranslationKey($this->findTranslationKey($key, $domain))
+                ->setLanguage($this->getLanguageByCode($locale))
+                ->setValue($value);
 
-        return $translationValue;
+            $this->createdTranslationValues[$cacheKey] = $translationValue;
+        }
+
+        if ($persist) {
+            $this->getEntityManager(Translation::class)->persist($this->createdTranslationValues[$cacheKey]);
+        }
+
+        return $this->createdTranslationValues[$cacheKey];
     }
 
     /**
@@ -98,33 +115,24 @@ class TranslationManager
      * @param string $value
      * @param string $locale
      * @param string $domain
-     * @param int $scope
      *
-     * @return Translation
+     * @return Translation|null
      */
-    public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
+    public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN)
     {
-        static $cache;
+        if (!$value && null !== ($translationValue = $this->findValue($key, $locale, $domain))) {
+            $this->getEntityManager(Translation::class)->remove($translationValue);
 
-        if (!$cache) {
-            $cache = [];
+            return null;
         }
 
-        $index = sprintf('%s-%s-%s', $key, $value, $locale);
-
-        if (!isset($cache[$index])) {
-            if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
-                $translationValue = $this->createValue($key, $value, $locale, $domain, $scope);
-            }
-
-            $translationValue->setValue($value);
-
-            $this->getEntityManager(Translation::class)->persist($translationValue);
-
-            $cache[$index] = $translationValue;
+        if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
+            $translationValue = $this->createValue($key, $value, $locale, $domain, true);
         }
 
-        return $cache[$index];
+        $translationValue->setValue($value);
+
+        return $translationValue;
     }
 
     /**
@@ -151,6 +159,11 @@ class TranslationManager
     public function flush($translations = null)
     {
         $this->getEntityManager(Translation::class)->flush($translations);
+
+        // clear local cache
+        $this->languages = [];
+        $this->translationKeys = [];
+        $this->createdTranslationValues = [];
     }
 
     public function clear()
@@ -201,10 +214,14 @@ class TranslationManager
      */
     public function getLanguageByCode($code)
     {
-        /** @var LanguageRepository $repo */
-        $repo = $this->getEntityRepository(Language::class);
+        if (!array_key_exists($code, $this->languages)) {
+            /** @var LanguageRepository $repo */
+            $repo = $this->getEntityRepository(Language::class);
 
-        return $repo->findOneBy(['code' => $code]);
+            $this->languages[$code] = $repo->findOneBy(['code' => $code]);
+        }
+
+        return $this->languages[$code];
     }
 
     /**
@@ -217,20 +234,23 @@ class TranslationManager
      */
     public function findTranslationKey($key, $domain = self::DEFAULT_DOMAIN)
     {
-        $repo = $this->getEntityRepository(TranslationKey::class);
-        $em = $this->getEntityManager(TranslationKey::class);
+        $cacheKey = sprintf('%s-%s', $domain, $key);
+        if (!array_key_exists($cacheKey, $this->translationKeys)) {
+            $translationKey = $this->getEntityRepository(TranslationKey::class)
+                ->findOneBy(['key' => $key, 'domain' => $domain]);
 
-        $translationKey = $repo->findOneBy(['key' => $key, 'domain' => $domain]);
+            if (!$translationKey) {
+                $translationKey = new TranslationKey();
+                $translationKey->setKey($key);
+                $translationKey->setDomain($domain);
 
-        if (!$translationKey) {
-            $translationKey = new TranslationKey();
-            $translationKey->setKey($key);
-            $translationKey->setDomain($domain);
-            $em->persist($translationKey);
-            $em->flush($translationKey);
+                $this->getEntityManager(TranslationKey::class)->persist($translationKey);
+            }
+
+            $this->translationKeys[$cacheKey] = $translationKey;
         }
 
-        return $translationKey;
+        return $this->translationKeys[$cacheKey];
     }
 
     /**

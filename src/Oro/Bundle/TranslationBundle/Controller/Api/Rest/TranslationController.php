@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Handler\Context;
+
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 /**
  * @RouteResource("translation")
@@ -99,5 +102,32 @@ class TranslationController extends FOSRestController
         );
 
         return $response;
+    }
+
+    /**
+     * @param string $locale
+     * @param string $domain
+     * @param string $key
+     *
+     * @return Response
+     *
+     * @Patch("translations/{locale}/{domain}/{key}/update")
+     */
+    public function updateAction($locale, $domain, $key)
+    {
+        $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
+
+        /* @var $translationManager TranslationManager */
+        $translationManager = $this->get('oro_translation.manager.translation');
+
+        $translation = $translationManager->saveValue($key, $data['value'], $locale, $domain);
+        $translationManager->flush();
+
+        if (null !== $translation) {
+            $data['id'] = $translation->getId();
+            $data['value'] = $translation->getValue();
+        }
+
+        return parent::handleView($this->view($data, Codes::HTTP_OK));
     }
 }

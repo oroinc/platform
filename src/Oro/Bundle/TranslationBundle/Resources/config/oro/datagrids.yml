@@ -98,6 +98,9 @@ datagrids:
                             alias: translation
                             conditionType: WITH
                             condition: 'translation.language = language AND translation.translationKey = translationKey'
+        inline_editing:
+            enable: true
+            entity_name: '%oro_translation.entity.translation.class%'
         columns:
             id:
                 label: oro.translation.translation.id.label
@@ -119,6 +122,15 @@ datagrids:
                 template: OroTranslationBundle:Translation:Datagrid/originalValue.html.twig
             value:
                 label: oro.translation.translation.value.label
+                inline_editing:
+                    editor:
+                        view: orotranslation/js/app/views/editor/text-editor-view
+                    save_api_accessor:
+                        route: oro_api_update_translation
+                        query_parameter_names:
+                            - key
+                            - locale
+                            - domain 
             key:
                 label: oro.translation.translation_key.key.label
             domain:
@@ -172,3 +184,5 @@ datagrids:
                 callable: ["@oro_translation.provider.translation_context", "resolveContext"]
                 params:
                     - key
+            locale:
+                data_name: code

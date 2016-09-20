@@ -530,6 +530,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
 
         $commandExecutor
+            ->runCommand('oro:translation:load', ['--process-isolation' => true])
             ->runCommand(
                 'oro:navigation:init',
                 array(
