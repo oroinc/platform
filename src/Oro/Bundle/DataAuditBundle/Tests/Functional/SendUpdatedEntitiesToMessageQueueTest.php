@@ -63,7 +63,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'stringProperty' => [null, 'aString'],
         ], $insertedEntity['change_set']);
@@ -92,7 +92,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'stringProperty' => [null, 'aString'],
         ], $insertedEntity['change_set']);
@@ -114,7 +114,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'intProperty' => [null, 1234],
         ], $insertedEntity['change_set']);
@@ -137,7 +137,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'serializedProperty' => [null, ['foo' => 'fooVal']],
         ], $insertedEntity['change_set']);
@@ -156,7 +156,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'jsonProperty' => [null, ['foo' => 'fooVal']],
         ], $insertedEntity['change_set']);
@@ -179,7 +179,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'dateProperty' => [null, '2010-11-12T00:01:02+0000'],
         ], $insertedEntity['change_set']);
@@ -210,7 +210,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([], $insertedEntity['change_set']);
     }
 
@@ -237,11 +237,11 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'child' => [null, [
                 'entity_class' => TestAuditDataChild::class,
-                'entity_id' => $child->getId(),
+                'entity_id' => ['id' => $child->getId()],
                 'change_set' => [],
             ]],
         ], $insertedEntity['change_set']);
@@ -272,17 +272,17 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $insertedEntity = $message->getBody()['entities_updated'][0];
 
         $this->assertEquals(TestAuditDataOwner::class, $insertedEntity['entity_class']);
-        $this->assertEquals($owner->getId(), $insertedEntity['entity_id']);
+        $this->assertEquals(['id' => $owner->getId()], $insertedEntity['entity_id']);
         $this->assertEquals([
             'child' => [
                 [
                     'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $firstChild->getId(),
+                    'entity_id' => ['id' => $firstChild->getId()],
                     'change_set' => [],
                 ],
                 [
                     'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $secondChild->getId(),
+                    'entity_id' => ['id' => $secondChild->getId()],
                     'change_set' => [],
                 ]
             ],
@@ -318,7 +318,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $this->assertEquals([
             'child' => [null, [
                 'entity_class' => TestAuditDataChild::class,
-                'entity_id' => $child->getId(),
+                'entity_id' => ['id' => $child->getId()],
                 'change_set' => [],
             ]],
         ], $insertedEntity['change_set']);
