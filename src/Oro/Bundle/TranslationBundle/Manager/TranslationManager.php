@@ -14,6 +14,9 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class TranslationManager
 {
     const DEFAULT_DOMAIN = 'messages';
