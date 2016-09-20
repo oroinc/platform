@@ -14,6 +14,7 @@ use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
+use Symfony\Component\DomCrawler\Crawler;
 
 class FeatureContext extends OroFeatureContext implements OroElementFactoryAware, KernelAwareContext
 {
@@ -150,35 +151,42 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
      */
     public function goToPages(TableNode $table)
     {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine')->getManager();
         /** @var MainMenu $menu */
         $menu = $this->createElement('MainMenu');
-        $count = $this->getPageTransitionCount($em);
+        $pages = $table->getColumn(0);
 
-        foreach ($table->getRows() as $row) {
-            $menu->openAndClick($row[0]);
-            $count++;
-            $this->spin(function () use ($em, $count) {
-                return $count === $this->getPageTransitionCount($em);
-            });
+        $firstPage = array_shift($pages);
+        $menu->openAndClick($firstPage);
+        $this->waitForAjax();
+
+        foreach ($pages as $page) {
+            $crawler = new Crawler($this->getSession()->getPage()->getHtml());
+            $actualTitle = $crawler->filter('head title')->first()->text();
+
+            $menu->openAndClick($page);
             $this->waitForAjax();
+
+            $result = $this->spin(function (FeatureContext $context) use ($actualTitle) {
+                $lastHistoryLink = $context->getLastHistoryLink();
+                $this->clickBarsIcon();
+
+                return false !== strpos($actualTitle, $lastHistoryLink);
+            });
+
+            self::assertNotFalse($result, sprintf(
+                'Page "%s" expected in last history link but got "%s"',
+                $actualTitle,
+                $this->getLastHistoryLink()
+            ));
         }
     }
 
-    /**
-     * @param EntityManager $em
-     * @return int
-     */
-    protected function getPageTransitionCount(EntityManager $em)
+    private function getLastHistoryLink()
     {
-        /** @var HistoryItemRepository $repository */
-        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+        $this->chooseQuickMenuTab('History');
+        $content = $this->createElement('History Content');
 
-        return array_sum(array_map(function (NavigationHistoryItem $item) use ($em) {
-            $em->detach($item);
-            return $item->getVisitCount();
-        }, $repository->findAll()));
+        return $content->find('css', 'ul li a')->getText();
     }
 
     /**
