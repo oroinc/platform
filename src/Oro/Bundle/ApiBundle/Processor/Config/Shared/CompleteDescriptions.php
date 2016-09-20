@@ -292,7 +292,6 @@ class CompleteDescriptions implements ProcessorInterface
         $fields = $filters->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                // todo:add check for parent doc
                 $loadedDescription = $this->apiDocMdParser->getDocumentation($entityClass, 'filters', '', $fieldName);
                 if ($loadedDescription) {
                     $field->setDescription($loadedDescription);
