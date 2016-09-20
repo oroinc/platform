@@ -668,15 +668,16 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds many-to-one relation
      *
      * @param Schema       $schema
-     * @param Table|string $table            A Table object or table name
-     * @param string       $associationName  The name of a relation field
-     * @param Table|string $targetTable      A Table object or table name
-     * @param string       $targetColumnName A column name is used to show related entity
+     * @param Table|string $table              A Table object or table name
+     * @param string       $associationName    The name of a relation field
+     * @param Table|string $targetTable        A Table object or table name
+     * @param string       $targetColumnName   A column name is used to show related entity
      * @param array        $options
-     * @param string       $fieldType        The field type. By default the field type is manyToOne,
-     *                                       but you can specify another type if it is based on manyToOne.
-     *                                       In this case this type should be registered
-     *                                       in entity_extend.yml under underlying_types section
+     * @param string       $fieldType          The field type. By default the field type is manyToOne,
+     *                                         but you can specify another type if it is based on manyToOne.
+     *                                         In this case this type should be registered
+     *                                         in entity_extend.yml under underlying_types section
+     * @param array        $relationOptions    Array of options used for new column definition
      */
     public function addManyToOneRelation(
         Schema $schema,
@@ -685,7 +686,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $targetTable,
         $targetColumnName,
         array $options = [],
-        $fieldType = RelationType::MANY_TO_ONE
+        $fieldType = RelationType::MANY_TO_ONE,
+        $relationOptions = []
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -700,13 +702,20 @@ class ExtendExtension implements NameGeneratorAwareInterface
         );
 
         $this->checkColumnsExist($targetTable, [$targetColumnName]);
+        $relationOptions = array_replace(
+            [
+                'notnull' => false,
+                'onDelete' => 'SET NULL'
+            ],
+            $relationOptions
+        );
 
         $this->addRelation(
             $selfTable,
             $selfColumnName,
             $targetTable,
-            ['notnull' => false],
-            ['onDelete' => 'SET NULL']
+            ['notnull' => $relationOptions['notnull']],
+            ['onDelete' => $relationOptions['onDelete']]
         );
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [

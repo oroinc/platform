@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -1736,6 +1737,49 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         ]
                     ],
                 ],
+            ]
+        );
+    }
+
+    public function testAddManyToOneRelationWithRelationOptions()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $table1 = $schema->createTable('table1');
+        $table1->addColumn('id', 'integer');
+        $table1->setPrimaryKey(['id']);
+
+        $table2 = $schema->createTable('table2');
+        $table2->addColumn('id', 'integer');
+        $table2->addColumn('name', 'string');
+        $table2->setPrimaryKey(['id']);
+
+        $extension->addManyToOneRelation(
+            $schema,
+            $table1,
+            'relation_column1',
+            $table2,
+            'name',
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]],
+            RelationType::MANY_TO_ONE,
+            [
+                'onDelete' => 'CASCADE',
+                'notnull' => true
+            ]
+        );
+
+        // assert relation options used in query in proper way
+        $this->assertSchemaSql(
+            $schema,
+            [
+                'CREATE TABLE table1 ('
+                . 'id INT NOT NULL, '
+                . 'relation_column1_id INT NOT NULL, '
+                . 'INDEX idx_table1_relation_column1_id (relation_column1_id), PRIMARY KEY(id))',
+                'CREATE TABLE table2 (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))',
+                'ALTER TABLE table1 ADD CONSTRAINT fk_table1_relation_column1_id '
+                . 'FOREIGN KEY (relation_column1_id) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
     }
