@@ -63,8 +63,19 @@ services:
         calls:
             - [addConfigurationPass,  ['@oro_workflow.configuration_pass.replace_property_path']]
 
+    oro_workflow.transition_trigger.cron_trigger_assembler:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\CronTriggerAssembler
+        public: false
+
+    oro_workflow.transition_trigger.event_trigger_assembler:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\EventTriggerAssembler
+        public: false
+
     oro_workflow.transition_trigger_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler'
+        calls:
+            - [registerAssembler, ['@oro_workflow.transition_trigger.event_trigger_assembler']]
+            - [registerAssembler, ['@oro_workflow.transition_trigger.cron_trigger_assembler']]
 
     oro_workflow.restriction_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler'

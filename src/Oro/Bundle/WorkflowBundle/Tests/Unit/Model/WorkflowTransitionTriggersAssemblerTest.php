@@ -4,102 +4,68 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggerAssemblerInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 
 class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @param array $expected
-     * @param WorkflowDefinition $workflowDefinition
-     * @dataProvider assembleData
-     */
-    public function testAssembleTriggers(array $expected, WorkflowDefinition $workflowDefinition)
+    public function testAssembler()
     {
-        $triggers = (new WorkflowTransitionTriggersAssembler())->assembleTriggers($workflowDefinition);
+        $assembler = new WorkflowTransitionTriggersAssembler();
+        $someAssembler = $this->getMock(TriggerAssemblerInterface::class);
+        $someAssembler->expects($this->once())->method('canAssemble')->willReturn(true);
+        $trigger = $this->getMockForAbstractClass(AbstractTransitionTrigger::class);
+        $someAssembler->expects($this->once())->method('assemble')->willReturn($trigger);
 
-        $c = count($triggers);
-        for ($i = 0; $c !== $i; $i++) {
-            $this->assertEquals($expected[$i], $triggers[$i]);
-        }
-    }
+        $assembler->registerAssembler($someAssembler);
 
-    /**
-     * @return array
-     */
-    public function assembleData()
-    {
-        $configuration = [
-            'simple' => [
+        $definition = (new WorkflowDefinition())
+            ->setConfiguration(
                 [
-                    (new TransitionTriggerCron())->setCron('* * * * *'),
-                    (new TransitionTriggerEvent())->setEvent('update')
-                ],
-                [
-                    ['cron' => '* * * * *'],
-                    ['event' => 'update']
-                ]
-            ],
-            'full' => [
-                [
-                    (new TransitionTriggerCron())
-                        ->setCron('* * * * *')
-                        ->setFilter('filter != true')
-                        ->setQueued(false),
-                    (new TransitionTriggerEvent())
-                        ->setEvent('update')
-                        ->setField('field')
-                        ->setQueued(false)
-                        ->setEntityClass('EntityClass')
-                        ->setRelation('relation.here')
-                        ->setRequire('expression()')
-                ],
-                [
-                    [
-                        'cron' => '* * * * *',
-                        'filter' => 'filter != true',
-                        'queued' => false
-                    ],
-                    [
-                        'event' => 'update',
-                        'field' => 'field',
-                        'queued' => false,
-                        'entity_class' => 'EntityClass',
-                        'relation' => 'relation.here',
-                        'require' => 'expression()'
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        'transitionName' => [
+                            WorkflowConfiguration::NODE_TRANSITION_TRIGGERS => [
+                                ['cron' => '* * * * *']
+                            ]
+                        ]
                     ]
                 ]
-            ]
-        ];
+            );
 
-        $data = [];
-        foreach ($configuration as $transition => $case) {
-            list($expected, $config) = $case;
+        $triggers = $assembler->assembleTriggers($definition);
 
-            $definition = new WorkflowDefinition();
+        $this->assertEquals([$trigger], $triggers);
+    }
 
-            foreach ($expected as $trigger) {
-                /**@var AbstractTransitionTrigger $trigger */
-                $trigger->setTransitionName($transition);
-                $trigger->setWorkflowDefinition($definition);
-            }
+    public function testAssemblerException()
+    {
+        $this->setExpectedException(
+            AssemblerException::class,
+            sprintf(
+                'Can\'t assemble trigger for %s workflow in transition %s by given options: %s',
+                'workflowName',
+                'transitionName',
+                var_export(['cron' => '* * * * *'], 1)
+            )
+        );
 
-            $data[$transition] = [
-                $expected,
-                $definition->setConfiguration(
+        $assembler = new WorkflowTransitionTriggersAssembler();
+        $assembler->assembleTriggers(
+            (new WorkflowDefinition())
+                ->setName('workflowName')
+                ->setConfiguration(
                     [
                         WorkflowConfiguration::NODE_TRANSITIONS => [
-                            $transition => [
-                                WorkflowConfiguration::NODE_TRANSITION_TRIGGERS => $config
+                            'transitionName' => [
+                                WorkflowConfiguration::NODE_TRANSITION_TRIGGERS => [
+                                    ['cron' => '* * * * *']
+                                ]
                             ]
                         ]
                     ]
                 )
-            ];
-        }
-
-        return $data;
+        );
     }
 }
