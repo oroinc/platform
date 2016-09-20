@@ -125,7 +125,6 @@ datagrids:
                 label: oro.translation.translation_key.domain.label
             context:
                 label: oro.translation.translation.context.label
-                renderable: false
         sorters:
             multiple_sorting: true
             columns:
