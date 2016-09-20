@@ -91,7 +91,7 @@ datagrids:
                             join: '%oro_translation.entity.translation_key.class%'
                             alias: translationKey
                             conditionType: WITH
-                            condition: 1 = 1 # always true (this node is required)
+                            condition: 1 = 1 # always true (required for DQLBuilder due require conditionType when joining on Entity class)
                     left:
                         -
                             join: '%oro_translation.entity.translation.class%'
