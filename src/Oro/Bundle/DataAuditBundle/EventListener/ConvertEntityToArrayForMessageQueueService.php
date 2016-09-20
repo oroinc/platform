@@ -19,7 +19,7 @@ class ConvertEntityToArrayForMessageQueueService
 
         return [
             'entity_class' => $entityClass,
-            'entity_id' => $this->getEntityId($em, $entity),
+            'entity_id' => $this->getEntityIdentifier($em, $entity),
             'change_set' => $this->sanitizeChangeSet($em, $changeSet),
         ];
     }
@@ -67,13 +67,23 @@ class ConvertEntityToArrayForMessageQueueService
      * @param EntityManagerInterface $em
      * @param object $entity
      *
-     * @return int|string
+     * @return array
      */
-    private function getEntityId(EntityManagerInterface $em, $entity)
+    private function getEntityIdentifier(EntityManagerInterface $em, $entity)
     {
-        $entityMeta = $em->getClassMetadata(get_class($entity));
-        $idFieldName = $entityMeta->getSingleIdentifierFieldName();
+        $identifier = [];
 
-        return $entityMeta->getReflectionProperty($idFieldName)->getValue($entity);
+        $entityMeta = $em->getClassMetadata(get_class($entity));
+        foreach ($entityMeta->getIdentifierValues($entity) as $field => $value) {
+            if ($entityMeta->hasAssociation($field)) {
+                $associationMeta = $em->getClassMetadata(get_class($value));
+                $idFieldName = $associationMeta->getSingleIdentifierFieldName();
+                $identifier[$field] = $associationMeta->getFieldValue($value, $idFieldName);
+            } else {
+                $identifier[$field] = $value;
+            }
+        }
+
+        return $identifier;
     }
 }
