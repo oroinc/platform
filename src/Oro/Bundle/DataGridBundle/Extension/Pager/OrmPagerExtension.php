@@ -29,8 +29,6 @@ class OrmPagerExtension extends AbstractPagerExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
-
         /** @var $datasource OrmDatasource */
         if ($datasource->getCountQb()) {
             $this->pager->setCountQb($datasource->getCountQb());
