@@ -4,7 +4,7 @@ define(function(require) {
     var TextEditorView;
     var BaseView = require('oroform/js/app/views/editor/text-editor-view');
 
-    // TODO: will be remove after https://magecore.atlassian.net/browse/BAP-11905
+    // TODO: will be removed after https://magecore.atlassian.net/browse/BAP-11905
     TextEditorView = BaseView.extend({
         template: require('tpl!../../../../templates/text-editor.html'),
         events: {
@@ -14,38 +14,49 @@ define(function(require) {
         },
 
         /**
-         * @inheritdoc
+         * @inheritDoc
          */
         focus: function(atEnd) {
             this.$('[name=value]').setCursorToEnd().focus();
         },
 
         /**
-         * @inheritdoc
+         * @inheritDoc
          */
         getValue: function() {
             return this.$('[name=value]').val();
         },
 
         /**
-         * @inheritdoc
+         * @inheritDoc
          */
         rethrowEvent: function(e) {
         },
 
         /**
-         * @inheritdoc
+         * @inheritDoc
+         */
+        onGenericKeydown: function(e) {
+            this.onGenericEnterKeydown(e);
+            this.onGenericTabKeydown(e);
+            this.onGenericArrowKeydown(e);
+            this.onGenericEscapeKeydown(e);
+        },
+
+        /**
+         * @inheritDoc
          */
         onGenericEnterKeydown: function(e) {
-            if (e.keyCode === this.ENTER_KEY_CODE && e.ctrlKey) {
+            if (e.keyCode === this.ENTER_KEY_CODE && (e.ctrlKey || e.shiftKey)) {
+                var postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
                 if (this.isChanged()) {
                     if (this.validator.form()) {
-                        this.trigger('saveAndEditNextRowAction');
+                        this.trigger('save' + postfix + 'Action')
                     } else {
                         this.focus();
                     }
                 } else {
-                    this.trigger('cancelAndEditNextRowAction');
+                    this.trigger('cancel' + postfix + 'Action');
                 }
 
                 e.stopImmediatePropagation();
