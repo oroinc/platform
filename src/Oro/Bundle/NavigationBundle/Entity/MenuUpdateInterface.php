@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 interface MenuUpdateInterface
@@ -58,6 +59,25 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function removeTitle(LocalizedFallbackValue $title);
+
+    /**
+     * @param Localization $localization
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getTitle(Localization $localization = null);
+
+    /**
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultTitle();
+
+    /**
+     * @param string $value
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function setDefaultTitle($value);
 
     /**
      * @return string

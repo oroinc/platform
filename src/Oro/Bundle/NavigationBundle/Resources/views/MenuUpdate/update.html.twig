@@ -19,7 +19,7 @@
     {% if resource_granted('oro_navigation_menu_update_update') %}
         {% set html = UI.saveAndCloseButton({
             'route': 'oro_navigation_menu_update_update',
-            'params': {'menu': '$menu', 'key': '$key'}
+            'params': {'menu': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
         }) %}
     {% endif %}
     {% if resource_granted('oro_navigation_menu_update_create') %}
@@ -58,6 +58,7 @@
                 'data': [
                     form_row(form.titles),
                     form_row(form.uri),
+                    form_row(form.key),
                     form_row(form.active)
                 ]
             }

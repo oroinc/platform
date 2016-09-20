@@ -38,6 +38,14 @@ class MenuUpdateType extends AbstractType
                 ]
             )
             ->add(
+                'key',
+                'text',
+                [
+                    'required' => true,
+                    'label' => 'oro.navigation.menuupdate.key.label',
+                ]
+            )
+            ->add(
                 'active',
                 'checkbox',
                 [

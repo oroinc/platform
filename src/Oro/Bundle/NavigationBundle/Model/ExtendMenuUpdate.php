@@ -4,12 +4,10 @@ namespace Oro\Bundle\NavigationBundle\Model;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 
-/**
- * @method LocalizedFallbackValue getTitle(Localization $localization = null)
- * @method LocalizedFallbackValue getDefaultTitle()
- */
-abstract class ExtendMenuUpdate
+abstract class ExtendMenuUpdate implements
+    MenuUpdateInterface
 {
     /**
      * Constructor
@@ -19,6 +17,37 @@ abstract class ExtendMenuUpdate
      * IMPORTANT: If the derived class has own constructor it must call parent constructor.
      */
     public function __construct()
+    {
+    }
+
+    /**
+     * The real implementation of this method is auto generated.
+     *
+     * @param Localization|null $localization
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getTitle(Localization $localization = null)
+    {
+    }
+
+    /**
+     * The real implementation of this method is auto generated.
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultTitle()
+    {
+    }
+
+    /**
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $value
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function setDefaultTitle($value)
     {
     }
 }

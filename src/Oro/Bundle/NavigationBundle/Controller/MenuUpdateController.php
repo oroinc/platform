@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
 /**
  * @Route("/menuupdate")
@@ -20,10 +21,9 @@ class MenuUpdateController extends Controller
 {
     /**
      * @Route(
-     *     "/{menu}/create/{parentKey}",
+     *     "/{menu}/{parentKey}/create",
      *     name="oro_navigation_menu_update_create",
-     *     defaults={"parentKey" = null},
-     *     requirements={"menu" = "[-\w]+", "parentKey" = "[-\w]+"}
+     *     defaults={"parentKey" = null}
      * )
      * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
      * @Acl(
@@ -39,28 +39,27 @@ class MenuUpdateController extends Controller
      */
     public function createAction($menu, $parentKey)
     {
-        if ($parentKey) {
-            $parentUpdate = $this->getDoctrine()
-                ->getManagerForClass('OroNavigationBundle:MenuUpdate')
-                ->getRepository('OroNavigationBundle:MenuUpdate')
-                ->getMenuUpdateByMenuAndKey($menu, $parentKey);
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-            if (!$parentUpdate) {
-                throw new NotFoundHttpException();
-            }
+        $menuUpdate = $manager->createMenuUpdate();
+
+        $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
+        if (!$parent) {
+            throw $this->createNotFoundException();
         }
 
-        $menuUpdate = $this->createMenuUpdate($menu, null, $parentKey);
+        $menuUpdate->setParentKey($parent->getKey());
+        $menuUpdate->setMenu($menu);
 
         return $this->update($menuUpdate);
     }
 
     /**
      * @Route(
-     *     "/{menu}/update/{key}/{parentKey}",
+     *     "/{menu}/{parentKey}/update/{key}",
      *     name="oro_navigation_menu_update_update",
-     *     defaults={"parentKey" = null},
-     *     requirements={"menu" = "[-\w]+", "key" = "[-\w]+", "parentKey" = "[-\w]+"}
+     *     defaults={"parentKey" = null}
      * )
      * @Template()
      * @Acl(
@@ -71,50 +70,26 @@ class MenuUpdateController extends Controller
      * )
      *
      * @param string $menu
-     * @param string $key
      * @param string $parentKey
+     * @param string $key
      * @return array|RedirectResponse
      */
-    public function updateAction($menu, $key, $parentKey)
+    public function updateAction($menu, $parentKey, $key)
     {
-        if ($parentKey) {
-            $parentUpdate = $this->getDoctrine()
-                ->getManagerForClass('OroNavigationBundle:MenuUpdate')
-                ->getRepository('OroNavigationBundle:MenuUpdate')
-                ->getMenuUpdateByMenuAndKey($menu, $parentKey);
-
-            if (!$parentUpdate) {
-                throw new NotFoundHttpException();
-            }
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        
+        $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
+        if (!$parent) {
+            throw $this->createNotFoundException();
         }
 
-        $menuUpdate = $this->getDoctrine()
-            ->getManagerForClass('OroNavigationBundle:MenuUpdate')
-            ->getRepository('OroNavigationBundle:MenuUpdate')
-            ->getMenuUpdateByMenuAndKey($menu, $key);
-
-        if ($menuUpdate !== null) {
-            $menuUpdate->setParentKey($parentKey);
-
-            return $this->update($menuUpdate);
-        } else {
-            throw new NotFoundHttpException();
+        $menuUpdate = $manager->getMenuUpdateByKey($menu, $key);
+        if (!$menuUpdate) {
+            throw $this->createNotFoundException();
         }
-    }
 
-    /**
-     * @param MenuUpdate $menuUpdate
-     * @return array|RedirectResponse
-     */
-    private function update(MenuUpdate $menuUpdate)
-    {
-        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
-
-        return $this->get('oro_form.model.update_handler')->update(
-            $menuUpdate,
-            $form,
-            $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
-        );
+        return $this->update($menuUpdate);
     }
 
     /**
@@ -148,21 +123,17 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @param string $menu
-     * @param string $key
-     * @param string $parentKey
-     * @return MenuUpdate
+     * @param MenuUpdateInterface $menuUpdate
+     * @return array|RedirectResponse
      */
-    private function createMenuUpdate($menu, $key, $parentKey)
+    private function update(MenuUpdateInterface $menuUpdate)
     {
-        $menuUpdate = new MenuUpdate();
-        $menuUpdate
-            ->setOwnershipType(MenuUpdate::OWNERSHIP_GLOBAL)
-            ->setMenu($menu)
-            ->setKey($key)
-            ->setParentKey($parentKey);
-        ;
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
 
-        return $menuUpdate;
+        return $this->get('oro_form.model.update_handler')->update(
+            $menuUpdate,
+            $form,
+            $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
+        );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\Builder;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit;
 
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;

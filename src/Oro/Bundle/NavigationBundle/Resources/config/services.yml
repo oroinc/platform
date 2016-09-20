@@ -408,7 +408,7 @@ services:
     oro_navigation.menu_update.builder:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
-            - '@oro_locale.helper.localization'
+            - '@oro_navigation.helper.menu_update'
         tags:
             - { name: oro_menu.builder }
 
@@ -419,3 +419,20 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_navigation.menu_update_provider, area: default }
+
+    oro_navigation.helper.menu_update:
+        class: Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper
+        arguments:
+            - '@oro_locale.helper.localization'
+
+    oro_navigation.manager.menu_update_abstract:
+        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
+        arguments:
+            - "@doctrine"
+            - "@oro_menu.builder_chain"
+            - '@oro_navigation.helper.menu_update'
+
+    oro_navigation.manager.menu_update_default:
+        parent: oro_navigation.manager.menu_update_abstract
+        calls:
+            - [ setEntityClass, [ Oro\Bundle\NavigationBundle\Entity\MenuUpdate ]]
