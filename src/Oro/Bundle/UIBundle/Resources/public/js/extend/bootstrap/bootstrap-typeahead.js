@@ -5,18 +5,20 @@ define(function(require) {
     require('bootstrap');
 
     /**
-     * This customization allows to define own focus, click, render, show, lookup functions for Typeahead
+     * This customization allows to define own functions for Typeahead
      */
     var Typeahead;
     var origTypeahead = $.fn.typeahead.Constructor;
     var origFnTypeahead = $.fn.typeahead;
 
     Typeahead = function(element, options) {
+        var _this = this;
         var opts = $.extend({}, $.fn.typeahead.defaults, options);
-        this.focus = opts.focus || this.focus;
-        this.render = opts.render || this.render;
-        this.show = opts.show || this.show;
-        this.lookup = opts.lookup || this.lookup;
+
+        _.each(opts, function(value, name) {
+            _this[name] = value || _this[name];
+        });
+
         origTypeahead.apply(this, arguments);
     };
 
