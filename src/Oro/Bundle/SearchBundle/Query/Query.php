@@ -570,10 +570,6 @@ class Query
      */
     public function getSelectDataFields()
     {
-        if (empty($this->selectAliases)) {
-            return $this->getSelect();
-        }
-
         if (empty($this->select)) {
             return [];
         }
@@ -591,7 +587,7 @@ class Query
                 $resultName = $fieldName;
             }
 
-            $result[] = sprintf('%s.%s', $fieldType, $resultName);
+            $result[$select] = $resultName;
         }
 
         return $result;
