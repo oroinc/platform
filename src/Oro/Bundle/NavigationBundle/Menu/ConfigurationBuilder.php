@@ -95,7 +95,7 @@ class ConfigurationBuilder implements BuilderInterface
         array $data,
         array &$itemList,
         array $options = [],
-        array $itemCodes = []
+        array &$itemCodes = []
     ) {
         $isAllowed = false;
         foreach ($data as $itemCode => $itemData) {
