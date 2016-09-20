@@ -6,7 +6,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -85,39 +84,26 @@ class MenuUpdateController extends Controller
     /**
      * @Route("/", name="oro_navigation_menu_update_index")
      * @Template()
+     * @AclAncestor("oro_navigation_menu_update_view")
+     *
+     * @return array
+     */
+    public function indexAction()
+    {
+        return [
+            'entity_class' => $this->container->getParameter('oro_navigation.entity.menu_update.class')
+        ];
+    }
+
+    /**
+     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
+     * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_view",
      *     type="entity",
      *     class="OroNavigationBundle:MenuUpdate",
      *     permission="VIEW"
      * )
-     *
-     * @return array
-     */
-    public function indexAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/grid", name="oro_navigation_menu_update_grid")
-     * @Template("OroNavigationBundle:MenuUpdate:grid.html.twig")
-     * @Acl(
-     *      id="oro_navigation_menu_grid",
-     *      type="entity",
-     *      class="OroNavigationBundle:MenuUpdate",
-     *      permission="VIEW"
-     * )
-     */
-    public function gridAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
-     * @Template()
-     * @AclAncestor("oro_navigation_menu_update_view")
      *
      * @param string $menu
      * @return array

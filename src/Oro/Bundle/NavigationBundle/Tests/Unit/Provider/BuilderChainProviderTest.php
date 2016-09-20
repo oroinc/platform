@@ -250,7 +250,7 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
         return $child;
     }
 
-    public function testGetMenusForArea()
+    public function testGetMenuListByArea()
     {
         $reflection = new \ReflectionClass($this->provider);
         $reflection_property = $reflection->getProperty('menus');
@@ -264,10 +264,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->with('area')
             ->will($this->returnValue('default'));
 
-        $menuDefault->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('usermenu'));
-
         $menuFrontend = $this->getMockBuilder('Knp\Menu\ItemInterface')
             ->getMock();
 
@@ -276,16 +272,11 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->with('area')
             ->will($this->returnValue('frontend'));
 
-        $menuFrontend->expects($this->never())
-            ->method('getName')
-            ->will($this->returnValue('frontend_menu'));
-
         $reflection_property->setValue($this->provider, [
             $menuDefault, $menuFrontend
         ]);
+        $result = $this->provider->getMenuListByArea('default');
 
-        $result = $this->provider->getMenusForArea('default');
-
-        $this->assertEquals(['usermenu'], $result);
+        $this->assertEquals([$menuDefault], $result);
     }
 }

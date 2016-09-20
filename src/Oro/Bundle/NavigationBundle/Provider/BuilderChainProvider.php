@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Knp\Menu\MenuItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuItem;
 use Knp\Menu\Provider\MenuProviderInterface;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
@@ -193,16 +193,16 @@ class BuilderChainProvider implements MenuProviderInterface
      *
      * @param  string $area
      *
-     * @return array|null
+     * @return MenuItem[]
      */
-    public function getMenusForArea($area)
+    public function getMenuListByArea($area)
     {
         $menuWithAlias = [];
 
         /** @var MenuItem $menu */
         foreach ($this->menus as $menu) {
             if ($menu->getExtra('area') == $area) {
-                $menuWithAlias[] = $menu->getName();
+                $menuWithAlias[] = $menu;
             }
         }
 

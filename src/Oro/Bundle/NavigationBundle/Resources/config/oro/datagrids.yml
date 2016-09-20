@@ -11,15 +11,15 @@ datagrids:
             title:
                 label: oro.menu.menuitem.titles.label
         properties:
-            id: ~
+            menu: ~
             title:
                 type: localized_value
                 data_name: titles
             view_link:
                 type: url
-                route: oro_menu_item_view
+                route: oro_navigation_menu_update_view
                 params:
-                    - id
+                    - menu
         sorters:
             columns:
                 title:

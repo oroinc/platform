@@ -1,25 +1,35 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Extension;
+namespace Oro\Bundle\NavigationBundle\Datagrid;
 
+use Knp\Menu\MenuItem;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
-class PlatformMenuDatasource implements DatasourceInterface
+/**
+ * Class MenuUpdateDatasource
+ * @package Oro\Bundle\NavigationBundle\Datagrid
+ */
+class MenuUpdateDatasource implements DatasourceInterface
 {
-    const AREA = 'default';
-
     /** @var BuilderChainProvider */
     protected $chainProvider;
 
     /**
-     * @param BuilderChainProvider $chainProvider
+     * @var string
      */
-    public function __construct(BuilderChainProvider $chainProvider)
+    protected $area;
+
+    /**
+     * @param BuilderChainProvider $chainProvider
+     * @param string               $area
+     */
+    public function __construct(BuilderChainProvider $chainProvider, $area)
     {
         $this->chainProvider = $chainProvider;
+        $this->area = $area;
     }
 
     /**
@@ -36,11 +46,11 @@ class PlatformMenuDatasource implements DatasourceInterface
     public function getResults()
     {
         $rows = [];
+        $menuItems = $this->chainProvider->getMenuListByArea($this->area);
 
-        if ($menus = $this->chainProvider->getMenusForArea(self::AREA)) {
-            foreach ($menus as $key => $value) {
-                $rows[] = new ResultRecord(['id' => $key, 'title' => $value]);
-            }
+        /** @var MenuItem $menuItem */
+        foreach ($menuItems as $menuItem) {
+            $rows[] = new ResultRecord(['menu' => $menuItem->getName(), 'title' => $menuItem->getName()]);
         }
 
         return $rows;
