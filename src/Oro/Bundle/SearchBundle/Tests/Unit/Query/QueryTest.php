@@ -226,6 +226,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         foreach ($selectFieldsProperty as $field) {
             $this->assertNotTrue(strpos($field, ' ') > 0);
         }
+
+        $query->select('newField');
+        $this->assertEmpty($query->getSelectAliases());
     }
 
     public function testGetSelectWithAliases()
