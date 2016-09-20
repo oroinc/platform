@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NotificationBundle\Async;
 
-
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -54,7 +53,7 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
 
         $this->mailer->send($emailMessage, $failedRecepiens);
 
-        if(count($failedRecepiens) > 0){
+        if (count($failedRecepiens) > 0) {
             $this->logger->critical(sprintf(
                 '[EmailSendingMessageProcessor] cannot sent message: "%s", receivers: %s',
                 $message->getBody(),

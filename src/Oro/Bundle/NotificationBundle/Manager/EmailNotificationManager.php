@@ -3,13 +3,11 @@
 namespace Oro\Bundle\NotificationBundle\Manager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Psr\Log\LoggerInterface;
 
 class EmailNotificationManager extends AbstractNotificationManager
@@ -62,7 +60,7 @@ class EmailNotificationManager extends AbstractNotificationManager
         foreach ($notifications as $notification) {
             $emailTemplate = $notification->getTemplate();
             try {
-                list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
+                list($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
                     $emailTemplate,
                     ['entity' => $object] + $params
                 );

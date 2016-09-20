@@ -3,8 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
@@ -81,7 +79,12 @@ class MassNotificationSender
 
         $massNotification = new MassNotification($senderName, $senderEmail, $recipients, $template);
 
-        $this->emailNotificationManager->process(null, [$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
+        $this->emailNotificationManager->process(
+            null,
+            [$massNotification],
+            null,
+            [self::MAINTENANCE_VARIABLE => $body]
+        );
         //persist and flush sending job entity
         $this->entityPool->persistAndFlush($this->em);
 

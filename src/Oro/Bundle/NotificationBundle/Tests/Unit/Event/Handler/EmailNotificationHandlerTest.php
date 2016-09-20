@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
@@ -11,7 +10,6 @@ use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\TagBundle\Entity\Taggable;
-
 
 class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,8 +39,8 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 
         /** @var EmailNotification $notification */
         $notification = $this->getMock(EmailNotification::class);
-        $notifications = array($notification);
-        $notificationsForManager = array(new EmailNotificationAdapter($entity, $notification, $em, $configProvider));
+        $notifications = [$notification];
+        $notificationsForManager = [new EmailNotificationAdapter($entity, $notification, $em, $configProvider)];
 
         /** @var EmailNotificationManager | \PHPUnit_Framework_MockObject_MockObject $manager */
         $manager = $this->getMockBuilder(EmailNotificationManager::class)

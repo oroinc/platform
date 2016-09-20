@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Manager;
 
-use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\Model\NotificationInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractNotificationManager
