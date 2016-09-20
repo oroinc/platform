@@ -1,5 +1,5 @@
-{% if record.getValue('_status') %}
-	{{ 'oro.translation.translation.status.translated'|trans }}
+{% if record.getValue('status') %}
+    {{ 'oro.translation.translation.status.translated'|trans }}
 {% else %}
-	{{ 'oro.translation.translation.status.untranslated'|trans }}
+    {{ 'oro.translation.translation.status.untranslated'|trans }}
 {% endif %}
