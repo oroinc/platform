@@ -70,4 +70,15 @@ class ProcessorTest extends AbstractProcessorTest
 
         $this->mailProcessor->sendResetPasswordAsAdminEmail($this->user);
     }
+
+    public function testSendForcedResetPasswordAsAdminEmail()
+    {
+        $this->assertSendCalled(
+            Processor::TEMPLATE_USER_FORCED_PASSWORD_CHANGE,
+            ['entity' => $this->user],
+            $this->buildMessage($this->user->getEmail())
+        );
+
+        $this->mailProcessor->sendForcedResetPasswordAsAdminEmail($this->user);
+    }
 }
