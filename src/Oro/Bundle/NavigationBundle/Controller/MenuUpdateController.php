@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -18,6 +18,20 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
  */
 class MenuUpdateController extends Controller
 {
+    /**
+     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Template()
+     * @AclAncestor("oro_navigation_menu_update_view")
+     *
+     * @return array
+     */
+    public function indexAction()
+    {
+        return [
+            'entity_class' => MenuUpdate::class
+        ];
+    }
+
     /**
      * @Route(
      *     "/{menu}/create/{parentKey}",
@@ -83,7 +97,7 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
      * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_view",
@@ -91,18 +105,6 @@ class MenuUpdateController extends Controller
      *     class="OroNavigationBundle:MenuUpdate",
      *     permission="VIEW"
      * )
-     *
-     * @return array
-     */
-    public function indexAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
-     * @Template()
-     * @AclAncestor("oro_navigation_menu_update_view")
      *
      * @param string $menu
      * @return array

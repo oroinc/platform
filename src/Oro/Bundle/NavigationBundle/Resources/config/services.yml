@@ -56,6 +56,8 @@ parameters:
     oro_navigation.content.simple_tag_generator.class:         Oro\Bundle\NavigationBundle\Content\SimpleTagGenerator
     oro_navigation.content.datagrid_tag_listener.class:        Oro\Bundle\NavigationBundle\Content\DataGridTagListener
 
+    oro_navigation.area:                                       default
+
 services:
     oro_menu.cache:
         parent: oro.cache.abstract
@@ -427,3 +429,12 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_navigation.menu_update_provider, area: default }
+
+    oro_navigation.extension.datasource.menu:
+        class: Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource
+        arguments:
+            - '@oro_menu.builder_chain'
+            - '@oro_menu.menu_manipulator'
+            - '%oro_navigation.area%'
+        tags:
+            - { name: oro_datagrid.datasource, type: menu-update-default-provider }
