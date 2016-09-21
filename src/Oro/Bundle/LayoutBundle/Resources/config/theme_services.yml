@@ -115,8 +115,8 @@ services:
         calls:
             - [addExtension, ['@oro_layout.layout_update_generator.extension.theme_relative_path']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.add_tree']]
-            - [addExtension, ['@oro_layout.layout_update_generator.extension.config_conditions']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.config_imports']]
+            - [addExtension, ['@oro_layout.layout_update_generator.extension.config_conditions']]
 
     oro_layout.layout_update_generator.extension.config_imports:
         class:  Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension

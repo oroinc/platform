@@ -244,8 +244,8 @@ class CompleteDescriptions implements ProcessorInterface
                     $field->setDescription($loadedDescription);
                     continue;
                 }
-
-                $propertyPath = $field->getPropertyPath() ? : $fieldName;
+                
+                $propertyPath = $field->getPropertyPath($fieldName);
                 if ($fieldPrefix) {
                     $propertyPath = $fieldPrefix . $propertyPath;
                 }
@@ -276,7 +276,7 @@ class CompleteDescriptions implements ProcessorInterface
                 if ($targetClass) {
                     $this->setDescriptionsForFields($targetEntity, $targetClass);
                 } else {
-                    $propertyPath = $field->getPropertyPath() ? : $fieldName;
+                    $propertyPath = $field->getPropertyPath($fieldName);
                     $this->setDescriptionsForFields($targetEntity, $entityClass, $propertyPath . '.');
                 }
             }
@@ -297,7 +297,7 @@ class CompleteDescriptions implements ProcessorInterface
                     $field->setDescription($loadedDescription);
                     continue;
                 }
-                $propertyPath = $field->getPropertyPath() ? : $fieldName;
+                $propertyPath = $field->getPropertyPath($fieldName);
                 $description = $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath);
                 if ($description) {
                     $field->setDescription($description);

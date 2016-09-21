@@ -147,6 +147,24 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertGeneration('collections.txt', $schema);
     }
 
+    public function testCollectionsWithPluralNames()
+    {
+        $schema = [
+            'type'      => 'Extend',
+            'property'  => [],
+            'relation'  => [],
+            'default'   => [],
+            'addremove' => [
+                'owners'  => [
+                    'self'                => 'owners',
+                    'is_target_addremove' => true,
+                    'target'              => 'targets',
+                ],
+            ]
+        ];
+        $this->assertGeneration('collections_with_plural_names.txt', $schema);
+    }
+
     public function testRelations()
     {
         $schema = [

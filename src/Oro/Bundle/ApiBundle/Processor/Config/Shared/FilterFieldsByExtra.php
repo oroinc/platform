@@ -112,7 +112,7 @@ class FilterFieldsByExtra implements ProcessorInterface
                 if (!$field->isExcluded()
                     && !in_array($fieldName, $allowedFields, true)
                     && !in_array($fieldName, $idFieldNames, true)
-                    && !ConfigUtil::isMetadataProperty($field->getPropertyPath() ?: $fieldName)
+                    && !ConfigUtil::isMetadataProperty($field->getPropertyPath($fieldName))
                 ) {
                     $field->setExcluded();
                 }
@@ -122,7 +122,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->hasTargetEntity()) {
-                $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                $propertyPath = $field->getPropertyPath($fieldName);
                 if ($metadata->hasAssociation($propertyPath)) {
                     $this->filterEntityFields(
                         $field->getTargetEntity(),
