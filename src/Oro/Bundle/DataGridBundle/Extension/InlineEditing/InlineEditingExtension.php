@@ -107,7 +107,7 @@ class InlineEditingExtension extends AbstractExtension
 
                 // Check access to edit field in Class level.
                 // If access not granted - skip inline editing for such field.
-                if ($this->checkFieldGrant($newColumn, $objectIdentity, $columnName, $column)) {
+                if (!$this->isFieldEditable($newColumn, $objectIdentity, $columnName, $column)) {
                     $column = $this->disableColumnEdit($column);
                     continue;
                 }
@@ -170,11 +170,11 @@ class InlineEditingExtension extends AbstractExtension
     }
 
     /**
-     * @param $column
+     * @param array $column
      *
      * @return bool
      */
-    protected function isEditable($column)
+    protected function isEnableEdit($column)
     {
         if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)
             && isset($column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY])) {
@@ -185,7 +185,7 @@ class InlineEditingExtension extends AbstractExtension
     }
 
     /**
-     * @param $column
+     * @param array $column
      *
      * @return mixed
      */
@@ -199,17 +199,17 @@ class InlineEditingExtension extends AbstractExtension
     }
 
     /**
-     * @param $newColumn
+     * @param array $newColumn
      * @param $objectIdentity
-     * @param $columnName
-     * @param $column
+     * @param string $columnName
+     * @param array $column
      *
      * @return bool
      */
-    protected function checkFieldGrant($newColumn, $objectIdentity, $columnName, $column)
+    protected function isFieldEditable($newColumn, $objectIdentity, $columnName, $column)
     {
-        return $this->isEditable($newColumn)
-        && !$this->authChecker->isGranted(
+        return $this->isEnableEdit($newColumn)
+        && $this->authChecker->isGranted(
             'EDIT',
             new FieldVote($objectIdentity, $this->getColummFieldName($columnName, $column))
         );
