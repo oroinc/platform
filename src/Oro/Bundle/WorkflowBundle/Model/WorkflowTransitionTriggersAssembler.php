@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 
@@ -74,11 +74,11 @@ class WorkflowTransitionTriggersAssembler
     /**
      * @param array $options
      * @param WorkflowDefinition $workflowDefinition
-     * @return TransitionTriggerEvent
+     * @return TransitionEventTrigger
      */
     private function createEventTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
-        $trigger = new TransitionTriggerEvent();
+        $trigger = new TransitionEventTrigger();
 
         $trigger->setEntityClass(
             !empty($options['entity_class']) ? $options['entity_class'] : $workflowDefinition->getRelatedEntity()
@@ -95,11 +95,11 @@ class WorkflowTransitionTriggersAssembler
 
     /**
      * @param array $options
-     * @return TransitionTriggerCron
+     * @return TransitionCronTrigger
      */
     private function createCronTrigger(array $options)
     {
-        $trigger = new TransitionTriggerCron();
+        $trigger = new TransitionCronTrigger();
 
         return $trigger
             ->setCron($options['cron'])

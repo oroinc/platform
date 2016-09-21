@@ -7,11 +7,11 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerEventProcessor;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Async\TransitionEventTriggerProcessor;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerEventHelper;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -19,7 +19,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
@@ -33,7 +33,7 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /** @var TransitionTriggerEventHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionEventTriggerHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $helper;
 
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
@@ -42,7 +42,7 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
-    /** @var TransitionTriggerEventProcessor */
+    /** @var TransitionEventTriggerProcessor */
     protected $processor;
 
     /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -55,7 +55,7 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
         $this->registry = $this->getMock(ManagerRegistry::class);
         $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
 
-        $this->helper = $this->getMockBuilder(TransitionTriggerEventHelper::class)
+        $this->helper = $this->getMockBuilder(TransitionEventTriggerHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -63,7 +63,7 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->logger = $this->getMock(LoggerInterface::class);
 
-        $this->processor = new TransitionTriggerEventProcessor(
+        $this->processor = new TransitionEventTriggerProcessor(
             $this->registry,
             $this->helper,
             $this->manager,
@@ -125,7 +125,7 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->expects($this->never())->method($this->anything());
 
-        $this->setUpLogger('Require of TransitionTriggerEvent was not pass', $message->getBody());
+        $this->setUpLogger('Require of TransitionEventTrigger was not pass', $message->getBody());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
     }
@@ -188,14 +188,14 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
 
         $trigger = null;
         if ($isTrigger) {
-            $trigger = $this->getEntity(TransitionTriggerEvent::class);
+            $trigger = $this->getEntity(TransitionEventTrigger::class);
         }
 
         $this->objectManager->expects($this->any())
             ->method('find')
             ->willReturnMap(
                 [
-                    [TransitionTriggerEvent::class, self::TRANSITION_TRIGGER_EVENT_ID, $trigger]
+                    [TransitionEventTrigger::class, self::TRANSITION_TRIGGER_EVENT_ID, $trigger]
                 ]
             );
 
@@ -224,55 +224,55 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
             ],
             'without trigger id, entity class and id' => [
                 'data' => ['test' => 1],
-                'expectedMessage' => 'Message should contain valid TransitionTriggerEvent id'
+                'expectedMessage' => 'Message should contain valid TransitionEventTrigger id'
             ],
             'empty trigger id, without entity class and id' => [
-                'data' => [TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => null],
-                'expectedMessage' => 'Message should contain valid TransitionTriggerEvent id'
+                'data' => [TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => null],
+                'expectedMessage' => 'Message should contain valid TransitionEventTrigger id'
             ],
             'empty trigger id, no trigger entity, without entity class and id' => [
                 'data' => [
-                    TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID
+                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID
                 ],
-                'expectedMessage' => 'Message should contain valid TransitionTriggerEvent id'
+                'expectedMessage' => 'Message should contain valid TransitionEventTrigger id'
             ],
             'without entity class and id' => [
                 'data' => [
-                    TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID
+                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID
                 ],
                 'expectedMessage' => 'Message should contain valid entity class name and id',
                 'trigger' => true
             ],
             'empty entity class, without entity id' => [
                 'data' => [
-                    TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionTriggerEventProcessor::ENTITY_CLASS => null,
+                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
+                    TransitionEventTriggerProcessor::ENTITY_CLASS => null,
                 ],
                 'expectedMessage' => 'Message should contain valid entity class name and id',
                 'trigger' => true
             ],
             'without entity id' => [
                 'data' => [
-                    TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionTriggerEventProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
+                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
+                    TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
                 ],
                 'expectedMessage' => 'Message should contain valid entity class name and id',
                 'trigger' => true
             ],
             'empty entity id' => [
                 'data' => [
-                    TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionTriggerEventProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
-                    TransitionTriggerEventProcessor::ENTITY_ID => null,
+                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
+                    TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
+                    TransitionEventTriggerProcessor::ENTITY_ID => null,
                 ],
                 'expectedMessage' => 'Message should contain valid entity class name and id',
                 'trigger' => true
             ],
             'no entity' => [
                 'data' => [
-                    TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionTriggerEventProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
-                    TransitionTriggerEventProcessor::ENTITY_ID => self::ENTITY_ID,
+                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
+                    TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
+                    TransitionEventTriggerProcessor::ENTITY_ID => self::ENTITY_ID,
                 ],
                 'expectedMessage' => 'Message should contain valid entity class name and id',
                 'trigger' => true
@@ -288,9 +288,9 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
     {
         if (null === $data) {
             $data = [
-                TransitionTriggerEventProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                TransitionTriggerEventProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
-                TransitionTriggerEventProcessor::ENTITY_ID => self::ENTITY_ID,
+                TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
+                TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
+                TransitionEventTriggerProcessor::ENTITY_ID => self::ENTITY_ID,
             ];
         }
 
@@ -303,12 +303,12 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $transitionName
      * @param string $workflowName
-     * @return TransitionTriggerEvent
+     * @return TransitionEventTrigger
      */
     private function getTrigger($transitionName = 'test transition', $workflowName = 'test workflow')
     {
         return $this->getEntity(
-            TransitionTriggerEvent::class,
+            TransitionEventTrigger::class,
             [
                 'transitionName' => $transitionName,
                 'workflowDefinition' => $this->getEntity(WorkflowDefinition::class, ['name' => $workflowName])
@@ -317,16 +317,16 @@ class TransitionTriggerEventProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param TransitionTriggerEvent $trigger
+     * @param TransitionEventTrigger $trigger
      * @param object $entity
      */
-    private function setUpObjectManager(TransitionTriggerEvent $trigger, $entity)
+    private function setUpObjectManager(TransitionEventTrigger $trigger, $entity)
     {
         $this->objectManager->expects($this->exactly(2))
             ->method('find')
             ->willReturnMap(
                 [
-                    [TransitionTriggerEvent::class, self::TRANSITION_TRIGGER_EVENT_ID, $trigger],
+                    [TransitionEventTrigger::class, self::TRANSITION_TRIGGER_EVENT_ID, $trigger],
                     [self::ENTITY_CLASS, self::ENTITY_ID, $entity]
                 ]
             );

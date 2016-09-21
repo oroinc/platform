@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
+class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
 {
     public function testAccessors()
     {
@@ -23,7 +23,7 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
     public function testImport()
     {
         $trigger = $this->getEntity();
-        /** @var TransitionTriggerEvent $entity */
+        /** @var TransitionEventTrigger $entity */
         $entity = $this->entity;
         $this->setDataToTrigger($trigger);
         $trigger->setEvent('test_event')
@@ -48,7 +48,7 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
      */
     public function testToString(array $data, $expected)
     {
-        $this->assertEquals($expected, (string) $this->createTriggerEvent($data));
+        $this->assertEquals($expected, (string) $this->createEventTrigger($data));
     }
 
     /**
@@ -97,8 +97,8 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
 
         $this->assertEquals(
             $expected,
-            $this->createTriggerEvent($match)->isEqualTo(
-                $this->createTriggerEvent($against)
+            $this->createEventTrigger($match)->isEqualTo(
+                $this->createEventTrigger($against)
             )
         );
     }
@@ -207,11 +207,11 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
 
     /**
      * @param array $attributes
-     * @return TransitionTriggerEvent
+     * @return TransitionEventTrigger
      */
-    protected function createTriggerEvent(array $attributes)
+    protected function createEventTrigger(array $attributes)
     {
-        $trigger = new TransitionTriggerEvent();
+        $trigger = new TransitionEventTrigger();
 
         foreach ($attributes as $name => $value) {
             $method = 'set' . ucfirst($name);
@@ -226,6 +226,6 @@ class TransitionTriggerEventTest extends AbstractTransitionTriggerTestCase
      */
     protected function getEntity()
     {
-        return new TransitionTriggerEvent();
+        return new TransitionEventTrigger();
     }
 }

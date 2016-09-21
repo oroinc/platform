@@ -7,8 +7,8 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
@@ -35,13 +35,13 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
     public function testUpdateTriggers()
     {
         $definition = (new WorkflowDefinition())->setName('workflow');
-        $newTrigger1 = (new TransitionTriggerCron())->setCron('1 * * * *');
-        $newTrigger2 = (new TransitionTriggerEvent())->setEvent('create');
+        $newTrigger1 = (new TransitionCronTrigger())->setCron('1 * * * *');
+        $newTrigger2 = (new TransitionEventTrigger())->setEvent('create');
 
         $triggersBag = new TriggersBag($definition, [$newTrigger1, $newTrigger2]);
 
-        $storedTrigger1 = (new TransitionTriggerCron())->setCron('2 * * * *');
-        $storedTrigger2 = (new TransitionTriggerEvent())->setEvent('update');
+        $storedTrigger1 = (new TransitionCronTrigger())->setCron('2 * * * *');
+        $storedTrigger2 = (new TransitionEventTrigger())->setEvent('update');
 
         $repository = $this->repositoryRetrieval();
         $repository->expects($this->once())
@@ -69,13 +69,13 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
     public function testUpdateTriggersNoActions()
     {
         $definition = (new WorkflowDefinition())->setName('workflow');
-        $newTrigger1 = (new TransitionTriggerCron())->setCron('1 * * * *');
-        $newTrigger2 = (new TransitionTriggerEvent())->setEvent('create');
+        $newTrigger1 = (new TransitionCronTrigger())->setCron('1 * * * *');
+        $newTrigger2 = (new TransitionEventTrigger())->setEvent('create');
 
         $triggersBag = new TriggersBag($definition, [$newTrigger1, $newTrigger2]);
 
-        $storedTrigger1 = (new TransitionTriggerCron())->setCron('2 * * * *');
-        $storedTrigger2 = (new TransitionTriggerEvent())->setEvent('update');
+        $storedTrigger1 = (new TransitionCronTrigger())->setCron('2 * * * *');
+        $storedTrigger2 = (new TransitionEventTrigger())->setEvent('update');
 
         $repository = $this->repositoryRetrieval();
         $repository->expects($this->once())
@@ -99,7 +99,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
 
         $repository = $this->repositoryRetrieval();
 
-        $trigger = new TransitionTriggerCron();
+        $trigger = new TransitionCronTrigger();
         $repository->expects($this->once())
             ->method('findBy')
             ->with(['workflowDefinition' => $definition->getName()])

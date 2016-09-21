@@ -5,14 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository")
  */
-class TransitionTriggerEvent extends AbstractTransitionTrigger
+class TransitionEventTrigger extends AbstractTransitionTrigger implements EventTriggerInterface
 {
-    const EVENT_CREATE = 'create';
-    const EVENT_UPDATE = 'update';
-    const EVENT_DELETE = 'delete';
-
     /**
      * Entity from event
      *
@@ -53,11 +49,19 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     protected $relation;
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getEntityClass()
     {
-        return $this->entityClass;
+        if ($this->entityClass) {
+            return $this->entityClass;
+        }
+
+        if ($this->getWorkflowDefinition()) {
+            return $this->getWorkflowDefinition()->getRelatedEntity();
+        }
+
+        return null;
     }
 
     /**
@@ -72,7 +76,7 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getEvent()
     {
@@ -91,7 +95,7 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -156,10 +160,10 @@ class TransitionTriggerEvent extends AbstractTransitionTrigger
     }
 
     /**
-     * @param TransitionTriggerEvent $trigger
+     * @param TransitionEventTrigger $trigger
      * @return $this
      */
-    public function import(TransitionTriggerEvent $trigger)
+    public function import(TransitionEventTrigger $trigger)
     {
         $this->importMainData($trigger);
 

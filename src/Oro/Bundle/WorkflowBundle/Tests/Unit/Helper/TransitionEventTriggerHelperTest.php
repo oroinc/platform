@@ -2,32 +2,32 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerEventHelper;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-class TransitionTriggerEventHelperTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowManager;
 
-    /** @var TransitionTriggerEvent */
+    /** @var TransitionEventTrigger */
     protected $trigger;
 
-    /** @var TransitionTriggerEventHelper */
+    /** @var TransitionEventTriggerHelper */
     protected $helper;
 
     protected function setUp()
     {
         $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
 
-        $this->helper = new TransitionTriggerEventHelper($this->workflowManager);
+        $this->helper = new TransitionEventTriggerHelper($this->workflowManager);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName('test_workflow')->setRelatedEntity('stdClass');
 
-        $this->trigger = new TransitionTriggerEvent();
+        $this->trigger = new TransitionEventTrigger();
         $this->trigger->setWorkflowDefinition($workflowDefinition)->setTransitionName('test_transition');
     }
 

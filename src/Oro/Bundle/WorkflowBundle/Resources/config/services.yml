@@ -16,8 +16,8 @@ parameters:
     oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
     oro_workflow.handler.start_transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler
 
-    oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron
-    oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent
+    oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger
+    oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
 
 services:
     oro_workflow.attribute_guesser:
@@ -258,14 +258,14 @@ services:
         arguments:
             - '@doctrine'
 
-    oro_workflow.helper.transition_trigger_event:
-        class: Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerEventHelper
+    oro_workflow.helper.transition_event_trigger:
+        class: Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper
         public: false
         arguments:
             - '@oro_workflow.manager'
 
-    oro_workflow.helper.transition_trigger_cron:
-        class: Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerCronHelper
+    oro_workflow.helper.transition_cron_trigger:
+        class: Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper
         public: false
         arguments:
             - '@oro_workflow.manager'

@@ -4,12 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
-class TransitionTriggerEventHelper
+class TransitionEventTriggerHelper
 {
     const TRIGGER_ENTITY = 'entity';
     const TRIGGER_WORKFLOW_ENTITY = 'mainEntity';
@@ -28,11 +28,11 @@ class TransitionTriggerEventHelper
     }
 
     /**
-     * @param TransitionTriggerEvent $trigger
+     * @param TransitionEventTrigger $trigger
      * @param object $entity
      * @return bool
      */
-    public function isRequirePass(TransitionTriggerEvent $trigger, $entity)
+    public function isRequirePass(TransitionEventTrigger $trigger, $entity)
     {
         $require = $trigger->getRequire();
         if (!$require) {
@@ -47,11 +47,11 @@ class TransitionTriggerEventHelper
     }
 
     /**
-     * @param TransitionTriggerEvent $trigger
+     * @param TransitionEventTrigger $trigger
      * @param object $entity
-     * @return array
+     * @return object
      */
-    private function getExpressionValues(TransitionTriggerEvent $trigger, $entity)
+    public function getMainEntity(TransitionEventTrigger $trigger, $entity)
     {
         $relation = $trigger->getRelation();
         if ($relation) {
@@ -66,10 +66,21 @@ class TransitionTriggerEventHelper
 
         $mainEntityClass = $workflowDefinition->getRelatedEntity();
         if (!$mainEntity instanceof $mainEntityClass) {
-            throw new \RuntimeException(
-                sprintf('Can\'t get main entity using relation "%s"', $relation)
-            );
+            throw new \RuntimeException(sprintf('Can\'t get main entity using relation "%s"', $relation));
         }
+
+        return $mainEntity;
+    }
+
+    /**
+     * @param TransitionEventTrigger $trigger
+     * @param object $entity
+     * @return array
+     */
+    private function getExpressionValues(TransitionEventTrigger $trigger, $entity)
+    {
+        $mainEntity = $this->getMainEntity($trigger, $entity);
+        $workflowDefinition = $trigger->getWorkflowDefinition();
 
         $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $workflowDefinition->getName());
 

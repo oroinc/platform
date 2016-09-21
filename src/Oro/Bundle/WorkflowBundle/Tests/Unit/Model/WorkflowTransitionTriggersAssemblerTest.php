@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 
@@ -34,8 +34,8 @@ class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit_Framework_TestCas
         $configuration = [
             'simple' => [
                 [
-                    (new TransitionTriggerCron())->setCron('* * * * *'),
-                    (new TransitionTriggerEvent())->setEvent('update')
+                    (new TransitionCronTrigger())->setCron('* * * * *'),
+                    (new TransitionEventTrigger())->setEvent('update')
                 ],
                 [
                     ['cron' => '* * * * *'],
@@ -44,11 +44,11 @@ class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit_Framework_TestCas
             ],
             'full' => [
                 [
-                    (new TransitionTriggerCron())
+                    (new TransitionCronTrigger())
                         ->setCron('* * * * *')
                         ->setFilter('filter != true')
                         ->setQueued(false),
-                    (new TransitionTriggerEvent())
+                    (new TransitionEventTrigger())
                         ->setEvent('update')
                         ->setField('field')
                         ->setQueued(false)

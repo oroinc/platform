@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
+class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
 {
     public function testAccessors()
     {
@@ -20,7 +20,7 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
     public function testImport()
     {
         $trigger = $this->getEntity();
-        /** @var TransitionTriggerCron $entity */
+        /** @var TransitionCronTrigger $entity */
         $entity = $this->entity;
         $this->setDataToTrigger($trigger);
         $trigger->setCron('test_cron')
@@ -155,11 +155,11 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
 
     /**
      * @param array $attributes
-     * @return TransitionTriggerCron
+     * @return TransitionCronTrigger
      */
     protected function createTriggerCron(array $attributes)
     {
-        $trigger = new TransitionTriggerCron();
+        $trigger = new TransitionCronTrigger();
 
         foreach ($attributes as $name => $value) {
             $method = 'set' . ucfirst($name);
@@ -174,6 +174,6 @@ class TransitionTriggerCronTest extends AbstractTransitionTriggerTestCase
      */
     protected function getEntity()
     {
-        return new TransitionTriggerCron();
+        return new TransitionCronTrigger();
     }
 }
