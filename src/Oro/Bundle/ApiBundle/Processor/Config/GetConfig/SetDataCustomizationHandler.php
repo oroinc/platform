@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -98,7 +98,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
             if ($metadata->hasAssociation($propertyPath)) {
                 $linkedMetadata = $this->doctrineHelper->getEntityMetadataForClass(
                     $metadata->getAssociationTargetClass($propertyPath)

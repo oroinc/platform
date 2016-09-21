@@ -154,7 +154,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added method `Oro\Component\Layout\Templating\Helper\LayoutHelper::parentBlockWidget` for rendering parent block widget.
 - Added method `getUpdateFileNamePatterns` to `Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface`.
 - Added method `getUpdateFilenamePattern` to `Oro\Component\Layout\Loader\Driver\DriverInterface`.
-- Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list. 
+- Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list.
 
 ####LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
@@ -195,12 +195,22 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - method `getDatagridConfigurationLoader` was added to get loader for datagrid.yml files.
     - method `ensureConfigurationLoaded` was added to check if datagrid config need to be loaded to cache.
     - You can find example of refreshing datagrid cache in `Oro/Bundle/DataGridBundle/EventListener/ContainerListener.php`
+- Class `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource.php`
+    - construction signature was changed now it takes next arguments:
+        `ConfigProcessorInterface` $processor,
+        `EventDispatcherInterface` $eventDispatcher,
+        `ParameterBinderInterface` $parameterBinder,
+        `QueryHintResolver` $queryHintResolver
 - Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts.
 - Configuration files for datagrids now loads from `Resources/config/oro/datagrids.yml` file instead of `Resources/config/datagrid.yml`.
 - Configuration files root node now changed to its plural form `datagrids: ...`.
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ExportAction`
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ImportAction`
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\AbstractImportExportAction`
+- Added class `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor`
+- Added interface `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface`
+- `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource::getParameterBinder` was deprecated
+- `Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface::getParameterBinder` was deprecated
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -280,7 +290,7 @@ tag if it works with extend classes
 ####HelpBundle:
 - Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
 - Root node `help` were added for help configuration in `Resources/config/oro/help.yml` file.
- 
+
 ####SearchBundle:
 - Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
 - Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
@@ -309,6 +319,7 @@ placeholders:
     placeholders: ...
     items: ...
 ```
+- Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
 
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
@@ -321,7 +332,16 @@ placeholders:
     * `oro_titles` to `titles`
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
-    
+- Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
+- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
+- Added `areas` node to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
+- Added interface `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
+- Added trait `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
+- Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate`, implements `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface` and using `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
+- Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
+- Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
+- Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
