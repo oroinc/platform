@@ -260,12 +260,40 @@ class TranslationManager
 
     /**
      * Fully rebuilds translation cache including JS translation
+     *
+     * @param string $translationCacheDir
      */
-    public function rebuildCache()
+    public function rebuildCache($translationCacheDir)
     {
-        $this->translator->warmUp(null);
+        if (!is_dir($translationCacheDir) || !is_writeable($translationCacheDir)) {
+            return;
+        }
+        $this->cleanup($translationCacheDir);
+        $this->translator->warmUp($translationCacheDir);
         $locales = $this->languageProvider->getEnabledLanguages();
         $this->jsTranslationDumper->dumpTranslations($locales);
+    }
+
+    /**
+     * Cleanup directory
+     *
+     * @param string $targetDir
+     */
+    protected function cleanup($targetDir)
+    {
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $path) {
+            $path->isFile() ? unlink($path->getPathname()) : rmdir($path->getPathname());
+        }
     }
 
     /**
