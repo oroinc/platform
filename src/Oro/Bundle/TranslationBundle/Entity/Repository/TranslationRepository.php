@@ -75,7 +75,7 @@ class TranslationRepository extends EntityRepository
      * @param string $languageCode
      * @param string $domain
      *
-     * @return array [['<id>', '<value>', '<key>', '<domain>', '<code>'], ...]
+     * @return array [['id' => '...', 'value' => '...', 'key' => '...', 'domain' => '...', 'code' => '...'], ...]
      */
     public function findAllByLanguageAndDomain($languageCode, $domain)
     {

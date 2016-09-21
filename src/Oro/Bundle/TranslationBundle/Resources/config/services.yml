@@ -107,7 +107,6 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader'
         arguments:
             - '@doctrine'
-            - '@oro_translation.manager.translation'
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 

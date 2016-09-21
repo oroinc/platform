@@ -11,27 +11,21 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class OrmTranslationLoader implements LoaderInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var TranslationManager */
-    protected $translationManager;
-
     /** @var bool|null */
     protected $dbCheck;
 
     /**
      * @param ManagerRegistry $doctrine
-     * @param TranslationManager $translationManager
      */
-    public function __construct(ManagerRegistry $doctrine, TranslationManager $translationManager)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
-        $this->translationManager = $translationManager;
     }
 
     /**

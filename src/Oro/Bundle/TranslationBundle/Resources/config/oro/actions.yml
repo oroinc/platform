@@ -288,7 +288,6 @@ operations:
                 - '@flash_message':
                     message: oro.translation.translation.message.rebuild_cache
                     type: 'success'
-                - '@refresh_grid': oro-translation-translations-grid
 
 action_groups:
     oro_translation_language_set_enabled:
