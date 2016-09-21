@@ -25,7 +25,7 @@ class MenuUpdateType extends AbstractType
                 LocalizedFallbackValueCollectionType::NAME,
                 [
                     'required' => true,
-                    'label' => 'oro.navigation.menuupdate.title.label',
+                    'label' => 'oro.navigation.menuupdate.titles.label',
                     'options' => ['constraints' => [new NotBlank()]]
                 ]
             )
@@ -38,8 +38,16 @@ class MenuUpdateType extends AbstractType
                 ]
             )
             ->add(
+                'key',
+                $options['menu_update_key'] ? 'hidden' : 'text',
+                [
+                    'required' => true,
+                    'label' => 'oro.navigation.menuupdate.key.label',
+                ]
+            )
+            ->add(
                 'active',
-                null,
+                'checkbox',
                 [
                     'label' => 'oro.navigation.menuupdate.active.label',
                 ]
@@ -54,6 +62,7 @@ class MenuUpdateType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => MenuUpdate::class,
+            'menu_update_key' => null,
         ]);
     }
 

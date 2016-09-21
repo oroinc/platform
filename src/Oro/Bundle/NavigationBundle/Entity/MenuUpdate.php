@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
@@ -35,6 +36,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      )
  * })
  * @Config(
+ *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-th"
@@ -46,7 +48,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
     MenuUpdateInterface
 {
     use MenuUpdateTrait;
-    
+
     const OWNERSHIP_USER            = 3;
 
     /**

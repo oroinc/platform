@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
 /**
  * @Route("/menuupdate")
@@ -20,12 +20,21 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 class MenuUpdateController extends Controller
 {
     /**
-     * @Route(
-     *     "/{menu}/create/{parentKey}",
-     *     name="oro_navigation_menu_update_create",
-     *     defaults={"parentKey" = null},
-     *     requirements={"menu" = "[-_\w]+", "parentKey" = "[-_w]+"}
-     * )
+     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Template()
+     * @AclAncestor("oro_navigation_menu_update_view")
+     *
+     * @return array
+     */
+    public function indexAction()
+    {
+        return [
+            'entity_class' => MenuUpdate::class
+        ];
+    }
+
+    /**
+     * @Route("/{menu}/create/{parentKey}", name="oro_navigation_menu_update_create")
      * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
      * @Acl(
      *     id="oro_navigation_menu_update_create",
@@ -38,18 +47,31 @@ class MenuUpdateController extends Controller
      * @param string|null $parentKey
      * @return array|RedirectResponse
      */
-    public function createAction($menu, $parentKey)
+    public function createAction($menu, $parentKey = null)
     {
-        return $this->update($menu, new MenuUpdate());
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+
+        /** @var MenuUpdate $menuUpdate */
+        $menuUpdate = $manager->createMenuUpdate();
+
+        if ($parentKey) {
+            $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
+
+            if (!$parent) {
+                throw $this->createNotFoundException();
+            }
+
+            $menuUpdate->setParentKey($parent->getKey());
+        }
+
+        $menuUpdate->setMenu($menu);
+
+        return $this->update($menu, $menuUpdate);
     }
 
     /**
-     * @Route(
-     *     "/{menu}/update/{key}/{parentKey}",
-     *     name="oro_navigation_menu_update_update",
-     *     defaults={"parentKey" = null},
-     *     requirements={"menu" = "[-_\w]+", "parentKey" = "[-_w]+"}
-     * )
+     * @Route("/{menu}/update/{key}", name="oro_navigation_menu_update_update")
      * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_update",
@@ -60,38 +82,24 @@ class MenuUpdateController extends Controller
      *
      * @param string $menu
      * @param string $key
-     * @param string $parentKey
      * @return array|RedirectResponse
      */
-    public function updateAction($menu, $key, $parentKey)
+    public function updateAction($menu, $key)
     {
-        return $this->update($menu, new MenuUpdate());
-    }
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-    /**
-     * @param string $menu
-     * @param MenuUpdate $menuUpdate
-     * @return array|RedirectResponse
-     */
-    private function update($menu, MenuUpdate $menuUpdate)
-    {
-        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
-
-        $response = $this->get('oro_form.model.update_handler')->update(
-            $menuUpdate,
-            $form,
-            $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
-        );
-        if (is_array($response)) {
-            $response['menu'] = $menu;
-            $response['tree'] = $this->getTree($menu);
+        /** @var MenuUpdate $menuUpdate */
+        $menuUpdate = $manager->getMenuUpdateByKey($menu, $key);
+        if (!$menuUpdate) {
+            throw $this->createNotFoundException();
         }
 
-        return $response;
+        return $this->update($menu, $menuUpdate);
     }
 
     /**
-     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
      * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_view",
@@ -99,18 +107,6 @@ class MenuUpdateController extends Controller
      *     class="OroNavigationBundle:MenuUpdate",
      *     permission="VIEW"
      * )
-     *
-     * @return array
-     */
-    public function indexAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
-     * @Template()
-     * @AclAncestor("oro_navigation_menu_update_view")
      *
      * @param string $menu
      * @return array
@@ -138,5 +134,27 @@ class MenuUpdateController extends Controller
         $root = $this->get('oro_menu.builder_chain')->get($menu);
 
         return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($root);
+    }
+
+    /**
+     * @param string $menu
+     * @param MenuUpdate $menuUpdate
+     * @return array|RedirectResponse
+     */
+    private function update($menu, MenuUpdate $menuUpdate)
+    {
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_update_key' => $menuUpdate->getKey()]);
+
+        $response = $this->get('oro_form.model.update_handler')->update(
+            $menuUpdate,
+            $form,
+            $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
+        );
+        if (is_array($response)) {
+            $response['menu'] = $menu;
+            $response['tree'] = $this->getTree($menu);
+        }
+
+        return $response;
     }
 }

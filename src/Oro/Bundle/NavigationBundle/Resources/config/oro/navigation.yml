@@ -52,13 +52,21 @@ navigation:
                 extras:
                     icon: 'icon-flag'
                 uri: '#'
-            user_list:
+            menu_list_default:
+                label: 'oro.navigation.menu.menu_list_default.label'
+                route: 'oro_navigation_menu_update_index'
                 extras:
-                    routes: ['/^oro_navigation_menu_update_[_\w]+$/']
+                    position: 90
+                    routes: ['/^oro_navigation_menu_update_\w+$/']
+                    description: 'Manage menus in default area'
 
         tree:
             application_menu:
                 type: application_menu
+                children:
+                    system_tab:
+                        children:
+                            menu_list_default: ~
 
             dots_menu:
                 type: dots_menu
@@ -73,6 +81,7 @@ navigation:
     titles:
         oro_shortcut_actionslist: 'Shortcut Actions List'
         oro_pinbar_help: 'How To Use Pinbar'
+
         oro_navigation_menu_update_index: ~
         oro_navigation_menu_update_view: '%%title%% - Menus'
 

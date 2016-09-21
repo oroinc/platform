@@ -4,6 +4,7 @@ oro:
             title: How To Use Pinbar
             message: Use pin icon on the right top corner of page to create fast access link in the pinbar.
         menu:
+            menu_list_default.label: Menu
             pinbar.label: Pinbar
             history.label: History
             favorite.label: Favorites
@@ -22,7 +23,10 @@ oro:
         pins:
             button: Minimize
             button.title: Pin/unpin the page
+        menuitem:
+            name.label: Name
         menuupdate:
+            menus: All Menus
             entity_label: Menu Item
             entity_plural_label: Menu Item
             id.label: Id

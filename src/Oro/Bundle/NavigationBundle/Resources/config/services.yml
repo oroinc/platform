@@ -3,7 +3,6 @@ parameters:
     oro_navigation.entity.navigation_history_item.class:       Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem
     oro_navigation.entity.pinbar_tab.class:                    Oro\Bundle\NavigationBundle\Entity\PinbarTab
     oro_navigation.entity.page_state.class:                    Oro\Bundle\NavigationBundle\Entity\PageState
-    oro_navigation.entity.menu_update.class:                   Oro\Bundle\NavigationBundle\Entity\MenuUpdate
 
     oro_menu.factory.acl_extension.class:                      Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
@@ -21,7 +20,6 @@ parameters:
     oro_navigation.item.builder.history.class:                 Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder
     oro_navigation.item.factory.class:                         Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
     oro_navigation.item.pinbar.post_persist_listener.class:    Oro\Bundle\NavigationBundle\Entity\Listener\PinbarPostPersist
-    oro_navigation.menu_update.pre_persist_listener.class:     Oro\Bundle\NavigationBundle\Entity\Listener\MenuUpdatePrePersist
 
     oro_navigation.event.response_history.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
     oro_navigation.event.response_hashnav.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
@@ -55,6 +53,8 @@ parameters:
     oro_navigation.content.doctrine_tag_generator.class:       Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator
     oro_navigation.content.simple_tag_generator.class:         Oro\Bundle\NavigationBundle\Content\SimpleTagGenerator
     oro_navigation.content.datagrid_tag_listener.class:        Oro\Bundle\NavigationBundle\Content\DataGridTagListener
+
+    oro_navigation.area:                                       default
 
 services:
     oro_menu.cache:
@@ -167,12 +167,6 @@ services:
             - [ setClassName, [ %oro_navigation.entity.pinbar_tab.class% ]]
         tags:
             - { name: doctrine.event_listener, event: postPersist }
-
-    oro_navigation.menu_update.pre_persist_listener:
-        class: %oro_navigation.menu_update.pre_persist_listener.class%
-        public: false
-        tags:
-            - { name: doctrine.orm.entity_listener, entity: %oro_navigation.entity.menu_update.class%, event: prePersist }
 
     oro_navigation.pinbar_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%
@@ -425,7 +419,7 @@ services:
     oro_navigation.menu_update.builder:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
-            - '@oro_locale.helper.localization'
+            - '@oro_navigation.helper.menu_update'
         tags:
             - { name: oro_menu.builder }
 
@@ -436,6 +430,32 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_navigation.menu_update_provider, area: default }
+
+    oro_navigation.extension.datasource.menu:
+        class: Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource
+        arguments:
+            - '@oro_menu.builder_chain'
+            - '@oro_menu.menu_manipulator'
+            - '%oro_navigation.area%'
+        tags:
+            - { name: oro_datagrid.datasource, type: menu-update-default-provider }
+
+    oro_navigation.helper.menu_update:
+        class: Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper
+        arguments:
+            - '@oro_locale.helper.localization'
+
+    oro_navigation.manager.menu_update_abstract:
+        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
+        arguments:
+            - "@doctrine"
+            - "@oro_menu.builder_chain"
+            - '@oro_navigation.helper.menu_update'
+
+    oro_navigation.manager.menu_update_default:
+        parent: oro_navigation.manager.menu_update_abstract
+        calls:
+            - [ setEntityClass, [ Oro\Bundle\NavigationBundle\Entity\MenuUpdate ]]
 
     oro_navigation.widget_provider.actions.edit_menus:
         parent: oro_ui.widget_provider.action_button.abstract

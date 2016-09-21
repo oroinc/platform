@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait;
 
@@ -13,6 +14,9 @@ class MenuUpdateStub implements MenuUpdateInterface
 
     /** @var array */
     protected $extras = [];
+
+    /** @var string */
+    protected $defaultTitle;
 
     /**
      * MenuUpdateStub constructor.
@@ -38,6 +42,31 @@ class MenuUpdateStub implements MenuUpdateInterface
     public function setExtras(array $extras)
     {
         $this->extras = $extras;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTitle(Localization $localization = null)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultTitle()
+    {
+        return $this->defaultTitle;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultTitle($value)
+    {
+        $this->defaultTitle = $value;
 
         return $this;
     }
