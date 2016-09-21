@@ -6,8 +6,6 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Translation\DataCollectorTranslator;
-
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
@@ -17,6 +15,7 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -34,7 +33,7 @@ class TranslationManager
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
-    /** @var DataCollectorTranslator */
+    /** @var Translator */
     protected $translator;
 
     /** @var JsTranslationDumper */
@@ -43,11 +42,14 @@ class TranslationManager
     /** @var string */
     protected $translationCacheDir;
 
+    /** @var array */
+    protected $availableDomains;
+
     /**
      * @param Registry $registry
      * @param LanguageProvider $languageProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
-     * @param DataCollectorTranslator $translator
+     * @param Translator $translator
      * @param JsTranslationDumper $jsTranslationDumper
      * @param string $translationCacheDir
      */
@@ -55,7 +57,7 @@ class TranslationManager
         Registry $registry,
         LanguageProvider $languageProvider,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache,
-        DataCollectorTranslator $translator,
+        Translator $translator,
         JsTranslationDumper $jsTranslationDumper,
         $translationCacheDir
     ) {
@@ -80,22 +82,6 @@ class TranslationManager
         $repo = $this->getEntityRepository(Translation::class);
 
         return $repo->findValue($key, $locale, $domain);
-    }
-
-    /**
-     * Finds all translations for given locale and domain
-     *
-     * @param string $locale
-     * @param string $domain
-     *
-     * @return Translation[]
-     */
-    public function findValues($locale, $domain = self::DEFAULT_DOMAIN)
-    {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-
-        return $repo->findAllByLanguageAndDomain($this->getLanguageByCode($locale), $domain);
     }
 
     /**
@@ -209,10 +195,20 @@ class TranslationManager
      */
     public function findAvailableDomainsForLocales(array $locales)
     {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
+        if (null === $this->availableDomains) {
+            /** @var TranslationRepository $repo */
+            $repo = $this->getEntityRepository(Translation::class);
 
-        return $repo->findAvailableDomainsForLocales($locales);
+            foreach ($repo->findAvailableDomains($locales) as $data) {
+                $this->availableDomains[$data['code']][] = $data;
+            }
+        }
+
+        $domains = array_intersect_key((array)$this->availableDomains, array_combine($locales, $locales));
+
+        return (array)array_reduce($domains, function ($carry, $item) {
+            return array_merge((array)$carry, $item);
+        });
     }
 
     /**

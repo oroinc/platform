@@ -241,6 +241,6 @@ services:
             - '@doctrine'
             - '@oro_translation.provider.language'
             - '@oro_translation.database_translation.metadata.cache'
-            - '@translator.data_collector'
+            - '@translator.default'
             - '@oro_translation.js_dumper'
             - '%kernel.cache_dir%/translations'

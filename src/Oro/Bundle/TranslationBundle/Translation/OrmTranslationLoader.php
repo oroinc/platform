@@ -10,6 +10,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class OrmTranslationLoader implements LoaderInterface
@@ -43,9 +44,9 @@ class OrmTranslationLoader implements LoaderInterface
 
         if ($this->checkDatabase()) {
             $messages = [];
-            $translations = $this->translationManager->findValues($locale, $domain);
+            $translations = $this->getTranslationRepository()->findAllByLanguageAndDomain($locale, $domain);
             foreach ($translations as $translation) {
-                $messages[$translation->getTranslationKey()->getKey()] = $translation->getValue();
+                $messages[$translation['key']] = $translation['value'];
             }
 
             $catalogue->add($messages, $domain);
@@ -77,5 +78,13 @@ class OrmTranslationLoader implements LoaderInterface
     protected function getEntityManager()
     {
         return $this->doctrine->getManagerForClass(Translation::class);
+    }
+
+    /**
+     * @return TranslationRepository
+     */
+    protected function getTranslationRepository()
+    {
+        return $this->getEntityManager()->getRepository(Translation::class);
     }
 }
