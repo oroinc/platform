@@ -30,4 +30,8 @@
             line-height: 1;
         }
     }
+
+    &__text {
+        margin-left: $offset-x-s / 2;
+    }
 }
