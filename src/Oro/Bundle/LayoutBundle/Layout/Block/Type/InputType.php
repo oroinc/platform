@@ -18,9 +18,11 @@ class InputType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'type' => 'text'
-        ]);
+        $resolver->setDefaults(
+            [
+                'type' => 'text'
+            ]
+        );
         $resolver->setDefined(
             [
                 'id',
@@ -44,13 +46,13 @@ class InputType extends AbstractType
 
     public function finishView(BlockView $view, BlockInterface $block)
     {
-        if(!$view->vars['name']) {
+        if (!$view->vars['name']) {
             unset($view->vars['name']);
         }
-        if(!$view->vars['value']) {
+        if (!$view->vars['value']) {
             unset($view->vars['value']);
         }
-        if(!$view->vars['placeholder']) {
+        if (!$view->vars['placeholder']) {
             unset($view->vars['placeholder']);
         }
     }
