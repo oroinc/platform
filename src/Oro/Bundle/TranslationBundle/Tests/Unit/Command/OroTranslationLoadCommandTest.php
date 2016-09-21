@@ -73,7 +73,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        $this->translator->expects($this->once())->method('getFallbackLocales')->willReturn(['locale1']);
+        $this->translator->expects($this->once())->method('getFallbackLocales')->willReturn(['locale1', 'locale1']);
         $this->translator->expects($this->once())->method('getLocale')->willReturn('currentLocale');
 
         $this->translationManager->expects($this->at(0))->method('findValue')
