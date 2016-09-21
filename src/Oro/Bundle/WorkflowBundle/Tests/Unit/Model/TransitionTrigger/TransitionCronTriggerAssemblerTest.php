@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\CronTriggerAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler;
 
-class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
+class TransitionCronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider canAssembleData
@@ -15,7 +15,7 @@ class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanAssemble($expected, array $options)
     {
-        $cronTriggerAssembler = new CronTriggerAssembler();
+        $cronTriggerAssembler = new TransitionCronTriggerAssembler();
 
         $this->assertEquals($expected, $cronTriggerAssembler->canAssemble($options));
     }
@@ -49,7 +49,7 @@ class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testAssemble()
     {
-        $cronTriggerAssembler = new CronTriggerAssembler();
+        $cronTriggerAssembler = new TransitionCronTriggerAssembler();
 
         $cronOpt = '* * * * *';
         $filterOpt = 'a = b';
@@ -58,7 +58,7 @@ class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinitionOpt = new WorkflowDefinition();
 
         /**
-         * @var TransitionTriggerCron $trigger
+         * @var TransitionCronTrigger $trigger
          */
         $trigger = $cronTriggerAssembler->assemble(
             [
@@ -71,7 +71,7 @@ class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertInstanceOf(
-            TransitionTriggerCron::class,
+            TransitionCronTrigger::class,
             $trigger,
             'Must return new instance of cron trigger entity'
         );
@@ -85,7 +85,7 @@ class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testAssembleDefaults()
     {
-        $cronTriggerAssembler = new CronTriggerAssembler();
+        $cronTriggerAssembler = new TransitionCronTriggerAssembler();
 
         $cronOpt = '* * * * *';
         $filterOpt = null;
@@ -94,7 +94,7 @@ class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinitionOpt = new WorkflowDefinition();
 
         /**
-         * @var TransitionTriggerCron $trigger
+         * @var TransitionCronTrigger $trigger
          */
         $trigger = $cronTriggerAssembler->assemble(
             [
@@ -105,7 +105,7 @@ class CronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertInstanceOf(
-            TransitionTriggerCron::class,
+            TransitionCronTrigger::class,
             $trigger,
             'Must return new instance of cron trigger entity'
         );

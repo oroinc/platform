@@ -2,19 +2,25 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-class EventTriggerAssembler extends TriggerAbstractAssembler
+class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
 {
+    /**
+     * {@inheritdoc}
+     */
     public function canAssemble(array $options)
     {
         return !empty($options['event']);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
-        $trigger = new TransitionTriggerEvent();
+        $trigger = new TransitionEventTrigger();
 
         $trigger->setEntityClass(
             !empty($options['entity_class']) ? $options['entity_class'] : $workflowDefinition->getRelatedEntity()

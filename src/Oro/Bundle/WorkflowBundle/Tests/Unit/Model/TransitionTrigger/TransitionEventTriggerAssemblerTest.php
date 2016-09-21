@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\EventTriggerAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler;
 
-class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider canAssembleData
@@ -15,7 +15,7 @@ class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanAssemble($expected, array $options)
     {
-        $cronTriggerAssembler = new EventTriggerAssembler();
+        $cronTriggerAssembler = new TransitionEventTriggerAssembler();
 
         $this->assertEquals($expected, $cronTriggerAssembler->canAssemble($options));
     }
@@ -49,7 +49,7 @@ class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testAssemble()
     {
-        $cronTriggerAssembler = new EventTriggerAssembler();
+        $cronTriggerAssembler = new TransitionEventTriggerAssembler();
 
         $eventOpt = 'update';
         $entityClassOpt = '\EntityClass';
@@ -62,7 +62,7 @@ class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinitionOpt = new WorkflowDefinition();
 
         /**
-         * @var TransitionTriggerEvent $trigger
+         * @var TransitionEventTrigger $trigger
          */
         $trigger = $cronTriggerAssembler->assemble(
             [
@@ -78,7 +78,7 @@ class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertInstanceOf(
-            TransitionTriggerEvent::class,
+            TransitionEventTrigger::class,
             $trigger,
             'Must return new instance of event trigger entity'
         );
@@ -96,7 +96,7 @@ class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testAssembleDefaults()
     {
-        $cronTriggerAssembler = new EventTriggerAssembler();
+        $cronTriggerAssembler = new TransitionEventTriggerAssembler();
 
         $eventOpt = 'create';
         $entityClassOpt = '\WorkflowRelatedEntity';
@@ -110,7 +110,7 @@ class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinitionOpt->setRelatedEntity($entityClassOpt);
 
         /**
-         * @var TransitionTriggerEvent $trigger
+         * @var TransitionEventTrigger $trigger
          */
         $trigger = $cronTriggerAssembler->assemble(
             [
@@ -121,7 +121,7 @@ class EventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertInstanceOf(
-            TransitionTriggerEvent::class,
+            TransitionEventTrigger::class,
             $trigger,
             'Must return new instance of event trigger entity'
         );

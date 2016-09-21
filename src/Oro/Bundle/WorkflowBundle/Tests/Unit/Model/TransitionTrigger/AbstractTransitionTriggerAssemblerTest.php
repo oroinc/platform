@@ -3,13 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\TriggerAbstractAssemblerStub;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\AbstractTransitionTriggerAssemblerStub;
 
-class TriggerAbstractAssemblerTest extends \PHPUnit_Framework_TestCase
+class AbstractTransitionTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCommonSetters()
     {
-        $assembler = new TriggerAbstractAssemblerStub(true);
+        $assembler = new AbstractTransitionTriggerAssemblerStub(true);
 
         $workflowDefinition = new WorkflowDefinition();
 
@@ -28,7 +28,7 @@ class TriggerAbstractAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testCommonSettersDefaults()
     {
-        $assembler = new TriggerAbstractAssemblerStub(true);
+        $assembler = new AbstractTransitionTriggerAssemblerStub(true);
 
         $workflowDefinition = new WorkflowDefinition();
 
@@ -45,7 +45,7 @@ class TriggerAbstractAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidOptionsException()
     {
-        $assembler = new TriggerAbstractAssemblerStub(false);
+        $assembler = new AbstractTransitionTriggerAssemblerStub(false);
 
         $workflowDefinition = (new WorkflowDefinition())->setName('workflowName');
 

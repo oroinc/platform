@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-abstract class TriggerAbstractAssembler implements TriggerAssemblerInterface
+abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAssemblerInterface
 {
     /**
      * @param array $options
@@ -15,10 +15,7 @@ abstract class TriggerAbstractAssembler implements TriggerAssemblerInterface
     abstract protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition);
 
     /**
-     * @param array $options
-     * @param string $transitionName
-     * @param WorkflowDefinition $workflowDefinition
-     * @return AbstractTransitionTrigger
+     * {@inheritdoc}
      */
     public function assemble(array $options, $transitionName, WorkflowDefinition $workflowDefinition)
     {
@@ -35,8 +32,7 @@ abstract class TriggerAbstractAssembler implements TriggerAssemblerInterface
 
         $trigger = $this->assembleTrigger($options, $workflowDefinition);
 
-        return $trigger
-            ->setWorkflowDefinition($workflowDefinition)
+        return $trigger->setWorkflowDefinition($workflowDefinition)
             ->setTransitionName($transitionName)
             ->setQueued($this->getOption($options, 'queued', true));
     }

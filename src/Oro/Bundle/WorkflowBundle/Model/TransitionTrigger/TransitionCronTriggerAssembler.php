@@ -2,23 +2,25 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-class CronTriggerAssembler extends TriggerAbstractAssembler
+class TransitionCronTriggerAssembler extends AbstractTransitionTriggerAssembler
 {
     /**
-     * @param array $options
-     * @return bool
+     * {@inheritdoc}
      */
     public function canAssemble(array $options)
     {
         return !empty($options['cron']);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
-        $trigger = new TransitionTriggerCron();
+        $trigger = new TransitionCronTrigger();
 
         return $trigger
             ->setCron($options['cron'])

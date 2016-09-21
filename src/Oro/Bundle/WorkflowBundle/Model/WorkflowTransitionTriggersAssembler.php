@@ -6,13 +6,11 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggerAssemblerInterface;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerAssemblerInterface;
 
 class WorkflowTransitionTriggersAssembler
 {
-    /**
-     * @var TriggerAssemblerInterface[]
-     */
+    /** @var TransitionTriggerAssemblerInterface[] */
     private $assemblers = [];
 
     /**
@@ -72,9 +70,9 @@ class WorkflowTransitionTriggersAssembler
     }
 
     /**
-     * @param TransitionTrigger\TriggerAssemblerInterface $assembler
+     * @param TransitionTriggerAssemblerInterface $assembler
      */
-    public function registerAssembler(TriggerAssemblerInterface $assembler)
+    public function registerAssembler(TransitionTriggerAssemblerInterface $assembler)
     {
         $this->assemblers[] = $assembler;
     }

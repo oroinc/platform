@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-interface TriggerAssemblerInterface
+interface TransitionTriggerAssemblerInterface
 {
     /**
      * @param array $options
