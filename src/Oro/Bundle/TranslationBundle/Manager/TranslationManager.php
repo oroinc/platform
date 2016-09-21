@@ -18,6 +18,9 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class TranslationManager
 {
     const DEFAULT_DOMAIN = 'messages';
@@ -37,25 +40,31 @@ class TranslationManager
     /** @var JsTranslationDumper */
     protected $jsTranslationDumper;
 
+    /** @var string */
+    protected $translationCacheDir;
+
     /**
      * @param Registry $registry
      * @param LanguageProvider $languageProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      * @param DataCollectorTranslator $translator
      * @param JsTranslationDumper $jsTranslationDumper
+     * @param string $translationCacheDir
      */
     public function __construct(
         Registry $registry,
         LanguageProvider $languageProvider,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache,
         DataCollectorTranslator $translator,
-        JsTranslationDumper $jsTranslationDumper
+        JsTranslationDumper $jsTranslationDumper,
+        $translationCacheDir
     ) {
         $this->registry = $registry;
         $this->languageProvider = $languageProvider;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
         $this->translator = $translator;
         $this->jsTranslationDumper = $jsTranslationDumper;
+        $this->translationCacheDir = $translationCacheDir;
     }
 
     /**
@@ -260,16 +269,11 @@ class TranslationManager
 
     /**
      * Fully rebuilds translation cache including JS translation
-     *
-     * @param string $translationCacheDir
      */
-    public function rebuildCache($translationCacheDir)
+    public function rebuildCache()
     {
-        if (!is_dir($translationCacheDir) || !is_writeable($translationCacheDir)) {
-            return;
-        }
-        $this->cleanup($translationCacheDir);
-        $this->translator->warmUp($translationCacheDir);
+        $this->cleanup($this->translationCacheDir);
+        $this->translator->warmUp($this->translationCacheDir);
         $locales = $this->languageProvider->getEnabledLanguages();
         $this->jsTranslationDumper->dumpTranslations($locales);
     }

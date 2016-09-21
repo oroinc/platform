@@ -243,3 +243,4 @@ services:
             - '@oro_translation.database_translation.metadata.cache'
             - '@translator.data_collector'
             - '@oro_translation.js_dumper'
+            - '%kernel.cache_dir%/translations'
