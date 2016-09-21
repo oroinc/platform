@@ -283,9 +283,9 @@ operations:
             acl_resource: ['EDIT', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
             actions:
                 - '@call_service_method':
-                    service: translator.default
-                    method: warmUp
-                    method_parameters: [null]
+                    service: oro_translation.manager.translation
+                    method: rebuildCache
+                    method_parameters: ['%kernel.cache_dir%/translations']
                 - '@flash_message':
                     message: oro.translation.translation.message.rebuild_cache
                     type: 'success'
