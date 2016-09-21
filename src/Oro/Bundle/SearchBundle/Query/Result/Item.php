@@ -9,6 +9,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\Exclude;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
+
 class Item
 {
     /**
@@ -55,6 +57,11 @@ class Item
     protected $selectedData = [];
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
      * @param ObjectManager $em
      * @param string|null   $entityName
      * @param string|null   $recordId
@@ -77,8 +84,10 @@ class Item
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
-        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
         $this->selectedData = is_array($selectedData) ? $selectedData : [];
+        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
+
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -125,6 +134,16 @@ class Item
     public function getRecordId()
     {
         return $this->recordId;
+    }
+
+    /**
+     * Alias for getRecordId
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->getRecordId();
     }
 
     /**
