@@ -46,7 +46,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
     /**
      * Gets the form event name.
      *
-     * @return string One of "pre_submit", "submit" or "post_submit"
+     * @return string One of "pre_submit", "submit", "post_submit" and "finish_submit"
      */
     public function getEvent()
     {
@@ -56,7 +56,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
     /**
      * Gets the form event name.
      *
-     * @param string $event One of "pre_submit", "submit" or "post_submit"
+     * @param string $event One of "pre_submit", "submit", "post_submit" and "finish_submit"
      */
     public function setEvent($event)
     {
@@ -87,7 +87,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
      * Gets the data associated with form event event.
      * For "pre_submit" event it is the submitted data.
      * For "submit" event it is the norm data.
-     * For "post_submit" event it is the view data.
+     * For "post_submit" and "finish_submit" events it is the view data.
      *
      * @return mixed
      */
