@@ -2,22 +2,22 @@
     max-width: 100%;
 
     &--size-m {
-        padding: $input-padding--m;
+        padding: $select-padding--m;
     }
 
     &--size-s {
-        padding: $input-padding--s;
+        padding: $select-padding--s;
     }
 
     @include element-state('hover') {
-        box-shadow: $input-box-shadow-hover-state;
+        box-shadow: $select-box-shadow-hover-state;
     }
 
     @include element-state('focus') {
-        box-shadow: $input-box-shadow-focus-state;
+        box-shadow: $select-box-shadow-focus-state;
     }
 
     @include element-state('error') {
-        box-shadow: $input-box-shadow-error-state;
+        box-shadow: $select-box-shadow-error-state;
     };
 }
