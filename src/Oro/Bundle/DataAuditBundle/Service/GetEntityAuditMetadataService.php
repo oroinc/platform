@@ -28,6 +28,8 @@ class GetEntityAuditMetadataService
      */
     public function getMetadata($entityClass)
     {
+        $entityClass = ClassUtils::getRealClass($entityClass);
+
         if (false == $this->auditConfigProvider->hasConfig($entityClass)) {
             return null;
         }
@@ -36,7 +38,7 @@ class GetEntityAuditMetadataService
             return null;
         }
 
-        $classMetadata = new ClassMetadata(ClassUtils::getRealClass($entityClass));
+        $classMetadata = new ClassMetadata($entityClass);
         foreach ($classMetadata->reflection->getProperties() as $rp) {
             $fieldName = $rp->getName();
 
