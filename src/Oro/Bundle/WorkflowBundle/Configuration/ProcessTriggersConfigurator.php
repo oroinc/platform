@@ -145,7 +145,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     }
 
     /**
-     * @param array|ProcessTrigger[] $storedTriggers
+     * @param ProcessTrigger[] $storedTriggers
      * @param ProcessTrigger $builtTrigger
      *
      * @return ProcessTrigger|null
