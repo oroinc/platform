@@ -6,7 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\ApiBundle\Form\EventListener\ScalarCollectionListener;
+use Oro\Bundle\ApiBundle\Form\EventListener\CollectionListener;
+use Oro\Bundle\ApiBundle\Form\EventListener\ScalarCollectionEntryFactory;
 
 class ScalarCollectionType extends AbstractType
 {
@@ -16,11 +17,13 @@ class ScalarCollectionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(
-            new ScalarCollectionListener(
-                $options['entry_data_class'],
-                $options['entry_data_property'],
-                $options['entry_type'],
-                $options['entry_options']
+            new CollectionListener(
+                new ScalarCollectionEntryFactory(
+                    $options['entry_data_class'],
+                    $options['entry_data_property'],
+                    $options['entry_type'],
+                    $options['entry_options']
+                )
             )
         );
     }

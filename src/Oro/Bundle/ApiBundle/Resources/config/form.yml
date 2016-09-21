@@ -14,6 +14,13 @@ services:
             - [] # All services with tag "oro.api.form.type_extension" are inserted here by ConfigurationCompilerPass
             - [] # All services with tag "oro.api.form.type_guesser" are inserted here by ConfigurationCompilerPass
 
+    oro_api.form.extension.customize_form_data:
+        class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension
+        arguments:
+            - '@oro_api.customize_form_data.processor'
+        tags:
+            - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
         arguments:

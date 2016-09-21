@@ -6,10 +6,9 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ScalarCollectionListener extends CollectionListener
+class ScalarCollectionEntryFactory extends CollectionEntryFactory
 {
     /** @var string */
     protected $dataProperty;
@@ -27,12 +26,9 @@ class ScalarCollectionListener extends CollectionListener
     }
 
     /**
-     * @param FormFactoryInterface $factory
-     * @param string               $name
-     *
-     * @return FormInterface
+     * {@inheritdoc}
      */
-    protected function createEntry(FormFactoryInterface $factory, $name)
+    public function createEntry(FormFactoryInterface $factory, $name)
     {
         $entryTypeBuilder = $factory->createNamedBuilder(
             $name,

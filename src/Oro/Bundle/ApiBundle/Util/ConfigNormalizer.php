@@ -5,6 +5,10 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Oro\Component\EntitySerializer\ConfigNormalizer as BaseConfigNormalizer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig as FieldConfig;
 
+/**
+ * This class should be synchronized with the config normalizer for ObjectNormalizer.
+ * @see Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer
+ */
 class ConfigNormalizer extends BaseConfigNormalizer
 {
     /**

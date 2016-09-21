@@ -91,7 +91,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api', 'my_group'],
-                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -144,7 +145,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -221,7 +223,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
