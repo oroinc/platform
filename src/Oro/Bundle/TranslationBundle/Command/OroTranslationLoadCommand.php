@@ -41,7 +41,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         /* @var $translator DataCollectorTranslator */
         $translator = $this->getContainer()->get('translator');
 
-        if (null == ($locales = $input->getOption('languages'))) {
+        if (null === ($locales = $input->getOption('languages'))) {
             $locales = array_unique(array_merge($translator->getFallbackLocales(), [$translator->getLocale()]));
         }
 
