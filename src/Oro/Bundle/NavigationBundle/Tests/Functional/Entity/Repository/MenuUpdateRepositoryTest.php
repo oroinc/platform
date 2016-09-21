@@ -22,7 +22,6 @@ class MenuUpdateRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures([]);
 
         $this->loadFixtures([
             'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
@@ -64,18 +63,13 @@ class MenuUpdateRepositoryTest extends WebTestCase
                 'expectedCount' => 2,
                 'useOrganizationScope' => true,
             ],
-            'business unit scope' => [
-                'expectedCount' => 2,
-                'useOrganizationScope' => false,
-                'useUserScope' => false,
-            ],
             'user scope' => [
                 'expectedCount' => 2,
                 'useOrganizationScope' => false,
                 'useUserScope' => true,
             ],
             'all scopes' => [
-                'expectedCount' => 4,
+                'expectedCount' => 3,
                 'useOrganizationScope' => true,
                 'useUserScope' => true,
             ],

@@ -10,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
@@ -19,6 +19,20 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
  */
 class MenuUpdateController extends Controller
 {
+    /**
+     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Template()
+     * @AclAncestor("oro_navigation_menu_update_view")
+     *
+     * @return array
+     */
+    public function indexAction()
+    {
+        return [
+            'entity_class' => MenuUpdate::class
+        ];
+    }
+
     /**
      * @Route("/{menu}/create/{parentKey}", name="oro_navigation_menu_update_create")
      * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
@@ -38,6 +52,7 @@ class MenuUpdateController extends Controller
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
+        /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $manager->createMenuUpdate();
 
         if ($parentKey) {
@@ -74,6 +89,7 @@ class MenuUpdateController extends Controller
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
+        /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $manager->getMenuUpdateByKey($menu, $key);
         if (!$menuUpdate) {
             throw $this->createNotFoundException();
@@ -83,7 +99,7 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
      * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_view",
@@ -91,18 +107,6 @@ class MenuUpdateController extends Controller
      *     class="OroNavigationBundle:MenuUpdate",
      *     permission="VIEW"
      * )
-     *
-     * @return array
-     */
-    public function indexAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
-     * @Template()
-     * @AclAncestor("oro_navigation_menu_update_view")
      *
      * @param string $menu
      * @return array
@@ -113,10 +117,10 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @param MenuUpdateInterface $menuUpdate
+     * @param MenuUpdate $menuUpdate
      * @return array|RedirectResponse
      */
-    private function update(MenuUpdateInterface $menuUpdate)
+    private function update(MenuUpdate $menuUpdate)
     {
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_update_key' => $menuUpdate->getKey()]);
 

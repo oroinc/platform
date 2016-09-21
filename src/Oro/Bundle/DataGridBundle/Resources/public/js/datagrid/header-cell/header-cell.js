@@ -20,13 +20,13 @@ define([
         /** @property */
         template: _.template(
             '<% if (sortable) { %>' +
-                '<a class="grid-header-cell-link" href="#">' +
-                    '<span class="grid-header-cell-label"><%- label %></span>' +
+                '<a class="grid-header-cell__link" href="#">' +
+                    '<span class="grid-header-cell__label"><%- label %></span>' +
                     '<span class="caret"></span>' +
                 '</a>' +
             '<% } else { %>' +
-                '<span class="grid-header-cell-label-container">' +
-                    '<span class="grid-header-cell-label"><%- label %></span>' +
+                '<span class="grid-header-cell__label-container">' +
+                    '<span class="grid-header-cell__label"><%- label %></span>' +
                 '</span>' +
             '<% } %>'
         ),
@@ -179,7 +179,7 @@ define([
 
         onMouseEnter: function(e) {
             var _this = this;
-            var $label = this.$('.grid-header-cell-label');
+            var $label = this.$('.grid-header-cell__label');
 
             // measure text content
             var realWidth = $label[0].clientWidth;
@@ -214,7 +214,7 @@ define([
 
         onMouseLeave: function(e) {
             clearTimeout(this.hintTimeout);
-            var $label = this.$('.grid-header-cell-label');
+            var $label = this.$('.grid-header-cell__label');
             $label.popover('hide');
             $label.popover('destroy');
             this.popoverAdded = false;

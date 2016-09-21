@@ -36,6 +36,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      )
  * })
  * @Config(
+ *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-th"
