@@ -434,6 +434,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource
         arguments:
             - '@oro_menu.builder_chain'
+            - '@oro_menu.menu_manipulator'
             - '%oro_navigation.area%'
         tags:
-            - { name: oro_datagrid.datasource, type: platform_menu }
+            - { name: oro_datagrid.datasource, type: menu-update-default-provider }

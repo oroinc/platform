@@ -2,34 +2,49 @@
 
 namespace Oro\Bundle\NavigationBundle\Datagrid;
 
-use Knp\Menu\MenuItem;
+use Knp\Menu\Util\MenuManipulator;
+
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
-/**
- * Class MenuUpdateDatasource
- * @package Oro\Bundle\NavigationBundle\Datagrid
- */
 class MenuUpdateDatasource implements DatasourceInterface
 {
     /** @var BuilderChainProvider */
     protected $chainProvider;
 
-    /**
-     * @var string
-     */
+    /** @var MenuManipulator */
+    protected $menuManipulator;
+
+    /** @var string */
     protected $area;
+
+    /** @var array */
+    protected $menuConfiguration;
 
     /**
      * @param BuilderChainProvider $chainProvider
-     * @param string               $area
+     * @param MenuManipulator $menuManipulator
+     * @param string $area
      */
-    public function __construct(BuilderChainProvider $chainProvider, $area)
+    public function __construct(BuilderChainProvider $chainProvider, MenuManipulator $menuManipulator, $area)
     {
         $this->chainProvider = $chainProvider;
+        $this->menuManipulator = $menuManipulator;
         $this->area = $area;
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return MenuUpdateDatasource
+     */
+    public function setMenuConfiguration(array $configuration)
+    {
+        $this->menuConfiguration = $configuration;
+
+        return $this;
     }
 
     /**
@@ -46,11 +61,12 @@ class MenuUpdateDatasource implements DatasourceInterface
     public function getResults()
     {
         $rows = [];
-        $menuItems = $this->chainProvider->getMenuListByArea($this->area);
 
-        /** @var MenuItem $menuItem */
-        foreach ($menuItems as $menuItem) {
-            $rows[] = new ResultRecord(['menu' => $menuItem->getName(), 'title' => $menuItem->getName()]);
+        foreach ($this->menuConfiguration['tree'] as $name => $item) {
+            $menuItem = $this->chainProvider->get($name);
+            if ($menuItem->getExtra('area') === $this->area) {
+                $rows[] = new ResultRecord($this->menuManipulator->toArray($menuItem));
+            }
         }
 
         return $rows;

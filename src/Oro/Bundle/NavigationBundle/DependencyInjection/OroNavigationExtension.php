@@ -90,6 +90,9 @@ class OroNavigationExtension extends Extension
         $container
             ->getDefinition('oro_navigation.content_provider.navigation_elements')
             ->replaceArgument(0, $config[Configuration::NAVIGATION_ELEMENTS_NODE]);
+        $container
+            ->getDefinition('oro_navigation.extension.datasource.menu')
+            ->addMethodCall('setMenuConfiguration', [$config]);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
 

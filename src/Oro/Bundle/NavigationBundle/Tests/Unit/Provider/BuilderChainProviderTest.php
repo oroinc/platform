@@ -249,34 +249,4 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
 
         return $child;
     }
-
-    public function testGetMenuListByArea()
-    {
-        $reflection = new \ReflectionClass($this->provider);
-        $reflection_property = $reflection->getProperty('menus');
-        $reflection_property->setAccessible(true);
-
-        $menuDefault = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
-
-        $menuDefault->expects($this->once())
-            ->method('getExtra')
-            ->with('area')
-            ->will($this->returnValue('default'));
-
-        $menuFrontend = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
-
-        $menuFrontend->expects($this->once())
-            ->method('getExtra')
-            ->with('area')
-            ->will($this->returnValue('frontend'));
-
-        $reflection_property->setValue($this->provider, [
-            $menuDefault, $menuFrontend
-        ]);
-        $result = $this->provider->getMenuListByArea('default');
-
-        $this->assertEquals([$menuDefault], $result);
-    }
 }

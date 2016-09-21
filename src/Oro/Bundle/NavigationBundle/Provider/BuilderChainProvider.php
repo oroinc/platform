@@ -187,25 +187,4 @@ class BuilderChainProvider implements MenuProviderInterface
             throw new \InvalidArgumentException('Menu alias was not set.');
         }
     }
-
-    /**
-     * Returns menu titles for area
-     *
-     * @param  string $area
-     *
-     * @return MenuItem[]
-     */
-    public function getMenuListByArea($area)
-    {
-        $menuWithAlias = [];
-
-        /** @var MenuItem $menu */
-        foreach ($this->menus as $menu) {
-            if ($menu->getExtra('area') == $area) {
-                $menuWithAlias[] = $menu;
-            }
-        }
-
-        return $menuWithAlias;
-    }
 }

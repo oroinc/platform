@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -17,6 +18,20 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
  */
 class MenuUpdateController extends Controller
 {
+    /**
+     * @Route("/", name="oro_navigation_menu_update_index")
+     * @Template()
+     * @AclAncestor("oro_navigation_menu_update_view")
+     *
+     * @return array
+     */
+    public function indexAction()
+    {
+        return [
+            'entity_class' => MenuUpdate::class
+        ];
+    }
+
     /**
      * @Route(
      *     "/{menu}/create/{parentKey}",
@@ -79,20 +94,6 @@ class MenuUpdateController extends Controller
             $form,
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
-    }
-
-    /**
-     * @Route("/", name="oro_navigation_menu_update_index")
-     * @Template()
-     * @AclAncestor("oro_navigation_menu_update_view")
-     *
-     * @return array
-     */
-    public function indexAction()
-    {
-        return [
-            'entity_class' => $this->container->getParameter('oro_navigation.entity.menu_update.class')
-        ];
     }
 
     /**

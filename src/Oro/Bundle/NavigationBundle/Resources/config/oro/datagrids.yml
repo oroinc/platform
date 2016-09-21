@@ -1,40 +1,24 @@
 datagrids:
     menu-update-grid:
+        acl_resource: oro_navigation_menu_update_view
+        source:
+            type: menu-update-default-provider
+        columns:
+            name:
+                label: oro.navigation.menuitem.name.label
+        properties:
+            view_link:
+                route: oro_navigation_menu_update_view
+                type: url
+                params:
+                    menu: name
+        actions:
+            view:
+                type: navigate
+                label: oro.grid.action.view
+                link: view_link
+                icon: eye-open
+                rowAction: true
         options:
             toolbarOptions:
                 hide: true
-                pagination:
-                    onePage: true
-        source:
-            type: platform_menu
-        columns:
-            title:
-                label: oro.menu.menuitem.titles.label
-        properties:
-            menu: ~
-            title:
-                type: localized_value
-                data_name: titles
-            view_link:
-                type: url
-                route: oro_navigation_menu_update_view
-                params:
-                    - menu
-        sorters:
-            columns:
-                title:
-                    data_name: title
-
-        filters:
-            columns:
-                title:
-                    type: string
-                    data_name: title
-        actions:
-            view:
-                type:          navigate
-                label:         oro.grid.action.view
-                link:          view_link
-                icon:          eye-open
-                acl_resource:  oro_menu_item_view
-                rowAction:     true
