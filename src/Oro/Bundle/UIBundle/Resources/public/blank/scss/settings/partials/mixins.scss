@@ -1,0 +1,67 @@
+@mixin after() {
+    content: '';
+
+    position: absolute;
+
+    display: block;
+}
+
+@mixin clearfix {
+    &::after {
+        content: '';
+
+        display: block;
+
+        clear: both;
+    }
+}
+
+// Use: z-index: z('base');
+@function z($layer) {
+    $layers: (
+        'base': 1,
+        'fixed': 50,
+        'dropdown': 100,
+        'popup': 150,
+        'hidden': -1
+    );
+
+    $z-index: map-get($layers, $layer);
+    @return $z-index;
+}
+
+// Use: @include breakpoint('desktop') {
+//  content
+//}
+@mixin breakpoint($type) {
+    $breakpoints: (
+        'desktop': '(min-width: ' + $breakpoint-desktop + ')',
+        'tablet': '(max-width: ' +  $breakpoint-tablet + ')',
+        'mobile': '(max-width: ' + $breakpoint-mobile + ')'
+    );
+
+    @media #{map-get($breakpoints, $type)} {
+        @content;
+    }
+}
+
+// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal);
+@mixin font-face($font-family, $file-path, $font-weight, $font-style) {
+    @font-face {
+        font-family: $font-family;
+        src: url('#{$file-path}.eot');
+        src: url('#{$file-path}.eot?#iefix') format('embedded-opentype'),
+        url('#{$file-path}.woff') format('woff'),
+        url('#{$file-path}.ttf') format('truetype'),
+        url('#{$file-path}.svg##{$font-family}') format('svg');
+        font-weight: $font-weight;
+        font-style: $font-style;
+    }
+    // Chrome for Windows rendering fix: http://www.adtrak.co.uk/blog/font-face-chrome-rendering/
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+        @font-face {
+            font-family: $font-family;
+            src: url('#{$file-path}.svg##{$font-family}') format('svg');
+        }
+    }
+}

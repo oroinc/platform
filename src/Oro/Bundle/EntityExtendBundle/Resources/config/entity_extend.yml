@@ -1,4 +1,0 @@
-oro_entity_extend:
-    underlying_types:
-        enum:       manyToOne
-        multiEnum:  manyToMany

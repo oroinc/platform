@@ -18,7 +18,7 @@ Calendar Context Menu is based on [knplabs/knp-menu](https://github.com/KnpLabs/
  with new action items from any bundle. To add a new action to the menu, the action configuration must be added to the
  navigation.yml, for example:
 ``` yaml
-oro_menu_config:
+menu_config:
     items:
         oro_calendar_remove_action:
             label: 'oro.calendar.context.remove'

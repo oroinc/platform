@@ -1,4 +1,4 @@
-oro_system_configuration:
+system_configuration:
     fields:
         some_field:
             ui_only: true

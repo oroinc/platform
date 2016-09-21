@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Assetic;
 use Oro\Bundle\LayoutBundle\Assetic\LayoutResource;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LayoutResourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +17,11 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->layoutResource = new LayoutResource($this->getThemeManager());
+        $this->layoutResource = new LayoutResource(
+            $this->getThemeManager(),
+            new Filesystem(),
+            __DIR__
+        );
     }
 
     protected function tearDown()
@@ -41,7 +46,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
     protected function getThemes()
     {
         $asset = [
-            'inputs' => ['styles.css'],
+            'inputs' => ['styles.css', 'styles.scss', 'styles.less'],
             'filters' => ['filters'],
             'output' => 'output.css',
         ];
@@ -111,6 +116,9 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
                 if (!isset($asset['output']) || empty($asset['inputs'])) {
                     continue;
                 }
+
+                sort($asset['inputs']);
+
                 $name = 'layout_' . $themeName . '_' . $assetKey;
                 $formulae[$name] = [
                     $asset['inputs'],

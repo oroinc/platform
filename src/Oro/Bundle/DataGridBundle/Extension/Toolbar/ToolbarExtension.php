@@ -18,6 +18,7 @@ class ToolbarExtension extends AbstractExtension
 
     const OPTIONS_PATH                         = '[options]';
     const TOOLBAR_OPTION_PATH                  = '[options][toolbarOptions]';
+    const TOOLBAR_HIDE_OPTION_PATH             = '[options][toolbarOptions][hide]';
     const PAGER_ITEMS_OPTION_PATH              = '[options][toolbarOptions][pageSize][items]';
     const PAGER_DEFAULT_PER_PAGE_OPTION_PATH   = '[options][toolbarOptions][pageSize][default_per_page]';
     const PAGER_ONE_PAGE_OPTION_PATH           = '[options][toolbarOptions][pagination][onePage]';
