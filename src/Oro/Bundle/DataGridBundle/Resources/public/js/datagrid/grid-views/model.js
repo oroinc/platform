@@ -87,7 +87,7 @@ define([
          * @returns {Array}
          */
         toJSON: function() {
-            return _.omit(this.attributes, ['editable', 'deletable', 'shared_by']);
+            return _.omit(this.attributes, ['editable', 'deletable', 'shared_by', 'icon']);
         },
 
         /**

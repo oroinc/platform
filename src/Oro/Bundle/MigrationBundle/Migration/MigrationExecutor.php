@@ -17,6 +17,7 @@ use Doctrine\DBAL\Schema\TableDiff;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
 class MigrationExecutor
@@ -25,6 +26,11 @@ class MigrationExecutor
      * @var MigrationQueryExecutor
      */
     protected $queryExecutor;
+
+    /**
+     * @var OroDataCacheManager
+     */
+    protected $cacheManager;
 
     /**
      * @var LoggerInterface
@@ -38,10 +44,12 @@ class MigrationExecutor
 
     /**
      * @param MigrationQueryExecutor $queryExecutor
+     * @param OroDataCacheManager $cacheManager
      */
-    public function __construct(MigrationQueryExecutor $queryExecutor)
+    public function __construct(MigrationQueryExecutor $queryExecutor, OroDataCacheManager $cacheManager)
     {
         $this->queryExecutor = $queryExecutor;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -90,6 +98,7 @@ class MigrationExecutor
         $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
         $schema = $this->getActualSchema();
         $failedMigrations = false;
+
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
             if (!empty($failedMigrations) && !$migration instanceof FailIndependentMigration) {
@@ -104,9 +113,12 @@ class MigrationExecutor
                 $failedMigrations[] = get_class($migration);
             }
         }
+
         if (!empty($failedMigrations)) {
             throw new \RuntimeException(sprintf('Failed migrations: %s.', implode(', ', $failedMigrations)));
         }
+
+        $this->cacheManager->clear();
     }
 
     /**
