@@ -4,8 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -40,7 +40,7 @@ class MenuUpdateController extends Controller
      */
     public function createAction($menu, $parentKey)
     {
-        return $this->update(new MenuUpdate());
+        return $this->update($menu, new MenuUpdate());
     }
 
     /**
@@ -65,22 +65,29 @@ class MenuUpdateController extends Controller
      */
     public function updateAction($menu, $key, $parentKey)
     {
-        return $this->update(new MenuUpdate());
+        return $this->update($menu, new MenuUpdate());
     }
 
     /**
+     * @param string $menu
      * @param MenuUpdate $menuUpdate
      * @return array|RedirectResponse
      */
-    private function update(MenuUpdate $menuUpdate)
+    private function update($menu, MenuUpdate $menuUpdate)
     {
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
 
-        return $this->get('oro_form.model.update_handler')->update(
+        $response = $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
             $form,
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
+        if (is_array($response)) {
+            $response['menu'] = $menu;
+            $response['tree'] = $this->getTree($menu);
+        }
+
+        return $response;
     }
 
     /**
@@ -110,8 +117,26 @@ class MenuUpdateController extends Controller
      */
     public function viewAction($menu)
     {
+        $root = $this->get('oro_menu.builder_chain')->get($menu);
+        if (!count($root->getChildren())) {
+            throw $this->createNotFoundException("Menu '$menu' not found");
+        }
+
         return [
-            'entity' => $this->get('oro_menu.builder_chain')->get($menu)
+            'entity' => $root,
+            'menu' => $menu,
+            'tree' => $this->getTree($menu),
         ];
+    }
+
+    /**
+     * @param string $menu
+     * @return array
+     */
+    public function getTree($menu)
+    {
+        $root = $this->get('oro_menu.builder_chain')->get($menu);
+
+        return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($root);
     }
 }

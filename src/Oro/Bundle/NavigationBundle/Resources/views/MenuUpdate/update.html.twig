@@ -9,7 +9,7 @@
     {% if resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': '',
-            'dataRedirect': path('oro_navigation_menu_update_view', {menu: app.request.get('menu')}),
+            'dataRedirect': path('oro_navigation_menu_update_view', {menu: menu}),
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-attribute',
             'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
@@ -87,8 +87,8 @@
     <div class="menuitem-container tree-component-container">
         <div class="menuitem menuitem-tree tree-component">
             {% set treeOptions = {
-                'data' : oro_navigation_menu_item_list(app.request.get('menu')),
-                'menu' : app.request.get('menu'),
+                'data' : tree,
+                'menu' : menu,
                 'updateAllowed' : resource_granted('oro_navigation_menu_update_update'),
                 'onSelectRoute' : 'oro_navigation_menu_update_update',
                 'onRootSelectRoute' : 'oro_navigation_menu_update_view'

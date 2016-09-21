@@ -38,3 +38,4 @@ oro:
             saved_message: Menu item saved successfully.
             select_existing_or_create_new: Select existing menu item or create new.
             roots_plural_label: Menus
+            edit_menus: Edit Menus

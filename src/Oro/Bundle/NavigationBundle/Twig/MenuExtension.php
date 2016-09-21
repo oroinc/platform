@@ -87,8 +87,7 @@ class MenuExtension extends \Twig_Extension
                     'is_safe' => array('html'),
                     'needs_environment' => true
                 )
-            ),
-            'oro_navigation_menu_item_list' => new \Twig_Function_Method($this, 'getTree'),
+            )
         );
     }
 
@@ -217,17 +216,6 @@ class MenuExtension extends \Twig_Extension
         }
 
         return $menu;
-    }
-
-    /**
-     * @param string $menu
-     * @return array
-     */
-    public function getTree($menu)
-    {
-        $root = $this->provider->get($menu);
-
-        return $this->menuUpdateTreeHandler->createTree($root);
     }
 
     /**

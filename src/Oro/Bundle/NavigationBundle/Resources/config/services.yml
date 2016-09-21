@@ -436,3 +436,12 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_navigation.menu_update_provider, area: default }
+
+    oro_navigation.widget_provider.actions.edit_menus:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_edit_menus_button
+            - oro_edit_menus_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity }
+            - { name: oro_ui.update_action_provider, group: activity }

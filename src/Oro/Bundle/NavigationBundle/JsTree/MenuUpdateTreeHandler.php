@@ -3,7 +3,9 @@
 namespace Oro\Bundle\NavigationBundle\JsTree;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Knp\Menu\ItemInterface;
+
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Tree\Handler\AbstractTreeHandler;
@@ -14,14 +16,6 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
      * @var TranslatorInterface
      */
     protected $translator;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($entityClass, ManagerRegistry $managerRegistry)
-    {
-        parent::__construct($entityClass, $managerRegistry);
-    }
 
     /**
      * @param TranslatorInterface $translator
@@ -57,24 +51,14 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
      */
     protected function getNodes($root, $includeRoot)
     {
-        return $this->getChildNodes($root, $includeRoot);
-    }
-
-    /**
-     * @param ItemInterface $parent
-     * @param bool $includeParent
-     * @return array
-     */
-    protected function getChildNodes($parent, $includeParent)
-    {
         $nodes = [];
-        if ($includeParent) {
-            $nodes[] = $parent;
+        if ($includeRoot) {
+            $nodes[] = $root;
         }
 
-        foreach ($parent->getChildren() as $child) {
+        foreach ($root->getChildren() as $child) {
             $nodes[] = $child;
-            $nodes = array_merge($nodes, $this->getChildNodes($child, false));
+            $nodes = array_merge($nodes, $this->getNodes($child, false));
         }
 
         return $nodes;

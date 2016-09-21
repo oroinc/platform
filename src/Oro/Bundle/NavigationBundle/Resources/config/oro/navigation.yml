@@ -52,6 +52,9 @@ navigation:
                 extras:
                     icon: 'icon-flag'
                 uri: '#'
+            user_list:
+                extras:
+                    routes: ['/^oro_navigation_menu_update_[_\w]+$/']
 
         tree:
             application_menu:
@@ -71,7 +74,7 @@ navigation:
         oro_shortcut_actionslist: 'Shortcut Actions List'
         oro_pinbar_help: 'How To Use Pinbar'
         oro_navigation_menu_update_index: ~
-        oro_navigation_menu_update_view: '%%title%%'
+        oro_navigation_menu_update_view: '%%title%% - Menus'
 
     navigation_elements:
         pinButton:
