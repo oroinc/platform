@@ -34,7 +34,7 @@ class AsyncIndexer implements IndexerInterface
     /**
      * @inheritdoc
      */
-    public function save($entity, $context = [])
+    public function save($entity, array $context = [])
     {
         $this->sendAsyncIndexerMessage(
             self::TOPIC_SAVE,
