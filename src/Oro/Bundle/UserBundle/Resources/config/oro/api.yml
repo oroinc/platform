@@ -5,6 +5,7 @@ api:
             delete_handler: oro_user.role.handler.delete
 
         Oro\Bundle\UserBundle\Entity\User:
+            documentation_resource: @OroUserBundle/Resources/doc/api/api.md
             delete_handler: oro_user.handler.delete
             fields:
                 emails:

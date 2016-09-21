@@ -150,14 +150,16 @@ class RestDocHandler implements HandlerInterface
 
         // add metadata for output
         if (ApiActions::isOutputAction($action)) {
-            $entityMetadata = $actionMetadata;
+            $outputMetadata = $actionMetadata;
+            $outputConfig = $config;
 
-            // check if output format should be taken from another action type. In this case Entity metadata
+            // check if output format should be taken from another action type. In this case Entity metadata and config
             // will be taken for the action, those format should be used.
             $outputFormatData = ApiActions::getActionOutputFormatActionType($action);
             if ($action !== $outputFormatData) {
-                $entityMetadata = $this->getContext($outputFormatData, $entityClass, $associationName)
-                    ->getMetadata();
+                $outContext = $this->getContext($outputFormatData, $entityClass, $associationName);
+                $outputMetadata = $outContext->getMetadata();
+                $outputConfig = $outContext->getConfig();
             }
 
             // unfortunately there is no other way to update output parameter except to use the reflection
@@ -168,7 +170,7 @@ class RestDocHandler implements HandlerInterface
                 [
                     'class' => ApiDocMetadata::class,
                     'options' => [
-                        'metadata' => new ApiDocMetadata($action, $entityMetadata, $config, $requestType)
+                        'metadata' => new ApiDocMetadata($action, $outputMetadata, $outputConfig, $requestType)
                     ]
                 ]
             );

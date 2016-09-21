@@ -87,10 +87,16 @@ class ApiDocMetadataParser implements ParserInterface
             $fieldData = [];
 
             $fieldData['required'] = !$associationMetadata->isNullable();
-            $fieldData['dataType'] = $this->getEntityType($associationMetadata->getTargetClassName(), $requestType);
+            if (DataType::isAssociationAsField($associationMetadata->getDataType())) {
+                $fieldData['dataType'] = $associationMetadata->getDataType();
+                $fieldData['isRelation'] = false;
+            } else {
+                $fieldData['dataType'] = $this->getEntityType($associationMetadata->getTargetClassName(), $requestType);
+                $fieldData['isRelation'] = true;
+            }
+
             $fieldData['description'] = $config->getField($associationName)->getDescription();
             $fieldData['readonly'] = !$addIdentificators && in_array($associationName, $identifiers, true);
-            $fieldData['isRelation'] = true;
             $fieldData['isCollection'] = $associationMetadata->isCollection();
 
             $result[$associationName] = $fieldData;

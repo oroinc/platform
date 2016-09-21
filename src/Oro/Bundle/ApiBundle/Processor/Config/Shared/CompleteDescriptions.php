@@ -72,10 +72,10 @@ class CompleteDescriptions implements ProcessorInterface
             $context->isCollection(),
             $context->getAssociationName()
         );
-        $this->setDescriptionsForFields($definition, $entityClass);
+        $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
         $filters = $context->getFilters();
         if (null !== $filters) {
-            $this->setDescriptionsForFilters($filters, $entityClass);
+            $this->setDescriptionsForFilters($filters, $entityClass, $targetAction);
         }
     }
 
@@ -234,12 +234,21 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $entityClass
      * @param string|null            $fieldPrefix
      */
-    protected function setDescriptionsForFields(EntityDefinitionConfig $definition, $entityClass, $fieldPrefix = null)
-    {
+    protected function setDescriptionsForFields(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $targetAction,
+        $fieldPrefix = null
+    ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $loadedDescription = $this->apiDocMdParser->getDocumentation($entityClass, 'fields', $fieldName);
+                $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                    $entityClass,
+                    'fields',
+                    $fieldName,
+                    $targetAction
+                );
                 if ($loadedDescription) {
                     $field->setDescription($loadedDescription);
                     continue;
@@ -262,6 +271,7 @@ class CompleteDescriptions implements ProcessorInterface
                         $entityClass,
                         'fields',
                         $fieldName,
+                        $targetAction,
                         $label
                     );
                     if ($loadedDescription) {
@@ -274,7 +284,7 @@ class CompleteDescriptions implements ProcessorInterface
             if ($targetEntity && $targetEntity->hasFields()) {
                 $targetClass = $field->getTargetClass();
                 if ($targetClass) {
-                    $this->setDescriptionsForFields($targetEntity, $targetClass);
+                    $this->setDescriptionsForFields($targetEntity, $targetClass, $targetAction);
                 } else {
                     $propertyPath = $field->getPropertyPath($fieldName);
                     $this->setDescriptionsForFields($targetEntity, $entityClass, $propertyPath . '.');
@@ -287,12 +297,17 @@ class CompleteDescriptions implements ProcessorInterface
      * @param FiltersConfig $filters
      * @param string        $entityClass
      */
-    protected function setDescriptionsForFilters(FiltersConfig $filters, $entityClass)
+    protected function setDescriptionsForFilters(FiltersConfig $filters, $entityClass, $targetAction)
     {
         $fields = $filters->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $loadedDescription = $this->apiDocMdParser->getDocumentation($entityClass, 'filters', '', $fieldName);
+                $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                    $entityClass,
+                    'filters',
+                    $fieldName,
+                    $targetAction
+                );
                 if ($loadedDescription) {
                     $field->setDescription($loadedDescription);
                     continue;
@@ -311,6 +326,7 @@ class CompleteDescriptions implements ProcessorInterface
                         $entityClass,
                         'filters',
                         $fieldName,
+                        $targetAction,
                         $description
                     );
                     if ($loadedDescription) {
