@@ -159,14 +159,14 @@ class GridViewManager
     }
 
     /**
-     * @param mixed  $user
+     * @param User  $user
      * @param string $gridName
      *
      * @return array
      */
-    public function getAllGridViews($user, $gridName)
+    public function getAllGridViews(User $user, $gridName)
     {
-        $cacheKey = sprintf('%s.%s.%s', self::ALL_VIEWS_KEY, $this->userToString($user), $gridName);
+        $cacheKey = sprintf('%s.%s.%s', self::ALL_VIEWS_KEY, $user->getUsername(), $gridName);
         if (!isset($this->cacheData[$cacheKey])) {
             $systemViews = $this->getSystemViews($gridName);
             $gridViews = [];
@@ -188,14 +188,14 @@ class GridViewManager
     /**
      * Get default view from all views (user made, system, etc)
      *
-     * @param mixed $user
+     * @param User $user
      * @param string $gridName
      *
      * @return mixed
      */
-    public function getDefaultView($user, $gridName)
+    public function getDefaultView(User $user, $gridName)
     {
-        $cacheKey = sprintf('%s.%s.%s', self::DEFAULT_VIEW_KEY, $this->userToString($user), $gridName);
+        $cacheKey = sprintf('%s.%s.%s', self::DEFAULT_VIEW_KEY, $user->getUsername(), $gridName);
         if (!array_key_exists($cacheKey, $this->cacheData)) {
             $gridViewRepository = $this->registry->getRepository('OroDataGridBundle:GridViewUser');
             $default = $gridViewRepository->findDefaultGridView($this->aclHelper, $user, $gridName, false);
@@ -290,15 +290,5 @@ class GridViewManager
         }
 
         return $views;
-    }
-
-    /**
-     * @param mixed $user
-     *
-     * @return string
-     */
-    protected function userToString($user)
-    {
-        return $user instanceof User ? $user->getUsername() : (string)$user;
     }
 }
