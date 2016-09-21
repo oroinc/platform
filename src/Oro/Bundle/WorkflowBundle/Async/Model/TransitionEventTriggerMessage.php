@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Util\JSON;
 
 class TransitionEventTriggerMessage implements \JsonSerializable
 {
-    const TRANSITION_TRIGGER_EVENT = 'transitionEventTrigger';
+    const TRANSITION_EVENT_TRIGGER = 'transitionEventTrigger';
     const WORKFLOW_ITEM = 'workflowItem';
 
     /** @var int */
@@ -34,7 +34,7 @@ class TransitionEventTriggerMessage implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            self::TRANSITION_TRIGGER_EVENT => $this->triggerId,
+            self::TRANSITION_EVENT_TRIGGER => $this->triggerId,
             self::WORKFLOW_ITEM => $this->workflowItemId
         ];
     }
@@ -51,7 +51,7 @@ class TransitionEventTriggerMessage implements \JsonSerializable
         }
 
         return new static(
-            static::getValue($data, self::TRANSITION_TRIGGER_EVENT),
+            static::getValue($data, self::TRANSITION_EVENT_TRIGGER),
             static::getValue($data, self::WORKFLOW_ITEM)
         );
     }

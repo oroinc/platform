@@ -46,20 +46,17 @@ class TransitionEventTriggerProcessor implements MessageProcessorInterface
         try {
             $triggerMessage = TransitionEventTriggerMessage::createFromJson($message->getBody());
 
-            $trigger = $this->getEntity(TransitionEventTrigger::class, $triggerMessage->getTriggerId());
-            if (!$trigger) {
-                throw new \InvalidArgumentException('Message should contain valid TransitionEventTrigger id');
-            }
+            $trigger = $this->resolveEntity(TransitionEventTrigger::class, $triggerMessage->getTriggerId());
 
-            $workflowItem = $this->getEntity(WorkflowItem::class, $triggerMessage->getWorkflowItemId());
-            if (!$workflowItem) {
-                throw new \RuntimeException('Message should contain valid WorkflowItem id');
-            }
+            $workflowItem = $this->resolveEntity(WorkflowItem::class, $triggerMessage->getWorkflowItemId());
 
             $result = $this->manager->transitIfAllowed($workflowItem, $trigger->getTransitionName());
+
             if (!$result) {
                 throw new \RuntimeException('Transition not allowed');
             }
+
+            return self::ACK;
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf(
@@ -71,21 +68,28 @@ class TransitionEventTriggerProcessor implements MessageProcessorInterface
 
             return self::REJECT;
         }
-
-        return self::ACK;
     }
 
     /**
      * @param string $className
      * @param int $id
-     * @return null|object
+     * @return object
+     * @throws \InvalidArgumentException
      */
-    protected function getEntity($className, $id)
+    protected function resolveEntity($className, $id)
     {
         if (empty($className) || (int)$id < 1) {
             return null;
         }
 
-        return $this->registry->getManagerForClass($className)->find($className, $id);
+        $entity = $this->registry->getManagerForClass($className)->find($className, $id);
+
+        if (!$entity) {
+            throw new \RuntimeException(
+                sprintf('Entity %s with identifier %s not found.', $className, $id)
+            );
+        }
+
+        return $entity;
     }
 }
