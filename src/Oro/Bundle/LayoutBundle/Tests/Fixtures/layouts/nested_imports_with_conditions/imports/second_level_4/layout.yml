@@ -1,0 +1,14 @@
+layout:
+    actions:
+        - '@addTree':
+            items:
+                __wrapper:
+                    blockType: container
+                    options:
+                        attr:
+                            class: "second-4-wrapper"
+            tree:
+                __root:
+                    __wrapper: ~
+
+    conditions: 'true'

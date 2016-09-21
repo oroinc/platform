@@ -157,41 +157,37 @@ class ObjectMapper extends AbstractMapper
      * into an output array.
      *
      * @param Query $query
-     * @param array $item
+     * @param array $resultItem
      * @return array|null
      */
-    public function mapSelectedData(Query $query, $item)
+    public function mapSelectedData(Query $query, $resultItem)
     {
-        $selects = $query->getSelect();
+        $dataFields = $query->getSelectDataFields();
 
-        if (empty($selects)) {
+        if (empty($dataFields)) {
             return null;
         }
 
         $result = [];
-        $selectAliases = $query->getSelectAliases();
 
-        foreach ($selects as $select) {
-            list ($type, $name) = Criteria::explodeFieldTypeName($select);
+        foreach ($dataFields as $column => $dataField) {
+            list ($type, $columnName) = Criteria::explodeFieldTypeName($column);
 
-            if (isset($selectAliases[$name])) {
-                $resultName = $selectAliases[$name];
-            } elseif (isset($selectAliases[$select])) {
-                $resultName = $selectAliases[$select];
-            } else {
-                $resultName = $name;
+            $value = '';
+
+            if (isset($resultItem[$columnName])) {
+                $value = $resultItem[$columnName];
             }
 
-            $result[$resultName] = '';
-
-            if (isset($item[$name])) {
-                $value = $item[$name];
-                if (is_array($value)) {
-                    $value = array_shift($value);
-                }
-
-                $result[$resultName] = $value;
+            if (isset($resultItem[$dataField])) {
+                $value = $resultItem[$dataField];
             }
+
+            if (is_array($value)) {
+                $value = array_shift($value);
+            }
+
+            $result[$dataField] = $value;
         }
 
         return $result;

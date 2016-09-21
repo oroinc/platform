@@ -340,11 +340,11 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $query->expects($this->once())
-            ->method('getSelect')
+            ->method('getSelectDataFields')
             ->willReturn([
-                'text.sku',
-                'text.defaultName',
-                'notExistingField'
+                'text.sku' => 'sku',
+                'text.defaultName' => 'defaultName',
+                'notExistingField' => 'notExistingField'
             ]);
 
         $item = [
