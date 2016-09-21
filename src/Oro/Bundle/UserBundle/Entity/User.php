@@ -427,7 +427,7 @@ class User extends ExtendUser implements
     /**
      * @var boolean $disableLogin
      *
-     * @ORM\Column(type="boolean", name="login_disabled", nullable=false)
+     * @ORM\Column(type="boolean", name="login_disabled", options={"default"=false})
      */
     protected $loginDisabled;
 

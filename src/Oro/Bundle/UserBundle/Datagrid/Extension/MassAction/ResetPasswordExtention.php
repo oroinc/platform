@@ -41,7 +41,6 @@ class ResetPasswordExtention extends AbstractExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if ($datasource instanceof OrmDatasource) {
-
             /** @var QueryBuilder $qb */
             $qb = $datasource->getQueryBuilder();
             $qb->select('u');
