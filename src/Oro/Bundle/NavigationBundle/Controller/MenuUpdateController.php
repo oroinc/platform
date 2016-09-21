@@ -20,11 +20,7 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 class MenuUpdateController extends Controller
 {
     /**
-     * @Route(
-     *     "/{menu}/{parentKey}/create",
-     *     name="oro_navigation_menu_update_create",
-     *     defaults={"parentKey" = null}
-     * )
+     * @Route("/{menu}/create/{parentKey}", name="oro_navigation_menu_update_create")
      * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
      * @Acl(
      *     id="oro_navigation_menu_update_create",
@@ -37,30 +33,30 @@ class MenuUpdateController extends Controller
      * @param string|null $parentKey
      * @return array|RedirectResponse
      */
-    public function createAction($menu, $parentKey)
+    public function createAction($menu, $parentKey = null)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
         $menuUpdate = $manager->createMenuUpdate();
 
-        $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
-        if (!$parent) {
-            throw $this->createNotFoundException();
+        if ($parentKey) {
+            $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
+
+            if (!$parent) {
+                throw $this->createNotFoundException();
+            }
+
+            $menuUpdate->setParentKey($parent->getKey());
         }
 
-        $menuUpdate->setParentKey($parent->getKey());
         $menuUpdate->setMenu($menu);
 
         return $this->update($menuUpdate);
     }
 
     /**
-     * @Route(
-     *     "/{menu}/{parentKey}/update/{key}",
-     *     name="oro_navigation_menu_update_update",
-     *     defaults={"parentKey" = null}
-     * )
+     * @Route("/{menu}/update/{key}", name="oro_navigation_menu_update_update")
      * @Template()
      * @Acl(
      *     id="oro_navigation_menu_update_update",
@@ -70,19 +66,13 @@ class MenuUpdateController extends Controller
      * )
      *
      * @param string $menu
-     * @param string $parentKey
      * @param string $key
      * @return array|RedirectResponse
      */
-    public function updateAction($menu, $parentKey, $key)
+    public function updateAction($menu, $key)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
-        
-        $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
-        if (!$parent) {
-            throw $this->createNotFoundException();
-        }
 
         $menuUpdate = $manager->getMenuUpdateByKey($menu, $key);
         if (!$menuUpdate) {
@@ -128,7 +118,7 @@ class MenuUpdateController extends Controller
      */
     private function update(MenuUpdateInterface $menuUpdate)
     {
-        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_update_key' => $menuUpdate->getKey()]);
 
         return $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,

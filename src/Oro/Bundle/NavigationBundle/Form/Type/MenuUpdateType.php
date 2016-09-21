@@ -39,7 +39,7 @@ class MenuUpdateType extends AbstractType
             )
             ->add(
                 'key',
-                'text',
+                $options['menu_update_key'] ? 'hidden' : 'text',
                 [
                     'required' => true,
                     'label' => 'oro.navigation.menuupdate.key.label',
@@ -62,6 +62,7 @@ class MenuUpdateType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => MenuUpdate::class,
+            'menu_update_key' => null,
         ]);
     }
 
