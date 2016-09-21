@@ -62,8 +62,11 @@ class ApiDocMdParser
                     return $sectionDocumentation;
                 }
 
-                if (null !== $element && array_key_exists($element, $sectionDocumentation)) {
-                    return $sectionDocumentation[$element];
+                if (null !== $element) {
+                    $element = strtolower($element);
+                    if (array_key_exists($element, $sectionDocumentation)) {
+                        return $sectionDocumentation[$element];
+                    }
                 }
             }
         }
@@ -114,7 +117,7 @@ class ApiDocMdParser
                     continue;
                 }
                 if ($subElement->tagName === 'h3') {
-                    $element = $subElement->nodeValue;
+                    $element = strtolower($subElement->nodeValue);
                     $this->loadedDocumentation[$headerKeys[$index]][$type][$element] = '';
                     continue;
                 }
