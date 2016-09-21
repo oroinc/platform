@@ -171,7 +171,16 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    abstract public function addWhere(Expression $expression, $type = self::WHERE_AND);
+    public function addWhere(Expression $expression, $type = self::WHERE_AND)
+    {
+        if (self::WHERE_AND === $type) {
+            $this->query->getCriteria()->andWhere($expression);
+        } elseif (self::WHERE_OR === $type) {
+            $this->query->getCriteria()->orWhere($expression);
+        }
+
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
@@ -179,5 +188,21 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     public function getSelectAliases()
     {
         return $this->query->getSelectAliases();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSelect()
+    {
+        return $this->query->getSelect();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSelectDataFields()
+    {
+        return $this->query->getSelectDataFields();
     }
 }

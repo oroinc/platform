@@ -1,0 +1,12 @@
+layout:
+    actions:
+        - '@addTree':
+            items:
+                __wrapper:
+                    blockType: container
+                    options:
+                        attr:
+                            class: "third-wrapper"
+            tree:
+                __root:
+                    __wrapper: ~
