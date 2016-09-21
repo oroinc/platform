@@ -124,7 +124,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
             return;
         }
 
-        if ($trigger->isQueued()) {
+        if ($trigger->isQueued() || $this->forceQueued) {
             $this->producer->send(self::TOPIC_NAME, TransitionEventTriggerMessage::create($trigger, $workflowItem));
         } else {
             $this->workflowManager->transitIfAllowed($workflowItem, $trigger->getTransitionName());

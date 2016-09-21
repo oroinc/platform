@@ -17,8 +17,19 @@ abstract class AbstractEventTriggerExtension implements EventTriggerExtensionInt
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var bool */
+    protected $forceQueued = false;
+
     /** @var array */
     protected $triggers;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setForceQueued($forceQueued = false)
+    {
+        $this->forceQueued = (bool)$forceQueued;
+    }
 
     /**
      * {@inheritdoc}

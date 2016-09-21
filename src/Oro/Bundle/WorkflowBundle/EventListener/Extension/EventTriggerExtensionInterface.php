@@ -7,6 +7,11 @@ use Doctrine\Common\Persistence\ObjectManager;
 interface EventTriggerExtensionInterface
 {
     /**
+     * @param bool $forceQueued
+     */
+    public function setForceQueued($forceQueued = false);
+
+    /**
      * @param object $entity
      * @param string $event
      * @return bool

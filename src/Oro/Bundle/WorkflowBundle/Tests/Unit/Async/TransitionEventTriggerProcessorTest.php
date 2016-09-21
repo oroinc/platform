@@ -7,11 +7,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\WorkflowBundle\Async\Model\TransitionEventTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Async\TransitionEventTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -23,18 +22,14 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
-    const TRANSITION_TRIGGER_EVENT_ID = 42;
-    const ENTITY_CLASS = 'stdClass';
-    const ENTITY_ID = 142;
+    const TRANSITION_EVENT_TRIGGER_ID = 42;
+    const WORKFLOW_ITEM_ID = 142;
 
     /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectManager;
 
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
-
-    /** @var TransitionEventTriggerHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $helper;
 
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
@@ -55,51 +50,27 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         $this->registry = $this->getMock(ManagerRegistry::class);
         $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
 
-        $this->helper = $this->getMockBuilder(TransitionEventTriggerHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->manager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
 
         $this->logger = $this->getMock(LoggerInterface::class);
 
-        $this->processor = new TransitionEventTriggerProcessor(
-            $this->registry,
-            $this->helper,
-            $this->manager,
-            $this->logger
-        );
+        $this->processor = new TransitionEventTriggerProcessor($this->registry, $this->manager, $this->logger);
 
         $this->session = $this->getMock(SessionInterface::class);
     }
 
     protected function tearDown()
     {
-        unset(
-            $this->processor,
-            $this->registry,
-            $this->helper,
-            $this->manager,
-            $this->logger,
-            $this->objectManager,
-            $this->session
-        );
+        unset($this->processor, $this->registry, $this->manager, $this->logger, $this->objectManager, $this->session);
     }
 
     public function testProcess()
     {
-        $trigger = $this->getTrigger();
-        $entity = $this->getEntity(self::ENTITY_CLASS);
+        $trigger = $this->getEntity(TransitionEventTrigger::class, ['transitionName' => 'test transition']);
         $workflowItem = $this->getEntity(WorkflowItem::class);
 
-        $this->setUpObjectManager($trigger, $entity);
+        $this->setUpObjectManager($trigger, $workflowItem);
 
-        $this->helper->expects($this->once())->method('isRequirePass')->with($trigger, $entity)->willReturn(true);
-
-        $this->manager->expects($this->once())
-            ->method('getWorkflowItem')
-            ->with($entity, $trigger->getWorkflowDefinition()->getName())
-            ->willReturn($workflowItem);
         $this->manager->expects($this->once())
             ->method('transitIfAllowed')
             ->with($workflowItem, $trigger->getTransitionName())
@@ -113,64 +84,20 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessNotRequirePass()
+    public function testProcessTransitionNotAllowed()
     {
         $message = $this->getMessageMock();
-        $trigger = $this->getTrigger();
-        $entity = $this->getEntity(self::ENTITY_CLASS);
-
-        $this->setUpObjectManager($trigger, $entity);
-
-        $this->helper->expects($this->once())->method('isRequirePass')->with($trigger, $entity)->willReturn(false);
-
-        $this->manager->expects($this->never())->method($this->anything());
-
-        $this->setUpLogger('Require of TransitionEventTrigger was not pass', $message->getBody());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
-    }
-
-    public function testProcessNoWorkflowItem()
-    {
-        $message = $this->getMessageMock();
-        $trigger = $this->getTrigger();
-        $entity = $this->getEntity(self::ENTITY_CLASS);
+        $trigger = $this->getEntity(TransitionEventTrigger::class, ['transitionName' => 'test transition']);
         $workflowItem = $this->getEntity(WorkflowItem::class);
 
-        $this->setUpObjectManager($trigger, $entity);
+        $this->setUpObjectManager($trigger, $workflowItem);
 
-        $this->helper->expects($this->once())->method('isRequirePass')->with($trigger, $entity)->willReturn(true);
-
-        $this->manager->expects($this->once())
-            ->method('getWorkflowItem')
-            ->with($entity, $trigger->getWorkflowDefinition()->getName())
-            ->willReturn($workflowItem);
         $this->manager->expects($this->once())
             ->method('transitIfAllowed')
             ->with($workflowItem, $trigger->getTransitionName())
             ->willReturn(false);
 
         $this->setUpLogger('Transition not allowed', $message->getBody());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
-    }
-
-    public function testProcessTransitionNotAllowed()
-    {
-        $message = $this->getMessageMock();
-        $trigger = $this->getTrigger();
-        $entity = $this->getEntity(self::ENTITY_CLASS);
-
-        $this->setUpObjectManager($trigger, $entity);
-
-        $this->helper->expects($this->once())->method('isRequirePass')->with($trigger, $entity)->willReturn(true);
-
-        $this->manager->expects($this->once())
-            ->method('getWorkflowItem')
-            ->with($entity, $trigger->getWorkflowDefinition()->getName())
-            ->willReturn(null);
-
-        $this->setUpLogger('Could not find WorkflowItem', $message->getBody());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
     }
@@ -195,7 +122,7 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('find')
             ->willReturnMap(
                 [
-                    [TransitionEventTrigger::class, self::TRANSITION_TRIGGER_EVENT_ID, $trigger]
+                    [TransitionEventTrigger::class, self::TRANSITION_EVENT_TRIGGER_ID, $trigger]
                 ]
             );
 
@@ -220,61 +147,51 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         return [
             'empty data' => [
                 'data' => [],
-                'expectedMessage' => 'Message should not be empty'
+                'expectedMessage' => 'Json should not be empty'
             ],
-            'without trigger id, entity class and id' => [
+            'without trigger id and workflowItem id' => [
                 'data' => ['test' => 1],
-                'expectedMessage' => 'Message should contain valid TransitionEventTrigger id'
+                'expectedMessage' => sprintf('Message should contain valid %s id', TransitionEventTrigger::class)
             ],
-            'empty trigger id, without entity class and id' => [
-                'data' => [TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => null],
-                'expectedMessage' => 'Message should contain valid TransitionEventTrigger id'
+            'empty trigger id, without workflowItem id' => [
+                'data' => [TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => null],
+                'expectedMessage' => sprintf('Message should contain valid %s id', TransitionEventTrigger::class)
             ],
-            'empty trigger id, no trigger entity, without entity class and id' => [
+            'trigger id, without trigger entity and workflowItem id' => [
                 'data' => [
-                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID
+                    TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => self::TRANSITION_EVENT_TRIGGER_ID
                 ],
-                'expectedMessage' => 'Message should contain valid TransitionEventTrigger id'
+                'expectedMessage' => sprintf(
+                    'Entity %s with identifier %d not found',
+                    TransitionEventTrigger::class,
+                    self::TRANSITION_EVENT_TRIGGER_ID
+                )
             ],
-            'without entity class and id' => [
+            'without workflowItem id' => [
                 'data' => [
-                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID
+                    TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => self::TRANSITION_EVENT_TRIGGER_ID
                 ],
-                'expectedMessage' => 'Message should contain valid entity class name and id',
+                'expectedMessage' => sprintf('Message should contain valid %s id', WorkflowItem::class),
                 'trigger' => true
             ],
-            'empty entity class, without entity id' => [
+            'empty workflowItem id' => [
                 'data' => [
-                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionEventTriggerProcessor::ENTITY_CLASS => null,
+                    TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => self::TRANSITION_EVENT_TRIGGER_ID,
+                    TransitionEventTriggerMessage::WORKFLOW_ITEM => null,
                 ],
-                'expectedMessage' => 'Message should contain valid entity class name and id',
+                'expectedMessage' => sprintf('Message should contain valid %s id', WorkflowItem::class),
                 'trigger' => true
             ],
-            'without entity id' => [
+            'without workflowItem entity' => [
                 'data' => [
-                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
+                    TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => self::TRANSITION_EVENT_TRIGGER_ID,
+                    TransitionEventTriggerMessage::WORKFLOW_ITEM => self::WORKFLOW_ITEM_ID
                 ],
-                'expectedMessage' => 'Message should contain valid entity class name and id',
-                'trigger' => true
-            ],
-            'empty entity id' => [
-                'data' => [
-                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
-                    TransitionEventTriggerProcessor::ENTITY_ID => null,
-                ],
-                'expectedMessage' => 'Message should contain valid entity class name and id',
-                'trigger' => true
-            ],
-            'no entity' => [
-                'data' => [
-                    TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                    TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
-                    TransitionEventTriggerProcessor::ENTITY_ID => self::ENTITY_ID,
-                ],
-                'expectedMessage' => 'Message should contain valid entity class name and id',
+                'expectedMessage' => sprintf(
+                    'Entity %s with identifier %d not found',
+                    WorkflowItem::class,
+                    self::WORKFLOW_ITEM_ID
+                ),
                 'trigger' => true
             ]
         ];
@@ -288,9 +205,8 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
     {
         if (null === $data) {
             $data = [
-                TransitionEventTriggerProcessor::TRANSITION_TRIGGER_EVENT => self::TRANSITION_TRIGGER_EVENT_ID,
-                TransitionEventTriggerProcessor::ENTITY_CLASS => self::ENTITY_CLASS,
-                TransitionEventTriggerProcessor::ENTITY_ID => self::ENTITY_ID,
+                TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => self::TRANSITION_EVENT_TRIGGER_ID,
+                TransitionEventTriggerMessage::WORKFLOW_ITEM => self::WORKFLOW_ITEM_ID
             ];
         }
 
@@ -301,33 +217,17 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $transitionName
-     * @param string $workflowName
-     * @return TransitionEventTrigger
-     */
-    private function getTrigger($transitionName = 'test transition', $workflowName = 'test workflow')
-    {
-        return $this->getEntity(
-            TransitionEventTrigger::class,
-            [
-                'transitionName' => $transitionName,
-                'workflowDefinition' => $this->getEntity(WorkflowDefinition::class, ['name' => $workflowName])
-            ]
-        );
-    }
-
-    /**
      * @param TransitionEventTrigger $trigger
-     * @param object $entity
+     * @param WorkflowItem $item
      */
-    private function setUpObjectManager(TransitionEventTrigger $trigger, $entity)
+    private function setUpObjectManager(TransitionEventTrigger $trigger, WorkflowItem $item)
     {
         $this->objectManager->expects($this->exactly(2))
             ->method('find')
             ->willReturnMap(
                 [
-                    [TransitionEventTrigger::class, self::TRANSITION_TRIGGER_EVENT_ID, $trigger],
-                    [self::ENTITY_CLASS, self::ENTITY_ID, $entity]
+                    [TransitionEventTrigger::class, self::TRANSITION_EVENT_TRIGGER_ID, $trigger],
+                    [WorkflowItem::class, self::WORKFLOW_ITEM_ID, $item]
                 ]
             );
     }

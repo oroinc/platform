@@ -59,7 +59,7 @@ class EventTriggerCache
 
         foreach ($triggers as $trigger) {
             $entityClass = $trigger->getEntityClass();
-            $event       = $trigger->getEvent();
+            $event = $trigger->getEvent();
 
             if (!isset($data[$entityClass])) {
                 $data[$entityClass] = [];
@@ -110,7 +110,7 @@ class EventTriggerCache
     protected function assertProvider()
     {
         if (!$this->provider) {
-            throw new \LogicException('Trigger cache provider is not defined');
+            throw new \LogicException('Event trigger cache provider is not defined');
         }
     }
 
@@ -121,7 +121,7 @@ class EventTriggerCache
     protected function getRepository()
     {
         if (!$this->triggerClassName) {
-            throw new \LogicException('Trigger class name is not defined');
+            throw new \LogicException('Event trigger class name is not defined');
         }
 
         return $this->registry->getManagerForClass($this->triggerClassName)->getRepository($this->triggerClassName);

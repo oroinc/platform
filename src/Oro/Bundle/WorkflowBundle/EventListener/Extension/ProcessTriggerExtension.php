@@ -120,7 +120,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
                     continue;
                 }
 
-                if ($trigger->isQueued()) {
+                if ($trigger->isQueued() || $this->forceQueued) {
                     $processJob = $this->queueProcess($trigger, $data);
                     $manager->persist($processJob);
 

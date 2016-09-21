@@ -78,16 +78,14 @@ class TransitionEventTriggerProcessor implements MessageProcessorInterface
      */
     protected function resolveEntity($className, $id)
     {
-        if (empty($className) || (int)$id < 1) {
-            return null;
+        if ((int)$id < 1) {
+            throw new \InvalidArgumentException(sprintf('Message should contain valid %s id', $className));
         }
 
         $entity = $this->registry->getManagerForClass($className)->find($className, $id);
 
         if (!$entity) {
-            throw new \RuntimeException(
-                sprintf('Entity %s with identifier %s not found.', $className, $id)
-            );
+            throw new \InvalidArgumentException(sprintf('Entity %s with identifier %s not found', $className, $id));
         }
 
         return $entity;
