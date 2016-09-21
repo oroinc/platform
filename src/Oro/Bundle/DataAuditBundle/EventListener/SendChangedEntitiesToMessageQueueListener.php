@@ -12,6 +12,7 @@ use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
+use Oro\Bundle\DataAuditBundle\Service\GetEntityAuditMetadataService;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -46,6 +47,11 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
     private $convertEntityToArrayForMessageQueueService;
 
     /**
+     * @var GetEntityAuditMetadataService
+     */
+    private $getEntityAuditMetadataService;
+
+    /**
      * @var \SplObjectStorage
      */
     private $allInsertions;
@@ -78,11 +84,13 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $securityTokenStorage,
-        ConvertEntityToArrayForMessageQueueService $convertEntityToArrayForMessageQueueService
+        ConvertEntityToArrayForMessageQueueService $convertEntityToArrayForMessageQueueService,
+        GetEntityAuditMetadataService $getEntityAuditMetadataService
     ) {
         $this->messageProducer = $messageProducer;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->convertEntityToArrayForMessageQueueService = $convertEntityToArrayForMessageQueueService;
+        $this->getEntityAuditMetadataService = $getEntityAuditMetadataService;
 
         $this->allInsertions = new \SplObjectStorage;
         $this->allUpdates = new \SplObjectStorage;
@@ -106,18 +114,30 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
 
         $insertions = new \SplObjectStorage();
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
+            if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
+                continue;
+            }
+
             $insertions[$entity] = $uow->getEntityChangeSet($entity);
         }
         $this->allInsertions[$em] = $insertions;
 
         $updates = new \SplObjectStorage();
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
+            if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
+                continue;
+            }
+
             $updates[$entity] = $uow->getEntityChangeSet($entity);
         }
         $this->allUpdates[$em] = $updates;
 
         $deletions = new \SplObjectStorage();
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
+            if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
+                continue;
+            }
+
             $changeSet = [];
             $entityMeta = $em->getClassMetadata(get_class($entity));
 
@@ -146,6 +166,10 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
             $insertDiff = $collection->getInsertDiff();
             $deleteDiff = [];
             foreach ($collection->getDeleteDiff() as $deletedEntity) {
+                if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($deletedEntity))) {
+                    continue;
+                }
+
                 $deleteDiff[] = $this->convertEntityToArrayForMessageQueueService
                     ->convertEntityToArray($em, $deletedEntity, []);
             }

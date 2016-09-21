@@ -27,6 +27,7 @@ services:
             - '@oro_message_queue.message_producer'
             - '@security.token_storage'
             - '@oro_dataaudit.listener.convert_entity_to_array_for_message_queue'
+            - '@oro_dataaudit.get_entity_audit_metadata'
         tags:
             - { name: 'doctrine.event_subscriber', priority: -255 }
 
