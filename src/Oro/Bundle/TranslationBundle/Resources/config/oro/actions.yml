@@ -285,7 +285,6 @@ operations:
                 - '@call_service_method':
                     service: oro_translation.manager.translation
                     method: rebuildCache
-                    method_parameters: ['%kernel.cache_dir%/translations']
                 - '@flash_message':
                     message: oro.translation.translation.message.rebuild_cache
                     type: 'success'
