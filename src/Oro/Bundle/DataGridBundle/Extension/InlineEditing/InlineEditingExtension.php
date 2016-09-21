@@ -174,7 +174,7 @@ class InlineEditingExtension extends AbstractExtension
      *
      * @return bool
      */
-    protected function isEnableEdit($column)
+    protected function isEnabledEdit($column)
     {
         if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)
             && isset($column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY])) {
@@ -208,7 +208,7 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected function isFieldEditable($newColumn, $objectIdentity, $columnName, $column)
     {
-        return $this->isEnableEdit($newColumn)
+        return $this->isEnabledEdit($newColumn)
         && $this->authChecker->isGranted(
             'EDIT',
             new FieldVote($objectIdentity, $this->getColummFieldName($columnName, $column))
