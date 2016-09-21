@@ -11,6 +11,7 @@ use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\OutputStub;
+use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 
 class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -73,27 +74,34 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
+        $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn([]);
+
         $this->translator->expects($this->once())->method('getFallbackLocales')->willReturn(['locale1', 'locale1']);
         $this->translator->expects($this->once())->method('getLocale')->willReturn('currentLocale');
 
-        $this->translationManager->expects($this->at(0))->method('findValue')
+        $this->container->expects($this->once())->method('set')
+            ->with('oro_translation.database_translation.loader', new EmptyArrayLoader());
+
+        $this->translationManager->expects($this->at(0))->method('rebuildCache');
+
+        $this->translationManager->expects($this->at(1))->method('findValue')
             ->with('key1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(1))->method('createValue')
+        $this->translationManager->expects($this->at(2))->method('createValue')
             ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1', true);
-        $this->translationManager->expects($this->at(2))->method('flush');
+        $this->translationManager->expects($this->at(3))->method('flush');
 
 
-        $this->translationManager->expects($this->at(3))->method('findValue')
+        $this->translationManager->expects($this->at(4))->method('findValue')
             ->with('key1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(4))->method('flush');
+        $this->translationManager->expects($this->at(5))->method('flush');
 
-        $this->translationManager->expects($this->at(5))->method('findValue')
-            ->with('key1', 'currentLocale', 'domain1')->willReturn(new \stdClass());
         $this->translationManager->expects($this->at(6))->method('findValue')
+            ->with('key1', 'currentLocale', 'domain1')->willReturn(new \stdClass());
+        $this->translationManager->expects($this->at(7))->method('findValue')
             ->with('key2', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(7))->method('flush');
+        $this->translationManager->expects($this->at(8))->method('flush');
 
-        $this->translationManager->expects($this->at(8))->method('invalidateCache');
+        $this->translationManager->expects($this->at(9))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
@@ -120,18 +128,23 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->never())->method('getFallbackLocales');
         $this->translator->expects($this->never())->method('getLocale');
 
-        $this->translationManager->expects($this->at(0))->method('findValue')
+        $this->container->expects($this->once())->method('set')
+            ->with('oro_translation.database_translation.loader', new EmptyArrayLoader());
+
+        $this->translationManager->expects($this->at(0))->method('rebuildCache');
+
+        $this->translationManager->expects($this->at(1))->method('findValue')
             ->with('key1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(1))->method('createValue')
+        $this->translationManager->expects($this->at(2))->method('createValue')
             ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1', true);
-        $this->translationManager->expects($this->at(2))->method('flush');
+        $this->translationManager->expects($this->at(3))->method('flush');
 
 
-        $this->translationManager->expects($this->at(3))->method('findValue')
+        $this->translationManager->expects($this->at(4))->method('findValue')
             ->with('key1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(4))->method('flush');
+        $this->translationManager->expects($this->at(5))->method('flush');
 
-        $this->translationManager->expects($this->at(5))->method('invalidateCache');
+        $this->translationManager->expects($this->at(6))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 

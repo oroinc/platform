@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\DataCollectorTranslator;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 
 class OroTranslationLoadCommand extends ContainerAwareCommand
 {
@@ -41,12 +42,17 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         /* @var $translator DataCollectorTranslator */
         $translator = $this->getContainer()->get('translator');
 
-        if (null === ($locales = $input->getOption('languages'))) {
+        if ([] === ($locales = $input->getOption('languages'))) {
             $locales = array_unique(array_merge($translator->getFallbackLocales(), [$translator->getLocale()]));
         }
 
         /* @var $translationManager TranslationManager */
         $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
+
+        // disable database loader to not get translations from database
+        $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
+
+        $translationManager->rebuildCache();
 
         foreach ($locales as $locale) {
             $domains = $translator->getCatalogue($locale)->all();
@@ -72,7 +78,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             }
         }
 
-        $translationManager->invalidateCache();
+        $translationManager->rebuildCache();
 
         $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
     }
