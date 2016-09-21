@@ -258,7 +258,7 @@ class WorkflowManager
      * Tries to transit workflow and checks weather given transition is allowed.
      * Returns true on success - false otherwise.
      * @param WorkflowItem $workflowItem
-     * @param $transition
+     * @param string $transition
      * @return bool
      */
     public function transitIfAllowed(WorkflowItem $workflowItem, $transition)
