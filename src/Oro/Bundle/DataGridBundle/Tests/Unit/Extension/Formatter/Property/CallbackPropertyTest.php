@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration
 class CallbackPropertyTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \stdClass|\PHPUnit_Framework_MockObject_MockObject */
-    protected $callableObject;
+    protected $callable;
 
     /** @var CallbackProperty */
     protected $property;

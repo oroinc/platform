@@ -6,12 +6,16 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Translation\DataCollectorTranslator;
+
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 /**
@@ -24,17 +28,37 @@ class TranslationManager
     /** @var Registry */
     protected $registry;
 
+    /** @var LanguageProvider */
+    protected $languageProvider;
+
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
+    /** @var DataCollectorTranslator */
+    protected $translator;
+
+    /** @var JsTranslationDumper */
+    protected $jsTranslationDumper;
+
     /**
      * @param Registry $registry
+     * @param LanguageProvider $languageProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
+     * @param DataCollectorTranslator $translator
+     * @param JsTranslationDumper $jsTranslationDumper
      */
-    public function __construct(Registry $registry, DynamicTranslationMetadataCache $dbTranslationMetadataCache)
-    {
+    public function __construct(
+        Registry $registry,
+        LanguageProvider $languageProvider,
+        DynamicTranslationMetadataCache $dbTranslationMetadataCache,
+        DataCollectorTranslator $translator,
+        JsTranslationDumper $jsTranslationDumper
+    ) {
         $this->registry = $registry;
+        $this->languageProvider = $languageProvider;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
+        $this->translator = $translator;
+        $this->jsTranslationDumper = $jsTranslationDumper;
     }
 
     /**
@@ -89,7 +113,8 @@ class TranslationManager
             ->setTranslationKey($this->findTranslationKey($key, $domain))
             ->setLanguage($this->getLanguageByCode($locale))
             ->setScope($scope)
-            ->setValue($value);
+            ->setValue($value)
+        ;
 
         return $translationValue;
     }
@@ -234,6 +259,44 @@ class TranslationManager
         }
 
         return $translationKey;
+    }
+
+    /**
+     * Fully rebuilds translation cache including JS translation
+     *
+     * @param string $translationCacheDir
+     */
+    public function rebuildCache($translationCacheDir)
+    {
+        if (!is_dir($translationCacheDir) || !is_writeable($translationCacheDir)) {
+            return;
+        }
+        $this->cleanup($translationCacheDir);
+        $this->translator->warmUp($translationCacheDir);
+        $locales = $this->languageProvider->getEnabledLanguages();
+        $this->jsTranslationDumper->dumpTranslations($locales);
+    }
+
+    /**
+     * Cleanup directory
+     *
+     * @param string $targetDir
+     */
+    protected function cleanup($targetDir)
+    {
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $path) {
+            $path->isFile() ? unlink($path->getPathname()) : rmdir($path->getPathname());
+        }
     }
 
     /**

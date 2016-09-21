@@ -239,4 +239,7 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
         arguments:
             - '@doctrine'
+            - '@oro_translation.provider.language'
             - '@oro_translation.database_translation.metadata.cache'
+            - '@translator.data_collector'
+            - '@oro_translation.js_dumper'
