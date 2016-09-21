@@ -180,7 +180,13 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
                 $lastHistoryLink = $context->getLastHistoryLink();
                 $this->clickBarsIcon();
 
-                return false !== strpos($actualTitle, $lastHistoryLink);
+                if (false === strpos($actualTitle, $lastHistoryLink)) {
+                    $context->getSession()->reload();
+
+                    return false;
+                }
+
+                return true;
             });
 
             self::assertNotFalse($result, sprintf(
