@@ -155,13 +155,6 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
 
-    oro_api.create.set_form_data_customization_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SetFormDataCustomizationHandler
-        arguments:
-            - '@oro_api.customize_form_data.processor'
-        tags:
-            - { name: oro.api.processor, action: create, group: transform_data, priority: -5 }
-
     oro_api.create.build_form:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildForm
         tags:

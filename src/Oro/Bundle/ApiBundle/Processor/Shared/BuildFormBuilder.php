@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -82,6 +83,7 @@ class BuildFormBuilder implements ProcessorInterface
         if (!array_key_exists('extra_fields_message', $options)) {
             $options['extra_fields_message'] = 'This form should not contain extra fields: "{{ extra_fields }}"';
         }
+        $options[CustomizeFormDataExtension::API_CONTEXT] = $context;
 
         return $options;
     }

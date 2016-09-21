@@ -1,42 +1,27 @@
 <?php
 
-/*
- * This file is a copy of {@see Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener}
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- */
-
 namespace Oro\Bundle\ApiBundle\Form\EventListener;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * This file is inspired by Symfony ResizeFormListener
+ * @see Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener
+ */
 class CollectionListener implements EventSubscriberInterface
 {
-    /** @var string */
-    protected $dataClass;
-
-    /** @var string */
-    protected $type;
-
-    /** @var array */
-    protected $options;
+    /** @var CollectionEntryFactory */
+    protected $entryFactory;
 
     /**
-     * @param string $dataClass
-     * @param string $type
-     * @param array  $options
+     * @param CollectionEntryFactory $entryFactory
      */
-    public function __construct($dataClass, $type, array $options = [])
+    public function __construct(CollectionEntryFactory $entryFactory)
     {
-        $this->dataClass = $dataClass;
-        $this->type = $type;
-        $this->options = $options;
+        $this->entryFactory = $entryFactory;
     }
 
     /**
@@ -76,7 +61,7 @@ class CollectionListener implements EventSubscriberInterface
         // Then add all rows again in the correct order
         $factory = $form->getConfig()->getFormFactory();
         foreach ($data as $name => $value) {
-            $form->add($this->createEntry($factory, $name));
+            $form->add($this->entryFactory->createEntry($factory, $name));
         }
     }
 
@@ -103,7 +88,7 @@ class CollectionListener implements EventSubscriberInterface
         $factory = $form->getConfig()->getFormFactory();
         foreach ($data as $name => $value) {
             if (!$form->has($name)) {
-                $form->add($this->createEntry($factory, $name));
+                $form->add($this->entryFactory->createEntry($factory, $name));
             }
         }
     }
@@ -150,30 +135,5 @@ class CollectionListener implements EventSubscriberInterface
     protected function isSupportedData($data)
     {
         return is_array($data) || ($data instanceof \Traversable && $data instanceof \ArrayAccess);
-    }
-
-    /**
-     * @param FormFactoryInterface $factory
-     * @param string               $name
-     *
-     * @return FormInterface
-     */
-    protected function createEntry(FormFactoryInterface $factory, $name)
-    {
-        return $factory->createNamed(
-            $name,
-            $this->type,
-            null,
-            array_replace(
-                [
-                    'auto_initialize' => false,
-                    'data_class'      => $this->dataClass,
-                    'property_path'   => '[' . $name . ']',
-                    'error_bubbling'  => false,
-                    'constraints'     => new Assert\Valid()
-                ],
-                $this->options
-            )
-        );
     }
 }

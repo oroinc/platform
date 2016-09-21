@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Type;
 
+use Oro\Bundle\ApiBundle\Form\EventListener\CollectionEntryFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,9 +18,11 @@ class CollectionType extends AbstractType
     {
         $builder->addEventSubscriber(
             new CollectionListener(
-                $options['entry_data_class'],
-                $options['entry_type'],
-                $options['entry_options']
+                new CollectionEntryFactory(
+                    $options['entry_data_class'],
+                    $options['entry_type'],
+                    $options['entry_options']
+                )
             )
         );
     }

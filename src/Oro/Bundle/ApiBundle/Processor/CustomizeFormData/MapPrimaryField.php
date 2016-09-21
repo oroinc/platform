@@ -5,15 +5,16 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
 
 /**
  * Sets a "primary" flag in a collection based on a value of "primary" field.
  */
-class MapPrimaryField implements ProcessorInterface
+class MapPrimaryField extends AbstractProcessor
 {
+    const PRIMARY_ITEM_KEY = 'primary_item_key';
+
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
@@ -59,30 +60,159 @@ class MapPrimaryField implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function processPreSubmit(CustomizeFormDataContext $context)
     {
-        /** @var CustomizeFormDataContext $context */
-
-        $primaryFieldForm = $context->getForm()->get($this->primaryFieldName);
-        if (!$primaryFieldForm->isSubmitted()) {
-            // the primary field does not exist in input data
+        $submittedData = $context->getData();
+        if (!is_array($submittedData) && !$submittedData instanceof \ArrayAccess) {
+            return;
+        }
+        $form = $context->getForm();
+        if (array_key_exists($this->associationName, $submittedData) || !$form->has($this->associationName)) {
+            return;
+        }
+        if (empty($submittedData[$this->primaryFieldName]) || !$form->has($this->primaryFieldName)) {
+            return;
+        }
+        $associationField = $context->getConfig()->getField($this->associationName);
+        if (null === $associationField) {
             return;
         }
 
-        $associationField = $context->getConfig()->getField($this->associationName);
-        $dataPropertyPath = $this->getAssociationFieldPropertyPath(
-            $associationField,
-            $this->associationDataFieldName
+        list($collectionSubmitData, $primaryItemKey) = $this->getAssociationSubmitData(
+            $form->get($this->associationName)->getData(),
+            $submittedData[$this->primaryFieldName],
+            $associationField
         );
-        $primaryFlagPropertyPath = $this->getAssociationFieldPropertyPath(
-            $associationField,
-            $this->associationPrimaryFlagFieldName
+        $submittedData[$this->associationName] = $collectionSubmitData;
+        $context->setData($submittedData);
+        if (null !== $primaryItemKey) {
+            $context->set(self::PRIMARY_ITEM_KEY, $primaryItemKey);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processPostSubmit(CustomizeFormDataContext $context)
+    {
+        $primaryFieldForm = $context->getForm()->get($this->primaryFieldName);
+        if (!$primaryFieldForm->isSubmitted()) {
+            // the primary field does not exist in the submitted data
+            return;
+        }
+
+        $primaryField = $context->getConfig()->getField($this->primaryFieldName);
+        if (null === $primaryField) {
+            return;
+        }
+        $associationField = $context->getConfig()->getField($this->associationName);
+        if (null === $associationField) {
+            return;
+        }
+
+        $data = $context->getData();
+        $primaryValue = $primaryFieldForm->getViewData();
+        $collection = $this->propertyAccessor->getValue(
+            $data,
+            $associationField->getPropertyPath($this->associationName)
+        );
+        $isKnownPrimaryValue = $this->updateAssociationData(
+            $collection,
+            $this->getAssociationFieldPropertyPath($associationField, $this->associationDataFieldName),
+            $this->getAssociationFieldPropertyPath($associationField, $this->associationPrimaryFlagFieldName),
+            $primaryValue
         );
 
-        $isKnownPrimaryValue = false;
-        $primaryValue = $primaryFieldForm->getViewData();
-        $collection = $context->getForm()->get($this->associationName)->getViewData();
+        if ($primaryValue && !$isKnownPrimaryValue) {
+            $primaryFieldForm->addError(
+                new FormError($this->unknownPrimaryValueValidationMessage)
+            );
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processFinishSubmit(CustomizeFormDataContext $context)
+    {
+        $form = $context->getForm();
+        $primaryItemKey = $context->get(self::PRIMARY_ITEM_KEY);
+        if (null !== $primaryItemKey && $form->has($this->associationName)) {
+            $associationForm = $form->get($this->associationName);
+            if ($associationForm->has($primaryItemKey)) {
+                ReflectionUtil::clearFormErrors($associationForm->get($primaryItemKey), true);
+            }
+        }
+    }
+
+    /**
+     * @param mixed                       $collection
+     * @param string                      $primaryValue
+     * @param EntityDefinitionFieldConfig $association
+     *
+     * @return array [collection submit data, the primary item key]
+     */
+    protected function getAssociationSubmitData(
+        $collection,
+        $primaryValue,
+        EntityDefinitionFieldConfig $association
+    ) {
         $this->assertAssociationData($collection);
+
+        $isCollapsed = $association->isCollapsed();
+        $dataPropertyPath = $this->getAssociationFieldPropertyPath(
+            $association,
+            $this->associationDataFieldName
+        );
+
+        $result = [];
+        $hasPrimaryItem = false;
+        foreach ($collection as $item) {
+            $value = $this->propertyAccessor->getValue($item, $dataPropertyPath);
+            if (trim($value) === trim($primaryValue)) {
+                $hasPrimaryItem = true;
+            }
+            $result[] = $this->getAssociationSubmittedDataItem($value, $isCollapsed);
+        }
+        $primaryItemKey = null;
+        if (!$hasPrimaryItem) {
+            $primaryItemKey = (string)count($result);
+            $result[] = $this->getAssociationSubmittedDataItem($primaryValue, $isCollapsed);
+        }
+
+        return [$result, $primaryItemKey];
+    }
+
+    /**
+     * @param mixed $value
+     * @param bool  $isCollapsed
+     *
+     * @return mixed
+     */
+    protected function getAssociationSubmittedDataItem($value, $isCollapsed)
+    {
+        return $isCollapsed
+            ? $value
+            : [$this->associationDataFieldName => $value];
+    }
+
+    /**
+     * @param mixed  $collection
+     * @param string $dataPropertyPath
+     * @param string $primaryFlagPropertyPath
+     * @param mixed  $primaryValue
+     *
+     * @return bool
+     */
+    protected function updateAssociationData(
+        $collection,
+        $dataPropertyPath,
+        $primaryFlagPropertyPath,
+        $primaryValue
+    ) {
+        $this->assertAssociationData($collection);
+
+        $isKnownPrimaryValue = false;
         foreach ($collection as $item) {
             $value = $this->propertyAccessor->getValue($item, $dataPropertyPath);
             $primaryFlag = $this->propertyAccessor->getValue($item, $primaryFlagPropertyPath);
@@ -96,11 +226,7 @@ class MapPrimaryField implements ProcessorInterface
             }
         }
 
-        if ($primaryValue && !$isKnownPrimaryValue) {
-            $primaryFieldForm->addError(
-                new FormError($this->unknownPrimaryValueValidationMessage)
-            );
-        }
+        return $isKnownPrimaryValue;
     }
 
     /**
@@ -127,16 +253,16 @@ class MapPrimaryField implements ProcessorInterface
     }
 
     /**
-     * @param mixed $data
+     * @param mixed $collection
      */
-    protected function assertAssociationData($data)
+    protected function assertAssociationData($collection)
     {
-        if (!$data instanceof \Traversable && !is_array($data)) {
+        if (!$collection instanceof \Traversable && !is_array($collection)) {
             throw new \RuntimeException(
                 sprintf(
                     'The "%s" field should be \Traversable or array, got "%s".',
                     $this->associationName,
-                    is_object($data) ? get_class($data) : gettype($data)
+                    is_object($collection) ? get_class($collection) : gettype($collection)
                 )
             );
         }
