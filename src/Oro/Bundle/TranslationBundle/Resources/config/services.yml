@@ -107,7 +107,6 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader'
         arguments:
             - '@doctrine'
-            - '@oro_translation.manager.translation'
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 
@@ -239,4 +238,8 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
         arguments:
             - '@doctrine'
+            - '@oro_translation.provider.language'
             - '@oro_translation.database_translation.metadata.cache'
+            - '@translator.default'
+            - '@oro_translation.js_dumper'
+            - '%kernel.cache_dir%/translations'

@@ -10,27 +10,22 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
 class OrmTranslationLoader implements LoaderInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var TranslationManager */
-    protected $translationManager;
-
     /** @var bool|null */
     protected $dbCheck;
 
     /**
      * @param ManagerRegistry $doctrine
-     * @param TranslationManager $translationManager
      */
-    public function __construct(ManagerRegistry $doctrine, TranslationManager $translationManager)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
-        $this->translationManager = $translationManager;
     }
 
     /**
@@ -43,9 +38,9 @@ class OrmTranslationLoader implements LoaderInterface
 
         if ($this->checkDatabase()) {
             $messages = [];
-            $translations = $this->translationManager->findValues($locale, $domain);
+            $translations = $this->getTranslationRepository()->findAllByLanguageAndDomain($locale, $domain);
             foreach ($translations as $translation) {
-                $messages[$translation->getTranslationKey()->getKey()] = $translation->getValue();
+                $messages[$translation['key']] = $translation['value'];
             }
 
             $catalogue->add($messages, $domain);
@@ -77,5 +72,13 @@ class OrmTranslationLoader implements LoaderInterface
     protected function getEntityManager()
     {
         return $this->doctrine->getManagerForClass(Translation::class);
+    }
+
+    /**
+     * @return TranslationRepository
+     */
+    protected function getTranslationRepository()
+    {
+        return $this->getEntityManager()->getRepository(Translation::class);
     }
 }

@@ -6,12 +6,11 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Component\Translation\MessageCatalogue;
 
-use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
 
@@ -23,6 +22,9 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
+    /** @var TranslationRepository|\PHPUnit_Framework_MockObject_MockObject */
+    protected $repository;
+
     /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationManager;
 
@@ -32,6 +34,10 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->connection = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->repository = $this->getMockBuilder(TranslationRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -51,6 +57,11 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->with(Translation::class)
             ->willReturn($this->em);
+
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with(Translation::class)
+            ->willReturn($this->repository);
 
         $this->translationManager = $this
             ->getMockBuilder(TranslationManager::class)
@@ -115,39 +126,22 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $locale = 'fr';
         $domain = 'test';
-        $language = (new Language())->setCode($locale);
         $metadataCache = $this
             ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
             ->disableOriginalConstructor()
             ->getMock();
         $resource = new OrmTranslationResource($locale, $metadataCache);
 
-        $translationKey1 = (new TranslationKey())->setDomain($domain)->setKey('label1');
-        $value1 = new Translation();
-        $value1->setTranslationKey($translationKey1);
-        $value1->setScope(Translation::SCOPE_SYSTEM);
-        $value1->setLanguage($language);
-        $value1->setValue('value1 (SYSTEM_SCOPE)');
-
-        $value2 = new Translation();
-        $value2->setTranslationKey($translationKey1);
-        $value2->setScope(Translation::SCOPE_UI);
-        $value2->setLanguage($language);
-        $value2->setValue('value1 (UI_SCOPE)');
-
-        $translationKey2 = (new TranslationKey())->setDomain($domain)->setKey('label3');
-        $value3 = new Translation();
-        $value3->setTranslationKey($translationKey2);
-        $value3->setScope(Translation::SCOPE_UI);
-        $value3->setLanguage($language);
-        $value3->setValue('value3');
-
-        $values = [$value1, $value2, $value3];
+        $values = [
+            ['key' => 'label1', 'value' => 'value1 (SYSTEM_SCOPE)'],
+            ['key' => 'label1', 'value' => 'value1 (UI_SCOPE)'],
+            ['key' => 'label3', 'value' => 'value3'],
+        ];
 
         $translationTable = 'translation_table';
 
-        $this->translationManager->expects($this->once())
-            ->method('findValues')
+        $this->repository->expects($this->once())
+            ->method('findAllByLanguageAndDomain')
             ->with($locale, $domain)
             ->willReturn($values);
 

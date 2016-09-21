@@ -12,8 +12,14 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class TranslationManager
 {
     const DEFAULT_DOMAIN = 'messages';
@@ -21,8 +27,23 @@ class TranslationManager
     /** @var Registry */
     protected $registry;
 
+    /** @var LanguageProvider */
+    protected $languageProvider;
+
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
+
+    /** @var Translator */
+    protected $translator;
+
+    /** @var JsTranslationDumper */
+    protected $jsTranslationDumper;
+
+    /** @var string */
+    protected $translationCacheDir;
+
+    /** @var array */
+    protected $availableDomains;
 
     /** @var Language[] */
     protected $languages = [];
@@ -35,12 +56,26 @@ class TranslationManager
 
     /**
      * @param Registry $registry
+     * @param LanguageProvider $languageProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
+     * @param Translator $translator
+     * @param JsTranslationDumper $jsTranslationDumper
+     * @param string $translationCacheDir
      */
-    public function __construct(Registry $registry, DynamicTranslationMetadataCache $dbTranslationMetadataCache)
-    {
+    public function __construct(
+        Registry $registry,
+        LanguageProvider $languageProvider,
+        DynamicTranslationMetadataCache $dbTranslationMetadataCache,
+        Translator $translator,
+        JsTranslationDumper $jsTranslationDumper,
+        $translationCacheDir
+    ) {
         $this->registry = $registry;
+        $this->languageProvider = $languageProvider;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
+        $this->translator = $translator;
+        $this->jsTranslationDumper = $jsTranslationDumper;
+        $this->translationCacheDir = $translationCacheDir;
     }
 
     /**
@@ -56,22 +91,6 @@ class TranslationManager
         $repo = $this->getEntityRepository(Translation::class);
 
         return $repo->findValue($key, $locale, $domain);
-    }
-
-    /**
-     * Finds all translations for given locale and domain
-     *
-     * @param string $locale
-     * @param string $domain
-     *
-     * @return Translation[]
-     */
-    public function findValues($locale, $domain = self::DEFAULT_DOMAIN)
-    {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-
-        return $repo->findAllByLanguageAndDomain($this->getLanguageByCode($locale), $domain);
     }
 
     /**
@@ -188,10 +207,20 @@ class TranslationManager
      */
     public function findAvailableDomainsForLocales(array $locales)
     {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
+        if (null === $this->availableDomains) {
+            /** @var TranslationRepository $repo */
+            $repo = $this->getEntityRepository(Translation::class);
 
-        return $repo->findAvailableDomainsForLocales($locales);
+            foreach ($repo->findAvailableDomains($locales) as $data) {
+                $this->availableDomains[$data['code']][] = $data;
+            }
+        }
+
+        $domains = array_intersect_key((array)$this->availableDomains, array_combine($locales, $locales));
+
+        return (array)array_reduce($domains, function ($carry, $item) {
+            return array_merge((array)$carry, $item);
+        });
     }
 
     /**
@@ -251,6 +280,39 @@ class TranslationManager
         }
 
         return $this->translationKeys[$cacheKey];
+    }
+
+    /**
+     * Fully rebuilds translation cache including JS translation
+     */
+    public function rebuildCache()
+    {
+        $this->cleanup($this->translationCacheDir);
+        $this->translator->warmUp($this->translationCacheDir);
+        $locales = $this->languageProvider->getEnabledLanguages();
+        $this->jsTranslationDumper->dumpTranslations($locales);
+    }
+
+    /**
+     * Cleanup directory
+     *
+     * @param string $targetDir
+     */
+    protected function cleanup($targetDir)
+    {
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $path) {
+            $path->isFile() ? unlink($path->getPathname()) : rmdir($path->getPathname());
+        }
     }
 
     /**

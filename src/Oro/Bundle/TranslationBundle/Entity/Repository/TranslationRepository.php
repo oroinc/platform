@@ -30,21 +30,15 @@ class TranslationRepository extends EntityRepository
     }
 
     /**
-     * Returns the list of all existing in the database translation domains for the given locales.
-     *
-     * @param Language[] $languages
-     *
      * @return array [['code' = '...', 'domain' => '...'], ...]
      */
-    public function findAvailableDomainsForLocales(array $languages)
+    public function findAvailableDomains()
     {
         $qb = $this->createQueryBuilder('t')
             ->distinct(true)
             ->select('l.code', 'k.domain')
             ->join('t.language', 'l')
             ->join('t.translationKey', 'k');
-
-        $qb->where($qb->expr()->in('l.code', $languages));
 
         return $qb->getQuery()->getArrayResult();
     }
@@ -78,23 +72,23 @@ class TranslationRepository extends EntityRepository
     }
 
     /**
-     * @param Language $language
+     * @param string $languageCode
      * @param string $domain
      *
-     * @return Translation[]
+     * @return array [['id' => '...', 'value' => '...', 'key' => '...', 'domain' => '...', 'code' => '...'], ...]
      */
-    public function findAllByLanguageAndDomain(Language $language, $domain)
+    public function findAllByLanguageAndDomain($languageCode, $domain)
     {
         $qb = $this->createQueryBuilder('t')
             ->distinct(true)
-            ->select('t')
+            ->select('t.id, t.value, k.key, k.domain, l.code')
             ->join('t.language', 'l')
             ->join('t.translationKey', 'k')
-            ->where('t.language = :language')
+            ->where('l.code = :code')
             ->andWhere('k.domain = :domain')
-            ->setParameter('language', $language)
+            ->setParameter('code', $languageCode)
             ->setParameter('domain', $domain, Type::STRING);
 
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery()->getArrayResult();
     }
 }
