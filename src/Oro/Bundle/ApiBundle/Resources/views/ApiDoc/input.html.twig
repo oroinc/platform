@@ -1,0 +1,32 @@
+<h4>Input</h4>
+<table class='fullwidth'>
+    <thead>
+    <tr>
+        <th>Parameter</th>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+        <tbody>
+        {% for name, infos in data %}
+            {% if not infos.readonly %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>
+                        {% if infos.dataType is defined %}
+                            {% if infos.isCollection is defined and infos.isCollection %}
+                                Array of:
+                            {% endif %}
+                            {% if infos.isRelation is defined and infos.isRelation %}
+                                <a href="#get--api-{{ infos.dataType }}" onclick="return gotoResource('get--api-{{ infos.dataType }}');">{{ infos.dataType }}</a>
+                            {% else %}
+                               {{ infos.dataType }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>{{ infos.description is defined ? infos.description|extra_markdown : ''  }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+</table>

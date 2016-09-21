@@ -27,8 +27,11 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** a short, human-readable description of API resource */
     const DESCRIPTION = 'description';
 
-    /** a detailed documentation of API resource */
+    /** a detailed documentation of API resource or link to a .md file that will be used to retrieve a documentation */
     const DOCUMENTATION = 'documentation';
+
+    /** resource link to a .md file that will be used to retrieve a documentation */
+    const DOCUMENTATION_RESOURCE = 'documentation_resource';
 
     /** the name of ACL resource */
     const ACL_RESOURCE = 'acl_resource';
