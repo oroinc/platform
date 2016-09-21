@@ -40,48 +40,38 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
     {
         $data = JSON::decode($message->getBody());
 
-        if (empty($data['from']) || (false == is_array($data['from']))) {
+        if (!isset($data['fromEmail']) || !isset($data['toEmail'])) {
             $this->logger->critical(
-                sprintf('[EmailSendingMessageProcessor] Empty email sender field: "%s"', $message->getBody())
+                sprintf(
+                    '[EmailSendingMessageProcessor] Got invalid message: "%s"',
+                    $message->getBody()
+                )
             );
 
             return self::REJECT;
         }
 
-        if (empty($data['to'])) {
-            $this->logger->critical(
-                sprintf('[EmailSendingMessageProcessor] Empty email receiver field: "%s"', $message->getBody())
-            );
-
-            return self::REJECT;
-        }
-
-        if (empty($data['body']) || false == is_array($data['body'])) {
-            $this->logger->critical(
-                sprintf('[EmailSendingMessageProcessor] Empty email body field: "%s"', $message->getBody())
-            );
-
-            return self::REJECT;
-        }
+        $data = array_merge([
+            'fromName' => null,
+            'subject' => null,
+            'body' => null,
+            'contentType' => null
+        ], $data);
 
         $emailMessage = new \Swift_Message(
             $data['subject'],
-            $data['body']['body'],
-            $data['body']['contentType']
+            $data['body'],
+            $data['contentType']
         );
 
-        $emailMessage->setFrom($data['from']['email'], $data['from']['name']);
-        $emailMessage->setTo($data['to']);
+        $emailMessage->setFrom($data['fromEmail'], $data['fromName']);
+        $emailMessage->setTo($data['toEmail']);
 
-        $failedRecepiens = [];
 
-        $this->mailer->send($emailMessage, $failedRecepiens);
-
-        if (count($failedRecepiens) > 0) {
+        if (false == $this->mailer->send($emailMessage)) {
             $this->logger->critical(sprintf(
-                '[EmailSendingMessageProcessor] cannot sent message: "%s", receivers: %s',
-                $message->getBody(),
-                implode(',', $failedRecepiens)
+                '[EmailSendingMessageProcessor] Cannot sent message: "%s"',
+                $message->getBody()
             ));
 
             return self::REJECT;

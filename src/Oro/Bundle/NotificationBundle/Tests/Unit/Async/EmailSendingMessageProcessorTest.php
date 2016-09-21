@@ -4,6 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\NotificationBundle\Async\EmailSendingMessageProcessor;
+use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -16,13 +17,22 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
         new EmailSendingMessageProcessor($this->createMailerMock(), $this->createLoggerMock());
     }
 
+    public function testShouldBeSubscribedForTopics()
+    {
+        $expectedSubscribedTopics = [
+            Topics::SEND_NOTIFICATION_EMAIL,
+        ];
+
+        $this->assertEquals($expectedSubscribedTopics, EmailSendingMessageProcessor::getSubscribedTopics());
+    }
+
     public function testShouldRejectIfSenderNotSet()
     {
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[EmailSendingMessageProcessor] Empty email sender field: "{"key":"value"}"')
+            ->with('[EmailSendingMessageProcessor] Got invalid message: "{"toEmail":"to@email.com"}"')
         ;
 
         $processor = new EmailSendingMessageProcessor(
@@ -31,29 +41,9 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage;
-        $message->setBody(json_encode(['key' => 'value']));
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectIfSenderNotArray()
-    {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('[EmailSendingMessageProcessor] Empty email sender field: "{"from":"not array"}"')
-        ;
-
-        $processor = new EmailSendingMessageProcessor(
-            $this->createMailerMock(),
-            $logger
-        );
-
-        $message = new NullMessage;
-        $message->setBody(json_encode(['from' => 'not array']));
+        $message->setBody(json_encode([
+            'toEmail' => 'to@email.com'
+        ]));
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -66,7 +56,7 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[EmailSendingMessageProcessor] Empty email receiver field: "{"from":["sender"]}"')
+            ->with('[EmailSendingMessageProcessor] Got invalid message: "{"fromEmail":"from@email.com"}"')
         ;
 
         $processor = new EmailSendingMessageProcessor(
@@ -75,82 +65,77 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage;
-        $message->setBody(json_encode(['from' => ['sender']]));
+        $message->setBody(json_encode([
+            'fromEmail' => 'from@email.com'
+        ]));
 
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectIfBodyNotSet()
+    public function testShouldRejectIfSendingFailed()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('[EmailSendingMessageProcessor] Empty email body field: "{"from":["sender"],"to":"receiver"}"')
-        ;
-
-        $processor = new EmailSendingMessageProcessor(
-            $this->createMailerMock(),
-            $logger
-        );
-
-        $message = new NullMessage;
-        $message->setBody(json_encode(['from' => ['sender'], 'to' => 'receiver']));
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectIfBodyNotArray()
-    {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with(
-                '[EmailSendingMessageProcessor] '.
-                'Empty email body field: "{"from":["sender"],"to":"receiver","body":"some body"}"')
-        ;
-
-        $processor = new EmailSendingMessageProcessor(
-            $this->createMailerMock(),
-            $logger
-        );
-
-        $message = new NullMessage;
-        $message->setBody(json_encode(['from' => ['sender'], 'to' => 'receiver', 'body' => 'some body']));
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectIfFailedRecepient()
-    {
-        $failedRecepient = 'failed@email.com';
-
         $mailer = $this->createMailerMock();
         $mailer
             ->expects($this->once())
             ->method('send')
-            ->willReturnCallback(function ($message, &$recepients) use ($failedRecepient) {
-                $recepients[] = $failedRecepient;
-            })
+            ->willReturn(0)
         ;
 
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[EmailSendingMessageProcessor] Empty email receiver field: "{"key":"value"}"')
+            ->with('[EmailSendingMessageProcessor] '.
+                'Cannot sent message: "{"toEmail":"to@email.com","fromEmail":"from@email.com"}"')
         ;
 
+        $processor = new EmailSendingMessageProcessor(
+            $mailer,
+            $logger
+        );
 
         $message = new NullMessage;
-        $message->setBody(json_encode(['key' => 'value']));
+        $message->setBody(json_encode([
+            'toEmail' => 'to@email.com',
+            'fromEmail' => 'from@email.com'
+        ]));
+
+        $result = $processor->process($message, $this->createSessionMock());
+
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+    }
+
+    public function testShouldSendEmailAndReturmACKIfAllParametersCorrect()
+    {
+        $mailer = $this->createMailerMock();
+        $mailer
+            ->expects($this->once())
+            ->method('send')
+            ->willReturn(1)
+        ;
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->never())
+            ->method('critical')
+        ;
+
+        $processor = new EmailSendingMessageProcessor(
+            $mailer,
+            $logger
+        );
+
+        $message = new NullMessage;
+        $message->setBody(json_encode([
+            'toEmail' => 'to@email.com',
+            'fromEmail' => 'from@email.com'
+        ]));
+
+        $result = $processor->process($message, $this->createSessionMock());
+
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
 

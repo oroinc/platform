@@ -95,16 +95,12 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
             ->with(EmailNotificationManager::TOPIC, [
-                'from' => [
-                    'email' => $testSenderEmail,
-                    'name' => $testSenderName,
-                ],
-                'to' => $testReceiverEmail,
+                'fromEmail' => $testSenderEmail,
+                'fromName' => $testSenderName,
+                'toEmail' => $testReceiverEmail,
                 'subject' => $testSubject,
-                'body' => [
-                    'body' => $testBody,
-                    'contentType' => 'text/html'
-                ]
+                'body' => $testBody,
+                'contentType' => 'text/html'
             ])
         ;
 
@@ -173,16 +169,12 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
             ->with(EmailNotificationManager::TOPIC, [
-                'from' => [
-                    'email' => $testSenderEmail,
-                    'name' => $testSenderName,
-                ],
-                'to' => $testReceiverEmail,
+                'fromEmail' => $testSenderEmail,
+                'fromName' => $testSenderName,
+                'toEmail' => $testReceiverEmail,
                 'subject' => $testSubject,
-                'body' => [
-                    'body' => $testBody,
-                    'contentType' => 'text/html'
-                ]
+                'body' => $testBody,
+                'contentType' => 'text/html'
             ])
         ;
 
@@ -254,16 +246,12 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
             ->with(EmailNotificationManager::TOPIC, [
-                'from' => [
-                    'email' => $testSenderEmail,
-                    'name' => $testSenderName,
-                ],
-                'to' => $testReceiverEmail,
+                'fromEmail' => $testSenderEmail,
+                'fromName' => $testSenderName,
+                'toEmail' => $testReceiverEmail,
                 'subject' => $testSubject,
-                'body' => [
-                    'body' => $testBody,
-                    'contentType' => 'text/html'
-                ]
+                'body' => $testBody,
+                'contentType' => 'text/html'
             ])
         ;
 

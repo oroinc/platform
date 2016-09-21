@@ -77,16 +77,12 @@ class EmailNotificationManager extends AbstractNotificationManager
 
                 foreach ($notification->getRecipientEmails() as $email) {
                     $this->sendQueryMessage([
-                        'from' => [
-                            'email' => $senderEmail,
-                            'name' => $senderName,
-                        ],
-                        'to' => $email,
+                        'fromEmail' => $senderEmail,
+                        'fromName' => $senderName,
+                        'toEmail' => $email,
                         'subject' => $subjectRendered,
-                        'body' => [
-                            'body' => $templateRendered,
-                            'contentType' => $type
-                        ]
+                        'body' => $templateRendered,
+                        'contentType' => $type
                     ]);
                 }
             } catch (\Twig_Error $e) {
