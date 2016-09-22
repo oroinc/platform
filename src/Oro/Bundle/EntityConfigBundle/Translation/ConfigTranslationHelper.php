@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Translation;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class ConfigTranslationHelper
@@ -61,32 +60,19 @@ class ConfigTranslationHelper
         }
 
         $locale = $this->translator->getLocale();
-        $entities = [];
 
         foreach ($translations as $key => $value) {
-            $entities[] = $this->createTranslationEntity($key, $value, $locale);
+            $this->translationManager->saveValue(
+                $key,
+                $value,
+                $locale,
+                TranslationManager::DEFAULT_DOMAIN
+            );
         }
 
         // mark translation cache dirty
         $this->translationManager->invalidateCache($locale);
 
-        $this->translationManager->flush($entities);
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     * @param string $locale
-     * @return Translation
-     */
-    protected function createTranslationEntity($key, $value, $locale)
-    {
-        return $this->translationManager->saveValue(
-            $key,
-            $value,
-            $locale,
-            TranslationManager::DEFAULT_DOMAIN,
-            Translation::SCOPE_UI
-        );
+        $this->translationManager->flush();
     }
 }

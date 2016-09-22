@@ -150,7 +150,7 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->translationManager->expects($this->once())
             ->method('saveValue')
-            ->with($key, $value, self::LOCALE, TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI)
+            ->with($key, $value, self::LOCALE, TranslationManager::DEFAULT_DOMAIN)
             ->willReturn($trans);
 
         $this->translationManager->expects($this->once())
@@ -158,8 +158,7 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->with(self::LOCALE);
 
         $this->translationManager->expects($this->once())
-            ->method('flush')
-            ->with([$trans]);
+            ->method('flush');
     }
 
     protected function assertTranslationServicesCalled()
