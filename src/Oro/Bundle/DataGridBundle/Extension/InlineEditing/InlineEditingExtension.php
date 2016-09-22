@@ -76,10 +76,10 @@ class InlineEditingExtension extends AbstractExtension
             [Configuration::BASE_CONFIG_KEY => $configItems]
         );
 
-        $aclResource = 'EDIT;entity:' . $configItems['entity_name'];
-        if (!empty($configItems['acl_resource'])) {
-            $aclResource = $configItems['acl_resource'];
-        }
+        $aclResource = !empty($configItems[Configuration::CONFIG_ACL_KEY]) ?
+            $configItems[Configuration::CONFIG_ACL_KEY] :
+            'EDIT;entity:' . $configItems[Configuration::CONFIG_ENTITY_KEY];
+
         $isGranted = $this->securityFacade->isGranted($aclResource);
 
         //according to ACL disable inline editing for the whole grid
