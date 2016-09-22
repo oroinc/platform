@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Provider;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
 abstract class AbstractSearchMappingProvider
 {
     /**
@@ -102,12 +104,16 @@ abstract class AbstractSearchMappingProvider
 
     /**
      * Get list of available entity classes
-     *
+     * @throws InvalidConfigurationException
      * @return array
      */
     public function getEntityClasses()
     {
         $mappingConfig = $this->getMappingConfig();
+
+        if (empty($mappingConfig)) {
+            throw new InvalidConfigurationException('Mapping config is empty.');
+        }
 
         return array_keys($mappingConfig);
     }
