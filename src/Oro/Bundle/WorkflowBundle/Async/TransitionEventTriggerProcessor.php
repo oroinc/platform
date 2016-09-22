@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityNotFoundException;
 
 use Psr\Log\LoggerInterface;
 
@@ -74,7 +75,7 @@ class TransitionEventTriggerProcessor implements MessageProcessorInterface
      * @param string $className
      * @param int $id
      * @return object
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException|EntityNotFoundException
      */
     protected function resolveEntity($className, $id)
     {
@@ -85,7 +86,7 @@ class TransitionEventTriggerProcessor implements MessageProcessorInterface
         $entity = $this->registry->getManagerForClass($className)->find($className, $id);
 
         if (!$entity) {
-            throw new \InvalidArgumentException(sprintf('Entity %s with identifier %s not found', $className, $id));
+            throw new EntityNotFoundException(sprintf('Entity %s with identifier %s not found', $className, $id));
         }
 
         return $entity;

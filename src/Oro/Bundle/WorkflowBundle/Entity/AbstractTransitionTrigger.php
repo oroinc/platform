@@ -143,7 +143,7 @@ abstract class AbstractTransitionTrigger
      */
     public function getWorkflowName()
     {
-        return $this->getWorkflowDefinition()->getName();
+        return $this->getWorkflowDefinition() ? $this->getWorkflowDefinition()->getName() : null;
     }
 
     /**

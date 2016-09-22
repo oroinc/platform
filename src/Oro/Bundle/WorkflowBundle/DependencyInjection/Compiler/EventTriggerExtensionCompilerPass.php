@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AddConditionAndActionCompilerPass implements CompilerPassInterface
+class EventTriggerExtensionCompilerPass implements CompilerPassInterface
 {
     const LISTENER_SERVICE = 'oro_workflow.listener.process_collector';
     const EXTENSION_TAG = 'oro_workflow.listener.process_collector.extension';

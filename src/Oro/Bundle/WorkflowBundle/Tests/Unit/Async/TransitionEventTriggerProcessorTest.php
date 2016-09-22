@@ -147,7 +147,7 @@ class TransitionEventTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         return [
             'empty data' => [
                 'data' => [],
-                'expectedMessage' => 'Json should not be empty'
+                'expectedMessage' => 'Given json should not be empty'
             ],
             'without trigger id and workflowItem id' => [
                 'data' => ['test' => 1],

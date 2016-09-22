@@ -30,6 +30,18 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit_Framework_Test
         ]);
     }
 
+    public function testGetWorkflowName()
+    {
+        $this->assertNull($this->entity->getWorkflowName());
+
+        $definition = new WorkflowDefinition();
+        $definition->setName('test name');
+
+        $this->entity->setWorkflowDefinition($definition);
+
+        $this->assertEquals($definition->getName(), $this->entity->getWorkflowName());
+    }
+
     /**
      * @param AbstractTransitionTrigger $trigger
      * @return AbstractTransitionTrigger

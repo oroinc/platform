@@ -205,6 +205,22 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
         return $cases;
     }
 
+    public function testGetEntityClass()
+    {
+        $trigger = new TransitionEventTrigger();
+
+        $this->assertNull($trigger->getEntityClass());
+
+        $definition = new WorkflowDefinition();
+        $definition->setRelatedEntity('test class name');
+
+        $trigger->setWorkflowDefinition($definition);
+        $this->assertEquals($definition->getRelatedEntity(), $trigger->getEntityClass());
+
+        $trigger->setEntityClass('stdClass');
+        $this->assertEquals('stdClass', $trigger->getEntityClass());
+    }
+
     /**
      * @param array $attributes
      * @return TransitionEventTrigger

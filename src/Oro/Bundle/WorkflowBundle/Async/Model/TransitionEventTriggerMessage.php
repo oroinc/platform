@@ -47,7 +47,7 @@ class TransitionEventTriggerMessage implements \JsonSerializable
     {
         $data = JSON::decode($json);
         if (!is_array($data) || !$data) {
-            throw new \InvalidArgumentException('Json should not be empty');
+            throw new \InvalidArgumentException('Given json should not be empty');
         }
 
         return new static(

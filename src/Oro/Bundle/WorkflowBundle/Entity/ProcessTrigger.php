@@ -296,7 +296,7 @@ class ProcessTrigger implements EventTriggerInterface
      */
     public function getEntityClass()
     {
-        return $this->getDefinition()->getRelatedEntity();
+        return $this->getDefinition() ? $this->getDefinition()->getRelatedEntity() : null;
     }
 
     /**
