@@ -91,13 +91,16 @@ class FieldConfigTest extends \PHPUnit_Framework_TestCase
     {
         $fieldConfig = new FieldConfig();
         $this->assertNull($fieldConfig->getPropertyPath());
+        $this->assertEquals('default', $fieldConfig->getPropertyPath('default'));
 
         $fieldConfig->setPropertyPath('test');
         $this->assertEquals('test', $fieldConfig->getPropertyPath());
+        $this->assertEquals('test', $fieldConfig->getPropertyPath('default'));
         $this->assertEquals(['property_path' => 'test'], $fieldConfig->toArray());
 
         $fieldConfig->setPropertyPath();
         $this->assertNull($fieldConfig->getPropertyPath());
+        $this->assertEquals('default', $fieldConfig->getPropertyPath('default'));
         $this->assertEquals([], $fieldConfig->toArray());
     }
 

@@ -28,11 +28,13 @@ class MetadataProvider
     /**
      * Gets metadata for the given version of an entity.
      *
-     * @param string                   $className   The FQCN of an entity
-     * @param string                   $version     The version of a config
-     * @param RequestType              $requestType The request type, for example "rest", "soap", etc.
-     * @param EntityDefinitionConfig   $config      The configuration of an entity
-     * @param MetadataExtraInterface[] $extras      Requests for additional metadata information
+     * @param string                   $className              The FQCN of an entity
+     * @param string                   $version                The version of a config
+     * @param RequestType              $requestType            The request type, for example "rest", "soap", etc.
+     * @param EntityDefinitionConfig   $config                 The configuration of an entity
+     * @param MetadataExtraInterface[] $extras                 Requests for additional metadata information
+     * @param bool                     $withExcludedProperties Whether excluded fields and associations
+     *                                                         should not be removed
      *
      * @return EntityMetadata|null
      */
@@ -41,7 +43,8 @@ class MetadataProvider
         $version,
         RequestType $requestType,
         EntityDefinitionConfig $config,
-        array $extras = []
+        array $extras = [],
+        $withExcludedProperties = false
     ) {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
@@ -49,15 +52,36 @@ class MetadataProvider
 
         $configKey = $config->getKey();
         if (!$configKey) {
-            return $this->loadMetadata($className, $version, $requestType, $config, $extras);
+            return $this->loadMetadata(
+                $className,
+                $version,
+                $requestType,
+                $config,
+                $extras,
+                $withExcludedProperties
+            );
         }
         
-        $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras, $configKey);
+        $cacheKey = $this->buildCacheKey(
+            $className,
+            $version,
+            $requestType,
+            $extras,
+            $withExcludedProperties,
+            $configKey
+        );
         if (array_key_exists($cacheKey, $this->cache)) {
             return clone $this->cache[$cacheKey];
         }
 
-        $metadata = $this->loadMetadata($className, $version, $requestType, $config, $extras);
+        $metadata = $this->loadMetadata(
+            $className,
+            $version,
+            $requestType,
+            $config,
+            $extras,
+            $withExcludedProperties
+        );
         $this->cache[$cacheKey] = $metadata;
 
         if (null === $metadata) {
@@ -73,6 +97,7 @@ class MetadataProvider
      * @param RequestType              $requestType
      * @param EntityDefinitionConfig   $config
      * @param MetadataExtraInterface[] $extras
+     * @param bool                     $withExcludedProperties
      *
      * @return EntityMetadata|null
      */
@@ -81,7 +106,8 @@ class MetadataProvider
         $version,
         RequestType $requestType,
         EntityDefinitionConfig $config,
-        array $extras
+        array $extras,
+        $withExcludedProperties
     ) {
         /** @var MetadataContext $context */
         $context = $this->processor->createContext();
@@ -92,6 +118,7 @@ class MetadataProvider
         if (!empty($extras)) {
             $context->setExtras($extras);
         }
+        $context->setWithExcludedProperties($withExcludedProperties);
 
         $this->processor->process($context);
 
@@ -108,13 +135,23 @@ class MetadataProvider
      * @param string                   $version
      * @param RequestType              $requestType
      * @param MetadataExtraInterface[] $extras
+     * @param bool                     $withExcludedProperties
      * @param string                   $configKey
      *
      * @return string
      */
-    protected function buildCacheKey($className, $version, RequestType $requestType, array $extras, $configKey)
-    {
-        $cacheKey = (string)$requestType . '|' . $version . '|' . $className;
+    protected function buildCacheKey(
+        $className,
+        $version,
+        RequestType $requestType,
+        array $extras,
+        $withExcludedProperties,
+        $configKey
+    ) {
+        $cacheKey = (string)$requestType
+            . '|' . $version
+            . '|' . $className
+            . '|' . ($withExcludedProperties ? '1' : '0');
         foreach ($extras as $extra) {
             $part = $extra->getCacheKeyPart();
             if (!empty($part)) {

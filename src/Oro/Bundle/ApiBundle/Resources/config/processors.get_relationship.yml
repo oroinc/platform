@@ -48,10 +48,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -10 }
 
-    oro_api.get_relationship.register_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterFilters
+    oro_api.get_relationship.register_configured_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters
         arguments:
             - '@oro_api.filter_factory'
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -50 }
 
@@ -61,6 +62,15 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -55 }
+
+    oro_api.get_relationship.register_dynamic_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
+        arguments:
+            - '@oro_api.filter_factory'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -60 }
 
     oro_api.get_relationship.rest.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetDefaultSorting
@@ -157,9 +167,6 @@ services:
 
     oro_api.get_relationship.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
-        arguments:
-            - '@oro_api.config_provider'
-            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: 50 }
 

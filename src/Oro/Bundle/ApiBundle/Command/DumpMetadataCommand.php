@@ -98,11 +98,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
         );
 
         return [
-            'oro_api' => [
-                'metadata' => [
-                    $entityClass => null !== $metadata ? $metadata->toArray() : null
-                ]
-            ]
+            $entityClass => null !== $metadata ? $metadata->toArray() : null
         ];
     }
 }
