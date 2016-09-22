@@ -285,6 +285,119 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testProcessForNotManageableEntityWhenToMayAssociationShouldBeRepresentedAsField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => [
+                    'data_type'        => 'array',
+                    'target_class'     => 'Test\Target',
+                    'target_type'      => 'to-many',
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'field11' => null
+                    ]
+                ]
+            ]
+        ];
+        $limit  = 100;
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $configObject = $this->createConfigObject($config);
+        $this->context->setMaxRelatedEntities($limit);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'        => 'array',
+                        'target_class'     => 'Test\Target',
+                        'target_type'      => 'to-many',
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'field11' => null
+                        ]
+                    ]
+                ]
+            ],
+            $configObject
+        );
+    }
+
+    public function testProcessForManageableEntityWhenToMayAssociationShouldBeRepresentedAsField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => [
+                    'data_type'        => 'array',
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'field11' => null
+                    ]
+                ]
+            ]
+        ];
+        $limit  = 100;
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('hasAssociation')
+            ->willReturnMap([['field1', true]]);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->with('field1')
+            ->willReturn('Test\Field1Target');
+        $rootEntityMetadata->expects($this->once())
+            ->method('isCollectionValuedAssociation')
+            ->with('field1')
+            ->willReturn(true);
+
+        $field1TargetEntityMetadata = $this->getClassMetadataMock('Test\Field1Target');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Field1Target', true, $field1TargetEntityMetadata],
+                ]
+            );
+
+        $configObject = $this->createConfigObject($config);
+        $this->context->setMaxRelatedEntities($limit);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'        => 'array',
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'field11' => null
+                        ]
+                    ]
+                ]
+            ],
+            $configObject
+        );
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */

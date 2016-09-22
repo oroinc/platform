@@ -195,20 +195,24 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param Response $response
-     * @param integer  $statusCode
-     * @param string   $entityName
-     * @param string   $requestType
+     * @param Response  $response
+     * @param int|int[] $statusCode
+     * @param string    $entityName
+     * @param string    $requestType
      */
-    protected function assertApiResponseStatusCodeEquals(Response $response, $statusCode, $entityName, $requestType)
-    {
+    protected static function assertApiResponseStatusCodeEquals(
+        Response $response,
+        $statusCode,
+        $entityName,
+        $requestType
+    ) {
         try {
-            $this->assertResponseStatusCodeEquals($response, $statusCode);
+            static::assertResponseStatusCodeEquals($response, $statusCode);
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $e = new \PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s',
-                    $statusCode,
+                    is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
                     $requestType,
                     $entityName,
                     $e->getMessage()
@@ -221,12 +225,12 @@ abstract class ApiTestCase extends WebTestCase
 
     /**
      * @param Response   $response
-     * @param integer    $statusCode
+     * @param int|int[]  $statusCode
      * @param string     $entityName
      * @param string     $requestType
      * @param array|null $content
      */
-    protected function assertUpdateApiResponseStatusCodeEquals(
+    protected static function assertUpdateApiResponseStatusCodeEquals(
         Response $response,
         $statusCode,
         $entityName,
@@ -234,12 +238,12 @@ abstract class ApiTestCase extends WebTestCase
         $content
     ) {
         try {
-            $this->assertResponseStatusCodeEquals($response, $statusCode);
+            static::assertResponseStatusCodeEquals($response, $statusCode);
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $e = new \PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s. Content: %s',
-                    $statusCode,
+                    is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
                     $requestType,
                     $entityName,
                     $e->getMessage(),
@@ -254,15 +258,27 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * Assert response status code equals
      *
-     * @param Response $response
-     * @param int      $statusCode
+     * @param Response  $response
+     * @param int|int[] $statusCode
      */
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
     {
         try {
-            \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode());
+            if (is_array($statusCode)) {
+                if (!in_array($response->getStatusCode(), $statusCode, true)) {
+                    throw new \PHPUnit_Framework_ExpectationFailedException(
+                        sprintf(
+                            'Failed asserting that %s is one of %s',
+                            $response->getStatusCode(),
+                            implode(', ', $statusCode)
+                        )
+                    );
+                }
+            } else {
+                \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode());
+            }
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            if ($statusCode < 400
+            if ((is_array($statusCode) ? min($statusCode) : $statusCode) <= 400
                 && $response->getStatusCode() >= 400
                 && (
                     $response->headers->contains('Content-Type', 'application/json')
@@ -270,7 +286,7 @@ abstract class ApiTestCase extends WebTestCase
                 )
             ) {
                 $e = new \PHPUnit_Framework_ExpectationFailedException(
-                    $e->getMessage() . ' Response content: ' . $response->getContent(),
+                    $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()
                 );
             }
