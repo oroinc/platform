@@ -12,7 +12,7 @@ use Oro\Component\MessageQueue\Client\Config as MessageQueConfig;
 class SearchMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var IndexerInterface $indexer
+     * @var IndexerInterface|PHPUnit_Framework_MockObject_MockObject $indexer
      */
     private $indexer;
 
@@ -22,7 +22,7 @@ class SearchMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private $processor;
 
     /**
-     * @var SessionInterface
+     * @var SessionInterface|PHPUnit_Framework_MockObject_MockObject
      */
     private $session;
 

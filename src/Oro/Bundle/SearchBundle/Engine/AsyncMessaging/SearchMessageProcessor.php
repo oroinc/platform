@@ -37,29 +37,25 @@ class SearchMessageProcessor implements MessageProcessorInterface
         $data = JSON::decode($message->getBody());
 
         switch ($message->getProperty(MessageQueConfig::PARAMETER_TOPIC_NAME)) {
-            case (AsyncIndexer::TOPIC_SAVE): {
+            case AsyncIndexer::TOPIC_SAVE:
                 $this->indexer->save($data['entity'], $data['context']);
 
                 break;
-            }
 
-            case (AsyncIndexer::TOPIC_DELETE): {
+            case AsyncIndexer::TOPIC_DELETE:
                 $this->indexer->delete($data['entity'], $data['context']);
 
                 break;
-            }
 
-            case (AsyncIndexer::TOPIC_REINDEX): {
+            case AsyncIndexer::TOPIC_REINDEX:
                 $this->indexer->reindex($data['class'], $data['context']);
 
                 break;
-            }
 
-            case (AsyncIndexer::TOPIC_RESET_INDEX): {
+            case AsyncIndexer::TOPIC_RESET_INDEX:
                 $this->indexer->resetIndex($data['class'], $data['context']);
 
                 break;
-            }
         }
     }
 }
