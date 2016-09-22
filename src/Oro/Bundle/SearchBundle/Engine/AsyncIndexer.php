@@ -34,7 +34,7 @@ class AsyncIndexer implements IndexerInterface
     /**
      * @inheritdoc
      */
-    public function save($entity, $context = [])
+    public function save($entity, array $context = [])
     {
         $this->sendAsyncIndexerMessage(
             self::TOPIC_SAVE,
@@ -48,7 +48,7 @@ class AsyncIndexer implements IndexerInterface
     /**
      * @inheritdoc
      */
-    public function delete($entity, $context = [])
+    public function delete($entity, array $context = [])
     {
         $this->sendAsyncIndexerMessage(
             self::TOPIC_DELETE,
@@ -70,7 +70,7 @@ class AsyncIndexer implements IndexerInterface
     /**
      * @inheritdoc
      */
-    public function resetIndex($class = null, $context = [])
+    public function resetIndex($class = null, array $context = [])
     {
         $this->sendAsyncIndexerMessage(
             self::TOPIC_RESET_INDEX,
@@ -84,7 +84,7 @@ class AsyncIndexer implements IndexerInterface
     /**
      * @inheritdoc
      */
-    public function reindex($class = null, $context = [])
+    public function reindex($class = null, array $context = [])
     {
         $this->sendAsyncIndexerMessage(
             self::TOPIC_REINDEX,
