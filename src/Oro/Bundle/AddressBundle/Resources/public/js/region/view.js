@@ -59,9 +59,9 @@ define(function(require) {
                 if (this.regionRequired) {
                     this.addRequiredFlag(this.$simpleEl);
                 }
-                this.switchedInputWidget(display);
+                this.switchInputWidget(display);
             } else {
-                this.switchedInputWidget(display);
+                this.switchInputWidget(display);
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }
@@ -137,10 +137,10 @@ define(function(require) {
             this.$el.trigger('value:changed');
         },
 
-        switchedInputWidget: function(display) {
+        switchInputWidget: function(display) {
             switch (this.switchState) {
-                case 'disabled':
-                    this.target.inputWidget('enabled', display);
+                case 'disable':
+                    this.target.inputWidget('disable', display);
                     break;
                 default: {
                     this.target.inputWidget(display ? 'show' : 'hide');

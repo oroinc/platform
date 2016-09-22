@@ -175,6 +175,10 @@ define(function(require) {
 
         _addEvent: function(eventName, callback) {
             this.$el.on(eventName + this.eventNamespace(), callback);
+        },
+
+        disable: function() {
+            this.$el.attr('disabled', arguments);
         }
     });
 

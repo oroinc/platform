@@ -99,7 +99,7 @@ define(function(require) {
             return this.applyWidgetFunction('search', arguments);
         },
 
-        enabled: function() {
+        disable: function() {
             return this.applyWidgetFunction('enable', arguments);
         }
     });
