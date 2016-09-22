@@ -33,6 +33,7 @@ oro:
             key.label: Key
             parent_key.label: Parent Key
             menu.label: Menu
+            title.label: Title
             titles.label: Title
             uri.label: Uri
             active.label: Active
@@ -40,3 +41,6 @@ oro:
             ownership_type.label: Ownership Type
             owner_id.label: Owner Id
             saved_message: Menu item saved successfully.
+            select_existing_or_create_new: Select existing menu item or create new.
+            roots_plural_label: Menus
+            edit_menus: Edit Menus

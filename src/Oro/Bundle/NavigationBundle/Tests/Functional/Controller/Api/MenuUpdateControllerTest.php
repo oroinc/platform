@@ -20,7 +20,6 @@ class MenuUpdateControllerTest extends WebTestCase
             'menuName' => 'foo',
             'key' => 'bar'
         ]);
-        $this->client->useHashNavigation(false);
         $this->client->request('DELETE', $url, [], [], $this->generateWsseAuthHeader());
         $result = $this->client->getResponse();
 

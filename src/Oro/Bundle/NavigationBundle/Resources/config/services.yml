@@ -101,6 +101,14 @@ services:
         tags:
             - { name: oro_menu.builder }
 
+    oro_navigation.tree.menu_update_tree_handler:
+        class: 'Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler'
+        arguments:
+            - Oro\Bundle\NavigationBundle\Entity\MenuUpdate
+            - "@doctrine"
+        calls:
+            - [ setTranslator, [ '@translator' ]]
+
     oro_menu.twig.extension:
         class: %oro_menu.twig.extension.class%
         arguments:
@@ -447,3 +455,12 @@ services:
         parent: oro_navigation.manager.menu_update_abstract
         calls:
             - [ setEntityClass, [ Oro\Bundle\NavigationBundle\Entity\MenuUpdate ]]
+
+    oro_navigation.widget_provider.actions.edit_menus:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_edit_menus_button
+            - oro_edit_menus_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity }
+            - { name: oro_ui.update_action_provider, group: activity }

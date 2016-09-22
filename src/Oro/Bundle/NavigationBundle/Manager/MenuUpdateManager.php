@@ -122,7 +122,7 @@ class MenuUpdateManager
      *
      * @return ItemInterface
      */
-    private function getMenu($name)
+    public function getMenu($name)
     {
         return $this->builderChainProvider->get($name);
     }
