@@ -32,7 +32,7 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $actual
      * @param array $expected
-     * @dataProvider normalizeOptionsDataProvider
+     * @dataProvider optionsDataProvider
      */
     public function testNormalizeOptions(array $actual, array $expected)
     {
@@ -50,7 +50,7 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $actual
      * @param array $expected
      * @param bool $isApplied
-     * @dataProvider normalizeOptionsDataProvider
+     * @dataProvider optionsDataProvider
      */
     public function testFinishView(array $actual, array $expected, $isApplied = true)
     {
@@ -77,7 +77,7 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function normalizeOptionsDataProvider()
+    public function optionsDataProvider()
     {
         return [
             'not applied' => [
