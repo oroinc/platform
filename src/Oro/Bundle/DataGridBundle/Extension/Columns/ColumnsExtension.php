@@ -31,6 +31,7 @@ class ColumnsExtension extends AbstractExtension
     const RENDER_FIELD_NAME      = 'renderable';
     const MINIFIED_COLUMNS_PARAM = 'c';
     const COLUMNS_PARAM          = '_columns';
+    const ACL_PATH               = 'acl_resource';
 
     /** @var Registry */
     protected $registry;
@@ -74,6 +75,14 @@ class ColumnsExtension extends AbstractExtension
         $this->processConfigs($config);
 
         return count($columns) > 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processConfigs(DatagridConfiguration $config)
+    {
+        $this->applyColumnsAcls($config);
     }
 
     /**
@@ -166,6 +175,26 @@ class ColumnsExtension extends AbstractExtension
         }
 
         parent::setParameters($parameters);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     */
+    protected function applyColumnsAcls(DatagridConfiguration $config)
+    {
+        $columns = $config->offsetGetOr(self::COLUMNS_PATH, []);
+
+        foreach ($columns as $key => $column) {
+            if (!array_key_exists('acl_resource', $column)) {
+                continue;
+            }
+
+            if (!$this->securityFacade->isGranted($column[self::ACL_PATH])) {
+                unset($columns[$key]);
+            }
+        }
+
+        $config->offsetSetByPath(self::COLUMNS_PATH, $columns);
     }
 
     /**
@@ -298,7 +327,7 @@ class ColumnsExtension extends AbstractExtension
             if (!$currentUser = $this->getCurrentUser()) {
                 return null;
             }
-            
+
             $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
                 $this->aclHelper,
                 $currentUser,

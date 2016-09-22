@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -14,12 +14,7 @@ class TranslationController extends BaseController
     /**
      * @Route("/", name="oro_translation_translation_index")
      * @Template
-     * @Acl(
-     *      id="oro_translation_language_view",
-     *      type="entity",
-     *      class="OroTranslationBundle:Language",
-     *      permission="VIEW"
-     * )
+     * @AclAncestor("oro_translation_language_view")
      *
      * @return array
      */
