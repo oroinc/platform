@@ -72,7 +72,7 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function getData()
     {
@@ -96,7 +96,11 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
+     * Collect options for BlockView-s when buildBlock method is triggered
+     *
+     * @param string $blockId
+     * @param string $blockType
+     * @param array $options
      */
     public function collectBuildBlockOptions($blockId, $blockType, array $options)
     {
@@ -110,7 +114,11 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
+     * Collect options for BlockView-s when buildView method is triggered
+     *
+     * @param BlockInterface $block
+     * @param string $blockTypeClass
+     * @param array $options
      */
     public function collectBuildViewOptions(BlockInterface $block, $blockTypeClass, array $options)
     {
@@ -121,7 +129,10 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
+     * Collect options for BlockView-s when finishView method is triggered
+     *
+     * @param BlockInterface $block
+     * @param array $options
      */
     public function collectFinishViewOptions(BlockInterface $block, array $options)
     {
@@ -131,7 +142,10 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
+     * Collect view vars for BlockView-s, save root BlockView, check if block is visible
+     *
+     * @param BlockInterface $block
+     * @param BlockView $view
      */
     public function collectBlockTree(BlockInterface $block, BlockView $view)
     {
@@ -146,6 +160,8 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
+     * Prepare options for twig rendering
+     *
      * @param array $options
      *
      * @return array
@@ -170,6 +186,9 @@ class LayoutDataCollector extends DataCollector
         return $result;
     }
 
+    /**
+     * Build final block tree with options and vars
+     */
     private function buildFinalBlockTree()
     {
         if ($this->rootBlockView) {
@@ -182,6 +201,8 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
+     * Add child BlockView-s with options and vars to parent BlockView recursively
+     *
      * @param BlockView $blockView
      * @param $output
      */

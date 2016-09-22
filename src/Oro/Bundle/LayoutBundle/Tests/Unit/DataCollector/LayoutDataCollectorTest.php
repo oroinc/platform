@@ -291,7 +291,6 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             $this->getBlockViews($child, $children, $result);
 
             $rootBlock->children[$id] = $child;
-
         }
 
         return $blockViews;
