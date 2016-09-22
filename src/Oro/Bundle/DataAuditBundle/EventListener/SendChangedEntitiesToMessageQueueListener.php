@@ -80,6 +80,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
      * @param MessageProducerInterface $messageProducer
      * @param TokenStorageInterface $securityTokenStorage
      * @param ConvertEntityToArrayForMessageQueueService $convertEntityToArrayForMessageQueueService
+     * @param GetEntityAuditMetadataService $getEntityAuditMetadataService
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
@@ -188,6 +189,11 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
     public function postFlush(PostFlushEventArgs $eventArgs)
     {
         if (false == $this->enabled) {
+            return;
+        }
+
+        if (! count($this->allInsertions) || ! count($this->allUpdates) ||
+            ! count($this->allDeletions) || ! count($this->allCollectionUpdates)) {
             return;
         }
         

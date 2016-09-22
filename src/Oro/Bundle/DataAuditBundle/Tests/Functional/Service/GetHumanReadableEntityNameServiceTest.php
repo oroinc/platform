@@ -38,7 +38,7 @@ class GetHumanReadableEntityNameServiceTest extends WebTestCase
         /** @var GetHumanReadableEntityNameService $service */
         $service = $this->getContainer()->get('oro_dataaudit.get_human_readable_entity_name');
 
-        $this->assertEquals('Organization::theId', $service->getName(Organization::class, 'theId'));
+        $this->assertEquals('Organization::12345', $service->getName(Organization::class, 12345));
     }
 
     public function testShouldReturnUserNameFormedByEntityNameResolver()

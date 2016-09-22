@@ -467,11 +467,11 @@ class AuditUpdatedEntitiesTest extends WebTestCase
                         'child' => [
                             [
                                 'entity_class' => TestAuditDataChild::class,
-                                'entity_id' => 'thePreviousChildEntityId',
+                                'entity_id' => 2345,
                             ],
                             [
                                 'entity_class' => TestAuditDataChild::class,
-                                'entity_id' => 'theNewChildEntityId',
+                                'entity_id' => 4567,
                             ]
                         ],
                     ],
@@ -498,7 +498,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('child', $auditField->getField());
-        $this->assertEquals('TestAuditDataChild::theNewChildEntityId', $auditField->getNewValue());
-        $this->assertSame('TestAuditDataChild::thePreviousChildEntityId', $auditField->getOldValue());
+        $this->assertEquals('TestAuditDataChild::4567', $auditField->getNewValue());
+        $this->assertSame('TestAuditDataChild::2345', $auditField->getOldValue());
     }
 }

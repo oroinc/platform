@@ -469,7 +469,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
                             null,
                             [
                                 'entity_class' => TestAuditDataChild::class,
-                                'entity_id' => 'theChildEntityId',
+                                'entity_id' => 54321,
                             ]
                         ],
                     ],
@@ -496,7 +496,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('child', $auditField->getField());
-        $this->assertEquals('TestAuditDataChild::theChildEntityId', $auditField->getNewValue());
+        $this->assertEquals('TestAuditDataChild::54321', $auditField->getNewValue());
         $this->assertSame(null, $auditField->getOldValue());
     }
 }
