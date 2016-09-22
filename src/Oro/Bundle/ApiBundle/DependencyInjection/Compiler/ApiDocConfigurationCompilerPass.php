@@ -55,6 +55,10 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
                     'setFileLocator',
                     [new Reference(self::FILE_LOCATOR_SERVICE)]
                 );
+                $apiDocHtmlFormatterDef->addMethodCall(
+                    'setDocumentationPath',
+                    [$container->getParameter('oro_api.api_doc.path')]
+                );
             }
         }
 

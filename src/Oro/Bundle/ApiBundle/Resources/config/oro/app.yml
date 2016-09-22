@@ -26,6 +26,7 @@ security:
 
 oro_api:
     api_doc_views: ['default', 'rest_json_api', 'rest_plain']
+    documentation_path: bundles/oroapi/doc/documentation.html
 
     filters:
         string: ~

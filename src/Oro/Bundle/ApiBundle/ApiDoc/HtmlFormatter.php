@@ -51,6 +51,28 @@ class HtmlFormatter extends AbstractFormatter
     /** @var boolean */
     protected $defaultSectionsOpened;
 
+    /** @var string */
+    protected $documentationPath;
+
+    /** @var bool */
+    protected $dumpContext = false;
+
+    /**
+     * @param string $documentationPath
+     */
+    public function setDocumentationPath($documentationPath)
+    {
+        $this->documentationPath = $documentationPath;
+    }
+
+    /**
+     * @param bool $isDumpContext
+     */
+    public function setIsDumpContext($isDumpContext)
+    {
+        $this->dumpContext = $isDumpContext;
+    }
+
     /**
      * @param FileLocatorInterface $fileLocator
      */
@@ -241,6 +263,8 @@ class HtmlFormatter extends AbstractFormatter
             'js'                    => $this->getJs(),
             'motdTemplate'          => $this->motdTemplate,
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
+            'documentationPath'     => $this->documentationPath,
+            'dumpContext'           => $this->dumpContext
         ];
     }
 

@@ -8,13 +8,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 
+use Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 
 /**
  * This listener registers the "view" option for "api:doc:dump" and "api:swagger:dump" commands
  * and sets the view to the "oro_api.rest.doc_view_detector" service that is used to
  * get REST API documentation view by services depended on it.
+ * Additionally, it sets dump context to true for HtmlFormatter
  */
 class DumpApiDocConsoleCommandListener
 {
@@ -23,12 +26,17 @@ class DumpApiDocConsoleCommandListener
     /** @var RestDocViewDetector */
     protected $docViewDetector;
 
+    /** @var AbstractFormatter */
+    protected $htmlFormatter;
+
     /**
      * @param RestDocViewDetector $docViewDetector
+     * @param AbstractFormatter   $htmlFormatter
      */
-    public function __construct(RestDocViewDetector $docViewDetector)
+    public function __construct(RestDocViewDetector $docViewDetector, AbstractFormatter $htmlFormatter)
     {
         $this->docViewDetector = $docViewDetector;
+        $this->htmlFormatter = $htmlFormatter;
     }
 
     /**
@@ -47,6 +55,10 @@ class DumpApiDocConsoleCommandListener
             $view = $event->getInput()->getParameterOption('--' . self::VIEW_OPTION);
             if ($view) {
                 $this->docViewDetector->setView($view);
+            }
+            // sets dump context to true to say that now we are at the dump process
+            if ($this->htmlFormatter instanceof HtmlFormatter) {
+                $this->htmlFormatter->setIsDumpContext(true);
             }
         }
     }

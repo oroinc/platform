@@ -46,6 +46,10 @@ class Configuration implements ConfigurationInterface
                 ->info('All supported ApiDoc views')
                 ->prototype('scalar')->end()
                 ->defaultValue(['default'])
+            ->end()
+            ->scalarNode('documentation_path')
+                ->info('Path to the API documentation')
+                ->defaultNull()
             ->end();
     }
 
