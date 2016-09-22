@@ -208,11 +208,17 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
 
+    # manager
+
     oro_notifications.manager.email_notification:
         class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager'
         arguments:
             - '@oro_email.email_renderer'
-            - '@oro_config.user'
-            - '@oro_message_queue.client.message_producer'
+            - '@oro_notifications.manager.email_notification_sender'
             - '@logger'
 
+    oro_notifications.manager.email_notification_sender:
+        class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender'
+        arguments:
+            - '@oro_config.user'
+            - '@oro_message_queue.client.message_producer'

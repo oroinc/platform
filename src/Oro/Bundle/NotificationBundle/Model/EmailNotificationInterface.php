@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 /**
  * Provides a way to get some configuration info of an email notification message
  */
-interface EmailNotificationInterface extends NotificationInterface
+interface EmailNotificationInterface
 {
     /**
      * Gets a template can be used to prepare a notification message

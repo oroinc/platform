@@ -40,7 +40,16 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
     {
         $data = JSON::decode($message->getBody());
 
-        if (!isset($data['fromEmail']) || !isset($data['toEmail'])) {
+        $data = array_merge([
+            'fromEmail' => null,
+            'fromName' => null,
+            'toEmail' => null,
+            'subject' => null,
+            'body' => null,
+            'contentType' => null
+        ], $data);
+
+        if (null == $data['fromEmail']  || null == $data['toEmail']) {
             $this->logger->critical(
                 sprintf(
                     '[EmailSendingMessageProcessor] Got invalid message: "%s"',
@@ -50,13 +59,6 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
 
             return self::REJECT;
         }
-
-        $data = array_merge([
-            'fromName' => null,
-            'subject' => null,
-            'body' => null,
-            'contentType' => null
-        ], $data);
 
         $emailMessage = new \Swift_Message(
             $data['subject'],
@@ -70,7 +72,7 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
 
         if (false == $this->mailer->send($emailMessage)) {
             $this->logger->critical(sprintf(
-                '[EmailSendingMessageProcessor] Cannot sent message: "%s"',
+                '[EmailSendingMessageProcessor] Cannot send message: "%s"',
                 $message->getBody()
             ));
 

@@ -88,7 +88,7 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('critical')
             ->with('[EmailSendingMessageProcessor] '.
-                'Cannot sent message: "{"toEmail":"to@email.com","fromEmail":"from@email.com"}"')
+                'Cannot send message: "{"toEmail":"to@email.com","fromEmail":"from@email.com"}"')
         ;
 
         $processor = new EmailSendingMessageProcessor(
