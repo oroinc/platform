@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Component\Layout\Block\Type\Options;
 use Symfony\Component\Form\FormView;
 
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\Options;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;

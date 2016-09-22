@@ -42,6 +42,9 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['resolve_value_bags']);

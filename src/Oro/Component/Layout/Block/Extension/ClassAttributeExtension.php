@@ -8,7 +8,6 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\StringOptionValueBuilder;
-use Oro\Component\Layout\Block\Type\Options;
 
 /**
  * This extension normalizes 'class' attribute and allows to use [append/subtract/replace]Option methods

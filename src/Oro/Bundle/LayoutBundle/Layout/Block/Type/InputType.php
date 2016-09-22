@@ -44,6 +44,9 @@ class InputType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function finishView(BlockView $view, BlockInterface $block)
     {
         if (!$view->vars['name']) {

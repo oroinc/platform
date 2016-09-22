@@ -5,7 +5,6 @@ namespace Oro\Component\Layout\Block\Type;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\Util\BlockUtils;
 
 class BaseType extends AbstractType
@@ -124,7 +123,6 @@ class BaseType extends AbstractType
 
     /**
      * @param BlockView $view
-     * @param Options   $options
      *
      * @return string
      */

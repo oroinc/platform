@@ -2,7 +2,6 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\CallbackLayoutUpdate;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutItemInterface;

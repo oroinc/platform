@@ -4,8 +4,6 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\Form\FormView;
 
-use Oro\Component\Layout\Block\Type\Options;
-
 /**
  * @method BlockView getParent()
  * @property BlockView[] children

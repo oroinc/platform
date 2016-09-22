@@ -97,7 +97,6 @@ interface LayoutRegistryInterface
      * @param string         $name    The block type name
      * @param BlockView      $view    The block view object
      * @param BlockInterface $block   The block configuration
-     * @param Options        $options The options
      */
     public function finishView($name, BlockView $view, BlockInterface $block);
 

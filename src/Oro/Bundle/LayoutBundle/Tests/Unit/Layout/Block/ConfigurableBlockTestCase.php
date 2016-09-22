@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\OptionsConfigTrait;
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
