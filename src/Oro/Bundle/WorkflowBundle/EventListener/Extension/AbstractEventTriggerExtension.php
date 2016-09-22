@@ -100,6 +100,7 @@ abstract class AbstractEventTriggerExtension implements EventTriggerExtensionInt
             }
         }
     }
+
     /**
      * @param mixed $first
      * @param mixed $second

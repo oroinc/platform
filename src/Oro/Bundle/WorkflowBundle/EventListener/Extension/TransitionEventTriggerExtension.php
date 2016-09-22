@@ -37,17 +37,20 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      * @param EventTriggerCache $triggerCache
      * @param MessageProducerInterface $producer
      * @param TransitionEventTriggerHelper $helper
+     * @param WorkflowManager $workflowManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EventTriggerCache $triggerCache,
         MessageProducerInterface $producer,
-        TransitionEventTriggerHelper $helper
+        TransitionEventTriggerHelper $helper,
+        WorkflowManager $workflowManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->triggerCache = $triggerCache;
         $this->producer = $producer;
         $this->helper = $helper;
+        $this->workflowManager = $workflowManager;
     }
 
     /**

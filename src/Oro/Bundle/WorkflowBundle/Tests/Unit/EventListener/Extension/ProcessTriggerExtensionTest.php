@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 
-use Doctrine\ORM\EntityManager;
-
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -21,26 +17,13 @@ use Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
-class ProcessTriggerExtensionTest extends \PHPUnit_Framework_TestCase
+class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 {
-    const ENTITY = 'stdClass';
-    const FIELD = 'field';
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
-    protected $entityManager;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessTriggerRepository */
     protected $repository;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessJobRepository */
     protected $processJobRepository;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessHandler */
     protected $handler;
@@ -48,21 +31,12 @@ class ProcessTriggerExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessLogger */
     protected $logger;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventTriggerCache */
-    protected $triggerCache;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessSchedulePolicy */
     protected $schedulePolicy;
 
-    /** @var ProcessTriggerExtension */
-    protected $extension;
-
-    /** @var array */
-    protected $triggers;
-
     protected function setUp()
     {
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        parent::setUp();
 
         $this->repository = $this->getMockBuilder(ProcessTriggerRepository::class)
             ->disableOriginalConstructor()
@@ -74,7 +48,6 @@ class ProcessTriggerExtensionTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['deleteByHashes'])
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
             ->willReturnMap(
@@ -87,8 +60,6 @@ class ProcessTriggerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->handler = $this->getMockBuilder(ProcessHandler::class)->disableOriginalConstructor()->getMock();
 
         $this->logger = $this->getMockBuilder(ProcessLogger::class)->disableOriginalConstructor()->getMock();
-
-        $this->triggerCache = $this->getMockBuilder(EventTriggerCache::class)->disableOriginalConstructor()->getMock();
 
         $this->schedulePolicy = $this->getMock(ProcessSchedulePolicy::class);
 
@@ -103,17 +74,9 @@ class ProcessTriggerExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset(
-            $this->extension,
-            $this->doctrineHelper,
-            $this->handler,
-            $this->logger,
-            $this->triggerCache,
-            $this->schedulePolicy,
-            $this->repository,
-            $this->processJobRepository,
-            $this->entityManager
-        );
+        parent::tearDown();
+
+        unset($this->handler, $this->logger, $this->schedulePolicy, $this->repository, $this->processJobRepository);
     }
 
     public function testSetForceQueued()
@@ -762,66 +725,6 @@ class ProcessTriggerExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $entityClass
-     * @param string $event
-     * @param bool $hasTrigger
-     */
-    protected function prepareTriggerCache($entityClass, $event, $hasTrigger = true)
-    {
-        $this->triggerCache->expects($this->any())
-            ->method('hasTrigger')
-            ->with($entityClass, $event)
-            ->willReturn($hasTrigger);
-    }
-
-    /**
-     * @param string $event
-     * @param object $entity
-     * @param array $changeSet
-     */
-    protected function callPreFunctionByEventName($event, $entity, $changeSet = [])
-    {
-        switch ($event) {
-            case EventTriggerInterface::EVENT_CREATE:
-                $this->extension->schedule($entity, $event);
-                break;
-            case EventTriggerInterface::EVENT_UPDATE:
-                $this->extension->schedule($entity, $event, $changeSet);
-                break;
-            case EventTriggerInterface::EVENT_DELETE:
-                $this->extension->schedule($entity, $event);
-                break;
-        }
-    }
-
-    /**
-     * @param ProcessTrigger[] $triggers
-     * @return array
-     */
-    protected function getExpectedTriggers(array $triggers)
-    {
-        $expectedTriggers = [];
-
-        foreach ($triggers as $trigger) {
-            $entityClass = $trigger->getDefinition()->getRelatedEntity();
-            $event = $trigger->getEvent();
-            $field = $trigger->getField();
-
-            if ($event === EventTriggerInterface::EVENT_UPDATE) {
-                if ($field) {
-                    $expectedTriggers[$entityClass][$event]['field'][$field][] = $trigger;
-                } else {
-                    $expectedTriggers[$entityClass][$event]['entity'][] = $trigger;
-                }
-            } else {
-                $expectedTriggers[$entityClass][$event][] = $trigger;
-            }
-        }
-
-        return $expectedTriggers;
-    }
-
-    /**
      * @param array $data
      * @param bool $modified
      * @return ProcessData
@@ -899,16 +802,5 @@ class ProcessTriggerExtensionTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-    }
-
-    /**
-     * @param array $triggers
-     */
-    protected function prepareRepository(array $triggers = null)
-    {
-        $this->repository->expects($this->once())
-            ->method('findAllWithDefinitions')
-            ->with(true)
-            ->willReturn($triggers ?: $this->getTriggers());
     }
 }
