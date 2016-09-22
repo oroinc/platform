@@ -38,6 +38,7 @@ datagrids:
                     autocomplete_api_accessor:
                         class: orouser/js/tools/acl-users-search-api-accessor
                         permission_check_entity_name: Oro_Bundle_TranslationBundle_Entity_Language
+                        permission: EDIT
             enabled:
                 label: oro.translation.language.enabled.label
                 type: twig
@@ -145,8 +146,6 @@ datagrids:
             value:
                 label: oro.translation.translation.value.label
                 inline_editing:
-#                    entity_name: '%oro_translation.entity.language.class%'
-#                    acl_resource: oro_translation_language_update
                     editor:
                         view: orotranslation/js/app/views/editor/text-editor-view
                     save_api_accessor:

@@ -182,17 +182,13 @@ class ColumnsExtension extends AbstractExtension
      */
     protected function applyColumnsAcls(DatagridConfiguration $config)
     {
-        $columns = $config->offsetGetOr(self::COLUMNS_PATH, []);
-
-        foreach ($columns as $key => $column) {
-            if (!array_key_exists('acl_resource', $column)) {
-                continue;
+        $columns = array_filter(
+            $config->offsetGetOr(self::COLUMNS_PATH, []),
+            function ($column) {
+                return !array_key_exists(self::ACL_PATH, $column) ||
+                    $this->securityFacade->isGranted($column[self::ACL_PATH]);
             }
-
-            if (!$this->securityFacade->isGranted($column[self::ACL_PATH])) {
-                unset($columns[$key]);
-            }
-        }
+        );
 
         $config->offsetSetByPath(self::COLUMNS_PATH, $columns);
     }
