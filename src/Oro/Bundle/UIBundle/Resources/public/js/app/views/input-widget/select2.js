@@ -97,6 +97,10 @@ define(function(require) {
 
         search: function() {
             return this.applyWidgetFunction('search', arguments);
+        },
+
+        enabled: function() {
+            return this.applyWidgetFunction('enable', arguments);
         }
     });
 
