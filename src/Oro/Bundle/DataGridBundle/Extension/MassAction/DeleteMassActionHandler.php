@@ -3,22 +3,17 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
-
-use JMS\JobQueueBundle\Entity\Job;
-
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
+use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
-use Oro\Bundle\DataGridBundle\Exception\LogicException;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
-
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
-use Oro\Bundle\SearchBundle\Command\IndexCommand;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
@@ -42,6 +37,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /** @var OptionalListenerManager */
     protected $listenerManager;
 
+    /** @var  MessageProducerInterface */
+    protected $producer;
+
     /** @var string */
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
 
@@ -59,7 +57,8 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         SecurityFacade $securityFacade,
         MassDeleteLimiter $limiter,
         RequestStack $requestStack,
-        OptionalListenerManager $listenerManager
+        OptionalListenerManager $listenerManager,
+        MessageProducerInterface $producer
     ) {
         $this->registry        = $registry;
         $this->translator      = $translator;
@@ -67,6 +66,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $this->limiter         = $limiter;
         $this->requestStack    = $requestStack;
         $this->listenerManager = $listenerManager;
+        $this->producer = $producer;
     }
 
     /**
@@ -97,14 +97,18 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      */
     protected function finishBatch(EntityManager $manager, $entityName, array $deletedIds)
     {
-        $jobManager = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
-        $args = array_merge([$entityName], $deletedIds);
-        $jobManager->persist(new Job(IndexCommand::NAME, $args));
+        $body = [];
+        foreach ($deletedIds as $deletedId) {
+            $body [] = [
+                'class' => $entityName,
+                'id' => $deletedId
+            ];
+        }
+
+        $this->producer->send(Topics::INDEX_ENTITIES, $body);
+
         $manager->flush();
         $manager->clear();
-        if ($jobManager !== $manager) {
-            $jobManager->flush();
-        }
     }
 
     /**
