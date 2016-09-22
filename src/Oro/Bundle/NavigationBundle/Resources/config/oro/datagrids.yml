@@ -11,7 +11,7 @@ datagrids:
                 route: oro_navigation_menu_update_view
                 type: url
                 params:
-                    menu: name
+                    menuName: name
         actions:
             view:
                 type: navigate

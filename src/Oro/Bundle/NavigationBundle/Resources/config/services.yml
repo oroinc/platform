@@ -104,7 +104,7 @@ services:
     oro_navigation.tree.menu_update_tree_handler:
         class: 'Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler'
         arguments:
-            - '%oro_navigation.entity.menu_update.class%'
+            - Oro\Bundle\NavigationBundle\Entity\MenuUpdate
             - "@doctrine"
         calls:
             - [ setTranslator, [ '@translator' ]]
@@ -115,7 +115,6 @@ services:
             - '@knp_menu.helper'
             - '@oro_menu.builder_chain'
             - '@oro_navigation.breadcrumb_manager'
-            - '@oro_navigation.tree.menu_update_tree_handler'
         calls:
           - [ setBreadcrumbManager, [ '@oro_navigation.chain_breadcrumb_manager' ]]
         tags:

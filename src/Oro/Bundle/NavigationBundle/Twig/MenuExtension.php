@@ -6,7 +6,6 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Twig\Helper;
 use Knp\Menu\Provider\MenuProviderInterface;
 
-use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
@@ -37,15 +36,9 @@ class MenuExtension extends \Twig_Extension
     protected $breadcrumbManager;
 
     /**
-     * @var MenuUpdateTreeHandler
-     */
-    protected $menuUpdateTreeHandler;
-
-    /**
      * @param Helper $helper
      * @param MenuProviderInterface $provider
      * @param BreadcrumbManager $breadcrumbManager
-     * @param MenuUpdateTreeHandler $menuUpdateTreeHandler
      *
      * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbManagerInterface
      * @see \Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface
@@ -53,13 +46,11 @@ class MenuExtension extends \Twig_Extension
     public function __construct(
         Helper $helper,
         MenuProviderInterface $provider,
-        BreadcrumbManager $breadcrumbManager,
-        MenuUpdateTreeHandler $menuUpdateTreeHandler
+        BreadcrumbManager $breadcrumbManager
     ) {
         $this->helper = $helper;
         $this->provider = $provider;
         $this->breadcrumbManager = $breadcrumbManager;
-        $this->menuUpdateTreeHandler = $menuUpdateTreeHandler;
     }
 
     /**

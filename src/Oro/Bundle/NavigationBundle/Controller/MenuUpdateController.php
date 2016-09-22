@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
+use Knp\Menu\ItemInterface;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -19,9 +21,12 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
  */
 class MenuUpdateController extends Controller
 {
+    /** @var MenuUpdateManager */
+    private $manager;
+
     /**
      * @Route("/", name="oro_navigation_menu_update_index")
-     * @Template()
+     * @Template
      * @AclAncestor("oro_navigation_menu_update_view")
      *
      * @return array
@@ -34,7 +39,27 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @Route("/{menu}/create/{parentKey}", name="oro_navigation_menu_update_create")
+     * @Route("/{menuName}", name="oro_navigation_menu_update_view")
+     * @Template
+     * @Acl(
+     *     id="oro_navigation_menu_update_view",
+     *     type="entity",
+     *     class="OroNavigationBundle:MenuUpdate",
+     *     permission="VIEW"
+     * )
+     *
+     * @param string $menuName
+     * @return array
+     */
+    public function viewAction($menuName)
+    {
+        $menu = $this->getMenu($menuName);
+
+        return $this->getResponse(['entity' => $menu], $menu);
+    }
+
+    /**
+     * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_menu_update_create")
      * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
      * @Acl(
      *     id="oro_navigation_menu_update_create",
@@ -43,36 +68,30 @@ class MenuUpdateController extends Controller
      *     permission="CREATE"
      * )
      *
-     * @param string $menu
+     * @param string $menuName
      * @param string|null $parentKey
      * @return array|RedirectResponse
      */
-    public function createAction($menu, $parentKey = null)
+    public function createAction($menuName, $parentKey = null)
     {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
-
         /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $manager->createMenuUpdate();
+        $menuUpdate = $this->getManager()->createMenuUpdate();
 
         if ($parentKey) {
-            $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
-
-            if (!$parent) {
-                throw $this->createNotFoundException();
-            }
-
+            $parent = $this->getMenuUpdate($menuName, $parentKey);
             $menuUpdate->setParentKey($parent->getKey());
         }
 
-        $menuUpdate->setMenu($menu);
+        $menuUpdate->setMenu($menuName);
 
-        return $this->update($menu, $menuUpdate);
+        $menu = $this->getMenu($menuName);
+
+        return $this->getResponse($this->update($menuUpdate), $menu);
     }
 
     /**
-     * @Route("/{menu}/update/{key}", name="oro_navigation_menu_update_update")
-     * @Template()
+     * @Route("/{menuName}/update/{key}", name="oro_navigation_menu_update_update")
+     * @Template
      * @Acl(
      *     id="oro_navigation_menu_update_update",
      *     type="entity",
@@ -80,81 +99,91 @@ class MenuUpdateController extends Controller
      *     permission="EDIT"
      * )
      *
-     * @param string $menu
+     * @param string $menuName
      * @param string $key
      * @return array|RedirectResponse
      */
-    public function updateAction($menu, $key)
+    public function updateAction($menuName, $key)
     {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $menuUpdate = $this->getMenuUpdate($menuName, $key);
 
-        /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $manager->getMenuUpdateByKey($menu, $key);
-        if (!$menuUpdate) {
-            throw $this->createNotFoundException();
-        }
+        $menu = $this->getMenu($menuName);
 
-        return $this->update($menu, $menuUpdate);
+        return $this->getResponse($this->update($menuUpdate), $menu);
     }
 
     /**
-     * @Route("/{menu}", name="oro_navigation_menu_update_view", requirements={"menu" = "[-_\w]+"})
-     * @Template()
-     * @Acl(
-     *     id="oro_navigation_menu_update_view",
-     *     type="entity",
-     *     class="OroNavigationBundle:MenuUpdate",
-     *     permission="VIEW"
-     * )
-     *
-     * @param string $menu
-     * @return array
-     */
-    public function viewAction($menu)
-    {
-        $root = $this->get('oro_menu.builder_chain')->get($menu);
-        if (!count($root->getChildren())) {
-            throw $this->createNotFoundException("Menu '$menu' not found");
-        }
-
-        return [
-            'entity' => $root,
-            'menu' => $menu,
-            'tree' => $this->getTree($menu),
-        ];
-    }
-
-    /**
-     * @param string $menu
-     * @return array
-     */
-    public function getTree($menu)
-    {
-        $root = $this->get('oro_menu.builder_chain')->get($menu);
-
-        return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($root);
-    }
-
-    /**
-     * @param string $menu
      * @param MenuUpdate $menuUpdate
      * @return array|RedirectResponse
      */
-    private function update($menu, MenuUpdate $menuUpdate)
+    private function update(MenuUpdate $menuUpdate)
     {
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_update_key' => $menuUpdate->getKey()]);
 
-        $response = $this->get('oro_form.model.update_handler')->update(
+        return $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
             $form,
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
+    }
+
+    /**
+     * @param array|RedirectResponse $response
+     * @param ItemInterface $menu
+     * @return array|RedirectResponse
+     */
+    protected function getResponse($response, ItemInterface $menu)
+    {
         if (is_array($response)) {
-            $response['menu'] = $menu;
-            $response['tree'] = $this->getTree($menu);
+            $treeHandler = $this->get('oro_navigation.tree.menu_update_tree_handler');
+
+            $response['menuName'] = $menu->getName();
+            $response['tree'] = $treeHandler->createTree($menu);
         }
 
         return $response;
+    }
+
+    /**
+     * @param string $menuName
+     * @param string $key
+     * @return MenuUpdate
+     */
+    protected function getMenuUpdate($menuName, $key)
+    {
+        $menuUpdate = $this->getManager()->getMenuUpdateByKey($menuName, $key);
+
+        if (!$menuUpdate) {
+            throw $this->createNotFoundException(
+                sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
+            );
+        }
+
+        return $menuUpdate;
+    }
+
+    /**
+     * @param string $menuName
+     * @return ItemInterface
+     */
+    protected function getMenu($menuName)
+    {
+        $menu = $this->getManager()->getMenu($menuName);
+        if (!count($menu->getChildren())) {
+            throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
+        }
+
+        return $menu;
+    }
+
+    /**
+     * @return MenuUpdateManager
+     */
+    private function getManager()
+    {
+        if (!$this->manager) {
+            $this->manager = $this->get('oro_navigation.manager.menu_update_default');
+        }
+        return $this->manager;
     }
 }

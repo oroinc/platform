@@ -9,7 +9,7 @@
     {% if resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': '',
-            'dataRedirect': path('oro_navigation_menu_update_view', {menu: menu}),
+            'dataRedirect': path('oro_navigation_menu_update_view', {menuName: menuName}),
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-attribute',
             'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
@@ -19,13 +19,13 @@
     {% if resource_granted('oro_navigation_menu_update_update') %}
         {% set html = UI.saveAndCloseButton({
             'route': 'oro_navigation_menu_update_update',
-            'params': {'menu': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
+            'params': {'menuName': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
         }) %}
     {% endif %}
     {% if resource_granted('oro_navigation_menu_update_create') %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_navigation_menu_update_create',
-            'params': {'menu': '$menu', 'parentKey': '$parentKey'}
+            'params': {'menuName': '$menu', 'parentKey': '$parentKey'}
         }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
@@ -89,7 +89,7 @@
         <div class="menuitem menuitem-tree tree-component">
             {% set treeOptions = {
                 'data' : tree,
-                'menu' : menu,
+                'menu' : menuName,
                 'updateAllowed' : resource_granted('oro_navigation_menu_update_update'),
                 'onSelectRoute' : 'oro_navigation_menu_update_update',
                 'onRootSelectRoute' : 'oro_navigation_menu_update_view'

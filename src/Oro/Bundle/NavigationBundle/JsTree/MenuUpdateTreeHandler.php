@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\JsTree;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Knp\Menu\ItemInterface;
 
 use Symfony\Component\Translation\TranslatorInterface;
@@ -48,6 +46,8 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
 
     /**
      * {@inheritdoc}
+     *
+     * @param ItemInterface $root
      */
     protected function getNodes($root, $includeRoot)
     {

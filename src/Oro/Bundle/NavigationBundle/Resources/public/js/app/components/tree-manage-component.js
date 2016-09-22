@@ -42,10 +42,10 @@ define(function(require) {
             var routeParams;
             if (this.onRootSelectRoute && selected.node.parent === '#') {
                 route = this.onRootSelectRoute;
-                routeParams = {menu: this.menu};
+                routeParams = {menuName: this.menu};
             } else {
                 route = this.onSelectRoute;
-                routeParams = {menu: this.menu, key: selected.node.id};
+                routeParams = {menuName: this.menu, key: selected.node.id};
             }
             mediator.execute('redirectTo', {url: routing.generate(route, routeParams)});
         },

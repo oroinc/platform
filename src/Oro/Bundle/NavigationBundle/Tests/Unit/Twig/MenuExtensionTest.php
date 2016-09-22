@@ -23,11 +23,6 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     protected $breadcrumbManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $menuUpdateTreeHandler;
-
-    /**
      * @var MenuExtension $menuExtension
      */
     protected $menuExtension;
@@ -35,11 +30,6 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->breadcrumbManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->menuUpdateTreeHandler = $this
-            ->getMockBuilder('Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,12 +42,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->menuExtension = new MenuExtension(
-            $this->helper,
-            $this->provider,
-            $this->breadcrumbManager,
-            $this->menuUpdateTreeHandler
-        );
+        $this->menuExtension = new MenuExtension($this->helper, $this->provider, $this->breadcrumbManager);
     }
 
     public function testGetFunctions()
