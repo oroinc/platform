@@ -57,8 +57,10 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
         }
 
         foreach ($root->getChildren() as $child) {
-            $nodes[] = $child;
-            $nodes = array_merge($nodes, $this->getNodes($child, false));
+            if ($child->isDisplayed()) {
+                $nodes[] = $child;
+                $nodes = array_merge($nodes, $this->getNodes($child, false));
+            }
         }
 
         return $nodes;

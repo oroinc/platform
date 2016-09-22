@@ -67,6 +67,7 @@ class MenuUpdateHelper
 
         if (!$item instanceof ItemInterface) {
             $item = $parentItem->addChild($update->getKey());
+            $item->setExtra('doesNotExistInNavigationYML', true);
         }
 
         if ($item->getParent()->getName() != $parentItem->getName()) {

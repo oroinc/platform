@@ -15,7 +15,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
  * @RouteResource("menuupdates")
@@ -26,18 +28,32 @@ class MenuUpdateController extends Controller
     /**
      * @Delete("/menuupdate/{menuName}/{key}")
      *
-     * @param string $menuName
-     * @param string $key
+     * @Acl(
+     *     id="oro_navigation_menu_update_delete",
+     *     type="entity",
+     *     class="OroNavigationBundle:MenuUpdate",
+     *     permission="DELETE"
+     * )
      *
      * @ApiDoc(
      *  description="Delete menu item for user"
      * )
+     *
+     * @param string $menuName
+     * @param string $key
+     *
      * @return Response
      */
     public function deleteAction($menuName, $key)
     {
-        $em = $this->getEntityManager();
-        $manager = $this->getManager();
+        /** @var ObjectManager $em */
+        $em = $this->getDoctrine()->getManagerForClass('Oro\Bundle\NavigationBundle\Entity\MenuUpdate');
+
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+
+        /** @var MenuUpdateHelper $helper */
+        $helper = $this->get('oro_navigation.helper.menu_update');
 
         $menuUpdate = $manager->getMenuUpdateByKeyAndScope(
             $menuName,
@@ -49,14 +65,10 @@ class MenuUpdateController extends Controller
             throw $this->createNotFoundException();
         }
 
-        $itemFromMenu = $manager->getMenuUpdateFromMenu(
-            $menuName,
-            $key,
-            MenuUpdate::OWNERSHIP_USER,
-            $this->getUser()->getId()
-        );
-        if ($itemFromMenu === null && $menuUpdate->getId() !== null) {
+        $item = $helper->findMenuItem($manager->getMenu($menuName), $key);
+        if ($item->getExtra('doesNotExistInNavigationYML')) {
             $em->remove($menuUpdate);
+            $em->flush();
 
             return new JsonResponse(null, 204);
         }
@@ -70,21 +82,5 @@ class MenuUpdateController extends Controller
         $em->flush();
 
         return new JsonResponse(null, 204);
-    }
-
-    /**
-     * @return MenuUpdateManager
-     */
-    private function getManager()
-    {
-        return $this->get('oro_navigation.manager.menu_update_default');
-    }
-
-    /**
-     * @return ObjectManager
-     */
-    private function getEntityManager()
-    {
-        return $this->getDoctrine()->getManagerForClass('Oro\Bundle\NavigationBundle\Entity\MenuUpdate');
     }
 }
