@@ -159,14 +159,14 @@ class GridViewManager
     }
 
     /**
-     * @param User  $user
+     * @param User|null  $user
      * @param string $gridName
      *
      * @return array
      */
-    public function getAllGridViews(User $user, $gridName)
+    public function getAllGridViews(User $user = null, $gridName = null)
     {
-        $cacheKey = sprintf('%s.%s.%s', self::ALL_VIEWS_KEY, $user->getUsername(), $gridName);
+        $cacheKey = sprintf('%s.%s.%s', self::ALL_VIEWS_KEY, $user ? $user->getUsername() : (string) $user, $gridName);
         if (!isset($this->cacheData[$cacheKey])) {
             $systemViews = $this->getSystemViews($gridName);
             $gridViews = [];
