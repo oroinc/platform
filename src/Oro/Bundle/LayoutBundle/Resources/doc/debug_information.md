@@ -7,10 +7,19 @@ In **Symfony Profiler** page you can find section **Layout** that contains:
  - **Context Data Items**
  - **Layout Tree**
 
- ### Layout Tree
+### Layout Tree
 
 In left part of **Layout Tree** section you can see tree of **block views** with **block id** and **block type**.
-In the right part of **Layout Tree** section you can find information of chosen **block view**, it contains options on **build block**, **build view** and **finish view** stages, also it contains all **block view** variables.
+In the right part of **Layout Tree** section you can find information of chosen **block view**.
+It contains such blocks:
+ - **Context Items** - [LayoutContext](../../../../Component/Layout/LayoutContext.php#L12) items for current page
+ - **Context Data Items** - [ContextDataCollection](../../../../Component/Layout/ContextDataCollection.php#L11) items for current page
+ - **Build Block Options** - collected when [buildBlock](../../../../Component/Layout/BlockTypeExtensionInterface.php#L18) method is triggered
+ - **Build View Options** - collected when [buildView](../../../../Component/Layout/BlockTypeExtensionInterface.php#L34) method is triggered
+ - **Finish View Options** - collected when [finishView](../../../../Component/Layout/BlockTypeExtensionInterface.php#L51) method is triggered
+ - **View Variables** - [BlockView](../../../../Component/Layout/BlockView.php) vars
+
+![Symfony Profiler - Layout](./images/symfony_profiler_layout.png "Symfony Profiler - Layout")
 
 Also you can disable **Layout Tree** in developer toolbar, go to `System - Configuration - Development Settings - Generate Layout Tree Dump For The Developer Toolbar`
 
