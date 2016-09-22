@@ -177,8 +177,9 @@ define(function(require) {
             this.$el.on(eventName + this.eventNamespace(), callback);
         },
 
-        disable: function() {
-            this.$el.attr('disabled', arguments);
+        disable: function(state) {
+            this.$el.attr('disabled', state);
+            this.refresh();
         }
     });
 
