@@ -48,10 +48,5 @@ api:
                 updatedAt:
                     description: Updated At
                     data_type: datetime
-            actions:
-                get: false
-                get_list: false
-                update: false
-                create: false
-                delete: false
-                delete_list: false
+            # this entity does not have own Data API resource
+            actions: false

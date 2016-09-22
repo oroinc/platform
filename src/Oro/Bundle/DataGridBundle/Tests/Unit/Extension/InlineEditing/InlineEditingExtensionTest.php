@@ -204,6 +204,9 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'two' => 'Two',
                         ]
                     ];
+                case 'nonAvailable1':
+                case 'nonAvailable2':
+                    return [Configuration::BASE_CONFIG_KEY => ['enable' => 'true']];
             }
 
             return [];

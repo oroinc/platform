@@ -23,31 +23,34 @@ class SimpleFilterFactory implements FilterFactoryInterface
     /**
      * Registers a filter that should be used to handle the given data-type.
      *
-     * @param string $dataType        The data-type of a value.
+     * @param string $filterType      The type of a filter.
      * @param string $filterClassName The class name of a filter. Should extents StandaloneFilter.
      * @param array  $parameters      Additional parameters for the filter. [property name => value, ...]
      */
-    public function addFilter($dataType, $filterClassName, array $parameters = [])
+    public function addFilter($filterType, $filterClassName, array $parameters = [])
     {
-        $this->filters[$dataType] = [$filterClassName, $parameters];
+        $this->filters[$filterType] = [$filterClassName, $parameters];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createFilter($dataType)
+    public function createFilter($filterType, array $options = [])
     {
-        if (!isset($this->filters[$dataType])) {
+        if (!isset($this->filters[$filterType])) {
             return null;
         }
 
-        $options = $this->filters[$dataType];
-        $filterClassName = $options[0];
+        list($filterClassName, $parameters) = $this->filters[$filterType];
+        $options = array_replace($parameters, $options);
+        $dataType = $filterType;
+        if (array_key_exists(self::DATA_TYPE_OPTION, $options)) {
+            $dataType = $options[self::DATA_TYPE_OPTION];
+            unset($options[self::DATA_TYPE_OPTION]);
+        }
         $filter = new $filterClassName($dataType);
-        if (!empty($options[1])) {
-            foreach ($options[1] as $name => $value) {
-                $this->propertyAccessor->setValue($filter, $name, $value);
-            }
+        foreach ($options as $name => $value) {
+            $this->propertyAccessor->setValue($filter, $name, $value);
         }
 
         return $filter;
