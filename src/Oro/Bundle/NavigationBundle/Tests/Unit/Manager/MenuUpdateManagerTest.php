@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Knp\Menu\ItemInterface;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
@@ -59,20 +60,29 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateMenuUpdate()
     {
+        $ownershipType = MenuUpdate::OWNERSHIP_USER;
+        $ownerId = 1;
+
         $entity = new MenuUpdateStub();
-        $entity->setOwnershipType(MenuUpdateStub::OWNERSHIP_GLOBAL);
+        $entity
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+        ;
 
         $this->manager->setEntityClass(MenuUpdateStub::class);
-        $result = $this->manager->createMenuUpdate();
+        $result = $this->manager->createMenuUpdate($ownershipType, $ownerId);
 
         $this->assertEquals($entity, $result);
         $this->assertEquals($entity->getOwnershipType(), $result->getOwnershipType());
+        $this->assertEquals($entity->getOwnerId(), $result->getOwnerId());
     }
 
     public function testGetMenuUpdateByKeyDatabase()
     {
         $menuName = 'test-menu';
         $key = 'test-key';
+        $ownershipType = MenuUpdate::OWNERSHIP_USER;
+        $ownerId = 1;
 
         $update = new MenuUpdateStub();
 
@@ -81,19 +91,26 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['menu' => $menuName, 'key' => $key])
+            ->with(['menu' => $menuName, 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue($update));
 
-        $this->assertEquals($update, $this->manager->getMenuUpdateByKey($menuName, $key));
+        $result = $this->manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
+
+        $this->assertEquals($update, $result);
     }
 
     public function testGetMenuUpdateByKeyYml()
     {
         $menuName = 'test-menu';
         $key = 'test-key';
+        $ownershipType = MenuUpdate::OWNERSHIP_USER;
+        $ownerId = 1;
 
         $update = new MenuUpdateStub();
-        $update->setOwnershipType(MenuUpdateInterface::OWNERSHIP_GLOBAL);
+        $update
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+        ;
 
         $menu = $this->getMock(ItemInterface::class);
         $menu->expects($this->once())
@@ -107,7 +124,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['menu' => $menuName, 'key' => $key])
+            ->with(['menu' => $menuName, 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue(null));
 
         $this->builderChainProvider
@@ -127,13 +144,17 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->method('updateMenuUpdate')
             ->with($update, $item, 'test-item');
 
-        $this->assertEquals($update, $this->manager->getMenuUpdateByKey($menuName, $key));
+        $result = $this->manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
+
+        $this->assertEquals($update, $result);
     }
 
     public function testGetMenuUpdateByKeyEmpty()
     {
         $menuName = 'test-menu';
         $key = 'test-key';
+        $ownershipType = MenuUpdate::OWNERSHIP_USER;
+        $ownerId = 1;
 
         $menu = $this->getMock(ItemInterface::class);
 
@@ -142,7 +163,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['menu' => $menuName, 'key' => $key])
+            ->with(['menu' => $menuName, 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue(null));
 
         $this->builderChainProvider
@@ -157,6 +178,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->with($menu, $key)
             ->will($this->returnValue(null));
 
-        $this->assertNull($this->manager->getMenuUpdateByKey($menuName, $key));
+        $result = $this->manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
+
+        $this->assertNull($result);
     }
 }

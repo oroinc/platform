@@ -32,6 +32,16 @@ oro_navigation_api_pagestate:
     defaults:
         version:  latest
 
+oro_navigation_api_menuupdate:
+    resource:     "@OroNavigationBundle/Controller/Api/MenuUpdateController.php"
+    type:         rest
+    prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest
+
 oro_pinbar_help:
     pattern:      /pinbar/help
     defaults:     { _controller: FrameworkBundle:Template:template, template: "OroNavigationBundle:Pinbar:help.html.twig" }

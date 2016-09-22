@@ -53,10 +53,15 @@ class MenuUpdateController extends Controller
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
         /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $manager->createMenuUpdate();
+        $menuUpdate = $manager->createMenuUpdate(MenuUpdate::OWNERSHIP_USER, $this->getUser()->getId());
 
         if ($parentKey) {
-            $parent = $manager->getMenuUpdateByKey($menu, $parentKey);
+            $parent = $manager->getMenuUpdateByKeyAndScope(
+                $menu,
+                $parentKey,
+                MenuUpdate::OWNERSHIP_USER,
+                $this->getUser()->getId()
+            );
 
             if (!$parent) {
                 throw $this->createNotFoundException();
@@ -90,7 +95,12 @@ class MenuUpdateController extends Controller
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
         /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $manager->getMenuUpdateByKey($menu, $key);
+        $menuUpdate = $manager->getMenuUpdateByKeyAndScope(
+            $menu,
+            $key,
+            MenuUpdate::OWNERSHIP_USER,
+            $this->getUser()->getId()
+        );
         if (!$menuUpdate) {
             throw $this->createNotFoundException();
         }

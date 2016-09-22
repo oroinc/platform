@@ -54,14 +54,19 @@ class MenuUpdateManager
     }
 
     /**
-     * @param int $ownership
+     * @param int $ownershipType
+     * @param int $ownerId
+     *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownership = MenuUpdateInterface::OWNERSHIP_GLOBAL)
+    public function createMenuUpdate($ownershipType, $ownerId)
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
-        $entity->setOwnershipType($ownership);
+        $entity
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+        ;
 
         return $entity;
     }
@@ -69,32 +74,41 @@ class MenuUpdateManager
     /**
      * @param string $menuName
      * @param string $key
+     * @param int $ownershipType
+     * @param int $ownerId
      *
      * @return null|MenuUpdateInterface
      */
-    public function getMenuUpdateByKey($menuName, $key)
+    public function getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId)
     {
         /** @var MenuUpdateInterface $update */
-        $update = $this->getRepository()->findOneBy(['menu' => $menuName, 'key' => $key]);
+        $update = $this->getRepository()->findOneBy([
+            'menu' => $menuName,
+            'key' => $key,
+            'ownershipType' => $ownershipType,
+            'ownerId' => $ownerId,
+        ]);
         if ($update) {
             return $update;
         }
 
-        return $this->getMenuUpdateFromMenu($menuName, $key);
+        return $this->getMenuUpdateFromMenu($menuName, $key, $ownershipType, $ownerId);
     }
 
     /**
      * @param string $menuName
      * @param string $key
+     * @param int $ownershipType
+     * @param int $ownerId
      *
      * @return null|MenuUpdateInterface
      */
-    private function getMenuUpdateFromMenu($menuName, $key)
+    public function getMenuUpdateFromMenu($menuName, $key, $ownershipType, $ownerId)
     {
         $menu = $this->getMenu($menuName);
         $item = $this->menuUpdateHelper->findMenuItem($menu, $key);
         if ($item) {
-            $update = $this->createMenuUpdate();
+            $update = $this->createMenuUpdate($ownershipType, $ownerId);
             $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menu->getName());
 
             return $update;
