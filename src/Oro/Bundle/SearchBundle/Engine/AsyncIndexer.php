@@ -118,7 +118,7 @@ class AsyncIndexer implements IndexerInterface
         if (is_array($entity)) {
             $result = [];
 
-            foreach ($entity as $entityEntry)  {
+            foreach ($entity as $entityEntry) {
                 $result[] = $this->getEntityScalarRepresentation($entityEntry);
             }
 
