@@ -42,6 +42,14 @@ class Select2Entity extends Element
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function selectOption($option, $multiple = false)
+    {
+        $this->setValue($option);
+    }
+
+    /**
      * @return NodeElement[]
      */
     public function getSuggestions()
