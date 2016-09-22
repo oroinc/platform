@@ -32,7 +32,7 @@ class Select2Entity extends Element
                 }
             }
 
-            self::fail(sprintf('Too many results for "%s"', $value));
+            self::fail(sprintf('Many results "%s" was found, but no one exactly match', $value));
         }
 
         self::assertNotCount(0, $results, sprintf('Not found result for "%s"', $value));

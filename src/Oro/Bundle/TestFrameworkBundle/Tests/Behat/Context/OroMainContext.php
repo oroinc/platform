@@ -246,7 +246,6 @@ class OroMainContext extends MinkContext implements
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
-
     }
 
     /**
