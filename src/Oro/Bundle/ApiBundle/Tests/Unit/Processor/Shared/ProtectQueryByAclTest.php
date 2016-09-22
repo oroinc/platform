@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\Common\Collections\Criteria;
-
+use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl;
@@ -51,6 +50,18 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         $this->context = new Context($configProvider, $metadataProvider);
     }
 
+    /**
+     * @return Criteria
+     */
+    protected function getCriteria()
+    {
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return new Criteria($resolver);
+    }
+
     public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
@@ -77,7 +88,7 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         $this->context->setClassName($className);
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
-        $criteria = new Criteria();
+        $criteria = $this->getCriteria();
         $this->context->setCriteria($criteria);
 
         $this->aclHelper->expects($this->once())
@@ -95,7 +106,7 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         $aclResource = 'acme_test_delete_resource';
         $config->setAclResource($aclResource);
         $this->context->setConfig($config);
-        $criteria = new Criteria();
+        $criteria = $this->getCriteria();
         $this->context->setCriteria($criteria);
         $aclAnnotation = new Acl(
             [
