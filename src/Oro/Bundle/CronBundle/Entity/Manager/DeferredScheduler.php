@@ -33,6 +33,9 @@ class DeferredScheduler implements LoggerAwareInterface
     /** @var array|Schedule[] */
     protected $forPersist = [];
 
+    /** @var array */
+    protected $lateArgumentsResolving = [];
+
     /** @var ManagerRegistry */
     private $registry;
 
@@ -55,16 +58,39 @@ class DeferredScheduler implements LoggerAwareInterface
 
     /**
      * @param string $command
+     * @param array|callable $arguments can be late resolving callback values (resolving will happen when flush invokes)
+     * @param string $cronDefinition
+     * @return void
+     */
+    public function addSchedule($command, $arguments, $cronDefinition)
+    {
+        if (is_callable($arguments)) {
+            $this->lateArgumentsResolving[] = [$command, $arguments, $cronDefinition];
+        } else {
+            $newSchedule = $this->ensureCreate($command, $arguments, $cronDefinition);
+
+            if ($newSchedule) {
+                $this->forPersist[] = $newSchedule;
+                $this->dirty = true;
+            }
+        }
+    }
+
+    /**
+     * @param string $command
      * @param array $arguments
      * @param string $cronDefinition
+     * @return null|Schedule
      */
-    public function addSchedule($command, array $arguments, $cronDefinition)
+    protected function ensureCreate($command, array $arguments, $cronDefinition)
     {
         if (!$this->scheduleManager->hasSchedule($command, $arguments, $cronDefinition)) {
             $schedule = $this->scheduleManager->createSchedule($command, $arguments, $cronDefinition);
-            $this->forPersist[] = $schedule;
-            $this->dirty = true;
             $this->notify('created', $schedule);
+
+            return $schedule;
+        } else {
+            return null;
         }
     }
 
@@ -139,17 +165,28 @@ class DeferredScheduler implements LoggerAwareInterface
      */
     public function flush()
     {
-        if ($this->dirty) {
+        if ($this->dirty || (count($this->lateArgumentsResolving) > 0)) {
             $objectManager = $this->getObjectManager();
 
             while ($toPersist = array_shift($this->forPersist)) {
                 $objectManager->persist($toPersist);
             }
+
+            while ($lateArguments = array_shift($this->lateArgumentsResolving)) {
+                list($command, $argumentsCallback, $cron) = $lateArguments;
+                $arguments = call_user_func($argumentsCallback);
+                $schedule = $this->ensureCreate($command, $arguments, $cron);
+                if ($schedule) {
+                    $objectManager->persist($schedule);
+                }
+            }
+
             while ($toRemove = array_shift($this->forRemove)) {
                 if ($objectManager->contains($toRemove)) {
                     $objectManager->remove($toRemove);
                 }
             }
+
             $objectManager->flush();
             $this->dirty = false;
             $this->logger->info('>>> schedule modification persisted.');

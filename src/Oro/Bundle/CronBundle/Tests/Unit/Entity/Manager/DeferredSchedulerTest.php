@@ -49,27 +49,62 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddAndFlush()
     {
+        $command = 'oro:test:command';
         $cronExpression = '* * * * *';
-
         $arguments = ['--arg1=string', '--arg2=100500'];
 
         //hasSchedule
         $this->scheduleManager->expects($this->once())
             ->method('hasSchedule')
-            ->with('oro:test:command', $arguments, $cronExpression)
+            ->with($command, $arguments, $cronExpression)
             ->willReturn(false);
 
         //create schedule
         $scheduleEntity = new Schedule();
         $this->scheduleManager->expects($this->once())
             ->method('createSchedule')
-            ->with('oro:test:command', $arguments, $cronExpression)
+            ->with($command, $arguments, $cronExpression)
             ->willReturn($scheduleEntity);
 
         $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
         $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
 
-        $this->deferredScheduler->addSchedule('oro:test:command', $arguments, $cronExpression);
+        $this->deferredScheduler->addSchedule($command, $arguments, $cronExpression);
+
+        $this->objectManager->expects($this->once())->method('flush');
+        $this->deferredScheduler->flush();
+        // second flush should be empty
+        $this->deferredScheduler->flush();
+    }
+
+    public function testAddLateArgumentsResolvingAndFlush()
+    {
+        $command = 'oro:test:command';
+        $cronExpression = '* * * * *';
+        $arguments = ['--arg1=string', '--arg2=100500'];
+        $argumentsCallback = function () use ($arguments) {
+            return $arguments;
+        };
+
+        //will cause to defer arguments for resolving on flush call
+        $this->deferredScheduler->addSchedule($command, $argumentsCallback, $cronExpression);
+
+        //while flush runs lateArgumentsResolving would have job to run
+        //hasSchedule
+        $this->scheduleManager->expects($this->once())
+            ->method('hasSchedule')
+            ->with($command, $arguments, $cronExpression)
+            ->willReturn(false);
+
+        //create schedule
+        $scheduleEntity = new Schedule();
+        $this->scheduleManager->expects($this->once())
+            ->method('createSchedule')
+            ->with($command, $arguments, $cronExpression)
+            ->willReturn($scheduleEntity);
+
+        $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
+        $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
 
         $this->objectManager->expects($this->once())->method('flush');
         $this->deferredScheduler->flush();

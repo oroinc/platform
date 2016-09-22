@@ -24,8 +24,8 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
      */
     public function __construct(DeferredScheduler $deferredScheduler)
     {
-        $this->setLogger(new NullLogger());
         $this->deferredScheduler = $deferredScheduler;
+        $this->setLogger(new NullLogger());
     }
 
     /**

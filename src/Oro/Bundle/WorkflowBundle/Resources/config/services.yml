@@ -270,7 +270,9 @@ services:
             - '@oro_workflow.repository.workflow_item'
 
     oro_workflow.transition_trigger.cron_scheduler:
-        class:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTriggerCronScheduler
+        arguments:
+            - '@oro_cron.deferred_scheduler'
 
     oro_workflow.validator_expression.dql_expression_verifier:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
@@ -304,3 +306,4 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.transition_trigger.update_decider'
+            - '@oro_workflow.transition_trigger.cron_scheduler'
