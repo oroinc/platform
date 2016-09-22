@@ -94,7 +94,6 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
      */
     public function testIsEqual($expected, array $match, array $against)
     {
-
         $this->assertEquals(
             $expected,
             $this->createEventTrigger($match)->isEqualTo(
