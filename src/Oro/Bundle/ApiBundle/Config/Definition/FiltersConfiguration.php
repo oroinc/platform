@@ -58,13 +58,45 @@ class FiltersConfiguration extends AbstractConfigurationSection
         //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
         $this->callConfigureCallbacks($node, $sectionName);
         $this->addPreProcessCallbacks($parentNode, $sectionName);
-        $this->addPostProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks(
+            $parentNode,
+            $sectionName,
+            function ($value) {
+                return $this->postProcessFieldConfig($value);
+            }
+        );
 
         $node
             ->booleanNode(FilterFieldConfig::EXCLUDE)->end()
             ->scalarNode(FilterFieldConfig::DESCRIPTION)->cannotBeEmpty()->end()
             ->scalarNode(FilterFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
+            ->scalarNode(FilterFieldConfig::TYPE)->cannotBeEmpty()->end()
+            ->arrayNode(FilterFieldConfig::OPTIONS)
+                ->useAttributeAsKey('name')
+                ->performNoDeepMerging()
+                ->prototype('variable')->end()
+            ->end()
+            ->arrayNode(FilterFieldConfig::OPERATORS)
+                ->prototype('scalar')->end()
+            ->end()
             ->scalarNode(FilterFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
             ->booleanNode(FilterFieldConfig::ALLOW_ARRAY)->end();
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected function postProcessFieldConfig(array $config)
+    {
+        if (empty($config[FilterFieldConfig::OPTIONS])) {
+            unset($config[FilterFieldConfig::OPTIONS]);
+        }
+        if (empty($config[FilterFieldConfig::OPERATORS])) {
+            unset($config[FilterFieldConfig::OPERATORS]);
+        }
+
+        return $config;
     }
 }
