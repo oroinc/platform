@@ -339,7 +339,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @When /^(?:|I )save form$/
+     * @When /^(?:|I )(save|submit) form$/
      */
     public function iSaveForm()
     {

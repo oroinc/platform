@@ -21,10 +21,9 @@ class Select2Entity extends Element
         self::assertCount(1, $inputs);
         array_shift($inputs)->setValue($value);
 
-        $results = $this->getSuggestedValues();
+        $results = $this->getSuggestions();
 
         if (1 < count($results)) {
-            /** @var NodeElement $result */
             foreach ($results as $result) {
                 if ($result->getText() == $value) {
                     $result->click();
@@ -43,9 +42,9 @@ class Select2Entity extends Element
     }
 
     /**
-     * @return string[]
+     * @return NodeElement[]
      */
-    public function getSuggestedValues()
+    public function getSuggestions()
     {
         $this->open();
         $this->getDriver()->waitForAjax();
@@ -61,21 +60,23 @@ class Select2Entity extends Element
             }
         }
 
-//        $resultsHoldersXpaths = [
-//            '//ul[contains(@class, "select2-result-sub")]',
-//            '//ul[contains(@class, "select2-result")]',
-//        ];
-//
-//        while ($resultsHoldersXpath = array_shift($resultsHoldersXpaths)) {
-//            /** @var NodeElement $element */
-//            foreach ($this->findAll('xpath', $resultsHoldersXpath) as $element) {
-//                if ($element->isVisible()) {
-//                    return $element->findAll('css', 'li');
-//                }
-//            }
-//        }
-//
         return [];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSuggestedValues()
+    {
+        $suggestions = array_map(
+            function (NodeElement $element) {
+                return $element->getText();
+            },
+            $this->getSuggestions()
+        );
+        $this->close();
+
+        return $suggestions;
     }
 
     public function open()
@@ -87,7 +88,9 @@ class Select2Entity extends Element
 
     public function close()
     {
-        if ($this->isOpen()) {
+        if ($dropDownMask = $this->getPage()->find('css', '.select2-drop-mask')) {
+            $dropDownMask->click();
+        } elseif ($this->isOpen()) {
             $this->getParent()->find('css', '.select2-arrow')->click();
         }
     }
