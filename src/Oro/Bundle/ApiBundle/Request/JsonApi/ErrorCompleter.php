@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\AbstractErrorCompleter;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 
 class ErrorCompleter extends AbstractErrorCompleter
@@ -42,9 +43,17 @@ class ErrorCompleter extends AbstractErrorCompleter
                 } else {
                     $parts = explode('.', $propertyPath);
                     if (array_key_exists($parts[0], $metadata->getAssociations())) {
-                        $pointer = [JsonApiDoc::RELATIONSHIPS, $parts[0], JsonApiDoc::DATA];
+                        $association = $metadata->getAssociation($parts[0]);
+                        $pointer = DataType::isAssociationAsField($association->getDataType())
+                            ? [JsonApiDoc::ATTRIBUTES, $parts[0]]
+                            : [JsonApiDoc::RELATIONSHIPS, $parts[0], JsonApiDoc::DATA];
                         if (count($parts) > 1) {
                             $pointer[] = $parts[1];
+                            if (DataType::isAssociationAsField($association->getDataType())
+                                && !$association->isCollapsed()
+                            ) {
+                                $pointer = array_merge($pointer, array_slice($parts, 2));
+                            }
                         }
                     } else {
                         $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));

@@ -1,0 +1,18 @@
+layout:
+    actions:
+        - '@addTree':
+            items:
+                __wrapper:
+                    blockType: container
+                    options:
+                        attr:
+                            class: "second-wrapper"
+            tree:
+                __root:
+                    __wrapper: ~
+
+    imports:
+        -
+            id: third_level
+            namespace: third
+            root: __wrapper

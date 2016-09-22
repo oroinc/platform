@@ -20,10 +20,10 @@ class ChainFilterFactory implements FilterFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createFilter($dataType)
+    public function createFilter($filterType, array $options = [])
     {
         foreach ($this->factories as $factory) {
-            $filter = $factory->createFilter($dataType);
+            $filter = $factory->createFilter($filterType, $options);
             if (null !== $filter) {
                 return $filter;
             }
