@@ -145,6 +145,8 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif ($sndParent->hasClass('control-group-choice')) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
+            } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
+                return $field;
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
