@@ -51,7 +51,7 @@ define(function(require) {
                 var postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
                 if (this.isChanged()) {
                     if (this.validator.form()) {
-                        this.trigger('save' + postfix + 'Action')
+                        this.trigger('save' + postfix + 'Action');
                     } else {
                         this.focus();
                     }

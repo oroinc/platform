@@ -76,14 +76,8 @@ class InlineEditingExtension extends AbstractExtension
             [Configuration::BASE_CONFIG_KEY => $configItems]
         );
 
-        $aclResource = !empty($configItems[Configuration::CONFIG_ACL_KEY]) ?
-            $configItems[Configuration::CONFIG_ACL_KEY] :
-            'EDIT;entity:' . $configItems[Configuration::CONFIG_ENTITY_KEY];
-
-        $isGranted = $this->securityFacade->isGranted($aclResource);
-
         //according to ACL disable inline editing for the whole grid
-        if (!$isGranted) {
+        if (!$this->isGranted($configItems)) {
             $normalizedConfigItems[Configuration::CONFIG_ENABLE_KEY] = false;
         }
 
@@ -139,6 +133,17 @@ class InlineEditingExtension extends AbstractExtension
         }
 
         $config->offsetSet(FormatterConfiguration::COLUMNS_KEY, $columns);
+    }
+
+    /**
+     * @param array $configItems
+     * @return bool
+     */
+    protected function isGranted(array $configItems)
+    {
+        return !empty($configItems[Configuration::CONFIG_ACL_KEY]) ?
+            $configItems[Configuration::CONFIG_ACL_KEY] :
+            'EDIT;entity:' . $configItems[Configuration::CONFIG_ENTITY_KEY];
     }
 
     /**

@@ -103,6 +103,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $configValues
+     * @param array $expectedValues
      * @param string $entityName
      * @dataProvider processConfigsProvider
      */
