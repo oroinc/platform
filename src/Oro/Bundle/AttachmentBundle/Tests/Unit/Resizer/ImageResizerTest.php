@@ -67,7 +67,12 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     public function testResizeImageWhenImageExistsAndNoForce()
     {
         $logger = $this->prophesize(LoggerInterface::class);
-        $logger->warning('Image (id: 1, filename: name.jpg) not found. Skipped during resize.');
+        $logger
+            ->warning(
+                'Image (id: 1, filename: name.jpg) not found. Skipped during resize.',
+                ['exception' => Argument::type(\Exception::class)]
+            )
+            ->shouldBeCalled();
         $this->resizer->setLogger($logger->reveal());
 
         $image = $this->prophesize(File::class);

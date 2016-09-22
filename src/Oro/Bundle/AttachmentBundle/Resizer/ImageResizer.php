@@ -79,11 +79,16 @@ class ImageResizer implements LoggerAwareInterface
         try {
             $content = $this->fileManager->getContent($image);
         } catch (\Exception $e) {
-            $this->logger->warning(sprintf(
-                'Image (id: %d, filename: %s) not found. Skipped during resize.',
-                $image->getId(),
-                $image->getFilename()
-            ));
+            if (null !== $this->logger) {
+                $this->logger->warning(
+                    sprintf(
+                        'Image (id: %d, filename: %s) not found. Skipped during resize.',
+                        $image->getId(),
+                        $image->getFilename()
+                    ),
+                    ['exception' => $e]
+                );
+            }
 
             return false;
         }
