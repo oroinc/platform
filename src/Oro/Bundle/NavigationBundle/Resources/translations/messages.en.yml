@@ -27,6 +27,12 @@ oro:
             name.label: Name
         menuupdate:
             menus: All Menus
+            submenu: Submenu Item
+            reset: Reset
+            reset_confirm: Are you sure you want to reset menu "%menuKey%"?
+            reset_message: Menu "%menuKey%" successfully reset
+            reset_ok_text: Yes, Reset
+            reset_title: Reset Confirmation
             entity_label: Menu Item
             entity_plural_label: Menu Item
             id.label: Id

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @RouteResource("menuupdates")
@@ -58,6 +59,30 @@ class MenuUpdateController extends Controller
         } else {
             $menuUpdate->setActive(false);
             $manager->updateMenuUpdate($menuUpdate);
+        }
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @Delete("/menuupdate/reset/{menuName}")
+     * @AclAncestor("oro_navigation_menu_update_delete")
+     * @ApiDoc(description="Reset menu to default state.")
+     *
+     * @param string $menuName
+     *
+     * @return Response
+     */
+    public function resetAction($menuName)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+
+        $userId = $this->getUser()->getId();
+        $updates = $manager->getMenuUpdatesByMenuAndScope($menuName, MenuUpdate::OWNERSHIP_USER, $userId);
+
+        foreach ($updates as $update) {
+            $manager->removeMenuUpdate($update);
         }
 
         return new JsonResponse(null, 204);

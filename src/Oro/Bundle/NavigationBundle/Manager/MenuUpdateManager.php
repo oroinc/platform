@@ -91,6 +91,22 @@ class MenuUpdateManager
 
     /**
      * @param string $menuName
+     * @param int $ownershipType
+     * @param int $ownerId
+     *
+     * @return MenuUpdateInterface[]
+     */
+    public function getMenuUpdatesByMenuAndScope($menuName, $ownershipType, $ownerId)
+    {
+        return $this->getRepository()->findBy([
+            'menu' => $menuName,
+            'ownershipType' => $ownershipType,
+            'ownerId' => $ownerId,
+        ]);
+    }
+
+    /**
+     * @param string $menuName
      * @param string $key
      * @param int $ownershipType
      * @param int $ownerId
