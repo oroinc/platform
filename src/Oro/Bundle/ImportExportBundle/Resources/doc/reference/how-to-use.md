@@ -37,7 +37,7 @@ namespace OroCRM\Bundle\ContactBundle\ImportExport\Serializer\Normalizer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
 
-use OroCRM\Bundle\ContactBundle\Entity\Group;
+use Oro\Bundle\ContactBundle\Entity\Group;
 
 class GroupNormalizer extends ConfigurableEntityNormalizer
 {
@@ -101,7 +101,7 @@ names of properties in export/import files, you can extend `Oro\Bundle\ImportExp
 namespace OroCRM\Bundle\ContactBundle\ImportExport\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
-use OroCRM\Bundle\ContactBundle\ImportExport\Provider\ContactHeaderProvider;
+use Oro\Bundle\ContactBundle\ImportExport\Provider\ContactHeaderProvider;
 
 class GroupDataConverter extends AbstractTableDataConverter
 {
@@ -260,7 +260,7 @@ namespace OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture;
 
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 
-use OroCRM\Bundle\ContactBundle\Entity\Contact;
+use Oro\Bundle\ContactBundle\Entity\Contact;
 
 class ContactFixture implements TemplateFixtureInterface
 {
