@@ -2,7 +2,6 @@ parameters:
     oro_workflow.listener.process_data_serialize.class:  Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener
     oro_workflow.listener.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener
     oro_workflow.listener.workflow_item.class:           Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener
-    oro_workflow.listener.process_collector.class:       Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener
 
 services:
     oro_workflow.listener.process_data_serialize:
@@ -35,8 +34,8 @@ services:
             - { name: doctrine.event_listener, event: preRemove }
             - { name: doctrine.event_listener, event: postFlush }
 
-    oro_workflow.listener.process_collector:
-        class: %oro_workflow.listener.process_collector.class%
+    oro_workflow.listener.event_trigger_collector:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\EventTriggerCollectorListener'
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
@@ -53,7 +52,7 @@ services:
             - '@oro_workflow.cache.process_trigger'
             - '@oro_workflow.process.schedule_policy'
         tags:
-            - { name: oro_workflow.listener.process_collector.extension }
+            - { name: oro_workflow.listener.event_trigger_collector.extension }
 
     oro_workflow.listener.extension.transition_trigger_event:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExtension'
@@ -64,7 +63,7 @@ services:
             - '@oro_workflow.helper.transition_event_trigger'
             - '@oro_workflow.manager'
         tags:
-            - { name: oro_workflow.listener.process_collector.extension }
+            - { name: oro_workflow.listener.event_trigger_collector.extension }
 
     oro_workflow.entity_listener.activation_validator:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowActivationValidatorEntityListener

@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EventTriggerExtensionCompilerPass implements CompilerPassInterface
 {
-    const LISTENER_SERVICE = 'oro_workflow.listener.process_collector';
-    const EXTENSION_TAG = 'oro_workflow.listener.process_collector.extension';
+    const LISTENER_SERVICE = 'oro_workflow.listener.event_trigger_collector';
+    const EXTENSION_TAG = 'oro_workflow.listener.event_trigger_collector.extension';
 
     /**
      * @param ContainerBuilder $container
