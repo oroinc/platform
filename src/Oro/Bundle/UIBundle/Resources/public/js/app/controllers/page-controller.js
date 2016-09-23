@@ -323,7 +323,7 @@ define([
                 _.defaults(options, {forceStartup: true, force: true});
                 $.when.apply($, queue).done(_.bind(function(customOptions) {
                     _.extend(options, customOptions || {});
-                    this._processRedirect({url: String(location)}, options);
+                    this._processRedirect({url: location.href}, options);
                     mediator.trigger('page:afterRefresh');
                 }, this));
             }, this);
