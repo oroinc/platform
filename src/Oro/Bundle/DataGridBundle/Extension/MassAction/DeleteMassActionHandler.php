@@ -105,9 +105,10 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
             ];
         }
 
+        $manager->flush();
+
         $this->producer->send(Topics::INDEX_ENTITIES, $body);
 
-        $manager->flush();
         $manager->clear();
     }
 
