@@ -7,6 +7,17 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TransitionCronTriggerAssembler extends AbstractTransitionTriggerAssembler
 {
+    /** @var TransitionTriggerCronVerifier */
+    protected $triggerCronVerifier;
+
+    /**
+     * @param TransitionTriggerCronVerifier $triggerCronVerifier
+     */
+    public function __construct(TransitionTriggerCronVerifier $triggerCronVerifier)
+    {
+        $this->triggerCronVerifier = $triggerCronVerifier;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -21,10 +32,13 @@ class TransitionCronTriggerAssembler extends AbstractTransitionTriggerAssembler
     protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
         $trigger = new TransitionCronTrigger();
-
-        return $trigger
+        $trigger
             ->setCron($options['cron'])
             ->setFilter($this->getOption($options, 'filter', null))
             ->setQueued($this->getOption($options, 'queued', true));
+
+        $this->triggerCronVerifier->verify($trigger);
+
+        return $trigger;
     }
 }
