@@ -10,14 +10,35 @@ datagrids:
                     - language.enabled
                     - language.createdAt
                     - language.updatedAt
+                    - CONCAT_WS(' ', languageOwner.firstName, languageOwner.lastName) as ownerName
+                    - languageOwner.id as owner
                 from:
                     - { table: '%oro_translation.entity.language.class%', alias: language }
+                join:
+                    left:
+                        - { join: language.owner, alias: languageOwner }
+        inline_editing:
+            enable: true
+            entity_name: '%oro_translation.entity.language.class%'
         columns:
             code:
                 label: oro.translation.language.entity_label
                 type: twig
                 frontend_type: html
                 template: OroTranslationBundle:Language:Datagrid/code.html.twig
+            ownerName:
+                acl_resource: oro_translation_language_update
+                label: oro.translation.language.owner.label
+                inline_editing:
+                    enable: true
+                    editor:
+                        view: oroform/js/app/views/editor/related-id-relation-editor-view
+                        view_options:
+                            value_field_name: owner
+                    autocomplete_api_accessor:
+                        class: orouser/js/tools/acl-users-search-api-accessor
+                        permission_check_entity_name: Oro_Bundle_TranslationBundle_Entity_Language
+                        permission: EDIT
             enabled:
                 label: oro.translation.language.enabled.label
                 type: twig
@@ -57,8 +78,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                true: oro.translation.language.enabled.label
-                                false: oro.translation.language.disabled.label
+                                true: oro.translation.language.status.enabled
+                                false: oro.translation.language.status.disabled
                 createdAt:
                     type:      datetime
                     data_name: language.createdAt
@@ -69,6 +90,7 @@ datagrids:
                     enabled:   false
         properties:
             id: ~
+            owner: ~
 
     oro-translation-translations-grid:
         acl_resource: oro_translation_translation_index
@@ -101,6 +123,7 @@ datagrids:
         inline_editing:
             enable: true
             entity_name: '%oro_translation.entity.translation.class%'
+            acl_resource: oro_translation_language_translate
         columns:
             id:
                 label: oro.translation.translation.id.label

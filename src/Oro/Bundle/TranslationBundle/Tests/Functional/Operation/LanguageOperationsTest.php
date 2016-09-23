@@ -31,7 +31,7 @@ class LanguageOperationsTest extends ActionTestCase
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
 
         $this->assertFalse($language->isEnabled());
-        $this->assertExecuteOperation('oro_translation_enable_language', $language->getId(), Language::class);
+        $this->assertExecuteOperation('oro_translation_language_enable', $language->getId(), Language::class);
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
         $this->assertTrue($language->isEnabled());
     }
@@ -43,7 +43,7 @@ class LanguageOperationsTest extends ActionTestCase
         $language->setEnabled(true);
 
         $this->assertTrue($language->isEnabled());
-        $this->assertExecuteOperation('oro_translation_disable_language', $language->getId(), Language::class);
+        $this->assertExecuteOperation('oro_translation_language_disable', $language->getId(), Language::class);
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
         $this->assertFalse($language->isEnabled());
     }
@@ -55,7 +55,7 @@ class LanguageOperationsTest extends ActionTestCase
         $language->setEnabled(true);
 
         $this->assertTrue($language->isEnabled());
-        $crawler = $this->assertOperationForm('oro_translation_add_language', $language->getId(), Language::class);
+        $crawler = $this->assertOperationForm('oro_translation_language_add', $language->getId(), Language::class);
         $form = $crawler->selectButton('Add Language')->form([
             'oro_action_operation[language_code]' => 'en_US',
         ]);

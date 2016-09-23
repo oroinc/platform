@@ -45,6 +45,9 @@ oro.translation:
         error:
             install: 'Language not installed'
             update: 'Language not updated'
+        permission:
+            translate:
+                label: Translate
     translation:
         entity_label: 'Translation'
         entity_plural_label: 'Translations'

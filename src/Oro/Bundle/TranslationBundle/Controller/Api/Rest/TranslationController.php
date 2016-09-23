@@ -13,6 +13,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Handler\Context;
 
@@ -112,6 +113,7 @@ class TranslationController extends FOSRestController
      * @return Response
      *
      * @Patch("translations/{locale}/{domain}/{key}/update")
+     * @AclAncestor("oro_translation_language_translate")
      */
     public function updateAction($locale, $domain, $key)
     {
