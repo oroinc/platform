@@ -125,12 +125,13 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
             return;
         }
 
-        if (! count($this->allInsertions) || ! count($this->allUpdates) ||
-            ! count($this->allDeletions) || ! count($this->allCollectionUpdates)) {
+        $em = $eventArgs->getEntityManager();
+
+        if (! count($this->allInsertions[$em]) && ! count($this->allUpdates[$em]) &&
+            ! count($this->allDeletions[$em]) && ! count($this->allCollectionUpdates[$em])) {
             return;
         }
-        
-        $em = $eventArgs->getEntityManager();
+
         try {
             $body = [
                 'timestamp' => time(),
