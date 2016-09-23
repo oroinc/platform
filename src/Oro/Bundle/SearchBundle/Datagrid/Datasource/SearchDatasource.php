@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
