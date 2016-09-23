@@ -20,6 +20,13 @@ class TranslationServiceProvider
     /** @var AbstractAPIAdapter */
     protected $adapter;
 
+    /**
+     * @var JsTranslationDumper
+     *
+     * @deprecated since 1.12 $jsTranslationDumper will be removed since 1.14
+     */
+    protected $jsTranslationDumper;
+
     /** @var NullLogger */
     protected $logger;
 
@@ -34,17 +41,22 @@ class TranslationServiceProvider
 
     /**
      * @param AbstractAPIAdapter  $adapter
+     * @param JsTranslationDumper $jsTranslationDumper
      * @param TranslationLoader   $translationLoader
      * @param DatabasePersister   $databasePersister
      * @param string              $cacheDir
+     *
+     * @deprecated since 1.12 $jsTranslationDumper argument will be removed since 1.14
      */
     public function __construct(
         AbstractAPIAdapter $adapter,
+        JsTranslationDumper $jsTranslationDumper,
         TranslationLoader $translationLoader,
         DatabasePersister $databasePersister,
         $cacheDir
     ) {
         $this->adapter             = $adapter;
+        $this->jsTranslationDumper = $jsTranslationDumper;
         $this->translationLoader   = $translationLoader;
         $this->databasePersister   = $databasePersister;
         $this->cacheDir            = $cacheDir;
