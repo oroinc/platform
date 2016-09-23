@@ -15,6 +15,12 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
     const TRANSLATION2 = 'translation.trans2';
     const TRANSLATION3 = 'translation.trans3';
 
+    const TRANSLATION_KEY_1 = 'translation.trans1';
+    const TRANSLATION_KEY_2 = 'translation.trans2';
+    const TRANSLATION_KEY_3 = 'translation.trans3';
+
+    const TRANSLATION_KEY_DOMAIN = 'test_domain';
+
     /**
      * {@inheritdoc}
      */
@@ -28,6 +34,10 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
      */
     public function load(ObjectManager $manager)
     {
+        $this->createTranslationKey($manager, self::TRANSLATION_KEY_1, self::TRANSLATION_KEY_DOMAIN);
+        $this->createTranslationKey($manager, self::TRANSLATION_KEY_2, self::TRANSLATION_KEY_DOMAIN);
+        $this->createTranslationKey($manager, self::TRANSLATION_KEY_3, self::TRANSLATION_KEY_DOMAIN);
+
         $this->createTranslation($manager, self::TRANSLATION1, LoadLanguages::LANGUAGE1);
         $this->createTranslation($manager, self::TRANSLATION2, LoadLanguages::LANGUAGE1);
         $this->createTranslation($manager, self::TRANSLATION3, LoadLanguages::LANGUAGE2);
@@ -39,20 +49,38 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
      * @param ObjectManager $manager
      * @param string $key
      * @param string $locale
+     *
      * @return Translation
      */
     protected function createTranslation(ObjectManager $manager, $key, $locale)
     {
         $translation = new Translation();
-        $translationKey = (new TranslationKey())->setDomain('test_domain')->setKey($key);
-        $manager->persist($translationKey);
+        $translationKey = $this->getReference(sprintf('tk-%s-%s', $key, self::TRANSLATION_KEY_DOMAIN));
+        $language = $this->getReference($locale);
         $translation
             ->setTranslationKey($translationKey)
             ->setValue($key)
-            ->setLanguage($this->getReference($locale));
+            ->setLanguage($language);
         $manager->persist($translation);
         $this->addReference($key, $translation);
 
         return $translation;
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @param string $key
+     * @param string $domain
+     *
+     * @return TranslationKey
+     */
+    protected function createTranslationKey(ObjectManager $manager, $key, $domain)
+    {
+
+        $translationKey = (new TranslationKey())->setDomain($domain)->setKey($key);
+        $manager->persist($translationKey);
+        $this->addReference(sprintf('tk-%s-%s', $key, $domain), $translationKey);
+
+        return $translationKey;
     }
 }

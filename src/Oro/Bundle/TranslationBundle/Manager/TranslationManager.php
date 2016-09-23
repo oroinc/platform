@@ -173,11 +173,11 @@ class TranslationManager
     }
 
     /**
-     * @param Translation[]|null $translations
+     * Flushes all changes
      */
-    public function flush($translations = null)
+    public function flush()
     {
-        $this->getEntityManager(Translation::class)->flush($translations);
+        $this->getEntityManager(Translation::class)->flush();
 
         // clear local cache
         $this->languages = [];
