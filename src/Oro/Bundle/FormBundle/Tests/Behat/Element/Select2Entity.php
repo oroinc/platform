@@ -7,20 +7,12 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class Select2Entity extends Element
 {
+    /**
+     * {@inheritdoc}
+     */
     public function setValue($value)
     {
-        $this->open();
-        /** @var NodeElement[] $inputs */
-        $inputs = array_filter(
-            $this->getPage()->findAll('css', '.select2-search input'),
-            function (NodeElement $element) {
-                return $element->isVisible();
-            }
-        );
-
-        self::assertCount(1, $inputs);
-        array_shift($inputs)->setValue($value);
-
+        $this->fillSearchField($value);
         $results = $this->getSuggestions();
 
         if (1 < count($results)) {
@@ -39,6 +31,24 @@ class Select2Entity extends Element
 
         array_shift($results)->click();
         $this->getDriver()->waitForAjax();
+    }
+
+    /**
+     * @param string $value
+     */
+    public function fillSearchField($value)
+    {
+        $this->open();
+        /** @var NodeElement[] $inputs */
+        $inputs = array_filter(
+            $this->getPage()->findAll('css', '.select2-search input'),
+            function (NodeElement $element) {
+                return $element->isVisible();
+            }
+        );
+
+        self::assertCount(1, $inputs);
+        array_shift($inputs)->setValue($value);
     }
 
     /**
