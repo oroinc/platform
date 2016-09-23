@@ -29,7 +29,7 @@ There are few ways how context could be accessed. Most common ways are the follo
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $value = $block->getContext()->get('value-key');
     }

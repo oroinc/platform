@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
