@@ -185,7 +185,10 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 
         $this->assertNull($submittedFallbackValue->getFallback());
         $this->assertEquals($requestData['valueWithFallback']['scalarValue'], $submittedFallbackValue->getOwnValue());
-        $this->assertEquals($requestData['valueWithFallback']['scalarValue'], $submittedFallbackValue->getScalarValue());
+        $this->assertEquals(
+            $requestData['valueWithFallback']['scalarValue'],
+            $submittedFallbackValue->getScalarValue()
+        );
     }
 
     public function testSubmitFallback()
