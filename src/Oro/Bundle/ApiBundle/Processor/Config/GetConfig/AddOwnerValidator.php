@@ -84,7 +84,7 @@ class AddOwnerValidator implements ProcessorInterface
         }
 
         // add NotBlank constraint
-        $property = $field->getPropertyPath() ?: $fieldName;
+        $property = $field->getPropertyPath($fieldName);
         if (!$this->validationHelper->hasValidationConstraintForProperty($entityClass, $property, NotBlank::class)) {
             $field->addFormConstraint(new NotBlank());
         }

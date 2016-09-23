@@ -88,3 +88,89 @@ full:
             field17: ~
             field18: ~
         extra1: true
+
+null_field_type:
+    config:
+        fields:
+            field1:
+                type: ~
+    expected:
+        fields:
+            field1: ~
+
+empty_field_type:
+    config:
+        fields:
+            field1:
+                type: ""
+    expected:
+        fields:
+            field1: ~
+
+field_type:
+    config:
+        fields:
+            field1:
+                type: integer
+    expected:
+        fields:
+            field1:
+                type: integer
+
+null_field_options:
+    config:
+        fields:
+            field1:
+                options: ~
+    expected:
+        fields:
+            field1: ~
+
+empty_field_options:
+    config:
+        fields:
+            field1:
+                options: []
+    expected:
+        fields:
+            field1: ~
+
+field_options:
+    config:
+        fields:
+            field1:
+                options:
+                    option1: value1
+    expected:
+        fields:
+            field1:
+                options:
+                    option1: value1
+
+null_field_operators:
+    config:
+        fields:
+            field1:
+                operators: ~
+    expected:
+        fields:
+            field1: ~
+
+empty_field_operators:
+    config:
+        fields:
+            field1:
+                operators: []
+    expected:
+        fields:
+            field1: ~
+
+field_operators:
+    config:
+        fields:
+            field1:
+                operators: ['=', '!=']
+    expected:
+        fields:
+            field1:
+                operators: ['=', '!=']

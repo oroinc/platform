@@ -14,9 +14,9 @@ There are two modes how expressions could be processed: if context option `expre
 then expressions will be evaluated on server side, or will be encoded to specified in 
 `expressions_encoding` context option format otherwise. 
 
-**NOTE:** it's impossible to rely on complex option values in `buildBlock` and `buildView` methods of your block type, because 
-of expressions will be evaluated only on `finishView` of base block type. You are able to deny expression usage via defining
-allowed types for option(expression always comes as an `array`)
+**NOTE:** Expressions are evaluated only on `finishView` event triggered for the base block type. Evaluation of the complex
+option values in `buildBlock` and `buildView` methods is not supported. To deny expression usage, define the allowed option types.
+Expressions are always passed in the [Options](../../../../Component/Layout/Block/Type/Options.php) object that wraps an `array` of expressions.
 
 Available variables
 -------------------
@@ -57,13 +57,13 @@ layout:
 Here we can see that *visible* option depends on context value, let's review how it could be used in a view layer:
 
 ```php
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        // here we can get scalar value as well as an expression
-        $view->vars['visible'] = $options['visible'];
+        // this operation better to use on finishView but if you are really sure you can write like this
+        $view->vars['visible'] =  $options->get('visible', false);
     }
     
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
        // we will depends on `expressions_evaluate` option we will have
        var_dump($view->vars['visible']);
