@@ -17,11 +17,11 @@ class EntityFieldFallbackTransformer implements DataTransformerInterface
             return $value;
         }
 
-        if (!is_null($value->getFallback())) {
-            return $value->setUseFallback(true);
+        if (is_null($value->getFallback())) {
+            return $value->setScalarValue($value->getOwnValue());
         }
 
-        return $value->setViewValue($value->getOwnValue());
+        return $value;
     }
 
     /**
@@ -34,7 +34,8 @@ class EntityFieldFallbackTransformer implements DataTransformerInterface
         }
 
         // set entity value to null, so entity will use fallback value
-        if ($value->isUseFallback() && $value->getFallback()) {
+        $fallbackId = $value->getFallback();
+        if (isset($fallbackId)) {
             $value->setScalarValue(null);
             $value->setArrayValue(null);
 
@@ -44,10 +45,12 @@ class EntityFieldFallbackTransformer implements DataTransformerInterface
         // not fallback, so make sure we clean fallback field
         $value->setFallback(null);
 
-        if (is_array($value->getViewValue())) {
-            return $value->setArrayValue($value->getViewValue())->setScalarValue(null);
+        if (is_array($value->getScalarValue())) {
+            return $value
+                ->setArrayValue($value->getScalarValue())
+                ->setScalarValue(null);
         }
 
-        return $value->setScalarValue($value->getViewValue())->setArrayValue(null);
+        return $value->setArrayValue(null);
     }
 }

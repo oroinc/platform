@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 class EntityFieldFallbackValue
 {
     const FALLBACK_TYPE = 'fallbackType';
-    const FALLBACK_LIST_KEY = 'fallbackList';
+    const FALLBACK_LIST = 'fallbackList';
 
     /**
      * @var integer
@@ -47,16 +47,6 @@ class EntityFieldFallbackValue
     protected $arrayValue;
 
     /**
-     * @var mixed
-     */
-    protected $viewValue;
-
-    /**
-     * @var bool
-     */
-    protected $useFallback;
-
-    /**
      * @return integer
      */
     public function getId()
@@ -79,25 +69,6 @@ class EntityFieldFallbackValue
     public function setFallback($fallback)
     {
         $this->fallback = $fallback;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isUseFallback()
-    {
-        return $this->useFallback;
-    }
-
-    /**
-     * @param boolean $useFallback
-     * @return $this
-     */
-    public function setUseFallback($useFallback)
-    {
-        $this->useFallback = $useFallback;
 
         return $this;
     }
@@ -143,25 +114,6 @@ class EntityFieldFallbackValue
     /**
      * @return mixed
      */
-    public function getViewValue()
-    {
-        return $this->viewValue;
-    }
-
-    /**
-     * @param mixed $viewValue
-     * @return $this
-     */
-    public function setViewValue($viewValue)
-    {
-        $this->viewValue = $viewValue;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getOwnValue()
     {
         if (!is_null($this->scalarValue)) {
@@ -169,13 +121,5 @@ class EntityFieldFallbackValue
         }
 
         return $this->arrayValue;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function __toString()
-    {
-        return (string)$this->scalarValue;
     }
 }

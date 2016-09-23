@@ -9,10 +9,7 @@ interface EntityFallbackProviderInterface
      * @param string $objectFieldName The field name on $object which is holding the fallback value
      * @return mixed
      */
-    public function getFallbackHolderEntity(
-        $object,
-        $objectFieldName
-    );
+    public function getFallbackHolderEntity($object, $objectFieldName);
 
     /**
      * @param object $object
@@ -20,4 +17,9 @@ interface EntityFallbackProviderInterface
      * @return bool
      */
     public function isFallbackSupported($object, $objectFieldName);
+
+    /**
+     * @return string
+     */
+    public function getFallbackLabel();
 }

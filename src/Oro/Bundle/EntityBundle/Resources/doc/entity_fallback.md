@@ -10,35 +10,34 @@ and add a @ConfigField annotation and doctrine relation to [EntityFieldFallbackV
      * @var EntityFieldFallbackValue
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue", cascade={"All"})
-     * @ORM\JoinColumn(name="manage_inventory_fallback_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="some_field_name_fallback_id", referencedColumnName="id", onDelete="SET NULL")
      * @ConfigField(
      *     defaultValues={
      *          "fallback": {
-     *              "fallbackType": "boolean",
      *              "fallbackList": {
-     *                  "category" : {
-     *                      "fieldName": "manageInventory"
+     *                  "someFallbackId" : {
+     *                      "fieldName": "someFieldName"
      *                  },
      *                  "systemConfig": {
-     *                      "configName": "oro_warehouse.manage_inventory"
+     *                      "configName": "oro_entity.some_configuration_name"
      *                  }
      *              }
      *          }
      *     }
      * )
      */
-    protected $manageInventory;
+    protected $someFieldName;
 ```
 
 An example of adding field by migration:
 
 ```php
-    $categoryTable = $schema->getTable('oro_catalog_category');
+    $someTable = $schema->getTable('oro_some_table');
     $fallbackTable = $schema->getTable('oro_entity_fallback_value');
     $this->extendExtension->addManyToOneRelation(
         $schema,
-        $categoryTable,
-        'manageInventory',
+        $someTable,
+        'someFieldName',
         $fallbackTable,
         'id',
         [
@@ -54,8 +53,8 @@ An example of adding field by migration:
             ],
             'fallback' => [
                 'fallbackList' => [
-                    'systemConfig' => ['configName' => 'oro_warehouse.manage_inventory'],
-                    'parentCategory' => ['fieldName' => 'manageInventory'],
+                    'someFallbackId' => ['fieldName' => 'someFieldName'],
+                    'systemConfig' => ['configName' => 'oro_entity.some_configuration_name'],
                 ],
             ],
         ]
@@ -69,7 +68,7 @@ The `fallbackType` specifies the type of the field value - it is only mandatory 
 system_configuration:
     (...)
     fields:
-        oro_warehouse.manage_inventory:
+        oro_entity.some_configuration_name:
             data_type: boolean
             type: choice
 ```
@@ -81,85 +80,39 @@ back to a system configuration [ConfigValue](../../../ConfigBundle/Entity/Config
 is mandatory (which refers to the form type name defined in `system_configuration.yml`). 
 There is a predefined fallback provider for `systemConfig` at [SystemConfigFallbackProvider](../../Fallback/Provider/SystemConfigFallbackProvider.php)
 
-To fallback to a new entity field, you need to create a new fallback provider, extending [AbstractEntityFallbackProvider](../../Fallback/Provider/AbstractEntityFallbackProvider.php)
-The provider for the  `category` fallback looks like:
+If a field, configured as fallback field, has a null value (no EntityFieldFallbackValue set at all), the resolver will try to automatically read 
+the fallback value from the defined `fallbackList`, in the order of definition - ie. from the example above, first try the
+`someFallbackId`, then the `systemConfig` fallback.
 
-```php
-namespace Oro\Bundle\WarehouseBundle\Fallback\Provider;
-
-use Oro\Bundle\CatalogBundle\Entity\Category;
-use Oro\Bundle\EntityBundle\Fallback\Provider\AbstractEntityFallbackProvider;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ProductBundle\Entity\Product;
-use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackArgumentException;
-
-class CategoryFallbackProvider extends AbstractEntityFallbackProvider
-{
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    /**
-     * ProductCategoryFallbackProvider constructor.
-     *
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFallbackHolderEntity(
-        $object,
-        $objectFieldName
-    ) {
-        if (!$object instanceof Product) {
-            throw new InvalidFallbackArgumentException(get_class($object), get_class($this));
-        }
-
-        return $this->doctrineHelper->getEntityRepository(Category::class)->findOneByProduct($object);
-    }
-}
-```
-
+To fallback to a new entity field, you need to create a new fallback provider, extending [AbstractEntityFallbackProvider](../../Fallback/Provider/AbstractEntityFallbackProvider.php),
 with a service definition in `Resources/config/fallbacks.yml` like:
 
 ```yaml
-    oro_warehouse.fallback.provider.category_provider:
-        class: Oro\Bundle\WarehouseBundle\Fallback\Provider\CategoryFallbackProvider
+    oro_entity.fallback.provider.system_config_provider:
+        class: Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider
         parent: oro_entity.fallback.provider.abstract_provider
         arguments:
-            - "@oro_entity.doctrine_helper"
+            - "@oro_config.manager"
         tags:
-            - { name: oro_entity.fallback_provider, id: category }
+            - { name: oro_entity.fallback_provider, id: systemConfig }
 ```
 
 We extend the parent `oro_entity.fallback.provider.abstract_provider` service, inject some dependencies, and tag it with
-`oro_entity.fallback_provider` as tag name, and `category` as id (this id will go into the @ConfigField `fallbackList` configuration as fallback name
-The provider will then need to implement `getFallbackHolderEntity` which defines how to access the parent fallback entity,
+`oro_entity.fallback_provider` as tag name, and `systemConfig` as id (this id will go into the @ConfigField `fallbackList` configuration as fallback name
+The provider will then need to implement `getFallbackHolderEntity` which defines how to access the parent fallback entity, `getFallbackLabel` used for translating the fallback name,
 and optionally the function `isFallbackSupported` which can add some conditions whether the fallback should appear as option on the ui for a specific instance.
 
-Next we need to render the field in the main object's class type, by embedding the [EntityFieldFallbackValueType](../../Form/Type/EntityFieldFallbackValueType.php) in the main type,
-like in `ProductType`:
+Next we need to render the field in the main object's class type, by embedding the [EntityFieldFallbackValueType](../../Form/Type/EntityFieldFallbackValueType.php) in the main form type,:
 
 ```php
-    $builder->add(
-        'manageInventory',
-        EntityFieldFallbackValueType::NAME,
-        [
-            'fallback_translation_prefix' => 'oro.product.fallback',
-        ]
-    )
+    $builder->add('someFieldName', EntityFieldFallbackValueType::NAME);
 ```
 
-The only mandatory option is `fallback_translation_prefix`. This type defines 3 fields: `viewValue` (which will hold the entity's own value, if no fallback is wanted),
+This type defines 3 fields: `scalarValue` (which will hold the entity's own value, if no fallback is wanted),
 `useFallback` (checkbox for ui to select/deselect fallback possibility) and `fallback` (which by default will render a dropdown with fallback list,
-and which will map to the fallback field of [EntityFieldFallbackValue](../../Entity/EntityFieldFallbackValue.php) holding the fallback id (like `category` or `systemConfig`.
-The options and types of those 3 fields can be overridden `value_options`, `fallback_options`, `use_fallback_options`, `value_type` and `fallback_type`.
+and which will map to the fallback field of [EntityFieldFallbackValue](../../Entity/EntityFieldFallbackValue.php) holding the fallback id (like `systemConfig`).
+The options and types of those 3 fields can be overridden with `value_options`, `fallback_options`, `use_fallback_options`, `value_type` and `fallback_type`.
+Internally, the submitted own value will be saved in `scalarValue`, if it is scalar, or `arrayValue`, if it's an array. 
 
 #### Example of fallback widget ####
 ![alt text](./images/fallback_example.png "Example of fallback widget")
@@ -174,5 +127,5 @@ The bundle also exposes a twig function to get the fallback compatible value of 
 [EntityFallbackResolver](../../Fallback/EntityFallbackResolver.php).
 
 ```twig
-{{ oro_entity_fallback_value(entity, 'manageInventory') }}
+{{ oro_entity_fallback_value(entity, 'someFieldName') }}
 ```

@@ -61,20 +61,13 @@ class EntityFieldFallbackValueType extends AbstractType
                 'fallback_type',
             ]
         );
-        $resolver->setRequired(
-            [
-                // translation prefix to generate fallback labels ex. oro.entity.fallback
-                'fallback_translation_prefix',
-            ]
-        );
 
         $resolver->setDefaults(
             [
                 'fallback_options' => [],
                 'use_fallback_options' => [],
                 'value_options' => [],
-                'data_class' => EntityFieldFallbackValue::class,
-                'fallback_translation_prefix',
+                'data_class' => EntityFieldFallbackValue::class
             ]
         );
     }
@@ -84,30 +77,32 @@ class EntityFieldFallbackValueType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add(
-                'useFallback',
-                CheckboxType::class,
-                array_merge(
-                    [
-                        'label' => 'oro.entity.fallback.use_fallback.label',
-                        'required' => false,
-                        'empty_data' => null,
-                    ],
-                    $options['use_fallback_options']
-                )
-            );
-
         $builder->addViewTransformer(new EntityFieldFallbackTransformer());
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {
                 $form = $event->getForm();
+                $fallbackId = $event->getData() ? $event->getData()->getFallback() : null;
+
+                $form->add(
+                    'useFallback',
+                    CheckboxType::class,
+                    array_merge(
+                        [
+                            'label' => 'oro.entity.fallback.use_fallback.label',
+                            'required' => false,
+                            'empty_data' => null,
+                            'mapped' => false,
+                            'data' => isset($fallbackId)
+                        ],
+                        $form->getConfig()->getOption('use_fallback_options')
+                    )
+                );
 
                 $valueType = $this->getValueFormType($form);
                 $form->add(
-                    'viewValue',
+                    'scalarValue',
                     $valueType,
                     $this->getValueFormOptions($form, $valueType)
                 );
@@ -215,14 +210,13 @@ class EntityFieldFallbackValueType extends AbstractType
             return $fallbackOptions;
         }
 
-        $labelPrefix = $form->getConfig()->getOption('fallback_translation_prefix');
         $choices = [];
 
         // Read fallback list of parent object
         $fallbackList = $this->fallbackResolver->getFallbackConfig(
             $form->getParent()->getData(),
             $form->getConfig()->getName(),
-            EntityFieldFallbackValue::FALLBACK_LIST_KEY
+            EntityFieldFallbackValue::FALLBACK_LIST
         );
 
         // generate choices from fallback list
@@ -236,24 +230,11 @@ class EntityFieldFallbackValueType extends AbstractType
                 continue;
             }
 
-            $labelSuffix = $fallbackId;
-            $choices[$fallbackId] = $this->getCorrectFallbackLabel($labelPrefix, $labelSuffix);
+            $choices[$fallbackId] = $this->fallbackResolver->getFallbackLabel($fallbackId);
         }
         $fallbackOptions['choices'] = $choices;
 
         return $fallbackOptions;
-    }
-
-    /**
-     * @param string $labelPrefix
-     * @param string $labelSuffix
-     * @return string
-     */
-    protected function getCorrectFallbackLabel($labelPrefix, $labelSuffix)
-    {
-        $prefix = (substr($labelPrefix, -1) == '.') ? $labelPrefix : $labelPrefix . '.';
-
-        return $prefix . $labelSuffix;
     }
 
     /**

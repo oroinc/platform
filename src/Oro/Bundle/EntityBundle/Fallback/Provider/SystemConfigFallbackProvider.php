@@ -31,18 +31,18 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
     {
         $fallbackConfig = $this->getEntityConfig($object, $objectFieldName);
 
-        if (!array_key_exists(EntityFieldFallbackValue::FALLBACK_LIST_KEY, $fallbackConfig)) {
+        if (!array_key_exists(EntityFieldFallbackValue::FALLBACK_LIST, $fallbackConfig)) {
             throw new FallbackFieldConfigurationMissingException(
                 sprintf(
                     "You must define the fallback configuration '%s' for the class '%s' field '%s'",
-                    EntityFieldFallbackValue::FALLBACK_LIST_KEY,
+                    EntityFieldFallbackValue::FALLBACK_LIST,
                     get_class($object),
                     $objectFieldName
                 )
             );
         }
 
-        $fallbackListConfig = $fallbackConfig[EntityFieldFallbackValue::FALLBACK_LIST_KEY];
+        $fallbackListConfig = $fallbackConfig[EntityFieldFallbackValue::FALLBACK_LIST];
         if (!array_key_exists(self::FALLBACK_ID, $fallbackListConfig)) {
             throw new FallbackFieldConfigurationMissingException(
                 sprintf(
@@ -68,5 +68,13 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
         }
 
         return $this->configManager->get($systemConfig[self::CONFIG_NAME_KEY]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFallbackLabel()
+    {
+        return 'oro.entity.fallback.system_config.label';
     }
 }

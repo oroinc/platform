@@ -47,7 +47,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(FallbackFieldConfigurationMissingException::class);
         $entityConfig = $this->getEntityConfiguration();
-        $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST_KEY][SystemConfigFallbackProvider::FALLBACK_ID] = [];
+        $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST][SystemConfigFallbackProvider::FALLBACK_ID] = [];
         $this->setUpFallbackConfig($entityConfig);
 
         $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
@@ -77,7 +77,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit_Framework_TestCase
     protected function getEntityConfiguration()
     {
         return [
-            EntityFieldFallbackValue::FALLBACK_LIST_KEY => [
+            EntityFieldFallbackValue::FALLBACK_LIST => [
                 SystemConfigFallbackProvider::FALLBACK_ID => ['configName' => 'test_config_name'],
             ],
             EntityFieldFallbackValue::FALLBACK_TYPE => 'boolean',

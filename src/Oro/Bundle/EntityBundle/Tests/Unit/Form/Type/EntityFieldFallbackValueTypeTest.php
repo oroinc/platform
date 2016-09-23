@@ -4,34 +4,23 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStubType;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType;
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
 class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 {
     /** @var EntityFallbackResolver|\PHPUnit_Framework_MockObject_MockObject */
     protected $fallbackResolver;
 
-    public function testBuildFormThrowsMissingOptionException()
-    {
-        $fallbackValue = new EntityFieldFallbackValue();
-        $options = [];
-
-        $this->setExpectedException(MissingOptionsException::class);
-        $this->factory->create(new EntityFieldFallbackValueType($this->fallbackResolver), $fallbackValue, $options);
-    }
-
     public function testOptionsCanBeOverridden()
     {
         $options = [
             'fallback' => [
-                'fallback_translation_prefix' => 'xxx',
                 'value_type' => IntegerType::class,
                 'fallback_type' => IntegerType::class,
                 'value_options' => ['scale' => 12],
@@ -46,7 +35,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $fallbackFormType = $this->getChildForm($form);
         $this->assertEquals(
             'integer',
-            $fallbackFormType->get('viewValue')->getConfig()->getType()->getName()
+            $fallbackFormType->get('scalarValue')->getConfig()->getType()->getName()
         );
         $this->assertEquals(
             'integer',
@@ -54,7 +43,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         );
         $this->assertEquals(
             $options['fallback']['value_options']['scale'],
-            $fallbackFormType->get('viewValue')->getConfig()->getOption('scale')
+            $fallbackFormType->get('scalarValue')->getConfig()->getOption('scale')
         );
         $this->assertEquals(
             $options['fallback']['fallback_options']['scale'],
@@ -62,7 +51,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         );
         $this->assertEquals(
             false,
-            $fallbackFormType->get('viewValue')->getConfig()->getOption('required')
+            $fallbackFormType->get('scalarValue')->getConfig()->getOption('required')
         );
         $this->assertEquals(
             $options['fallback']['fallback_options']['required'],
@@ -85,11 +74,11 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
         $this->assertEquals(
             'integer',
-            $this->getChildForm($form)->get('viewValue')->getConfig()->getType()->getName()
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
         );
     }
 
-    public function testViewValueTypeFallbacksToBoolFieldConfig()
+    public function testscalarValueTypeFallbacksToBoolFieldConfig()
     {
         $parentObject = new FallbackParentStub();
         $parentObject->valueWithFallback = new EntityFieldFallbackValue();
@@ -100,11 +89,11 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
         $this->assertEquals(
             'choice',
-            $this->getChildForm($form)->get('viewValue')->getConfig()->getType()->getName()
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
         );
     }
 
-    public function testViewValueTypeFallbacksToStringFieldConfig()
+    public function testscalarValueTypeFallbacksToStringFieldConfig()
     {
         $parentObject = new FallbackParentStub();
         $parentObject->valueWithFallback = new EntityFieldFallbackValue();
@@ -115,7 +104,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
         $this->assertEquals(
             'text',
-            $this->getChildForm($form)->get('viewValue')->getConfig()->getType()->getName()
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
         );
     }
 
@@ -135,7 +124,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $this->fallbackResolver->expects($this->any())
             ->method('getFallbackConfig')->willReturn([]);
         $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
-        $formOptions = $this->getChildForm($form)->get('viewValue')->getConfig()->getOptions();
+        $formOptions = $this->getChildForm($form)->get('scalarValue')->getConfig()->getOptions();
         $this->assertEquals(
             $systemConfig['options']['choices'],
             $formOptions['choices']
@@ -186,9 +175,8 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 
         $requestData = [
             'valueWithFallback' => [
-                'fallback' => 'testFallback2',
                 'useFallback' => false,
-                'viewValue' => 'testValue',
+                'scalarValue' => 'testValue',
             ],
         ];
         $form->submit($requestData);
@@ -196,9 +184,8 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $submittedFallbackValue = $form->getData()->valueWithFallback;
 
         $this->assertNull($submittedFallbackValue->getFallback());
-        $this->assertEquals($requestData['valueWithFallback']['useFallback'], $submittedFallbackValue->isUseFallback());
-        $this->assertEquals($requestData['valueWithFallback']['viewValue'], $submittedFallbackValue->getOwnValue());
-        $this->assertEquals($requestData['valueWithFallback']['viewValue'], $submittedFallbackValue->getScalarValue());
+        $this->assertEquals($requestData['valueWithFallback']['scalarValue'], $submittedFallbackValue->getOwnValue());
+        $this->assertEquals($requestData['valueWithFallback']['scalarValue'], $submittedFallbackValue->getScalarValue());
     }
 
     public function testSubmitFallback()
@@ -216,7 +203,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
             'valueWithFallback' => [
                 'fallback' => 'testFallback2',
                 'useFallback' => true,
-                'viewValue' => 'testvalue',
+                'scalarValue' => 'testvalue',
             ],
         ];
         $form->submit($requestData);
@@ -224,7 +211,6 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $submittedFallbackValue = $form->getData()->valueWithFallback;
 
         $this->assertEquals($requestData['valueWithFallback']['fallback'], $submittedFallbackValue->getFallback());
-        $this->assertEquals($requestData['valueWithFallback']['useFallback'], $submittedFallbackValue->isUseFallback());
         $this->assertNull($submittedFallbackValue->getOwnValue());
     }
 
@@ -242,11 +228,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
      */
     protected function getDefaultOptions()
     {
-        return [
-            'fallback' => [
-                'fallback_translation_prefix' => 'xxx',
-            ],
-        ];
+        return ['fallback' => []];
     }
 
     /**

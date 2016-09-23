@@ -30,22 +30,22 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($value->isUseFallback());
     }
 
-    public function testTransformSetsViewValueIfArray()
+    public function testTransformSetsScalarValueIfArray()
     {
         $value = new EntityFieldFallbackValue();
         $testValue = ['test' => 'test'];
         $value->setArrayValue($testValue);
         $value = $this->entityFieldFallbackTransformer->transform($value);
-        $this->assertSame($testValue, $value->getViewValue());
+        $this->assertSame($testValue, $value->getScalarValue());
     }
 
-    public function testTransformSetsViewValueIfScalar()
+    public function testTransformSetsScalarValueIfScalar()
     {
         $value = new EntityFieldFallbackValue();
         $testValue = 'testValue';
         $value->setScalarValue($testValue);
         $value = $this->entityFieldFallbackTransformer->transform($value);
-        $this->assertSame($testValue, $value->getViewValue());
+        $this->assertSame($testValue, $value->getScalarValue());
     }
 
     public function testReverseTransformClearsOwnValues()
@@ -65,16 +65,15 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformClearsFallbackAndArrayIfScalar()
     {
         $value = new EntityFieldFallbackValue();
-        $value->setScalarValue('testValue');
+        $scalarValue = 'testValue';
+        $value->setScalarValue($scalarValue);
         $value->setArrayValue(['testValue']);
         $value->setUseFallback(false);
         $value->setFallback('testFallback');
-        $viewValue = 'viewValue';
-        $value->setViewValue($viewValue);
 
         $value = $this->entityFieldFallbackTransformer->reverseTransform($value);
         $this->assertNull($value->getFallback());
-        $this->assertEquals($viewValue, $value->getScalarValue());
+        $this->assertEquals($scalarValue, $value->getScalarValue());
         $this->assertNull($value->getArrayValue());
         $this->assertNotNull($value->getOwnValue());
     }
@@ -82,17 +81,15 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformClearsFallbackAndArrayIfArray()
     {
         $value = new EntityFieldFallbackValue();
-        $value->setScalarValue('testValue');
-        $value->setArrayValue(['testValue']);
+        $arrayValue = ['testValue'];
+        $value->setScalarValue($arrayValue);
         $value->setUseFallback(false);
         $value->setFallback('testFallback');
-        $viewValue = ['viewValue'];
-        $value->setViewValue($viewValue);
 
         $value = $this->entityFieldFallbackTransformer->reverseTransform($value);
         $this->assertNull($value->getFallback());
-        $this->assertEquals($viewValue, $value->getArrayValue());
+        $this->assertEquals($arrayValue, $value->getArrayValue());
         $this->assertNull($value->getScalarValue());
-        $this->assertEquals($viewValue, $value->getOwnValue());
+        $this->assertEquals($arrayValue, $value->getOwnValue());
     }
 }

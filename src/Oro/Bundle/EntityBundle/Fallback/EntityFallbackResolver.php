@@ -24,6 +24,8 @@ class EntityFallbackResolver
     const TYPE_INTEGER = 'integer';
     const TYPE_ARRAY = 'array';
 
+    const FALLBACK_FIELD_NAME = 'fieldName';
+
     /** @var array */
     public static $allowedTypes = [self::TYPE_BOOLEAN, self::TYPE_STRING, self::TYPE_INTEGER, self::TYPE_ARRAY];
 
@@ -119,7 +121,7 @@ class EntityFallbackResolver
         $fallbackList = $this->getFallbackConfig(
             $object,
             $objectFieldName,
-            EntityFieldFallbackValue::FALLBACK_LIST_KEY
+            EntityFieldFallbackValue::FALLBACK_LIST
         );
 
         $configName = $this->getSystemFallbackConfigName($fallbackList);
@@ -149,36 +151,49 @@ class EntityFallbackResolver
     /**
      * @param object $object
      * @param string $objectFieldName
+     * @param int $level
      * @return mixed
-     * @throws FallbackFieldConfigurationMissingException
      * @throws InvalidFallbackKeyException
      */
-    public function getFallbackValue($object, $objectFieldName)
+    public function getFallbackValue($object, $objectFieldName, $level = 1)
     {
         $fallbackValue = $this->accessor->getValue($object, $objectFieldName);
-        // if object field is not fallback type, just return it
-        if (!$fallbackValue instanceof EntityFieldFallbackValue) {
-            return $fallbackValue;
-        }
-        // if fallback id is not provided and object has an own value, return it
-        if (is_null($fallbackValue->getFallback()) && !is_null($fallbackValue->getOwnValue())) {
-            return $this->resolveValueByType($fallbackValue->getOwnValue(), $object, $objectFieldName);
-        }
 
         // Read the fallback configuration for the current object
-        $fallbackConfiguration = $this->getFallbackConfig(
+        $fallbackList = $this->getFallbackConfig(
             $object,
             $objectFieldName,
-            EntityFieldFallbackValue::FALLBACK_LIST_KEY
+            EntityFieldFallbackValue::FALLBACK_LIST
         );
 
-        $objectFallbackKey = $fallbackValue->getFallback();
+        // if object field is not fallback type, try to get values from each provider, in the order of the
+        // fallback list definition
+        if (!$fallbackValue instanceof EntityFieldFallbackValue) {
+            // if we have a value, try to resolve it
+            if (!is_null($fallbackValue)) {
+                return $this->resolveValueByType($fallbackValue, $object, $objectFieldName);
+            }
 
-        if (!$objectFallbackKey) {
+            // if we are on the main origin object, proceed with searching through the default fallback list
+            if (1 === $level) {
+                return $this->getFallbackValueByFallbackList($fallbackList, $object, $objectFieldName, $level);
+            }
+
             return null;
         }
 
-        if (!array_key_exists($objectFallbackKey, $fallbackConfiguration)) {
+        // if fallback id is not provided and object has an own value, return it
+        $objectFallbackKey = $fallbackValue->getFallback();
+        if (is_null($objectFallbackKey)) {
+            if (!is_null($fallbackValue->getOwnValue())) {
+                return $this->resolveValueByType($fallbackValue->getOwnValue(), $object, $objectFieldName);
+            }
+
+            // if both fallback and own values are null, proceed with searching through the default fallback list
+            return $this->getFallbackValueByFallbackList($fallbackList, $object, $objectFieldName, $level);
+        }
+
+        if (!array_key_exists($objectFallbackKey, $fallbackList)) {
             throw new InvalidFallbackKeyException($objectFallbackKey);
         }
 
@@ -192,19 +207,19 @@ class EntityFallbackResolver
         }
 
         // get fallback field configuration for current fallback type
-        $fallbackEntityConfig = $fallbackConfiguration[$fallbackValue->getFallback()];
+        $fallbackEntityConfig = $fallbackList[$fallbackValue->getFallback()];
 
-        if (!is_array($fallbackEntityConfig) || !array_key_exists('fieldName', $fallbackEntityConfig)) {
-            throw new FallbackFieldConfigurationMissingException(
-                sprintf(
-                    "You must specify the '%s' option for the fallback '%s'",
-                    'fieldName',
-                    $fallbackValue->getFallback()
-                )
-            );
-        }
+        $this->validateFallbackPropertyExists(
+            $fallbackEntityConfig,
+            $fallbackValue->getFallback(),
+            self::FALLBACK_FIELD_NAME
+        );
 
-        return $this->getFallbackValue($fallbackHolderEntity, $fallbackEntityConfig['fieldName']);
+        return $this->getFallbackValue(
+            $fallbackHolderEntity,
+            $fallbackEntityConfig[self::FALLBACK_FIELD_NAME],
+            $level
+        );
     }
 
     /**
@@ -224,7 +239,7 @@ class EntityFallbackResolver
             return $config;
         }
 
-        if (!array_key_exists($configName, $config)) {
+        if (!is_array($config) || !array_key_exists($configName, $config)) {
             throw new FallbackFieldConfigurationMissingException(
                 sprintf(
                     "You must define the fallback configuration '%s' for class '%s', field '%s'",
@@ -236,6 +251,15 @@ class EntityFallbackResolver
         }
 
         return $config[$configName];
+    }
+
+    /**
+     * @param string $fallbackId
+     * @return string
+     */
+    public function getFallbackLabel($fallbackId)
+    {
+        return $this->getFallbackProvider($fallbackId)->getFallbackLabel();
     }
 
     /**
@@ -266,6 +290,63 @@ class EntityFallbackResolver
     }
 
     /**
+     * @param array $fallbackList
+     * @param object $object
+     * @param string $objectFieldName
+     * @param int $level
+     * @return mixed|null
+     */
+    protected function getFallbackValueByFallbackList($fallbackList, $object, $objectFieldName, $level)
+    {
+        foreach ($fallbackList as $fallbackId => $fallbackConfig) {
+            // get the actual entity from which we need the fallback value for $object->$objectFieldName
+            $fallbackHolderEntity = $this->getFallbackProvider($fallbackId)
+                ->getFallbackHolderEntity($object, $objectFieldName);
+
+            if (is_null($fallbackHolderEntity)) {
+                continue;
+            }
+            // fallback holder is already an actual value, like in the case of systemConfig fallback type
+            if (!is_object($fallbackHolderEntity)) {
+                return $fallbackHolderEntity;
+            }
+
+            $this->validateFallbackPropertyExists($fallbackConfig, $fallbackId, self::FALLBACK_FIELD_NAME);
+
+            // read fallback value and return it if found one, else get it from the next fallback provider
+            $fallbackValue = $this->getFallbackValue(
+                $fallbackHolderEntity,
+                $fallbackConfig[self::FALLBACK_FIELD_NAME],
+                $level + 1
+            );
+            if (!is_null($fallbackValue)) {
+                return $fallbackValue;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array $fallbackConfig
+     * @param string $fallbackId
+     * @param string $property
+     * @throws FallbackFieldConfigurationMissingException
+     */
+    protected function validateFallbackPropertyExists($fallbackConfig, $fallbackId, $property)
+    {
+        if (!is_array($fallbackConfig) || !array_key_exists($property, $fallbackConfig)) {
+            throw new FallbackFieldConfigurationMissingException(
+                sprintf(
+                    "You must specify the '%s' option for the fallback '%s'",
+                    $property,
+                    $fallbackId
+                )
+            );
+        }
+    }
+
+    /**
      * @param $value
      * @param object $object
      * @param string $objectFieldName
@@ -287,7 +368,7 @@ class EntityFallbackResolver
             case static::TYPE_INTEGER:
                 return (int)$value;
             case static::TYPE_ARRAY:
-                return $value;
+                return (array)$value;
         }
 
         return $value;
