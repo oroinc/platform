@@ -314,7 +314,7 @@ action_groups:
                 type: string
             fileDir:
                 type: string
-        acl_resource: [TRANSLATE, $.data]
+        acl_resource: oro_translation_translation_update
         conditions:
             '@not_empty': [$.fileDir]
         actions:
@@ -330,7 +330,7 @@ action_groups:
                 type: string
             date:
                 type: datetime
-        acl_resource: [TRANSLATE, $.data]
+        acl_resource: oro_translation_translation_update
         actions:
             - '@find_entity':
                 class: 'Oro\Bundle\TranslationBundle\Entity\Language'
