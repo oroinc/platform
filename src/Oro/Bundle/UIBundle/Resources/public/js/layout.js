@@ -99,11 +99,23 @@ define(function(require) {
             this.initPopover($container);
         },
 
-        initPopover: function(container) {
-            var $items = container.find('[data-toggle="popover"]').filter(function() {
-                // skip already initialized popovers
-                return !$(this).data('popover');
+        initPopover: function(container, options) {
+            options = _.defaults(options || {}, {
+                animation: false,
+                delay: {show: 0, hide: 0},
+                html: true,
+                container: false,
+                trigger: 'manual'
             });
+
+            var $items = container;
+            if (!container.is('[data-toggle="popover"]')) {
+                $items = container.find('[data-toggle="popover"]').filter(function() {
+                    // skip already initialized popovers
+                    return !$(this).data('popover');
+                });
+            }
+
             $items.not('[data-close="false"]').each(function(i, el) {
                 //append close link
                 var content = $(el).data('content');
@@ -111,13 +123,7 @@ define(function(require) {
                 $(el).data('content', content);
             });
 
-            $items.popover({
-                animation: false,
-                delay: {show: 0, hide: 0},
-                html: true,
-                container: false,
-                trigger: 'manual'
-            }).on('click.popover', function(e) {
+            $items.popover(options).on('click.popover', function(e) {
                 $(this).popover('toggle');
                 e.preventDefault();
             });
