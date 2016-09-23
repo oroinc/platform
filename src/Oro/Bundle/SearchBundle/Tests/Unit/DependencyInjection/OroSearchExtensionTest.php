@@ -349,8 +349,8 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     private function getSearchBundleResource($resourceFile)
     {
         $ds = DIRECTORY_SEPARATOR;
-        $directory = realpath(dirname(__DIR__) . $ds . '..' . $ds . '..');
+        $directory = realpath(dirname(__DIR__).$ds.'..'.$ds.'..');
 
-        return $directory . $ds . 'Resources' . $ds . 'config' . $ds . $resourceFile;
+        return $directory.$ds.'Resources'.$ds.'config'.$ds.$resourceFile;
     }
 }

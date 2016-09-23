@@ -39,9 +39,8 @@ interface IndexerInterface
      * Resets data for all indexed classes if $class is null
      *
      * @param string|string[] $class
-     * @param array           $context
      */
-    public function resetIndex($class = null, array $context = []);
+    public function resetIndex($class = null);
 
     /**
      * Reindex data for one or several classes in index
