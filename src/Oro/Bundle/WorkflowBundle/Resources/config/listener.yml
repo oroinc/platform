@@ -73,15 +73,6 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.workflow_definition.entity.class%', event: prePersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.workflow_definition.entity.class%', event: preUpdate }
 
-    oro_workflow.event_listener.scheduled_transitions_listener:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener'
-        arguments:
-            - '@oro_workflow.transition_schedule.process_configuration_generator'
-            - '@oro_workflow.process.configurator'
-            - '@doctrine'
-        tags:
-            - { name: oro_workflow.changes.subscriber }
-
     oro_workflow.event_listener.transition_triggers:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener'
         arguments:
