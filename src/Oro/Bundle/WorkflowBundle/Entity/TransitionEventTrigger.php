@@ -57,11 +57,7 @@ class TransitionEventTrigger extends AbstractTransitionTrigger implements EventT
             return $this->entityClass;
         }
 
-        if ($this->getWorkflowDefinition()) {
-            return $this->getWorkflowDefinition()->getRelatedEntity();
-        }
-
-        return null;
+        return parent::getEntityClass();
     }
 
     /**

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
@@ -31,9 +30,9 @@ class TransitionTriggerCronVerifier
     }
 
     /**
-     * @param TransitionTriggerCron $trigger
+     * @param TransitionCronTrigger $trigger
      */
-    public function verify(TransitionTriggerCron $trigger)
+    public function verify(TransitionCronTrigger $trigger)
     {
         $expressions = $this->prepareExpressions($trigger);
 
@@ -61,10 +60,10 @@ class TransitionTriggerCronVerifier
     }
 
     /**
-     * @param TransitionTriggerCron $trigger
+     * @param TransitionCronTrigger $trigger
      * @return array
      */
-    protected function prepareExpressions(TransitionTriggerCron $trigger)
+    protected function prepareExpressions(TransitionCronTrigger $trigger)
     {
         $options = [];
         $options['cron'] = $trigger->getCron();
@@ -79,7 +78,7 @@ class TransitionTriggerCronVerifier
                 );
             $options['filter'] = $this->workflowItemRepository->getIdsByStepNamesAndEntityClassQueryBuilder(
                 $steps,
-                $trigger->getWorkflowDefinition()->getRelatedEntity(),
+                $trigger->getEntityClass(),
                 $trigger->getFilter()
             )->getQuery();
         }

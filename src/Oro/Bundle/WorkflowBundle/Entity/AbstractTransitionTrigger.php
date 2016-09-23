@@ -193,6 +193,14 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getEntityClass()
+    {
+        return $this->getWorkflowDefinition() ? $this->getWorkflowDefinition()->getRelatedEntity() : null;
+    }
+
+    /**
      * Compare additional fields of triggers
      *
      * @param AbstractTransitionTrigger $trigger
