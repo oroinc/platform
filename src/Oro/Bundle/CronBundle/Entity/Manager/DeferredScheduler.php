@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Model;
+namespace Oro\Bundle\CronBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -10,17 +10,15 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
-use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
-use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessTriggerCronScheduler implements LoggerAwareInterface
+/**
+ * Provide late management for Schedule entities
+ * All modifications stored into memory and performed only when flush method is invoked
+ */
+class DeferredScheduler implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
-
-    /** @var string */
-    private static $command = HandleProcessTriggerCommand::NAME;
 
     /** @var ScheduleManager */
     protected $scheduleManager;
@@ -33,6 +31,9 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
 
     /** @var array|Schedule[] */
     protected $forPersist = [];
+
+    /** @var array */
+    protected $lateArgumentsResolving = [];
 
     /** @var ManagerRegistry */
     private $registry;
@@ -48,57 +49,66 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
     public function __construct(ScheduleManager $scheduleManager, ManagerRegistry $registry, $scheduleClass)
     {
         $this->scheduleManager = $scheduleManager;
-
         $this->registry = $registry;
         $this->scheduleClass = $scheduleClass;
         $this->setLogger(new NullLogger());
     }
 
     /**
-     * @param ProcessTrigger $trigger
-     *
-     * @throws \InvalidArgumentException
+     * @param string $command
+     * @param array|callable $arguments can be late resolving callback values (resolving will happen when flush invokes)
+     * @param string $cronDefinition
      */
-    public function add(ProcessTrigger $trigger)
+    public function addSchedule($command, $arguments, $cronDefinition)
     {
-        if (!$trigger->getCron()) {
-            throw new \InvalidArgumentException(
-                sprintf('%s supports only cron schedule triggers.', __CLASS__)
-            );
-        }
+        if (is_callable($arguments)) {
+            $this->lateArgumentsResolving[] = [$command, $arguments, $cronDefinition];
+        } else {
+            $newSchedule = $this->ensureCreate($command, $arguments, $cronDefinition);
 
-        $arguments = $this->buildArguments($trigger);
-
-        if (!$this->scheduleManager->hasSchedule(self::$command, $arguments, $trigger->getCron())) {
-            $schedule = $this->scheduleManager->createSchedule(self::$command, $arguments, $trigger->getCron());
-            $this->forPersist[] = $schedule;
-            $this->dirty = true;
-            $this->notify('created', $schedule);
+            if ($newSchedule) {
+                $this->forPersist[] = $newSchedule;
+                $this->dirty = true;
+            }
         }
     }
 
     /**
-     * @param ProcessTrigger $trigger
-     * @throws \InvalidArgumentException
+     * @param string $command
+     * @param array $arguments
+     * @param string $cronDefinition
+     * @return null|Schedule
      */
-    public function removeSchedule(ProcessTrigger $trigger)
+    protected function ensureCreate($command, array $arguments, $cronDefinition)
     {
-        if (!$trigger->getCron()) {
-            throw new \InvalidArgumentException(
-                sprintf('%s supports only cron schedule triggers.', __CLASS__)
-            );
+        $schedule = null;
+
+        if (!$this->scheduleManager->hasSchedule($command, $arguments, $cronDefinition)) {
+            $schedule = $this->scheduleManager->createSchedule($command, $arguments, $cronDefinition);
+            $this->notify('created', $schedule);
         }
 
-        $schedules = $this->getRepository()->findBy(
-            ['command' => self::$command, 'definition' => $trigger->getCron()]
-        );
+        return $schedule;
+    }
+
+    /**
+     * @param string $command
+     * @param array $arguments
+     * @param string $cronDefinition
+     */
+    public function removeSchedule($command, array $arguments, $cronDefinition)
+    {
+        $schedules = $this->getRepository()->findBy(['command' => $command, 'definition' => $cronDefinition]);
 
         $argsSchedule = new Schedule();
-        $argsSchedule->setArguments($this->buildArguments($trigger));
+        $argsSchedule->setArguments($arguments);
 
-        $schedules = array_filter($schedules, function (Schedule $schedule) use ($argsSchedule) {
-            return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
-        });
+        $schedules = array_filter(
+            $schedules,
+            function (Schedule $schedule) use ($argsSchedule) {
+                return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
+            }
+        );
 
         if (count($schedules) !== 0) {
             foreach ($schedules as $schedule) {
@@ -110,21 +120,6 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
     }
 
     /**
-     * @param ProcessTrigger $trigger
-     *
-     * @return array
-     */
-    protected function buildArguments(ProcessTrigger $trigger)
-    {
-        $args = [
-            sprintf('--name=%s', $trigger->getDefinition()->getName()),
-            sprintf('--id=%d', $trigger->getId())
-        ];
-
-        return $args;
-    }
-
-    /**
      * @return ObjectManager
      */
     protected function getObjectManager()
@@ -132,9 +127,7 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
         $objectManager = $this->registry->getManagerForClass($this->scheduleClass);
 
         if (!$objectManager) {
-            throw new \InvalidArgumentException(
-                'Please provide manageable schedule entity class'
-            );
+            throw new \InvalidArgumentException('Please provide manageable schedule entity class');
         }
 
         return $objectManager;
@@ -147,7 +140,7 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
     protected function notify($action, Schedule $schedule)
     {
         $this->logger->info(sprintf(
-            '>>> process trigger cron schedule [%s] %s %s - %s',
+            '>>> cron schedule [%s] %s %s - %s',
             $schedule->getDefinition(),
             $schedule->getCommand(),
             implode(' ', $schedule->getArguments()),
@@ -165,25 +158,34 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
 
     /**
      * Applies schedule modifications to database
-     *
-     * @return Schedule[] array of new Schedules
      */
     public function flush()
     {
-        if ($this->dirty) {
+        if ($this->dirty || (count($this->lateArgumentsResolving) > 0)) {
             $objectManager = $this->getObjectManager();
 
             while ($toPersist = array_shift($this->forPersist)) {
                 $objectManager->persist($toPersist);
             }
+
+            while ($lateArguments = array_shift($this->lateArgumentsResolving)) {
+                list($command, $argumentsCallback, $cron) = $lateArguments;
+                $arguments = call_user_func($argumentsCallback);
+                $schedule = $this->ensureCreate($command, $arguments, $cron);
+                if ($schedule) {
+                    $objectManager->persist($schedule);
+                }
+            }
+
             while ($toRemove = array_shift($this->forRemove)) {
                 if ($objectManager->contains($toRemove)) {
                     $objectManager->remove($toRemove);
                 }
             }
+
             $objectManager->flush();
             $this->dirty = false;
-            $this->logger->info('>>> process trigger schedule modification persisted.');
+            $this->logger->info('>>> schedule modification persisted.');
         }
     }
 }

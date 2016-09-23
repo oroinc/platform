@@ -4,23 +4,21 @@ namespace Oro\Bundle\WorkflowBundle\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectRepository;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-
-class ProcessTriggerCache
+class EventTriggerCache
 {
-    const DATA  = 'data';
+    const DATA = 'data';
     const BUILT = 'built';
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     protected $provider;
+
+    /** @var string */
+    protected $triggerClassName;
 
     /**
      * @param ManagerRegistry $registry
@@ -39,6 +37,14 @@ class ProcessTriggerCache
     }
 
     /**
+     * @param string $triggerClassName
+     */
+    public function setTriggerClassName($triggerClassName)
+    {
+        $this->triggerClassName = $triggerClassName;
+    }
+
+    /**
      * Write to cache entity classes and appropriate events
      *
      * @return array
@@ -48,22 +54,18 @@ class ProcessTriggerCache
         $this->assertProvider();
 
         // get all triggers data
-        $triggerRepository = $this->registry
-            ->getManagerForClass('OroWorkflowBundle:ProcessTrigger')
-            ->getRepository('OroWorkflowBundle:ProcessTrigger');
-        /** @var ProcessTrigger[] $triggers */
-        $triggers = $triggerRepository->findAllWithDefinitions();
-        $data     = array();
+        $triggers = $this->getRepository()->findAllWithDefinitions();
+        $data = [];
 
         foreach ($triggers as $trigger) {
-            $entityClass = $trigger->getDefinition()->getRelatedEntity();
-            $event       = $trigger->getEvent();
+            $entityClass = $trigger->getEntityClass();
+            $event = $trigger->getEvent();
 
             if (!isset($data[$entityClass])) {
-                $data[$entityClass] = array();
+                $data[$entityClass] = [];
             }
 
-            if (!in_array($event, $data[$entityClass])) {
+            if (!in_array($event, $data[$entityClass], true)) {
                 $data[$entityClass][] = $event;
             }
         }
@@ -91,7 +93,7 @@ class ProcessTriggerCache
             $data = $this->provider->fetch(self::DATA);
         }
 
-        return !empty($data[$entityClass]) && in_array($event, $data[$entityClass]);
+        return !empty($data[$entityClass]) && in_array($event, $data[$entityClass], true);
     }
 
     /**
@@ -108,7 +110,20 @@ class ProcessTriggerCache
     protected function assertProvider()
     {
         if (!$this->provider) {
-            throw new \LogicException('Process trigger cache provider is not defined');
+            throw new \LogicException('Event trigger cache provider is not defined');
         }
+    }
+
+    /**
+     * @return ObjectRepository
+     * @throws \LogicException
+     */
+    protected function getRepository()
+    {
+        if (!$this->triggerClassName) {
+            throw new \LogicException('Event trigger class name is not defined');
+        }
+
+        return $this->registry->getManagerForClass($this->triggerClassName)->getRepository($this->triggerClassName);
     }
 }

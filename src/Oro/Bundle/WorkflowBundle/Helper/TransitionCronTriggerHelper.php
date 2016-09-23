@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-class TransitionTriggerCronHelper
+class TransitionCronTriggerHelper
 {
     /** @var WorkflowManager */
     private $workflowManager;
@@ -26,10 +26,10 @@ class TransitionTriggerCronHelper
     }
 
     /**
-     * @param TransitionTriggerCron $trigger
+     * @param TransitionCronTrigger $trigger
      * @return array an array of integers as ids of matched workflowItems
      */
-    public function fetchWorkflowItemsIdsForTrigger(TransitionTriggerCron $trigger)
+    public function fetchWorkflowItemsIdsForTrigger(TransitionCronTrigger $trigger)
     {
         $workflow = $this->workflowManager->getWorkflow($trigger->getWorkflowDefinition()->getName());
 

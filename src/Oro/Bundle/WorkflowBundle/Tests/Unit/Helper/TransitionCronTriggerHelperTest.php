@@ -5,15 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerCronHelper;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-class TransitionTriggerCronHelperTest extends \PHPUnit_Framework_TestCase
+class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
 {
     const TRANSITION_NAME = 'test_transition';
     const RELATED_CLASS_NAME = 'stdClass';
@@ -26,13 +26,13 @@ class TransitionTriggerCronHelperTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowItemRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /** @var TransitionTriggerCronHelper */
+    /** @var TransitionCronTriggerHelper */
     protected $helper;
 
     /** @var WorkflowDefinition */
     protected $workflowDefinition;
 
-    /** @var TransitionTriggerCron */
+    /** @var TransitionCronTrigger */
     protected $trigger;
 
     protected function setUp()
@@ -43,12 +43,12 @@ class TransitionTriggerCronHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new TransitionTriggerCronHelper($this->workflowManager, $this->repository);
+        $this->helper = new TransitionCronTriggerHelper($this->workflowManager, $this->repository);
 
         $this->workflowDefinition = new WorkflowDefinition();
         $this->workflowDefinition->setName(self::WORKFLOW_NAME)->setRelatedEntity(self::RELATED_CLASS_NAME);
 
-        $this->trigger = new TransitionTriggerCron();
+        $this->trigger = new TransitionCronTrigger();
         $this->trigger->setWorkflowDefinition($this->workflowDefinition)
             ->setTransitionName(self::TRANSITION_NAME)
             ->setFilter(self::FILTER);

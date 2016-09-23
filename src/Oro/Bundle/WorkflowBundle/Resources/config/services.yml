@@ -16,8 +16,8 @@ parameters:
     oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
     oro_workflow.handler.start_transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler
 
-    oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron
-    oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent
+    oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger
+    oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
 
 services:
     oro_workflow.attribute_guesser:
@@ -202,11 +202,9 @@ services:
             - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
-        class: Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler
+        class: Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler
         arguments:
-            - '@oro_cron.schedule_manager'
-            - '@doctrine'
-            - '%oro_cron.entity.schedule.class%'
+            - '@oro_cron.deferred_scheduler'
 
     oro_workflow.process.definitions_configurator:
         class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator
@@ -252,18 +250,23 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.repository.workflow_item'
 
-    oro_workflow.helper.transition_trigger_event:
-        class: Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerEventHelper
+    oro_workflow.helper.transition_event_trigger:
+        class: Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper
         public: false
         arguments:
             - '@oro_workflow.manager'
 
-    oro_workflow.helper.transition_trigger_cron:
-        class: Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerCronHelper
+    oro_workflow.helper.transition_cron_trigger:
+        class: Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper
         public: false
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.repository.workflow_item'
+
+    oro_workflow.transition_trigger.cron_scheduler:
+        class: Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler
+        arguments:
+            - '@oro_cron.deferred_scheduler'
 
     oro_workflow.validator_expression.dql_expression_verifier:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
@@ -297,6 +300,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.transition_trigger.update_decider'
+            - '@oro_workflow.transition_trigger.cron_scheduler'
 
     oro_workflow.transition_trigger.trigger_cron_verifier:
         class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier'

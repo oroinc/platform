@@ -11,7 +11,8 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
@@ -317,7 +318,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->children()
                     ->enumNode('event')
                         ->defaultNull()
-                        ->values(TransitionTriggerEvent::getAllowedEvents())
+                        ->values(TransitionEventTrigger::getAllowedEvents())
                     ->end()
                     ->scalarNode('field')
                         ->defaultNull()
@@ -382,7 +383,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->validate()
                     ->ifTrue(
                         function ($data) {
-                            return $data['field'] && $data['event'] !== TransitionTriggerEvent::EVENT_UPDATE;
+                            return $data['field'] && $data['event'] !== EventTriggerInterface::EVENT_UPDATE;
                         }
                     )->thenInvalid('The "field" option is only allowed for update event.')
                 ->end()

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity()
  */
-class TransitionTriggerCron extends AbstractTransitionTrigger
+class TransitionCronTrigger extends AbstractTransitionTrigger
 {
     /**
      * @var string
@@ -62,10 +62,10 @@ class TransitionTriggerCron extends AbstractTransitionTrigger
     }
 
     /**
-     * @param TransitionTriggerCron $trigger
+     * @param TransitionCronTrigger $trigger
      * @return $this
      */
-    public function import(TransitionTriggerCron $trigger)
+    public function import(TransitionCronTrigger $trigger)
     {
         $this->importMainData($trigger);
 

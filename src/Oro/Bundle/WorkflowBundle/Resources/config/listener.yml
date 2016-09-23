@@ -37,19 +37,34 @@ services:
 
     oro_workflow.listener.process_collector:
         class: %oro_workflow.listener.process_collector.class%
-        arguments:
-            - '@doctrine'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_workflow.process.process_handler'
-            - '@oro_workflow.process.logger'
-            - '@oro_workflow.cache.process_trigger'
-            - '@oro_workflow.process.schedule_policy'
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
             - { name: doctrine.event_listener, event: preRemove }
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: onClear }
+
+    oro_workflow.listener.extension.process_trigger:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.process.process_handler'
+            - '@oro_workflow.process.logger'
+            - '@oro_workflow.cache.process_trigger'
+            - '@oro_workflow.process.schedule_policy'
+        tags:
+            - { name: oro_workflow.listener.process_collector.extension }
+
+    oro_workflow.listener.extension.transition_trigger_event:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExtension'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.cache.transition_trigger_event'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_workflow.helper.transition_event_trigger'
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_workflow.listener.process_collector.extension }
 
     oro_workflow.entity_listener.activation_validator:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowActivationValidatorEntityListener
