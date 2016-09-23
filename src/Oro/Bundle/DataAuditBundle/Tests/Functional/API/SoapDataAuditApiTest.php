@@ -47,14 +47,13 @@ class SoapDataAuditApiTest extends WebTestCase
         return $request;
     }
 
-    /**
-     * @param array $response
-     * @return array
-     */
-    public function testGetAudits()
+    public function testShouldReturnListOfAudits()
     {
         $audit = new Audit();
+        $audit->setObjectId(12345);
         $audit->setObjectClass('object\class');
+        $audit->setObjectName('object-name');
+        $audit->setVersion(567);
         $audit->setTransactionId('transaction-id');
 
         $em = $this->getDoctrine()->getManagerForClass(ClassUtils::getClass($audit));
@@ -62,7 +61,6 @@ class SoapDataAuditApiTest extends WebTestCase
         $em->flush();
 
         $result = $this->soapClient->getAudits();
-        var_dump($result);
         $result = $this->valueToArray($result);
 
         if (!is_array(reset($result['item']))) {
@@ -74,26 +72,34 @@ class SoapDataAuditApiTest extends WebTestCase
 
         $resultActual = reset($result);
 
-//        $this->assertEquals($response['username'], $resultActual['objectName']);
-        $this->assertEquals('admin', $resultActual['username']);
-
-        return $result;
+        $this->assertEquals($audit->getId(), $resultActual['id']);
+        $this->assertEquals(12345, $resultActual['objectId']);
+        $this->assertEquals('object\class', $resultActual['objectClass']);
+        $this->assertEquals('object-name', $resultActual['objectName']);
+        $this->assertEquals(567, $resultActual['version']);
     }
 
-    /**
-     * @param array $response
-     * @return array
-     * @depends testGetAudits
-     */
-    public function testGetAudit($response)
+    public function testShouldReturnOne()
     {
-        foreach ($response as $audit) {
-            $result = $this->soapClient->getAudit($audit['id']);
-            $result = $this->valueToArray($result);
-            unset($result['loggedAt']);
-            unset($audit['loggedAt']);
-            $this->assertEquals($audit, $result);
-        }
+        $audit = new Audit();
+        $audit->setObjectId(12345);
+        $audit->setObjectClass('object\class');
+        $audit->setObjectName('object-name');
+        $audit->setVersion(567);
+        $audit->setTransactionId('transaction-id');
+
+        $em = $this->getDoctrine()->getManagerForClass(ClassUtils::getClass($audit));
+        $em->persist($audit);
+        $em->flush();
+
+        $result = $this->soapClient->getAudit($audit['id']);
+        $result = $this->valueToArray($result);
+
+        $this->assertEquals($audit->getId(), $result['id']);
+        $this->assertEquals(12345, $result['objectId']);
+        $this->assertEquals('object\class', $result['objectClass']);
+        $this->assertEquals('object-name', $result['objectName']);
+        $this->assertEquals(567, $result['version']);
     }
 
     private function getDoctrine()
