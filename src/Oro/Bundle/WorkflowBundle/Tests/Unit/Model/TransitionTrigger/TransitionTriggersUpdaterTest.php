@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
@@ -13,7 +14,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTriggerCronScheduler;
 
 class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
 {

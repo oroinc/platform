@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cron;
 
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
+use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTriggerCronScheduler;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class TransitionTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
@@ -50,6 +50,10 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->scheduler->addSchedule($cronTrigger);
     }
 
+    /**
+     * @param array $properties
+     * @return TransitionCronTrigger
+     */
     private function createTrigger(array $properties)
     {
         $trigger = new TransitionCronTrigger();

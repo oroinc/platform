@@ -9,10 +9,10 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
-use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 
 class ProcessTriggersConfigurator implements LoggerAwareInterface
 {
@@ -145,7 +145,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     }
 
     /**
-     * @param ProcessTrigger[] $storedTriggers
+     * @param array|ProcessTrigger[] $storedTriggers
      * @param ProcessTrigger $builtTrigger
      *
      * @return ProcessTrigger|null

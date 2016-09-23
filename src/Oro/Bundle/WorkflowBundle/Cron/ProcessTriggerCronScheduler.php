@@ -1,32 +1,14 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Model;
+namespace Oro\Bundle\WorkflowBundle\Cron;
 
-use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
-class ProcessTriggerCronScheduler implements LoggerAwareInterface
+class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
 {
     /** @var string */
     private static $command = HandleProcessTriggerCommand::NAME;
-
-    /**
-     * @var DeferredScheduler
-     */
-    private $deferredScheduler;
-
-    /**
-     * @param DeferredScheduler $deferredScheduler
-     */
-    public function __construct(DeferredScheduler $deferredScheduler)
-    {
-        $this->deferredScheduler = $deferredScheduler;
-        $this->setLogger(new NullLogger());
-    }
 
     /**
      * @param ProcessTrigger $trigger
@@ -66,26 +48,9 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
      */
     protected function buildArguments(ProcessTrigger $trigger)
     {
-        $args = [
+        return [
             sprintf('--name=%s', $trigger->getDefinition()->getName()),
             sprintf('--id=%d', $trigger->getId())
         ];
-
-        return $args;
-    }
-
-    /**
-     * Applies schedule modifications to database
-     */
-    public function flush()
-    {
-        return $this->deferredScheduler->flush();
-    }
-
-    public function setLogger(LoggerInterface $logger)
-    {
-        if ($this->deferredScheduler instanceof LoggerAwareInterface) {
-            $this->deferredScheduler->setLogger($logger);
-        }
     }
 }

@@ -15,7 +15,6 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 /**
  * Provide late management for Schedule entities
  * All modifications stored into memory and performed only when flush method is invoked
- * @package Oro\Bundle\WorkflowBundle\Model
  */
 class DeferredScheduler implements LoggerAwareInterface
 {
@@ -50,7 +49,6 @@ class DeferredScheduler implements LoggerAwareInterface
     public function __construct(ScheduleManager $scheduleManager, ManagerRegistry $registry, $scheduleClass)
     {
         $this->scheduleManager = $scheduleManager;
-
         $this->registry = $registry;
         $this->scheduleClass = $scheduleClass;
         $this->setLogger(new NullLogger());
@@ -60,7 +58,6 @@ class DeferredScheduler implements LoggerAwareInterface
      * @param string $command
      * @param array|callable $arguments can be late resolving callback values (resolving will happen when flush invokes)
      * @param string $cronDefinition
-     * @return void
      */
     public function addSchedule($command, $arguments, $cronDefinition)
     {
@@ -84,14 +81,14 @@ class DeferredScheduler implements LoggerAwareInterface
      */
     protected function ensureCreate($command, array $arguments, $cronDefinition)
     {
+        $schedule = null;
+
         if (!$this->scheduleManager->hasSchedule($command, $arguments, $cronDefinition)) {
             $schedule = $this->scheduleManager->createSchedule($command, $arguments, $cronDefinition);
             $this->notify('created', $schedule);
-
-            return $schedule;
-        } else {
-            return null;
         }
+
+        return $schedule;
     }
 
     /**
@@ -101,16 +98,17 @@ class DeferredScheduler implements LoggerAwareInterface
      */
     public function removeSchedule($command, array $arguments, $cronDefinition)
     {
-        $schedules = $this->getRepository()->findBy(
-            ['command' => $command, 'definition' => $cronDefinition]
-        );
+        $schedules = $this->getRepository()->findBy(['command' => $command, 'definition' => $cronDefinition]);
 
         $argsSchedule = new Schedule();
         $argsSchedule->setArguments($arguments);
 
-        $schedules = array_filter($schedules, function (Schedule $schedule) use ($argsSchedule) {
-            return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
-        });
+        $schedules = array_filter(
+            $schedules,
+            function (Schedule $schedule) use ($argsSchedule) {
+                return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
+            }
+        );
 
         if (count($schedules) !== 0) {
             foreach ($schedules as $schedule) {
@@ -129,9 +127,7 @@ class DeferredScheduler implements LoggerAwareInterface
         $objectManager = $this->registry->getManagerForClass($this->scheduleClass);
 
         if (!$objectManager) {
-            throw new \InvalidArgumentException(
-                'Please provide manageable schedule entity class'
-            );
+            throw new \InvalidArgumentException('Please provide manageable schedule entity class');
         }
 
         return $objectManager;

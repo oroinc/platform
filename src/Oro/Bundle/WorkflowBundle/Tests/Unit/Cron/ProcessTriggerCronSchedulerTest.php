@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cron;
 
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
+use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 
 class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DeferredScheduler|\PHPUnit_Framework_MockObject_MockObject */
-    private $deferredScheduler;
+    protected $deferredScheduler;
 
     /** @var ProcessTriggerCronScheduler */
     protected $processCronScheduler;
@@ -26,25 +26,20 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testAdd()
     {
+        $cronExpression = '* * * * *';
+
+        $processDefinitionMock = $this->getMockBuilder(ProcessDefinition::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $processDefinitionMock->expects($this->once())->method('getName')->willReturn('process-definition-name');
+
         /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $trigger * */
         $trigger = $this->getMock(ProcessTrigger::class);
-
-        $cronExpression = '* * * * *';
-        $trigger->expects($this->any())
-            ->method('getCron')
-            ->willReturn($cronExpression);
+        $trigger->expects($this->any())->method('getCron')->willReturn($cronExpression);
 
         //create arguments
-        $processDefinitionMock = $this->getMockBuilder(ProcessDefinition::class)->getMock();
-        $trigger->expects($this->once())
-            ->method('getDefinition')
-            ->willReturn($processDefinitionMock);
-        $processDefinitionMock->expects($this->once())
-            ->method('getName')
-            ->willReturn('process-definition-name');
-        $trigger->expects($this->once())
-            ->method('getId')
-            ->willReturn(100500);
+        $trigger->expects($this->once())->method('getDefinition')->willReturn($processDefinitionMock);
+        $trigger->expects($this->once())->method('getId')->willReturn(100500);
 
         $arguments = ['--name=process-definition-name', '--id=100500'];
 
@@ -59,6 +54,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
     {
         /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
         $mockTrigger = $this->getMock(ProcessTrigger::class);
+
         $mockProcessDefinition = $this->getMock(ProcessDefinition::class);
         $mockProcessDefinition->expects($this->once())->method('getName')->willReturn('process_name');
 
@@ -73,14 +69,15 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->processCronScheduler->removeSchedule($mockTrigger);
     }
 
-    public function testException()
+    public function testRemoveException()
     {
         /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
         $mockTrigger = $this->getMock(ProcessTrigger::class);
         $mockTrigger->expects($this->exactly(1))->method('getCron')->willReturn(null);
+
         $this->setExpectedException(
             'InvalidArgumentException',
-            'Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler supports only cron schedule triggers.'
+            'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler supports only cron schedule triggers.'
         );
 
         $this->processCronScheduler->removeSchedule($mockTrigger);
@@ -92,7 +89,11 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
         $trigger = $this->getMock(ProcessTrigger::class);
         $trigger->expects($this->once())->method('getCron')->willReturn(null);
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException(
+            'InvalidArgumentException',
+            'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler supports only cron schedule triggers.'
+        );
+
         $this->processCronScheduler->add($trigger);
     }
 }

@@ -202,7 +202,7 @@ services:
             - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
-        class: Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler
+        class: Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler
         arguments:
             - '@oro_cron.deferred_scheduler'
 
@@ -250,12 +250,6 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.repository.workflow_item'
 
-    oro_workflow.transition_trigger.query_factory:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionQueryFactory
-        public: false
-        arguments:
-            - '@doctrine'
-
     oro_workflow.helper.transition_event_trigger:
         class: Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper
         public: false
@@ -270,7 +264,7 @@ services:
             - '@oro_workflow.repository.workflow_item'
 
     oro_workflow.transition_trigger.cron_scheduler:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTriggerCronScheduler
+        class: Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler
         arguments:
             - '@oro_cron.deferred_scheduler'
 

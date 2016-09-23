@@ -5,10 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTriggerCronScheduler;
 
 class TransitionTriggersUpdater
 {
@@ -94,7 +94,6 @@ class TransitionTriggersUpdater
     private function flush()
     {
         $this->getEntityManager()->flush();
-
         $this->cronScheduler->flush();
     }
 
@@ -130,10 +129,10 @@ class TransitionTriggersUpdater
      */
     private function getEntityManager()
     {
-        if ($this->em) {
-            return $this->em;
+        if (!$this->em) {
+            $this->em = $this->doctrineHelper->getEntityManagerForClass(AbstractTransitionTrigger::class);
         }
 
-        return $this->em = $this->doctrineHelper->getEntityManagerForClass(AbstractTransitionTrigger::class);
+        return $this->em;
     }
 }

@@ -5,9 +5,11 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Entity\Manager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
@@ -40,11 +42,7 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->scheduleClass = Schedule::class;
         $this->objectManager = $this->getMock(ObjectManager::class);
 
-        $this->deferredScheduler = new DeferredScheduler(
-            $this->scheduleManager,
-            $this->registry,
-            $this->scheduleClass
-        );
+        $this->deferredScheduler = new DeferredScheduler($this->scheduleManager, $this->registry, $this->scheduleClass);
     }
 
     public function testAddAndFlush()
@@ -67,11 +65,11 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($scheduleEntity);
 
         $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
+
         $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
+        $this->objectManager->expects($this->once())->method('flush');
 
         $this->deferredScheduler->addSchedule($command, $arguments, $cronExpression);
-
-        $this->objectManager->expects($this->once())->method('flush');
         $this->deferredScheduler->flush();
         // second flush should be empty
         $this->deferredScheduler->flush();
@@ -85,9 +83,6 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
         $argumentsCallback = function () use ($arguments) {
             return $arguments;
         };
-
-        //will cause to defer arguments for resolving on flush call
-        $this->deferredScheduler->addSchedule($command, $argumentsCallback, $cronExpression);
 
         //while flush runs lateArgumentsResolving would have job to run
         //hasSchedule
@@ -104,9 +99,12 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($scheduleEntity);
 
         $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
-        $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
 
+        $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
         $this->objectManager->expects($this->once())->method('flush');
+
+        //will cause to defer arguments for resolving on flush call
+        $this->deferredScheduler->addSchedule($command, $argumentsCallback, $cronExpression);
         $this->deferredScheduler->flush();
         // second flush should be empty
         $this->deferredScheduler->flush();
@@ -133,10 +131,10 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
+
         $this->objectManager->expects($this->once())->method('remove')->with($foundMatchedSchedule);
 
         $this->deferredScheduler->removeSchedule('oro:test:command', ['--arg1=string', '--arg2=42'], '* * * * *');
-
         $this->deferredScheduler->flush();
         // second flush should be empty
         $this->deferredScheduler->flush();
