@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Util;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Block\Type\Options;
 
 class BlockUtils
 {
@@ -21,12 +22,14 @@ class BlockUtils
      */
     public static function registerPlugin(BlockView $view, $pluginName)
     {
+        $optionsArray = $view->vars['block_prefixes'];
         array_splice(
-            $view->vars['block_prefixes'],
+            $optionsArray,
             -1,
             1,
-            [$pluginName, end($view->vars['block_prefixes'])]
+            [$pluginName, end($optionsArray)]
         );
+        $view->vars['block_prefixes'] = $optionsArray;
     }
 
     /**
@@ -53,19 +56,19 @@ class BlockUtils
      * Gets the url related options and pass them to the block view.
      *
      * @param BlockView   $view     The block view
-     * @param array       $options  The block options
+     * @param Options     $options  The block options
      * @param boolean     $required Specifies whether the url related options are mandatory
      * @param string|null $prefix   The prefix for the url related options
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public static function processUrl(BlockView $view, array $options, $required = false, $prefix = null)
+    public static function processUrl(BlockView $view, Options $options, $required = false, $prefix = null)
     {
         $pathName  = null !== $prefix ? $prefix . '_path' : 'path';
         $routeName = null !== $prefix ? $prefix . '_route_name' : 'route_name';
-        if (!empty($options[$pathName])) {
+        if ($options->isExistsAndNotEmpty($pathName)) {
             $view->vars[$pathName] = $options[$pathName];
-        } elseif (!empty($options[$routeName])) {
+        } elseif ($options->isExistsAndNotEmpty($routeName)) {
             $view->vars[$routeName] = $options[$routeName];
 
             $routeParamName              = null !== $prefix ? $prefix . '_route_parameters' : 'route_parameters';
@@ -76,6 +79,18 @@ class BlockUtils
             throw new MissingOptionsException(
                 sprintf('Either "%s" or "%s" must be set.', $pathName, $routeName)
             );
+        }
+    }
+
+    /**
+     * @param BlockView $view
+     * @param Options   $options
+     * @param array     $optionNames
+     */
+    public static function setViewVarsFromOptions(BlockView $view, Options $options, array $optionNames)
+    {
+        foreach ($optionNames as $optionName) {
+            $view->vars[$optionName] = isset($options[$optionName]) ? $options->get($optionName, false) : null;
         }
     }
 

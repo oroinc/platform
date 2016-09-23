@@ -745,6 +745,7 @@ use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType;
 
@@ -765,10 +766,11 @@ class LinkExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if (!empty($options['image'])) {
-            $view->vars['image'] = $options['image'];
+        // this operation better to use on finishView but if you are really sure you can write like this
+        if ($options->isExistsAndNotEmpty('image')) {
+            $view->vars['image'] = $options->get('image', false);
         }
     }
 
@@ -843,6 +845,7 @@ use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
+use Oro\Component\Layout\Block\Type\Options;
 
 class ContainerExtension extends AbstractBlockTypeExtension
 {
@@ -857,7 +860,7 @@ class ContainerExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block, Options $options)
     {
         if (!empty($options['type'])) {
             BlockUtils::registerPlugin($view, $options['type'] . '_' . $block->getTypeName());
@@ -1446,6 +1449,7 @@ use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
+use Oro\Component\Layout\Block\Type\Options;
 
 class ImageType extends AbstractType
 {
@@ -1462,12 +1466,13 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::processUrl($view, $options, true);
 
-        if (!empty($options['alt'])) {
-            $view->vars['alt'] = $options['alt'];
+        // this operation better to use on finishView but if you are really sure you can write like this
+        if ($options->isExistsAndNotEmpty('alt')) {
+            $view->vars['alt'] = $options->get('alt', false);
         }
     }
 

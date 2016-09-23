@@ -23,6 +23,7 @@ class BlockView extends FormView
     public function __construct(BlockView $parent = null)
     {
         parent::__construct($parent);
+
         unset($this->vars['value']);
     }
 }
