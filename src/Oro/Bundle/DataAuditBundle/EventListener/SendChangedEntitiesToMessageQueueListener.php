@@ -10,8 +10,6 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
-use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
-use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
 use Oro\Bundle\DataAuditBundle\Service\GetEntityAuditMetadataService;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -111,76 +109,11 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
         }
         
         $em = $eventArgs->getEntityManager();
-        $uow = $em->getUnitOfWork();
 
-        $insertions = new \SplObjectStorage();
-        foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
-                continue;
-            }
-
-            $insertions[$entity] = $uow->getEntityChangeSet($entity);
-        }
-        $this->allInsertions[$em] = $insertions;
-
-        $updates = new \SplObjectStorage();
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
-                continue;
-            }
-
-            $updates[$entity] = $uow->getEntityChangeSet($entity);
-        }
-        $this->allUpdates[$em] = $updates;
-
-        $deletions = new \SplObjectStorage();
-        foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
-                continue;
-            }
-
-            $changeSet = [];
-            $entityMeta = $em->getClassMetadata(get_class($entity));
-
-            // in order to audit many to one inverse side we have to store some info to change set.
-            foreach ($entityMeta->associationMappings as $filedName => $mapping) {
-                if (ClassMetadataInfo::MANY_TO_ONE == $mapping['type']) {
-                    if ($relatedEntity = $entityMeta->getFieldValue($entity, $filedName)) {
-                        $changeSet[$filedName] = [
-                            $this->convertEntityToArrayForMessageQueueService
-                                ->convertEntityToArray($em, $relatedEntity, []),
-                            null
-                        ];
-                    }
-                }
-            }
-
-            $deletions[$entity] = $this->convertEntityToArrayForMessageQueueService
-                ->convertEntityToArray($em, $entity, $changeSet);
-        }
-        $this->allDeletions[$em] = $deletions;
-
-        $collectionUpdates = new \SplObjectStorage();
-        foreach ($uow->getScheduledCollectionUpdates() as $collection) {
-            /** @var $collection PersistentCollection */
-            
-            $insertDiff = $collection->getInsertDiff();
-            $deleteDiff = [];
-            foreach ($collection->getDeleteDiff() as $deletedEntity) {
-                if (false == $this->getEntityAuditMetadataService->getMetadata(get_class($deletedEntity))) {
-                    continue;
-                }
-
-                $deleteDiff[] = $this->convertEntityToArrayForMessageQueueService
-                    ->convertEntityToArray($em, $deletedEntity, []);
-            }
-
-            $collectionUpdates[$collection] = [
-                'insertDiff' => $insertDiff,
-                'deleteDiff' => $deleteDiff,
-            ];
-        }
-        $this->allCollectionUpdates[$em] = $collectionUpdates;
+        $this->findAuditableInsertions($em);
+        $this->findAuditableUpdates($em);
+        $this->findAuditableDeletions($em);
+        $this->findAuditableCollectionUpdates($em);
     }
 
     /**
@@ -228,20 +161,120 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
             $body['entities_deleted'] = $this->processDeletions($em);
             $body['collections_updated'] = $this->processCollectionUpdates($em);
 
-            if ($body['entities_inserted'] || $body['entities_updated'] ||
-                $body['entities_deleted'] || $body['collections_updated']) {
-                $message = new Message();
-                $message->setPriority(MessagePriority::VERY_LOW);
-                $message->setBody($body);
+            $message = new Message();
+            $message->setPriority(MessagePriority::VERY_LOW);
+            $message->setBody($body);
 
-                $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message);
-            }
+            $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message);
         } finally {
             $this->allInsertions->detach($em);
             $this->allUpdates->detach($em);
             $this->allDeletions->detach($em);
             $this->allCollectionUpdates->detach($em);
         }
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    private function findAuditableInsertions(EntityManager $em)
+    {
+        $uow = $em->getUnitOfWork();
+
+        $insertions = new \SplObjectStorage();
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
+            if (! $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
+                continue;
+            }
+
+            $insertions[$entity] = $uow->getEntityChangeSet($entity);
+        }
+
+        $this->allInsertions[$em] = $insertions;
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    private function findAuditableUpdates(EntityManager $em)
+    {
+        $uow = $em->getUnitOfWork();
+
+        $updates = new \SplObjectStorage();
+        foreach ($uow->getScheduledEntityUpdates() as $entity) {
+            if (! $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
+                continue;
+            }
+
+            $updates[$entity] = $uow->getEntityChangeSet($entity);
+        }
+
+        $this->allUpdates[$em] = $updates;
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    private function findAuditableDeletions(EntityManager $em)
+    {
+        $uow = $em->getUnitOfWork();
+
+        $deletions = new \SplObjectStorage();
+        foreach ($uow->getScheduledEntityDeletions() as $entity) {
+            if (! $this->getEntityAuditMetadataService->getMetadata(get_class($entity))) {
+                continue;
+            }
+
+            $changeSet = [];
+            $entityMeta = $em->getClassMetadata(get_class($entity));
+
+            // in order to audit many to one inverse side we have to store some info to change set.
+            foreach ($entityMeta->associationMappings as $filedName => $mapping) {
+                if (ClassMetadataInfo::MANY_TO_ONE == $mapping['type']) {
+                    if ($relatedEntity = $entityMeta->getFieldValue($entity, $filedName)) {
+                        $changeSet[$filedName] = [
+                            $this->convertEntityToArrayForMessageQueueService
+                                ->convertEntityToArray($em, $relatedEntity, []),
+                            null
+                        ];
+                    }
+                }
+            }
+
+            $deletions[$entity] = $this->convertEntityToArrayForMessageQueueService
+                ->convertEntityToArray($em, $entity, $changeSet);
+        }
+
+        $this->allDeletions[$em] = $deletions;
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    public function findAuditableCollectionUpdates(EntityManager $em)
+    {
+        $uow = $em->getUnitOfWork();
+
+        $collectionUpdates = new \SplObjectStorage();
+        foreach ($uow->getScheduledCollectionUpdates() as $collection) {
+            /** @var $collection PersistentCollection */
+            if (! $this->getEntityAuditMetadataService->getMetadata($collection->getTypeClass()->getName())) {
+                continue;
+            }
+
+            $insertDiff = $collection->getInsertDiff();
+            $deleteDiff = [];
+            foreach ($collection->getDeleteDiff() as $deletedEntity) {
+                $deleteDiff[] = $this->convertEntityToArrayForMessageQueueService
+                    ->convertEntityToArray($em, $deletedEntity, []);
+            }
+
+            $collectionUpdates[$collection] = [
+                'insertDiff' => $insertDiff,
+                'deleteDiff' => $deleteDiff,
+            ];
+        }
+        $this->allCollectionUpdates[$em] = $collectionUpdates;
     }
 
     /**
@@ -253,10 +286,6 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
     {
         $insertions = [];
         foreach ($this->allInsertions[$em] as $entity) {
-            if ($entity instanceof  AbstractAudit || $entity instanceof  AbstractAuditField) {
-                continue;
-            }
-
             $changeSet = $this->allInsertions[$em][$entity];
             $insertions[] = $this->convertEntityToArrayForMessageQueueService
                 ->convertEntityToArray($em, $entity, $changeSet);
@@ -274,10 +303,6 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
     {
         $updates = [];
         foreach ($this->allUpdates[$em] as $entity) {
-            if ($entity instanceof  AbstractAudit || $entity instanceof  AbstractAuditField) {
-                continue;
-            }
-
             $changeSet = $this->allUpdates[$em][$entity];
             $updates[] = $this->convertEntityToArrayForMessageQueueService
                 ->convertEntityToArray($em, $entity, $changeSet);
@@ -295,10 +320,6 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
     {
         $deletions = [];
         foreach ($this->allDeletions[$em] as $entity) {
-            if ($entity instanceof  AbstractAudit || $entity instanceof  AbstractAuditField) {
-                continue;
-            }
-
             $deletions[] = $this->allDeletions[$em][$entity];
         }
 
@@ -316,11 +337,6 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
 
         foreach ($this->allCollectionUpdates[$em] as $collection) {
             /** @var PersistentCollection $collection */
-            $owner = $collection->getOwner();
-            if ($owner instanceof  AbstractAudit) {
-                continue;
-            }
-
             $new = ['inserted' => [], 'deleted' => [], 'changed' => [],];
             foreach ($this->allCollectionUpdates[$em][$collection]['insertDiff'] as $entity) {
                 $new['inserted'][] = $this->convertEntityToArrayForMessageQueueService
@@ -332,7 +348,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
 
             $ownerFieldName = $collection->getMapping()['fieldName'];
             $entityData  = $this->convertEntityToArrayForMessageQueueService
-                ->convertEntityToArray($em, $owner, []);
+                ->convertEntityToArray($em, $collection->getOwner(), []);
             $entityData['change_set'][$ownerFieldName] = [null, $new];
 
             if ($new['inserted'] || $new['deleted']) {
