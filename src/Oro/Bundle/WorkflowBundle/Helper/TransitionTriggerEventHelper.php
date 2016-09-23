@@ -32,7 +32,7 @@ class TransitionTriggerEventHelper
      * @param object $entity
      * @return bool
      */
-    public function checkRequire(TransitionTriggerEvent $trigger, $entity)
+    public function isRequirePass(TransitionTriggerEvent $trigger, $entity)
     {
         $require = $trigger->getRequire();
         if (!$require) {
