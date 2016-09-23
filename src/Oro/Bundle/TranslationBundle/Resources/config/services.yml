@@ -45,7 +45,6 @@ services:
         class: %oro_translation.service_provider.class%
         arguments:
             - '@oro_translation.uploader.default_adapter'
-            - '@oro_translation.js_dumper'
             - '@translation.loader'
             - '@oro_translation.database_translation.persister'
             - %kernel.cache_dir%
