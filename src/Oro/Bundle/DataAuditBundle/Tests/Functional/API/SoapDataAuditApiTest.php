@@ -92,7 +92,7 @@ class SoapDataAuditApiTest extends WebTestCase
         $em->persist($audit);
         $em->flush();
 
-        $result = $this->soapClient->getAudit($audit['id']);
+        $result = $this->soapClient->getAudit($audit->getId());
         $result = $this->valueToArray($result);
 
         $this->assertEquals($audit->getId(), $result['id']);
