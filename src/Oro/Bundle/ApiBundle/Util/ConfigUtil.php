@@ -28,6 +28,19 @@ class ConfigUtil extends BaseConfigUtil
     const INHERIT = 'inherit';
 
     /**
+     * You can use this constant as a property path for computed field
+     * to avoid collisions with existing getters.
+     * Example of usage:
+     *  'fields' => [
+     *      'primaryPhone' => ['property_path' => '_']
+     *  ]
+     * In this example a value of primaryPhone will not be loaded
+     * even if an entity has getPrimaryPhone method.
+     * Also such field will be marked as not mapped for Symfony forms.
+     */
+    const IGNORE_PROPERTY_PATH = '_';
+
+    /**
      * Gets a native PHP array representation of each object in a given array.
      *
      * @param object[] $objects

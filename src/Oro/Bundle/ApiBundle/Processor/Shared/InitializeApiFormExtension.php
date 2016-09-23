@@ -7,6 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\ContextConfigAccessor;
 use Oro\Bundle\ApiBundle\Processor\ContextMetadataAccessor;
 
 /**
@@ -41,5 +42,6 @@ class InitializeApiFormExtension implements ProcessorInterface
 
         $this->formExtensionSwitcher->switchToApiFormExtension();
         $this->metadataTypeGuesser->setMetadataAccessor(new ContextMetadataAccessor($context));
+        $this->metadataTypeGuesser->setConfigAccessor(new ContextConfigAccessor($context));
     }
 }

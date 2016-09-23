@@ -52,9 +52,6 @@
             class: label_attr.class|replace({'{{ class_prefix }}': class_prefix})
         }) %}
     {%- endif -%}
-    {%- if id is not empty -%}
-        {% set label_attr = label_attr|merge({for: id}) %}
-    {%- endif -%}
     {%- for attrname, attrvalue in label_attr -%}
         {%- if attrname is same as('title') -%}
             {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain) }}"
@@ -76,12 +73,6 @@
     {% if name is defined %}
         {% set attr = attr|merge({
             name: name
-        }) %}
-    {% endif %}
-
-    {% if id is defined and id is not empty %}
-        {% set attr = attr|merge({
-            id: id
         }) %}
     {% endif %}
 

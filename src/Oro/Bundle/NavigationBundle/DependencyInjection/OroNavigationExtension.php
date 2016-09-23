@@ -21,6 +21,7 @@ class OroNavigationExtension extends Extension
     const MENU_CONFIG_KEY = 'menu_config';
     const NAVIGATION_ELEMENTS_KEY = 'navigation_elements';
     const NAVIGATION_CONFIG_ROOT = 'navigation';
+    const MENU_CONFIG_AREAS_KEY   = 'areas';
 
     /**
      * {@inheritDoc}
@@ -136,8 +137,13 @@ class OroNavigationExtension extends Extension
     {
         foreach ($particularConfig as $entity => $entityConfig) {
             if (isset($parentConfig[$configBranchName][$entity])) {
-                $parentConfig[$configBranchName][$entity]
-                    = array_replace_recursive($parentConfig[$configBranchName][$entity], $entityConfig);
+                if ($entity == self::MENU_CONFIG_AREAS_KEY) {
+                    $parentConfig[$configBranchName][$entity] =
+                        array_merge_recursive($parentConfig[$configBranchName][$entity], $entityConfig);
+                } else {
+                    $parentConfig[$configBranchName][$entity]
+                        = array_replace_recursive($parentConfig[$configBranchName][$entity], $entityConfig);
+                }
             } else {
                 $parentConfig[$configBranchName][$entity] = $entityConfig;
             }

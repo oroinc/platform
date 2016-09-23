@@ -126,7 +126,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
         $updates = ['root' => [$update]];
 
         $expectedResult = $updates;
-        $expectedResult['root'][] = $importUpdate;
+        array_unshift($expectedResult['root'], $importUpdate);
 
         $this->visitor->walkUpdates($updates, $context);
         $this->assertEquals($expectedResult, $updates);
@@ -183,25 +183,25 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
 
         $path = implode(
             DIRECTORY_SEPARATOR,
-            [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'first_import']
+            [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'second_import']
         );
 
         $this->resourceProvider
             ->expects($this->at(0))
             ->method('findApplicableResources')
             ->with([$path])
-            ->will($this->returnValue(['import/first_file']));
+            ->will($this->returnValue(['import/second_file']));
 
         $path = implode(
             DIRECTORY_SEPARATOR,
-            [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'second_import']
+            [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'first_import']
         );
 
         $this->resourceProvider
             ->expects($this->at(1))
             ->method('findApplicableResources')
             ->with([$path])
-            ->will($this->returnValue(['import/second_file']));
+            ->will($this->returnValue(['import/first_file']));
 
         /** @var ImportedLayoutUpdate|\PHPUnit_Framework_MockObject_MockObject $firstImportUpdate */
         $firstImportUpdate = $this->getMock(ImportedLayoutUpdate::class);
@@ -212,24 +212,24 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
         $this->loader
             ->expects($this->at(0))
             ->method('load')
-            ->with('import/first_file')
-            ->will($this->returnValue($firstImportUpdate));
+            ->with('import/second_file')
+            ->will($this->returnValue($secondImportUpdate));
 
         $this->loader
             ->expects($this->at(1))
             ->method('load')
-            ->with('import/second_file')
-            ->will($this->returnValue($secondImportUpdate));
+            ->with('import/first_file')
+            ->will($this->returnValue($firstImportUpdate));
 
         $this->dependencyInitializer
             ->expects($this->at(0))
             ->method('initialize')
-            ->with($firstImportUpdate);
+            ->with($secondImportUpdate);
 
         $this->dependencyInitializer
             ->expects($this->at(1))
             ->method('initialize')
-            ->with($secondImportUpdate);
+            ->with($firstImportUpdate);
 
         $updates = ['root' => [
             $updateWithImports,
@@ -237,9 +237,9 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
         ]];
 
         $expectedResult = ['root' => [
-            $updateWithImports,
             $secondImportUpdate,
             $firstImportUpdate,
+            $updateWithImports,
             $updateWithoutImports
         ]];
 
@@ -308,7 +308,7 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
         $updates = ['root' => [$update]];
 
         $expectedResult = $updates;
-        $expectedResult['root'][] = $importUpdate;
+        array_unshift($expectedResult['root'], $importUpdate);
 
         $this->visitor->walkUpdates($updates, $context);
         $this->assertEquals($expectedResult, $updates);

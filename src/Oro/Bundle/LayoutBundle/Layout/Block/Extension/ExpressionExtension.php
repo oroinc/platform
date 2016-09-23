@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
@@ -31,28 +32,21 @@ class ExpressionExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data)
+    public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-        if (false !== $context->getOr('expressions_evaluate_deferred')) {
-            return;
-        }
-        $evaluate = $context->getOr('expressions_evaluate');
-        $encoding = $context->getOr('expressions_encoding');
-
-        $this->processor->processExpressions($options, $context, $data, $evaluate, $encoding);
+        $values = $options->toArray();
+        $this->processor->processExpressions($values, $context, null, true, null);
+        $options->setMultiple($values);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $context = $block->getContext();
         $data = $block->getData();
 
-        if (true !== $context->getOr('expressions_evaluate_deferred')) {
-            return;
-        }
         $evaluate = $context->getOr('expressions_evaluate');
         $encoding = $context->getOr('expressions_encoding');
 
