@@ -1,0 +1,4 @@
+assets:
+    css:
+        'oroimap':
+          - 'bundles/oroimap/css/less/main.less'
