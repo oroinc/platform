@@ -124,6 +124,11 @@ class ACLContext extends OroFeatureContext implements OroElementFactoryAware, Ke
         return $this->elementFactory->createElement('UserRoleForm');
     }
 
+    /**
+     * @param string $user
+     * @return Role
+     * @throws ExpectationException
+     */
     protected function getRole($user)
     {
         if ('administrator' === $user) {

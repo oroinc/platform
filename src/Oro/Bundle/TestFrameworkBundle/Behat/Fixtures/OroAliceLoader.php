@@ -9,6 +9,9 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class OroAliceLoader extends Loader
 {
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($locale = 'en_US', array $providers = [], $seed = 1, array $parameters = [])
     {
         parent::__construct($locale, $providers, $seed, $parameters);
@@ -22,6 +25,9 @@ class OroAliceLoader extends Loader
         return $this->objects;
     }
 
+    /**
+     * @param RegistryInterface $doctrine
+     */
     public function setDoctrine(RegistryInterface $doctrine)
     {
         $this->typeHintChecker->setPersister(new AliceDoctrine($doctrine->getManager()));
