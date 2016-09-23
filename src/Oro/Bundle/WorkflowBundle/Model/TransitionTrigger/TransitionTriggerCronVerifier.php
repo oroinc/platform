@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
@@ -16,17 +19,17 @@ class TransitionTriggerCronVerifier
     /** @var WorkflowAssembler */
     private $workflowAssembler;
 
-    /** @var WorkflowItemRepository */
-    private $workflowItemRepository;
+    /** @var ManagerRegistry */
+    private $registry;
 
     /**
      * @param WorkflowAssembler $workflowAssembler
-     * @param WorkflowItemRepository $workflowItemRepository
+     * @param ManagerRegistry $registry
      */
-    public function __construct(WorkflowAssembler $workflowAssembler, WorkflowItemRepository $workflowItemRepository)
+    public function __construct(WorkflowAssembler $workflowAssembler, ManagerRegistry $registry)
     {
         $this->workflowAssembler = $workflowAssembler;
-        $this->workflowItemRepository = $workflowItemRepository;
+        $this->registry = $registry;
     }
 
     /**
@@ -67,8 +70,10 @@ class TransitionTriggerCronVerifier
     {
         $options = [];
         $options['cron'] = $trigger->getCron();
+
         if ($trigger->getFilter()) {
             $workflow = $this->workflowAssembler->assemble($trigger->getWorkflowDefinition(), false);
+
             $steps = $workflow->getStepManager()
                 ->getRelatedTransitionSteps($trigger->getTransitionName())
                 ->map(
@@ -76,13 +81,24 @@ class TransitionTriggerCronVerifier
                         return $step->getName();
                     }
                 );
-            $options['filter'] = $this->workflowItemRepository->getIdsByStepNamesAndEntityClassQueryBuilder(
-                $steps,
-                $trigger->getEntityClass(),
-                $trigger->getFilter()
-            )->getQuery();
+
+            $options['filter'] = $this->getWorkflowItemRepository()
+                ->getIdsByStepNamesAndEntityClassQueryBuilder(
+                    $steps,
+                    $trigger->getEntityClass(),
+                    $trigger->getFilter()
+                )
+                ->getQuery();
         }
 
         return $options;
+    }
+
+    /**
+     * @return WorkflowItemRepository
+     */
+    protected function getWorkflowItemRepository()
+    {
+        return $this->registry->getManagerForClass(WorkflowItem::class)->getRepository(WorkflowItem::class);
     }
 }

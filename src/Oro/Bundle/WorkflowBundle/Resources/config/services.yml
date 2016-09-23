@@ -307,7 +307,7 @@ services:
         public: false
         arguments:
             - '@oro_workflow.workflow_assembler'
-            - '@oro_workflow.repository.workflow_item'
+            - '@doctrine'
         calls:
             - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]

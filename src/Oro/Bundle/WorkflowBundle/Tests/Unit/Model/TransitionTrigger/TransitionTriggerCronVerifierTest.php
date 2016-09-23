@@ -3,12 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier;
@@ -49,10 +52,19 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $em = $this->getMock(ObjectManager::class);
+        $em->expects($this->any())
+            ->method('getRepository')
+            ->with(WorkflowItem::class)
+            ->willReturn($this->workflowItemRepository);
+
+        $registry = $this->getMock(ManagerRegistry::class);
+        $registry->expects($this->any())->method('getManagerForClass')->with(WorkflowItem::class)->willReturn($em);
+
         $this->cronVerifier = $this->getMock(ExpressionVerifierInterface::class);
         $this->filterVerifier = $this->getMock(ExpressionVerifierInterface::class);
 
-        $this->verifier = new TransitionTriggerCronVerifier($this->workflowAssembler, $this->workflowItemRepository);
+        $this->verifier = new TransitionTriggerCronVerifier($this->workflowAssembler, $registry);
     }
 
     public function testAddOptionVerifier()
