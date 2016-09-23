@@ -66,7 +66,9 @@ class MenuUpdate extends ExtendMenuUpdate implements
      */
     public function getExtras()
     {
-        $extras = [];
+        $extras = [
+            'existsInNavigationYml' => $this->isExistsInNavigationYml()
+        ];
 
         if ($this->getPriority() !== null) {
             $extras['position'] = $this->getPriority();

@@ -86,6 +86,11 @@ trait MenuUpdateTrait
     protected $priority;
 
     /**
+     * @var boolean
+     */
+    protected $existsInNavigationYml = false;
+
+    /**
      * @return int
      */
     public function getId()
@@ -285,6 +290,26 @@ trait MenuUpdateTrait
     public function setPriority($priority)
     {
         $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isExistsInNavigationYml()
+    {
+        return $this->existsInNavigationYml;
+    }
+
+    /**
+     * @param boolean $existsInNavigationYml
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setExistsInNavigationYml($existsInNavigationYml)
+    {
+        $this->existsInNavigationYml = $existsInNavigationYml;
 
         return $this;
     }

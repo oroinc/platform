@@ -32,12 +32,14 @@ class MenuUpdateHelper
         $menu,
         array $extrasMapping = ['position' => 'priority']
     ) {
-        $update->setKey($item->getName());
-        $update->setUri($item->getUri());
-        $update->setDefaultTitle($item->getLabel());
+        $this->setMenuUpdateProperty($update, 'key', $item->getName());
+        $this->setMenuUpdateProperty($update, 'uri', $item->getUri());
+        $this->setMenuUpdateProperty($update, 'defaultTitle', $item->getLabel());
+
         if ($item->getParent()) {
-            $update->setParentKey($item->getParent()->getName());
+            $this->setMenuUpdateProperty($update, 'parentKey', $item->getParent()->getName());
         }
+
         $update->setActive($item->isDisplayed());
         $update->setMenu($menu);
 
@@ -46,10 +48,7 @@ class MenuUpdateHelper
                 $key = $extrasMapping[$key];
             }
 
-            $method = 'set' . ucfirst($key);
-            if (method_exists($update, $method)) {
-                $update->{$method}($value);
-            }
+            $this->setMenuUpdateProperty($update, $key, $value);
         }
     }
 
@@ -67,7 +66,8 @@ class MenuUpdateHelper
 
         if (!$item instanceof ItemInterface) {
             $item = $parentItem->addChild($update->getKey());
-            $item->setExtra('doesNotExistInNavigationYML', true);
+        } else {
+            $update->setExistsInNavigationYml(true);
         }
 
         if ($item->getParent()->getName() != $parentItem->getName()) {
@@ -112,5 +112,23 @@ class MenuUpdateHelper
         }
 
         return $item;
+    }
+
+    /**
+     * @param MenuUpdateInterface $update
+     * @param string $key
+     * @param mixed $value
+     */
+    private function setMenuUpdateProperty(MenuUpdateInterface $update, $key, $value)
+    {
+        $method = 'get' . ucfirst($key);
+        if (method_exists($update, $method)) {
+            $result = $update->{$method}();
+
+            $method = 'set' . ucfirst($key);
+            if ($result === null && method_exists($update, $method)) {
+                $update->{$method}($value);
+            }
+        }
     }
 }

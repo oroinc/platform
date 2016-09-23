@@ -11,7 +11,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -79,7 +78,7 @@ class MenuUpdateController extends Controller
         $menuUpdate = $this->getManager()->createMenuUpdate(MenuUpdate::OWNERSHIP_USER, $this->getUser()->getId());
 
         if ($parentKey) {
-            $parent = $this->getMenuUpdate($menuName, $parentKey);
+            $parent = $this->getMenuUpdate($menuName, $parentKey, true);
             $menuUpdate->setParentKey($parent->getKey());
         }
 
@@ -113,10 +112,10 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @param MenuUpdateInterface $menuUpdate
+     * @param MenuUpdate $menuUpdate
      * @return array|RedirectResponse
      */
-    private function update(MenuUpdateInterface $menuUpdate)
+    private function update(MenuUpdate $menuUpdate)
     {
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_update_key' => $menuUpdate->getKey()]);
 
@@ -132,7 +131,7 @@ class MenuUpdateController extends Controller
      * @param ItemInterface $menu
      * @return array|RedirectResponse
      */
-    protected function getResponse($response, ItemInterface $menu)
+    private function getResponse($response, ItemInterface $menu)
     {
         if (is_array($response)) {
             $treeHandler = $this->get('oro_navigation.tree.menu_update_tree_handler');
@@ -147,9 +146,10 @@ class MenuUpdateController extends Controller
     /**
      * @param string $menuName
      * @param string $key
-     * @return MenuUpdateInterface
+     * @param bool $isExist
+     * @return MenuUpdate
      */
-    protected function getMenuUpdate($menuName, $key)
+    private function getMenuUpdate($menuName, $key, $isExist = false)
     {
         $menuUpdate = $this->getManager()->getMenuUpdateByKeyAndScope(
             $menuName,
@@ -158,7 +158,7 @@ class MenuUpdateController extends Controller
             $this->getUser()->getId()
         );
 
-        if (!$menuUpdate) {
+        if ($isExist && !$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
                 sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
             );
@@ -171,7 +171,7 @@ class MenuUpdateController extends Controller
      * @param string $menuName
      * @return ItemInterface
      */
-    protected function getMenu($menuName)
+    private function getMenu($menuName)
     {
         $menu = $this->getManager()->getMenu($menuName);
         if (!count($menu->getChildren())) {

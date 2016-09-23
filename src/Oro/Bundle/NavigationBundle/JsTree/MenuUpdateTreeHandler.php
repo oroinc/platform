@@ -56,6 +56,7 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
             $nodes[] = $root;
         }
 
+        /** @var ItemInterface $child */
         foreach ($root->getChildren() as $child) {
             if ($child->isDisplayed()) {
                 $nodes[] = $child;

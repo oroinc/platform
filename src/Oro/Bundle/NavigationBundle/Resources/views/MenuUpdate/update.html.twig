@@ -6,7 +6,7 @@
 {% set entityId = entity.id %}
 
 {% block navButtons %}
-    {% if resource_granted('DELETE', entity) %}
+    {% if entity.key and resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_menuupdates', {menuName: menuName, key: app.request.get('key')}),
             'dataRedirect': path('oro_navigation_menu_update_view', {menuName: menuName}),

@@ -20,6 +20,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityRepository;
 
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $entityManager;
+
     /** @var BuilderChainProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $builderChainProvider;
 
@@ -36,9 +39,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityRepository = $this->getMock(EntityRepository::class, [], [], '', false);
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
-        $entityManager = $this->getMock(EntityManager::class, [], [], '', false);
-        $entityManager
+        $this->entityManager = $this->getMock(EntityManager::class, [], [], '', false);
+        $this->entityManager
             ->expects($this->any())
             ->method('getRepository')
             ->with(MenuUpdateStub::class)
@@ -50,7 +52,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getManagerForClass')
             ->with(MenuUpdateStub::class)
-            ->will($this->returnValue($entityManager));
+            ->will($this->returnValue($this->entityManager));
 
         $this->builderChainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
         $this->menuUpdateHelper = $this->getMock(MenuUpdateHelper::class, [], [], '', false);
@@ -77,6 +79,42 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($entity->getOwnerId(), $result->getOwnerId());
     }
 
+    public function testUpdateMenuUpdate()
+    {
+        $entity = new MenuUpdateStub();
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('persist')
+            ->with($entity);
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('flush')
+            ->with($entity);
+
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+        $this->manager->updateMenuUpdate($entity);
+    }
+
+    public function testRemoveMenuUpdate()
+    {
+        $entity = new MenuUpdateStub();
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('remove')
+            ->with($entity);
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('flush')
+            ->with($entity);
+
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+        $this->manager->removeMenuUpdate($entity);
+    }
+
     public function testGetMenuUpdateByKeyDatabase()
     {
         $menuName = 'test-menu';
@@ -86,6 +124,13 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $update = new MenuUpdateStub();
 
+        $menu = $this->getMock(ItemInterface::class);
+        $menu->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($menuName));
+
+        $item = $this->getMock(ItemInterface::class);
+
         $this->manager->setEntityClass(MenuUpdateStub::class);
 
         $this->entityRepository
@@ -93,6 +138,23 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findOneBy')
             ->with(['menu' => $menuName, 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue($update));
+
+        $this->builderChainProvider
+            ->expects($this->once())
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('findMenuItem')
+            ->with($menu, $key)
+            ->will($this->returnValue($item));
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('updateMenuUpdate')
+            ->with($update, $item, $menuName);
 
         $result = $this->manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
 
@@ -115,7 +177,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $menu = $this->getMock(ItemInterface::class);
         $menu->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('test-item'));
+            ->will($this->returnValue($menuName));
 
         $item = $this->getMock(ItemInterface::class);
 
@@ -142,7 +204,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->menuUpdateHelper
             ->expects($this->once())
             ->method('updateMenuUpdate')
-            ->with($update, $item, 'test-item');
+            ->with($update, $item, $menuName);
 
         $result = $this->manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
 
@@ -155,6 +217,12 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $key = 'test-key';
         $ownershipType = MenuUpdate::OWNERSHIP_USER;
         $ownerId = 1;
+
+        $update = new MenuUpdateStub();
+        $update
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+        ;
 
         $menu = $this->getMock(ItemInterface::class);
 
@@ -180,6 +248,6 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
 
-        $this->assertNull($result);
+        $this->assertEquals($update, $result);
     }
 }
