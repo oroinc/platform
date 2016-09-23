@@ -1,4 +1,8 @@
-{% include 'NelmioApiDocBundle::Components/motd.html.twig' %}
+{% if not dumpContext and documentationPath is not null%}
+    <div class="motd" style="font-size: 1.2em; padding: 5px 40px;">
+        <a href="{{ asset(documentationPath) }}">The documentation</a>
+    </div>
+{% endif %}
 <style type="text/css">
     #summary { display: none; }
 </style>
@@ -68,17 +72,12 @@
             };
 
         {% if not dumpContext %}
-        var headerBlocks = '<div id="api_type" style="float: left; font-size: 1.2em; padding: 13px 16px;">type: ' +
-                '<a href="' + apiDocHref + '">plain</a>' +
-                '&nbsp;|&nbsp;' +
-                '<a href="' + apiDocHref + '/rest_json_api">JSON.API</a>' +
-                '</div>';
-        {% if documentationPath is not null  %}
-        headerBlocks += '<div id="doc_link" style="float: left; font-size: 1.2em; padding: 13px 16px;">' +
-                'The documentation: <a href="{{ asset(documentationPath) }}">link</a>' +
-                '</div>';
-        {% endif %}
-        $apiDocLink.after(headerBlocks);
+        $apiDocLink.after('<div id="api_type" style="float: left; font-size: 1.2em; padding: 13px 16px;">type: ' +
+            '<a href="' + apiDocHref + '">plain</a>' +
+            '&nbsp;|&nbsp;' +
+            '<a href="' + apiDocHref + '/rest_json_api">JSON.API</a>' +
+            '</div>'
+        );
         {% endif %}
 
         /**
