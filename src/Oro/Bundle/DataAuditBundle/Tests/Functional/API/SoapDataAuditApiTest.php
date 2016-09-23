@@ -85,7 +85,7 @@ class SoapDataAuditApiTest extends WebTestCase
         $audit->setObjectId(12345);
         $audit->setObjectClass('object\class');
         $audit->setObjectName('object-name');
-        $audit->setVersion(567);
+        $audit->setVersion(5678);
         $audit->setTransactionId('transaction-id');
 
         $em = $this->getDoctrine()->getManagerForClass(ClassUtils::getClass($audit));
@@ -99,7 +99,7 @@ class SoapDataAuditApiTest extends WebTestCase
         $this->assertEquals(12345, $result['objectId']);
         $this->assertEquals('object\class', $result['objectClass']);
         $this->assertEquals('object-name', $result['objectName']);
-        $this->assertEquals(567, $result['version']);
+        $this->assertEquals(5678, $result['version']);
     }
 
     private function getDoctrine()
