@@ -32,21 +32,58 @@ class TranslationManagerTest extends WebTestCase
 
     public function testCreateValue()
     {
-        $key = uniqid('TEST_KEY_');
-        $value = uniqid('TEST_VALUE');
+        $key = uniqid('TEST_KEY_', true);
+        $value = uniqid('TEST_VALUE', true);
         $locale = LoadLanguages::LANGUAGE1;
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
         $translation = $this->manager->findValue($key, $locale, $domain);
         $this->assertNull($translation);
 
-        $this->manager->createValue($key, $value, $locale, $domain, true);
+        $this->manager->saveValue($key, $value, $locale, $domain, true);
 
         $this->manager->flush();
 
         $translation = $this->manager->findValue($key, $locale, $domain);
 
-        $this->ensureTanslationIsCorrect($translation, $key, $value, $domain, $locale);
+        $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
+    }
+
+    public function testUpdateValue()
+    {
+        $key = LoadTranslations::TRANSLATION_KEY_1;
+        $value = uniqid('TEST_VALUE', true);
+        $locale = LoadLanguages::LANGUAGE1;
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+
+        $translation = $this->manager->findValue($key, $locale, $domain);
+        $this->ensureTranslationIsCorrect($translation, $key, LoadTranslations::TRANSLATION1, $domain, $locale);
+
+        $this->manager->saveValue($key, $value, $locale, $domain, true);
+
+        $this->manager->flush();
+
+        $translation = $this->manager->findValue($key, $locale, $domain);
+
+        $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
+    }
+
+    public function testDeleteValue()
+    {
+        $key = LoadTranslations::TRANSLATION_KEY_2;
+        $value = null;
+        $locale = LoadLanguages::LANGUAGE1;
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+
+        $translation = $this->manager->findValue($key, $locale, $domain);
+        $this->ensureTranslationIsCorrect($translation, $key, LoadTranslations::TRANSLATION2, $domain, $locale);
+
+        $this->manager->saveValue($key, $value, $locale, $domain, true);
+
+        $this->manager->flush();
+
+        $translation = $this->manager->findValue($key, $locale, $domain);
+        $this->assertNull($translation);
     }
 
     /**
@@ -56,7 +93,7 @@ class TranslationManagerTest extends WebTestCase
      * @param string $domain
      * @param string $locale
      */
-    protected function ensureTanslationIsCorrect(Translation $translation, $key, $value, $domain, $locale)
+    protected function ensureTranslationIsCorrect(Translation $translation, $key, $value, $domain, $locale)
     {
         $this->assertEquals($value, $translation->getValue());
         $this->assertInstanceOf(Language::class, $translation->getLanguage());
@@ -64,5 +101,28 @@ class TranslationManagerTest extends WebTestCase
         $this->assertInstanceOf(TranslationKey::class, $translation->getTranslationKey());
         $this->assertEquals($key, $translation->getTranslationKey()->getKey());
         $this->assertEquals($domain, $translation->getTranslationKey()->getDomain());
+    }
+
+    public function testRebuildCache()
+    {
+        $translator = $this->getContainer()->get('translator.default');
+
+        $key = uniqid('TRANSLATION_KEY_', true);
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+        $locale = LoadLanguages::LANGUAGE2;
+        $expectedValue = uniqid('TEST_VALUE_', true);
+
+        $this->manager->saveValue($key, $expectedValue, $locale, $domain);
+        $this->manager->flush();
+
+        //Ensure that catalog still contains old translated value
+        $actualValue = $translator->trans($key, [], $domain, $locale);
+        $this->assertNotEquals($expectedValue, $actualValue);
+
+        $this->manager->rebuildCache();
+
+        //Ensure that catalog now contains new translated value
+        $actualValue = $translator->trans($key, [], $domain, $locale);
+        $this->assertEquals($expectedValue, $actualValue);
     }
 }

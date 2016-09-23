@@ -211,7 +211,7 @@ class TranslationManager
             /** @var TranslationRepository $repo */
             $repo = $this->getEntityRepository(Translation::class);
 
-            foreach ($repo->findAvailableDomains($locales) as $data) {
+            foreach ($repo->findAvailableDomains() as $data) {
                 $this->availableDomains[$data['code']][] = $data;
             }
         }
