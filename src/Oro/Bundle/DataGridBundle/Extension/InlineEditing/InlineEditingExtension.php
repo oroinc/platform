@@ -141,9 +141,11 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected function isGranted(array $configItems)
     {
-        return !empty($configItems[Configuration::CONFIG_ACL_KEY]) ?
+        $acl = !empty($configItems[Configuration::CONFIG_ACL_KEY]) ?
             $configItems[Configuration::CONFIG_ACL_KEY] :
             'EDIT;entity:' . $configItems[Configuration::CONFIG_ENTITY_KEY];
+
+        return $this->securityFacade->isGranted($acl);
     }
 
     /**
