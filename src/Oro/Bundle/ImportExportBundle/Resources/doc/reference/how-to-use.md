@@ -33,7 +33,7 @@ Generally you should implement both interfaces if you need to add both import an
 ```php
 <?php
 
-namespace OroCRM\Bundle\ContactBundle\ImportExport\Serializer\Normalizer;
+namespace Oro\Bundle\ContactBundle\ImportExport\Serializer\Normalizer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
 
@@ -62,7 +62,7 @@ class GroupNormalizer extends ConfigurableEntityNormalizer
 
     public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
-        return is_array($data) && $type == 'OroCRM\Bundle\ContactBundle\Entity\Group';
+        return is_array($data) && $type == 'Oro\Bundle\ContactBundle\Entity\Group';
     }
 }
 
@@ -75,7 +75,7 @@ configuration:
 
 ```yml
 parameters:
-    orocrm_contact.importexport.normalizer.group.class: OroCRM\Bundle\ContactBundle\ImportExport\Serializer\Normalizer\GroupNormalizer
+    orocrm_contact.importexport.normalizer.group.class: Oro\Bundle\ContactBundle\ImportExport\Serializer\Normalizer\GroupNormalizer
 services:
     orocrm_contact.importexport.normalizer.group:
         class: %orocrm_contact.importexport.normalizer.group.class%
@@ -98,7 +98,7 @@ names of properties in export/import files, you can extend `Oro\Bundle\ImportExp
 ```php
 <?php
 
-namespace OroCRM\Bundle\ContactBundle\ImportExport\Converter;
+namespace Oro\Bundle\ContactBundle\ImportExport\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
 use Oro\Bundle\ContactBundle\ImportExport\Provider\ContactHeaderProvider;
@@ -128,12 +128,12 @@ class GroupDataConverter extends AbstractTableDataConverter
 
 ```yml
 services:
-    orocrm_contact.importexport.data_converter.group:
+    oro_contact.importexport.data_converter.group:
         parent: oro_importexport.data_converter.configurable
 ```
 
-Look at more complex example of DataConverter in OroCRMContactBundle
-`OroCRM\Bundle\MagentoBundle\ImportExport\Converter\OrderAddressDataConverter`.
+Look at more complex example of DataConverter in OroContactBundle
+`Oro\Bundle\MagentoBundle\ImportExport\Converter\OrderAddressDataConverter`.
 
 
 Export Processor
@@ -144,7 +144,7 @@ DI configuration.
 
 ```yml
 services:
-    orocrm_contact.importexport.processor.export_group:
+    oro_contact.importexport.processor.export_group:
         parent: oro_importexport.processor.export_abstract
         calls:
              - [setDataConverter, [@orocrm_contact.importexport.data_converter.group]]
@@ -179,7 +179,7 @@ it can update only existed ones.
 ```php
 <?php
 
-namespace OroCRM\Bundle\ContactBundle\ImportExport\Strategy;
+namespace Oro\Bundle\ContactBundle\ImportExport\Strategy;
 
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 
@@ -207,7 +207,7 @@ class ContactAddOrReplaceStrategy extends ConfigurableAddOrReplaceStrategy
 
 ```yml
 services:
-    orocrm_contact.importexport.strategy.group.add_or_replace:
+    oro_contact.importexport.strategy.group.add_or_replace:
         class: %orocrm_contact.importexport.strategy.group.class%
         parent: oro_importexport.strategy.configurable_add_or_replace
 ```
@@ -221,7 +221,7 @@ already configured using DI configuration.
 ```yml
 services:
     # Import processor
-    orocrm_contact.importexport.processor.import_group:
+    oro_contact.importexport.processor.import_group:
         parent: oro_importexport.processor.import_abstract
         calls:
              - [setDataConverter, [@orocrm_contact.importexport.data_converter.group]]
@@ -256,7 +256,7 @@ Fixtures implementation based on default import/export process.
 ```php
 <?php
 
-namespace OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture;
+namespace Oro\Bundle\ContactBundle\ImportExport\TemplateFixture;
 
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 
@@ -297,10 +297,10 @@ class ContactFixture implements TemplateFixtureInterface
 
 ```yml
 parameters:
-    orocrm_contact.importexport.template_fixture.contact.class: OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
+    oro_contact.importexport.template_fixture.contact.class: Oro\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
 
 services:
-    orocrm_contact.importexport.template_fixture.contact:
+    oro_contact.importexport.template_fixture.contact:
         class: %orocrm_contact.importexport.template_fixture.contact.class%
         tags:
             - { name: oro_importexport.template_fixture }
@@ -309,13 +309,13 @@ services:
 
 **Define fixture converter:**
 ```yml
-    orocrm_contact.importexport.template_fixture.data_converter.contact:
+    oro_contact.importexport.template_fixture.data_converter.contact:
         parent: oro_importexport.data_converter.template_fixture.configurable
 ```
 
 **Define export processor:**
 ```yml
-    orocrm_contact.importexport.processor.export_template:
+    oro_contact.importexport.processor.export_template:
         parent: oro_importexport.processor.export_abstract
         calls:
             - [setDataConverter, [@orocrm_contact.importexport.template_fixture.data_converter.contact]]

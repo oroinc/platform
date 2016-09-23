@@ -20,7 +20,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension;
 use Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface;
 
-class OroCRMAccountBundle implements Migration, NoteExtensionAwareInterface
+class OroAccountBundle implements Migration, NoteExtensionAwareInterface
 {
     /** @var NoteExtension */
     protected $noteExtension;

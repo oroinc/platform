@@ -88,7 +88,7 @@ processes:
         contact_definition:                                      # name of process definition
             label: 'Contact Definition'                          # label of the process definition
             enabled: true                                        # this definition is enabled (activated)
-            entity: OroCRM\Bundle\ContactBundle\Entity\Contact   # related entity
+            entity: Oro\Bundle\ContactBundle\Entity\Contact   # related entity
             order: 20                                            # processing order
             exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
             preconditions:                                       # List of preconditions to check before scheduling process
@@ -136,7 +136,7 @@ provoke self-triggering.
 ``app/console oro:process:configuration:load`` - after that you can create ``Contact`` of changed assigned user
 and ensure that process works.
  - Expression `$.` allows you to access main data container, for processes it is instance of `Oro\Bundle\WorkflowBundle\Model\ProcessData`.
- - Expression `$` (shortcut) or `$.data` allows you to access current entity, above in example it's `OroCRM\Bundle\ContactBundle\Entity\Contact`.
+ - Expression `$` (shortcut) or `$.data` allows you to access current entity, above in example it's `Oro\Bundle\ContactBundle\Entity\Contact`.
 
 
 Console commands
