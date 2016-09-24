@@ -11,6 +11,7 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -289,6 +290,35 @@ class OroMainContext extends MinkContext implements
         $page = $this->getSession()->getPage();
         $page->find('css', '.lg-image')->mouseOver();
         $page->find('css', 'span.lg-close')->click();
+    }
+
+    /**
+     * @Then /^(?:|I )click on "(?P<text>[^"]+)" attachment thumbnail$/
+     */
+    public function commentAttachmentShouldProperlyWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->clickOnAttachmentThumbnail();
+
+        $thumbnail = $this->getPage()->find('css', "div.thumbnail a[title='$text']");
+        self::assertTrue($thumbnail->isValid(), sprintf('Thumbnail "%s" not found', $text));
+
+        $thumbnail->click();
+    }
+
+    /**
+     * @Then /^download link for "(?P<text>[^"]+)" attachment should work$/
+     */
+    public function downloadLinkForAttachmentShouldWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->checkDownloadLink();
     }
 
      /**
