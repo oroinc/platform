@@ -1,0 +1,11 @@
+features:
+    feature1:
+        toggle: changed_toggle
+        routes:
+            - f1_route3
+        configuration:
+            - config_leaf2
+
+    feature2:
+        label: "Feature 2"
+        toggle: toggle2

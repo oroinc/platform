@@ -12,6 +12,7 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Resizer\ImageResizer;
 use Oro\Bundle\AttachmentBundle\Tools\ImageFactory;
+use Psr\Log\LoggerInterface;
 
 class ImageResizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,14 +66,43 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
 
     public function testResizeImageWhenImageExistsAndNoForce()
     {
-        $image = new File();
+        $image = $this->prophesize(File::class);
+        $image->getId()->willReturn(1);
+        $image->getFileName()->willReturn('image.jpg');
 
         $this->attachmentManager->getFilteredImageUrl($image, self::FILTER_NAME)->willReturn(self::PATH);
 
         $this->cacheManager->isStored(self::PATH, self::FILTER_NAME, self::CACHE_RESOLVER_NAME)->willReturn(true);
         $this->cacheManager->store(Argument::any())->shouldNotBeCalled();
 
-        $this->assertFalse($this->resizer->resizeImage($image, self::FILTER_NAME, false));
+        $this->assertFalse($this->resizer->resizeImage($image->reveal(), self::FILTER_NAME, false));
+    }
+
+    public function testImageNotFound()
+    {
+        $exception = new \Exception();
+
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger
+            ->warning(
+                'Image (id: 1, filename: image.jpg) not found. Skipped during resize.',
+                ['exception' => $exception]
+            )
+            ->shouldBeCalled();
+        $this->resizer->setLogger($logger->reveal());
+
+        $image = $this->prophesize(File::class);
+        $image->getId()->willReturn(1);
+        $image->getFilename()->willReturn('image.jpg');
+
+        $this->attachmentManager->getFilteredImageUrl($image, self::FILTER_NAME)->willReturn(self::PATH);
+
+        $this->fileManager->getContent($image)->willThrow($exception);
+
+        $this->cacheManager->isStored(self::PATH, self::FILTER_NAME, self::CACHE_RESOLVER_NAME)->willReturn(false);
+        $this->cacheManager->store(Argument::any())->shouldNotBeCalled();
+
+        $this->assertFalse($this->resizer->resizeImage($image->reveal(), self::FILTER_NAME, false));
     }
 
     public function testResizeImageWhenImageExistsAndForce()

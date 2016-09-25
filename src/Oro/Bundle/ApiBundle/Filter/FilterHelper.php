@@ -132,7 +132,7 @@ class FilterHelper
 
         $this->filterMap = [];
         foreach ($this->filters as $filterKey => $filter) {
-            if ($filter instanceof ComparisonFilter) {
+            if ($filter instanceof FieldAwareFilterInterface) {
                 $this->filterMap[$filter->getField()] = [
                     $this->filterValues->get($filterKey),
                     $filterKey,

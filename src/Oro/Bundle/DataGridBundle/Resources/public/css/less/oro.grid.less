@@ -361,3 +361,25 @@ td > .nowrap-ellipsis {
 .grid .action-column >.dropdown {
   margin-left: 0;
 }
+.with-floating-header {
+  .grid-header-cell{
+    padding-right: 0;
+  }
+  .grid-header-cell__link, .grid-header-cell__label-container{
+    width: 100%;
+    display: flex;
+  }
+  .grid-header-cell__label {
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
+    float: left;
+  }
+  &.floatThead .grid-header.thead-sizing .grid-header-cell:not(.abbreviated) .grid-header-cell__label {
+    width: 0 !important;
+  }
+  &:not(.floatThead) .grid-header .grid-header-cell:not(.abbreviated) .grid-header-cell__label,
+  .grid-header.thead-sizing  .grid-header-cell:not(.abbreviated) .grid-header-cell__label {
+    width: 40px !important;
+  }
+}

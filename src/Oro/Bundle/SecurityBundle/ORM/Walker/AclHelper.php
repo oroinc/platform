@@ -34,14 +34,10 @@ class AclHelper
     const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
     const ORO_USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
-    /**
-     * @var OwnershipConditionDataBuilder
-     */
+    /** @var OwnershipConditionDataBuilder */
     protected $builder;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
     /** @var array */
@@ -81,9 +77,7 @@ class AclHelper
     {
         $conditionData = $this->builder->getAclConditionData($className, $permission);
         if (!empty($conditionData)) {
-            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
-            list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
-                = $conditionData;
+            list($entityField, $value, , $organizationField, $organizationValue, $ignoreOwner) = $conditionData;
 
             if (isset($mapField[$organizationField])) {
                 $organizationField = $mapField[$organizationField];
@@ -231,22 +225,15 @@ class AclHelper
      */
     protected function processSelect($select, $permission)
     {
-        if ($select instanceof SelectStatement) {
-            $isSubRequest = false;
-        } else {
-            $isSubRequest = true;
-        }
-
         $whereConditions = [];
         $joinConditions  = [];
-        $fromClause      = $isSubRequest ? $select->subselectFromClause : $select->fromClause;
 
+        $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             $condition = $this->processRangeVariableDeclaration(
                 $identificationVariableDeclaration->rangeVariableDeclaration,
                 $permission,
-                false,
-                $isSubRequest
+                false
             );
             if ($condition) {
                 $whereConditions[] = $condition;
@@ -261,8 +248,7 @@ class AclHelper
                         $condition = $this->processRangeVariableDeclaration(
                             $join->joinAssociationDeclaration,
                             $permission,
-                            true,
-                            $isSubRequest
+                            true
                         );
                     } else {
                         $condition = $this->processJoinAssociationPathExpression(
@@ -354,28 +340,25 @@ class AclHelper
      * @param RangeVariableDeclaration $rangeVariableDeclaration
      * @param string                   $permission
      * @param bool                     $isJoin
-     * @param bool                     $isSubRequest
      *
      * @return null|AclCondition|JoinAclCondition
      */
     protected function processRangeVariableDeclaration(
         RangeVariableDeclaration $rangeVariableDeclaration,
         $permission,
-        $isJoin = false,
-        $isSubRequest = false
+        $isJoin = false
     ) {
-        $this->addEntityAlias($rangeVariableDeclaration);
-        $entityName = $rangeVariableDeclaration->abstractSchemaName;
-        $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
-
-
-        $isUserTable = in_array($rangeVariableDeclaration->abstractSchemaName, [self::ORO_USER_CLASS]);
         $resultData = false;
-        if (!$isUserTable || $rangeVariableDeclaration->isRoot) {
+
+        $this->addEntityAlias($rangeVariableDeclaration);
+
+        $entityName = $rangeVariableDeclaration->abstractSchemaName;
+        if ($entityName !== self::ORO_USER_CLASS || $rangeVariableDeclaration->isRoot) {
             $resultData = $this->builder->getAclConditionData($entityName, $permission);
         }
 
         if ($resultData !== false && ($resultData === null || !empty($resultData))) {
+            $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             if (!empty($resultData)) {
                 list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)

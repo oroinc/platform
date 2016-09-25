@@ -125,7 +125,12 @@ class CollectFormErrors implements ProcessorInterface
 
         $cause = $error->getCause();
         if ($cause instanceof ConstraintViolation) {
-            $result = $this->getConstraintViolationPropertyPath($cause);
+            $path = $this->getFormFieldPath($field);
+            $causePath = $this->getConstraintViolationPath($cause);
+            if (count($causePath) > count($path)) {
+                $path = $causePath;
+            }
+            $result = implode('.', $path);
         }
         if (!$result) {
             $result = $field->getName();
@@ -141,14 +146,44 @@ class CollectFormErrors implements ProcessorInterface
      */
     protected function getConstraintViolationPropertyPath(ConstraintViolation $constraintViolation)
     {
+        $path = $this->getConstraintViolationPath($constraintViolation);
+
+        return !empty($path)
+            ? implode('.', $path)
+            : null;
+    }
+
+    /**
+     * @param ConstraintViolation $constraintViolation
+     *
+     * @return string[]
+     */
+    protected function getConstraintViolationPath(ConstraintViolation $constraintViolation)
+    {
         $propertyPath = $constraintViolation->getPropertyPath();
         if (!$propertyPath) {
-            return null;
+            return [];
         }
 
         $path = new ViolationPath($propertyPath);
 
-        return implode('.', $path->getElements());
+        return $path->getElements();
+    }
+
+    /**
+     * @param FormInterface $field
+     *
+     * @return string[]
+     */
+    protected function getFormFieldPath(FormInterface $field)
+    {
+        $path = [];
+        while (null !== $field->getParent()) {
+            $path[] = $field->getName();
+            $field = $field->getParent();
+        }
+
+        return array_reverse($path);
     }
 
     /**

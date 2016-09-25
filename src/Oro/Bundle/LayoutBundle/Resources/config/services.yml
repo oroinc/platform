@@ -115,6 +115,8 @@ services:
         class: Oro\Bundle\LayoutBundle\Assetic\LayoutResource
         arguments:
             - '@oro_layout.theme_manager'
+            - '@filesystem'
+            - "%kernel.root_dir%/../web/"
         tags:
             - { name: assetic.formula_resource, loader: layout }
 

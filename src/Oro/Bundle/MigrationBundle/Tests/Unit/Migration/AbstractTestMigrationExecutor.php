@@ -3,6 +3,8 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+
+use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
@@ -16,6 +18,9 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
 
     /** @var MigrationQueryExecutor */
     protected $queryExecutor;
+
+    /** @var OroDataCacheManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $cacheManager;
 
     protected function setUp()
     {
@@ -37,7 +42,7 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
         $this->connection->expects($this->atLeastOnce())
             ->method('getSchemaManager')
             ->will($this->returnValue($sm));
-        $this->connection->expects($this->once())
+        $this->connection->expects($this->atLeastOnce())
             ->method('getDatabasePlatform')
             ->will($this->returnValue($platform));
 
@@ -45,6 +50,10 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
 
         $this->queryExecutor = new MigrationQueryExecutor($this->connection);
         $this->queryExecutor->setLogger($this->logger);
+
+        $this->cacheManager = $this->getMockBuilder('Oro\Bundle\CacheBundle\Manager\OroDataCacheManager')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**

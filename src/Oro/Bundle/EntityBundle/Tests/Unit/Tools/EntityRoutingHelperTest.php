@@ -273,7 +273,7 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Record doesn't found.
+     * @expectedExceptionMessage Record doesn't exist
      */
     public function testGetEntityForNotExistingEntity()
     {

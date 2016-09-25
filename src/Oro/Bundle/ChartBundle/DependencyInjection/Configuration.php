@@ -7,6 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const CONFIG_ROOT_NODE = 'oro_chart';
     /**
      * {@inheritdoc}
      *
@@ -15,7 +16,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_chart')
+        $treeBuilder->root(self::CONFIG_ROOT_NODE)
             ->info('Configuration of charts')
             ->useAttributeAsKey('name')
             ->prototype('array')

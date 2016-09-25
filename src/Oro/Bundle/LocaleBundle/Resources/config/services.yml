@@ -292,8 +292,8 @@ services:
             - { name: security.voter }
 
     oro_locale.repository.localization:
-        class: Doctrine\ORM\EntityRepository
-        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        class: 'Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository'
+        parent: oro_entity.abstract_repository
         arguments:
             - '%oro_locale.entity.localization.class%'
 

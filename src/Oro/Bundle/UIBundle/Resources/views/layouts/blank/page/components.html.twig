@@ -1,0 +1,11 @@
+{% block centered_container_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' centered-container'
+    }) %}
+
+    <div {{ block('block_attributes') }}>
+        <div class="centered-container__content">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
