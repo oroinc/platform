@@ -19,27 +19,27 @@ class ImageResizer implements LoggerAwareInterface
     /**
      * @var AttachmentManager
      */
-    private $attachmentManager;
+    protected $attachmentManager;
 
     /**
      * @var CacheManager
      */
-    private $cacheManager;
+    protected $cacheManager;
 
     /**
      * @var FileManager
      */
-    private $fileManager;
+    protected $fileManager;
 
     /**
      * @var ImageFactory
      */
-    private $imageFactory;
+    protected $imageFactory;
 
     /**
      * @var string
      */
-    private $cacheResolverName;
+    protected $cacheResolverName;
 
     /**
      * @param AttachmentManager $attachmentManager
@@ -70,8 +70,30 @@ class ImageResizer implements LoggerAwareInterface
      */
     public function resizeImage(File $image, $filterName, $force)
     {
-        $path = $this->attachmentManager->getFilteredImageUrl($image, $filterName);
+        $path = $this->getPath($image, $filterName);
 
+        return $this->createAndStoreImage($image, $filterName, $path, $force);
+    }
+
+    /**
+     * @param File $image
+     * @param string $filterName
+     * @return string
+     */
+    protected function getPath(File $image, $filterName)
+    {
+        return $this->attachmentManager->getFilteredImageUrl($image, $filterName);
+    }
+
+    /**
+     * @param File $image
+     * @param string $filterName
+     * @param string $path
+     * @param bool $force
+     * @return bool
+     */
+    protected function createAndStoreImage(File $image, $filterName, $path, $force)
+    {
         if (!$force && $this->cacheManager->isStored($path, $filterName, $this->cacheResolverName)) {
             return false;
         }
