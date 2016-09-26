@@ -6,7 +6,7 @@
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
 
 {% block activityDetails %}
-    {{ entityName|raw }}
+    {{ entityName }}
     <%
         var hasLink   = !!data.ownerLink;
         var ownerLink = hasLink
