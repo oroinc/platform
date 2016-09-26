@@ -3,23 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
 class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 {
-    const TRIGGER_CLASS_NAME = 'stdClass';
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $registry;
-
     /**
      * @var EventTriggerCache
      */
@@ -35,10 +27,7 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry = $this->getMock(ManagerRegistry::class);
-
-        $this->cache = new EventTriggerCache($this->registry);
-        $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
+        $this->cache = new EventTriggerCache();
     }
 
     public function testSetProvider()
@@ -58,8 +47,8 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
             ['save', [EventTriggerCache::BUILT, true]],
         ];
 
-        $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->prepareProvider($expectedProviderCalls));
+        $this->cache->setEventTriggerRepository($this->prepareRepository($this->testTriggerData));
         $this->assertEquals($this->testTriggerData, $this->cache->build());
     }
 
@@ -86,8 +75,8 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
             ['fetch', [EventTriggerCache::DATA], $this->testTriggerData],
         ];
 
-        $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->prepareProvider($expectedProviderCalls));
+        $this->cache->setEventTriggerRepository($this->prepareRepository($this->testTriggerData));
 
         $this->assertTrue($this->cache->hasTrigger('FirstEntity', ProcessTrigger::EVENT_CREATE));
         $this->assertFalse($this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE));
@@ -104,12 +93,11 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Event trigger class name is not defined
+     * @expectedExceptionMessage Event trigger repository is not defined
      */
-    public function testNoTriggerClassNameException()
+    public function testNoRepositoryException()
     {
         $this->cache->setProvider($this->prepareProvider([]));
-        $this->cache->setTriggerClassName(null);
 
         $this->cache->build();
     }
@@ -146,8 +134,9 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $data
+     * @return \PHPUnit_Framework_MockObject_MockObject|EventTriggerRepositoryInterface
      */
-    protected function prepareRegistryForBuild(array $data)
+    protected function prepareRepository(array $data)
     {
         // generate triggers
         $triggers = [];
@@ -166,17 +155,8 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
         // set mocks
         $repository = $this->getMockBuilder(ProcessTriggerRepository::class)->disableOriginalConstructor()->getMock();
-        $repository->expects($this->any())->method('findAllWithDefinitions')->will($this->returnValue($triggers));
+        $repository->expects($this->any())->method('getAvailableEventTriggers')->will($this->returnValue($triggers));
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $entityManager->expects($this->any())
-            ->method('getRepository')
-            ->with(self::TRIGGER_CLASS_NAME)
-            ->willReturn($repository);
-
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->with(self::TRIGGER_CLASS_NAME)
-            ->willReturn($entityManager);
+        return $repository;
     }
 }

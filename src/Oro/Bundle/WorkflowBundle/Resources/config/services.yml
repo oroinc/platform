@@ -236,6 +236,18 @@ services:
         arguments:
             - '%oro_workflow.workflow_item.entity.class%'
 
+    oro_workflow.repository.process_trigger:
+        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_workflow.process_trigger.entity.class%'
+
+    oro_workflow.repository.transition_event_trigger:
+        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_workflow.entity.transition_trigger_event.class%'
+
     oro_workflow.helper.transition_event_trigger:
         class: Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper
         public: false
