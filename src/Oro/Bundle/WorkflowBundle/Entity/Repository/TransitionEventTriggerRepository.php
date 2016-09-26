@@ -4,9 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 
-class TransitionEventTriggerRepository extends EntityRepository
+class TransitionEventTriggerRepository extends EntityRepository implements EventTriggerRepositoryInterface
 {
     /**
      * @param bool|null $enabled
@@ -25,5 +26,13 @@ class TransitionEventTriggerRepository extends EntityRepository
         }
 
         return $queryBuilder->getQuery()->execute();
+    }
+
+    /**
+     * @return \Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger[]|EventTriggerInterface[]
+     */
+    public function getAvailableEventTriggers()
+    {
+        return $this->findAllWithDefinitions();
     }
 }

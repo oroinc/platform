@@ -3,30 +3,18 @@
 namespace Oro\Bundle\WorkflowBundle\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface;
 
 class EventTriggerCache
 {
     const DATA = 'data';
     const BUILT = 'built';
 
-    /** @var ManagerRegistry */
-    protected $registry;
-
     /** @var CacheProvider */
     protected $provider;
 
-    /** @var string */
-    protected $triggerClassName;
-
-    /**
-     * @param ManagerRegistry $registry
-     */
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
+    /** @var EventTriggerRepositoryInterface */
+    protected $repository;
 
     /**
      * @param CacheProvider $provider
@@ -37,24 +25,25 @@ class EventTriggerCache
     }
 
     /**
-     * @param string $triggerClassName
+     * @param EventTriggerRepositoryInterface $triggerRepository
      */
-    public function setTriggerClassName($triggerClassName)
+    public function setEventTriggerRepository(EventTriggerRepositoryInterface $triggerRepository)
     {
-        $this->triggerClassName = $triggerClassName;
+        $this->repository = $triggerRepository;
     }
 
     /**
      * Write to cache entity classes and appropriate events
      *
      * @return array
+     * @throws \LogicException
      */
     public function build()
     {
-        $this->assertProvider();
+        $this->assertConfigured();
 
         // get all triggers data
-        $triggers = $this->getRepository()->findAllWithDefinitions();
+        $triggers = $this->repository->getAvailableEventTriggers();
         $data = [];
 
         foreach ($triggers as $trigger) {
@@ -82,10 +71,11 @@ class EventTriggerCache
      * @param string $entityClass
      * @param string $event
      * @return bool
+     * @throws \LogicException
      */
     public function hasTrigger($entityClass, $event)
     {
-        $this->assertProvider();
+        $this->assertConfigured();
 
         if (!$this->isBuilt()) {
             $data = $this->build();
@@ -107,23 +97,14 @@ class EventTriggerCache
     /**
      * @throws \LogicException
      */
-    protected function assertProvider()
+    protected function assertConfigured()
     {
         if (!$this->provider) {
             throw new \LogicException('Event trigger cache provider is not defined');
         }
-    }
 
-    /**
-     * @return ObjectRepository
-     * @throws \LogicException
-     */
-    protected function getRepository()
-    {
-        if (!$this->triggerClassName) {
-            throw new \LogicException('Event trigger class name is not defined');
+        if (!$this->repository) {
+            throw new \LogicException('Event trigger repository is not defined');
         }
-
-        return $this->registry->getManagerForClass($this->triggerClassName)->getRepository($this->triggerClassName);
     }
 }
