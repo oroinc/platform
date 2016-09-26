@@ -137,27 +137,38 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     protected function sort(ItemInterface $menu)
     {
-        if ($menu->hasChildren() && $menu->getDisplayChildren()) {
-            $orderedChildren = array();
-            $unorderedChildren = array();
-            $hasOrdering = false;
+        if ($menu->hasChildren()) {
+            $orderedChildren = [];
+            $unorderedChildren = [];
+
+            /** @var ItemInterface[] $children */
             $children = $menu->getChildren();
-            foreach ($children as &$child) {
-                if ($child->hasChildren() && $child->getDisplayChildren()) {
+            foreach ($children as $child) {
+                if ($child->hasChildren()) {
                     $this->sort($child);
                 }
                 $position = $child->getExtra('position');
                 if ($position !== null) {
                     $orderedChildren[$child->getName()] = (int) $position;
-                    $hasOrdering = true;
                 } else {
                     $unorderedChildren[] = $child->getName();
                 }
             }
-            if ($hasOrdering) {
-                asort($orderedChildren);
-                $menu->reorderChildren(array_merge(array_keys($orderedChildren), $unorderedChildren));
+
+            asort($orderedChildren);
+            $order = array_merge(array_keys($orderedChildren), $unorderedChildren);
+
+            $i = 0;
+            $positions = [];
+            foreach ($order as $name) {
+                $positions[$name] = $i;
             }
+
+            foreach ($children as $child) {
+                $child->setExtra('position', $positions[$child->getName()]);
+            }
+
+            $menu->reorderChildren($order);
         }
     }
 

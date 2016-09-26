@@ -115,22 +115,46 @@ class MenuUpdateManager
     }
 
     /**
-     * @param MenuUpdateInterface $update
      * @param string $menuName
-     * @param string $key
-     *
-     * @return MenuUpdateInterface
+     * @param ItemInterface[] $orderedChildren
+     * @param int $ownershipType
+     * @param int $ownerId
      */
-    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key)
+    public function reorderMenuUpdate($menuName, $orderedChildren, $ownershipType, $ownerId)
     {
-        $menu = $this->getMenu($menuName);
-        $item = $this->menuUpdateHelper->findMenuItem($menu, $key);
+        $order = [];
+        foreach ($orderedChildren as $priority => $child) {
+            $order[$child->getName()] = $priority;
+        }
+        
+        /** @var MenuUpdateInterface[] $updates */
+        $updates = $this->getRepository()->findBy([
+            'menu' => $menuName,
+            'key' => array_keys($order),
+            'ownershipType' => $ownershipType,
+            'ownerId' => $ownerId,
+        ]);
+        
+        foreach ($updates as $update) {
+            $update->setPriority($order[$update->getKey()]);
+            $this->getEntityManager()->persist($update);
 
-        if ($item) {
-            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menu->getName());
+            unset($orderedChildren[$order[$update->getKey()]]);
         }
 
-        return $update;
+        foreach ($orderedChildren as $priority => $child) {
+            $update = $this->createMenuUpdate($ownershipType, $ownerId);
+            $update->setKey($child->getName());
+            $update->setMenu($menuName);
+            $parentKey = $child->getParent()->getName();
+            $update->setParentKey($parentKey != $menuName ? $parentKey : null);
+            $update->setPriority($priority);
+
+            $this->getEntityManager()->persist($update);
+            $updates[] = $update;
+        }
+
+        $this->getEntityManager()->flush($updates);
     }
 
     /**
@@ -142,6 +166,37 @@ class MenuUpdateManager
     {
         return $this->builderChainProvider->get($name);
     }
+
+    /**
+     * @param string $menuName
+     * @param string $key
+     * @return ItemInterface|null
+     */
+    public function findMenuItem($menuName, $key)
+    {
+        $menu = $this->getMenu($menuName);
+
+        return $this->menuUpdateHelper->findMenuItem($menu, $key);
+    }
+
+    /**
+     * @param MenuUpdateInterface $update
+     * @param string $menuName
+     * @param string $key
+     *
+     * @return MenuUpdateInterface
+     */
+    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key)
+    {
+        $item = $this->findMenuItem($menuName, $key);
+
+        if ($item) {
+            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menuName);
+        }
+
+        return $update;
+    }
+
 
     /**
      * @return EntityRepository
