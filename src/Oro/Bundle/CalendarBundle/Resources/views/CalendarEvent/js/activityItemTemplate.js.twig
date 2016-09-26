@@ -5,7 +5,7 @@
 {% set entityName  = oro_entity_config_value(entityClass, 'label')|trans %}
 
 {% block activityDetails %}
-    {{ entityName|raw }}
+    {{ entityName }}
     <% var template = (verb == 'create')
         ? {{ 'oro.calendar.calendarevent.added_by'|trans|json_encode|raw }}
         : {{ 'oro.calendar.calendarevent.updated_by'|trans|json_encode|raw }};
@@ -37,8 +37,8 @@
     {% set action %}
         <% if (editable) { %>
         <a href="#" class="action item-edit-button"
-           title="{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}">
-            <i class="icon-edit hide-text">{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}</i>
+           title="{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName}) }}">
+            <i class="icon-edit hide-text">{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName}) }}</i>
         </a>
         <% } %>
     {% endset %}
@@ -47,8 +47,8 @@
     {% set action %}
         <% if (removable) { %>
         <a href="#" class="action item-remove-button"
-           title="{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}">
-            <i class="icon-trash hide-text">{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}</i>
+           title="{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName}) }}">
+            <i class="icon-trash hide-text">{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName}) }}</i>
         </a>
         <% } %>
     {% endset %}
