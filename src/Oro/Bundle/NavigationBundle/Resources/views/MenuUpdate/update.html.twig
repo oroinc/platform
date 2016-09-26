@@ -74,7 +74,7 @@
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {% set html = UI.saveAndCloseButton({
+    {% set html = UI.saveAndStayButton({
         'route': routePrefix ~ 'update',
         'params': {'menuName': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
     }) %}

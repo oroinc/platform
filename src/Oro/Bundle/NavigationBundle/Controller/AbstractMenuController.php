@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Knp\Menu\ItemInterface;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -13,15 +14,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 abstract class AbstractMenuController extends Controller
 {
-    /** @var MenuUpdateManager */
+    /**
+     * @var MenuUpdateManager
+     */
     protected $manager;
 
     /**
@@ -39,6 +39,7 @@ abstract class AbstractMenuController extends Controller
 
     /**
      * @param string $menuName
+     *
      * @return array|RedirectResponse
      */
     public function viewAction($menuName)
@@ -60,7 +61,7 @@ abstract class AbstractMenuController extends Controller
         $menuUpdate = $this->getManager()->createMenuUpdate($this->getOwnershipType(), $this->getUser()->getId());
 
         if ($parentKey) {
-            $parent = $this->getMenuUpdate($menuName, $parentKey);
+            $parent = $this->getMenuUpdate($menuName, $parentKey, true);
             $menuUpdate->setParentKey($parent->getKey());
         }
 
@@ -74,6 +75,7 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param string $menuName
      * @param string $key
+     *
      * @return array|RedirectResponse
      */
     public function updateAction($menuName, $key)
@@ -86,6 +88,7 @@ abstract class AbstractMenuController extends Controller
 
     /**
      * @param MenuUpdateInterface $menuUpdate
+     *
      * @return array|RedirectResponse
      */
     protected function update(MenuUpdateInterface $menuUpdate)
@@ -102,9 +105,10 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param array|RedirectResponse $response
      * @param ItemInterface $menu
+     *
      * @return array|RedirectResponse
      */
-    protected function getResponse($response, ItemInterface $menu)
+    private function getResponse($response, ItemInterface $menu)
     {
         if (is_array($response)) {
             $treeHandler = $this->get('oro_navigation.tree.menu_update_tree_handler');
@@ -120,9 +124,11 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param string $menuName
      * @param string $key
+     * @param bool $isExist
+     *
      * @return MenuUpdateInterface
      */
-    protected function getMenuUpdate($menuName, $key)
+    protected function getMenuUpdate($menuName, $key, $isExist = false)
     {
         if ($this->getOwnershipType() == MenuUpdate::OWNERSHIP_ORGANIZATION) {
             $ownerId = $this->getCurrentOrganization()->getId();
@@ -137,7 +143,7 @@ abstract class AbstractMenuController extends Controller
             $ownerId
         );
 
-        if (!$menuUpdate) {
+        if ($isExist && !$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
                 sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
             );
@@ -148,6 +154,7 @@ abstract class AbstractMenuController extends Controller
 
     /**
      * @param string $menuName
+     *
      * @return ItemInterface
      */
     protected function getMenu($menuName)

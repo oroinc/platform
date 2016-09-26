@@ -140,6 +140,18 @@ interface MenuUpdateInterface
     public function setActive($active);
 
     /**
+     * @return boolean
+     */
+    public function isExistsInNavigationYml();
+
+    /**
+     * @param boolean $existsInNavigationYml
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setExistsInNavigationYml($existsInNavigationYml);
+
+    /**
      * @return int
      */
     public function getPriority();

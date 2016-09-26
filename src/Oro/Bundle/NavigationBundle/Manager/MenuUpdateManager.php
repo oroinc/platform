@@ -72,6 +72,24 @@ class MenuUpdateManager
     }
 
     /**
+     * @param MenuUpdateInterface $update
+     */
+    public function updateMenuUpdate(MenuUpdateInterface $update)
+    {
+        $this->getEntityManager()->persist($update);
+        $this->getEntityManager()->flush($update);
+    }
+
+    /**
+     * @param MenuUpdateInterface $update
+     */
+    public function removeMenuUpdate(MenuUpdateInterface $update)
+    {
+        $this->getEntityManager()->remove($update);
+        $this->getEntityManager()->flush($update);
+    }
+
+    /**
      * @param string $menuName
      * @param string $key
      * @param int $ownershipType
@@ -88,22 +106,23 @@ class MenuUpdateManager
             'ownershipType' => $ownershipType,
             'ownerId' => $ownerId,
         ]);
-        if ($update) {
-            return $update;
+        
+        if (!$update) {
+            $update = $this->createMenuUpdate($ownershipType, $ownerId);
         }
 
-        return $this->getMenuUpdateFromMenu($menuName, $key, $ownershipType, $ownerId);
+        return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);
     }
 
     /**
+     * @param MenuUpdateInterface $update
      * @param string $menuName
      * @param string $key
      * @param int $ownershipType
-     * @param int $ownerId
      *
-     * @return null|MenuUpdateInterface
+     * @return MenuUpdateInterface
      */
-    public function getMenuUpdateFromMenu($menuName, $key, $ownershipType, $ownerId)
+    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $ownershipType)
     {
         $options = [
             'ignoreCache' => true,
@@ -111,14 +130,12 @@ class MenuUpdateManager
         ];
         $menu = $this->getMenu($menuName, $options);
         $item = $this->menuUpdateHelper->findMenuItem($menu, $key);
-        if ($item) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId);
-            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menu->getName());
 
-            return $update;
+        if ($item) {
+            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menu->getName());
         }
 
-        return null;
+        return $update;
     }
 
     /**
