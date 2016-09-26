@@ -115,7 +115,27 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->removeMenuUpdate($entity);
     }
 
-    public function testGetMenuUpdateByKeyDatabase()
+    public function testGetMenuUpdatesByMenuAndScope()
+    {
+        $menuName = 'test-menu';
+        $ownershipType = MenuUpdate::OWNERSHIP_USER;
+        $ownerId = 1;
+
+        $update = new MenuUpdateStub();
+
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+
+        $this->entityRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['menu' => $menuName, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
+            ->will($this->returnValue([$update]));
+
+        $result = $this->manager->getMenuUpdatesByMenuAndScope($menuName, $ownershipType, $ownerId);
+        $this->assertEquals([$update], $result);
+    }
+
+    public function testGetMenuUpdateByKeyAndScopeDatabase()
     {
         $menuName = 'test-menu';
         $key = 'test-key';
@@ -161,7 +181,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($update, $result);
     }
 
-    public function testGetMenuUpdateByKeyYml()
+    public function testGetMenuUpdateByKeyAndScopeYml()
     {
         $menuName = 'test-menu';
         $key = 'test-key';
@@ -211,7 +231,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($update, $result);
     }
 
-    public function testGetMenuUpdateByKeyEmpty()
+    public function testGetMenuUpdateByKeyAndScopeEmpty()
     {
         $menuName = 'test-menu';
         $key = 'test-key';

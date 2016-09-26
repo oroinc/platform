@@ -27,7 +27,7 @@ class MenuUpdateController extends Controller
      * @Delete("/menu/{ownershipType}/{menuName}/{key}")
      *
      * @ApiDoc(
-     *  description="Delete menu item for user"
+     *  description="Delete menu item in specified scope."
      * )
      *
      * @param string $ownershipType
@@ -65,7 +65,37 @@ class MenuUpdateController extends Controller
             $manager->updateMenuUpdate($menuUpdate);
         }
 
-        return new JsonResponse(null, 204);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Delete("/menu/reset/{ownershipType}/{menuName}")
+     *
+     * @ApiDoc(description="Reset menu to default state.")
+     *
+     * @param int $ownershipType
+     * @param string $menuName
+     *
+     * @return Response
+     */
+    public function resetAction($ownershipType, $menuName)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+
+        if ($ownershipType == MenuUpdate::OWNERSHIP_ORGANIZATION) {
+            $ownerId = $this->getCurrentOrganization()->getId();
+        } else {
+            $ownerId = $this->getCurrentUser()->getId();
+        }
+
+        $updates = $manager->getMenuUpdatesByMenuAndScope($menuName, $ownershipType, $ownerId);
+
+        foreach ($updates as $update) {
+            $manager->removeMenuUpdate($update);
+        }
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     /**

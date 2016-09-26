@@ -1,6 +1,8 @@
 {% extends bap.layout %}
+
 {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% from _self import resetButton %}
 
 {% if ownershipType == constant('Oro\\Bundle\\NavigationBundle\\Entity\\MenuUpdate::OWNERSHIP_ORGANIZATION') %}
     {% set routePrefix = 'oro_navigation_org_menu_' %}
@@ -49,6 +51,14 @@
                                     'aCss': 'btn-primary',
                                     'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
                                     'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
+                                }) }}
+
+                                {{ UI.buttonSeparator() }}
+
+                                {{ resetButton({
+                                    'dataUrl': path('oro_api_reset_menuupdates', {menuName: menuName, ownershipType: ownershipType}),
+                                    'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
+                                    'menuKey': menuName
                                 }) }}
                             </div>
                         </div>
@@ -100,3 +110,32 @@
         </div>
     </div>
 {% endblock content %}
+
+{% macro resetButton(parameters) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set url = parameters.dataUrl is defined ? parameters.dataUrl : '' %}
+
+    {% set parameters = parameters|merge({
+        'data': {
+            'message': 'oro.navigation.menuupdate.reset_confirm'|trans({ '%menuKey%' : parameters.menuKey }),
+            'success-message': 'oro.navigation.menuupdate.reset_message'|trans({ '%menuKey%' : parameters.menuKey }),
+            'ok-text': 'oro.navigation.menuupdate.reset_ok_text'|trans,
+            'title': 'oro.navigation.menuupdate.reset_title'|trans,
+            'url': url
+        },
+        'title': 'oro.navigation.menuupdate.reset'|trans,
+        'label': 'oro.navigation.menuupdate.reset'|trans,
+        'aCss': ' btn icons-holder-text no-hash remove-button',
+        'path': 'javascript:void(0);'
+    }) %}
+
+    {% if parameters.dataRedirect is defined %}
+        {% set data = parameters.data|merge({'redirect': parameters.dataRedirect}) %}
+        {% set parameters = parameters|merge({ 'data': data }) %}
+    {% endif %}
+
+    <div class="pull-left btn-group icons-holder">
+        {{ UI.link(parameters) }}
+    </div>
+{% endmacro %}
