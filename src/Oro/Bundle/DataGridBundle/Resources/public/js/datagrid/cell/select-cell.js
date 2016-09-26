@@ -16,6 +16,8 @@ define([
      * @extends Backgrid.SelectCell
      */
     SelectCell = Backgrid.SelectCell.extend({
+        events: {},
+
         /**
          * @inheritDoc
          */
