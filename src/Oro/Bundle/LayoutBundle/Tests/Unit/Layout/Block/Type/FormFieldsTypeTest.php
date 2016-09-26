@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormView;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\Options;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
@@ -116,7 +117,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $formLayoutBuilder->expects($this->never())
             ->method('build');
 
-        $type->buildBlock($builder, $options);
+        $type->buildBlock($builder, new Options($options));
 
         $this->assertSame(
             $formAccessor,
@@ -140,13 +141,13 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
 
         $type = new FormFieldsType($formLayoutBuilder);
-        $options = $this->resolveOptions(
+        $options = new Options($this->resolveOptions(
             $type,
             [
                 'form_name'       => $formName,
                 'split_to_fields' => true
             ]
-        );
+        ));
 
         $formLayoutBuilder->expects($this->once())
             ->method('build')
@@ -174,9 +175,9 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $type = $this->getBlockType(FormFieldsType::NAME);
         $options = $this->resolveOptions(
             $type,
-            ['form_name' => 'test_form']
+            ['form_name' => 'test_form', 'split_to_fields' => true]
         );
-        $type->buildBlock($builder, $options);
+        $type->buildBlock($builder, new Options($options));
     }
 
     // @codingStandardsIgnoreStart
@@ -200,9 +201,9 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $type = $this->getBlockType(FormFieldsType::NAME);
         $options = $this->resolveOptions(
             $type,
-            ['form_name' => $formName]
+            ['form_name' => $formName, 'split_to_fields' => true]
         );
-        $type->buildBlock($builder, $options);
+        $type->buildBlock($builder, new Options($options));
     }
 
     public function testBuildView()
@@ -212,25 +213,16 @@ class FormFieldsTypeTest extends BlockTypeTestCase
 
         $view = new BlockView();
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface');
-        $context = new LayoutContext();
-        $formView = new FormView();
-
-        $context->set('form', $formAccessor);
-
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $formAccessor->expects($this->any())
-            ->method('getView')
-            ->will($this->returnValue($formView));
 
         $type->buildView(
             $view,
             $block,
-            ['form_name' => 'form', 'split_to_fields' => false]
+            new Options(['form' => null, 'form_name' => 'form', 'split_to_fields' => false])
         );
-        $this->assertSame($formView, $view->vars['form']);
+        $this->assertEquals(null, $view->vars['form']);
+        $this->assertEquals('form', $view->vars['form_name']);
+        $this->assertEquals(false, $view->vars['split_to_fields']);
+        $this->assertEquals(null, $view->vars['form_data']);
     }
 
     public function testFinishView()
@@ -243,9 +235,15 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $view = new BlockView($rootView);
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+
         $context = new LayoutContext();
         $formView = new FormView();
-        $view->vars['form'] = $formView;
+        $formAccessor->expects($this->any())
+            ->method('getView')
+            ->will($this->returnValue($formView));
+
+        $view->vars['form_name'] = $formName;
+        $view->vars['split_to_fields'] = false;
 
         $this->setLayoutBlocks(['root' => $rootView]);
 
@@ -254,13 +252,8 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
-        $formAccessor->expects($this->once())
-            ->method('getProcessedFields')
-            ->will(
-                $this->returnValue([])
-            );
 
-        $type->finishView($view, $block, ['form_name' => $formName, 'split_to_fields' => true]);
+        $type->finishView($view, $block);
 
         $this->assertFalse($formView->isRendered());
     }
@@ -277,7 +270,11 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
         $context = new LayoutContext();
         $formView = new FormView();
-        $view->vars['form'] = $formView;
+        $formAccessor->expects($this->any())
+            ->method('getView')
+            ->will($this->returnValue($formView));
+        $view->vars['form_name'] = $formName;
+        $view->vars['split_to_fields'] = true;
 
         $formView->children['field1'] = new FormView($formView);
         $formView->children['field2'] = new FormView($formView);
@@ -316,7 +313,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                 )
             );
 
-        $type->finishView($view, $block, ['form_name' => $formName, 'split_to_fields' => true]);
+        $type->finishView($view, $block);
 
         $this->assertFalse($formView->isRendered());
         $this->assertFalse($formView['field1']->isRendered());
@@ -330,13 +327,16 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
         $type = new FormFieldsType($formLayoutBuilder);
 
-        $formName = 'form';
         $view = new BlockView();
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
         $context = new LayoutContext();
         $formView = new FormView();
-        $view->vars['form'] = $formView;
+        $formAccessor->expects($this->any())
+            ->method('getView')
+            ->will($this->returnValue($formView));
+        $view->vars['form_name'] = 'form';
+        $view->vars['split_to_fields'] = true;
 
         $formView->children['field1'] = new FormView($formView);
         $formView->children['field2'] = new FormView($formView);
@@ -370,7 +370,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                 )
             );
 
-        $type->finishView($view, $block, ['form_name' => $formName, 'split_to_fields' => true]);
+        $type->finishView($view, $block);
 
         $this->assertFalse($formView->isRendered());
         $this->assertFalse($formView['field1']->isRendered());
