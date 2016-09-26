@@ -129,19 +129,6 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * Collect options for BlockView-s when finishView method is triggered
-     *
-     * @param BlockInterface $block
-     * @param array $options
-     */
-    public function collectFinishViewOptions(BlockInterface $block, array $options)
-    {
-        if ($this->isDebug && $this->configManager->get('oro_layout.debug_developer_toolbar')) {
-            $this->dataByBlock[$block->getId()]['finish_view_options'] = $this->prepareOptions($options);
-        }
-    }
-
-    /**
      * Collect view vars for BlockView-s, save root BlockView, check if block is visible
      *
      * @param BlockInterface $block
@@ -211,10 +198,12 @@ class LayoutDataCollector extends DataCollector
         $output['children'] = [];
 
         foreach ($blockView->children as $child) {
-            $id = $child->vars['id'];
-            $output['children'][$id] = $this->getDataByBlock($id);
+            if (array_key_exists('id', $child->vars)) {
+                $id = $child->vars['id'];
+                $output['children'][$id] = $this->getDataByBlock($id);
 
-            $this->recursiveBuildFinalBlockTree($child, $output['children'][$id]);
+                $this->recursiveBuildFinalBlockTree($child, $output['children'][$id]);
+            }
         }
     }
 

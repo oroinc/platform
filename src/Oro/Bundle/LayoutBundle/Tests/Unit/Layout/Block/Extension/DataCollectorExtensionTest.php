@@ -6,6 +6,7 @@ use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\DataCollectorExtension;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
@@ -34,7 +35,7 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $blockId = 'root';
         $blockTypeName = 'root';
-        $options = ['optionKey' => 'optionValue'];
+        $options = new Options(['optionKey' => 'optionValue']);
 
         /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
         $builder = $this->getMock(BlockBuilderInterface::class);
@@ -48,7 +49,7 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->dataCollector
             ->expects($this->once())
             ->method('collectBuildBlockOptions')
-            ->with($blockId, $blockTypeName, $options);
+            ->with($blockId, $blockTypeName, $options->toArray());
 
         $this->extension->buildBlock($builder, $options);
     }
@@ -59,34 +60,13 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
         $view = $this->getMock(BlockView::class);
         /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
         $block = $this->getMock(BlockInterface::class);
-        $options = ['optionKey' => 'optionValue'];
+        $options = new Options(['optionKey' => 'optionValue']);
 
         $this->dataCollector
             ->expects($this->once())
             ->method('collectBuildViewOptions')
-            ->with($block, get_class($block), $options);
+            ->with($block, get_class($block), $options->toArray());
 
         $this->extension->buildView($view, $block, $options);
-    }
-
-    public function testFinishView()
-    {
-        /** @var BlockView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock(BlockView::class);
-        /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
-        $block = $this->getMock(BlockInterface::class);
-        $options = ['optionKey' => 'optionValue'];
-
-        $this->dataCollector
-            ->expects($this->once())
-            ->method('collectFinishViewOptions')
-            ->with($block, $options);
-
-        $this->dataCollector
-            ->expects($this->once())
-            ->method('collectBlockTree')
-            ->with($block, $view);
-
-        $this->extension->finishView($view, $block, $options);
     }
 }

@@ -182,52 +182,6 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider blockOptionsProvider
-     *
-     * @param array $options
-     * @param array $tree
-     */
-    public function testCollectFinishViewOptions($options, $tree)
-    {
-        $rootBlock = new BlockView();
-        $rootBlock->vars['id'] = key($tree);
-        $blockViews = $this->getBlockViews($rootBlock, current($tree));
-
-        foreach ($options as $id => $blockOptions) {
-            /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
-            $block = $this->getMock(BlockInterface::class);
-            $block->expects($this->any())
-                ->method('getId')
-                ->will($this->returnValue($id));
-
-            $this->dataCollector->collectFinishViewOptions($block, $blockOptions);
-        }
-
-        foreach ($blockViews as $blockView) {
-            $blockView->vars = $options[$blockView->vars['id']];
-
-            /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
-            $block = $this->getMock(BlockInterface::class);
-            $block->expects($this->any())
-                ->method('getId')
-                ->will($this->returnValue($blockView->vars['id']));
-
-            $this->dataCollector->collectBlockTree($block, $blockView);
-        }
-
-        $this->contextHolder
-            ->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue(new LayoutContext()));
-
-        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
-
-        foreach ($blockViews as $blockView) {
-            $this->assertEquals($blockView->vars, $options[$blockView->vars['id']]);
-        }
-    }
-
-    /**
      * @return array
      */
     public function blockOptionsProvider()

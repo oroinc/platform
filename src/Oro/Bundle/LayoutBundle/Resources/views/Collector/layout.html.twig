@@ -417,10 +417,6 @@
             {{ tree.view_block_details(data.id, 'Build View Options', data.build_view_options, 'build_view_options', true) }}
         {% endif %}
 
-        {% if data.finish_view_options is defined %}
-            {{ tree.view_block_details(data.id, 'Finish View Options', data.finish_view_options, 'finish_view_options', true) }}
-        {% endif %}
-
         {% if data.view_vars is defined %}
             {{ tree.view_block_details(data.id, 'View Variables', data.view_vars, 'view_vars') }}
         {% endif %}
