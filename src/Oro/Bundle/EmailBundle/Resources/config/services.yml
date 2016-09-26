@@ -1092,6 +1092,7 @@ services:
             - '@oro_email.email.activity.manager'
             - '@oro_email.provider.emailowners.provider'
             - '@oro_email.email.manager'
+            - '@oro_message_queue.client.message_producer'
 
     oro_email.tools.email_body_helper:
         class: Oro\Bundle\EmailBundle\Tools\EmailBodyHelper

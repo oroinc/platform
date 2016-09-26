@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
@@ -15,6 +16,8 @@ use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
  */
 class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     protected function setUp()
     {
         parent::setUp();
@@ -33,27 +36,17 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
     {
         $emailUser = $this->createEmailUser();
 
-        // guard
-        $this->assertEmpty($this->getMessageProducer()->getTraces());
-
         // setSeen
         $emailUser->setSeen(true);
         $this->getEntityManager()->flush();
 
-        $traces = $this->getMessageProducer()->getTraces();
-        $this->assertCount(1, $traces);
-        $this->assertEquals(Topics::SYNC_EMAIL_SEEN_FLAG, $traces[0]['topic']);
-        $this->assertSame(['ids' => [$emailUser->getId()], 'seen' => true], $traces[0]['message']);
+        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['ids' => [$emailUser->getId()], 'seen' => true]);
 
         // setUnseen
-        $this->getMessageProducer()->clearTraces();
         $emailUser->setSeen(false);
         $this->getEntityManager()->flush();
 
-        $traces = $this->getMessageProducer()->getTraces();
-        $this->assertCount(1, $traces);
-        $this->assertEquals(Topics::SYNC_EMAIL_SEEN_FLAG, $traces[0]['topic']);
-        $this->assertSame(['ids' => [$emailUser->getId()], 'seen' => false], $traces[0]['message']);
+        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['ids' => [$emailUser->getId()], 'seen' => false]);
     }
 
     private function createEmailUser()
