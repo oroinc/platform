@@ -50,7 +50,7 @@
     </script>
     <script type="text/template" id="emailtemplate-chooser-template">
         <% _.each(entities, function(entity, i) { %>
-        <option value="<%= entity.get('id') %>"><%= entity.get('name') %></option>
+        <option value="<%- entity.get('id') %>"><%- entity.get('name') %></option>
         <% }); %>
     </script>
 
