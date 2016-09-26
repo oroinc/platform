@@ -73,6 +73,19 @@
             line-height: 1.5;
         }
 
+        .expand-all {
+            text-align: right;
+        }
+
+        .expand-all a {
+            text-decoration: none;
+            color: #999;
+        }
+
+        .expand-all a:hover {
+            border-bottom: 1px dashed;
+        }
+
         .tree-inner.underline {
             text-decoration: line-through;
         }
@@ -84,6 +97,9 @@
 
     {% if collector.data.views|length %}
         <div id="tree-menu" class="tree">
+            <div class="expand-all">
+                <a id="expand-all" href="#" data-collapsed-title="Collapse All">Expand All</a>
+            </div>
             <ul>
                 {% for viewId, viewData in collector.data.views %}
                     {{ view_tree_entry(viewId, viewData, true) }}
@@ -209,7 +225,7 @@
                     isExpanded: isExpanded,
                     isCollapsed: isCollapsed,
                     expand: expand,
-                    collapse: collapse
+                    collapse: collapse,
                 };
             }
 
@@ -292,7 +308,8 @@
             }
 
             var tabTarget = new TabView();
-            var toggler = new Toggler(new JsonStorage(sessionStorage));
+            var storage = new JsonStorage(sessionStorage);
+            var toggler = new Toggler(storage);
             var clickHandler = function (element, callback) {
                 Sfjs.addEventListener(element, 'click', function (e) {
                     if (!e) {
@@ -315,6 +332,38 @@
 
             tabTarget.initTabs(document.querySelectorAll('.tree .tree-inner'));
             toggler.initButtons(document.querySelectorAll('a.toggle-button'));
+
+            (function() {
+                var STORAGE_KEY = 'sf_toggle_all_data';
+                var buttons = document.querySelectorAll('.tree-inner a.toggle-button');
+                var target = document.getElementById('expand-all');
+                var isExpanded = storage.getItem(STORAGE_KEY, false);
+
+                var changeTitle = function(target) {
+                    var title = target.getAttribute('data-collapsed-title');
+                    target.setAttribute('data-collapsed-title', target.text);
+                    target.text = title;
+                };
+
+                if(isExpanded) {
+                    changeTitle(target);
+                }
+
+                var toggleAll = function() {
+                    var isExpanded = storage.getItem(STORAGE_KEY, false);
+                    for (var i = 0; i < buttons.length; i++) {
+                        if(isExpanded) {
+                            toggler.collapse(buttons[i]);
+                        } else {
+                            toggler.expand(buttons[i]);
+                        }
+                    }
+                    changeTitle(target);
+                    storage.setItem(STORAGE_KEY, isExpanded ? false : true);
+                };
+
+                clickHandler(target, toggleAll);
+            })();
         }());
     </script>
 {% endblock %}
