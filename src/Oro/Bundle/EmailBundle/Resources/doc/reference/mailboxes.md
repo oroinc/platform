@@ -190,7 +190,7 @@ class LeadMailboxProcessProvider implements MailboxProcessProviderInterface
      */
     public function getLabel()
     {
-        return 'orocrm.sales.mailbox.process.lead.label';
+        return 'oro.sales.mailbox.process.lead.label';
     }
 }
 
