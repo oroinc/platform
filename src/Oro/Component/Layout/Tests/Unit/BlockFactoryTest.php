@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\Block\Type\BaseType;
@@ -259,7 +260,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('normalizeOptions')
             ->will(
                 $this->returnCallback(
-                    function (array &$options, ContextInterface $context, DataAccessorInterface $data) {
+                    function (Options $options, ContextInterface $context, DataAccessorInterface $data) {
                         if ($options['test_option_2'] === '{BG}:red') {
                             $options['test_option_2'] = ['background'=> 'red'];
                         }
@@ -270,7 +271,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('buildBlock')
             ->will(
                 $this->returnCallback(
-                    function (BlockBuilderInterface $builder, array $options) {
+                    function (BlockBuilderInterface $builder, Options $options) {
                         if ($options['test_option_1'] === 'move_logo_to_root') {
                             $builder->getLayoutManipulator()->move('logo', 'root');
                         }
@@ -281,7 +282,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('buildView')
             ->will(
                 $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block, array $options) {
+                    function (BlockView $view, BlockInterface $block, Options $options) {
                         $view->vars['attr']['block_id'] = $block->getId();
                         if ($options['test_option_1'] === 'move_logo_to_root') {
                             $view->vars['attr']['logo_moved'] = true;
@@ -294,7 +295,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('finishView')
             ->will(
                 $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block, array $options) {
+                    function (BlockView $view, BlockInterface $block) {
                         if (isset($view['test'])) {
                             $view['test']->vars['processed_by_header_extension'] = true;
                         }

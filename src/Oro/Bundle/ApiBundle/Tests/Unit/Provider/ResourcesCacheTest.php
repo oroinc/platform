@@ -105,13 +105,18 @@ class ResourcesCacheTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 'accessible_1.2rest',
-                ['Test\Entity1', 'Test\Entity3']
+                [
+                    'Test\Entity1' => true,
+                    'Test\Entity2' => false,
+                    'Test\Entity3' => true
+                ]
             );
 
         $this->resourcesCache->saveResources(
             '1.2',
             new RequestType(['rest']),
-            [$resource1, $resource2, $resource3]
+            [$resource1, $resource2, $resource3],
+            ['Test\Entity1', 'Test\Entity3']
         );
     }
 

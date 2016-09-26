@@ -109,4 +109,32 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
             $this->context->isCollection()
         );
     }
+
+    public function testProcessForSubresourceWithEmptyTargetClass()
+    {
+        $parentEntityClass = 'Test\ParentClass';
+        $associationName = 'testAssociation';
+
+        $entitySubresources = new ApiResourceSubresources($parentEntityClass);
+        $entitySubresources->addSubresource('testAssociation');
+
+        $this->subresourcesProvider->expects($this->once())
+            ->method('getSubresources')
+            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn($entitySubresources);
+
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [
+                Error::createValidationError(
+                    'relationship constraint',
+                    'The target entity type cannot be recognized.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
 }

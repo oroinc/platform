@@ -23,7 +23,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     {
         parent::setUp();
 
-        $this->executor = new MigrationExecutor($this->queryExecutor);
+        $this->executor = new MigrationExecutor($this->queryExecutor, $this->cacheManager);
         $this->executor->setLogger($this->logger);
     }
 
@@ -32,6 +32,8 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         $migrations = [
             new MigrationState(new IndexMigration()),
         ];
+        $this->cacheManager->expects($this->once())
+            ->method('clear');
 
         $this->executor->executeUp($migrations);
     }
@@ -49,6 +51,9 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
             '\RuntimeException',
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration.'
         );
+        $this->cacheManager->expects($this->never())
+            ->method('clear');
+
         $this->executor->executeUp($migrationsToExecute);
         $this->assertEquals(
             '> Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration',
@@ -76,6 +81,9 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
             '\RuntimeException',
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration.'
         );
+        $this->cacheManager->expects($this->never())
+            ->method('clear');
+
         $this->executor->executeUp($migrationsToExecute);
         $this->assertEquals(
             '> Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration',

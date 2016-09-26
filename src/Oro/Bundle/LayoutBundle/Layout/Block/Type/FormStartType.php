@@ -3,8 +3,10 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class FormStartType extends AbstractFormType
 {
@@ -29,25 +31,39 @@ class FormStartType extends AbstractFormType
 
     /**
      * {@inheritdoc}
+     */
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    {
+        BlockUtils::setViewVarsFromOptions(
+            $view,
+            $options,
+            ['form_action', 'form_route_name', 'form_route_parameters', 'form_method', 'form_enctype']
+        );
+        parent::buildView($view, $block, $options);
+    }
+    
+    /**
+     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
 
         // form action
-        if (isset($options['form_action'])) {
-            $path = $options['form_action'];
+        if (!empty($view->vars['form_action'])) {
+            $path = $view->vars['form_action'];
             if ($path) {
                 $view->vars['action_path'] = $path;
             }
-        } elseif (isset($options['form_route_name'])) {
-            $routeName = $options['form_route_name'];
+        } elseif (!empty($view->vars['form_route_name'])) {
+            $routeName = $view->vars['form_route_name'];
             if ($routeName) {
                 $view->vars['action_route_name']       = $routeName;
-                $view->vars['action_route_parameters'] = isset($options['form_route_parameters'])
-                    ? $options['form_route_parameters']
+                $view->vars['action_route_parameters'] = !empty($view->vars['form_route_parameters'])
+                    ? $view->vars['form_route_parameters']
                     : [];
             }
         } else {
@@ -65,28 +81,20 @@ class FormStartType extends AbstractFormType
         }
 
         // form method
-        $method = isset($options['form_method'])
-            ? strtoupper($options['form_method'])
+        $method = $view->vars['form_method']
+            ? strtoupper($view->vars['form_method'])
             : $formAccessor->getMethod();
         if ($method) {
             $view->vars['method'] = $method;
         }
 
         // form enctype
-        $enctype = isset($options['form_enctype'])
-            ? $options['form_enctype']
+        $enctype = isset($view->vars['form_enctype'])
+            ? $view->vars['form_enctype']
             : $formAccessor->getEnctype();
         if ($enctype) {
             $view->vars['enctype'] = $enctype;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
-    {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         $view->vars['form'] = $formAccessor->getView();
 
