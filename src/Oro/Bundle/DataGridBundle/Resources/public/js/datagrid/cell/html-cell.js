@@ -1,6 +1,7 @@
 define([
-    './string-cell'
-], function(StringCell) {
+    './string-cell',
+    'backgrid'
+], function(StringCell, Backgrid) {
     'use strict';
 
     var HtmlCell;
@@ -14,11 +15,19 @@ define([
      */
     HtmlCell = StringCell.extend({
         /**
+         * use a default implementation to do not affect html content
+         * @property {(Backgrid.CellFormatter)}
+         */
+        formatter: new Backgrid.CellFormatter(),
+
+        /**
          * Render a text string in a table cell. The text is converted from the
          * model's raw value for this cell's column.
          */
         render: function() {
-            this.$el.empty().html(this.model.get(this.column.get('name')));
+            var value = this.model.get(this.column.get('name'));
+            var formattedValue = this.formatter.fromRaw(value);
+            this.$el.html(formattedValue);
             return this;
         }
     });

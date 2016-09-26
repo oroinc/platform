@@ -103,6 +103,12 @@ menu_config:
             display: <boolean>                # disable showing of menu item
             displayChildren: <boolean>        # disable showing of menu item children
 
+    areas:                                    # menu area identifier
+        default:                              # identifier area for menu in admin panel
+            - application_menu                # application menu in admin panel
+        custom:                               # identifier area for menu in custom place
+            - custom_menu                     # custom menu in admin panel
+
     tree:
         <menu_alias>                            # menu alias
             type: <menu_type>                   # menu type code. Link to menu template section.
@@ -124,7 +130,8 @@ Configuration builder reads all menu.yaml and merges its to one menu configurati
 replace any menu item from his bundles. Developers can prioritize loading and rewriting of menu's configuration
 options via sorting bundles in AppKernel.php.
 
-<a name="rendering-menus"></a>
+**IMPORTANT:**  Don't use duplicated item keys in menu tree, this keys must be unique. We strongly recommend to add unique prefixes (namespaces) for your menu items.
+For example: `acme_my_menu_item` instead of `my_menu_item`.
 
 ### Page Titles
 

@@ -7,7 +7,6 @@ interface TranslationStatusInterface
     /**
      * Setting key for config manager
      */
-    const CONFIG_KEY      = 'oro_translation.available_translations';
     const META_CONFIG_KEY = 'oro_translation.installed_translation_meta';
 
     /**
