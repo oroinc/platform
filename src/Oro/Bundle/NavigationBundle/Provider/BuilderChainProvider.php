@@ -17,6 +17,7 @@ use \Doctrine\Common\Cache\CacheProvider;
 class BuilderChainProvider implements MenuProviderInterface
 {
     const COMMON_BUILDER_ALIAS = '_common_builder';
+    const IGNORE_CACHE_OPTION = 'ignoreCache';
 
     /**
      * Collection of builders grouped by alias.
@@ -91,8 +92,10 @@ class BuilderChainProvider implements MenuProviderInterface
     {
         $this->assertAlias($alias);
 
+        $ignoreCache = array_key_exists(self::IGNORE_CACHE_OPTION, $options);
+
         if (!array_key_exists($alias, $this->menus)) {
-            if ($this->cache && $this->cache->contains($alias)) {
+            if (!$ignoreCache && $this->cache && $this->cache->contains($alias)) {
                 $menuData = $this->cache->fetch($alias);
                 $this->menus[$alias] = $this->factory->createFromArray($menuData);
             } else {

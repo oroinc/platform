@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -10,7 +11,7 @@ class DefaultMenuUpdateProvider extends AbstractMenuUpdateProvider
     /**
      * {@inheritdoc}
      */
-    public function getUpdates($menu)
+    public function getUpdates($menu, $ownershipType)
     {
         /** @var MenuUpdateRepository $repository */
         $repository = $this->doctrineHelper->getEntityRepository('OroNavigationBundle:MenuUpdate');
@@ -18,7 +19,11 @@ class DefaultMenuUpdateProvider extends AbstractMenuUpdateProvider
         $organization = $this->getCurrentOrganization();
         $user = $this->getCurrentUser();
 
-        return $repository->getMenuUpdates($menu, $organization, $user);
+        if ($ownershipType == MenuUpdate::OWNERSHIP_ORGANIZATION) {
+            return $repository->getMenuUpdates($menu, $organization);
+        } else {
+            return $repository->getMenuUpdates($menu, $organization, $user);
+        }
     }
 
     /**

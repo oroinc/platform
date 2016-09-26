@@ -105,7 +105,11 @@ class MenuUpdateManager
      */
     public function getMenuUpdateFromMenu($menuName, $key, $ownershipType, $ownerId)
     {
-        $menu = $this->getMenu($menuName);
+        $options = [
+            'ignoreCache' => true,
+            'ownershipType' => $ownershipType
+        ];
+        $menu = $this->getMenu($menuName, $options);
         $item = $this->menuUpdateHelper->findMenuItem($menu, $key);
         if ($item) {
             $update = $this->createMenuUpdate($ownershipType, $ownerId);
@@ -119,12 +123,13 @@ class MenuUpdateManager
 
     /**
      * @param string $name
+     * @param array $options
      *
      * @return ItemInterface
      */
-    public function getMenu($name)
+    public function getMenu($name, $options = [])
     {
-        return $this->builderChainProvider->get($name);
+        return $this->builderChainProvider->get($name, $options);
     }
 
     /**

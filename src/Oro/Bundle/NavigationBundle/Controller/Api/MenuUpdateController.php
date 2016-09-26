@@ -10,6 +10,8 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,25 +28,19 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 class MenuUpdateController extends Controller
 {
     /**
-     * @Delete("/menuupdate/{menuName}/{key}")
-     *
-     * @Acl(
-     *     id="oro_navigation_menu_update_delete",
-     *     type="entity",
-     *     class="OroNavigationBundle:MenuUpdate",
-     *     permission="DELETE"
-     * )
+     * @Delete("/menu/{ownershipType}/{menuName}/{key}")
      *
      * @ApiDoc(
      *  description="Delete menu item for user"
      * )
      *
+     * @param string $ownershipType
      * @param string $menuName
      * @param string $key
      *
      * @return Response
      */
-    public function deleteAction($menuName, $key)
+    public function deleteAction($ownershipType, $menuName, $key)
     {
         /** @var ObjectManager $em */
         $em = $this->getDoctrine()->getManagerForClass('Oro\Bundle\NavigationBundle\Entity\MenuUpdate');
@@ -55,11 +51,17 @@ class MenuUpdateController extends Controller
         /** @var MenuUpdateHelper $helper */
         $helper = $this->get('oro_navigation.helper.menu_update');
 
+        if ($ownershipType == MenuUpdate::OWNERSHIP_ORGANIZATION) {
+            $ownerId = $this->getCurrentOrganization()->getId();
+        } else {
+            $ownerId = $this->getCurrentUser()->getId();
+        }
+
         $menuUpdate = $manager->getMenuUpdateByKeyAndScope(
             $menuName,
             $key,
-            MenuUpdate::OWNERSHIP_USER,
-            $this->getUser()->getId()
+            $ownershipType,
+            $ownerId
         );
         if ($menuUpdate === null) {
             throw $this->createNotFoundException();
@@ -82,5 +84,31 @@ class MenuUpdateController extends Controller
         $em->flush();
 
         return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @return null|User
+     */
+    private function getCurrentUser()
+    {
+        $user = $this->get('oro_security.security_facade')->getLoggedUser();
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|Organization
+     */
+    private function getCurrentOrganization()
+    {
+        $organization = $this->get('oro_security.security_facade')->getOrganization();
+        if (!is_bool($organization)) {
+            return $organization;
+        }
+
+        return null;
     }
 }

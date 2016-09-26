@@ -2,49 +2,88 @@
 
 {% set formAction = app.request.uri %}
 
-{% oro_title_set({params : {"%entity.key%": entity.key, "%entityName%": 'oro.navigation.menuupdate.entity_label'|trans }}) %}
 {% set entityId = entity.id %}
 
+{% if ownershipType == constant('Oro\\Bundle\\NavigationBundle\\Entity\\MenuUpdate::OWNERSHIP_ORGANIZATION') %}
+    {% set routePrefix = 'oro_navigation_org_menu_' %}
+    {% oro_title_set({params : {"%title%": entity.title|trans()}}) %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path(routePrefix ~ 'index'),
+        'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans,
+        'additional': [
+            {
+                'indexPath': path(routePrefix ~ 'view', {menuName: menuName}),
+                'indexLabel': menuName
+            }
+        ]
+    } %}
+{% else %}
+    {% set routePrefix = 'oro_navigation_user_menu_' %}
+    {% set fullname = app.user|oro_format_name|default('N/A') %}
+    {% oro_title_set({params : {"%username%": fullname, "%title%": entity.title|trans()}}) %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_user_index'),
+        'indexLabel': 'oro.user.entity_plural_label'|trans,
+        'additional': [
+            {
+                'indexPath': path('oro_user_profile_view'),
+                'indexLabel': fullname
+            },
+            {
+                'indexPath': path(routePrefix ~ 'index'),
+                'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans
+            },
+            {
+                'indexPath': path(routePrefix ~ 'view', {menuName: menuName}),
+                'indexLabel': menuName
+            }
+        ]
+    } %}
+{% endif %}
+
+{% set treeOnRootSelectRoute = routePrefix ~ 'view' %}
+{% set treeOnSelectRoute = routePrefix ~ 'update' %}
+{% set deleteRedirectRoute = routePrefix ~ 'view' %}
+{% set menuCreateRoute = routePrefix ~ 'create' %}
+{% set menuUpdateRoute = routePrefix ~ 'update' %}
+
+{% if entity.key %}
+    {% set breadcrumbs = breadcrumbs|merge({'entityTitle': entity.title|trans()}) %}
+{% else %}
+    {% set breadcrumbs = breadcrumbs|merge({'entityTitle': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})}) %}
+{% endif %}
+
 {% block navButtons %}
-    {% if resource_granted('DELETE', entity) %}
+    {{ UI.button({
+        'path' : path(routePrefix ~ 'create', {menuName: menuName, parentKey: entity.key}),
+        'iCss': 'icon-folder-close',
+        'aCss': 'btn-primary',
+        'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
+        'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
+    }) }}
+
+    {% if entity.key %}
         {{ UI.deleteButton({
-            'dataUrl': path('oro_api_delete_menuupdates', {menuName: menuName, key: app.request.get('key')}),
-            'dataRedirect': path('oro_navigation_menu_update_view', {menuName: menuName}),
+            'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+            'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-attribute',
             'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {% if resource_granted('oro_navigation_menu_update_update') %}
-        {% set html = UI.saveAndCloseButton({
-            'route': 'oro_navigation_menu_update_update',
-            'params': {'menuName': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
-        }) %}
-    {% endif %}
-    {% if resource_granted('oro_navigation_menu_update_create') %}
-        {% set html = html ~ UI.saveAndNewButton({
-            'route': 'oro_navigation_menu_update_create',
-            'params': {'menuName': '$menu', 'parentKey': '$parentKey'}
-        }) %}
-    {% endif %}
+    {% set html = UI.saveAndCloseButton({
+        'route': routePrefix ~ 'update',
+        'params': {'menuName': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
+    }) %}
+    {% set html = html ~ UI.saveAndNewButton({
+        'route': routePrefix ~ 'create',
+        'params': {'menuName': '$menu', 'parentKey': '$parentKey'}
+    }) %}
     {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
-
-{% block pageHeader %}
-    {% if entityId %}
-        {% set breadcrumbs = {
-            'entity': entity,
-            'indexPath': app.request.uri,
-            'indexLabel': 'oro.navigation.menuupdate.entity_plural_label'|trans,
-            'entityTitle': entity.key
-        } %}
-        {{ parent() }}
-    {% else %}
-        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
-    {% endif %}
-{% endblock pageHeader %}
 
 {% block content_data %}
     {% set id = 'menu-update-form' %}
@@ -90,9 +129,9 @@
             {% set treeOptions = {
                 'data' : tree,
                 'menu' : menuName,
-                'updateAllowed' : resource_granted('oro_navigation_menu_update_update'),
-                'onSelectRoute' : 'oro_navigation_menu_update_update',
-                'onRootSelectRoute' : 'oro_navigation_menu_update_view'
+                'updateAllowed' : true,
+                'onRootSelectRoute' : routePrefix ~ 'view',
+                'onSelectRoute' : routePrefix ~ 'update'
             } %}
             <div
                     data-page-component-module="oronavigation/js/app/components/tree-manage-component"

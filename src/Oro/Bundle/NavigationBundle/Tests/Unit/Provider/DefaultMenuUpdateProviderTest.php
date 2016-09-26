@@ -72,6 +72,8 @@ class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
             ->with('OroNavigationBundle:MenuUpdate')
             ->willReturn($menuUpdateRepository);
 
-        $this->assertEquals($result, $this->defaultMenuUpdateProvider->getUpdates(MenuUpdateData::MENU));
+        $updates = $this->defaultMenuUpdateProvider->getUpdates(MenuUpdateData::MENU, MenuUpdate::OWNERSHIP_USER);
+
+        $this->assertEquals($result, $updates);
     }
 }
