@@ -91,7 +91,7 @@ abstract class NormalizeSection implements ProcessorInterface
                         $entityClass,
                         $targetEntity,
                         $this->buildPrefix($fieldName),
-                        $this->buildPrefix($field->getPropertyPath() ?: $fieldName)
+                        $this->buildPrefix($field->getPropertyPath($fieldName))
                     );
                     $targetEntity->remove($sectionName);
                 }

@@ -15,6 +15,9 @@ class CollectSubresourcesContext extends ApiContext
     /** @var ApiResource[] [entity class => ApiResource, ... ] */
     protected $resources = [];
 
+    /** @var string[] */
+    protected $accessibleResources = [];
+
     /**
      * {@inheritdoc}
      */
@@ -71,5 +74,25 @@ class CollectSubresourcesContext extends ApiContext
         foreach ($resources as $resource) {
             $this->resources[$resource->getEntityClass()] = $resource;
         }
+    }
+
+    /**
+     * Gets a list of resources accessible through Data API.
+     *
+     * @return string[] The list of class names
+     */
+    public function getAccessibleResources()
+    {
+        return $this->accessibleResources;
+    }
+
+    /**
+     * Sets a list of resources accessible through Data API.
+     *
+     * @param string[] $classNames
+     */
+    public function setAccessibleResources(array $classNames)
+    {
+        $this->accessibleResources = $classNames;
     }
 }

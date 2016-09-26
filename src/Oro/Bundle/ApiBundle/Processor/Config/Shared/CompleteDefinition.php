@@ -131,7 +131,10 @@ class CompleteDefinition implements ProcessorInterface
         $existingFields = [];
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath();
+            if (empty($propertyPath) || ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
+                $propertyPath = $fieldName;
+            }
             $existingFields[$propertyPath] = $fieldName;
         }
 
