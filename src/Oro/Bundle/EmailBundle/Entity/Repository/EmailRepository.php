@@ -61,24 +61,15 @@ class EmailRepository extends EntityRepository
      */
     public function getNewEmails(User $user, Organization $organization, $limit, $folderId)
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('eu')
-            ->from('OroEmailBundle:EmailUser', 'eu')
-            ->leftJoin('eu.email', 'e')
-            ->where($this->getAclWhereCondition($user, $organization))
-            ->orderBy('eu.seen', 'ASC')
-            ->addOrderBy('e.sentAt', 'DESC')
-            ->setParameter('organization', $organization)
-            ->setParameter('owner', $user)
-            ->setMaxResults($limit);
-
-        if ($folderId > 0) {
-            $qb->leftJoin('eu.folders', 'f')
-                ->andWhere('f.id = :folderId')
-                ->setParameter('folderId', $folderId);
+        $qb = $this->getEmailList($user, $organization, $limit, $folderId, false);
+        $newEmails = $qb->getQuery()->getResult();
+        if (count($newEmails) < $limit) {
+            $qb = $this->getEmailList($user, $organization, $limit - count($newEmails), $folderId, true);
+            $seenEmails = $qb->getQuery()->getResult();
+            $newEmails = array_merge($newEmails, $seenEmails);
         }
 
-        return $qb->getQuery()->getResult();
+        return $newEmails;
     }
 
     /**
@@ -249,5 +240,38 @@ class EmailRepository extends EntityRepository
         } else {
             return $andExpr;
         }
+    }
+
+    /**
+     * @param User         $user
+     * @param Organization $organization
+     * @param integer      $limit
+     * @param integer      $folderId
+     * @param bool         $isSeen
+     *
+     * @return QueryBuilder
+     */
+    protected function getEmailList(User $user, Organization $organization, $limit, $folderId, $isSeen)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('eu')
+            ->from('OroEmailBundle:EmailUser', 'eu')
+            ->where($this->getAclWhereCondition($user, $organization))
+            ->andWhere('eu.seen = :seen')
+            ->orderBy('eu.receivedAt', 'DESC')
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
+            ->setParameter('seen', $isSeen)
+            ->setMaxResults($limit);
+
+        if ($folderId > 0) {
+            $qb->leftJoin('eu.folders', 'f')
+                ->andWhere('f.id = :folderId')
+                ->setParameter('folderId', $folderId);
+
+            return $qb;
+        }
+
+        return $qb;
     }
 }

@@ -1,12 +1,17 @@
 api:
     entities:
-        Oro\Bundle\UserBundle\Entity\Email: ~
         Oro\Bundle\UserBundle\Entity\Group: ~
         Oro\Bundle\UserBundle\Entity\Role:
             delete_handler: oro_user.role.handler.delete
 
         Oro\Bundle\UserBundle\Entity\User:
             delete_handler: oro_user.handler.delete
+            fields:
+                emails:
+                    data_type: array
+                    exclusion_policy: all
+                    fields:
+                        email: ~
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary
@@ -16,3 +21,7 @@ api:
                     exclude: false # set manually because this entity is marked as a dictionary
                 update:
                     exclude: false # set manually because this entity is marked as a dictionary
+
+        Oro\Bundle\UserBundle\Entity\Email:
+            # this entity does not have own Data API resource
+            actions: false

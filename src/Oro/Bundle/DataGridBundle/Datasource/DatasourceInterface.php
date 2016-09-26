@@ -4,10 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Datasource;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
-/**
- * Class DatasourceInterface
- * @package Oro\Bundle\DataGridBundle\Datasource
- */
 interface DatasourceInterface
 {
     /**

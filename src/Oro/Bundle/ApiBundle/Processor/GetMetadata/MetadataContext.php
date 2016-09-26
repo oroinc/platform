@@ -18,6 +18,9 @@ class MetadataContext extends ApiContext
     /** a list of requests for additional metadata information that should be retrieved */
     const EXTRA = 'extra';
 
+    /** whether excluded fields and associations should not be removed */
+    const WITH_EXCLUDED_PROPERTIES = 'withExcludedProperties';
+
     /** @var MetadataExtraInterface[] */
     protected $extras = [];
 
@@ -117,5 +120,25 @@ class MetadataContext extends ApiContext
 
         $this->extras = $extras;
         $this->set(self::EXTRA, $names);
+    }
+
+    /**
+     * Gets a flag indicates whether excluded fields and associations should not be removed.
+     *
+     * @return bool
+     */
+    public function getWithExcludedProperties()
+    {
+        return (bool)$this->get(self::WITH_EXCLUDED_PROPERTIES);
+    }
+
+    /**
+     * Sets a flag indicates whether excluded fields and associations should not be removed.
+     *
+     * @param bool $flag
+     */
+    public function setWithExcludedProperties($flag)
+    {
+        $this->set(self::WITH_EXCLUDED_PROPERTIES, $flag);
     }
 }
