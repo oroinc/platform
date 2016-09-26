@@ -65,7 +65,9 @@ class ApiDocMetadataParser implements ParserInterface
         $action,
         RequestType $requestType
     ) {
-        $result = [];
+        $identifiersData = [];
+        $fields = [];
+        $relations = [];
 
         $addIdentificators = ApiActions::isIdentificatorNeededForAction($action);
         $identifiers = $metadata->getIdentifierFieldNames();
@@ -80,29 +82,42 @@ class ApiDocMetadataParser implements ParserInterface
             $fieldData['isRelation'] = false;
             $fieldData['isCollection'] = false;
 
-            $result[$fieldName] = $fieldData;
+            if (in_array($fieldName, $identifiers, true)) {
+                $identifiersData[$fieldName] = $fieldData;
+            } else {
+                $fields[$fieldName] = $fieldData;
+            }
         }
         // process relations
         foreach ($metadata->getAssociations() as $associationName => $associationMetadata) {
             $fieldData = [];
 
             $fieldData['required'] = !$associationMetadata->isNullable();
-            if (DataType::isAssociationAsField($associationMetadata->getDataType())) {
-                $fieldData['dataType'] = $associationMetadata->getDataType();
-                $fieldData['isRelation'] = false;
-            } else {
-                $fieldData['dataType'] = $this->getEntityType($associationMetadata->getTargetClassName(), $requestType);
-                $fieldData['isRelation'] = true;
-            }
-
             $fieldData['description'] = $config->getField($associationName)->getDescription();
             $fieldData['readonly'] = !$addIdentificators && in_array($associationName, $identifiers, true);
             $fieldData['isCollection'] = $associationMetadata->isCollection();
 
-            $result[$associationName] = $fieldData;
+            $fieldData['dataType'] = $this->getEntityType($associationMetadata->getTargetClassName(), $requestType);
+            $fieldData['isRelation'] = true;
+
+            if (in_array($associationName, $identifiers, true)) {
+                $identifiersData[$associationName] = $fieldData;
+            } else {
+                if (DataType::isAssociationAsField($associationMetadata->getDataType())) {
+                    $fieldData['dataType'] = $associationMetadata->getDataType();
+                    $fieldData['isRelation'] = false;
+                    $fields[$associationName] = $fieldData;
+                } else {
+                    $relations[$associationName] = $fieldData;
+                }
+            }
         }
 
-        return $result;
+        ksort($identifiersData);
+        ksort($fields);
+        ksort($relations);
+
+        return array_merge($identifiersData, $fields, $relations);
     }
 
     /**

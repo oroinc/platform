@@ -15,7 +15,7 @@
                     <td>
                         {% if infos.dataType is defined %}
                             {% if infos.isCollection is defined and infos.isCollection and infos.dataType not in ['array', 'scalar'] %}
-                                array of:
+                                array of
                             {% endif %}
                             {% if infos.isRelation is defined and infos.isRelation %}
                                 <a href="#get--api-{{ infos.dataType }}" onclick="return gotoResource('get--api-{{ infos.dataType }}');">{{ infos.dataType }}</a>
