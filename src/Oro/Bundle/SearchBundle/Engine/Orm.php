@@ -14,6 +14,9 @@ use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Orm extends AbstractEngine
 {
     /** @var SearchIndexRepository */
