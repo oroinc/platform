@@ -21,7 +21,7 @@ class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
             ['parentKey', 'page_container'],
             ['uri', 'uri'],
             ['menu', 'main_menu'],
-            ['ownershipType', MenuUpdateInterface::OWNERSHIP_GLOBAL],
+            ['ownershipType', MenuUpdateInterface::OWNERSHIP_ORGANIZATION],
             ['ownerId', 3],
             ['active', true],
             ['priority', 1],
