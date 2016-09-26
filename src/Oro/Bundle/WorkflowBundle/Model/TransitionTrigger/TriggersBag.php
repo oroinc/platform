@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TriggersBag
@@ -13,13 +13,13 @@ class TriggersBag
     private $definition;
 
     /**
-     * @var array|AbstractTransitionTrigger[]
+     * @var array|BaseTransitionTrigger[]
      */
     private $triggers = [];
 
     /**
      * @param WorkflowDefinition $definition
-     * @param array|AbstractTransitionTrigger[] $triggers
+     * @param array|BaseTransitionTrigger[] $triggers
      */
     public function __construct(WorkflowDefinition $definition, array $triggers)
     {
@@ -30,15 +30,15 @@ class TriggersBag
     }
 
     /**
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      */
-    protected function addTrigger(AbstractTransitionTrigger $trigger)
+    protected function addTrigger(BaseTransitionTrigger $trigger)
     {
         $this->triggers[] = $trigger;
     }
 
     /**
-     * @return array|\Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger[]
+     * @return array|\Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger[]
      */
     public function getTriggers()
     {

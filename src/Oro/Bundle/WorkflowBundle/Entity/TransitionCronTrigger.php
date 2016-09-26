@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity()
  */
-class TransitionCronTrigger extends AbstractTransitionTrigger
+class TransitionCronTrigger extends BaseTransitionTrigger
 {
     /**
      * @var string
@@ -93,7 +93,7 @@ class TransitionCronTrigger extends AbstractTransitionTrigger
     /**
      * {@inheritdoc}
      */
-    protected function isEqualAdditionalFields(AbstractTransitionTrigger $trigger)
+    protected function isEqualAdditionalFields(BaseTransitionTrigger $trigger)
     {
         return $trigger instanceof static
             && $this->cron === $trigger->getCron()

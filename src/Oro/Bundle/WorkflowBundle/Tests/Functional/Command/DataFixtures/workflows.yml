@@ -19,9 +19,6 @@ workflows:
                 transition_definition: second_transition_definition
                 frontend_options:
                     icon: bar
-                schedule:
-                    cron: '* * * * *'
-                    filter: 'e.id = 7'
         transition_definitions:
             second_transition_definition: []
 

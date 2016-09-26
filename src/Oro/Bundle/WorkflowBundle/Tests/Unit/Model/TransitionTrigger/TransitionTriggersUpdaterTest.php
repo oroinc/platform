@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -153,7 +153,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManagerForClass')
-            ->with(AbstractTransitionTrigger::class)->willReturn($em);
+            ->with(BaseTransitionTrigger::class)->willReturn($em);
 
         return $em;
     }
@@ -166,7 +166,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
-            ->with(AbstractTransitionTrigger::class)
+            ->with(BaseTransitionTrigger::class)
             ->willReturn($repository);
 
         return $repository;

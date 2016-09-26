@@ -34,9 +34,6 @@ workflows:
                 label: 'Start transition'
                 step_to: open
                 transition_definition: start_transiotion_definition
-                schedule:
-                    cron: '* * * * *'
-                    filter: 'e.id = 7'
 
     test_multistep_flow:
         label: 'Test MultiStep Flow'

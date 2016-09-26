@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
@@ -12,7 +12,7 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit_Framework_Test
     use EntityTestCaseTrait;
 
     /**
-     * @var AbstractTransitionTrigger
+     * @var BaseTransitionTrigger
      */
     protected $entity;
 
@@ -43,10 +43,10 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @param AbstractTransitionTrigger $trigger
-     * @return AbstractTransitionTrigger
+     * @param BaseTransitionTrigger $trigger
+     * @return BaseTransitionTrigger
      */
-    protected function setDataToTrigger(AbstractTransitionTrigger $trigger)
+    protected function setDataToTrigger(BaseTransitionTrigger $trigger)
     {
         return $trigger->setTransitionName('test_transition')
             ->setQueued(false)
@@ -63,7 +63,7 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @return AbstractTransitionTrigger
+     * @return BaseTransitionTrigger
      */
     abstract protected function getEntity();
 }

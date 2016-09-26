@@ -19,24 +19,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *     "event" = "Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger"
  * })
  * @Config(
- *      defaultValues={
- *          "note"={
- *              "immutable"=true
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
+ *      mode="hidden"
  * )
  * @todo: setup needed indexes in BAP-11776
  */
-abstract class AbstractTransitionTrigger
+abstract class BaseTransitionTrigger
 {
     use DatesAwareTrait;
 
@@ -168,9 +155,9 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      */
-    protected function importMainData(AbstractTransitionTrigger $trigger)
+    protected function importMainData(BaseTransitionTrigger $trigger)
     {
         $this->setQueued($trigger->isQueued())
             ->setTransitionName($trigger->getTransitionName())
@@ -178,10 +165,10 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      * @return bool
      */
-    public function isEqualTo(AbstractTransitionTrigger $trigger)
+    public function isEqualTo(BaseTransitionTrigger $trigger)
     {
         $expectedWorkflowName = $this->workflowDefinition ? $this->workflowDefinition->getName() : null;
         $actualWorkflowName = $trigger->workflowDefinition ? $trigger->workflowDefinition->getName() : null;
@@ -203,8 +190,8 @@ abstract class AbstractTransitionTrigger
     /**
      * Compare additional fields of triggers
      *
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      * @return bool
      */
-    abstract protected function isEqualAdditionalFields(AbstractTransitionTrigger $trigger);
+    abstract protected function isEqualAdditionalFields(BaseTransitionTrigger $trigger);
 }

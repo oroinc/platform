@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerAssemblerInterface;
@@ -15,7 +15,7 @@ class WorkflowTransitionTriggersAssembler
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @return AbstractTransitionTrigger[]
+     * @return BaseTransitionTrigger[]
      * @throws AssemblerException
      */
     public function assembleTriggers(WorkflowDefinition $workflowDefinition)
@@ -48,7 +48,7 @@ class WorkflowTransitionTriggersAssembler
      * @param array $options
      * @param string $transitionName
      * @param WorkflowDefinition $workflowDefinition
-     * @return AbstractTransitionTrigger
+     * @return BaseTransitionTrigger
      * @throws AssemblerException
      */
     private function assemble(array $options, $transitionName, WorkflowDefinition $workflowDefinition)

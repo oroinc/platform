@@ -35,9 +35,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      *
      * @param array $expectedMessages
      * @param array $expectedDefinitions
-     * @param array $expectedProcesses
      */
-    public function testExecute(array $expectedMessages, array $expectedDefinitions, array $expectedProcesses)
+    public function testExecute(array $expectedMessages, array $expectedDefinitions)
     {
         $repositoryWorkflow = $this->getRepository('OroWorkflowBundle:WorkflowDefinition');
         $repositoryProcess = $this->getRepository('OroWorkflowBundle:ProcessDefinition');
@@ -56,13 +55,9 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         $processes = $repositoryProcess->findAll();
 
         $this->assertCount(count($definitionsBefore) + count($expectedDefinitions), $definitions);
-        $this->assertCount(count($processesBefore) + count($expectedProcesses), $processes);
+        $this->assertCount(count($processesBefore), $processes);
         foreach ($expectedDefinitions as $definitionName) {
             $this->assertDefinitionLoaded($definitions, $definitionName);
-        }
-
-        foreach ($expectedProcesses as $processName) {
-            $this->assertProcessLoaded($processes, $processName);
         }
     }
 
@@ -79,10 +74,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
                 'expectedDefinitions' => [
                     'first_workflow',
                     'second_workflow'
-                ],
-                'expectedProcesses' => [
-                    'stpn__first_workflow__second_transition',
-                ],
+                ]
             ]
         ];
     }

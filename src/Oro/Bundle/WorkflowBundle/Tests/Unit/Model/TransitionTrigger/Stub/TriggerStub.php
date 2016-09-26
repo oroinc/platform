@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub;
 
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 
-class TriggerStub extends AbstractTransitionTrigger
+class TriggerStub extends BaseTransitionTrigger
 {
     /**
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      * @return bool
      */
-    protected function isEqualAdditionalFields(AbstractTransitionTrigger $trigger)
+    protected function isEqualAdditionalFields(BaseTransitionTrigger $trigger)
     {
         return true;
     }

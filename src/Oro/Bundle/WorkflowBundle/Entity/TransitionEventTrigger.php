@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository")
  */
-class TransitionEventTrigger extends AbstractTransitionTrigger implements EventTriggerInterface
+class TransitionEventTrigger extends BaseTransitionTrigger implements EventTriggerInterface
 {
     /**
      * Entity from event
@@ -192,7 +192,7 @@ class TransitionEventTrigger extends AbstractTransitionTrigger implements EventT
     /**
      * {@inheritdoc}
      */
-    protected function isEqualAdditionalFields(AbstractTransitionTrigger $trigger)
+    protected function isEqualAdditionalFields(BaseTransitionTrigger $trigger)
     {
         return $trigger instanceof static
             && $this->entityClass === $trigger->getEntityClass()

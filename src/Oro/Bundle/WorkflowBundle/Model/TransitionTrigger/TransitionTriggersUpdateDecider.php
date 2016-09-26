@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 
 class TransitionTriggersUpdateDecider
 {
@@ -33,10 +33,10 @@ class TransitionTriggersUpdateDecider
 
     /**
      * @param array $triggers
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      * @return bool
      */
-    private function contains(array &$triggers, AbstractTransitionTrigger $trigger)
+    private function contains(array &$triggers, BaseTransitionTrigger $trigger)
     {
         foreach ($triggers as $match) {
             if ($trigger->isEqualTo($match)) {

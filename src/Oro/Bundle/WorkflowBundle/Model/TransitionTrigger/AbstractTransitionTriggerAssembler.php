@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAssemblerInterface
@@ -10,7 +10,7 @@ abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAs
     /**
      * @param array $options
      * @param WorkflowDefinition $workflowDefinition
-     * @return AbstractTransitionTrigger
+     * @return BaseTransitionTrigger
      */
     abstract protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition);
 

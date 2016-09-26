@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
-use Oro\Bundle\WorkflowBundle\Entity\AbstractTransitionTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
@@ -65,9 +65,9 @@ class TransitionTriggersUpdater
     }
 
     /**
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      */
-    private function persist(AbstractTransitionTrigger $trigger)
+    private function persist(BaseTransitionTrigger $trigger)
     {
         $this->getEntityManager()->persist($trigger);
 
@@ -77,9 +77,9 @@ class TransitionTriggersUpdater
     }
 
     /**
-     * @param AbstractTransitionTrigger $trigger
+     * @param BaseTransitionTrigger $trigger
      */
-    private function remove(AbstractTransitionTrigger $trigger)
+    private function remove(BaseTransitionTrigger $trigger)
     {
         $this->getEntityManager()->remove($trigger);
 
@@ -113,11 +113,11 @@ class TransitionTriggersUpdater
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @return array|AbstractTransitionTrigger[]
+     * @return array|BaseTransitionTrigger[]
      */
     private function getStoredDefinitionTriggers(WorkflowDefinition $workflowDefinition)
     {
-        return $this->doctrineHelper->getEntityRepositoryForClass(AbstractTransitionTrigger::class)->findBy(
+        return $this->doctrineHelper->getEntityRepositoryForClass(BaseTransitionTrigger::class)->findBy(
             [
                 'workflowDefinition' => $workflowDefinition->getName()
             ]
@@ -130,7 +130,7 @@ class TransitionTriggersUpdater
     private function getEntityManager()
     {
         if (!$this->em) {
-            $this->em = $this->doctrineHelper->getEntityManagerForClass(AbstractTransitionTrigger::class);
+            $this->em = $this->doctrineHelper->getEntityManagerForClass(BaseTransitionTrigger::class);
         }
 
         return $this->em;
