@@ -100,6 +100,15 @@ define(function(require) {
         },
 
         initPopover: function(container, options) {
+            var $items = container.find('[data-toggle="popover"]').filter(function () {
+                // skip already initialized popovers
+                return !$(this).data('popover');
+            });
+
+            this.initPopoverForElements($items, options);
+        },
+
+        initPopoverForElements: function($items, options, overrideOptionsByData) {
             options = _.defaults(options || {}, {
                 animation: false,
                 delay: {show: 0, hide: 0},
@@ -108,12 +117,8 @@ define(function(require) {
                 trigger: 'manual'
             });
 
-            var $items = container;
-            if (!container.is('[data-toggle="popover"]')) {
-                $items = container.find('[data-toggle="popover"]').filter(function() {
-                    // skip already initialized popovers
-                    return !$(this).data('popover');
-                });
+            if (overrideOptionsByData) {
+                options = $.extend(options, $items.data());
             }
 
             $items.not('[data-close="false"]').each(function(i, el) {
