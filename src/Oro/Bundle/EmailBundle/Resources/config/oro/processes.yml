@@ -17,18 +17,15 @@ processes:
                         - '@call_method':
                             object: $.data
                             method: incrementUnsyncedFlagCount
-                        - '@format_string':
-                            attribute: $.arguments
-                            string: '--ids=%id%'
-                            arguments:
-                                id: $id
-                        - '@create_entity':
-                            class: JMS\JobQueueBundle\Entity\Job
-                            attribute: $.syncJob
-                            flush: true
-                            arguments:
-                                - 'oro:email:flag-sync'
-                                - ['--seen=false', $.arguments]
+                        - '@assign_constant_value':
+                            attribute: '$.topic'
+                            value: 'Oro\Bundle\EmailBundle\Async\Topics::SYNC_EMAIL_SEEN_FLAG'
+                        - '@call_service_method':
+                            service: 'oro_message_queue.message_producer'
+                            method: 'send'
+                            method_parameters:
+                                - '$.topic'
+                                - { ids: ['$id'], seen: false }
                 - '@tree':
                     conditions:
                         '@equal': [$seen, true]
@@ -36,18 +33,15 @@ processes:
                         - '@call_method':
                             object: $.data
                             method: incrementUnsyncedFlagCount
-                        - '@format_string':
-                            attribute: $.arguments
-                            string: '--ids=%id%'
-                            arguments:
-                                id: $id
-                        - '@create_entity':
-                            class: JMS\JobQueueBundle\Entity\Job
-                            attribute: $.syncJob
-                            flush: true
-                            arguments:
-                                - 'oro:email:flag-sync'
-                                - ['--seen=true', $.arguments]
+                        - '@assign_constant_value':
+                            attribute: '$.topic'
+                            value: 'Oro\Bundle\EmailBundle\Async\Topics::SYNC_EMAIL_SEEN_FLAG'
+                        - '@call_service_method':
+                            service: 'oro_message_queue.message_producer'
+                            method: 'send'
+                            method_parameters:
+                                - '$.topic'
+                                - { ids: ['$id'], seen: true }
 
     triggers:
         sync_email_flag_after_changed:
