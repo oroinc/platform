@@ -61,7 +61,7 @@ class MenuUpdateController extends Controller
             $manager->updateMenuUpdate($menuUpdate);
         }
 
-        return new JsonResponse(null, 204);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -85,6 +85,6 @@ class MenuUpdateController extends Controller
             $manager->removeMenuUpdate($update);
         }
 
-        return new JsonResponse(null, 204);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
