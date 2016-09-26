@@ -30,20 +30,6 @@ class TranslationRepository extends EntityRepository
     }
 
     /**
-     * @return array [['code' = '...', 'domain' => '...'], ...]
-     */
-    public function findAvailableDomains()
-    {
-        $qb = $this->createQueryBuilder('t')
-            ->distinct(true)
-            ->select('l.code', 'k.domain')
-            ->join('t.language', 'l')
-            ->join('t.translationKey', 'k');
-
-        return $qb->getQuery()->getArrayResult();
-    }
-
-    /**
      * @param Language $language
      *
      * @return int

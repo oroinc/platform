@@ -12,7 +12,6 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
-use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -36,9 +35,6 @@ class TranslationManager
     /** @var Translator */
     protected $translator;
 
-    /** @var JsTranslationDumper */
-    protected $jsTranslationDumper;
-
     /** @var string */
     protected $translationCacheDir;
 
@@ -59,7 +55,6 @@ class TranslationManager
      * @param LanguageProvider $languageProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      * @param Translator $translator
-     * @param JsTranslationDumper $jsTranslationDumper
      * @param string $translationCacheDir
      */
     public function __construct(
@@ -67,14 +62,12 @@ class TranslationManager
         LanguageProvider $languageProvider,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache,
         Translator $translator,
-        JsTranslationDumper $jsTranslationDumper,
         $translationCacheDir
     ) {
         $this->registry = $registry;
         $this->languageProvider = $languageProvider;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
         $this->translator = $translator;
-        $this->jsTranslationDumper = $jsTranslationDumper;
         $this->translationCacheDir = $translationCacheDir;
     }
 
@@ -134,24 +127,40 @@ class TranslationManager
      * @param string $value
      * @param string $locale
      * @param string $domain
+     * @param int $scope
      *
      * @return Translation|null
      */
-    public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN)
+    public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
-        if (!$value && null !== ($translationValue = $this->findValue($key, $locale, $domain))) {
-            $this->getEntityManager(Translation::class)->remove($translationValue);
-
+        $translationValue = $this->findValue($key, $locale, $domain);
+        if (!$this->canUpdateTranslation($scope, $translationValue)) {
             return null;
         }
 
-        if (null === ($translationValue = $this->findValue($key, $locale, $domain))) {
+        if (!$value && $translationValue) {
+            $this->getEntityManager(Translation::class)->remove($translationValue);
+            return null;
+        }
+
+        if (null === $translationValue) {
             $translationValue = $this->createValue($key, $value, $locale, $domain, true);
         }
 
         $translationValue->setValue($value);
+        $translationValue->setScope($scope);
 
         return $translationValue;
+    }
+
+    /**
+     * @param int $scope
+     * @param Translation $translation
+     * @return bool
+     */
+    protected function canUpdateTranslation($scope, Translation $translation = null)
+    {
+        return $scope === Translation::SCOPE_UI || null === $translation || $translation->getScope() === $scope;
     }
 
     /**
@@ -208,19 +217,36 @@ class TranslationManager
     public function findAvailableDomainsForLocales(array $locales)
     {
         if (null === $this->availableDomains) {
-            /** @var TranslationRepository $repo */
-            $repo = $this->getEntityRepository(Translation::class);
+            /** @var TranslationKeyRepository $repo */
+            $repo = $this->getEntityRepository(TranslationKey::class);
 
-            foreach ($repo->findAvailableDomains($locales) as $data) {
-                $this->availableDomains[$data['code']][] = $data;
+            $this->availableDomains = $repo->findAvailableDomains();
+
+//            $avd = $repo->findAvailableDomains();
+//            dump(['avd' => $avd, 'ls' => $locales]);
+//            exit();
+
+        }
+
+        $result = [];
+        foreach ($locales as $locale) {
+            foreach ($this->availableDomains as $domain) {
+                $result[] = [
+                    'code' => $locale,
+                    'domain' => $domain,
+                ];
             }
         }
 
-        $domains = array_intersect_key((array)$this->availableDomains, array_combine($locales, $locales));
-
-        return (array)array_reduce($domains, function ($carry, $item) {
-            return array_merge((array)$carry, $item);
-        });
+        return $result;
+//
+//            dump(['avd' => $result]);
+//            exit();
+////        $domains = array_intersect_key((array)$this->availableDomains, array_combine($locales, $locales));
+////
+////        return (array)array_reduce($domains, function ($carry, $item) {
+////            return array_merge((array)$carry, $item);
+////        });
     }
 
     /**
@@ -283,14 +309,12 @@ class TranslationManager
     }
 
     /**
-     * Fully rebuilds translation cache including JS translation
+     * Rebuilds translation cache
      */
     public function rebuildCache()
     {
         $this->cleanup($this->translationCacheDir);
         $this->translator->warmUp($this->translationCacheDir);
-        $locales = $this->languageProvider->getEnabledLanguages();
-        $this->jsTranslationDumper->dumpTranslations($locales);
     }
 
     /**

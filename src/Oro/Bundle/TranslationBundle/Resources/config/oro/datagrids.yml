@@ -39,6 +39,7 @@ datagrids:
                         class: orouser/js/tools/acl-users-search-api-accessor
                         permission_check_entity_name: Oro_Bundle_TranslationBundle_Entity_Language
                         permission: EDIT
+                renderable: false
             enabled:
                 label: oro.translation.language.enabled.label
                 type: twig
@@ -135,9 +136,7 @@ datagrids:
                 template: OroTranslationBundle:Language:Datagrid/code.html.twig
             status:
                 label: oro.translation.translation.status.label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Translation:Datagrid/status.html.twig
+                frontend_type: boolean
             originalValue:
                 label: oro.translation.translation.original_value.label
                 type: twig
@@ -163,6 +162,8 @@ datagrids:
         sorters:
             multiple_sorting: true
             columns:
+                code:
+                    data_name: language.code
                 status:
                     data_name: status
                 value:
@@ -171,6 +172,8 @@ datagrids:
                     data_name: key
                 domain:
                     data_name: domain
+            default:
+                code: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC                    
         filters:
             columns:
                 code:
@@ -179,14 +182,10 @@ datagrids:
                     options:
                         field_options:
                             choices: "@oro_translation.provider.language->getAvailableLanguages"
+                            multiple: true
                 status:
-                    type: choice
+                    type: boolean
                     data_name: CAST(status as int)
-                    options:
-                        field_options:
-                            choices:
-                                true: 'oro.translation.translation.status.translated'
-                                false: 'oro.translation.translation.status.untranslated'
                 value:
                     type: string
                     data_name: value
@@ -196,10 +195,10 @@ datagrids:
                 domain:
                     type: choice
                     data_name: domain
-                    enabled: true
                     options:
                         field_options:
                             choices: "@oro_translation.manager.translation->getAvailableDomains"
+                            multiple: true
         properties:
             id: ~
             context:

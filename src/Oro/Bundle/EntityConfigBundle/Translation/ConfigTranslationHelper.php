@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Translation;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class ConfigTranslationHelper
@@ -66,7 +67,8 @@ class ConfigTranslationHelper
                 $key,
                 $value,
                 $locale,
-                TranslationManager::DEFAULT_DOMAIN
+                TranslationManager::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
             );
         }
 

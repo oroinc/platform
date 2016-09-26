@@ -12,7 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;

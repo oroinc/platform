@@ -1,6 +1,9 @@
 oro.translation:
     download:
         error: 'Error while downloading package'
+        
+    context:
+        ui_label: 'UI Label'
 
     action:
         disable: 'Disable'
@@ -8,12 +11,12 @@ oro.translation:
         download: 'Download'
         install: 'Install'
         update: 'Update'
-        import: 'Import'
-        export: 'Export'
+        import: 'Upload Translation File'
+        export: 'Download Translation File'
         add: 'Add Language'
         translation_completeness.label: 'Translation Completeness:'
         install.title: 'Install "%language%" language'
-        update.title: 'Update "%language%" language'
+        update.title: 'Update "%language%"'
         rebuild_cache.label: 'Update Cache'
 
     language:
@@ -32,7 +35,8 @@ oro.translation:
         translation_status:
             label: 'Updates'
             up_to_date: 'Up to date'
-            update_needed: 'Update is available'
+            update_available: 'Update is available'
+            install_available: 'Can be installed'
         translation_completeness.label: 'Translation Completeness'
 
         message:
@@ -57,10 +61,7 @@ oro.translation:
         value.label: 'Translated Value'
         original_value.label: 'Original Value'
         context.label: 'Context'
-        status:
-            label: 'Status'
-            translated: 'Translated'
-            untranslated: 'Untranslated'
+        status.label: 'Translated'
         message:
             rebuild_cache: 'Translation Cache has been updated'
 

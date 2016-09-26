@@ -5,7 +5,7 @@
         <div class="progress">
             <div class="bar bar-success" style="width: {{ translationCompleteness * 100 }}%;"></div>
         </div>
-        <b>{{ translationCompleteness|oro_format_percent }}</b>
+        <b>{{ (translationCompleteness * 100)|round(0, 'floor') }}%</b>
     </div>
 {% else %}
     {{ 'N/A'|trans }}

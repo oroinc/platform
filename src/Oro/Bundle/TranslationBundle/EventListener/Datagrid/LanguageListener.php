@@ -20,6 +20,7 @@ class LanguageListener
     const STATS_COUNT = 'translationCount';
     const STATS_INSTALLED = 'translationInstalled';
     const STATS_AVAILABLE_UPDATE = 'translationAvailableUpdate';
+    const STATS_AVAILABLE_INSTALL = 'translationAvailableInstall';
 
     const COLUMN_STATUS = 'translationStatus';
     const COLUMN_COVERAGE = 'translationCompleteness';
@@ -69,6 +70,10 @@ class LanguageListener
             $record->setValue(
                 self::STATS_AVAILABLE_UPDATE,
                 $this->languageHelper->isAvailableUpdateTranslates($language)
+            );
+            $record->setValue(
+                self::STATS_AVAILABLE_INSTALL,
+                $this->languageHelper->isAvailableInstallTranslates($language)
             );
         }
     }

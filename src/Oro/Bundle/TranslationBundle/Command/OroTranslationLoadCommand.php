@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\DataCollectorTranslator;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 
 class OroTranslationLoadCommand extends ContainerAwareCommand
@@ -39,20 +40,31 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /* @var $translator DataCollectorTranslator */
-        $translator = $this->getContainer()->get('translator');
+        /* @var $translationManager LanguageProvider */
+        $languageProvider = $this->getContainer()->get('oro_translation.provider.language');
+        $availableLocales = array_keys($languageProvider->getAvailableLanguages());
 
-        if ([] === ($locales = $input->getOption('languages'))) {
-            $locales = array_unique(array_merge($translator->getFallbackLocales(), [$translator->getLocale()]));
-        }
+        $locales = $input->getOption('languages') ?: $availableLocales;
 
-        /* @var $translationManager TranslationManager */
-        $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
+        $output->writeln(
+            sprintf(
+                '<info>Available locales</info>: %s. <info>Should be processed:</info> %s.',
+                implode(', ', $availableLocales),
+                implode(', ', $locales)
+            )
+        );
+
+        $translationLoader = $this->getContainer()->get('oro_translation.database_translation.loader');
 
         // disable database loader to not get translations from database
         $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
 
+        /* @var $translationManager TranslationManager */
+        $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
         $translationManager->rebuildCache();
+
+        /* @var $translator DataCollectorTranslator */
+        $translator = $this->getContainer()->get('translator');
 
         foreach ($locales as $locale) {
             $domains = $translator->getCatalogue($locale)->all();
@@ -77,6 +89,8 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                 $output->writeln(sprintf('added %d records.', $records));
             }
         }
+
+        $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
 
         $translationManager->rebuildCache();
 
