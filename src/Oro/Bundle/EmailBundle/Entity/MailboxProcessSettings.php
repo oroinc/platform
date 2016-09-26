@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings;
 
 /**
  * @ORM\Table(
@@ -15,7 +14,7 @@ use Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string", length=30)
  */
-abstract class MailboxProcessSettings extends ExtendMailboxProcessSettings
+abstract class MailboxProcessSettings
 {
     /**
      * @ORM\Id

@@ -123,12 +123,4 @@ class StandaloneFilter implements FilterInterface
     public function apply(Criteria $criteria, FilterValue $value = null)
     {
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createExpression(FilterValue $value = null)
-    {
-        return null;
-    }
 }

@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -67,7 +68,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
     {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
             if ($metadata->hasAssociation($propertyPath)) {
                 $this->setEntityFieldLimit($field, $metadata, $propertyPath, $limit);
             }
@@ -89,7 +90,9 @@ class SetMaxRelatedEntities implements ProcessorInterface
         if ($metadata->isCollectionValuedAssociation($fieldName)) {
             $targetEntity = $field->getOrCreateTargetEntity();
             if (!$targetEntity->hasMaxResults()) {
-                $targetEntity->setMaxResults($limit);
+                if (!DataType::isAssociationAsField($field->getDataType())) {
+                    $targetEntity->setMaxResults($limit);
+                }
             } elseif ($targetEntity->getMaxResults() < 0) {
                 $targetEntity->setMaxResults(null);
             }
@@ -125,7 +128,9 @@ class SetMaxRelatedEntities implements ProcessorInterface
         if ($field->isCollectionValuedAssociation()) {
             $targetEntity = $field->getOrCreateTargetEntity();
             if (!$targetEntity->hasMaxResults()) {
-                $targetEntity->setMaxResults($limit);
+                if (!DataType::isAssociationAsField($field->getDataType())) {
+                    $targetEntity->setMaxResults($limit);
+                }
             } elseif ($targetEntity->getMaxResults() < 0) {
                 $targetEntity->setMaxResults(null);
             }

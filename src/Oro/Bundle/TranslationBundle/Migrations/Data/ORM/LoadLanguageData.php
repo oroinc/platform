@@ -41,7 +41,7 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
 
         $defaultLanguage = $configManager->get(Configuration::getConfigKeyByName(Configuration::LANGUAGE));
         $enabledLanguages = (array)$configManager->get(Configuration::getConfigKeyByName('languages'));
-        $downloadedLanguages = array_keys((array)$configManager->get(TranslationStatusInterface::CONFIG_KEY));
+        $downloadedLanguages = array_keys((array)$configManager->get('oro_translation.available_translations'));
 
         /** English language must be in list by default, because we already have translations in *.en.yml files */
         $languages = array_unique(array_merge(['en', $defaultLanguage], $enabledLanguages, $downloadedLanguages));
