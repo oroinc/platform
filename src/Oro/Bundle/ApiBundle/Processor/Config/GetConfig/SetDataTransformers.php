@@ -69,7 +69,7 @@ class SetDataTransformers implements ProcessorInterface
             $targetConfig = $field->getTargetEntity();
             if (null !== $targetConfig) {
                 if (null !== $metadata && $targetConfig->hasFields()) {
-                    $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                    $propertyPath = $field->getPropertyPath($fieldName);
                     if ($metadata->hasAssociation($propertyPath)) {
                         $this->setDataTransformers(
                             $targetConfig,
@@ -82,7 +82,7 @@ class SetDataTransformers implements ProcessorInterface
             } else {
                 $dataType = $field->getDataType();
                 if (null !== $metadata && !$dataType) {
-                    $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                    $propertyPath = $field->getPropertyPath($fieldName);
                     if ($metadata->hasField($propertyPath)) {
                         $dataType = $metadata->getTypeOfField($propertyPath);
                     }

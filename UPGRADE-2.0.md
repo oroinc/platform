@@ -112,6 +112,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Entity config `workflow.active_workflows` was removed. Use workflows configuration boolean node `defaults.active` instead.
 * Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
 * Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
+- `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
@@ -127,6 +128,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Changed signature of constructor of `Oro\Bundle\LocaleBundle\Form\Type\LanguageType` - now it takes following arguments:
     - `ConfigManager $cm`,
     - `LanguageProvider $languageProvider`.
+- `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
@@ -149,7 +151,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added method `Oro\Component\Layout\Templating\Helper\LayoutHelper::parentBlockWidget` for rendering parent block widget.
 - Added method `getUpdateFileNamePatterns` to `Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface`.
 - Added method `getUpdateFilenamePattern` to `Oro\Component\Layout\Loader\Driver\DriverInterface`.
-
+- Added `Oro\Component\Layout\Block\Type\Options` class that wraps the `array` of options and can evaluate option type (is `option` instanceof `Expression`).
+- Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list.
+- Updated `Oro\Component\Layout\BlockTypeInterface`, `Oro\Component\Layout\BlockTypeExtensionInterface`, `Oro\Component\Layout\LayoutRegistryInterface` to use the `Options` object instead of `array`.
 
 ####LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
@@ -183,12 +187,22 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - method `getDatagridConfigurationLoader` was added to get loader for datagrid.yml files.
     - method `ensureConfigurationLoaded` was added to check if datagrid config need to be loaded to cache.
     - You can find example of refreshing datagrid cache in `Oro/Bundle/DataGridBundle/EventListener/ContainerListener.php`
+- Class `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource.php`
+    - construction signature was changed now it takes next arguments:
+        `ConfigProcessorInterface` $processor,
+        `EventDispatcherInterface` $eventDispatcher,
+        `ParameterBinderInterface` $parameterBinder,
+        `QueryHintResolver` $queryHintResolver
 - Added parameter `split_to_cells` to layout `datagrid` block type which allows to customize grid through layouts.
 - Configuration files for datagrids now loads from `Resources/config/oro/datagrids.yml` file instead of `Resources/config/datagrid.yml`.
 - Configuration files root node now changed to its plural form `datagrids: ...`.
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ExportAction`
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\ImportAction`
 - Added class `Oro\Bundle\DataGridBundle\Extension\Action\Action\AbstractImportExportAction`
+- Added class `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor`
+- Added interface `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface`
+- `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource::getParameterBinder` was deprecated
+- `Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface::getParameterBinder` was deprecated
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -237,6 +251,11 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
         `ConfigManager` $configManager
 - Entity extend configuration now loads from `Resources/conig/oro/entity_extend.yml` file instead of `Resources/config/entity_extend.yml`
 - Root node for entity extend configuration in file `Resources/conig/oro/entity_extend.yml` were changed from `oro_entity_extend` to `entity_extend`
+- `Oro\Bundle\EntityExtendBundle\Command\CacheCommand::setClassAliases` no longer throws `\ReflectionException`
+- `Oro\Bundle\EntityExtendBundle\OroEntityExtendBundle::checkConfigs` and `Oro\Bundle\EntityExtendBundle\OroEntityExtendBundle::initializeCache`
+throws `\RuntimeException` if cache initialization failed. Make sure you don't autoload extended entity classes during container compilation.
+- `cache_warmer` is decorated to allow disable cache warming during extend commands calls. Tag your warmer with `oro_entity_extend.warmer`
+tag if it works with extend classes
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
@@ -246,7 +265,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - YAML Configuration for query designer now loads from `Resources/config/oro/query_designer.yml` file instead of `Resources/config/query_designer.yml`.
 
 ####TestFrameworkBundle:
-- Behat elements now loads from `Resources/config/oro/behat_elements.yml` file instead of `Resources/config/behat_elements.yml`.
+- Behat elements now loads from `Resources/config/oro/behat.yml` file instead of `Resources/config/behat_elements.yml`.
 
 ####ChartBundle:
 - Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
@@ -263,10 +282,25 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 ####HelpBundle:
 - Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
 - Root node `help` were added for help configuration in `Resources/config/oro/help.yml` file.
- 
+
 ####SearchBundle:
 - Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
 - Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
+- `oro_search.entity.repository.search_index` marked as lazy
+- Search `\Oro\Bundle\SearchBundle\Query\Query::addSelect()` and `\Oro\Bundle\SearchBundle\Query\Query::select()` have been extended to support the SQL aliasing syntax.
+- `\Oro\Bundle\SearchBundle\Query\IndexerQuery` has grown to have an interface `\Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and an abstract base class with common operations. New operations in the interface, highly encouraged to use them: `addSelect`, `setFrom`, `setWhere`.
+- `\Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager` is no longer depending on IndexerQuery.
+- `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` has now improved alignment with the `\Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource` and is moved to the `Oro\Bundle\SearchBundle\Datasource` namespace.
+- Search Query is now created by `\Oro\Bundle\SearchBundle\Query\Factory\QueryFactory`.
+- using own, customized Query wrappers, instead of IndexerQuery now possible, by replacing QueryFactory with own factory `\Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface` object.
+- new Extensions added: `\Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\SearchPagerExtension` (extending the Orm version), `\Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension` (common part with the Orm version).
+- `\Oro\Bundle\SearchBundle\Datagrid\Extension\SearchFilterExtension` makes it possible to use search filters together with a new `\Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter`.
+- `\Oro\Bundle\SearchBundle\Datagrid\Datasource\Search\SearchFilterDatasourceAdapter` does not rely on the Doctrine's ExpressionBuilder. Using `expr()` discouraged in favor of `Criteria::expr()`.
+- filters are now loaded per Datasource, by specifying the `datasource` attribute. Currently supported values are `orm` and `search`.
+- custom Search filter added: `\Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter`.
+- `\Oro\Bundle\SearchBundle\Query\Result\Item` is now compatible with the default backend datagrid templates.
+- `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` can now be defined as the datasource of any datagrid (both frontend and backend).
+- Datagrids having search datasource expect an indexed array of search indexes in 'from' part of datagrid configuration, as opposed to ORM format
 
 ####UiBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
@@ -277,6 +311,7 @@ placeholders:
     placeholders: ...
     items: ...
 ```
+- Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
 
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
@@ -289,8 +324,60 @@ placeholders:
     * `oro_titles` to `titles`
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
-    
+- Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
+- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
+- Added `areas` node to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
+- Added interface `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
+- Added trait `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
+- Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate`, implements `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface` and using `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
+- Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
+- Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
+- Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` changed. Added `ConfigManager $configManager` as last argument.
+- `Oro/Bundle/EmailBundle/Cache/EntityCacheClearer` deprecated, tag on `oro_email.entity.cache.clearer` removed
+- `oro_email.email_address.entity_manager` inherits `oro_entity.abstract_entity_manager`
+- `Oro/Bundle/EmailBundle/Entity/MailboxProcessSettings` no longer inherits `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings`
+- `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` removed
+
+####EntityBundle
+- `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
+
+Before
+```
+oro_workflow.repository.workflow_item:
+    class: Doctrine\ORM\EntityRepository
+    factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+```
+
+After
+```
+oro_workflow.repository.workflow_item:
+    class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
+    parent: oro_entity.abstract_repository
+```
+
+- `oro_entity.abstract_entity_manager` introduced. Please inherit all your doctrine entity manager factory services
+
+Before
+```
+oro_email.email_address.entity_manager:
+    public: false
+    class: Doctrine\ORM\EntityManager
+    factory: ['@doctrine', getManagerForClass]
+```
+
+After
+```
+oro_email.email_address.entity_manager:
+    parent: oro_entity.abstract_entity_manager
+```
+
+####CacheBundle
+- `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers
+
+####MigrationBundle
+- `Oro\Bundle\MigrationBundle\Migration\MigrationExecutor` now clears cache at all cache providers after successful migration load

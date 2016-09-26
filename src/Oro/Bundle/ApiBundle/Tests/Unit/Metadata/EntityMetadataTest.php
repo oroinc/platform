@@ -86,7 +86,11 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
                 ],
                 'associations'             => [
                     'association1' => [
-                        'data_type' => 'testDataType'
+                        'data_type'        => 'testDataType',
+                        'nullable'         => false,
+                        'collapsed'        => false,
+                        'association_type' => null,
+                        'collection'       => false,
                     ]
                 ],
             ],

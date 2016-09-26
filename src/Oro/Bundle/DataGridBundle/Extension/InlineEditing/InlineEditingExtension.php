@@ -97,25 +97,19 @@ class InlineEditingExtension extends AbstractExtension
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
-                // Check access to edit field in Class level.
-                // If access not granted - skip inline editing for such field.
-                $dadaFieldName = $this->getColummFieldName($columnName, $column);
-                if (!$this->authChecker->isGranted(
-                    'EDIT',
-                    new FieldVote($objectIdentity, $dadaFieldName)
-                )
-                ) {
-                    if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)) {
-                        $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY] = false;
-                    }
-                    continue;
-                }
                 $newColumn = $this->guesser->getColumnOptions(
                     $columnName,
                     $configItems['entity_name'],
                     $column,
                     $behaviour
                 );
+
+                // Check access to edit field in Class level.
+                // If access not granted - skip inline editing for such field.
+                if (!$this->isFieldEditable($newColumn, $objectIdentity, $columnName, $column)) {
+                    $column = $this->disableColumnEdit($column);
+                    continue;
+                }
 
                 // frontend type key must not be replaced with default value
                 $frontendTypeKey = PropertyInterface::FRONTEND_TYPE_KEY;
@@ -185,5 +179,51 @@ class InlineEditingExtension extends AbstractExtension
         }
 
         return $dadaFieldName;
+    }
+
+    /**
+     * @param array $column
+     *
+     * @return bool
+     */
+    protected function isEnabledEdit($column)
+    {
+        if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)
+            && isset($column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY])) {
+            return $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $column
+     *
+     * @return mixed
+     */
+    protected function disableColumnEdit($column)
+    {
+        if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)) {
+            $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY] = false;
+        }
+
+        return $column;
+    }
+
+    /**
+     * @param array $newColumn
+     * @param $objectIdentity
+     * @param string $columnName
+     * @param array $column
+     *
+     * @return bool
+     */
+    protected function isFieldEditable($newColumn, $objectIdentity, $columnName, $column)
+    {
+        return $this->isEnabledEdit($newColumn)
+        && $this->authChecker->isGranted(
+            'EDIT',
+            new FieldVote($objectIdentity, $this->getColummFieldName($columnName, $column))
+        );
     }
 }

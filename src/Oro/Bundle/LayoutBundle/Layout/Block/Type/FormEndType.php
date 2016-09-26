@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class FormEndType extends AbstractFormType
 {
@@ -22,12 +24,20 @@ class FormEndType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['render_rest']);
+        parent::buildView($view, $block, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block)
+    {
+        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
 
         $view->vars['form'] = $formAccessor->getView();
-        $view->vars['render_rest'] = $options['render_rest'];
     }
 
     /**
