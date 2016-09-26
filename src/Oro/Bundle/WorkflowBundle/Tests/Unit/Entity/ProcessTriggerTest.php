@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 /**
- * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -295,5 +295,17 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         }
 
         return $trigger;
+    }
+
+    public function testGetEntityClass()
+    {
+        $this->assertNull($this->entity->getEntityClass());
+
+        $definition = new ProcessDefinition();
+        $definition->setRelatedEntity('test class name');
+
+        $this->entity->setDefinition($definition);
+
+        $this->assertEquals($definition->getRelatedEntity(), $this->entity->getEntityClass());
     }
 }

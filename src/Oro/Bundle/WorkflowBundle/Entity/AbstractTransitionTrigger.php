@@ -15,8 +15,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({
- *     "cron" = "Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron",
- *     "event" = "Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent"
+ *     "cron" = "Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger",
+ *     "event" = "Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger"
  * })
  * @Config(
  *      defaultValues={
@@ -139,6 +139,14 @@ abstract class AbstractTransitionTrigger
     }
 
     /**
+     * @return string
+     */
+    public function getWorkflowName()
+    {
+        return $this->getWorkflowDefinition() ? $this->getWorkflowDefinition()->getName() : null;
+    }
+
+    /**
      * Pre persist event handler
      *
      * @ORM\PrePersist
@@ -182,6 +190,14 @@ abstract class AbstractTransitionTrigger
             && $this->queued === $trigger->isQueued()
             && $this->transitionName === $trigger->getTransitionName()
             && $this->isEqualAdditionalFields($trigger);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityClass()
+    {
+        return $this->getWorkflowDefinition() ? $this->getWorkflowDefinition()->getRelatedEntity() : null;
     }
 
     /**

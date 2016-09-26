@@ -5,9 +5,25 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier;
 
 class TransitionCronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var TransitionTriggerCronVerifier|\PHPUnit_Framework_MockObject_MockObject */
+    protected $verifier;
+
+    /** @var TransitionCronTriggerAssembler */
+    protected $assembler;
+
+    protected function setUp()
+    {
+        $this->verifier = $this->getMockBuilder(TransitionTriggerCronVerifier::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->assembler = new TransitionCronTriggerAssembler($this->verifier);
+    }
+
     /**
      * @dataProvider canAssembleData
      * @param bool $expected
@@ -15,9 +31,7 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanAssemble($expected, array $options)
     {
-        $cronTriggerAssembler = new TransitionCronTriggerAssembler();
-
-        $this->assertEquals($expected, $cronTriggerAssembler->canAssemble($options));
+        $this->assertEquals($expected, $this->assembler->canAssemble($options));
     }
 
     /**
@@ -49,18 +63,18 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testAssemble()
     {
-        $cronTriggerAssembler = new TransitionCronTriggerAssembler();
-
         $cronOpt = '* * * * *';
         $filterOpt = 'a = b';
         $queuedOpt = false;
         $transitionOpt = 'transitionName';
         $workflowDefinitionOpt = new WorkflowDefinition();
 
-        /**
-         * @var TransitionCronTrigger $trigger
-         */
-        $trigger = $cronTriggerAssembler->assemble(
+        $this->verifier->expects($this->once())
+            ->method('verify')
+            ->with($this->isInstanceOf(TransitionCronTrigger::class));
+
+        /** @var TransitionCronTrigger $trigger */
+        $trigger = $this->assembler->assemble(
             [
                 'cron' => $cronOpt,
                 'filter' => $filterOpt,
@@ -85,18 +99,18 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testAssembleDefaults()
     {
-        $cronTriggerAssembler = new TransitionCronTriggerAssembler();
-
         $cronOpt = '* * * * *';
         $filterOpt = null;
         $queuedOpt = true;
         $transitionOpt = 'transitionName';
         $workflowDefinitionOpt = new WorkflowDefinition();
 
-        /**
-         * @var TransitionCronTrigger $trigger
-         */
-        $trigger = $cronTriggerAssembler->assemble(
+        $this->verifier->expects($this->once())
+            ->method('verify')
+            ->with($this->isInstanceOf(TransitionCronTrigger::class));
+
+        /** @var TransitionCronTrigger $trigger */
+        $trigger = $this->assembler->assemble(
             [
                 'cron' => $cronOpt,
             ],

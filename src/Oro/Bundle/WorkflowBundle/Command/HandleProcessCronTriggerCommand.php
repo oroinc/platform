@@ -9,9 +9,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionTriggerCronHelper;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class HandleProcessCronTriggerCommand extends ContainerAwareCommand
@@ -44,14 +44,14 @@ class HandleProcessCronTriggerCommand extends ContainerAwareCommand
             return;
         }
 
-        /** @var TransitionTriggerCron $trigger */
-        $trigger = $this->getTransitionTriggerCronRepository()->find($triggerId);
+        /** @var TransitionCronTrigger $trigger */
+        $trigger = $this->getTransitionCronTriggerRepository()->find($triggerId);
         if (!$trigger) {
             $output->writeln('<error>Transition cron trigger not found</error>');
             return;
         }
 
-        $workflowItems = $this->getTransitionTriggerCronHelper()->fetchWorkflowItemsIdsForTrigger($trigger);
+        $workflowItems = $this->getTransitionCronTriggerHelper()->fetchWorkflowItemsIdsForTrigger($trigger);
 
         $data = array_map(
             function (WorkflowItem $workflowItem) use ($trigger) {
@@ -97,7 +97,7 @@ class HandleProcessCronTriggerCommand extends ContainerAwareCommand
     /**
      * @return ObjectRepository
      */
-    protected function getTransitionTriggerCronRepository()
+    protected function getTransitionCronTriggerRepository()
     {
         $className = $this->getContainer()->getParameter('oro_workflow.entity.transition_trigger_cron.class');
 
@@ -105,11 +105,11 @@ class HandleProcessCronTriggerCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return TransitionTriggerCronHelper
+     * @return TransitionCronTriggerHelper
      */
-    protected function getTransitionTriggerCronHelper()
+    protected function getTransitionCronTriggerHelper()
     {
-        return $this->getContainer()->get('oro_workflow.helper.transition_trigger_cron');
+        return $this->getContainer()->get('oro_workflow.helper.transition_cron_trigger');
     }
 
     /**

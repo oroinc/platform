@@ -66,6 +66,8 @@ services:
     oro_workflow.assembler.transition_trigger.cron:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler
         public: false
+        arguments:
+            - '@oro_workflow.transition_trigger.trigger_cron_verifier'
 
     oro_workflow.assembler.transition_trigger.event:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler

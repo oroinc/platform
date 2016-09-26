@@ -62,6 +62,8 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $this->updateReportsDefinitions($queries);
         $queries->addQuery(new RemoveExtendedFieldsQuery());
         $queries->addPostQuery(new MoveActiveFromConfigToFieldQuery());
+
+        $this->removeScheduledTransitions($queries);
     }
 
     /**
@@ -135,6 +137,31 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
             ['workflow_name'],
             ['name'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * @param QueryBag $queries
+     */
+    protected function removeScheduledTransitions(QueryBag $queries)
+    {
+        $params = ['stpn_name' => 'stpn__%'];
+        $types = ['stpn_name' => Type::STRING];
+
+        $queries->addQuery(
+            new ParametrizedSqlMigrationQuery(
+                'DELETE FROM oro_process_trigger WHERE definition_name LIKE :stpn_name',
+                $params,
+                $types
+            )
+        );
+
+        $queries->addQuery(
+            new ParametrizedSqlMigrationQuery(
+                'DELETE FROM oro_process_definition WHERE name LIKE :stpn_name',
+                $params,
+                $types
+            )
         );
     }
 }
