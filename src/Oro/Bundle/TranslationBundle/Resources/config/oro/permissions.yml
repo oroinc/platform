@@ -1,10 +1,4 @@
 oro_permissions:
-    ASSIGN:
-        exclude_entities:
-            - Oro\Bundle\TranslationBundle\Entity\Language
-    SHARE:
-        exclude_entities:
-            - Oro\Bundle\TranslationBundle\Entity\Language
     DELETE:
         exclude_entities:
             - Oro\Bundle\TranslationBundle\Entity\Language
