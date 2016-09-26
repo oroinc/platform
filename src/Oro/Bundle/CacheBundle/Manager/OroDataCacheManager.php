@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CacheBundle\Manager;
 
+use Doctrine\Common\Cache\ClearableCache;
+
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
 
 class OroDataCacheManager
@@ -30,6 +32,18 @@ class OroDataCacheManager
         foreach ($this->cacheProviders as $cacheProvider) {
             if ($cacheProvider instanceof SyncCacheInterface) {
                 $cacheProvider->sync();
+            }
+        }
+    }
+
+    /**
+     * Clear cache at all registered cache providers
+     */
+    public function clear()
+    {
+        foreach ($this->cacheProviders as $cacheProvider) {
+            if ($cacheProvider instanceof ClearableCache) {
+                $cacheProvider->deleteAll();
             }
         }
     }
