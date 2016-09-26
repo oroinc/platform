@@ -13,10 +13,27 @@
         <script type="text/javascript">
 
             $(function () {
-
-                $(document).ajaxError(function (e) {
+                $(document).ajaxError(function (event, jqxhr, settings) {
                     loader.displayOriginalElement();
-                    util.error("{{ 'oro.distribution.messages.ajax_error'|trans }}");
+                    if (jqxhr.status === 500) {
+                        var message;
+                        if (settings.url.substr(0, Urls.install.length) === Urls.install) {
+                            message = "{{ 'oro.distribution.messages.ajax_500error'|trans({
+                                '{{ action }}': 'oro.distribution.action.install'|trans|lower
+                            }) }}";
+                        } else if (settings.url.substr(0, Urls.update.length) === Urls.update) {
+                            message = "{{ 'oro.distribution.messages.ajax_500error'|trans({
+                                '{{ action }}': 'oro.distribution.action.update'|trans|lower
+                            }) }}";
+                        } else {
+                            message = "{{ 'oro.distribution.messages.ajax_500error'|trans({
+                                '{{ action }}': 'oro.distribution.messages.perform_the_action_to'|trans|lower
+                            }) }}";
+                        }
+                        util.error(message);
+                    } else {
+                        util.error("{{ 'oro.distribution.messages.ajax_error'|trans }}");
+                    }
                 });
 
                 var Urls = {

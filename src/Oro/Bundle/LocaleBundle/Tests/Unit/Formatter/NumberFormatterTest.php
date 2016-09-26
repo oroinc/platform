@@ -290,11 +290,11 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider formatDurationDataProvider
      */
-    public function testFormatDuration($expected, $value, $attributes, $textAttributes, $symbols, $locale)
+    public function testFormatDuration($expected, $value, $attributes, $textAttributes, $symbols, $locale, $default)
     {
         $this->assertEquals(
             $expected,
-            $this->formatter->formatDuration($value, $attributes, $textAttributes, $symbols, $locale)
+            $this->formatter->formatDuration($value, $attributes, $textAttributes, $symbols, $locale, $default)
         );
     }
 
@@ -307,7 +307,26 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
                 'attributes' => array(),
                 'textAttributes' => array(),
                 'symbols' => array(),
-                'locale' => 'en'
+                'locale' => 'en',
+                'default' => false
+            ),
+            'with default format' => array(
+                'expected' => '00:00:01',
+                'value' => 1,
+                'attributes' => array(),
+                'textAttributes' => array(),
+                'symbols' => array(),
+                'locale' => null,
+                'default' => true
+            ),
+            'without default format' => array(
+                'expected' => '1 sec.',
+                'value' => 1,
+                'attributes' => array(),
+                'textAttributes' => array(),
+                'symbols' => array(),
+                'locale' => 'en',
+                'default' => false
             ),
             'with_words' => array(
                 'expected' => '1 hour, 1 minute, 1 second',
@@ -317,7 +336,8 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
                     \NumberFormatter::DEFAULT_RULESET => "%with-words"
                 ),
                 'symbols' => array(),
-                'locale' => 'en_US'
+                'locale' => 'en_US',
+                'default' => false
             ),
             'fix_for_localization_problems' => array(
                 'expected' => '01:01:01',
@@ -325,7 +345,8 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
                 'attributes' => array(),
                 'textAttributes' => array(),
                 'symbols' => array(),
-                'locale' => 'ru'
+                'locale' => 'ru',
+                'default' => false
             ),
         );
     }

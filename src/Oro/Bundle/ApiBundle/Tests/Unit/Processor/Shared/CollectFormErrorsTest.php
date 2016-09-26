@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameValuePairType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
@@ -23,7 +24,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new CollectFormErrors();
+        $this->processor = new CollectFormErrors(new ConstraintTextExtractor());
     }
 
     public function testProcessWithoutForm()
@@ -137,6 +138,34 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
     }
 
+    public function testProcessWithInvalidRenamedPropertyValue()
+    {
+        $dataClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormValidation\TestObject';
+        $data = new $dataClass();
+
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true, 'data_class' => $dataClass])
+            ->add('renamedTitle', 'text', ['property_path' => 'title'])
+            ->getForm();
+        $form->setData($data);
+        $form->submit(
+            [
+                'renamedTitle' => null,
+            ]
+        );
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'renamedTitle'),
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessWithInvalidPropertyValues()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
@@ -193,6 +222,34 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
     }
 
+    public function testProcessWithInvalidCollectionRenamedPropertyValue()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add(
+                'renamedField1',
+                'text',
+                ['property_path' => '[field1]', 'constraints' => [new Constraints\All(new Constraints\NotNull())]]
+            )
+            ->getForm();
+        $form->submit(
+            [
+                'renamedField1' => [1, null],
+            ]
+        );
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('not null constraint', 'This value should not be null.', 'renamedField1.1')
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessWithInvalidCollectionPropertyValueWhenFormFieldIsCollectionType()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
@@ -220,6 +277,39 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->assertEquals(
             [
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1.1')
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithInvalidCollectionRenamedPropertyValueWhenFormFieldIsCollectionType()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add(
+                'renamedField1',
+                'collection',
+                [
+                    'property_path' => '[field1]',
+                    'type'          => 'text',
+                    'options'       => ['constraints' => [new Constraints\NotBlank()]],
+                    'allow_add'     => true
+                ]
+            )
+            ->getForm();
+        $form->submit(
+            [
+                'renamedField1' => [1, null],
+            ]
+        );
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'renamedField1.1')
             ],
             $this->context->getErrors()
         );

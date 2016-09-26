@@ -50,44 +50,6 @@ class BaseProcessor
 
     /**
      * @param UserInterface $user
-     * @param array         $templateData
-     * @param string        $type
-     *
-     * @return int          The return value is the number of recipients who were accepted for delivery
-     */
-    protected function sendEmail(UserInterface $user, array $templateData, $type)
-    {
-        list($subjectRendered, $templateRendered) = $templateData;
-
-        $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-        $senderName  = $this->configManager->get('oro_notification.email_notification_sender_name');
-
-        $email = $this->emailHolderHelper->getEmail($user);
-
-        $message = \Swift_Message::newInstance()
-            ->setSubject($subjectRendered)
-            ->setFrom($senderEmail, $senderName)
-            ->setTo($email)
-            ->setBody($templateRendered, $type);
-
-        return $this->mailer->send($message);
-    }
-
-    /**
-     * @param string $emailTemplateName
-     *
-     * @return null|EmailTemplateInterface
-     */
-    protected function findEmailTemplateByName($emailTemplateName)
-    {
-        return $this->managerRegistry
-            ->getManagerForClass('OroEmailBundle:EmailTemplate')
-            ->getRepository('OroEmailBundle:EmailTemplate')
-            ->findOneBy(['name' => $emailTemplateName]);
-    }
-
-    /**
-     * @param UserInterface $user
      * @param string        $emailTemplateName
      * @param array         $emailTemplateParams
      *
@@ -105,6 +67,62 @@ class BaseProcessor
             $this->renderer->compileMessage($emailTemplate, $emailTemplateParams),
             $this->getEmailTemplateType($emailTemplate)
         );
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param array         $templateData
+     * @param string        $type
+     *
+     * @return int          The return value is the number of recipients who were accepted for delivery
+     */
+    protected function sendEmail(UserInterface $user, array $templateData, $type)
+    {
+        list($subjectRendered, $templateRendered) = $templateData;
+
+        $senderEmail = $this->getSenderEmail($user);
+        $senderName  = $this->getSenderName($user);
+
+        $email = $this->emailHolderHelper->getEmail($user);
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject($subjectRendered)
+            ->setFrom($senderEmail, $senderName)
+            ->setTo($email)
+            ->setBody($templateRendered, $type);
+
+        return $this->mailer->send($message);
+    }
+
+    /**
+     * @param UserInterface $user
+     * @return string
+     */
+    protected function getSenderEmail(UserInterface $user)
+    {
+        return $this->configManager->get('oro_notification.email_notification_sender_email');
+    }
+
+    /**
+     * @param UserInterface $user
+     * @return string
+     */
+    protected function getSenderName(UserInterface $user)
+    {
+        return $this->configManager->get('oro_notification.email_notification_sender_name');
+    }
+
+    /**
+     * @param string $emailTemplateName
+     *
+     * @return null|EmailTemplateInterface
+     */
+    protected function findEmailTemplateByName($emailTemplateName)
+    {
+        return $this->managerRegistry
+            ->getManagerForClass('OroEmailBundle:EmailTemplate')
+            ->getRepository('OroEmailBundle:EmailTemplate')
+            ->findOneBy(['name' => $emailTemplateName]);
     }
 
     /**

@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
+use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActionExtension extends AbstractExtension
@@ -24,6 +26,8 @@ class ActionExtension extends AbstractExtension
     const ACTION_CONFIGURATION_KEY = 'action_configuration';
     const ACTION_TYPE_KEY          = 'type';
 
+    const ENABLE_ACTIONS_PARAMETER = '_enable_actions';
+
     /** @var ContainerInterface */
     protected $container;
 
@@ -33,20 +37,31 @@ class ActionExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var array */
     protected $actions = [];
 
     /** @var array */
     protected static $excludeParams = [ActionInterface::ACL_KEY];
 
+    /**
+     * @param ContainerInterface $container
+     * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface $translator
+     * @param EventDispatcherInterface $eventDispatcher
+     */
     public function __construct(
         ContainerInterface $container,
         SecurityFacade $securityFacade,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->container      = $container;
         $this->securityFacade = $securityFacade;
         $this->translator     = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -54,6 +69,12 @@ class ActionExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if (!$this->getParameters()->get(static::ENABLE_ACTIONS_PARAMETER, true)) {
+            return false;
+        }
+
+        $this->eventDispatcher->dispatch(ConfigureActionsBefore::NAME, new ConfigureActionsBefore($config));
+
         $actions = $config->offsetGetOr(static::ACTION_KEY, []);
 
         return !empty($actions);

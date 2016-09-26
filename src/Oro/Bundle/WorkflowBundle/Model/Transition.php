@@ -13,6 +13,7 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 /**
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class Transition
 {
@@ -44,7 +45,12 @@ class Transition
     /**
      * @var ActionInterface|null
      */
-    protected $postAction;
+    protected $preAction;
+
+    /**
+     * @var ActionInterface|null
+     */
+    protected $action;
 
     /**
      * @var bool
@@ -200,25 +206,39 @@ class Transition
     }
 
     /**
-     * Set post action.
-     *
-     * @param ActionInterface $postAction
+     * @param ActionInterface $preAction
      * @return Transition
      */
-    public function setPostAction(ActionInterface $postAction = null)
+    public function setPreAction(ActionInterface $preAction = null)
     {
-        $this->postAction = $postAction;
+        $this->preAction = $preAction;
         return $this;
     }
 
     /**
-     * Get post action.
-     *
      * @return ActionInterface|null
      */
-    public function getPostAction()
+    public function getPreAction()
     {
-        return $this->postAction;
+        return $this->preAction;
+    }
+
+    /**
+     * @param ActionInterface $action
+     * @return Transition
+     */
+    public function setAction(ActionInterface $action = null)
+    {
+        $this->action = $action;
+        return $this;
+    }
+
+    /**
+     * @return ActionInterface|null
+     */
+    public function getAction()
+    {
+        return $this->action;
     }
 
     /**
@@ -268,6 +288,10 @@ class Transition
      */
     protected function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
     {
+        if ($this->preAction) {
+            $this->preAction->execute($workflowItem);
+        }
+
         if (!$this->preCondition) {
             return true;
         }
@@ -316,8 +340,8 @@ class Transition
             $stepTo = $this->getStepTo();
             $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
 
-            if ($this->postAction) {
-                $this->postAction->execute($workflowItem);
+            if ($this->action) {
+                $this->action->execute($workflowItem);
             }
         } else {
             throw new ForbiddenTransitionException(

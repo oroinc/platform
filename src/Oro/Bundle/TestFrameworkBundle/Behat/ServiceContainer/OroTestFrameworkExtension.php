@@ -7,8 +7,11 @@ use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
+use Behat\Testwork\Cli\ServiceContainer\CliExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
+use Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
@@ -24,6 +27,8 @@ use Symfony\Component\Yaml\Yaml;
 class OroTestFrameworkExtension implements TestworkExtension
 {
     const DUMPER_TAG = 'oro_test.dumper';
+
+    const ELEMENTS_CONFIG_ROOT = 'elements';
 
     /**
      * {@inheritdoc}
@@ -63,9 +68,21 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $builder
             ->children()
+                ->arrayNode('application_suites')
+                    ->prototype('scalar')->end()
+                    ->info(
+                        "Suites that applicable for application.\n".
+                        'This suites will be run with --applicable-suites key in console'
+                    )
+                    ->defaultValue([])
+                ->end()
                 ->arrayNode('shared_contexts')
                     ->prototype('scalar')->end()
                     ->info('Contexts that added to all autoload bundles suites')
+                    ->defaultValue([])
+                ->end()
+                ->scalarNode('reference_initializer_class')
+                    ->defaultValue('Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer')
                 ->end()
             ->end();
     }
@@ -80,22 +97,22 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $this->loadSessionsListener($container);
+        $container->setParameter('oro_test.application_suites', $config['application_suites']);
+        $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     public function processDbDumpers(ContainerBuilder $container)
     {
         $dbDumper = $this->getDbDumper($container);
         $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
     }
 
-    private function loadSessionsListener(ContainerBuilder $container)
-    {
-        $container
-            ->getDefinition('mink.listener.sessions')
-            ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
-    }
-
+    /**
+     * @param ContainerBuilder $container
+     */
     /**
      * @param ContainerBuilder $container
      * @throws OutOfBoundsException When
@@ -220,17 +237,19 @@ class OroTestFrameworkExtension implements TestworkExtension
             $mappingPath = str_replace(
                 '/',
                 DIRECTORY_SEPARATOR,
-                $bundle->getPath().'/Resources/config/behat_elements.yml'
+                $bundle->getPath().'/Resources/config/oro/behat.yml'
             );
 
             if (!is_file($mappingPath)) {
                 continue;
             }
 
-            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse(file_get_contents($mappingPath)));
+            $config = Yaml::parse(file_get_contents($mappingPath));
+
+            $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
         }
 
-        $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
+        $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
     }
 
     /**

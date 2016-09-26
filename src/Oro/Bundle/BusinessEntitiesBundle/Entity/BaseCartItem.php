@@ -7,10 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * Class BasePerson
- *
- * @package Oro\Bundle\BusinessEntitiesBundle\Entity
- *
  * @ORM\MappedSuperclass
  */
 class BaseCartItem
@@ -33,7 +29,7 @@ class BaseCartItem
     /**
      * @var string
      *
-     * @ORM\Column(name="sku", type="string", length=255)
+     * @ORM\Column(name="sku", type="string", length=255, nullable=true)
      */
     protected $sku;
 

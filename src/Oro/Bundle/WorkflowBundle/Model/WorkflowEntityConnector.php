@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
@@ -10,11 +12,10 @@ use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 class WorkflowEntityConnector
 {
+    const WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX = 'workflow_applicable_entity:';
+
     /** @var ManagerRegistry */
     protected $registry;
-
-    /** @var WorkflowSystemConfigManager */
-    protected $workflowConfigManager;
 
     /** @var array */
     protected $supportedIdentifierTypes = [
@@ -25,17 +26,19 @@ class WorkflowEntityConnector
         Type::STRING
     ];
 
-    /** @var array|bool[] */
-    protected $cache = [];
+    /**
+     * @var Cache
+     */
+    protected $cache;
 
     /**
      * @param ManagerRegistry $managerRegistry
-     * @param WorkflowSystemConfigManager $workflowConfigManager
+     * @param Cache $cache
      */
-    public function __construct(ManagerRegistry $managerRegistry, WorkflowSystemConfigManager $workflowConfigManager)
+    public function __construct(ManagerRegistry $managerRegistry, Cache $cache = null)
     {
         $this->registry = $managerRegistry;
-        $this->workflowConfigManager = $workflowConfigManager;
+        $this->cache = $cache ?: new ArrayCache();
     }
 
     /**
@@ -46,12 +49,17 @@ class WorkflowEntityConnector
     {
         $entityClass = is_object($entity) ? ClassUtils::getClass($entity) : ClassUtils::getRealClass($entity);
 
-        if (!array_key_exists($entityClass, $this->cache)) {
-            $this->cache[$entityClass] = $this->workflowConfigManager->isConfigurable($entityClass) &&
-                $this->isSupportedIdentifierType($entityClass);
+        $cacheKey = self::WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX . $entityClass;
+
+        if (false === $this->cache->contains($cacheKey)) {
+            $data = $this->isSupportedIdentifierType($entityClass);
+
+            $this->cache->save($cacheKey, $data);
+            //to reduce amounts of calls in cache->fetch returns immediately
+            return $data;
         }
 
-        return $this->cache[$entityClass];
+        return $this->cache->fetch($cacheKey);
     }
 
     /**

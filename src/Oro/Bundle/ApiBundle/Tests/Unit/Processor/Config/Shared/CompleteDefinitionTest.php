@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -117,8 +118,25 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadataForClass');
 
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Association1Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -128,8 +146,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'association1' => [
-                        'target_class'     => 'Test\Association1Target',
-                        'exclusion_policy' => 'all'
+                        'target_class'           => 'Test\Association1Target',
+                        'exclusion_policy'       => 'all',
+                        'identifier_field_names' => ['id']
                     ],
                 ]
             ],
@@ -521,8 +540,25 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Association1Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -534,7 +570,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'id'           => null,
                     'association1' => [
-                        'exclusion_policy' => 'all'
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'identifier_field_names' => ['id']
                     ],
                 ]
             ],
@@ -1253,6 +1291,50 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 ],
                 'field3' => [
                     'property_path' => 'realField3'
+                ],
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessIdentifierFieldsOnlyForManageableEntityWithIgnoredPropertyPath()
+    {
+        $config = [
+            'fields' => [
+                'id'     => null,
+                'field1' => [
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
+                ],
+                'field2' => [
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ],
             ]
         ];

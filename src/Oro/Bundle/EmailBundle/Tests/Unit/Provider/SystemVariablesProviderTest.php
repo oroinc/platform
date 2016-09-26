@@ -59,9 +59,9 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['oro_ui.application_name', false, false, ''],
-                        ['oro_ui.application_title', false, false, ''],
-                        ['oro_ui.application_url', false, false, 'http://localhost/'],
+                        ['oro_ui.application_name', false, false, null, ''],
+                        ['oro_ui.application_title', false, false, null, ''],
+                        ['oro_ui.application_url', false, false, null, 'http://localhost/'],
                     ]
                 )
             );

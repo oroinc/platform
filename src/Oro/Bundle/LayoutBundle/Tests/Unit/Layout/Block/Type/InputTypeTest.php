@@ -9,6 +9,36 @@ use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class InputTypeTest extends BlockTypeTestCase
 {
+    public function testSetDefaultOptions()
+    {
+        $this->assertEquals(
+            [
+                'type' => 'text',
+            ],
+            $this->resolveOptions(InputType::NAME, [])
+        );
+    }
+
+    public function testGetBlockView()
+    {
+        $type = 'button';
+        $id = 'test_id';
+        $value = 'test_value';
+        $name = 'test_name';
+        $placeholder = 'test_placeholder';
+
+        $view = $this->getBlockView(
+            InputType::NAME,
+            ['type' => $type, 'id' => $id, 'value' => $value, 'name' => $name, 'placeholder' => $placeholder]
+        );
+
+        $this->assertEquals($type, $view->vars['type']);
+        $this->assertEquals($id, $view->vars['attr']['id']);
+        $this->assertEquals($value, $view->vars['value']);
+        $this->assertEquals($name, $view->vars['name']);
+        $this->assertEquals($placeholder, $view->vars['placeholder']);
+    }
+
     public function testGetName()
     {
         $type = $this->getBlockType(InputType::NAME);
@@ -21,69 +51,5 @@ class InputTypeTest extends BlockTypeTestCase
         $type = $this->getBlockType(InputType::NAME);
 
         $this->assertSame(BaseType::NAME, $type->getParent());
-    }
-
-    public function testSetDefaultOptions()
-    {
-        $this->assertEquals(
-            [
-                'type' => 'text',
-                'id' => null,
-                'name' => null,
-                'value' => null,
-                'placeholder' => null,
-            ],
-            $this->resolveOptions(InputType::NAME, [])
-        );
-
-        $options = [
-            'type' => 'password',
-            'id' => 'passwordId',
-            'name' => 'passwordName',
-            'value' => '***',
-            'placeholder' => 'Enter password',
-        ];
-        $this->assertEquals($options, $this->resolveOptions(InputType::NAME, $options));
-    }
-
-    public function testBuildViewPassword()
-    {
-        $view = $this->getBlockView(InputType::NAME, ['type' => 'password']);
-
-        $this->assertEquals('password', $view->vars['type']);
-        $this->assertEquals(
-            [
-                'type' => 'password',
-                'autocomplete' => 'off',
-            ],
-            $view->vars['attr']
-        );
-    }
-
-    public function testBuildViewWithoutOptions()
-    {
-        $view = $this->getBlockView(InputType::NAME);
-
-        $this->assertEquals(
-            [
-                'type' => 'text',
-            ],
-            $view->vars['attr']
-        );
-    }
-
-    public function testBuildView()
-    {
-        $options = [
-            'id' => 'usernameId',
-            'name' => 'usernameName',
-            'value' => 'username',
-            'placeholder' => 'Enter username',
-        ];
-
-        $view = $this->getBlockView(InputType::NAME, $options);
-
-        $this->assertEquals('text', $view->vars['type']);
-        $this->assertEquals(['type' => 'text'] + $options, $view->vars['attr']);
     }
 }

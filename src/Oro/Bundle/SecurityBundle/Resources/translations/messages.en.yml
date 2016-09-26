@@ -4,15 +4,16 @@ CREATE: Create
 EDIT: Edit
 DELETE: Delete
 ASSIGN: Assign
-
+"view %entityName%": "View %entityName%"
+"view %fieldName% not granted": "You don't have permissions to view %fieldName%"
 oro:
     security:
         access-level:
             BASIC: User
             LOCAL: Business Unit
             DEEP: Division
-            GLOBAL: System
-            SYSTEM: System
+            GLOBAL: Global
+            SYSTEM: Global
             NONE: None
         organization:
             access_denied: You don't have access to organization "%organization_name%"

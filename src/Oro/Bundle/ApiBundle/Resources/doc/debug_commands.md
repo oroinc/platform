@@ -13,7 +13,7 @@ php app/console oro:api:cache:clear
 
 ### oro:api:doc:cache:clear
 
-This command command allows to clear or warm-up API documentation cache.
+This command allows to clear or warm-up API documentation cache.
 
 If this command is launched without parameters it warm-ups all API documentation caches:
 
@@ -65,6 +65,12 @@ or
 
 ```bash
 php app/console oro:api:dump users --sub-resources
+```
+
+In additional you can use this command to get all entities that are not accessible through Data API. Use `--not-accessible` option for this:
+
+```bash
+php app/console oro:api:dump --not-accessible
 ```
 
 ### oro:api:debug

@@ -50,34 +50,26 @@ class EmailRepository extends EntityRepository
 
     /**
      * Get $limit last emails
+     * todo: BAP-11456 Move method getNewEmails from EmailRepository to EmailUserRepository
      *
      * @param User         $user
      * @param Organization $organization
      * @param int          $limit
      * @param int|null     $folderId
      *
-     * @return mixed
+     * @return array
      */
     public function getNewEmails(User $user, Organization $organization, $limit, $folderId)
     {
-        $qb = $this->createQueryBuilder('e')
-            ->select('e, eu.seen')
-            ->leftJoin('e.emailUsers', 'eu')
-            ->where($this->getAclWhereCondition($user, $organization))
-            ->groupBy('e, eu.seen')
-            ->orderBy('eu.seen', 'ASC')
-            ->addOrderBy('e.sentAt', 'DESC')
-            ->setParameter('organization', $organization)
-            ->setParameter('owner', $user)
-            ->setMaxResults($limit);
-
-        if ($folderId > 0) {
-            $qb->leftJoin('eu.folders', 'f')
-               ->andWhere('f.id = :folderId')
-               ->setParameter('folderId', $folderId);
+        $qb = $this->getEmailList($user, $organization, $limit, $folderId, false);
+        $newEmails = $qb->getQuery()->getResult();
+        if (count($newEmails) < $limit) {
+            $qb = $this->getEmailList($user, $organization, $limit - count($newEmails), $folderId, true);
+            $seenEmails = $qb->getQuery()->getResult();
+            $newEmails = array_merge($newEmails, $seenEmails);
         }
 
-        return $qb->getQuery()->getResult();
+        return $newEmails;
     }
 
     /**
@@ -91,9 +83,9 @@ class EmailRepository extends EntityRepository
      */
     public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        $repository = $this->getEntityManager()->getRepository('OroEmailBundle:EmailUser');
-        $qb = $repository->createQueryBuilder('eu')
-            ->select('COUNT(DISTINCT IDENTITY(eu.email))')
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('COUNT(DISTINCT IDENTITY(eu.email))')
+            ->from('OroEmailBundle:EmailUser', 'eu')
             ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
             ->setParameter('organization', $organization)
@@ -107,25 +99,6 @@ class EmailRepository extends EntityRepository
         }
 
         return $qb->getQuery()->getSingleScalarResult();
-    }
-
-    /**
-     * Get emails with empty body and at not synced body state
-     *
-     * @param int $batchSize
-     *
-     * @return Email[]
-     */
-    public function getEmailsWithoutBody($batchSize)
-    {
-        return $this->createQueryBuilder('email')
-            ->select('email')
-            ->where('email.emailBody is null')
-            ->andWhere('email.bodySynced = false or email.bodySynced is null')
-            ->setMaxResults($batchSize)
-            ->orderBy('email.sentAt', 'DESC')
-            ->getQuery()
-            ->getResult();
     }
 
     /**
@@ -150,6 +123,25 @@ class EmailRepository extends EntityRepository
             ->groupBy('f.id');
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Get emails with empty body and at not synced body state
+     *
+     * @param int $batchSize
+     *
+     * @return Email[]
+     */
+    public function getEmailsWithoutBody($batchSize)
+    {
+        return $this->createQueryBuilder('email')
+            ->select('email')
+            ->where('email.emailBody is null')
+            ->andWhere('email.bodySynced = false or email.bodySynced is null')
+            ->setMaxResults($batchSize)
+            ->orderBy('email.sentAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -248,5 +240,38 @@ class EmailRepository extends EntityRepository
         } else {
             return $andExpr;
         }
+    }
+
+    /**
+     * @param User         $user
+     * @param Organization $organization
+     * @param integer      $limit
+     * @param integer      $folderId
+     * @param bool         $isSeen
+     *
+     * @return QueryBuilder
+     */
+    protected function getEmailList(User $user, Organization $organization, $limit, $folderId, $isSeen)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('eu')
+            ->from('OroEmailBundle:EmailUser', 'eu')
+            ->where($this->getAclWhereCondition($user, $organization))
+            ->andWhere('eu.seen = :seen')
+            ->orderBy('eu.receivedAt', 'DESC')
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
+            ->setParameter('seen', $isSeen)
+            ->setMaxResults($limit);
+
+        if ($folderId > 0) {
+            $qb->leftJoin('eu.folders', 'f')
+                ->andWhere('f.id = :folderId')
+                ->setParameter('folderId', $folderId);
+
+            return $qb;
+        }
+
+        return $qb;
     }
 }

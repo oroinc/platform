@@ -1,0 +1,53 @@
+navigation:
+    menu_config:
+        areas:
+            default:
+                - quicklinks
+        items:
+            customers_tab:
+                label: 'Customers'
+            call_list:
+                label: 'Calls'
+            to_replace:
+                label: 'Replaced'
+            to_move_top:
+                label: 'To move'
+            to_move_child:
+                label: 'To move child'
+            shortcut_call_list:
+                label: Show list
+            quicklinks_request_quote:
+                label: 'Request Quote'
+        tree:
+            application_menu:
+                children:
+                    customers_tab:
+                        children:
+                            call_list: ~
+                            to_replace: ~
+                            to_move_top:
+                                children:
+                                    to_move_child: ~
+
+            shortcuts:
+                children:
+                    shortcut_call_list: ~
+
+            quicklinks:
+                type: quicklinks
+                children:
+                    quicklinks_request_quote: ~
+
+    titles:
+        orocrm_call_index: Calls
+
+
+    navigation_elements:
+        favoriteButton:
+            routes:
+                call_list:  false
+                some_route: false
+        shortcutsPanel:
+            default: true
+            routes:
+                some_route: false

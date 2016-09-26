@@ -45,7 +45,7 @@ define(function(require) {
     function Dropdown(element) {
         var $el = $(element).on('click.dropdown.data-api', this.toggle);
         var globalHandlers = {
-            'click.dropdown.data-api': function() {
+            'click.dropdown.data-api select2-open.dropdown.data-api showTimepicker.dropdown.data-api': function() {
                 var $dropdown = $el.parent();
                 if ($dropdown.is('.open')) {
                     $dropdown.trigger('hide.bs.dropdown').removeClass('open');
@@ -97,9 +97,15 @@ define(function(require) {
                 css.left = 'auto';
             }
 
+            var containerOffset = $container.offset();
+            var dropdownMenuOffset = $dropdownMenu.offset();
+
             var originalPosition = {
                 parent: $parent.offset(),
-                dropdownMenu: $dropdownMenu.offset()
+                dropdownMenu: {
+                    left: dropdownMenuOffset.left - containerOffset.left,
+                    top: dropdownMenuOffset.top - containerOffset.top
+                }
             };
             $placeholder = $('<div class="dropdown-menu__placeholder"/>');
             $dropdownMenu.data('related-toggle', $this);
@@ -336,16 +342,19 @@ define(function(require) {
             var eventData = e && e.data || {};
             var $toggle = $(toggleDropdown, $dropdown);
             var $dropdownMenu = $('>.dropdown-menu', $dropdown);
-
             var scrollableRect = scrollHelper.getFinalVisibleRect($toggle.closest('.ui-dialog-content')[0]);
             var toggleRect = $toggle[0].getBoundingClientRect();
 
-            if ($dropdown.is('.dropdown') && scrollableRect.top > toggleRect.bottom) {
+            $dropdownMenu.css({position: 'absolute', display: '', top: '', left: '', bottom: '', right: ''});
+
+            var dropdownMenuRect = $dropdownMenu[0].getBoundingClientRect();
+
+            if ($dropdown.is('.dropdown') && scrollableRect.top > Math.min(dropdownMenuRect.top, toggleRect.bottom)) {
                 // whole toggle-item is hidden at the top of scrollable container
                 flipToOpposite($dropdown);
             }
 
-            if ($dropdown.is('.dropup') && scrollableRect.bottom < toggleRect.top) {
+            if ($dropdown.is('.dropup') && scrollableRect.bottom < Math.max(dropdownMenuRect.bottom, toggleRect.top)) {
                 // whole toggle-item is hidden at the bottom of scrollable container
                 flipToOpposite($dropdown);
             }
@@ -355,15 +364,13 @@ define(function(require) {
                 $dropdown.is('.dropup') && scrollableRect.top > toggleRect.top
             ) {
                 // dropdown menu is completely hidden behind scrollable container
-                $dropdownMenu.css({position: 'absolute', top: '', left: '', bottom: '', right: ''});
+                $dropdownMenu.hide();
                 return;
             }
 
             if (!eventData.preferCurrentState) {
                 flipToInitial($dropdown);
             }
-
-            $dropdownMenu.css({position: 'absolute', top: '', left: '', bottom: '', right: ''});
 
             if (!isInRange(document.body, $dropdownMenu[0])) {
                 flipToOpposite($dropdown);
@@ -392,7 +399,8 @@ define(function(require) {
                     return;
                 }
                 var $dropdown = $(this);
-                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup')) {
+                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup') ||
+                    $dropdown.has('>.dropdown-menu').length === 0) {
                     // handles only case when dropdown id opened in dialog
                     return;
                 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -19,16 +21,22 @@ abstract class BuildResultDocument implements ProcessorInterface
     /** @var ErrorCompleterInterface */
     protected $errorCompleter;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param DocumentBuilderInterface $documentBuilder
      * @param ErrorCompleterInterface  $errorCompleter
+     * @param LoggerInterface          $logger
      */
     public function __construct(
         DocumentBuilderInterface $documentBuilder,
-        ErrorCompleterInterface $errorCompleter
+        ErrorCompleterInterface $errorCompleter,
+        LoggerInterface $logger
     ) {
         $this->documentBuilder = $documentBuilder;
         $this->errorCompleter = $errorCompleter;
+        $this->logger = $logger;
     }
 
     /**
@@ -69,6 +77,15 @@ abstract class BuildResultDocument implements ProcessorInterface
         $this->errorCompleter->complete($error);
         $this->documentBuilder->clear();
         $this->documentBuilder->setErrorObject($error);
+
+        $this->logger->error(
+            sprintf('Building of the result document failed.'),
+            [
+                'exception' => $e,
+                'action'    => $context->getAction(),
+                'entity'    => $context->getClassName()
+            ]
+        );
     }
 
     /**

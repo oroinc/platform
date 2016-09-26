@@ -88,7 +88,7 @@ define([
         options: {},
 
         /**
-         * Initial state of collection
+         * Default initial state of collection
          *
          * @property
          */
@@ -99,8 +99,19 @@ define([
             filters: {},
             sorters: {},
             columns: {},
-            appearanceType: 'grid'
+            appearanceType: 'grid',
+            appearanceData: {}
         },
+
+        /**
+         * Default current state of collection
+         *
+         * @property
+         */
+        state: _.extend({
+            appearanceType: 'grid',
+            appearanceData: {}
+        }, BackbonePageableCollection.prototype.state),
 
         /**
          * Declaration of URL parameters

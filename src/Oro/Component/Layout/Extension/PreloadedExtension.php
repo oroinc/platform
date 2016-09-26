@@ -5,7 +5,6 @@ namespace Oro\Component\Layout\Extension;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
-use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
@@ -64,13 +63,7 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * The data providers provided by this extension
      *
-     * @var DataProviderInterface[]
-     *
-     * Example:
-     *  [
-     *      'data_provider_1' => DataProviderInterface,
-     *      'data_provider_2' => DataProviderInterface
-     *  ]
+     * @var object[]
      */
     private $dataProviders;
 
@@ -81,7 +74,7 @@ class PreloadedExtension implements ExtensionInterface
      * @param array $typeExtensions       array of BlockTypeExtensionInterface[]
      * @param array $layoutUpdates        array of LayoutUpdateInterface[]
      * @param array $contextConfigurators ContextConfiguratorInterface[]
-     * @param array $dataProviders        DataProviderInterface[]
+     * @param array $dataProviders        object[]
      *
      * @throws Exception\InvalidArgumentException
      */
@@ -309,11 +302,6 @@ class PreloadedExtension implements ExtensionInterface
             if (!is_string($key)) {
                 throw new Exception\InvalidArgumentException(
                     'Keys of $dataProviders array must be strings.'
-                );
-            }
-            if (!$val instanceof DataProviderInterface) {
-                throw new Exception\InvalidArgumentException(
-                    'Each item of $dataProviders array must be DataProviderInterface.'
                 );
             }
         }

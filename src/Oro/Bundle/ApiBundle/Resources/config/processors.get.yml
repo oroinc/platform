@@ -95,6 +95,13 @@ services:
     # if you add a new processor in this group, it should be added in the "security_check" group of
     # actions that execute this action, e.g. look at "security_check" group of "create" or "update" actions
 
+    oro_api.get.entity_type_feature_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro.api.processor, action: get, group: security_check, priority: 20 }
+
     oro_api.get.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
@@ -195,16 +202,20 @@ services:
         arguments:
             - '@oro_api.rest.document_builder'
             - '@oro_api.rest.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest&!json_api, priority: -50 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get.json_api.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
             - '@oro_api.json_api.document_builder'
             - '@oro_api.json_api.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: json_api, priority: -55 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors

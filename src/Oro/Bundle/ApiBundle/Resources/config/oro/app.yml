@@ -25,6 +25,8 @@ security:
             context: main
 
 oro_api:
+    api_doc_views: ['default', 'rest_json_api', 'rest_plain']
+
     filters:
         string: ~
         boolean: ~
@@ -40,6 +42,8 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        primaryField:
+            class: Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
 
     form_types:
         - form.type.form
@@ -68,6 +72,8 @@ oro_api:
         - form.type_extension.form.validator
         - form.type_extension.repeated.validator
         - form.type_extension.form.data_collector
+        - oro_security.form.extension.aclprotected_fields_type
+        - oro_form.extension.constraint_as_option
 
     form_type_guessers:
         - form.type_guesser.validator

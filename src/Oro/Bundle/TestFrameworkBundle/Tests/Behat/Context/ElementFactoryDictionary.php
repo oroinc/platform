@@ -28,4 +28,24 @@ trait ElementFactoryDictionary
     {
         return $this->elementFactory->createElement($name);
     }
+
+    /**
+     * @param string $name Element name
+     * @param string $text Text that contains in element node
+     * @param OroElement $context
+     *
+     * @return OroElement
+     */
+    public function findElementContains($name, $text, OroElement $context = null)
+    {
+        return $this->elementFactory->findElementContains($name, $text, $context);
+    }
+
+    /**
+     * @return OroElement
+     */
+    public function getPage()
+    {
+        return $this->elementFactory->getPage();
+    }
 }

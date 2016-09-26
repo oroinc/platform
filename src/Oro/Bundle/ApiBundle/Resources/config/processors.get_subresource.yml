@@ -28,7 +28,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 30 }
 
@@ -63,10 +62,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: json_api, priority: -20 }
 
-    oro_api.get_subresource.register_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterFilters
+    oro_api.get_subresource.register_configured_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters
         arguments:
             - '@oro_api.filter_factory'
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -50 }
 
@@ -76,6 +76,15 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -55 }
+
+    oro_api.get_subresource.register_dynamic_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
+        arguments:
+            - '@oro_api.filter_factory'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -60 }
 
     oro_api.get_subresource.rest.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetDefaultSorting
@@ -184,9 +193,6 @@ services:
 
     oro_api.get_subresource.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
-        arguments:
-            - '@oro_api.config_provider'
-            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: 50 }
 
@@ -307,32 +313,40 @@ services:
         arguments:
             - '@oro_api.rest.document_builder'
             - '@oro_api.rest.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: true, requestType: rest&!json_api, priority: -50 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get_subresource.rest.build_result_document.single_item:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
             - '@oro_api.rest.document_builder'
             - '@oro_api.rest.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: false, requestType: rest&!json_api, priority: -50 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get_subresource.json_api.build_result_document.collection:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildListResultDocument
         arguments:
             - '@oro_api.json_api.document_builder'
             - '@oro_api.json_api.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: true, requestType: json_api, priority: -55 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get_subresource.json_api.build_result_document.single_item:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
             - '@oro_api.json_api.document_builder'
             - '@oro_api.json_api.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: false, requestType: json_api, priority: -55 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.get_subresource.rest.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors

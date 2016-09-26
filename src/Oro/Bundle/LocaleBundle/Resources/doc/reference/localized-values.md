@@ -20,7 +20,7 @@ localization.titles|localized_value
 Format values in layout configs
 ===============================
 
-Use `localized_value` ExpressionFunction
+Use `locale` Layout data provider and `getLocalizedValue()`.
 
 ```yml
 # .../Resources/views/layouts/.../myconfig.yml
@@ -30,7 +30,7 @@ layout:
             ...
             options:
                 ...
-                content: '=localized_value(data["localization"].getTitles())'
+                content: '=data["locale"].getLocalizedValue(data["localization"].getTitles())'
 ```
 
 Format values in datagrids
@@ -40,8 +40,8 @@ Use datagrid property with type `localized_value` and attribute `data_name` to s
 If current localization not detected, will be joined SQL relation to default fallback values, otherwhise it will be recieved by LocalizationHelper, sorters and filters will be removed.
 
 ```yml
-# .../Resources/config/datagrid.yml
-datagrid:
+# .../Resources/config/oro/datagrids.yml
+datagrids:
     my-localizations-grid:
         source:
             type: orm

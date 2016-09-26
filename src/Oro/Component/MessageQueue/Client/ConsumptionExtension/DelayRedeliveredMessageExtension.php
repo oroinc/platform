@@ -2,6 +2,7 @@
 namespace Oro\Component\MessageQueue\Client\ConsumptionExtension;
 
 use Oro\Component\MessageQueue\Client\DriverInterface;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -16,18 +17,20 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
     private $driver;
 
     /**
+     * The number of seconds the message should be delayed
+     *
      * @var int
      */
-    private $delaySec;
+    private $delay;
 
     /**
      * @param DriverInterface $driver
-     * @param int             $delaySec
+     * @param int             $delay The number of seconds the message should be delayed
      */
-    public function __construct(DriverInterface $driver, $delaySec)
+    public function __construct(DriverInterface $driver, $delay)
     {
         $this->driver = $driver;
-        $this->delaySec = $delaySec;
+        $this->delay = $delay;
     }
 
     /**
@@ -40,25 +43,28 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
             return;
         }
 
-        $queue = $context->getSession()->createQueue($context->getQueueName());
-
-        $prevProperties = $message->getProperties();
-        $newProperties = $message->getProperties();
-
-        if (! isset($newProperties[self::PROPERTY_REDELIVER_COUNT])) {
-            $newProperties[self::PROPERTY_REDELIVER_COUNT] = 1;
+        $properties = $message->getProperties();
+        if (! isset($properties[self::PROPERTY_REDELIVER_COUNT])) {
+            $properties[self::PROPERTY_REDELIVER_COUNT] = 1;
         } else {
-            $newProperties[self::PROPERTY_REDELIVER_COUNT]++;
+            $properties[self::PROPERTY_REDELIVER_COUNT]++;
         }
 
-        $message->setProperties($newProperties);
+        $delayedMessage = new Message();
+        $delayedMessage->setBody($message->getBody());
+        $delayedMessage->setHeaders($message->getHeaders());
+        $delayedMessage->setProperties($properties);
+        $delayedMessage->setDelay($this->delay);
 
-        $this->driver->delayMessage($queue, $message, $this->delaySec);
+        $queue = $context->getSession()->createQueue($context->getQueueName());
+
+        $this->driver->send($queue, $delayedMessage);
         $context->getLogger()->debug('[DelayRedeliveredMessageExtension] Send delayed message');
 
-        $message->setProperties($prevProperties);
-
         $context->setStatus(MessageProcessorInterface::REJECT);
-        $context->getLogger()->debug('[DelayRedeliveredMessageExtension] Set reject message status to context');
+        $context->getLogger()->debug(
+            '[DelayRedeliveredMessageExtension] '.
+            'Reject redelivered original message by setting reject status to context.'
+        );
     }
 }

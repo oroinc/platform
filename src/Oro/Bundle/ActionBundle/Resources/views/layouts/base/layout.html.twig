@@ -20,7 +20,10 @@
 {% endmacro %}
 
 {% block action_line_buttons_widget %}
-    {% set attr = attr|merge({ class: attr.class|default('') ~ " row-fluid"}) %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " row-fluid",
+        'data-page-component-module': 'oroaction/js/app/components/buttons-component'
+    }) %}
     <div{{ block('block_attributes') }}>
         {% for action in actions %}
             <div class="btn-group icons-holder">
@@ -39,7 +42,10 @@
     {% set actionsCount = actions|length %}
     {% if actionsCount > 0 %}
         {% set action = actions|first %}
-        {% set attr = attr|merge({ class: attr.class|default('') ~ " btn-group"}) %}
+        {% set attr = attr|merge({
+            class: attr.class|default('') ~ " btn-group",
+            'data-page-component-module': 'oroaction/js/app/components/buttons-component'
+        }) %}
         {% set primaryButtonCss = 'btn btn-primary ' ~ action.buttonOptions.class|default('') ~ " "  ~ params.buttonOptions.aCss|default('') %}
         <div{{ block('block_attributes') }}>
             <a {{ _self.get_action_attributes(action, entityClass, entityId, primaryButtonCss) }}>

@@ -29,7 +29,7 @@ class ConfigurationPass implements CompilerPassInterface
 
             $configLoader = new CumulativeConfigLoader(
                 'oro_query_designer',
-                new YamlCumulativeFileLoader('Resources/config/query_designer.yml')
+                new YamlCumulativeFileLoader('Resources/config/oro/query_designer.yml')
             );
             $resources    = $configLoader->load($container);
             foreach ($resources as $resource) {

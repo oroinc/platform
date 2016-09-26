@@ -2,6 +2,7 @@
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Type;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -127,7 +128,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
 
-        $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()]);
+        $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
+            'id' => Type::INTEGER,
+        ]);
 
         if (1 !== $affectedRows) {
             throw new \LogicException(sprintf(
@@ -165,7 +168,14 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 'redelivered' => true,
             ];
 
-            $affectedRows = $this->dbal->insert($this->connection->getTableName(), $dbalMessage);
+            $affectedRows = $this->dbal->insert($this->connection->getTableName(), $dbalMessage, [
+                'body' => Type::TEXT,
+                'headers' => Type::TEXT,
+                'properties' => Type::TEXT,
+                'priority' => Type::SMALLINT,
+                'queue' => Type::STRING,
+                'redelivered' => Type::BOOLEAN,
+            ]);
 
             if (1 !== $affectedRows) {
                 throw new \LogicException(sprintf(
@@ -190,9 +200,10 @@ class DbalMessageConsumer implements MessageConsumerInterface
          * more sub query.
          */
         $sql = sprintf(
-            'UPDATE %s SET consumer_id=?, delivered_at=? '.
+            'UPDATE %s SET consumer_id=:consumerId, delivered_at=:deliveredAt '.
             'WHERE id = (SELECT id FROM ('.
-            'SELECT id FROM %s WHERE queue=? AND consumer_id IS NULL AND (delayed_until IS NULL OR delayed_until<=?) '.
+            'SELECT id FROM %s WHERE queue=:queue AND consumer_id IS NULL AND '.
+            '(delayed_until IS NULL OR delayed_until<=:delayedUntil) '.
             'ORDER BY priority DESC, id ASC LIMIT 1'.
             ') AS x )',
             $this->connection->getTableName(),
@@ -201,7 +212,21 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
         $now = time();
 
-        $affectedRows = $this->dbal->executeUpdate($sql, [$this->consumerId, $now, $this->queue->getQueueName(), $now]);
+        $affectedRows = $this->dbal->executeUpdate(
+            $sql,
+            [
+                'consumerId' => $this->consumerId,
+                'deliveredAt' => $now,
+                'queue' => $this->queue->getQueueName(),
+                'delayedUntil' => $now,
+            ],
+            [
+                'consumerId' => Type::STRING,
+                'deliveredAt' => Type::INTEGER,
+                'queue' => Type::STRING,
+                'delayedUntil' => Type::INTEGER,
+            ]
+        );
 
         if (0 === $affectedRows) {
             return;
@@ -209,11 +234,21 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
         if (1 === $affectedRows) {
             $sql = sprintf(
-                'SELECT * FROM %s WHERE consumer_id=? AND queue=? LIMIT 1',
+                'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
                 $this->connection->getTableName()
             );
 
-            $dbalMessage = $this->dbal->executeQuery($sql, [$this->consumerId, $this->queue->getQueueName()])->fetch();
+            $dbalMessage = $this->dbal->executeQuery(
+                $sql,
+                [
+                    'consumerId' => $this->consumerId,
+                    'queue' => $this->queue->getQueueName(),
+                ],
+                [
+                    'consumerId' => Type::STRING,
+                    'queue' => Type::STRING,
+                ]
+            )->fetch();
 
             if (false == $dbalMessage) {
                 throw new \LogicException(sprintf(

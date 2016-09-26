@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\Block\Type\BaseType;
@@ -110,17 +111,18 @@ class BlockFactoryTest extends LayoutTestCase
         $this->assertBlockView(
             [ // root
                 'vars'     => [
-                    'id'                  => 'rootId',
-                    'block_type'          => 'root',
-                    'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_rootId',
-                    'block_prefixes'      => [
+                    'id'                   => 'rootId',
+                    'block_type'           => 'root',
+                    'block_type_widget_id' => 'root_widget',
+                    'translation_domain'   => 'messages',
+                    'unique_block_prefix'  => '_rootId',
+                    'block_prefixes'       => [
                         BaseType::NAME,
                         ContainerType::NAME,
                         'root',
                         '_rootId'
                     ],
-                    'cache_key'           => '_rootId_root'
+                    'cache_key'            => '_rootId_root'
                 ],
                 'children' => []
             ],
@@ -141,47 +143,50 @@ class BlockFactoryTest extends LayoutTestCase
         $this->assertBlockView(
             [ // root
                 'vars'     => [
-                    'id'                  => 'rootId',
-                    'block_type'          => 'root',
-                    'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_rootId',
-                    'block_prefixes'      => [
+                    'id'                   => 'rootId',
+                    'block_type'           => 'root',
+                    'block_type_widget_id' => 'root_widget',
+                    'translation_domain'   => 'messages',
+                    'unique_block_prefix'  => '_rootId',
+                    'block_prefixes'       => [
                         BaseType::NAME,
                         ContainerType::NAME,
                         'root',
                         '_rootId'
                     ],
-                    'cache_key'           => '_rootId_root'
+                    'cache_key'            => '_rootId_root'
                 ],
                 'children' => [
                     [ // header
                         'vars'     => [
-                            'id'                  => 'headerId',
-                            'block_type'          => 'header',
-                            'translation_domain'  => 'messages',
-                            'unique_block_prefix' => '_headerId',
-                            'block_prefixes'      => [
+                            'id'                   => 'headerId',
+                            'block_type'           => 'header',
+                            'block_type_widget_id' => 'header_widget',
+                            'translation_domain'   => 'messages',
+                            'unique_block_prefix'  => '_headerId',
+                            'block_prefixes'       => [
                                 BaseType::NAME,
                                 ContainerType::NAME,
                                 'header',
                                 '_headerId'
                             ],
-                            'cache_key'           => '_headerId_header'
+                            'cache_key'            => '_headerId_header'
                         ],
                         'children' => [
                             [ // logo
                                 'vars' => [
-                                    'id'                  => 'logoId',
-                                    'block_type'          => 'logo',
-                                    'translation_domain'  => 'messages',
-                                    'unique_block_prefix' => '_logoId',
-                                    'block_prefixes'      => [
+                                    'id'                   => 'logoId',
+                                    'block_type'           => 'logo',
+                                    'block_type_widget_id' => 'logo_widget',
+                                    'translation_domain'   => 'messages',
+                                    'unique_block_prefix'  => '_logoId',
+                                    'block_prefixes'       => [
                                         BaseType::NAME,
                                         'logo',
                                         '_logoId'
                                     ],
-                                    'cache_key'           => '_logoId_logo',
-                                    'title'               => 'test'
+                                    'cache_key'            => '_logoId_logo',
+                                    'title'                => 'test'
                                 ]
                             ]
                         ]
@@ -255,7 +260,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('normalizeOptions')
             ->will(
                 $this->returnCallback(
-                    function (array &$options, ContextInterface $context, DataAccessorInterface $data) {
+                    function (Options $options, ContextInterface $context, DataAccessorInterface $data) {
                         if ($options['test_option_2'] === '{BG}:red') {
                             $options['test_option_2'] = ['background'=> 'red'];
                         }
@@ -266,7 +271,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('buildBlock')
             ->will(
                 $this->returnCallback(
-                    function (BlockBuilderInterface $builder, array $options) {
+                    function (BlockBuilderInterface $builder, Options $options) {
                         if ($options['test_option_1'] === 'move_logo_to_root') {
                             $builder->getLayoutManipulator()->move('logo', 'root');
                         }
@@ -277,7 +282,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('buildView')
             ->will(
                 $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block, array $options) {
+                    function (BlockView $view, BlockInterface $block, Options $options) {
                         $view->vars['attr']['block_id'] = $block->getId();
                         if ($options['test_option_1'] === 'move_logo_to_root') {
                             $view->vars['attr']['logo_moved'] = true;
@@ -290,7 +295,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('finishView')
             ->will(
                 $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block, array $options) {
+                    function (BlockView $view, BlockInterface $block) {
                         if (isset($view['test'])) {
                             $view['test']->vars['processed_by_header_extension'] = true;
                         }

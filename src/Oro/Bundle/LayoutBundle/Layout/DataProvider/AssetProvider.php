@@ -4,9 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\DataProvider;
 
 use Symfony\Component\Asset\Packages;
 
-use Oro\Component\Layout\AbstractServerRenderDataProvider;
-
-class AssetProvider extends AbstractServerRenderDataProvider
+class AssetProvider
 {
     /** @var Packages */
     protected $packages;
@@ -19,6 +17,12 @@ class AssetProvider extends AbstractServerRenderDataProvider
         $this->packages = $packages;
     }
 
+    /**
+     * @param string $path
+     * @param string|null $packageName
+     *
+     * @return string
+     */
     public function getUrl($path, $packageName = null)
     {
         if ($path === null) {

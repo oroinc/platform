@@ -17,8 +17,10 @@ class OroSearchExtension extends Extension
     /**
      * Merge strategy.
      */
-    const STRATEGY_APPEND  = 'append';
+    const STRATEGY_APPEND = 'append';
     const STRATEGY_REPLACE = 'replace';
+
+    const SEARCH_FILE_ROOT_NODE = 'search';
 
     /**
      * Default merge strategy params
@@ -26,25 +28,30 @@ class OroSearchExtension extends Extension
      * @var array $optionsToMerge
      */
     protected $mergeOptions = [
-        'title_fields'  => self::STRATEGY_REPLACE,
-        'fields'        => self::STRATEGY_APPEND
+        'title_fields' => self::STRATEGY_REPLACE,
+        'fields' => self::STRATEGY_APPEND
     ];
 
     /**
-     * @param  array            $configs
+     * @param  array $configs
      * @param  ContainerBuilder $container
      * @throws InvalidConfigurationException
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         // load entity search configuration from search.yml files
-        $configPart          = [];
-        $ymlLoader           = new YamlCumulativeFileLoader('Resources/config/search.yml');
+        $configPart = [];
+        $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search.yml');
         $configurationLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
-        $engineResources     = $configurationLoader->load($container);
+        $engineResources = $configurationLoader->load($container);
 
         foreach ($engineResources as $resource) {
-            foreach ($resource->data as $key => $value) {
+            if (!isset($resource->data[self::SEARCH_FILE_ROOT_NODE])
+                || !is_array($resource->data[self::SEARCH_FILE_ROOT_NODE])
+            ) {
+                continue;
+            }
+            foreach ($resource->data[self::SEARCH_FILE_ROOT_NODE] as $key => $value) {
                 if (isset($configPart[$key])) {
                     $firstConfig = $configPart[$key];
                     $configPart[$key] = $this->mergeConfig($firstConfig, $value);
@@ -75,9 +82,10 @@ class OroSearchExtension extends Extension
         // load engine specific and general search services
         $serviceLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $serviceLoader->load('services.yml');
+        $serviceLoader->load('filters.yml');
 
         $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml');
-        $engineLoader    = new CumulativeConfigLoader('oro_search', $ymlLoader);
+        $engineLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
         $engineResources = $engineLoader->load($container);
 
         if (!empty($engineResources)) {
@@ -134,6 +142,7 @@ class OroSearchExtension extends Extension
         if (array_key_exists($fieldName, $this->mergeOptions)) {
             return $this->mergeOptions[$fieldName];
         }
+
         return $this->getDefaultStrategy();
     }
 
@@ -159,7 +168,7 @@ class OroSearchExtension extends Extension
 
     /**
      * @param ContainerBuilder $container
-     * @param array            $config
+     * @param array $config
      * @deprecated since 1.9, will be removed after 1.11
      * Please use oro_search.provider.search_mapping service for mapping config
      */

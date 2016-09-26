@@ -38,9 +38,9 @@ class ActionAssembler extends AbstractAssembler
      *
      * array(
      *     'conditions' => array(<condition_data>),
-     *     'post_actions' => array(
-     *         array(<first_post_action_data>),
-     *         array(<second_post_action_data>),
+     *     'actions' => array(
+     *         array(<first_action_data>),
+     *         array(<second_action_data>),
      *         ...
      *     )
      * )
@@ -48,8 +48,8 @@ class ActionAssembler extends AbstractAssembler
      * or
      *
      * array(
-     *     array(<first_post_action_data>),
-     *     array(<second_post_action_data>),
+     *     array(<first_action_data>),
+     *     array(<second_action_data>),
      *     ...
      * )
      *

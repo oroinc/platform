@@ -272,13 +272,18 @@ class TestHelper
                 )
             );
 
+        $entityMetadataProvider =
+            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
+                ->disableOriginalConstructor()
+                ->getMock();
         return new FieldAclExtension(
             $idAccessor,
             new EntityClassResolver($doctrine),
             $metadataProvider,
             $decisionMaker,
             $entityOwnerAccessor,
-            $configProvider
+            $configProvider,
+            $entityMetadataProvider
         );
     }
 

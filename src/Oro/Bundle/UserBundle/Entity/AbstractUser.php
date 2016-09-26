@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
-use Oro\Component\Layout\ContextItemInterface;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -25,8 +24,7 @@ abstract class AbstractUser implements
     LoginInfoInterface,
     \Serializable,
     OrganizationAwareUserInterface,
-    PasswordRecoveryInterface,
-    ContextItemInterface
+    PasswordRecoveryInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -247,14 +245,6 @@ abstract class AbstractUser implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function toString()
-    {
-        return (string)$this;
-    }
-
-    /**
      * @return int
      */
     public function getId()
@@ -325,7 +315,7 @@ abstract class AbstractUser implements
      *
      * @return AbstractUser
      */
-    public function setLastLogin(\DateTime $time)
+    public function setLastLogin(\DateTime $time = null)
     {
         $this->lastLogin = $time;
 

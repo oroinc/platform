@@ -35,6 +35,12 @@ define(function(require) {
         grid: null,
 
         /**
+         * Check if sorting enabled
+         * @type {boolean}
+         */
+        addSorting: true,
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
@@ -49,6 +55,8 @@ define(function(require) {
             _.extend(this, _.pick(options, ['columns', 'grid']));
 
             this.managedColumns = options.managedColumns;
+
+            this.addSorting = options.addSorting;
 
             this.columnFilterModel = new ColumnFilterModel();
 
@@ -110,6 +118,7 @@ define(function(require) {
                 el: this.columnManagerView.$('.column-manager-table').get(0),
                 collection: this.managedColumns,
                 filterModel: this.columnFilterModel,
+                addSorting: this.addSorting,
                 orderShift: orderShift
             });
         },

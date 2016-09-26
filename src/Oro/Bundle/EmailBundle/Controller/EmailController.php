@@ -8,6 +8,8 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +34,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EmailBundle\Command\PurgeEmailAttachmentCommand;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
@@ -45,6 +48,32 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
  */
 class EmailController extends Controller
 {
+    /**
+     * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
+     * @AclAncestor("oro_config_system")
+     */
+    public function purgeEmailsAttachmentsAction()
+    {
+        $job = new Job(PurgeEmailAttachmentCommand::NAME);
+        $em = $this->getDoctrine()->getManagerForClass(Job::class);
+        $em->persist($job);
+        $em->flush();
+
+        return new JsonResponse([
+            'message'    => $this->get('translator')->trans(
+                'oro.email.controller.job_scheduled.message',
+                [
+                    '%link%' => sprintf(
+                        '<a href="%s" class="job-view-link">%s</a>',
+                        $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
+                        $this->get('translator')->trans('oro.email.controller.job_progress')
+                    )
+                ]
+            ),
+            'successful' => true,
+        ]);
+    }
+
     /**
      * @Route("/view/{id}", name="oro_email_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
@@ -440,7 +469,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/user-emails", name="oro_email_user_emails")
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_user_view")
      * @Template
      */
     public function userEmailsAction()

@@ -2,15 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter\Stub\WorkflowEntity;
 
@@ -27,9 +30,9 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry
      */
-    protected $configProvider;
+    protected $workflowRegistry;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowPermissionRegistry
@@ -38,22 +41,20 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+
+        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $this->configProvider);
+        $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $this->workflowRegistry);
 
         $this->voter = new WorkflowEntityVoter($this->doctrineHelper, $this->permissionRegistry);
     }
 
     protected function tearDown()
     {
-        unset($this->voter);
-        unset($this->doctrineHelper);
+        unset($this->voter, $this->doctrineHelper);
     }
 
     /**
@@ -308,19 +309,12 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
 
-        $config->expects($this->any())
-            ->method('get')
-            ->with('active_workflows', false, false)
-            ->willReturn(true);
-
-        $this->configProvider
-            ->expects($this->any())
-            ->method('getConfig')
-            ->willReturn($config);
+        $this->workflowRegistry->expects($this->any())
+            ->method('getActiveWorkflowsByEntityClass')
+            ->with('SupportedClass')
+            ->willReturn(new ArrayCollection([$workflow]));
     }
 
     /**

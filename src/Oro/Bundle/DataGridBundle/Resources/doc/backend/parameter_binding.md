@@ -11,7 +11,7 @@ parameters of datagrid and parameters of query.
 ## Configuration Syntax
 
 ``` yml
-datagrid:
+datagrids:
     acme-demo-datagrid:
         source:
             type: orm
@@ -33,7 +33,7 @@ In case if name of parameters in grid and query not match, you can pass associat
 be name of parameter in query, and value - name of parameter if grid:
 
 ``` yml
-datagrid:
+datagrids:
     acme-demo-grid:
         source:
             type: orm

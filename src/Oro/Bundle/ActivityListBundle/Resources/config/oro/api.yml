@@ -1,4 +1,0 @@
-oro_api:
-    entities:
-        Oro\Bundle\ActivityListBundle\Entity\ActivityList: ~
-        Oro\Bundle\ActivityListBundle\Entity\ActivityOwner: ~

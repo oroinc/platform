@@ -117,7 +117,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
      */
     protected function preparePermissions(AclPrivilege $privilege, $item)
     {
-        $orders = [];
+        $permissions = [];
         foreach ($privilege->getPermissions() as $permissionName => $permission) {
             /** @var AclPermission $permission */
             $permissionEntity = $this->permissionManager->getPermissionByName($permission->getName());
@@ -128,11 +128,10 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
                     $permissionName,
                     $permission
                 );
-                $item['permissions'][] = $privilegePermission;
-                $orders[] = $privilegePermission['label'];
+                $permissions[$permission->getName()] = $privilegePermission;
             }
         }
-        array_multisort($orders, $item['permissions']);
+        $item['permissions'] = $this->sortPermissions($permissions);
 
         return $item;
     }
@@ -191,5 +190,33 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     protected function getRoleTranslationPrefix()
     {
         return AclAccessLevelSelectorType::TRANSLATE_KEY_ACCESS_LEVEL . '.';
+    }
+
+    /**
+     * Sort permissions. The CRUD permissions goes first and other ordered by the alphabet.
+     *
+     * @param array $permissions
+     *
+     * @return array
+     */
+    protected function sortPermissions(array $permissions)
+    {
+        $result = [];
+        $permissionsList = ['VIEW', 'CREATE', 'EDIT', 'DELETE'];
+        foreach ($permissionsList as $permissionName) {
+            if (array_key_exists($permissionName, $permissions)) {
+                $result[] = $permissions[$permissionName];
+                unset($permissions[$permissionName]);
+            }
+        }
+
+        if (count($permissions)) {
+            ksort($permissions);
+            foreach ($permissions as $permission) {
+                $result[] = $permission;
+            }
+        }
+
+        return $result;
     }
 }

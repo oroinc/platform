@@ -17,7 +17,7 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 
 /**
  * @outputBuffering enabled
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class EmailSyncCommandTest extends WebTestCase
 {
@@ -94,5 +94,111 @@ class EmailSyncCommandTest extends WebTestCase
         foreach ($expectedList as $expected) {
             $this->assertContains($expected, $result);
         }
+    }
+
+    /**
+     * @dataProvider commandImapSyncProvider
+     * @param string $commandName
+     * @param array $params
+     * @param array $data
+     * @param string $assertMethod
+     * @param int $assertCount
+     * @param array $expectedList
+     */
+    public function testImapSync(
+        $commandName,
+        array $params,
+        $data,
+        $assertMethod,
+        $assertCount,
+        $expectedList
+    ) {
+        $this->loadFixtures(['Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadOriginData']);
+
+        $this->mockProtocol($data, $assertCount);
+
+        if (isset($params['--id'])) {
+            $params['--id'] = (string)$this->getReference($params['--id'])->getId();
+        }
+        $result = $this->runCommand($commandName, $params);
+        foreach ($expectedList as $expected) {
+            $this->assertContains($expected, $result);
+        }
+        if ($assertMethod) {
+            $listRepo = $this->getContainer()->get('doctrine')->getRepository('OroEmailBundle:Email');
+            $list = $listRepo->findAll();
+            $this->$assertMethod($assertCount, count($list));
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function commandImapSyncProvider()
+    {
+        $results = [];
+        $path = __DIR__ . DIRECTORY_SEPARATOR . 'ImapResponses';
+        $apiData = $this->getRequestsData($path);
+
+        foreach ($apiData as $data) {
+            $results[$data['id']] = [
+                'commandName'     => 'oro:cron:imap-sync',
+                'params'          => $data['params'],
+                'data'            => $data['data'],
+                'assertMethod'    => 'assertEquals',
+                'assertCount'     => $data['total'],
+                'expectedContent' => $data['log_info']
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param string $folder
+     *
+     * @return array
+     */
+    public static function getRequestsData($folder)
+    {
+        $parameters = [];
+        $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
+        foreach ($testFiles as $fileName => $object) {
+            $parameters[$object->getFilename()] = Yaml::parse(file_get_contents($fileName)) ?: [];
+        }
+        ksort($parameters);
+
+        return $parameters;
+    }
+
+    /**
+     * @param mixed $data
+     * @param int $assertCount
+     */
+    protected function mockProtocol($data, $assertCount)
+    {
+        $uid = isset($data[Imap::UID]) ? $data[Imap::UID] : 0;
+        $internaldate = isset($data[Imap::INTERNALDATE]) ? $data[Imap::INTERNALDATE] : 0;
+
+        $message = new Message($data);
+        $headers = $message->getHeaders();
+        $headers->addHeaderLine(Imap::UID, $uid);
+        $headers->addHeaderLine('InternalDate', $internaldate);
+
+        $this->imap->expects($this->any())
+            ->method('getMessage')
+            ->willReturn($message);
+        $this->imap->expects($this->any())
+            ->method('getMessages')
+            ->willReturn([1 => $message]);
+        $this->imap->expects($this->any())
+            ->method('search')
+            ->willReturn([1]);
+        $this->imap->expects($this->any())
+            ->method('uidSearch')
+            ->willReturn([$uid]);
+        $this->imap->expects($this->any())
+            ->method('count')
+            ->willReturn($assertCount);
     }
 }

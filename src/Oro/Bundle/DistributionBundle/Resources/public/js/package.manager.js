@@ -20,20 +20,20 @@ function PackageManager(Urls, util) {
         }
     };
 
-    function sendRequest(url, params, completeCallback) {
+    function sendRequest(url, params, doneCallback) {
         $.ajax({
             url: url,
             method: 'GET',
             data: {params: params},
             dataType: 'json',
-            complete: completeCallback
+            success: doneCallback
         });
     }
 
     function installCompleteCallback(xhr) {
         var response = xhr.responseJSON;
 
-        switch (response.code) {
+        switch (response && response.code) {
             case InstallStatus.INSTALLED:
                 util.redirect(Urls.installed, 'Package installed successfully');
 
@@ -77,9 +77,6 @@ function PackageManager(Urls, util) {
                     reflectUICallback
                 );
                 break;
-            default:
-                util.error('Unknown error');
-                reflectUICallback();
         }
 
     }
@@ -87,7 +84,7 @@ function PackageManager(Urls, util) {
     function updateCompleteCallback(xhr) {
         var response = xhr.responseJSON;
 
-        switch (response.code) {
+        switch (response && response.code) {
             case UpdateStatus.UPDATED:
                 util.redirect(Urls.installed, 'Package updated successfully');
 
@@ -98,10 +95,6 @@ function PackageManager(Urls, util) {
                 reflectUICallback();
 
                 break;
-
-            default:
-                util.error('Unknown error');
-                reflectUICallback();
         }
     }
 

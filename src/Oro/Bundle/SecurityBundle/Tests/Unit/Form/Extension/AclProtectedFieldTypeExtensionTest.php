@@ -5,11 +5,13 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -65,7 +67,14 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
     public function testGetExtendedType()
     {
-        $this->assertEquals('form', $this->extension->getExtendedType());
+        $expectedResult = method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
+            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
+            : 'form';
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->extension->getExtendedType()
+        );
     }
 
     public function testBuildFormWithCorrectData()
@@ -210,23 +219,37 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $entity->country = 'USA';
         $entity->city = 'Los Angeles';
         $entity->street = 'Main street';
+        $entity->zip = 78945;
         /** @var Form $form */
         $form = $this->factory->create('form', $entity, $options);
         $form->add('city');
         $form->add('street');
         $form->add('country');
 
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $builder = new FormBuilder('postoffice', null, $dispatcher, $this->factory);
+        $builder->setPropertyPath(new PropertyPath('zip'));
+        $builder->setAttribute('error_mapping', array());
+        $builder->setErrorBubbling(false);
+        $builder->setMapped(true);
+        $form->add($builder->getForm());
+
+        // add error that should be cleaned
+        $form->get('country')->addError(new FormError('test error'));
+
         $data = [
             'country' => 'some country',
             'city' => 'some city',
-            'street' => 'some street'
+            'street' => 'some street',
+            'postoffice' => 61000
         ];
 
         $this->securityFacade->expects($this->any())
             ->method('isGranted')
             ->willReturnCallback(
                 function ($permission, FieldVote $object) {
-                    return $object->getField() !== 'country';
+                    $this->assertEquals('CREATE', $permission);
+                    return !in_array($object->getField(), ['country', 'zip']);
                 }
             );
 
@@ -237,7 +260,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             [
                 'country' => 'USA',
                 'city' => 'some city',
-                'street' => 'some street'
+                'street' => 'some street',
+                'postoffice' => '78945'
             ],
             $event->getData()
         );
@@ -248,8 +272,14 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $countryErrors = $form->get('country')->getErrors();
         $this->assertCount(1, $countryErrors);
         $this->assertEquals(
-            'You are not allowed to modify \'country\' field.',
+            'You have no access to modify this field.',
             $countryErrors[0]->getMessage()
+        );
+        $postofficeErrors = $form->get('postoffice')->getErrors();
+        $this->assertCount(1, $postofficeErrors);
+        $this->assertEquals(
+            'You have no access to modify this field.',
+            $postofficeErrors[0]->getMessage()
         );
         $this->assertCount(0, $form->get('city')->getErrors());
         $this->assertCount(0, $form->get('street')->getErrors());

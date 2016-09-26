@@ -79,7 +79,7 @@ class WorkflowController extends FOSRestController
             $entityClass = $workflow->getDefinition()->getRelatedEntity();
             $entity = $this->getEntityReference($entityClass, $entityId);
 
-            $workflowItem = $workflowManager->startWorkflow($workflow, $entity, $transitionName, $dataArray);
+            $workflowItem = $workflowManager->startWorkflow($workflowName, $entity, $transitionName, $dataArray);
         } catch (HttpException $e) {
             return $this->handleError($e->getMessage(), $e->getStatusCode());
         } catch (WorkflowNotFoundException $e) {
@@ -247,8 +247,8 @@ class WorkflowController extends FOSRestController
     {
         $workflowManager = $this->get('oro_workflow.manager');
 
-        $workflowManager->resetWorkflowData($workflowDefinition);
-        $workflowManager->activateWorkflow($workflowDefinition);
+        $workflowManager->resetWorkflowData($workflowDefinition->getName());
+        $workflowManager->activateWorkflow($workflowDefinition->getName());
 
         return $this->handleView(
             $this->view(
@@ -282,8 +282,8 @@ class WorkflowController extends FOSRestController
     {
         $workflowManager = $this->get('oro_workflow.manager');
 
-        $workflowManager->resetWorkflowData($workflowDefinition);
-        $workflowManager->deactivateWorkflow($workflowDefinition);
+        $workflowManager->resetWorkflowData($workflowDefinition->getName());
+        $workflowManager->deactivateWorkflow($workflowDefinition->getName());
 
         return $this->handleView(
             $this->view(

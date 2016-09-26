@@ -59,11 +59,13 @@ class AttachmentProvider
     }
 
     /**
+     * @todo should be moved out after BAP-11405
+     *
      * @param $entity
      *
      * @return File
      */
-    protected function getAttachmentByEntity($entity)
+    private function getAttachmentByEntity($entity)
     {
         $accessor   = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($entity, 'attachment');
@@ -72,6 +74,8 @@ class AttachmentProvider
     }
 
     /**
+     * @todo should be marked as deprecated after BAP-11405
+     *
      * @param $entity
      *
      * @return array
@@ -90,7 +94,7 @@ class AttachmentProvider
                 );
             }
             $result = [
-                'attachmentURL'       => $this->attachmentManager->getAttachmentURL($entity, $attachment),
+                'attachmentURL'       => $this->getAttachmentURL($entity, $attachment),
                 'attachmentSize'      => $this->attachmentManager->getFileSize($attachment->getFileSize()),
                 'attachmentFileName'  => $attachment->getOriginalFilename(),
                 'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
@@ -99,5 +103,18 @@ class AttachmentProvider
         }
 
         return $result;
+    }
+
+    /**
+     * @todo should be moved out after BAP-11405
+     *
+     * @param $entity
+     * @param File $attachment
+     *
+     * @return string
+     */
+    private function getAttachmentURL($entity, $attachment)
+    {
+        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
 }

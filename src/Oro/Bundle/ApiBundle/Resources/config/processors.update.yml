@@ -89,6 +89,13 @@ services:
     # security_check
     #
 
+    oro_api.update.entity_type_feature_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro.api.processor, action: update, group: security_check, priority: 20 }
+
     oro_api.update.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
@@ -181,6 +188,8 @@ services:
 
     oro_api.update.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors
+        arguments:
+            - '@oro_api.constraint_text_extractor'
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
 
@@ -249,16 +258,20 @@ services:
         arguments:
             - '@oro_api.rest.document_builder'
             - '@oro_api.rest.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest&!json_api, priority: -50 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.update.json_api.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
             - '@oro_api.json_api.document_builder'
             - '@oro_api.json_api.error_completer'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -55 }
+            - { name: monolog.logger, channel: api }
 
     oro_api.update.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors

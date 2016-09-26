@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilder\AssociationToArrayAttributeConverter;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface;
 
@@ -17,6 +19,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /** @var array */
     protected $result = [];
+
+    /** @var AssociationToArrayAttributeConverter */
+    private $arrayAttributeConverter;
 
     public function __construct()
     {
@@ -172,19 +177,99 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
      *
      * @return bool
      */
-    protected function isIdentity(EntityMetadata $metadata)
+    protected function hasIdentifierFieldsOnly(EntityMetadata $metadata)
     {
-        if (count($metadata->getAssociations()) > 0) {
-            return false;
+        return $metadata->hasIdentifierFieldsOnly();
+    }
+
+    /**
+     * @return AssociationToArrayAttributeConverter
+     */
+    protected function getArrayAttributeConverter()
+    {
+        if (null === $this->arrayAttributeConverter) {
+            $this->arrayAttributeConverter = $this->createArrayAttributeConverter();
         }
 
-        $idFields = $metadata->getIdentifierFieldNames();
-        $fields = $metadata->getFields();
-
-        return
-            count($fields) === count($idFields)
-            && count(array_diff_key($fields, array_flip($idFields))) === 0;
+        return $this->arrayAttributeConverter;
     }
+
+    /**
+     * @return AssociationToArrayAttributeConverter
+     */
+    protected function createArrayAttributeConverter()
+    {
+        return new AssociationToArrayAttributeConverter($this->objectAccessor);
+    }
+
+    /**
+     * @param mixed $value
+     * @param bool  $isCollection
+     *
+     * @return bool
+     */
+    protected function isEmptyRelationship($value, $isCollection)
+    {
+        return $isCollection
+            ? empty($value)
+            : null === $value;
+    }
+
+    /**
+     * @param array               $data
+     * @param string              $associationName
+     * @param AssociationMetadata $association
+     *
+     * @return mixed
+     */
+    public function getRelationshipValue(array $data, $associationName, AssociationMetadata $association)
+    {
+        $result = null;
+        $isCollection = $association->isCollection();
+        if (array_key_exists($associationName, $data)) {
+            $val = $data[$associationName];
+            if (!$this->isEmptyRelationship($val, $isCollection)) {
+                if (DataType::isAssociationAsField($association->getDataType())) {
+                    $result = $isCollection
+                        ? $this->getArrayAttributeConverter()->convertCollectionToArray($val, $association)
+                        : $this->getArrayAttributeConverter()->convertObjectToArray($val, $association);
+                } else {
+                    $result = $isCollection
+                        ? $this->processRelatedCollection($val, $association)
+                        : $this->processRelatedObject($val, $association);
+                }
+            }
+        }
+        if (null === $result && $isCollection) {
+            $result = [];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array|\Traversable  $collection
+     * @param AssociationMetadata $associationMetadata
+     *
+     * @return array
+     */
+    public function processRelatedCollection($collection, AssociationMetadata $associationMetadata)
+    {
+        $result = [];
+        foreach ($collection as $object) {
+            $result[] = $this->processRelatedObject($object, $associationMetadata);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param mixed               $object
+     * @param AssociationMetadata $associationMetadata
+     *
+     * @return mixed
+     */
+    abstract protected function processRelatedObject($object, AssociationMetadata $associationMetadata);
 
     /**
      * Checks that the primary data does not exist.

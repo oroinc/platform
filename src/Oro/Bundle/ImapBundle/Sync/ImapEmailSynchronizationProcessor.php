@@ -10,7 +10,6 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
@@ -24,6 +23,9 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
     /** Determines how many emails can be loaded from IMAP server at once */
@@ -100,6 +102,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 // set seen flags from previously synchronized emails
                 $this->checkFlags($imapFolder, $checkStartDate);
 
+                $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
+
             } catch (UnselectableFolderException $e) {
                 $folder->setSyncEnabled(false);
                 $this->logger->info(
@@ -116,12 +120,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->cleanUp(true, $imapFolder->getFolder());
 
             $processSpentTime = time() - $processStartTime;
-            if ($processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+
+            if (false === $this->getSettings()->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
                 break;
             }
         }
-
-        $this->removeManager->removeRemotelyRemovedEmails($this->manager, $imapFolders);
 
         // run removing of empty outdated folders every N synchronizations
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
@@ -233,6 +236,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
     {
@@ -249,7 +255,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if (!$this->checkOnOldEmailForMailbox($folder, $email, $folder->getOrigin()->getMailbox())) {
                 continue;
             }
-            if (!$this->checkOnExistsSavedEmail($email, $existingUids)) {
+
+            if ($this->checkToSkipSyncEmail($email, $existingUids)) {
                 continue;
             }
 
@@ -276,16 +283,21 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                         $emailUser->addFolder($folder);
                     }
                 }
-                $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
-                $newImapEmails[] = $imapEmail;
-                $this->em->persist($imapEmail);
-                $this->logger->notice(
-                    sprintf(
-                        'The "%s" (UID: %d) email was persisted.',
-                        $email->getSubject(),
-                        $email->getId()->getUid()
-                    )
-                );
+
+                if (false === $this->getSettings()->isForceMode()
+                    || (true  === $this->getSettings()->isForceMode() && count($relatedExistingImapEmails) === 0)
+                ) {
+                    $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
+                    $newImapEmails[] = $imapEmail;
+                    $this->em->persist($imapEmail);
+                    $this->logger->notice(
+                        sprintf(
+                            'The "%s" (UID: %d) email was persisted.',
+                            $email->getSubject(),
+                            $email->getId()->getUid()
+                        )
+                    );
+                }
             } catch (\Exception $e) {
                 $this->logger->warning(
                     sprintf(
@@ -349,7 +361,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
-     * Check allowing to save email by uid
+     * Check the email was synced by Uid or wasn't.
      *
      * @param Email $email
      * @param array $existingUids
@@ -359,17 +371,51 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function checkOnExistsSavedEmail(Email $email, array $existingUids)
     {
         if (in_array($email->getId()->getUid(), $existingUids)) {
-            $this->logger->info(
-                sprintf(
-                    'Skip "%s" (UID: %d) email, because it is already synchronised.',
-                    $email->getSubject(),
-                    $email->getId()->getUid()
-                )
-            );
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
+    }
+
+    /**
+     * Check allowing to save email by uid
+     *
+     * @param Email $email
+     * @param array $existingUids
+     *
+     * @return bool
+     */
+    protected function checkToSkipSyncEmail($email, $existingUids)
+    {
+        $existsSavedEmail = $this->checkOnExistsSavedEmail($email, $existingUids);
+
+        $skipSync = false;
+
+        if ($existsSavedEmail) {
+            $msg = 'Skip "%s" (UID: %d) email, because it is already synchronised.';
+            $skipSync = true;
+
+            if ($this->getSettings()->isForceMode()) {
+                $msg = null;
+                if ($this->getSettings()->needShowMessage()) {
+                    $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+                }
+
+                $skipSync = false;
+            }
+
+            if ($msg) {
+                $this->logger->info(
+                    sprintf(
+                        $msg,
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+            }
+        }
+
+        return $skipSync;
     }
 
     /**
@@ -470,7 +516,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         ImapEmailFolder $imapFolder,
         EmailFolder $folder
     ) {
-        $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+        $lastUid = null;
+        if (false === $this->getSettings()->isForceMode()) {
+            $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+        }
+
         if (!$lastUid && $origin->getMailbox() && $folder->getSyncStartDate()) {
             $emails = $this->initialMailboxSync($folder);
         } else {

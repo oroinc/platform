@@ -106,6 +106,7 @@ define(function(require) {
             }
 
             options.viewsCollection = collection;
+            options.appearances = this.metadata.options.appearances;
             return _.omit(options, ['views']);
         }
     };

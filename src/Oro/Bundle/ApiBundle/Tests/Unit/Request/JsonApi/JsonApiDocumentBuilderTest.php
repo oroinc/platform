@@ -480,6 +480,425 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    public function testMissingAssociationsAsFields()
+    {
+        $object = [
+            'id' => 123,
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
+        foreach ($metadata->getAssociations() as $association) {
+            $association->setDataType('array');
+        }
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'missingToOne'  => null,
+                        'missingToMany' => []
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    /**
+     * @dataProvider toOneAssociationAsFieldProvider
+     */
+    public function testToOneAssociationAsField($value, $expected)
+    {
+        $object = [
+            'id'       => 123,
+            'category' => $value,
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $association = $metadata->addAssociation(
+            $this->createAssociationMetadata('category', 'Test\Category')
+        );
+        $association->setDataType('scalar');
+        $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'category' => $expected
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function toOneAssociationAsFieldProvider()
+    {
+        return [
+            [null, null],
+            [123, 123],
+            [
+                ['id' => 123],
+                ['id' => 123, 'name' => null],
+            ],
+            [
+                ['id' => 123, 'name' => 'name1'],
+                ['id' => 123, 'name' => 'name1'],
+            ],
+            [
+                ['id' => 123, 'name' => 'name1', 'other' => 'val1'],
+                ['id' => 123, 'name' => 'name1'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider toManyAssociationAsFieldProvider
+     */
+    public function testToManyAssociationAsField($value, $expected)
+    {
+        $object = [
+            'id'         => 123,
+            'categories' => $value,
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $association = $metadata->addAssociation(
+            $this->createAssociationMetadata('categories', 'Test\Category', true)
+        );
+        $association->setDataType('array');
+        $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'categories' => $expected
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function toManyAssociationAsFieldProvider()
+    {
+        return [
+            [null, []],
+            [[], []],
+            [[123, 124], [123, 124]],
+            [
+                [['id' => 123], ['id' => 124]],
+                [['id' => 123, 'name' => null], ['id' => 124, 'name' => null]],
+            ],
+            [
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
+            ],
+            [
+                [
+                    ['id' => 123, 'name' => 'name1', 'other' => 'val1'],
+                    ['id' => 124, 'name' => 'name2', 'other' => 'val1']
+                ],
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider toOneAssociationAsFieldForIdFieldsOnlyProvider
+     */
+    public function testToOneAssociationAsFieldForIdFieldsOnly($value, $expected)
+    {
+        $object = [
+            'id'       => 123,
+            'category' => $value,
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $association = $metadata->addAssociation(
+            $this->createAssociationMetadata('category', 'Test\Category')
+        );
+        $association->setDataType('scalar');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'category' => $expected
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function toOneAssociationAsFieldForIdFieldsOnlyProvider()
+    {
+        return [
+            [null, null],
+            [123, 123],
+            [['id' => 123], 123],
+            [['id' => 123, 'name' => 'name1'], 123],
+        ];
+    }
+
+    /**
+     * @dataProvider toManyAssociationAsFieldForIdFieldsOnlyProvider
+     */
+    public function testToManyAssociationAsFieldForIdFieldsOnly($value, $expected)
+    {
+        $object = [
+            'id'         => 123,
+            'categories' => $value,
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $association = $metadata->addAssociation(
+            $this->createAssociationMetadata('categories', 'Test\Category', true)
+        );
+        $association->setDataType('array');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'categories' => $expected
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function toManyAssociationAsFieldForIdFieldsOnlyProvider()
+    {
+        return [
+            [null, []],
+            [[], []],
+            [[123, 124], [123, 124]],
+            [
+                [['id' => 123], ['id' => 124]],
+                [123, 124]
+            ],
+            [
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
+                [123, 124]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider toOneCollapsedAssociationAsFieldProvider
+     */
+    public function testToOneCollapsedAssociationAsField($value, $expected)
+    {
+        $object = [
+            'id'       => 123,
+            'category' => $value,
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $association = $metadata->addAssociation(
+            $this->createAssociationMetadata('category', 'Test\Category')
+        );
+        $association->setDataType('scalar');
+        $association->setCollapsed('scalar');
+        $association->getTargetMetadata()->removeField('id');
+        $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'category' => $expected
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function toOneCollapsedAssociationAsFieldProvider()
+    {
+        return [
+            [null, null],
+            ['name1', 'name1'],
+            [
+                ['name' => 'name1'],
+                'name1',
+            ],
+            [
+                ['name' => 'name1', 'other' => 'val1'],
+                'name1',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider toManyCollapsedAssociationAsFieldProvider
+     */
+    public function testToManyCollapsedAssociationAsField($value, $expected)
+    {
+        $object = [
+            'id'         => 123,
+            'categories' => $value,
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $association = $metadata->addAssociation(
+            $this->createAssociationMetadata('categories', 'Test\Category', true)
+        );
+        $association->setDataType('array');
+        $association->setCollapsed('scalar');
+        $association->getTargetMetadata()->removeField('id');
+        $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '123',
+                    'attributes' => [
+                        'categories' => $expected
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function toManyCollapsedAssociationAsFieldProvider()
+    {
+        return [
+            [null, []],
+            [[], []],
+            [['name1', 'name2'], ['name1', 'name2']],
+            [
+                [['name' => 'name1'], ['name' => 'name2']],
+                ['name1', 'name2'],
+            ],
+            [
+                [
+                    ['name' => 'name1', 'other' => 'val1'],
+                    ['name' => 'name2', 'other' => 'val1']
+                ],
+                ['name1', 'name2'],
+            ],
+        ];
+    }
+
+    public function testNestedAssociationAsArrayAttribute()
+    {
+        $object = [
+            'id'          => 1,
+            'association' => [
+                'id'         => 123,
+                'name'       => 'Name',
+                'meta1'      => 'Meta1',
+                'category'   => 456,
+                'group'      => null,
+                'role'       => ['id' => 789],
+                'categories' => [
+                    ['id' => 456],
+                    ['id' => 457]
+                ],
+                'groups'     => null,
+                'products'   => [],
+                'roles'      => [
+                    ['id' => 789, 'name' => 'Role1'],
+                    ['id' => 780, 'name' => 'Role2']
+                ],
+                'unknown'    => 'test'
+            ],
+        ];
+
+        $targetMetadata = $this->getEntityMetadata('Test\Target', ['id']);
+        $targetMetadata->addField($this->createFieldMetadata('id'));
+        $targetMetadata->addField($this->createFieldMetadata('name'));
+        $targetMetadata->addField($this->createFieldMetadata('missingField'));
+        $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('groups', 'Test\Group', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $targetMetadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $targetMetadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $associationMetadata = $metadata->addAssociation(
+            $this->createAssociationMetadata('association', 'Test\Target')
+        );
+        $associationMetadata->setTargetMetadata($targetMetadata);
+        $associationMetadata->setDataType('array');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type'       => 'test_entity',
+                    'id'         => '1',
+                    'attributes' => [
+                        'association' => [
+                            'id'            => 123,
+                            'name'          => 'Name',
+                            'missingField'  => null,
+                            'meta1'         => 'Meta1',
+                            'category'      => 456,
+                            'group'         => null,
+                            'role'          => 789,
+                            'categories'    => [456, 457],
+                            'groups'        => [],
+                            'products'      => [],
+                            'roles'         => [
+                                ['id' => 789, 'name' => 'Role1'],
+                                ['id' => 780, 'name' => 'Role2']
+                            ],
+                            'missingToOne'  => null,
+                            'missingToMany' => []
+                        ]
+                    ]
+                ],
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetErrorObject()
     {
         $error = new Error();

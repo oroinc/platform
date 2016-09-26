@@ -9,14 +9,13 @@ use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
-use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
-use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
 class ImapEmailRemoveManager implements LoggerAwareInterface
 {
@@ -39,61 +38,59 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
      * @param ImapEmailManager $manager
      * @param array $imapFolders
      */
-    public function removeRemotelyRemovedEmails(ImapEmailManager $manager, $imapFolders)
+    public function removeRemotelyRemovedEmails($imapFolder, $folder, $manager)
     {
-        foreach ($imapFolders as $imapFolder) {
-            $folder = $imapFolder->getFolder();
-            $folderName = $folder->getFullName();
-            try {
-                $manager->selectFolder($folderName);
+        $this->em->transactional(function () use ($imapFolder, $folder, $manager) {
+            $existingUids = $manager->getEmailUIDs();
 
-                $this->em->transactional(function () use ($imapFolder, $folder, $manager) {
-                    $existingUids = $manager->getEmailUIDs();
+            $staleImapEmailsQb = $this
+                ->em
+                ->getRepository('OroImapBundle:ImapEmail')
+                ->createQueryBuilder('ie');
+            $staleImapEmailsQb
+                ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
+                ->setParameter('imap_folder', $imapFolder);
 
-                    $staleImapEmailsQb = $this
-                        ->em
-                        ->getRepository('OroImapBundle:ImapEmail')
-                        ->createQueryBuilder('ie');
-                    $staleImapEmailsQb
-                        ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
-                        ->setParameter('imap_folder', $imapFolder);
+            if ($existingUids) {
+                $staleImapEmailsQb
+                    ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
+                    ->setParameter('uids', $existingUids);
+            }
 
-                    if ($existingUids) {
-                        $staleImapEmailsQb
-                            ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
-                            ->setParameter('uids', $existingUids);
-                    }
+            $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
+                ->setPageCallback(function () {
+                    $this->em->flush();
+                    $clearClass = [
+                        'Oro\Bundle\EmailBundle\Entity\Email',
+                        'Oro\Bundle\EmailBundle\Entity\EmailUser',
+                        'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
+                        'Oro\Bundle\ImapBundle\Entity\ImapEmail',
+                        'Oro\Bundle\EmailBundle\Entity\EmailBody',
+                    ];
 
-                    $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
-                        ->setPageCallback(function () {
-                            $this->em->flush();
-                            $this->em->clear();
-                        });
-
-                    /* @var $staleImapEmails ImapEmail[] */
-                    foreach ($staleImapEmails as $imapEmail) {
-                        $email = $imapEmail->getEmail();
-                        $email->getEmailUsers()
-                            ->forAll(function ($key, EmailUser $emailUser) use ($folder, $imapEmail) {
-                                $existsEmails = $this->em->getRepository('OroImapBundle:ImapEmail')
-                                    ->findBy(['email' => $imapEmail->getEmail()]);
-
-                                $emailUser->removeFolder($folder);
-                                // if existing imapEmail is last for current email or is absent
-                                // we remove emailUser and after that will remove last imapEmail and email
-                                if (count($existsEmails) <= 1 && !$emailUser->getFolders()->count()) {
-                                    $this->em->remove($emailUser);
-                                }
-                            });
-                        $this->em->remove($imapEmail);
+                    foreach ($clearClass as $item) {
+                        $this->em->clear($item);
                     }
                 });
-            } catch (UnselectableFolderException $e) {
-                $this->logger->info(
-                    sprintf('The folder "%s" cannot be selected for remove email and was skipped.', $folderName)
-                );
+
+            /* @var $staleImapEmails ImapEmail[] */
+            foreach ($staleImapEmails as $imapEmail) {
+                $email = $imapEmail->getEmail();
+                $email->getEmailUsers()
+                    ->forAll(function ($key, EmailUser $emailUser) use ($folder, $imapEmail) {
+                        $existsEmails = $this->em->getRepository('OroImapBundle:ImapEmail')
+                            ->findBy(['email' => $imapEmail->getEmail()]);
+
+                        $emailUser->removeFolder($folder);
+                        // if existing imapEmail is last for current email or is absent
+                        // we remove emailUser and after that will remove last imapEmail and email
+                        if (count($existsEmails) <= 1 && !$emailUser->getFolders()->count()) {
+                            $this->em->remove($emailUser);
+                        }
+                    });
+                $this->em->remove($imapEmail);
             }
-        }
+        });
     }
 
     /**
@@ -110,23 +107,27 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
         $imapFolders = $repo->getEmptyOutdatedFoldersByOrigin($origin);
         $folders     = new ArrayCollection();
 
+        /** @var ImapEmailFolder $imapFolder */
         foreach ($imapFolders as $imapFolder) {
-            $this->logger->info(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
+            $emailFolder = $imapFolder->getFolder();
+            if ($emailFolder->getSubFolders()->count() === 0) {
+                $this->logger->info(sprintf('Remove "%s" folder.', $emailFolder->getFullName()));
 
-            if (!$folders->contains($imapFolder->getFolder())) {
-                $folders->add($imapFolder->getFolder());
+                if (!$folders->contains($emailFolder)) {
+                    $folders->add($emailFolder);
+                }
+
+                $this->em->remove($imapFolder);
             }
-
-            $this->em->remove($imapFolder);
         }
 
         foreach ($folders as $folder) {
             $this->em->remove($folder);
         }
 
-        if (count($imapFolders) > 0) {
+        if (count($folders) > 0) {
             $this->em->flush();
-            $this->logger->info(sprintf('Removed %d folder(s).', count($imapFolders)));
+            $this->logger->info(sprintf('Removed %d folder(s).', count($folders)));
         }
     }
 

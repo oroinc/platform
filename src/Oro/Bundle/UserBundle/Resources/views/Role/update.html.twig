@@ -25,7 +25,8 @@
     {% set html = UI.saveAndCloseButton({
         'type': 'button',
         'class': 'btn-success role-submit',
-        'route': 'oro_user_role_index'
+        'route': 'oro_user_role_view',
+        'params': {'id': '$id'}
     }) %}
     {% if resource_granted('oro_user_role_create') %}
         {% set html = html ~ UI.saveAndNewButton({

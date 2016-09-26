@@ -62,7 +62,8 @@ define(function(require) {
 
         getModelUpdateData: function() {
             var data = {};
-            data[this.fieldName] = this.getValue() / 100;
+            var value = this.getValue();
+            data[this.fieldName] = isNaN(value) ? null : value / 100;
             return data;
         },
 

@@ -49,15 +49,16 @@ class Error
     /**
      * Creates an instance of Error class represents a violation of validation constraint.
      *
-     * @param string|Label      $title  A short, human-readable summary of the problem that should not change
-     *                                  from occurrence to occurrence of the problem.
-     * @param string|Label|null $detail A human-readable explanation specific to this occurrence of the problem
+     * @param string|Label      $title      A short, human-readable summary of the problem that should not change
+     *                                      from occurrence to occurrence of the problem.
+     * @param string|Label|null $detail     A human-readable explanation specific to this occurrence of the problem
+     * @param integer|null      $statusCode A status code should be returned for the error. Default value - 400
      *
      * @return Error
      */
-    public static function createValidationError($title, $detail = null)
+    public static function createValidationError($title, $detail = null, $statusCode = Response::HTTP_BAD_REQUEST)
     {
-        return self::create($title, $detail)->setStatusCode(Response::HTTP_BAD_REQUEST);
+        return self::create($title, $detail)->setStatusCode($statusCode);
     }
 
     /**

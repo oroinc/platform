@@ -4,5 +4,5 @@
     ><input type="checkbox" value="<%= selected_access_level %>"
         <% if (access_level === selected_access_level) { %> checked<% } %>>&nbsp;<%= label %></label>
 <% } else { %>
-<div<% if (description) {%> title="<%= description %>"<% } %> class="role-capability__item-label"><%= label %></div>
+<div<% if (description) {%> title="<%= description %>"<% } %> class="role-capability__item-label<% if (noAccess) { %> role-capability__item-label--no-access<% } %>"><%= label %></div>
 <% } %>

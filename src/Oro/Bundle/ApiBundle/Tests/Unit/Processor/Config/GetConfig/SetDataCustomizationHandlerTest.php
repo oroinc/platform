@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
@@ -311,126 +311,6 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
                     ['Test\Field2Target', true, $field2TargetEntityMetadata],
                     ['Test\Field22Target', true, $field22TargetEntityMetadata],
-                ]
-            );
-
-        /** @var EntityDefinitionConfig $configObject */
-        $configObject = $this->createConfigObject($config);
-        $this->context->setResult($configObject);
-        $this->processor->process($this->context);
-
-        $this->assertNotNull(
-            $configObject->getPostSerializeHandler()
-        );
-        $this->assertNull(
-            $configObject
-                ->getField('field1')
-                ->getTargetEntity()
-        );
-        $this->assertNotNull(
-            $configObject
-                ->getField('field2')
-                ->getTargetEntity()
-                ->getPostSerializeHandler()
-        );
-        $this->assertNull(
-            $configObject
-                ->getField('field2')
-                ->getTargetEntity()
-                ->getField('field21')
-                ->getTargetEntity()
-        );
-        $this->assertNotNull(
-            $configObject
-                ->getField('field2')
-                ->getTargetEntity()
-                ->getField('field22')
-                ->getTargetEntity()
-                ->getPostSerializeHandler()
-        );
-        $this->assertNull(
-            $configObject
-                ->getField('field2')
-                ->getTargetEntity()
-                ->getField('field22')
-                ->getTargetEntity()
-                ->getField('field221')
-                ->getTargetEntity()
-        );
-
-        $rootAssert    = $this->getRootHandlerAssertion($configObject);
-        $field2Assert  = $this->getChildHandlerAssertion(
-            $configObject,
-            $configObject->getField('field2')->getTargetEntity(),
-            'Test\Field2Target',
-            'field2'
-        );
-        $field22Assert = $this->getChildHandlerAssertion(
-            $configObject,
-            $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
-            'Test\Field22Target',
-            'field2.field22'
-        );
-        foreach ([$rootAssert, $field2Assert, $field22Assert] as $assert) {
-            $assert();
-        }
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testProcessForManageableEntityAndAssociationsWithPropertyPathToChildEntity()
-    {
-        $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'field1' => null,
-                'field2' => [
-                    'exclusion_policy' => 'all',
-                    'property_path'    => 'field22.field221',
-                    'fields'           => [
-                        'field21' => null,
-                        'field22' => [
-                            'exclusion_policy' => 'all',
-                            'fields'           => [
-                                'field221' => null
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-
-        $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
-        $field2TargetEntityMetadata->expects($this->any())
-            ->method('hasAssociation')
-            ->willReturnMap([['field22', true]]);
-        $field2TargetEntityMetadata->expects($this->any())
-            ->method('getAssociationTargetClass')
-            ->with('field22')
-            ->willReturn('Test\Field22Target');
-
-        $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(2))
-            ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata],
-                ]
-            );
-        $this->doctrineHelper->expects($this->once())
-            ->method('findEntityMetadataByPath')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, ['field22'], $field2TargetEntityMetadata],
                 ]
             );
 

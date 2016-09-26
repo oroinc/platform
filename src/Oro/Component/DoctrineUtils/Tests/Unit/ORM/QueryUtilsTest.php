@@ -2,13 +2,38 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\PhpUtils\ArrayUtil;
 
-class QueryUtilsTest extends \PHPUnit_Framework_TestCase
+class QueryUtilsTest extends OrmTestCase
 {
+    /** @var EntityManager */
+    protected $em;
+
+    public function setUp()
+    {
+        $reader         = new AnnotationReader();
+        $metadataDriver = new AnnotationDriver(
+            $reader,
+            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        );
+
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $this->em->getConfiguration()->setEntityNamespaces(
+            [
+                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+            ]
+        );
+    }
+
     public function testCreateResultSetMapping()
     {
         $platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
@@ -364,6 +389,238 @@ class QueryUtilsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($name . '_value'));
 
         return $parameter;
+    }
+
+    /**
+     * @dataProvider getDqlAliasesDataProvider
+     */
+    public function testGetDqlAliases(callable $dqlFactory, array $expectedAliases)
+    {
+        $this->assertEquals($expectedAliases, QueryUtils::getDqlAliases($dqlFactory($this->em)));
+    }
+
+    public function getDqlAliasesDataProvider()
+    {
+        return [
+            'query with fully qualified entity name' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.bestItem', 'i')
+                        ->getDQL();
+                },
+                ['p', 'i'],
+            ],
+            'query aliased entity name' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Test:Person', 'p')
+                        ->join('p.bestItem', 'i')
+                        ->getDQL();
+                },
+                ['p', 'i'],
+            ],
+            'query with subquery' => [
+                function (EntityManager $em) {
+                    $qb = $em->createQueryBuilder();
+
+                    return $qb
+                        ->select('p')
+                        ->from('Test:Person', 'p')
+                        ->join('p.bestItem', 'i')
+                        ->where(
+                            $qb->expr()->exists(
+                                $em->createQueryBuilder()
+                                    ->select('p2')
+                                    ->from('Test:Person', 'p2')
+                                    ->join('p2.groups', '_g2')
+                                    ->where('p2.id = p.id')
+                            )
+                        )
+                        ->getDQL();
+                },
+                ['p', 'i', 'p2', '_g2'],
+            ],
+            'query with newlines after aliases, AS keyword and case insensitive' => [
+                function () {
+                    return <<<DQL
+SELECT  p
+FROM  TestPerson  p
+JOIN  p.bestItem  AS  i
+WHERE EXISTS(
+    SELECT p2
+    FROM TestPerson  p2
+    join  p2.groups  _g2
+    WHERE  p2.id  =  p.id
+)
+DQL
+                    ;
+                },
+                ['p', 'i', 'p2', '_g2'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider replaceDqlAliasesProvider
+     */
+    public function testReplaceDqlAliases($dql, array $replacements, $expectedDql)
+    {
+        $this->assertEquals($expectedDql, QueryUtils::replaceDqlAliases($dql, $replacements));
+    }
+
+    public function replaceDqlAliasesProvider()
+    {
+        return [
+            [
+                <<<DQL
+SELECT eu.id
+FROM OroEmailBundle:EmailUser eu
+LEFT JOIN eu.email e
+LEFT JOIN eu.mailboxOwner mb
+LEFT JOIN e.recipients r_to
+LEFT JOIN eu.folders f
+LEFT JOIN f.origin o
+LEFT JOIN e.emailBody eb
+WHERE (EXISTS(
+    SELECT 1
+    FROM OroEmailBundle:EmailOrigin _eo
+    JOIN _eo.folders _f
+    JOIN _f.emailUsers _eu
+    WHERE _eo.isActive = true AND _eu.id = eu.id
+))
+AND e.head = true AND (eu.owner = :owner AND eu.organization  = :organization) AND e.subject LIKE :subject1027487935
+DQL
+                ,
+                [
+                    ['eu', 'eur'],
+                    ['e', 'er'],
+                    ['mb', 'mbr'],
+                    ['r_to', 'r_tor'],
+                    ['f', 'fr'],
+                    ['o', 'or'],
+                    ['eb', 'ebr'],
+                    ['_eo', '_eor'],
+                    ['_f', '_fr'],
+                    ['_eu', '_eur'],
+                ],
+                <<<DQL
+SELECT eur.id
+FROM OroEmailBundle:EmailUser eur
+LEFT JOIN eur.email er
+LEFT JOIN eur.mailboxOwner mbr
+LEFT JOIN er.recipients r_tor
+LEFT JOIN eur.folders fr
+LEFT JOIN fr.origin or
+LEFT JOIN er.emailBody ebr
+WHERE (EXISTS(
+    SELECT 1
+    FROM OroEmailBundle:EmailOrigin _eor
+    JOIN _eor.folders _fr
+    JOIN _fr.emailUsers _eur
+    WHERE _eor.isActive = true AND _eur.id = eur.id
+))
+AND er.head = true AND (eur.owner = :owner AND eur.organization  = :organization) AND er.subject LIKE :subject1027487935
+DQL
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getJoinClassDataProvider
+     */
+    public function testGetJoinClass(callable $qbFactory, $joinPath, $expectedClass)
+    {
+        $qb = $qbFactory($this->em);
+
+        $this->assertEquals(
+            $expectedClass,
+            QueryUtils::getJoinClass($qb, ArrayUtil::getIn($qb->getDqlPart('join'), $joinPath))
+        );
+    }
+
+    public function getJoinClassDataProvider()
+    {
+        return [
+            'field:manyToOne' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.bestItem', 'i');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+            'field:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.groups', 'g');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+            ],
+            'field:manyToMany.field:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('p.groups', 'g')
+                        ->join('g.items', 'i');
+                },
+                ['p', 1],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+            'class:manyToOne' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+            'class:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g');
+                },
+                ['p', 0],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+            ],
+            'class:manyToMany.class:manyToMany' => [
+                function (EntityManager $em) {
+                    return $em->createQueryBuilder()
+                        ->select('p')
+                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
+                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                },
+                ['p', 1],
+                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+            ],
+        ];
+    }
+
+    public function testFindJoinByAlias()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
+            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+
+        $this->assertNull(QueryUtils::findJoinByAlias($qb, 'p'));
+        $this->assertEquals('g', QueryUtils::findJoinByAlias($qb, 'g')->getAlias());
+        $this->assertEquals('i', QueryUtils::findJoinByAlias($qb, 'i')->getAlias());
+        $this->assertNull(QueryUtils::findJoinByAlias($qb, 'w'));
     }
 
     /**

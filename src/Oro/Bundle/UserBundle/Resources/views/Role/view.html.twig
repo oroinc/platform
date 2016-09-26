@@ -1,0 +1,106 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% oro_title_set({params : {"%label%": entity.label }}) %}
+
+{% set gridName = 'role-users-grid' %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_user_role_index'),
+        'indexLabel': 'oro.user.role.entity_plural_label'|trans,
+        'entityTitle': entity.label|default('N/A'|trans)
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block navButtonContainer %}
+    {% block navButtons %}
+        {% placeholder view_navButtons with {entity: entity} %}
+        {% if entity.id is defined and resource_granted('DELETE', entity) %}
+            {{ UI.deleteButton({
+                'dataUrl': path('oro_api_delete_role', {'id': entity.id}),
+                'dataRedirect': path('oro_user_role_index'),
+                'aCss': 'no-hash remove-button',
+                'dataId': entity.id,
+                'id': 'btn-remove-role',
+                'entity_label': 'oro.user.role.entity_label'|trans,
+                'disabled': not allow_delete
+            })
+            }}
+        {% endif %}
+    {% endblock navButtons %}
+{% endblock navButtonContainer %}
+
+{% block content_data %}
+    {% set dataBlocks = [
+        {
+            'title': 'General'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [
+                    UI.renderProperty('oro.user.role.role.label'|trans, entity.label)
+                ]}
+            ]
+        }
+    ] %}
+
+    {% set additionalBlock %}
+        {% if (entity.organization is defined) %}
+            {{ UI.renderHtmlProperty('oro.user.role.organization.label'|trans, entity.organization) }}
+        {% endif %}
+        {{ UI.renderHtmlProperty('oro.user.role.extend_description.label'|trans, entity.extendDescription) }}
+    {% endset %}
+
+    {% set rolePermissionsGrid %}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/entity-category-tabs-component',
+            options: tabsOptions
+        }) }}></div>
+        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: true} }) }}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/capability-set-component',
+            options: capabilitySetOptions
+        }) }}></div>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': 'Additional'|trans,
+        'subblocks': [{
+            'data': [
+                additionalBlock
+            ]
+        }]
+    }]) %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': 'Entity'|trans,
+        'subblocks': [{
+            'data': [
+                rolePermissionsGrid
+            ]
+        }]
+    }]) %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'oro.user.entity_plural_label'|trans,
+        'subblocks': [{
+            'title' : null,
+            'useSpan': false,
+            'data' : [
+                dataGrid.renderGrid(gridName, {role: entity.id}, { cssClass: 'inner-grid' })
+            ]
+        }]
+    }] ) %}
+
+    {% set id = 'user-role-view' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}
+
+{% block stats %}
+    {# Must be empty, because parent view uses this block to render dates, which are not implemented in this entity #}
+{% endblock stats %}

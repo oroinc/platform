@@ -128,6 +128,9 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 'association3' => [
                     'property_path' => 'realAssociation3'
                 ],
+                'association4' => [
+                    'exclude' => false
+                ],
             ]
         ];
 
@@ -193,13 +196,14 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                     'association3' => [
                         'property_path' => 'realAssociation3'
                     ],
+                    'association4' => null,
                 ]
             ],
             $this->context->getResult()
         );
     }
 
-    public function testProcessWhenTargetEntityDoesNotHaveApiResource()
+    public function testProcessWhenTargetEntityDoesNotHaveAccessibleApiResource()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -234,11 +238,8 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             );
         $this->resourcesProvider->expects($this->once())
             ->method('isResourceAccessible')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
-                ]
-            );
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -249,6 +250,119 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'association1' => [
                         'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForArrayAssociation()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'data_type' => 'array'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata],
+                ]
+            );
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceKnown')
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type' => 'array'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForArrayAssociationAndTargetEntityDoesNotHaveApiResource()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'data_type' => 'array'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata],
+                ]
+            );
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceKnown')
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type' => 'array',
+                        'exclude'   => true
                     ]
                 ]
             ],
@@ -293,11 +407,8 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             );
         $this->resourcesProvider->expects($this->once())
             ->method('isResourceAccessible')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
-                ]
-            );
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -313,7 +424,65 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenTargetEntityUsesTableInheritanceAndNoApiResourceForAnyConcreteTargetEntity()
+    public function testProcessForArrayAssociationWhenTargetEntityUsesTableInheritance()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'data_type' => 'array'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
+        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
+        $association1Metadata->subClasses      = ['Test\Association1Target1'];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata],
+                ]
+            );
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceKnown')
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type' => 'array'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWhenTargetEntityUsesTableInheritanceAndNoAccessibleApiResourceForAnyConcreteTarget()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -366,6 +535,69 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'association1' => [
                         'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForArrayAssociationAndTargetUsesTableInheritanceAndNoApiResourceForAnyConcreteTarget()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'data_type' => 'array'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['targetEntity' => 'Test\Association1Target']);
+
+        $association1Metadata                  = $this->getClassMetadataMock('Test\Association1Target');
+        $association1Metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
+        $association1Metadata->subClasses      = ['Test\Association1Target1'];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $association1Metadata],
+                ]
+            );
+        $this->resourcesProvider->expects($this->exactly(2))
+            ->method('isResourceKnown')
+            ->willReturnMap(
+                [
+                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
+                    ['Test\Association1Target1', $this->context->getVersion(), $this->context->getRequestType(), false],
+                ]
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type' => 'array',
+                        'exclude'   => true
                     ]
                 ]
             ],

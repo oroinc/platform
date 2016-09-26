@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
@@ -25,15 +26,15 @@ class TaggableDatagridExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['enable_tagging'] = $options['enable_tagging'];
+        BlockUtils::setViewVarsFromOptions($view, $options, ['enable_tagging']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         BlockUtils::registerPlugin($view, 'taggable_datagrid');
     }

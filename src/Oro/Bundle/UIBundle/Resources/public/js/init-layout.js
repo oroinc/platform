@@ -178,10 +178,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         });
 
-        $(document).on('focus', '.select2-focusser, .select2-input', function(e) {
-            $('.hasDatepicker').datepicker('hide');
-        });
-
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .dropup.open, .dropup .open, ' +
             '.oro-drop.open, .oro-drop .open';
         $('html')[0].addEventListener('click', function(e) {
@@ -197,7 +193,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }).not(clickingTarget).trigger('tohide.bs.dropdown');
         }, true);
 
-        $('#main-menu').mouseover(function() {
+        var mainMenu = $('#main-menu');
+        var activeDropdownsSelector = $(openDropdownsSelector.replace('open', 'active'), mainMenu);
+
+        // trigger refresh of current page if active dropdown is clicked, despite the Backbone router limitations
+        $('li.active', $(activeDropdownsSelector)).on('click', function() {
+            mediator.execute('refreshPage');
+        });
+
+        mainMenu.mouseover(function() {
             $(openDropdownsSelector).trigger('tohide.bs.dropdown');
         });
 
@@ -441,6 +445,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         });
         validateContainer($listContainer);
     });
+
+    //TODO: implement clone row
 
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();

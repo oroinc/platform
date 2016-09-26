@@ -11,13 +11,17 @@ use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
 
 class Configuration implements ConfigurationInterface
 {
+    const ROOT_NODE = 'oro_menu_config';
+    const NAVIGATION_ELEMENTS_NODE = 'oro_navigation_elements';
+
+
     /**
      * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_menu_config', 'array', new MenuTreeBuilder());
+        $rootNode = $treeBuilder->root(self::ROOT_NODE, 'array', new MenuTreeBuilder());
 
         $node = $rootNode->children();
         $this->setChildren($node);
@@ -47,7 +51,7 @@ class Configuration implements ConfigurationInterface
     protected function setChildren($node)
     {
         $node->
-            arrayNode('oro_navigation_elements')
+            arrayNode(self::NAVIGATION_ELEMENTS_NODE)
             ->useAttributeAsKey('id')
             ->prototype('array')
                 ->children()
@@ -152,6 +156,16 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ->end();
+
+        $node
+            ->arrayNode('areas')
+                ->useAttributeAsKey('id')
+                    ->prototype('array')
+                        ->requiresAtLeastOneElement()
+                        ->prototype('scalar')->end()
+                    ->end()
+                ->end()
+            ->end();
 
         return $this;
     }

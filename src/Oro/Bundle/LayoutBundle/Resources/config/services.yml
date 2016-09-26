@@ -115,6 +115,8 @@ services:
         class: Oro\Bundle\LayoutBundle\Assetic\LayoutResource
         arguments:
             - '@oro_layout.theme_manager'
+            - '@filesystem'
+            - "%kernel.root_dir%/../web/"
         tags:
             - { name: assetic.formula_resource, loader: layout }
 
@@ -156,6 +158,7 @@ services:
 
     oro_layout.layout_context_holder:
         class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder
+
     oro_layout.expression_language.cache:
         public: false
         parent: oro.cache.abstract

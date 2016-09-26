@@ -7,22 +7,15 @@ use Oro\Component\MessageQueue\Transport\QueueInterface;
 interface DriverInterface
 {
     /**
-     * @return MessageProducer
-     */
-    public function createProducer();
-
-    /**
      * @return MessageInterface
      */
-    public function createMessage();
+    public function createTransportMessage();
 
     /**
-     * @param MessageInterface $message
-     * @param int $priority
-     *
-     * @return void
+     * @param QueueInterface $queue
+     * @param Message $message
      */
-    public function setMessagePriority(MessageInterface $message, $priority);
+    public function send(QueueInterface $queue, Message $message);
 
     /**
      * @param string $queueName
@@ -30,15 +23,6 @@ interface DriverInterface
      * @return QueueInterface
      */
     public function createQueue($queueName);
-
-    /**
-     * @param QueueInterface   $queue
-     * @param MessageInterface $message
-     * @param int              $delaySec
-     *
-     * @return void
-     */
-    public function delayMessage(QueueInterface $queue, MessageInterface $message, $delaySec);
 
     /**
      * @return Config

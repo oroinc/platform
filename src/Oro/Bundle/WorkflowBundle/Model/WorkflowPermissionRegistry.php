@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclRepository;
@@ -39,20 +38,17 @@ class WorkflowPermissionRegistry
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
-
-    /** @var WorkflowManager */
-    protected $workflowManager;
+    /** @var WorkflowRegistry */
+    protected $workflowRegistry;
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param ConfigProvider $configProvider
+     * @param WorkflowRegistry $workflowRegistry
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigProvider $configProvider)
+    public function __construct(DoctrineHelper $doctrineHelper, WorkflowRegistry $workflowRegistry)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->configProvider = $configProvider;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     /**
@@ -70,9 +66,8 @@ class WorkflowPermissionRegistry
         foreach ($supportedClasses as $relatedClass => $supportedClass) {
             $support = in_array($class, $supportedClass, true);
             if ($activeWorkflows) {
-                $config = $this->configProvider->getConfig($relatedClass);
-
-                $support = $support && $config->get('active_workflows', false, false);
+                $support = $support && $this->workflowRegistry
+                        ->getActiveWorkflowsByEntityClass($relatedClass)->isEmpty() === false;
             }
 
             if ($support) {

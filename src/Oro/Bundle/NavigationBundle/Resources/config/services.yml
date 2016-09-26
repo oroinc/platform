@@ -68,9 +68,15 @@ services:
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
 
+    oro_menu_feature_extension:
+        class: 'Oro\Bundle\NavigationBundle\Menu\FeatureAwareMenuFactoryExtension'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+
     oro_menu.factory:
         class: %oro_menu.factory.class%
         calls:
+            - [ addExtension, [ '@oro_menu_feature_extension' ] ]
             - [ addExtension, [ '@oro_menu_acl_extension' ] ]
 
     oro_menu.builder_chain:
@@ -398,3 +404,18 @@ services:
             - '@oro_navigation.content.tag_generator_chain'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+
+    oro_navigation.menu_update.builder:
+        class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+        arguments:
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: oro_menu.builder }
+
+    oro_navigation.menu_update_provider.default:
+        class: Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_navigation.menu_update_provider, area: default }

@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Doctrine\Common\Cache\CacheProvider;
-
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class CacheClearCommand extends ContainerAwareCommand
 {
@@ -49,7 +47,7 @@ EOF
 
         $io->comment('Clearing the cache for entity aliases');
         /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
+        $entityAliasResolver = $this->getContainer()->get('oro_api.entity_alias_resolver');
         $entityAliasResolver->clearCache();
 
         $io->success('API cache was successfully cleared.');
