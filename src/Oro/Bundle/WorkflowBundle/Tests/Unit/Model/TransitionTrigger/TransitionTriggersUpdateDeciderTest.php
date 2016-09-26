@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider;
 
 class TransitionTriggersUpdateDeciderTest extends \PHPUnit_Framework_TestCase
@@ -39,10 +39,10 @@ class TransitionTriggersUpdateDeciderTest extends \PHPUnit_Framework_TestCase
      */
     public function decideData()
     {
-        $cron1type1 = (new TransitionTriggerCron())->setCron('* * * * *');
-        $cron2type2 = (new TransitionTriggerCron())->setCron('1 * * * *');
-        $cron3type2 = (new TransitionTriggerCron())->setCron('1 * * * *');
-        $event2type2 = (new TransitionTriggerEvent())->setEvent('update');
+        $cron1type1 = (new TransitionCronTrigger())->setCron('* * * * *');
+        $cron2type2 = (new TransitionCronTrigger())->setCron('1 * * * *');
+        $cron3type2 = (new TransitionCronTrigger())->setCron('1 * * * *');
+        $event2type2 = (new TransitionEventTrigger())->setEvent('update');
 
         return [
             'equal must be kept' => [

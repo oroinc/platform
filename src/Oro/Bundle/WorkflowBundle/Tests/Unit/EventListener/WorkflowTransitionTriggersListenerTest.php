@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerCron;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionTriggerEvent;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
@@ -58,8 +58,8 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new WorkflowChangesEvent($definition);
 
-        $trigger1 = new TransitionTriggerCron();
-        $trigger2 = new TransitionTriggerEvent();
+        $trigger1 = new TransitionCronTrigger();
+        $trigger2 = new TransitionEventTrigger();
         $this->assembler->expects($this->once())->method('assembleTriggers')->with($definition)->willReturn(
             [
                 $trigger1,

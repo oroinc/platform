@@ -1,9 +1,8 @@
 services:
     oro_workflow.async.transition_trigger_event_processor:
-        class: 'Oro\Bundle\WorkflowBundle\Async\TransitionTriggerEventProcessor'
+        class: 'Oro\Bundle\WorkflowBundle\Async\TransitionEventTriggerProcessor'
         arguments:
             - '@doctrine'
-            - '@oro_workflow.helper.transition_trigger_event'
             - '@oro_workflow.manager'
             - '@logger'
         tags:
