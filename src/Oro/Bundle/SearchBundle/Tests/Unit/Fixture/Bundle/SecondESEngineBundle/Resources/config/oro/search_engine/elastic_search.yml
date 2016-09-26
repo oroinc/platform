@@ -1,6 +1,0 @@
-services:
-    test_es_service:
-        class: 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'
-
-    test_es_second_bundle_service:
-        class: 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'

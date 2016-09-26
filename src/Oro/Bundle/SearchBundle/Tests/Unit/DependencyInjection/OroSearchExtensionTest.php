@@ -9,8 +9,8 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -241,8 +241,8 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadAllDefinedEngineConfigurationsForElasticEngine()
     {
-        $firstBundle = new FirstESEngineBundle();
-        $secondBundle = new SecondESEngineBundle();
+        $firstBundle = new FirstEngineBundle();
+        $secondBundle = new SecondEngineBundle();
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -253,7 +253,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $config = [
             'oro_search' => [
-                'engine' => 'elastic_search',
+                'engine' => 'other_engine',
             ]
         ];
 
@@ -263,25 +263,25 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedResourceFiles = [
             $this->getSearchBundleResource('services.yml'),
             $this->getSearchBundleResource('filters.yml'),
-            $this->getResourcePath('FirstESEngineBundle', 'elastic_search.yml'),
-            $this->getResourcePath('SecondESEngineBundle', 'elastic_search.yml')
+            $this->getResourcePath('FirstEngineBundle', 'other_engine.yml'),
+            $this->getResourcePath('SecondEngineBundle', 'other_engine.yml')
         ];
 
         $this->assertResourceFilesMatch($expectedResourceFiles);
 
         $this->assertServiceHasClass(
-            'test_es_service',
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'
+            'test_engine_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle'
         );
 
         $this->assertServiceHasClass(
-            'test_es_second_bundle_service',
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'
+            'test_engine_second_bundle_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle'
         );
 
         $this->assertServiceHasClass(
-            'test_es_first_bundle_service',
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle'
+            'test_engine_first_bundle_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle'
         );
 
         $this->assertFalse($this->container->has('test_orm_service'));
