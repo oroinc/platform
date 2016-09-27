@@ -16,11 +16,9 @@ class GridViewManagerStub extends GridViewManager
     }
 
     /**
-     * @param $user
-     * @param $gridName
-     * @return array
+     * {@inheritdoc}
      */
-    public function getAllGridViews($user, $gridName)
+    public function getAllGridViews(User $user = null, $gridName = null)
     {
         $currentUser = new User();
 

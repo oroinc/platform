@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class DumpCommand extends AbstractDebugCommand
 {
@@ -154,7 +155,8 @@ class DumpCommand extends AbstractDebugCommand
             );
             if ($isSubresourcesRequested) {
                 $subresourcesText = $this->getEntitySubresourcesText(
-                    $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType)
+                    $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType),
+                    $requestType
                 );
                 if ($subresourcesText) {
                     $output->writeln($subresourcesText);
@@ -165,17 +167,28 @@ class DumpCommand extends AbstractDebugCommand
 
     /**
      * @param ApiResourceSubresources $entitySubresources
+     * @param RequestType             $requestType
      *
      * @return string
      */
-    protected function getEntitySubresourcesText(ApiResourceSubresources $entitySubresources)
-    {
+    protected function getEntitySubresourcesText(
+        ApiResourceSubresources $entitySubresources,
+        $requestType
+    ) {
         $result = '';
         $subresources = $entitySubresources->getSubresources();
         if (!empty($subresources)) {
             $result .= ' Sub-resources:';
             foreach ($subresources as $associationName => $subresource) {
+                $targetEntityType = $this->resolveEntityType($subresource->getTargetClassName(), $requestType);
+                $acceptableTargetEntityTypes = [];
+                foreach ($subresource->getAcceptableTargetClassNames() as $className) {
+                    $acceptableTargetEntityTypes[] = $this->resolveEntityType($className, $requestType);
+                }
                 $result .= sprintf("\n  <comment>%s</comment>", $associationName);
+                $result .= "\n   Type: " . ($subresource->isCollection() ? 'to-many' : 'to-one');
+                $result .= "\n   Target: " . $targetEntityType;
+                $result .= "\n   Acceptable Targets: " . implode(', ', $acceptableTargetEntityTypes);
                 $subresourceExcludedActions = $subresource->getExcludedActions();
                 if (!empty($subresourceExcludedActions)) {
                     $result .= "\n   Excluded Actions: " . implode(', ', $subresourceExcludedActions);
@@ -233,5 +246,24 @@ class DumpCommand extends AbstractDebugCommand
         }
 
         return $result;
+    }
+
+    /**
+     * @param string|null $entityClass
+     * @param RequestType $requestType
+     *
+     * @return string|null
+     */
+    protected function resolveEntityType($entityClass, RequestType $requestType)
+    {
+        if (!$entityClass) {
+            return null;
+        }
+
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->getContainer()->get('oro_api.value_normalizer'),
+            $entityClass,
+            $requestType
+        );
     }
 }

@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+
+use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 
 class ApiExceptionListener extends ExceptionListener
 {
