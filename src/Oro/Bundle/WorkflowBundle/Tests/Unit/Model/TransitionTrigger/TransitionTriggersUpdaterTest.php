@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -29,6 +30,9 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
     /** @var TransitionTriggerCronScheduler|\PHPUnit_Framework_MockObject_MockObject */
     private $cronScheduler;
 
+    /** @var EventTriggerCache|\PHPUnit_Framework_MockObject_MockObject */
+    private $cache;
+
     protected function setUp()
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
@@ -37,10 +41,13 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->cache = $this->getMockBuilder(EventTriggerCache::class)->disableOriginalConstructor()->getMock();
+
         $this->updater = new TransitionTriggersUpdater(
             $this->doctrineHelper,
             $this->updateDecider,
-            $this->cronScheduler
+            $this->cronScheduler,
+            $this->cache
         );
     }
 
@@ -77,6 +84,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
 
         $em->expects($this->once())->method('flush');
         $this->cronScheduler->expects($this->once())->method('flush');
+        $this->cache->expects($this->once())->method('build');
 
         $this->updater->updateTriggers($triggersBag);
     }
@@ -104,6 +112,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
             ->willReturn([[], []]); //all abstain by decider
 
         //no em actions
+        $this->cache->expects($this->never())->method('build');
 
         $this->updater->updateTriggers($triggersBag);
     }
@@ -125,6 +134,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
         $this->cronScheduler->expects($this->once())->method('removeSchedule')->with($trigger);
         $em->expects($this->once())->method('flush');
         $this->cronScheduler->expects($this->once())->method('flush');
+        $this->cache->expects($this->once())->method('build');
 
         $this->updater->removeTriggers($definition);
     }
@@ -141,6 +151,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         //no em actions
+        $this->cache->expects($this->never())->method('build');
 
         $this->updater->removeTriggers($definition);
     }

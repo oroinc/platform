@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -24,19 +25,25 @@ class TransitionTriggersUpdater
     /** @var TransitionTriggerCronScheduler */
     private $cronScheduler;
 
+    /** @var EventTriggerCache */
+    private $cache;
+
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param TransitionTriggersUpdateDecider $decider
      * @param TransitionTriggerCronScheduler $cronScheduler
+     * @param EventTriggerCache $cache
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TransitionTriggersUpdateDecider $decider,
-        TransitionTriggerCronScheduler $cronScheduler
+        TransitionTriggerCronScheduler $cronScheduler,
+        EventTriggerCache $cache
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->updateDecider = $decider;
         $this->cronScheduler = $cronScheduler;
+        $this->cache = $cache;
     }
 
     /**
@@ -95,6 +102,7 @@ class TransitionTriggersUpdater
     {
         $this->getEntityManager()->flush();
         $this->cronScheduler->flush();
+        $this->cache->build();
     }
 
     /**

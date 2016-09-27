@@ -282,6 +282,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.transition_trigger.update_decider'
             - '@oro_workflow.transition_trigger.cron_scheduler'
+            - '@oro_workflow.cache.transition_trigger_event'
 
     oro_workflow.transition_trigger.trigger_cron_verifier:
         class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier'
