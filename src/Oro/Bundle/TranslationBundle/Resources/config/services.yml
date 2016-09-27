@@ -182,7 +182,7 @@ services:
         class: '%oro_translation.strategy.default.class%'
         public: false
         arguments:
-            - '@oro_config.global'
+            - '@oro_translation.provider.language'
             - '%installed%'
 
     oro_translation.strategy.provider:
@@ -200,9 +200,8 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-language-grid, method: onBuildBefore }
 
     oro_translation.repository.language:
-        class: Doctrine\ORM\EntityRepository
-        public: false
-        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        class: 'Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository'
+        parent: oro_entity.abstract_repository
         arguments:
             - '%oro_translation.entity.language.class%'
 

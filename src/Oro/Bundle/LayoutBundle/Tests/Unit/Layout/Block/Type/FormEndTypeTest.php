@@ -17,7 +17,7 @@ class FormEndTypeTest extends BlockTypeTestCase
         $this->assertEquals('form', $options['form_name']);
     }
 
-    public function testBuildView()
+    public function testGetBlockView()
     {
         $formName = 'test_form';
         $formView = new FormView();
@@ -32,17 +32,18 @@ class FormEndTypeTest extends BlockTypeTestCase
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormEndType::NAME,
-            ['form_name' => $formName]
+            ['form_name' => $formName, 'render_rest' => true]
         );
 
         $this->assertSame($formView, $view->vars['form']);
+        $this->assertTrue($view->vars['render_rest']);
     }
 
     /**
      * @expectedException \OutOfBoundsException
      * @expectedExceptionMessage Undefined index: test_form.
      */
-    public function testBuildViewWithoutForm()
+    public function testGetBlockViewViewWithoutForm()
     {
         $this->getBlockView(
             FormEndType::NAME,
@@ -56,7 +57,7 @@ class FormEndTypeTest extends BlockTypeTestCase
      * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface", "integer" given.
      */
     // @codingStandardsIgnoreEnd
-    public function testBuildViewWithInvalidForm()
+    public function testGetBlockViewViewWithInvalidForm()
     {
         $formName = 'test_form';
 

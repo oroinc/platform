@@ -1,0 +1,4 @@
+assets:
+    css:
+      'orowindows':
+          - 'bundles/orowindows/css/jquery.dialog.extended.css'

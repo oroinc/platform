@@ -1,0 +1,4 @@
+assets:
+    css:
+        'orocomment':
+            - 'bundles/orocomment/css/less/comment.less'

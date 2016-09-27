@@ -76,7 +76,7 @@ class FieldAccessor
             }
             $fieldConfigs = $config->getFields();
             foreach ($fieldConfigs as $field => $fieldConfig) {
-                if (ConfigUtil::isMetadataProperty($fieldConfig->getPropertyPath() ?: $field)) {
+                if (ConfigUtil::isMetadataProperty($fieldConfig->getPropertyPath($field))) {
                     $result[] = $field;
                 }
             }

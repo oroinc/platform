@@ -3,3 +3,6 @@ oro_entity:
         Oro\Bundle\NavigationBundle\Entity\Title:
             alias:        pagetitle
             plural_alias: pagetitles
+        Oro\Bundle\NavigationBundle\Entity\MenuUpdate:
+            alias:        defaultmenuupdate
+            plural_alias: defaultmenuupdates
