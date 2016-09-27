@@ -149,9 +149,9 @@ class EmailFolder
     /**
      * @var integer
      *
-     * @ORM\Column(name="failed_count", type="integer")
+     * @ORM\Column(name="failed_count", type="integer", nullable=true)
      */
-    private $failedCount = 0;
+    protected $failedCount = 0;
 
     public function __construct()
     {
