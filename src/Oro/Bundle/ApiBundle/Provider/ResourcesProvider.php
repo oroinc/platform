@@ -29,7 +29,7 @@ class ResourcesProvider
     }
 
     /**
-     * Gets all resources available through a given Data API version.
+     * Gets a configuration of all resources for a given Data API version.
      *
      * @param string      $version     The Data API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
@@ -51,31 +51,87 @@ class ResourcesProvider
         $this->processor->process($context);
 
         $resources = array_values($context->getResult()->toArray());
-        $this->resourcesCache->saveResources($version, $requestType, $resources);
+        $this->resourcesCache->saveResources(
+            $version,
+            $requestType,
+            $resources,
+            $context->getAccessibleResources()
+        );
 
         return $resources;
     }
 
     /**
-     * Checks whether a given entity type is accessible through Data API.
+     * Gets a list of resources accessible through Data API.
      *
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return string[] The list of class names
+     */
+    public function getAccessibleResources($version, RequestType $requestType)
+    {
+        $result = [];
+        $accessibleResources = $this->loadAccessibleResources($version, $requestType);
+        foreach ($accessibleResources as $entityClass => $isAccessible) {
+            if ($isAccessible) {
+                $result[] = $entityClass;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Checks whether a given entity is accessible through Data API.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool
      */
     public function isResourceAccessible($entityClass, $version, RequestType $requestType)
     {
+        $accessibleResources = $this->loadAccessibleResources($version, $requestType);
+
+        return
+            array_key_exists($entityClass, $accessibleResources)
+            && $accessibleResources[$entityClass];
+    }
+
+    /**
+     * Checks whether a given entity is configured to be used in Data API.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return bool
+     */
+    public function isResourceKnown($entityClass, $version, RequestType $requestType)
+    {
+        $accessibleResources = $this->loadAccessibleResources($version, $requestType);
+
+        return array_key_exists($entityClass, $accessibleResources);
+    }
+
+    /**
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return array [entity class => accessible flag]
+     */
+    protected function loadAccessibleResources($version, RequestType $requestType)
+    {
         if (null === $this->accessibleResources) {
-            $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
-            if (null === $accessibleResources) {
+            $this->accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
+            if (null === $this->accessibleResources) {
                 $this->getResources($version, $requestType);
-                $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
+                $this->accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
             }
-            $this->accessibleResources = array_fill_keys($accessibleResources, true);
         }
 
-        return isset($this->accessibleResources[$entityClass]);
+        return $this->accessibleResources;
     }
 }

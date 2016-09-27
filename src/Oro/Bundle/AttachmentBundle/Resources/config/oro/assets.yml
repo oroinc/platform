@@ -1,0 +1,4 @@
+assets:
+    css:
+        'oroattachment':
+            - 'bundles/oroattachment/css/attachment.less'

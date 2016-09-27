@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\StringUtil;
 
 class ReflectionUtil
@@ -51,6 +52,31 @@ class ReflectionUtil
         }
 
         return null;
+    }
+
+    /**
+     * Removes all errors of the given form.
+     *
+     * @param FormInterface $form The form
+     * @param bool          $deep Whether to clear errors of child forms as well
+     */
+    public static function clearFormErrors(FormInterface $form, $deep = false)
+    {
+        if (count($form->getErrors()) > 0) {
+            $clearClosure = \Closure::bind(
+                function (FormInterface $form) {
+                    $form->errors = [];
+                },
+                null,
+                $form
+            );
+            $clearClosure($form);
+        }
+        if ($deep) {
+            foreach ($form as $childForm) {
+                self::clearFormErrors($childForm);
+            }
+        }
     }
 
     /**

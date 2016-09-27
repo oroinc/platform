@@ -24,7 +24,6 @@ class ExpressionContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertTrue($context['expressions_evaluate']);
-        $this->assertFalse($context['expressions_evaluate_deferred']);
         $this->assertFalse(isset($context['expressions_encoding']));
     }
 
@@ -33,14 +32,12 @@ class ExpressionContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context = new LayoutContext();
 
         $context['expressions_evaluate'] = false;
-        $context['expressions_evaluate_deferred'] = true;
         $context['expressions_encoding'] = 'json';
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
         $this->assertFalse($context['expressions_evaluate']);
-        $this->assertTrue($context['expressions_evaluate_deferred']);
         $this->assertEquals('json', $context['expressions_encoding']);
     }
 }
