@@ -4,16 +4,14 @@ namespace Oro\Bundle\SecurityBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Doctrine\ORM\EntityManager;
-use JMS\JobQueueBundle\Entity\Job;
-
+use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Command\ReindexCommand;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
@@ -51,7 +49,7 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
             return;
         }
 
-        $searchResult = $this->container->get('oro_search.index')->advancedSearch(
+        $searchResult = $this->getIndexer()->advancedSearch(
             sprintf(
                 'from oro_user where username ~ %s and integer oro_user_owner = %d',
                 $user->getUsername(),
@@ -64,46 +62,32 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
             return;
         }
 
-        /** @var ObjectMapper $searchObjectMapper */
-        $searchObjectMapper = $this->container->get('oro_search.mapper');
+        $searchObjectMapper = $this->getSearchMapper();
 
-        $entityClasses = $searchObjectMapper->getEntities();
-        foreach ($entityClasses as $entityClass) {
-            $countQuery = $em->createQueryBuilder()
-                ->select('count(entity)')
-                ->from($entityClass, 'entity');
+        $this->getProducer()->send(Topics::REINDEX, $searchObjectMapper->getEntities());
+    }
 
-            $count = $countQuery->getQuery()->getSingleScalarResult();
-            if ($count > self::INDEXATION_LIMIT) {
-                $jobsCount = ceil($count / self::INDEXATION_LIMIT);
-                for ($i = 0; $i < $jobsCount; $i++) {
-                    $offset = $i * self::INDEXATION_LIMIT;
-                    $job    = new Job(
-                        ReindexCommand::COMMAND_NAME,
-                        [
-                            $entityClass,
-                            $offset,
-                            self::INDEXATION_LIMIT,
-                            '-v'
-                        ],
-                        true,
-                        JOB::DEFAULT_QUEUE,
-                        $i == 0 ? JOB::PRIORITY_HIGH : JOB::PRIORITY_LOW
-                    );
-                    $em->persist($job);
-                }
-            } else {
-                $job = new Job(
-                    ReindexCommand::COMMAND_NAME,
-                    [$entityClass, '-v'],
-                    true,
-                    JOB::DEFAULT_QUEUE,
-                    JOB::PRIORITY_HIGH
-                );
-                $em->persist($job);
-            }
-        }
+    /**
+     * @return ObjectMapper
+     */
+    private function getSearchMapper()
+    {
+        return $this->container->get('oro_search.mapper');
+    }
 
-        $em->flush();
+    /**
+     * @return Indexer
+     */
+    private function getIndexer()
+    {
+        return $this->container->get('oro_search.index');
+    }
+
+    /**
+     * @return MessageProducerInterface
+     */
+    private function getProducer()
+    {
+        return $this->container->get('oro_message_queue.client.message_producer');
     }
 }
