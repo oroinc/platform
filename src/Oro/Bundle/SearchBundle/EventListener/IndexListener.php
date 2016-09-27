@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
