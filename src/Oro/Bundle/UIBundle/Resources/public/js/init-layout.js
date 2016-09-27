@@ -193,7 +193,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }).not(clickingTarget).trigger('tohide.bs.dropdown');
         }, true);
 
-        $('#main-menu').mouseover(function() {
+        var mainMenu = $('#main-menu');
+        var activeDropdownsSelector = $(openDropdownsSelector.replace('open', 'active'), mainMenu);
+
+        // trigger refresh of current page if active dropdown is clicked, despite the Backbone router limitations
+        $('li.active', $(activeDropdownsSelector)).on('click', function() {
+            mediator.execute('refreshPage');
+        });
+
+        mainMenu.mouseover(function() {
             $(openDropdownsSelector).trigger('tohide.bs.dropdown');
         });
 

@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
@@ -35,7 +36,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $normalizers,
             new DoctrineHelper($doctrine),
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
+            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface')),
+            new ConfigNormalizer()
         );
 
         $normalizers->addNormalizer(
@@ -733,6 +735,118 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeShouldNotChangeOriginalConfig()
+    {
+        $object = new Object\Group();
+        $object->setId(123);
+        $object->setName('test_name');
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'name' => [
+                    'depends_on' => ['id']
+                ]
+            ]
+        ];
+
+        $configObject = $this->createConfigObject($config);
+        $srcConfig = $configObject->toArray();
+        $this->objectNormalizer->normalizeObject($object, $configObject);
+
+        $this->assertEquals($srcConfig, $configObject->toArray());
+    }
+
+    public function testNormalizeWithIgnoredField()
+    {
+        $object = new Object\Group();
+        $object->setId(123);
+        $object->setName('test_name');
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'    => null,
+                'name1' => [
+                    'property_path' => '_'
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id' => 123,
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeWithDependsOnNotConfiguredField()
+    {
+        $object = new Object\Group();
+        $object->setId(123);
+        $object->setName('test_name');
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'name' => [
+                    'depends_on' => ['id']
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'   => 123,
+                'name' => 'test_name',
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeWithDependsOnExcludedField()
+    {
+        $object = new Object\Group();
+        $object->setId(123);
+        $object->setName('test_name');
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'   => [
+                    'exclude' => true
+                ],
+                'name' => [
+                    'depends_on' => ['id']
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'   => 123,
+                'name' => 'test_name',
             ],
             $result
         );

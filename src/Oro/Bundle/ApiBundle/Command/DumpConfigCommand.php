@@ -186,11 +186,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         $config = $configProvider->getConfig($entityClass, $version, $requestType, $extras);
 
         return [
-            'oro_api' => [
-                'entities' => [
-                    $entityClass => $this->convertConfigToArray($config)
-                ]
-            ]
+            $entityClass => $this->convertConfigToArray($config)
         ];
     }
 
@@ -210,11 +206,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         $config = $configProvider->getRelationConfig($entityClass, $version, $requestType, $extras);
 
         return [
-            'oro_api' => [
-                'relations' => [
-                    $entityClass => $this->convertConfigToArray($config)
-                ]
-            ]
+            $entityClass => $this->convertConfigToArray($config)
         ];
     }
 

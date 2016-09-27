@@ -27,6 +27,9 @@ class AssociationMetadata implements ToArrayInterface
     /** @var bool */
     protected $nullable = false;
 
+    /** @var bool */
+    protected $collapsed = false;
+
     /** @var EntityMetadata|null */
     private $targetMetadata;
 
@@ -55,24 +58,19 @@ class AssociationMetadata implements ToArrayInterface
      */
     public function toArray()
     {
-        $result = ['name' => $this->name];
-        if ($this->dataType) {
-            $result['data_type'] = $this->dataType;
-        }
+        $result = [
+            'name' => $this->name,
+            'data_type'        => $this->dataType,
+            'nullable'         => $this->nullable,
+            'collapsed'        => $this->collapsed,
+            'association_type' => $this->associationType,
+            'collection'       => $this->collection
+        ];
         if ($this->targetClass) {
             $result['target_class'] = $this->targetClass;
         }
         if ($this->acceptableTargetClasses) {
             $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
-        }
-        if ($this->associationType) {
-            $result['association_type'] = $this->associationType;
-        }
-        if ($this->collection) {
-            $result['collection'] = $this->collection;
-        }
-        if ($this->nullable) {
-            $result['nullable'] = $this->nullable;
         }
         if (null !== $this->targetMetadata) {
             $result['target_metadata'] = $this->targetMetadata->toArray();
@@ -269,5 +267,25 @@ class AssociationMetadata implements ToArrayInterface
     public function setIsNullable($value)
     {
         $this->nullable = $value;
+    }
+
+    /**
+     * Indicates whether the association should be collapsed to a scalar.
+     *
+     * @return bool
+     */
+    public function isCollapsed()
+    {
+        return $this->collapsed;
+    }
+
+    /**
+     * Sets a flag indicates whether the association should be collapsed to a scalar.
+     *
+     * @param bool $collapsed
+     */
+    public function setCollapsed($collapsed = true)
+    {
+        $this->collapsed = $collapsed;
     }
 }
