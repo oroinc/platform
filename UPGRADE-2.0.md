@@ -256,6 +256,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 throws `\RuntimeException` if cache initialization failed. Make sure you don't autoload extended entity classes during container compilation.
 - `cache_warmer` is decorated to allow disable cache warming during extend commands calls. Tag your warmer with `oro_entity_extend.warmer`
 tag if it works with extend classes
+- Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. It accepts `Oro\Bundle\SearchBundle\Provider\SearchMappingProvider` and `Oro\Component\MessageQueue\Client\MessageProducerInterface` as params instead of `Doctrine\Common\Persistence\ManagerRegistry` and `Oro\Bundle\SearchBundle\Provider\SearchMappingProvider`.
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
