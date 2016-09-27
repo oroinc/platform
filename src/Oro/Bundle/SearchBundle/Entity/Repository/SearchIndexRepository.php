@@ -25,7 +25,7 @@ class SearchIndexRepository extends EntityRepository
     protected $driverRepo;
 
     /**
-     * @var BaseDriver[]
+     * @var array
      */
     protected $drivers;
 
