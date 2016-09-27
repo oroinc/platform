@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
@@ -51,7 +52,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
         $view->vars['attr']['class'] = $classAttr;
 
         $context['expressions_evaluate'] = true;
-        $this->extension->finishView($view, $block, []);
+        $this->extension->finishView($view, $block, new Options());
 
         $this->assertEquals('test_class', $view->vars['attr']['class']);
     }
@@ -72,7 +73,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
         $view->vars['attr']['class'] = $classAttr;
 
         $context['expressions_evaluate'] = true;
-        $this->extension->finishView($view, $block, []);
+        $this->extension->finishView($view, $block, new Options());
 
         $this->assertArrayNotHasKey('class', $view->vars['attr']);
     }
@@ -93,7 +94,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
         $view->vars['attr']['class'] = $classAttr;
 
         $context['expressions_evaluate'] = false;
-        $this->extension->finishView($view, $block, []);
+        $this->extension->finishView($view, $block, new Options());
 
         $this->assertSame($classAttr, $view->vars['attr']['class']);
     }
@@ -115,7 +116,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $context['expressions_evaluate'] = false;
         $context['expressions_encoding'] = 'json';
-        $this->extension->finishView($view, $block, []);
+        $this->extension->finishView($view, $block, new Options());
 
         $this->assertEquals('{"@actions":[{"name":"add","args":["test_class"]}]}', $view->vars['attr']['class']);
     }
@@ -134,7 +135,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $context['expressions_evaluate'] = false;
         $context['expressions_encoding'] = 'json';
-        $this->extension->finishView($view, $block, []);
+        $this->extension->finishView($view, $block, new Options());
 
         $this->assertArrayNotHasKey('class', $view->vars['attr']);
     }

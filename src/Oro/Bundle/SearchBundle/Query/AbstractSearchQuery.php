@@ -189,4 +189,20 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         return $this->query->getSelectAliases();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSelect()
+    {
+        return $this->query->getSelect();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSelectDataFields()
+    {
+        return $this->query->getSelectDataFields();
+    }
 }

@@ -4,12 +4,16 @@ namespace Oro\Bundle\ApiBundle\Filter;
 
 interface FilterFactoryInterface
 {
+    /** use this option in case if the filter type does not equal to the data type */
+    const DATA_TYPE_OPTION = 'data_type';
+
     /**
-     * Creates a filter for the given data-type.
+     * Creates a new instance of filter.
      *
-     * @param string $dataType
+     * @param string $filterType The type of a filter.
+     * @param array  $options    The filter options.
      *
      * @return StandaloneFilter|null
      */
-    public function createFilter($dataType);
+    public function createFilter($filterType, array $options = []);
 }

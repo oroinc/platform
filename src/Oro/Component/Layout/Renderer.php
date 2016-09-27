@@ -195,7 +195,7 @@ class Renderer implements FormRendererInterface
         // Escape if no resource exists for this block
         if (!$resource) {
             throw new \LogicException(sprintf(
-                'Unable to render the form as none of the following blocks exist: "%s".',
+                'Unable to render the layout as none of the following blocks exist: "%s".',
                 implode('", "', array_reverse($blockNameHierarchy))
             ));
         }
