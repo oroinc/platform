@@ -121,8 +121,11 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
     protected function processMessage(TransitionEventTrigger $trigger, $entity)
     {
         $mainEntity = $this->helper->getMainEntity($trigger, $entity);
-        $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $trigger->getWorkflowName());
+        if (!is_object($mainEntity)) {
+            return;
+        }
 
+        $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $trigger->getWorkflowName());
         if (!$workflowItem) {
             return;
         }

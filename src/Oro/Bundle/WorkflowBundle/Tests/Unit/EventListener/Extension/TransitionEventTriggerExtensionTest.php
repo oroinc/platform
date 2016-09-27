@@ -257,10 +257,11 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->prepareTriggerCache($entityClass, EventTriggerInterface::EVENT_CREATE);
 
         $this->helper->expects($this->any())->method('isRequirePass')->willReturn(true);
+        $this->helper->expects($this->any())->method('getMainEntity')->willReturn($entity);
 
-        $this->workflowManager->expects($this->once())->method('getWorkflowItem')->willReturn(null);
-
+        $this->workflowManager->expects($this->any())->method('getWorkflowItem')->willReturn(null);
         $this->workflowManager->expects($this->never())->method('transitIfAllowed');
+
         $this->producer->expects($this->never())->method('send');
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);

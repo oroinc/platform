@@ -84,10 +84,17 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Can't get main entity using relation "mainEntity"
-     */
+    public function testIsRequirePassWrongEntity()
+    {
+        $entity = new \stdClass();
+        $entity->testField2 = 'test value';
+        $entity->mainEntity = null;
+
+        $this->trigger->setRequire('mainEntity.field')->setRelation('mainEntity');
+
+        $this->assertFalse($this->helper->isRequirePass($this->trigger, $entity));
+    }
+
     public function testGetMainEntityWrongEntity()
     {
         $entity = new \stdClass();
@@ -98,6 +105,6 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
             ->setRequire('testField2 == "test value 2"')
             ->setRelation('mainEntity');
 
-        $this->helper->getMainEntity($this->trigger, $entity);
+        $this->assertNull($this->helper->getMainEntity($this->trigger, $entity));
     }
 }

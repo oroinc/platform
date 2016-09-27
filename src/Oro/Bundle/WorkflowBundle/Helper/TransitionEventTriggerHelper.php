@@ -41,7 +41,16 @@ class TransitionEventTriggerHelper
 
         $expressionLanguage = new ExpressionLanguage();
 
-        $result = $expressionLanguage->evaluate($require, $this->getExpressionValues($trigger, $entity));
+        $result = $expressionLanguage->evaluate(
+            implode(
+                ' and ',
+                [
+                    self::TRIGGER_WORKFLOW_ENTITY . '!== null',
+                    $require
+                ]
+            ),
+            $this->getExpressionValues($trigger, $entity)
+        );
 
         return !empty($result);
     }
@@ -49,7 +58,7 @@ class TransitionEventTriggerHelper
     /**
      * @param TransitionEventTrigger $trigger
      * @param object $entity
-     * @return object
+     * @return object|null
      */
     public function getMainEntity(TransitionEventTrigger $trigger, $entity)
     {
@@ -62,11 +71,9 @@ class TransitionEventTriggerHelper
             $mainEntity = $entity;
         }
 
-        $workflowDefinition = $trigger->getWorkflowDefinition();
-
-        $mainEntityClass = $workflowDefinition->getRelatedEntity();
+        $mainEntityClass = $trigger->getWorkflowDefinition()->getRelatedEntity();
         if (!$mainEntity instanceof $mainEntityClass) {
-            throw new \RuntimeException(sprintf('Can\'t get main entity using relation "%s"', $relation));
+            $mainEntity = null;
         }
 
         return $mainEntity;
