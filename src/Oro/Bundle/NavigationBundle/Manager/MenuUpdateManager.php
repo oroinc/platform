@@ -140,18 +140,56 @@ class MenuUpdateManager
      */
     private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $ownershipType)
     {
-        $options = [
-            'ignoreCache' => true,
-            'ownershipType' => $ownershipType
-        ];
-        $menu = $this->getMenu($menuName, $options);
-        $item = $this->menuUpdateHelper->findMenuItem($menu, $key);
+        $item = $this->findMenuItem($menuName, $key, $ownershipType);
 
         if ($item) {
-            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menu->getName());
+            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menuName);
         }
 
         return $update;
+    }
+
+    /**
+     * @param string $menuName
+     * @param ItemInterface[] $orderedChildren
+     * @param int $ownershipType
+     * @param int $ownerId
+     */
+    public function reorderMenuUpdate($menuName, $orderedChildren, $ownershipType, $ownerId)
+    {
+        $order = [];
+        foreach ($orderedChildren as $priority => $child) {
+            $order[$child->getName()] = $priority;
+        }
+        
+        /** @var MenuUpdateInterface[] $updates */
+        $updates = $this->getRepository()->findBy([
+            'menu' => $menuName,
+            'key' => array_keys($order),
+            'ownershipType' => $ownershipType,
+            'ownerId' => $ownerId,
+        ]);
+        
+        foreach ($updates as $update) {
+            $update->setPriority($order[$update->getKey()]);
+            $this->getEntityManager()->persist($update);
+
+            unset($orderedChildren[$order[$update->getKey()]]);
+        }
+
+        foreach ($orderedChildren as $priority => $child) {
+            $update = $this->createMenuUpdate($ownershipType, $ownerId);
+            $update->setKey($child->getName());
+            $update->setMenu($menuName);
+            $parentKey = $child->getParent()->getName();
+            $update->setParentKey($parentKey != $menuName ? $parentKey : null);
+            $update->setPriority($priority);
+
+            $this->getEntityManager()->persist($update);
+            $updates[] = $update;
+        }
+
+        $this->getEntityManager()->flush($updates);
     }
 
     /**
@@ -163,6 +201,24 @@ class MenuUpdateManager
     public function getMenu($name, $options = [])
     {
         return $this->builderChainProvider->get($name, $options);
+    }
+
+    /**
+     * @param string $menuName
+     * @param string $key
+     * @param int $ownershipType
+     *
+     * @return ItemInterface|null
+     */
+    public function findMenuItem($menuName, $key, $ownershipType)
+    {
+        $options = [
+            'ignoreCache' => true,
+            'ownershipType' => $ownershipType
+        ];
+        $menu = $this->getMenu($menuName, $options);
+
+        return $this->menuUpdateHelper->findMenuItem($menu, $key);
     }
 
     /**

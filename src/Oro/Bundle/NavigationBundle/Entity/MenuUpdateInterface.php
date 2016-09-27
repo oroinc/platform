@@ -9,8 +9,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 interface MenuUpdateInterface
 {
-    const OWNERSHIP_GLOBAL        = 1;
-    const OWNERSHIP_ORGANIZATION  = 2;
+    const OWNERSHIP_ORGANIZATION  = 1;
 
     /**
      * @return int

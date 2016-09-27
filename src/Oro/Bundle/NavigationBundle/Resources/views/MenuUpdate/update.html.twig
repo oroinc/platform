@@ -124,9 +124,11 @@
             {% set treeOptions = {
                 'data' : tree,
                 'menu' : menuName,
+                'ownershipType' : ownershipType,
                 'updateAllowed' : true,
                 'onRootSelectRoute' : routePrefix ~ 'view',
-                'onSelectRoute' : routePrefix ~ 'update'
+                'onSelectRoute' : routePrefix ~ 'update',
+                'onMoveRoute' : 'oro_api_move_menuupdates'
             } %}
             <div
                     data-page-component-module="oronavigation/js/app/components/tree-manage-component"

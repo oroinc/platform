@@ -20,12 +20,8 @@ class MenuUpdateRepository extends EntityRepository
     public function getMenuUpdates($menu, Organization $organization = null, User $user = null)
     {
         $qb = $this->createQueryBuilder('mu');
-        $exprs = [
-            $qb->expr()->andX(
-                $qb->expr()->eq('mu.ownershipType', MenuUpdate::OWNERSHIP_GLOBAL),
-                $qb->expr()->isNull('mu.ownerId')
-            )
-        ];
+        $exprs = [];
+
         if ($organization !== null) {
             $exprs[] = $qb->expr()->andX(
                 $qb->expr()->eq('mu.ownershipType', MenuUpdate::OWNERSHIP_ORGANIZATION),

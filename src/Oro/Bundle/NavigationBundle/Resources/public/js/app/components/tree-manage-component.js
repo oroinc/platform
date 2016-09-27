@@ -20,12 +20,18 @@ define(function(require) {
         menu: '',
 
         /**
+         * @property {Number}
+         */
+        ownershipType: 0,
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {
             TreeManageComponent.__super__.initialize.call(this, options);
 
             this.menu = options.menu;
+            this.ownershipType = options.ownershipType;
         },
 
         /**
@@ -49,6 +55,43 @@ define(function(require) {
             }
             mediator.execute('redirectTo', {url: routing.generate(route, routeParams)});
         },
+
+        /**
+         * Triggers after node move
+         *
+         * @param {Object} e
+         * @param {Object} data
+         */
+        onMove: function(e, data) {
+            if (this.moveTriggered) {
+                return;
+            }
+
+            var self = this;
+            $.ajax({
+                async: false,
+                type: 'PUT',
+                url: routing.generate(self.onMoveRoute, {ownershipType: this.ownershipType, menuName: this.menu}),
+                data: {
+                    key: data.node.id,
+                    parentKey: data.parent,
+                    position: data.position
+                },
+                success: function(result) {
+                    if (!result.status) {
+                        self.rollback(data);
+                        messenger.notificationFlashMessage(
+                            'error',
+                            __('oro.ui.jstree.move_node_error', {nodeText: data.node.text})
+                        );
+                    } else if (self.reloadWidget) {
+                        widgetManager.getWidgetInstanceByAlias(self.reloadWidget, function(widget) {
+                            widget.render();
+                        });
+                    }
+                }
+            });
+        }
     });
 
     return TreeManageComponent;
