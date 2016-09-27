@@ -150,6 +150,8 @@ class ContextsExtension extends AbstractExtension
 
         $items = $this->activityManager
             ->getActivityTargetsQueryBuilder($entityClassName, $criteria)
+            ->addOrderBy('entity', 'ASC')
+            ->addOrderBy('title', 'ASC')
             ->getQuery()
             ->getArrayResult();
 

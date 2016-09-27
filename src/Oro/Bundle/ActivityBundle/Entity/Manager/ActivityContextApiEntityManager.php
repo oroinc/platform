@@ -125,6 +125,18 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $result[] = $item;
         }
 
+        // sort list by class name (group the same classes) and then by title
+        usort(
+            $result,
+            function ($a, $b) {
+                if ($a['targetClassName'] . $a['title'] <= $b['targetClassName'] . $b['title']){
+                    return -1;
+                }
+
+                return 1;
+            }
+        );
+
         return $result;
     }
 
