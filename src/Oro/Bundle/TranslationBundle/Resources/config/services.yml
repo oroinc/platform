@@ -229,11 +229,6 @@ services:
             - '@oro_translation.service_provider'
             - '@oro_config.global'
 
-    oro_translation.form.type.import:
-        class: 'Oro\Bundle\TranslationBundle\Form\Type\TranslationImportType'
-        tags:
-            - { name: form.type, alias: oro_translation_import }
-
     oro_translation.manager.translation:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
         arguments:
@@ -242,3 +237,9 @@ services:
             - '@oro_translation.database_translation.metadata.cache'
             - '@translator.default'
             - '%kernel.cache_dir%/translations'
+
+    oro_translation.filter.language:
+        class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
+        parent: oro_filter.entity_filter
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }

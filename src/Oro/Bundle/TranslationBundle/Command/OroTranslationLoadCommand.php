@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -13,6 +14,7 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class OroTranslationLoadCommand extends ContainerAwareCommand
 {
@@ -54,6 +56,12 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             )
         );
 
+        $resourceCache = new ArrayCache();
+
+        /* @var $translator Translator */
+        $translator = $this->getContainer()->get('translator');
+        $translator->setResourceCache($resourceCache);
+
         $translationLoader = $this->getContainer()->get('oro_translation.database_translation.loader');
 
         // disable database loader to not get translations from database
@@ -62,9 +70,6 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         /* @var $translationManager TranslationManager */
         $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
         $translationManager->rebuildCache();
-
-        /* @var $translator DataCollectorTranslator */
-        $translator = $this->getContainer()->get('translator');
 
         foreach ($locales as $locale) {
             $domains = $translator->getCatalogue($locale)->all();
@@ -90,7 +95,9 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             }
         }
 
+        // restore DB loader and clear resource loader cache
         $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
+        $resourceCache->deleteAll();
 
         $translationManager->rebuildCache();
 

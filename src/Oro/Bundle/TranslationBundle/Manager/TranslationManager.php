@@ -221,11 +221,6 @@ class TranslationManager
             $repo = $this->getEntityRepository(TranslationKey::class);
 
             $this->availableDomains = $repo->findAvailableDomains();
-
-//            $avd = $repo->findAvailableDomains();
-//            dump(['avd' => $avd, 'ls' => $locales]);
-//            exit();
-
         }
 
         $result = [];
@@ -239,14 +234,6 @@ class TranslationManager
         }
 
         return $result;
-//
-//            dump(['avd' => $result]);
-//            exit();
-////        $domains = array_intersect_key((array)$this->availableDomains, array_combine($locales, $locales));
-////
-////        return (array)array_reduce($domains, function ($carry, $item) {
-////            return array_merge((array)$carry, $item);
-////        });
     }
 
     /**

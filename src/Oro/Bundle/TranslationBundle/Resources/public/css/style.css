@@ -19,3 +19,11 @@
 .oro-translation-languages .translation-status .status-available-install {
     color: #5eb95e;
 }
+
+.oro-translation-translations .grid-header-cell {
+    min-width: 100px;
+}
+
+#main .oro-translation-translations label {
+    text-transform: none;
+}
