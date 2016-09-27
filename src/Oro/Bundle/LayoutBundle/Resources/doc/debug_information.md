@@ -16,7 +16,6 @@ It contains such blocks:
  - **Context Data Items** - [ContextDataCollection](../../../../Component/Layout/ContextDataCollection.php) items for current page
  - **Build Block Options** - collected when [buildBlock](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered
  - **Build View Options** - collected when [buildView](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered
- - **Finish View Options** - collected when [finishView](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered
  - **View Variables** - [BlockView](../../../../Component/Layout/BlockView.php) vars
 
 ![Symfony Profiler - Layout](./images/symfony_profiler_layout.png "Symfony Profiler - Layout")
