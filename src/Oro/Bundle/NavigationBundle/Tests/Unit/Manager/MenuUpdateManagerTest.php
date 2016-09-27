@@ -7,9 +7,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuFactory;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
@@ -145,9 +145,6 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update = new MenuUpdateStub();
 
         $menu = $this->getMock(ItemInterface::class);
-        $menu->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($menuName));
 
         $item = $this->getMock(ItemInterface::class);
 
@@ -195,9 +192,6 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $menu = $this->getMock(ItemInterface::class);
-        $menu->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($menuName));
 
         $item = $this->getMock(ItemInterface::class);
 
@@ -269,5 +263,120 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
 
         $this->assertEquals($update, $result);
+    }
+
+    public function testReorderMenuUpdate()
+    {
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+
+        $menuName = 'test-menu';
+        $ownershipType = MenuUpdate::OWNERSHIP_USER;
+        $ownerId = 1;
+
+        $factory = new MenuFactory();
+        $menu = $factory->createItem($menuName);
+
+        $item = $menu->addChild('first_menu');
+
+        $orderedChildren = [
+            0 => $menu->addChild('first_menu'),
+            1 => $menu->addChild('second_menu'),
+            2 => $item->addChild('third_menu'),
+            3 => $menu->addChild('fourth_menu'),
+        ];
+
+        $update1 = new MenuUpdateStub();
+        $update1->setKey('second_menu');
+        $update1->setPriority(1);
+
+        $update3 = new MenuUpdateStub();
+        $update3->setKey('fourth_menu');
+        $update3->setPriority(3);
+
+        $updates = [$update1, $update3];
+
+        $this->entityRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with([
+                'menu' => $menuName,
+                'key' => ['first_menu', 'second_menu', 'third_menu', 'fourth_menu'],
+                'ownershipType' => $ownershipType,
+                'ownerId' => $ownerId,
+            ])
+            ->will($this->returnValue($updates));
+
+        $update0 = new MenuUpdateStub();
+        $update0->setKey('first_menu');
+        $update0->setMenu($menuName);
+        $update0->setParentKey(null);
+        $update0->setPriority(0);
+        $update0->setOwnershipType($ownershipType);
+        $update0->setOwnerId($ownerId);
+
+        $update2 = new MenuUpdateStub();
+        $update2->setKey('third_menu');
+        $update2->setMenu($menuName);
+        $update2->setParentKey('first_menu');
+        $update2->setPriority(2);
+        $update2->setOwnershipType($ownershipType);
+        $update2->setOwnerId($ownerId);
+
+        $this->entityManager
+            ->expects($this->exactly(4))
+            ->method('persist')
+            ->withConsecutive(
+                [$update1],
+                [$update3],
+                [$update0],
+                [$update2]
+            );
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('flush')
+            ->with([$update1, $update3, $update0, $update2]);
+
+        $this->manager->reorderMenuUpdate($menuName, $orderedChildren, $ownershipType, $ownerId);
+    }
+
+    public function testGetMenu()
+    {
+        $menuName = 'test-menu';
+
+        $menu = $this->getMock(ItemInterface::class);
+
+        $this->builderChainProvider
+            ->expects($this->once())
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $this->assertEquals($menu, $this->manager->getMenu($menuName));
+    }
+
+    public function findMenuItem()
+    {
+        $menuName = 'test-menu';
+
+        $key = 'test-key';
+
+        $menu = $this->getMock(ItemInterface::class);
+
+        $item = $this->getMock(ItemInterface::class);
+
+        $this->builderChainProvider
+            ->expects($this->once())
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('findMenuItem')
+            ->with($menu, $key)
+            ->will($this->returnValue($item));
+
+        $this->assertEquals($item, $this->manager->findMenuItem($menuName, $key));
     }
 }

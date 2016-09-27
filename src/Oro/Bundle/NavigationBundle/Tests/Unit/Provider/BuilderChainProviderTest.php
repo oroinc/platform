@@ -189,19 +189,11 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->method('hasChildren')
             ->will($this->returnValue(true));
 
-        $topMenu->expects($this->any())
-            ->method('getDisplayChildren')
-            ->will($this->returnValue(true));
-
         $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
             ->getMock();
 
         $menu->expects($this->any())
             ->method('hasChildren')
-            ->will($this->returnValue(true));
-
-        $menu->expects($this->any())
-            ->method('getDisplayChildren')
             ->will($this->returnValue(true));
 
         $childOne = $this->getChildItem('child1', 5);
@@ -244,6 +236,8 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->with('position')
             ->will($this->returnValue($position));
         $child->expects($this->once())
+            ->method('setExtra');
+        $child->expects($this->exactly(2))
             ->method('getName')
             ->will($this->returnValue($name));
 

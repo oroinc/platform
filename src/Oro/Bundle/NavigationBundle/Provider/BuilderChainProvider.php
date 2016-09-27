@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuItem;
@@ -11,8 +13,6 @@ use Knp\Menu\Provider\MenuProviderInterface;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
-
-use \Doctrine\Common\Cache\CacheProvider;
 
 class BuilderChainProvider implements MenuProviderInterface
 {
@@ -38,7 +38,7 @@ class BuilderChainProvider implements MenuProviderInterface
     private $factory;
 
     /**
-     * @var \Doctrine\Common\Cache\CacheProvider
+     * @var CacheProvider
      */
     private $cache;
 
@@ -56,7 +56,7 @@ class BuilderChainProvider implements MenuProviderInterface
     /**
      * Set cache instance
      *
-     * @param \Doctrine\Common\Cache\CacheProvider $cache
+     * @param CacheProvider $cache
      */
     public function setCache(CacheProvider $cache)
     {
