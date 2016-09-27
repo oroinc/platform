@@ -26,6 +26,20 @@ class TransitionEventTriggerMessageTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testToArray()
+    {
+        $triggerId = 42;
+        $workflowItemId = 142;
+
+        $this->assertEquals(
+            [
+                TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => $triggerId,
+                TransitionEventTriggerMessage::WORKFLOW_ITEM => $workflowItemId
+            ],
+            $this->getTransitionEventTriggerMessage($triggerId, $workflowItemId)->toArray()
+        );
+    }
+
     /**
      * @dataProvider createFromJsonExceptionProvider
      *

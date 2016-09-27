@@ -33,10 +33,7 @@ class TransitionEventTriggerMessage implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return [
-            self::TRANSITION_EVENT_TRIGGER => $this->triggerId,
-            self::WORKFLOW_ITEM => $this->workflowItemId
-        ];
+        return $this->toArray();
     }
 
     /**
@@ -80,6 +77,17 @@ class TransitionEventTriggerMessage implements \JsonSerializable
     public function getWorkflowItemId()
     {
         return (int)$this->workflowItemId;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            self::TRANSITION_EVENT_TRIGGER => $this->triggerId,
+            self::WORKFLOW_ITEM => $this->workflowItemId
+        ];
     }
 
     /**

@@ -305,10 +305,10 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             ->method('send')
             ->with(
                 TransitionEventTriggerExtension::TOPIC_NAME,
-                $this->getEntity(
-                    TransitionEventTriggerMessage::class,
-                    ['triggerId' => $expectedTrigger->getId(), 'workflowItemId' => $workflowItem->getId()]
-                )
+                [
+                    TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => $expectedTrigger->getId(),
+                    TransitionEventTriggerMessage::WORKFLOW_ITEM => $workflowItem->getId(),
+                ]
             );
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
