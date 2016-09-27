@@ -9,7 +9,6 @@ use Doctrine\ORM\Tools\SchemaValidator;
 
 use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
-use Oro\Bundle\OrderBundle\Entity\Order;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**

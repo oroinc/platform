@@ -501,7 +501,9 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'owner'           => true,
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany'),
-                'cascade'         => ['persist', 'remove']
+                'cascade'         => ['persist', 'remove'],
+                'on_delete'       => 'CASCADE',
+                'nullable'        => true
             ]
         ];
         $targetRelations = [
@@ -524,7 +526,9 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             [
                 'target_entity' => 'Test\TargetEntity',
                 'relation_key'  => 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto',
-                'cascade'       => ['persist', 'remove']
+                'cascade'       => ['persist', 'remove'],
+                'on_delete'       => 'CASCADE',
+                'nullable'        => true
             ],
             'manyToOne',
             'Test\SourceEntity',
