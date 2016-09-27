@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuItem;
@@ -11,8 +13,6 @@ use Knp\Menu\Provider\MenuProviderInterface;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
-
-use \Doctrine\Common\Cache\CacheProvider;
 
 class BuilderChainProvider implements MenuProviderInterface
 {
@@ -38,7 +38,7 @@ class BuilderChainProvider implements MenuProviderInterface
     private $factory;
 
     /**
-     * @var \Doctrine\Common\Cache\CacheProvider
+     * @var CacheProvider
      */
     private $cache;
 
@@ -56,7 +56,7 @@ class BuilderChainProvider implements MenuProviderInterface
     /**
      * Set cache instance
      *
-     * @param \Doctrine\Common\Cache\CacheProvider $cache
+     * @param CacheProvider $cache
      */
     public function setCache(CacheProvider $cache)
     {
@@ -137,38 +137,27 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     protected function sort(ItemInterface $menu)
     {
-        if ($menu->hasChildren()) {
-            $orderedChildren = [];
-            $unorderedChildren = [];
-
-            /** @var ItemInterface[] $children */
+        if ($menu->hasChildren() && $menu->getDisplayChildren()) {
+            $orderedChildren = array();
+            $unorderedChildren = array();
+            $hasOrdering = false;
             $children = $menu->getChildren();
-            foreach ($children as $child) {
-                if ($child->hasChildren()) {
+            foreach ($children as &$child) {
+                if ($child->hasChildren() && $child->getDisplayChildren()) {
                     $this->sort($child);
                 }
                 $position = $child->getExtra('position');
                 if ($position !== null) {
                     $orderedChildren[$child->getName()] = (int) $position;
+                    $hasOrdering = true;
                 } else {
                     $unorderedChildren[] = $child->getName();
                 }
             }
-
-            asort($orderedChildren);
-            $order = array_merge(array_keys($orderedChildren), $unorderedChildren);
-
-            $i = 0;
-            $positions = [];
-            foreach ($order as $name) {
-                $positions[$name] = $i;
+            if ($hasOrdering) {
+                asort($orderedChildren);
+                $menu->reorderChildren(array_merge(array_keys($orderedChildren), $unorderedChildren));
             }
-
-            foreach ($children as $child) {
-                $child->setExtra('position', $positions[$child->getName()]);
-            }
-
-            $menu->reorderChildren($order);
         }
     }
 
