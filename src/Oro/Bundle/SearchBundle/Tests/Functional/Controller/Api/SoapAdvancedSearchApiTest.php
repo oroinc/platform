@@ -47,6 +47,7 @@ class SoapAdvancedSearchApiTest extends WebTestCase
             unset($result['elements']['item'][$key]['recordId']);
         }
 
+        $this->addOroDefaultPrefixToUrlInParameterArray($response['soap']['data'], 'recordUrl');
         $this->assertSame($response['soap']['data'], $result['elements']['item']);
     }
 
