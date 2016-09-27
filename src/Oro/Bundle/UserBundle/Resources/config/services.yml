@@ -425,3 +425,13 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@request_stack'
             - '@security.context'
+
+    oro_user.security.login_history_manager:
+        class: Oro\Bundle\UserBundle\Security\LoginHistoryManager
+        arguments:
+            - '@doctrine'
+
+    oro_user.security.login_history_provider:
+        class: Oro\Bundle\UserBundle\Security\LoginHistoryProvider
+        arguments:
+            - '@doctrine'
