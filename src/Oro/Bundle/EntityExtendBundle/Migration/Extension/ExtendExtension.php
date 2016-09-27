@@ -677,7 +677,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                         but you can specify another type if it is based on manyToOne.
      *                                         In this case this type should be registered
      *                                         in entity_extend.yml under underlying_types section
-     * @param array        $relationOptions    Array of options used for new column definition
      */
     public function addManyToOneRelation(
         Schema $schema,
@@ -686,8 +685,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $targetTable,
         $targetColumnName,
         array $options = [],
-        $fieldType = RelationType::MANY_TO_ONE,
-        $relationOptions = []
+        $fieldType = RelationType::MANY_TO_ONE
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -702,20 +700,26 @@ class ExtendExtension implements NameGeneratorAwareInterface
         );
 
         $this->checkColumnsExist($targetTable, [$targetColumnName]);
-        $relationOptions = array_replace(
-            [
-                'notnull' => false,
-                'onDelete' => 'SET NULL'
-            ],
-            $relationOptions
-        );
+
+        $relation = $options['extend'];
+        if (array_key_exists('on_delete', $relation)) {
+            $onDelete = $relation['on_delete'];
+        } else {
+            $onDelete = 'SET NULL';
+        }
+
+        if (array_key_exists('nullable', $relation)) {
+            $notnull = !$relation['nullable'];
+        } else {
+            $notnull = false;
+        }
 
         $this->addRelation(
             $selfTable,
             $selfColumnName,
             $targetTable,
-            ['notnull' => $relationOptions['notnull']],
-            ['onDelete' => $relationOptions['onDelete']]
+            ['notnull' => $notnull],
+            ['onDelete' => $onDelete]
         );
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [

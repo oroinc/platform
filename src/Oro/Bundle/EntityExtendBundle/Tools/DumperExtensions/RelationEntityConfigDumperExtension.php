@@ -135,7 +135,9 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
             'field_id'        => $selfFieldId,
             'owner'           => $selfIsOwnerSide,
             'target_entity'   => $targetEntityClass,
-            'target_field_id' => $targetFieldId
+            'target_field_id' => $targetFieldId,
+            'on_delete'       => $fieldConfig->get('on_delete'),
+            'nullable'        => $fieldConfig->get('nullable')
         ];
         if ($fieldConfig->has('cascade')) {
             $selfRelation['cascade'] = $fieldConfig->get('cascade');
