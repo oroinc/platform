@@ -89,12 +89,12 @@
             <div class="container-fluid accordion"
                 data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
-            {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
-            {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
+            {% include 'OroActivityListBundle:ActivityList:js/list.html.twig' with {'id': 'template-activity-list'} %}
+            {% include 'OroActivityListBundle:ActivityList:js/view.html.twig' with {'id': 'template-activity-item'} %}
             {% for activityClass, activityOptions in configuration %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass) } %}
             {% endfor %}
-            {% include 'OroCommentBundle:Comment/js:list.js.twig' with {'id': 'template-activity-item-comment'} %}
+            {% include 'OroCommentBundle:Comment/js:list.html.twig' with {'id': 'template-activity-item-comment'} %}
         {% endblock %}
 
         {% placeholder oro_activity_list_after with {entityClass: oro_class_name(entity, true), entityId: entity.id} %}
