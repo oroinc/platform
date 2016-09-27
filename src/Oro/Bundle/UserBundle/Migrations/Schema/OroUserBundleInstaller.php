@@ -90,6 +90,7 @@ class OroUserBundleInstaller implements
         $this->createOroUserAccessGroupRoleTable($schema);
         $this->createOroAccessRoleTable($schema);
         $this->createOroUserStatusTable($schema);
+        $this->createOroUserLoginHistoryTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroUserEmailForeignKeys($schema);
@@ -519,5 +520,30 @@ class OroUserBundleInstaller implements
         $table = $schema->getTable('oro_access_group');
         $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
+    }
+
+    /**
+     * Create oro_security_permission table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroUserLoginHistoryTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_user_login_history');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('provider_class', 'string', ['length' => 255]);
+        $table->addColumn('failed_attempts', 'integer', ['notnull' => false]);
+        $table->addColumn('failed_daily_attempts', 'integer', ['notnull' => false]);
+        $table->addColumn('createdAt', 'datetime');
+        $table->addColumn('updatedAt', 'datetime');
+        $table->setPrimaryKey(['id']);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['owner_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        $table->addUniqueIndex(['user_id', 'provider_class']);
     }
 }
