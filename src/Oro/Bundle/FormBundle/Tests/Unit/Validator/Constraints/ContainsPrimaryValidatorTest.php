@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Common\Collections\AbstractLazyCollection;
+
 use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimaryValidator;
 
 class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
@@ -15,6 +17,16 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = $this->getMock('Symfony\Component\Validator\Constraint');
         $validator = new ContainsPrimaryValidator();
         $validator->validate(false, $constraint);
+    }
+
+    public function testShouldKeepLazyCollectionUninitialized()
+    {
+        /** @var AbstractLazyCollection $collection */
+        $collection = $this->getMockForAbstractClass(AbstractLazyCollection::class);
+        $validator = new ContainsPrimaryValidator();
+        $validator->validate($collection, $this->getMock('Symfony\Component\Validator\Constraint'));
+
+        $this->assertFalse($collection->isInitialized());
     }
 
     /**

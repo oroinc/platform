@@ -1,0 +1,4 @@
+assets:
+    css:
+      oroentitymerge:
+          - 'bundles/oroentitymerge/css/less/merge_view.less'

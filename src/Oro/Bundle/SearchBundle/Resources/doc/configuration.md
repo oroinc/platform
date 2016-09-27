@@ -189,3 +189,88 @@ search services.
 
 Also engine configuration can override existing services to support some specific use cases of search engine
 (f.e. ORM engine overrides index listener to support single flush).
+
+
+Datagrid configuration
+----------------------
+
+The SearchBundle supplies a datasource, that can be used interchangeably with the default Orm datasource. This datasource feeds pure search index data,  bypassing the default DBMS, thus allowing pure index storage layer driven datagrids to be built.
+
+An example of a DatagridBundle's configuration entry in the `Resources/config/oro/datagrids.yml` file, 
+that builds a simple user datagrid, using search index data only:
+ 
+     user-search-grid:
+         source:
+             type: search
+             query:
+                 select:
+                     - text.username as name
+                     - text.email
+                 from:
+                     - oro_user
+         columns:
+             name:
+                 label: oro.user.username.label
+                 data_name: name
+             email:
+                 label: oro.user.email.label
+                 data_name: email
+         sorters:
+             columns:
+                 name:
+                     data_name: username
+                     type: string
+                 email:
+                     data_name: email
+                     type: string
+             default:
+                 name: ASC
+         filters:
+             columns:
+                 quick_search:
+                     label: 'Quick search'
+                     type: string
+                     data_name: all_text
+                 name:
+                     type: string
+                     data_name: username
+                 email:
+                     type: string
+                     data_name: email
+         properties:
+             id: ~
+             view_link:
+                 type: url
+                 route: oro_user_view
+                 params:
+                     - id
+             update_link:
+                 type: url
+                 route: oro_user_update
+                 params:
+                     - id
+             delete_link:
+                 type: url
+                 route: oro_api_delete_user
+                 params:
+                     - id
+         actions:
+             view:
+                 type:          navigate
+                 label:         oro.grid.action.view
+                 link:          view_link
+                 icon:          eye-open
+                 acl_resource:  oro_user_user_view
+                 rowAction:     true
+             update:
+                 type:          navigate
+                 label:         oro.grid.action.update
+                 link:          update_link
+                 icon:          edit
+                 acl_resource:  oro_user_user_update
+             delete:
+                 type:          delete
+                 label:         oro.grid.action.delete
+                 link:          delete_link
+                 icon:          trash
+                 acl_resource:  oro_user_user_delete
