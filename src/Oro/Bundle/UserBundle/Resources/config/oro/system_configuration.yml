@@ -1,0 +1,36 @@
+system_configuration:
+    groups:
+       security_options:
+           icon:  icon-key
+           title: oro.user.system_configuration.groups.security_options.title
+       login_attempts:
+           icon: icon-signin
+           title: oro.user.system_configuration.groups.login_attempts.title
+
+    fields:
+        oro_user.login_attempts:
+            data_type: integer
+            type: integer
+            priority: 60
+            options:
+                label: oro.user.system_configuration.fields.login_attempts.label
+        oro_user.daily_login_attempts:
+            data_type: integer
+            type: integer
+            priority: 70
+            options:
+                label: oro.user.system_configuration.fields.daily_login_attempts.label
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            security_options:
+                               priority: 90
+                               children:
+                                   login_attempts:
+                                       children:
+                                           - oro_user.login_attempts
+                                           - oro_user.daily_login_attempts

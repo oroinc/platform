@@ -222,3 +222,12 @@ oro:
             all_owners: All owners
             business_unit: Business Unit
             current_user: Current User
+
+        system_configuration:
+            groups:
+                security_options.title: Security options
+                login_attempts.title: Login attempts
+            fields:
+                login_attempts.label: Max login attempts
+                daily_login_attempts.label: Max daily login attempts
+
