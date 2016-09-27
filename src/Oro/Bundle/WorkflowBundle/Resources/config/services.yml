@@ -256,10 +256,10 @@ services:
 
     oro_workflow.helper.transition_cron_trigger:
         class: Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper
-        public: false
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.repository.workflow_item'
+            - '@doctrine'
 
     oro_workflow.transition_trigger.cron_scheduler:
         class: Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler

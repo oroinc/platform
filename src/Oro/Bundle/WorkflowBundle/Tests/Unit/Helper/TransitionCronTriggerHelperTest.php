@@ -3,6 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -17,6 +20,7 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
 {
     const TRANSITION_NAME = 'test_transition';
     const RELATED_CLASS_NAME = 'stdClass';
+    const RELATED_CLASS_ID_FIELD = 'id';
     const WORKFLOW_NAME = 'test_workflow';
     const FILTER = 'filter != null';
 
@@ -25,6 +29,9 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
 
     /** @var WorkflowItemRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
+
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
 
     /** @var TransitionCronTriggerHelper */
     protected $helper;
@@ -43,7 +50,19 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new TransitionCronTriggerHelper($this->workflowManager, $this->repository);
+        $metadata = new ClassMetadataInfo(self::RELATED_CLASS_NAME);
+        $metadata->setIdentifier([self::RELATED_CLASS_ID_FIELD]);
+
+        $em = $this->getMock(ObjectManager::class);
+        $em->expects($this->any())->method('getClassMetadata')->with(self::RELATED_CLASS_NAME)->willReturn($metadata);
+
+        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(self::RELATED_CLASS_NAME)
+            ->willReturn($em);
+
+        $this->helper = new TransitionCronTriggerHelper($this->workflowManager, $this->repository, $this->registry);
 
         $this->workflowDefinition = new WorkflowDefinition();
         $this->workflowDefinition->setName(self::WORKFLOW_NAME)->setRelatedEntity(self::RELATED_CLASS_NAME);
@@ -54,7 +73,7 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
             ->setFilter(self::FILTER);
     }
 
-    public function testFetchWorkflowItemsIds()
+    public function testFetchWorkflowItems()
     {
         $data = [1, 2, 3, 4, 5];
         $steps = ['step1', 'step2'];
@@ -62,11 +81,16 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
         $this->setUpWorkflowManager(self::WORKFLOW_NAME, $steps);
 
         $this->repository->expects($this->once())
-            ->method('getIdsByStepNamesAndEntityClass')
-            ->with(new ArrayCollection(array_combine($steps, $steps)), self::RELATED_CLASS_NAME, self::FILTER)
+            ->method('findByStepNamesAndEntityClass')
+            ->with(
+                new ArrayCollection(array_combine($steps, $steps)),
+                self::RELATED_CLASS_NAME,
+                self::RELATED_CLASS_ID_FIELD,
+                self::FILTER
+            )
             ->willReturn($data);
 
-        $this->assertEquals($data, $this->helper->fetchWorkflowItemsIdsForTrigger($this->trigger));
+        $this->assertEquals($data, $this->helper->fetchWorkflowItemsForTrigger($this->trigger));
     }
 
     /**

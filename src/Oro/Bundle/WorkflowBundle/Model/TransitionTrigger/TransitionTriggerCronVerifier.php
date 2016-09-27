@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -83,9 +85,10 @@ class TransitionTriggerCronVerifier
                 );
 
             $options['filter'] = $this->getWorkflowItemRepository()
-                ->getIdsByStepNamesAndEntityClassQueryBuilder(
+                ->findByStepNamesAndEntityClassQueryBuilder(
                     $steps,
                     $trigger->getEntityClass(),
+                    $this->getIdentifierField($trigger->getEntityClass()),
                     $trigger->getFilter()
                 )
                 ->getQuery();
@@ -95,10 +98,31 @@ class TransitionTriggerCronVerifier
     }
 
     /**
+     * @param string $entityClass
+     * @return string
+     */
+    protected function getIdentifierField($entityClass)
+    {
+        /** @var ClassMetadataInfo $metadata */
+        $metadata = $this->getObjectManager($entityClass)->getClassMetadata($entityClass);
+
+        return $metadata->getSingleIdentifierFieldName();
+    }
+
+    /**
      * @return WorkflowItemRepository
      */
     protected function getWorkflowItemRepository()
     {
-        return $this->registry->getManagerForClass(WorkflowItem::class)->getRepository(WorkflowItem::class);
+        return $this->getObjectManager(WorkflowItem::class)->getRepository(WorkflowItem::class);
+    }
+
+    /**
+     * @param string $entityClass
+     * @return ObjectManager
+     */
+    protected function getObjectManager($entityClass)
+    {
+        return $this->registry->getManagerForClass($entityClass);
     }
 }

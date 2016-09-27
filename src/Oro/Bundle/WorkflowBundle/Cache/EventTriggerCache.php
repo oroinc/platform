@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface;
 
 class EventTriggerCache
@@ -10,11 +12,22 @@ class EventTriggerCache
     const DATA = 'data';
     const BUILT = 'built';
 
+    /** @var ManagerRegistry */
+    protected $registry;
+
     /** @var CacheProvider */
     protected $provider;
 
-    /** @var EventTriggerRepositoryInterface */
-    protected $repository;
+    /** @var string */
+    protected $triggerClassName;
+
+    /**
+     * @param ManagerRegistry $registry
+     */
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->registry = $registry;
+    }
 
     /**
      * @param CacheProvider $provider
@@ -25,25 +38,24 @@ class EventTriggerCache
     }
 
     /**
-     * @param EventTriggerRepositoryInterface $triggerRepository
+     * @param string $triggerClassName
      */
-    public function setEventTriggerRepository(EventTriggerRepositoryInterface $triggerRepository)
+    public function setTriggerClassName($triggerClassName)
     {
-        $this->repository = $triggerRepository;
+        $this->triggerClassName = $triggerClassName;
     }
 
     /**
      * Write to cache entity classes and appropriate events
      *
      * @return array
-     * @throws \LogicException
      */
     public function build()
     {
         $this->assertConfigured();
 
         // get all triggers data
-        $triggers = $this->repository->getAvailableEventTriggers();
+        $triggers = $this->getRepository()->getAvailableEventTriggers();
         $data = [];
 
         foreach ($triggers as $trigger) {
@@ -103,8 +115,24 @@ class EventTriggerCache
             throw new \LogicException('Event trigger cache provider is not defined');
         }
 
-        if (!$this->repository) {
-            throw new \LogicException('Event trigger repository is not defined');
+        if (!$this->triggerClassName) {
+            throw new \LogicException('Event trigger class name is not defined');
         }
+    }
+
+    /**
+     * @return EventTriggerRepositoryInterface
+     * @throws \LogicException
+     */
+    protected function getRepository()
+    {
+        $repository = $this->registry->getManagerForClass($this->triggerClassName)
+            ->getRepository($this->triggerClassName);
+
+        if (!$repository instanceof EventTriggerRepositoryInterface) {
+            throw new \RuntimeException('Invalid repository');
+        }
+
+        return $repository;
     }
 }

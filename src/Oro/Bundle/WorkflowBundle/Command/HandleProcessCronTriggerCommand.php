@@ -51,7 +51,7 @@ class HandleProcessCronTriggerCommand extends ContainerAwareCommand
             return;
         }
 
-        $workflowItems = $this->getTransitionCronTriggerHelper()->fetchWorkflowItemsIdsForTrigger($trigger);
+        $workflowItems = $this->getTransitionCronTriggerHelper()->fetchWorkflowItemsForTrigger($trigger);
 
         $data = array_map(
             function (WorkflowItem $workflowItem) use ($trigger) {

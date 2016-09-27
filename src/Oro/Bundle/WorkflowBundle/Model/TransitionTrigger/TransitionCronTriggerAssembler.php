@@ -33,6 +33,7 @@ class TransitionCronTriggerAssembler extends AbstractTransitionTriggerAssembler
     {
         $trigger = new TransitionCronTrigger();
         $trigger
+            ->setWorkflowDefinition($workflowDefinition)
             ->setCron($options['cron'])
             ->setFilter($this->getOption($options, 'filter', null))
             ->setQueued($this->getOption($options, 'queued', true));

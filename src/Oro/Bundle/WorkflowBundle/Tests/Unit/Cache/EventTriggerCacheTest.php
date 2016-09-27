@@ -3,15 +3,24 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
 class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 {
+    const TRIGGER_CLASS_NAME = 'stdClass';
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $registry;
+
     /**
      * @var EventTriggerCache
      */
@@ -27,7 +36,10 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->cache = new EventTriggerCache();
+        $this->registry = $this->getMock(ManagerRegistry::class);
+
+        $this->cache = new EventTriggerCache($this->registry);
+        $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
     }
 
     public function testSetProvider()
@@ -47,8 +59,8 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
             ['save', [EventTriggerCache::BUILT, true]],
         ];
 
+        $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->prepareProvider($expectedProviderCalls));
-        $this->cache->setEventTriggerRepository($this->prepareRepository($this->testTriggerData));
         $this->assertEquals($this->testTriggerData, $this->cache->build());
     }
 
@@ -75,8 +87,8 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
             ['fetch', [EventTriggerCache::DATA], $this->testTriggerData],
         ];
 
+        $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->prepareProvider($expectedProviderCalls));
-        $this->cache->setEventTriggerRepository($this->prepareRepository($this->testTriggerData));
 
         $this->assertTrue($this->cache->hasTrigger('FirstEntity', ProcessTrigger::EVENT_CREATE));
         $this->assertFalse($this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE));
@@ -93,11 +105,37 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Event trigger repository is not defined
+     * @expectedExceptionMessage Event trigger class name is not defined
      */
-    public function testNoRepositoryException()
+    public function testNoTriggerClassNameException()
     {
         $this->cache->setProvider($this->prepareProvider([]));
+        $this->cache->setTriggerClassName(null);
+
+        $this->cache->build();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Invalid repository
+     */
+    public function testInvalidTriggerRepository()
+    {
+        $this->cache->setProvider($this->prepareProvider([]));
+        $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
+
+        $repository = $this->getMock(ObjectRepository::class);
+
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(self::TRIGGER_CLASS_NAME)
+            ->willReturn($repository);
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(self::TRIGGER_CLASS_NAME)
+            ->willReturn($entityManager);
 
         $this->cache->build();
     }
@@ -134,9 +172,8 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $data
-     * @return \PHPUnit_Framework_MockObject_MockObject|EventTriggerRepositoryInterface
      */
-    protected function prepareRepository(array $data)
+    protected function prepareRegistryForBuild(array $data)
     {
         // generate triggers
         $triggers = [];
@@ -157,6 +194,15 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder(ProcessTriggerRepository::class)->disableOriginalConstructor()->getMock();
         $repository->expects($this->any())->method('getAvailableEventTriggers')->will($this->returnValue($triggers));
 
-        return $repository;
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(self::TRIGGER_CLASS_NAME)
+            ->willReturn($repository);
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(self::TRIGGER_CLASS_NAME)
+            ->willReturn($entityManager);
     }
 }

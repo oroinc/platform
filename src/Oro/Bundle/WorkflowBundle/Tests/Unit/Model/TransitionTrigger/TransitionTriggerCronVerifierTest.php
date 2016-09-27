@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
@@ -26,6 +27,7 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase
     use EntityTrait;
 
     const ENTITY_CLASS = 'stdClass';
+    const ENTITY_ID_FIELD = 'id';
 
     /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
     private $workflowAssembler;
@@ -52,14 +54,24 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $metadata = new ClassMetadataInfo(self::ENTITY_CLASS);
+        $metadata->setIdentifier([self::ENTITY_ID_FIELD]);
+
         $em = $this->getMock(ObjectManager::class);
         $em->expects($this->any())
             ->method('getRepository')
             ->with(WorkflowItem::class)
             ->willReturn($this->workflowItemRepository);
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($metadata);
 
         $registry = $this->getMock(ManagerRegistry::class);
-        $registry->expects($this->any())->method('getManagerForClass')->with(WorkflowItem::class)->willReturn($em);
+        $registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($this->logicalOr(WorkflowItem::class, self::ENTITY_CLASS))
+            ->willReturn($em);
 
         $this->cronVerifier = $this->getMock(ExpressionVerifierInterface::class);
         $this->filterVerifier = $this->getMock(ExpressionVerifierInterface::class);
@@ -111,10 +123,11 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase
             ->willReturn($workflow);
 
         $this->workflowItemRepository->expects($this->once())
-            ->method('getIdsByStepNamesAndEntityClassQueryBuilder')
+            ->method('findByStepNamesAndEntityClassQueryBuilder')
             ->with(
                 new ArrayCollection([$expectedStep->getName() => $expectedStep->getName()]),
                 self::ENTITY_CLASS,
+                self::ENTITY_ID_FIELD,
                 $filter
             )
             ->willReturn($this->setUpQueryBuilder($query));

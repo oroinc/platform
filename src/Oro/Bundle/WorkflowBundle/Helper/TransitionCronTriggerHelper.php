@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Model\Step;
@@ -15,21 +18,29 @@ class TransitionCronTriggerHelper
     /** @var WorkflowItemRepository */
     private $repository;
 
+    /** @var ManagerRegistry */
+    private $registry;
+
     /**
-     * @param WorkflowItemRepository $repository
      * @param WorkflowManager $workflowManager
+     * @param WorkflowItemRepository $repository
+     * @param ManagerRegistry $registry
      */
-    public function __construct(WorkflowManager $workflowManager, WorkflowItemRepository $repository)
-    {
+    public function __construct(
+        WorkflowManager $workflowManager,
+        WorkflowItemRepository $repository,
+        ManagerRegistry $registry
+    ) {
         $this->workflowManager = $workflowManager;
         $this->repository = $repository;
+        $this->registry = $registry;
     }
 
     /**
      * @param TransitionCronTrigger $trigger
      * @return array an array of integers as ids of matched workflowItems
      */
-    public function fetchWorkflowItemsIdsForTrigger(TransitionCronTrigger $trigger)
+    public function fetchWorkflowItemsForTrigger(TransitionCronTrigger $trigger)
     {
         $workflow = $this->workflowManager->getWorkflow($trigger->getWorkflowDefinition()->getName());
 
@@ -41,10 +52,25 @@ class TransitionCronTriggerHelper
                 }
             );
 
-        return $this->repository->getIdsByStepNamesAndEntityClass(
+        $entityClass = $workflow->getDefinition()->getRelatedEntity();
+
+        return $this->repository->findByStepNamesAndEntityClass(
             $steps,
-            $workflow->getDefinition()->getRelatedEntity(),
+            $entityClass,
+            $this->getIdentifierField($entityClass),
             $trigger->getFilter()
         );
+    }
+
+    /**
+     * @param string $entityClass
+     * @return string
+     */
+    protected function getIdentifierField($entityClass)
+    {
+        /** @var ClassMetadataInfo $metadata */
+        $metadata = $this->registry->getManagerForClass($entityClass)->getClassMetadata($entityClass);
+
+        return $metadata->getSingleIdentifierFieldName();
     }
 }

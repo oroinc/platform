@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -12,9 +11,6 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class WorkflowItemRepository extends EntityRepository
 {
@@ -248,22 +244,25 @@ class WorkflowItemRepository extends EntityRepository
     /**
      * @param Collection $stepNames
      * @param string $entityClass
+     * @param string $entityIdentifier
      * @param null $dqlFilter
      * @return QueryBuilder
      */
-    public function getIdsByStepNamesAndEntityClassQueryBuilder(Collection $stepNames, $entityClass, $dqlFilter = null)
-    {
-        $identifier = $this->getIdentifierField($entityClass);
-
+    public function findByStepNamesAndEntityClassQueryBuilder(
+        Collection $stepNames,
+        $entityClass,
+        $entityIdentifier,
+        $dqlFilter = null
+    ) {
         $queryBuilder = $this->createQueryBuilder('wi')
-            ->select('wi, wi.id')
+            ->select('wi')
             ->innerJoin('wi.definition', 'wd')
             ->innerJoin('wi.currentStep', 'ws')
             ->innerJoin(
                 $entityClass,
                 'e',
                 Query\Expr\Join::WITH,
-                sprintf('CAST(wi.entityId as string) = CAST(e.%s as string)', $identifier)
+                sprintf('CAST(wi.entityId as string) = CAST(e.%s as string)', $entityIdentifier)
             );
 
         $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
@@ -282,37 +281,18 @@ class WorkflowItemRepository extends EntityRepository
     /**
      * @param Collection $stepNames
      * @param string $entityClass
+     * @param string $entityIdentifier
      * @param null $dqlFilter
-     * @return array
+     * @return array|\Oro\Bundle\WorkflowBundle\Entity\WorkflowItem[]
      */
-    public function getIdsByStepNamesAndEntityClass(Collection $stepNames, $entityClass, $dqlFilter = null)
-    {
-        $queryBuilder = $this->getIdsByStepNamesAndEntityClassQueryBuilder($stepNames, $entityClass, $dqlFilter);
-
-        return array_column($queryBuilder->getQuery()->getArrayResult(), 'id');
-    }
-
-    /**
-     * @param string $entityClass
-     * @return mixed
-     * @throws WorkflowException
-     */
-    protected function getIdentifierField($entityClass)
-    {
-        $metadata = $this->getEntityManager()->getClassMetadata($entityClass);
-
-        if ($metadata->isIdentifierComposite) {
-            throw new WorkflowException(
-                sprintf(
-                    'Entity `%s` transition query build failed. ' .
-                    'Composite primary keys are not supported for workflow entities.',
-                    $entityClass
-                )
-            );
-        }
-
-        $identifiers = $metadata->getIdentifierFieldNames();
-
-        return $identifiers[0];
+    public function findByStepNamesAndEntityClass(
+        Collection $stepNames,
+        $entityClass,
+        $entityIdentifier,
+        $dqlFilter = null
+    ) {
+        return $this->findByStepNamesAndEntityClassQueryBuilder($stepNames, $entityClass, $entityIdentifier, $dqlFilter)
+            ->getQuery()
+            ->getResult();
     }
 }

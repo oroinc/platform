@@ -194,24 +194,23 @@ class WorkflowItemRepositoryTest extends WebTestCase
         }
     }
 
-    public function testGetIdsByStepNamesAndEntityClass()
+    public function testFindByStepNamesAndEntityClass()
     {
-        $ids = $this->repository->getIdsByStepNamesAndEntityClass(
+        $items = $this->repository->findByStepNamesAndEntityClass(
             new ArrayCollection(['starting_point']),
-            WorkflowAwareEntity::class
+            WorkflowAwareEntity::class,
+            'id'
         );
 
-        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $ids);
+        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $items);
 
         $expected = [];
         // 21 because "test_multistep_flow" was second loaded workflows in fixtures
         for ($i = 21; $i < 21 + LoadWorkflowAwareEntities::COUNT; $i++) {
-            /** @var WorkflowItem $item */
-            $item = $this->getReference('test_multistep_flow_item.' . $i);
-            $expected[] = $item->getId();
+            $expected[] = $this->getReference('test_multistep_flow_item.' . $i);
         }
 
-        $this->assertEquals($expected, $ids);
+        $this->assertEquals($expected, $items);
     }
 
     public function testResetWorkflowData()

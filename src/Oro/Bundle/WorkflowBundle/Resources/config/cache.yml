@@ -9,14 +9,20 @@ services:
         calls:
             - [ setNamespace, [ 'oro_workflow_transition_trigger_event' ] ]
 
+    oro_workflow.cache.trigger.abstract:
+        abstract: true
+        class: 'Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache'
+        arguments:
+            - '@doctrine'
+
     oro_workflow.cache.process_trigger:
-        parent: Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache
+        parent: oro_workflow.cache.trigger.abstract
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.process_trigger' ] ]
-            - [ setEventTriggerRepository, [ '@oro_workflow.repository.process_trigger' ] ]
+            - [ setTriggerClassName, [ '%oro_workflow.process_trigger.entity.class%' ] ]
 
     oro_workflow.cache.transition_trigger_event:
-        parent: Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache
+        parent: oro_workflow.cache.trigger.abstract
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.transition_trigger_event' ] ]
-            - [ setEventTriggerRepository, [ '@oro_workflow.repository.transition_event_trigger' ] ]
+            - [ setTriggerClassName, [ '%oro_workflow.entity.transition_trigger_event.class%' ] ]
