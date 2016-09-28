@@ -50,7 +50,7 @@ class SearchDatasource implements DatasourceInterface
     {
         $this->datagrid = $grid;
 
-        $this->searchQuery = $this->queryFactory->create($grid, $config);
+        $this->searchQuery = $this->queryFactory->create($config);
 
         $this->yamlToSearchQueryConverter->process($this->searchQuery, $config);
 
