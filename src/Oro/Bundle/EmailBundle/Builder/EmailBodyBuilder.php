@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 
 /**
  * A helper class allows you to easy build EmailBody entity
@@ -23,6 +24,9 @@ class EmailBodyBuilder
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var EmailBodyHelper */
+    private $emailBodyHelper;
 
     /**
      * @param ConfigManager $configManager
@@ -58,7 +62,8 @@ class EmailBodyBuilder
         $this->emailBody = new EmailBody();
         $this->emailBody
             ->setBodyContent($content)
-            ->setBodyIsText($bodyIsText);
+            ->setBodyIsText($bodyIsText)
+            ->setTextBody(!$bodyIsText ? $this->getEmailBodyHelper()->getClearBody($content) : $content);
     }
 
     /**
@@ -158,5 +163,17 @@ class EmailBodyBuilder
         }
 
         return $contentSize;
+    }
+
+    /**
+     * @return EmailBodyHelper
+     */
+    protected function getEmailBodyHelper()
+    {
+        if (!$this->emailBodyHelper) {
+            $this->emailBodyHelper = new EmailBodyHelper();
+        }
+
+        return $this->emailBodyHelper;
     }
 }

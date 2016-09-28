@@ -6,18 +6,18 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class EmailBodyHelper
 {
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
-
-    /**
-     * EmailBodyHelper constructor.
-     *
-     * @param HtmlTagHelper $htmlTagHelper
-     */
-    public function __construct(HtmlTagHelper $htmlTagHelper)
-    {
-        $this->htmlTagHelper = $htmlTagHelper;
-    }
+//    /** @var HtmlTagHelper */
+//    protected $htmlTagHelper;
+//
+//    /**
+//     * EmailBodyHelper constructor.
+//     *
+//     * @param HtmlTagHelper $htmlTagHelper
+//     */
+//    public function __construct(HtmlTagHelper $htmlTagHelper)
+//    {
+//        $this->htmlTagHelper = $htmlTagHelper;
+//    }
 
     /**
      * Returns the plain text representation of email body
@@ -50,6 +50,6 @@ class EmailBodyHelper
         // clear `script` and `style` tags from content
         $body = preg_replace('/<(style|script).*?>.*?<\/\1>/s', '', $body);
 
-        return preg_replace('/(\s\s+|\n+|[^[:print:]])/', ' ', $this->htmlTagHelper->stripTags($body));
+        return preg_replace('/(\s\s+|\n+|[^[:print:]])/', ' ', trim(strip_tags($body)));
     }
 }

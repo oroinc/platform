@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 
 /**
  * Email Body
@@ -53,6 +54,13 @@ class EmailBody
      * @JMS\Type("boolean")
      */
     protected $bodyIsText;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="text_body", type="text")
+     */
+    protected $textBody;
 
     /**
      * @var bool
@@ -270,5 +278,30 @@ class EmailBody
     public function __toString()
     {
         return (string)$this->getId();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTextBody()
+    {
+        if (empty($this->textBody) && !empty($this->bodyContent)) {
+            $emailBodyHelper = new EmailBodyHelper();
+
+            return $emailBodyHelper->getClearBody($this->bodyContent);
+        }
+
+        return $this->textBody;
+    }
+
+    /**
+     * @param string $textBody
+     * @return $this
+     */
+    public function setTextBody($textBody)
+    {
+        $this->textBody = $textBody;
+
+        return $this;
     }
 }

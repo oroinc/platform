@@ -56,6 +56,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle::oroEmailAttachmentTable($schema);
         OroEmailBundle::oroEmailAttachmentContentTable($schema);
         OroEmailBundle::oroEmailBodyTable($schema);
+        OroEmailBundle127::addTextBodyFieldToEmailBodyTable($schema);
         OroEmailBundle::oroEmailFolderTable($schema);
         OroEmailBundle::oroEmailOriginTable($schema);
         OroEmailBundle::oroEmailRecipientTable($schema);

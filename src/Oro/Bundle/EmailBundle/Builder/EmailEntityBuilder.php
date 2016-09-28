@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -34,6 +35,9 @@ class EmailEntityBuilder
      * @var EmailAddressHelper
      */
     private $emailAddressHelper;
+
+    /** @var EmailBodyHelper */
+    private $emailBodyHelper;
 
     /**
      * Constructor
@@ -250,7 +254,8 @@ class EmailEntityBuilder
         $result
             ->setBodyContent($content)
             ->setBodyIsText(!$isHtml)
-            ->setPersistent($persistent);
+            ->setPersistent($persistent)
+            ->setTextBody($isHtml ? $this->getEmailBodyHelper()->getClearBody($content) : $content);
 
         return $result;
     }
@@ -475,5 +480,17 @@ class EmailEntityBuilder
                 . ' or Oro\Bundle\EmailBundle\Entity\EmailFolder'
             );
         }
+    }
+
+    /**
+     * @return EmailBodyHelper
+     */
+    protected function getEmailBodyHelper()
+    {
+        if (!$this->emailBodyHelper) {
+            $this->emailBodyHelper = new EmailBodyHelper();
+        }
+
+        return $this->emailBodyHelper;
     }
 }
