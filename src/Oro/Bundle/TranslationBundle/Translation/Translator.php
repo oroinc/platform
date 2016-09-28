@@ -5,7 +5,9 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageSelector;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
@@ -40,6 +42,27 @@ class Translator extends BaseTranslator
 
     /** @var string|null */
     protected $strategyName;
+
+    /** @var MessageSelector */
+    protected $messageSelector;
+
+    /** @var array */
+    protected $originalOptions;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(
+        ContainerInterface $container,
+        MessageSelector $messageSelector,
+        $loaderIds = [],
+        array $options = []
+    ) {
+        $this->messageSelector = $messageSelector;
+        $this->originalOptions = $options;
+
+        parent::__construct($container, $messageSelector, $loaderIds, $options);
+    }
 
     /**
      * Collector of translations
@@ -163,6 +186,36 @@ class Translator extends BaseTranslator
         $this->applyCurrentStrategy();
 
         parent::warmUp($cacheDir);
+    }
+
+    public function rebuildCache()
+    {
+        $cacheDir = $this->originalOptions['cache_dir'];
+
+        if (!$cacheDir || !is_dir($cacheDir)) {
+            $this->warmUp(null);
+            return;
+        }
+
+        $tmpDir = uniqid($cacheDir, true);
+
+        $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
+
+        $translator = new static( $this->container, $this->messageSelector, $this->loaderIds, $options);
+        $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
+
+        $translator->warmUp($tmpDir);
+
+        $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
+        foreach ($iterator as $path) {
+            if (!$path->isFile()) {
+                continue;
+            }
+            copy($path->getPathName(), $cacheDir . DIRECTORY_SEPARATOR . $path->getFileName());
+            unlink($path->getPathName());
+        }
+
+        rmdir($tmpDir);
     }
 
     /**

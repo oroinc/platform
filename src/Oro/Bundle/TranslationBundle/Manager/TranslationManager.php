@@ -200,14 +200,6 @@ class TranslationManager
     }
 
     /**
-     * @param string|null $locale
-     */
-    public function invalidateCache($locale = null)
-    {
-        $this->dbTranslationMetadataCache->updateTimestamp($locale);
-    }
-
-    /**
      * Returns the list of all existing in the database translation domains for the given locales.
      *
      * @param string[] $locales
@@ -296,34 +288,19 @@ class TranslationManager
     }
 
     /**
+     * @param string|null $locale
+     */
+    public function invalidateCache($locale = null)
+    {
+        $this->dbTranslationMetadataCache->updateTimestamp($locale);
+    }
+
+    /**
      * Rebuilds translation cache
      */
     public function rebuildCache()
     {
-        $this->cleanup($this->translationCacheDir);
-        $this->translator->warmUp($this->translationCacheDir);
-    }
-
-    /**
-     * Cleanup directory
-     *
-     * @param string $targetDir
-     */
-    protected function cleanup($targetDir)
-    {
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
-            return;
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($iterator as $path) {
-            $path->isFile() ? unlink($path->getPathname()) : rmdir($path->getPathname());
-        }
+        $this->translator->rebuildCache();
     }
 
     /**

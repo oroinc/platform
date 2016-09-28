@@ -10,6 +10,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\OutputStub;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 
@@ -21,8 +22,14 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
+    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $languageProvider;
+
     /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationManager;
+
+    /** @var EmptyArrayLoader */
+    protected $translationLoader;
 
     /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $input;
@@ -46,16 +53,24 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getCatalogue')
             ->will($this->returnValueMap($this->getCatalogueMap()));
 
+        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->translationManager = $this->getMockBuilder(TranslationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->translationLoader = new EmptyArrayLoader();
 
         $this->container = $this->getMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
                 ['translator', 1, $this->translator],
+                ['oro_translation.provider.language', 1, $this->languageProvider],
                 ['oro_translation.manager.translation', 1, $this->translationManager],
+                ['oro_translation.database_translation.loader', 1, $this->translationLoader],
             ]));
 
         $this->input = $this->getMock(InputInterface::class);
@@ -76,11 +91,15 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
     {
         $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn([]);
 
-        $this->translator->expects($this->once())->method('getFallbackLocales')->willReturn(['locale1', 'locale1']);
-        $this->translator->expects($this->once())->method('getLocale')->willReturn('currentLocale');
+        $this->languageProvider->expects($this->once())
+            ->method('getAvailableLanguages')
+            ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
 
-        $this->container->expects($this->once())->method('set')
-            ->with('oro_translation.database_translation.loader', new EmptyArrayLoader());
+        $loader = new EmptyArrayLoader();
+
+        $this->container->expects($this->at(2))->method('set')
+            ->with('oro_translation.database_translation.loader', new EmptyArrayLoader())
+            ->willReturn($this->translationManager);
 
         $this->translationManager->expects($this->at(0))->method('rebuildCache');
 
@@ -101,12 +120,16 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
             ->with('key2', 'currentLocale', 'domain1')->willReturn(new \stdClass());
         $this->translationManager->expects($this->at(8))->method('flush');
 
+        $this->container->expects($this->at(5))->method('set')
+            ->with('oro_translation.database_translation.loader', $loader);
+
         $this->translationManager->expects($this->at(9))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
         $this->assertEquals(
             [
+                'Available locales: locale1, currentLocale. Should be processed: locale1, currentLocale.',
                 'Loading translations [locale1] (2) ...',
                 '  > loading [domain1] (1) ... ',
                 'added 1 records.',
@@ -116,6 +139,8 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 '  > loading [domain1] (2) ... ',
                 'added 0 records.',
                 'All messages successfully loaded.',
+                'Rebuilding cache ... ',
+                'Done.',
             ],
             $this->output->messages
         );
@@ -125,11 +150,9 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
     {
         $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn(['locale1']);
 
-        $this->translator->expects($this->never())->method('getFallbackLocales');
-        $this->translator->expects($this->never())->method('getLocale');
-
-        $this->container->expects($this->once())->method('set')
-            ->with('oro_translation.database_translation.loader', new EmptyArrayLoader());
+        $this->languageProvider->expects($this->once())
+            ->method('getAvailableLanguages')
+            ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
 
         $this->translationManager->expects($this->at(0))->method('rebuildCache');
 
@@ -150,36 +173,15 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
+                'Available locales: locale1, currentLocale. Should be processed: locale1.',
                 'Loading translations [locale1] (2) ...',
                 '  > loading [domain1] (1) ... ',
                 'added 1 records.',
                 '  > loading [domain2] (1) ... ',
                 'added 0 records.',
                 'All messages successfully loaded.',
-            ],
-            $this->output->messages
-        );
-    }
-
-    public function testExecuteWithUnknownLanguage()
-    {
-        $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn(['unknown_locale']);
-
-        $this->translator->expects($this->never())->method('getFallbackLocales');
-        $this->translator->expects($this->never())->method('getLocale');
-
-        $this->translationManager->expects($this->never())->method('findValue');
-        $this->translationManager->expects($this->never())->method('createValue');
-        $this->translationManager->expects($this->never())->method('flush');
-
-        $this->translationManager->expects($this->at(0))->method('invalidateCache');
-
-        $this->command->run($this->input, $this->output);
-
-        $this->assertEquals(
-            [
-                'Loading translations [unknown_locale] (0) ...',
-                'All messages successfully loaded.',
+                'Rebuilding cache ... ',
+                'Done.',
             ],
             $this->output->messages
         );
@@ -210,10 +212,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                         'key1' => 'domain2-locale1-message1',
                     ],
                 ])
-            ],
-            [
-                'unknown_locale',
-                new MessageCatalogue('unknown_locale', [])
             ],
         ];
     }

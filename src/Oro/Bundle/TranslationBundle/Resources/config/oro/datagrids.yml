@@ -147,6 +147,7 @@ datagrids:
             value:
                 label: oro.translation.translation.value.label
                 inline_editing:
+                    enable: true
                     editor:
                         view: orotranslation/js/app/views/editor/text-editor-view
                     save_api_accessor:
