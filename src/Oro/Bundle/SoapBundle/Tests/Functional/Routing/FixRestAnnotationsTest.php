@@ -22,7 +22,7 @@ class FixRestAnnotationsTest extends WebTestCase
         $brokenRoutes = [];
         /** @var Route $route */
         foreach ($router->getRouteCollection() as $routeName => $route) {
-            if (false !== strpos($routeName, '_api_') && 0 !== strpos($route->getPath(), '/api/')) {
+            if ($this->checkRoute($routeName, $route->getPath())) {
                 $brokenRoutes[$routeName] = $route->getPath();
             }
         }
@@ -33,5 +33,29 @@ class FixRestAnnotationsTest extends WebTestCase
             }
             $this->fail($message);
         }
+    }
+
+    /**
+     * @param string $routeName
+     * @param string $routePath
+     *
+     * @return bool
+     */
+    protected function checkRoute($routeName, $routePath)
+    {
+        $oroDefaultPrefix = $this->getUrl('oro_default');
+        /**
+         * CRM only mode
+         */
+        if ($oroDefaultPrefix === '/') {
+            return (false !== strpos($routeName, '_api_') && 0 !== strpos($routePath, '/api/'));
+        }
+
+        /**
+         * Integration mode (CRM + COMMERCE)
+         */
+        return
+            false !== strpos($routeName, '_api_') &&
+            0 !== strpos($routePath, '/api/') && 0 !== strpos($routePath, $oroDefaultPrefix . 'api/');
     }
 }
