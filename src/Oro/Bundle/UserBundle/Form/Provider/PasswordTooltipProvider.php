@@ -49,14 +49,8 @@ class PasswordTooltipProvider
      */
     public function getTooltip()
     {
-        $parts = [];
-        foreach (self::$tooltipPartsMap as $configKey => $partKey) {
-            $config = $this->configManager->get($configKey);
-            if ($config) {
-                $parts[] = $partKey;
-            }
-        }
-        $minLength = $this->configManager->get(PasswordComplexityValidator::CONFIG_MIN_LENGTH);
+        $parts = $this->getEnabledRules();
+        $minLength = $this->getMinLength();
         $transKey = self::UNRESTRICTED;
 
         if (count($parts) > 0) {
@@ -64,5 +58,33 @@ class PasswordTooltipProvider
         }
 
         return $this->translator->trans($transKey, ['{{ length }}' => $minLength]);
+    }
+
+    /**
+     * Return a map of configured rules
+     *
+     * @return array
+     */
+    public function getEnabledRules()
+    {
+        $parts = [];
+        foreach (self::$tooltipPartsMap as $configKey => $partKey) {
+            $config = $this->configManager->get($configKey);
+            if ($config) {
+                $parts[] = $partKey;
+            }
+        }
+
+        return $parts;
+    }
+
+    /**
+     * Get the min length requirement for passwords
+     *
+     * @return int
+     */
+    public function getMinLength()
+    {
+        return (int) $this->configManager->get(PasswordComplexityValidator::CONFIG_MIN_LENGTH);;
     }
 }

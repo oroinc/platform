@@ -35,6 +35,10 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
                 'required'      => true,
                 'label'         => 'oro.user.new_password.label',
                 'hint'       => null,
+                'attr' => [
+                    'data-require-length' => '',
+                    'data-require-rules' => '',
+                ],
                 'constraints'   => [
                     new NotBlank(),
                     new PasswordComplexity(),

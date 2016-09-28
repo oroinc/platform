@@ -25,10 +25,18 @@ class SetPasswordType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // build a list of indexes of the rules (1,2,3)
+        $requireRules = join(',', array_keys(array_filter((array)$this->passwordTooltip->getEnabledRules())));
+
         $builder->add('password', 'password', [
             'required'      => true,
             'label'         => 'oro.user.new_password.label',
-            'hint'       => $this->passwordTooltip->getTooltip(),
+            'hint'          => $this->passwordTooltip->getTooltip(),
+            'attr'          => [
+                // config of Suggest password
+                'data-require-length' => $this->passwordTooltip->getMinLength(),
+                'data-require-rules' => $requireRules
+            ],
             'constraints'   => [
                 new NotBlank(),
                 new PasswordComplexity(),
