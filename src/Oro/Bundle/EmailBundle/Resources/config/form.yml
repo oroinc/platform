@@ -102,6 +102,8 @@ services:
 
     oro_email.form.type.emailtemplate_rich_text:
         class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType
+        arguments:
+            - %kernel.cache_dir%
         tags:
             - { name: form.type, alias: oro_email_template_rich_text }
 
