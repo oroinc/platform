@@ -127,10 +127,10 @@ define(function(require) {
                     data: {
                         'keys': this.value.value
                     },
-                    success: function (response) {
+                    success: function(response) {
                         self.trigger(successEventName, response);
                     },
-                    error: function (jqXHR) {
+                    error: function(jqXHR) {
                         messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                     }
                 });
@@ -138,7 +138,7 @@ define(function(require) {
                 var select2ConfigData = this.select2ConfigData;
                 var value = this.value.value;
                 var result = {
-                    results: _.filter(select2ConfigData, function (item) {
+                    results: _.filter(select2ConfigData, function(item) {
                         return _.indexOf(value, item.id) !== -1;
                     })
                 };
@@ -271,10 +271,10 @@ define(function(require) {
                             dictionary: this.dictionaryClass
                         }
                     ),
-                        dataType: 'json',
-                        delay: 250,
-                        type: 'POST',
-                        data: function(params) {
+                    dataType: 'json',
+                    delay: 250,
+                    type: 'POST',
+                    data: function(params) {
                         return {
                             q: params // search term
                         };
