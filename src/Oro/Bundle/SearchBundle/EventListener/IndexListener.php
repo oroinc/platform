@@ -38,11 +38,6 @@ class IndexListener implements OptionalListenerInterface
     protected $entitiesConfig = [];
 
     /**
-     * @var SearchMappingProvider
-     */
-    protected $mappingProvider;
-
-    /**
      * @var array
      */
     protected $savedEntities = [];
