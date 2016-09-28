@@ -139,7 +139,6 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 'bundles' => array(),
                 'expectedMenu' => array(
-                    'areas' => array(),
                     'items' => array(
                         'items_sub2' => array_merge(array('label' => 'Sub2'), $defaultItemParameters)
                     ),
@@ -190,12 +189,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     $bundle2->getName() => get_class($bundle2),
                 ),
                 'expectedMenu' => array(
-                    'areas' => array(
-                        'default' => array('application_menu', 'quicklinks'),
-                        'custom' => array('shortcuts'),
-                    ),
                     'items' => array(
-                        'customers_tab' => array_merge(array('label' => 'Customers'), $defaultItemParameters),
+                        'customers_tab' => array_merge(array('label' => 'Customers', 'readOnly' => true), $defaultItemParameters),
                         'call_list' => array_merge(array('label' => 'Calls RENAMED'), $defaultItemParameters),
                         'to_replace' => array_merge(array('label' => 'Replaced'), $defaultItemParameters),
                         'to_move_top' => array_merge(array('label' => 'To move'), $defaultItemParameters),
@@ -210,6 +205,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     'tree' => array(
                         'application_menu' => array(
                             'type' => 'application_menu',
+                            'area' => 'default',
                             'children' => array(
                                 'customers_tab' => array(
                                     'children' => array(
@@ -243,6 +239,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         ),
                         'shortcuts' => array(
                             'type' => 'shortcuts',
+                            'area' => 'custom',
+                            'read_only' => true,
                             'children' => array(
                                 'shortcut_call_list' => array(
                                     'children' => array(),

@@ -76,7 +76,6 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     public function setAreaToExtraProvider()
     {
         $defaultConfig = array(
-            'areas' => array(),
             'items' => array(
                 'homepage' => array(
                     'name' => 'Home page 2',
@@ -104,12 +103,14 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         return array(
             'with no area specified' => array(
                 'options' => $defaultConfig,
-                'expectedArea' => ConfigurationBuilder::DEFAULT_AREA,
+                'expectedArea' => 'default',
             ),
             'with area' => array(
-                'options' => array_merge($defaultConfig, array(
-                    'areas' => array(
-                        'frontend' => ['navbar']
+                'options' => array_replace_recursive($defaultConfig, array(
+                    'tree' => array(
+                        'navbar' => array(
+                            'area' => 'frontend'
+                        )
                     )
                 )),
                 'expectedArea' => 'frontend',
