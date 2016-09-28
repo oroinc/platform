@@ -66,6 +66,7 @@ class MenuUpdateManager
         $entity
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
+            ->setKey($this->generateKey())
         ;
 
         return $entity;
@@ -228,5 +229,13 @@ class MenuUpdateManager
     private function getEntityManager()
     {
         return $this->managerRegistry->getManagerForClass($this->entityClass);
+    }
+
+    /**
+     * @return string
+     */
+    public function generateKey()
+    {
+        return uniqid('menu_item_');
     }
 }

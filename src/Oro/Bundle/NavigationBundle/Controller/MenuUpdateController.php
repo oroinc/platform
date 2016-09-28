@@ -117,7 +117,7 @@ class MenuUpdateController extends Controller
      */
     private function update(MenuUpdate $menuUpdate)
     {
-        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_update_key' => $menuUpdate->getKey()]);
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
 
         return $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
