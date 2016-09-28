@@ -702,6 +702,9 @@ define(function(require) {
             // prepare options for jQuery FullCalendar control
             options = { // prepare options for jQuery FullCalendar control
                 timezone: this.options.timezone,
+                displayEventEnd: {
+                    month: true
+                },
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.onFcSelect, this),
