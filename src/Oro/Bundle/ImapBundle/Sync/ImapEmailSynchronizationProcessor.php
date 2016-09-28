@@ -78,10 +78,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->initEnv($origin);
         $processStartTime = time();
         // iterate through all folders enabled for sync and do a synchronization of emails for each one
-        $imapFolders = $this->getSyncEnabledImapFolders($origin);
-        //sort folders by failed count, so not failed folders should be synced first.
-        //sorting only array here(not in QB) to avoid confusing in other possible places where folders are used
-        $this->sortFoldersByFailedCount($imapFolders);
+        $imapFolders = $this->getSyncEnabledImapFolders($origin, true);
         foreach ($imapFolders as $imapFolder) {
             $folder = $imapFolder->getFolder();
 
@@ -564,13 +561,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @return ImapEmailFolder[]
      */
-    protected function getSyncEnabledImapFolders(EmailOrigin $origin)
+    protected function getSyncEnabledImapFolders(EmailOrigin $origin, $sortByFailedCount = false)
     {
         $this->logger->info('Get folders enabled for sync...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE);
+        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE, $sortByFailedCount);
 
         $this->logger->info(sprintf('Got %d folder(s).', count($imapFolders)));
 
@@ -600,25 +597,5 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 )
             );
         }
-    }
-
-    /**
-     * @param array $imapFolders
-     *
-     * @return ImapEmailSynchronizationProcessor
-     */
-    protected function sortFoldersByFailedCount(&$imapFolders)
-    {
-        usort($imapFolders, function ($imapFolder1, $imapFolder2) {
-            $failedCount1 = $imapFolder1->getFolder()->getFailedCount();
-            $failedCount2 = $imapFolder2->getFolder()->getFailedCount();
-            if ($failedCount1 == $failedCount2) {
-                return 0;
-            }
-
-            return ($failedCount1 < $failedCount2) ? -1 : 1;
-        });
-
-        return $this;
     }
 }
