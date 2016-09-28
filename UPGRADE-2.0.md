@@ -135,6 +135,11 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 `Oro/Bundle/SearchBundle/Entity/IndexText`, `Oro/Bundle/SearchBundle/Entity/Item`
 - Constructor of class `Oro/Bundle/Engine/FulltextIndexManager` was changed. New optional arguments `$tableName` and `$indexName` was added.
 - Methods `PdoMysql::getPlainSql` and `PdoPgsql::getPlainSql` were changed. New optional arguments `$tableName` and `$indexName` was added
+- `\Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider::getEntityConfig` returns empty array if config not found
+- `\Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider::getEntityModeConfig` default value is Mode::NORMAL if configurations is mepty
+- `\Oro\Bundle\SearchBundle\Engine\ObjectMapper::mapSelectedData` returns empty array if data fields not found
+- `\Oro\Bundle\SearchBundle\Query\Result\Item::_construct` signature changed, array type hintings added
+
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
