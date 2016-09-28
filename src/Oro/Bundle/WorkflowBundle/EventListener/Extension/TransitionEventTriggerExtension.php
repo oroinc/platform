@@ -126,17 +126,25 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         }
 
         $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $trigger->getWorkflowName());
-        if (!$workflowItem) {
-            return;
-        }
 
         if ($trigger->isQueued() || $this->forceQueued) {
-            $this->producer->send(
-                self::TOPIC_NAME,
-                TransitionEventTriggerMessage::create($trigger, $workflowItem)->toArray()
+            $message = TransitionEventTriggerMessage::create(
+                $trigger,
+                $workflowItem,
+                $this->doctrineHelper->getEntityIdentifier($mainEntity)
             );
-        } else {
+
+            $this->producer->send(self::TOPIC_NAME, $message->toArray());
+        } elseif ($workflowItem) {
             $this->workflowManager->transitIfAllowed($workflowItem, $trigger->getTransitionName());
+        } else {
+            $this->workflowManager->startWorkflow(
+                $trigger->getWorkflowName(),
+                $entity,
+                $trigger->getTransitionName(),
+                [],
+                false
+            );
         }
     }
 

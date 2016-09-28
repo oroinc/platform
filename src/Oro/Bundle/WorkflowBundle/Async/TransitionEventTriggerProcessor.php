@@ -44,14 +44,30 @@ class TransitionEventTriggerProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
+        $result = null;
+
         try {
             $triggerMessage = TransitionEventTriggerMessage::createFromJson($message->getBody());
 
-            $trigger = $this->resolveEntity(TransitionEventTrigger::class, $triggerMessage->getTriggerId());
+            $trigger = $this->resolveEntity(TransitionEventTrigger::class, $triggerMessage->getTriggerId(), true);
 
             $workflowItem = $this->resolveEntity(WorkflowItem::class, $triggerMessage->getWorkflowItemId());
+            if ($workflowItem) {
+                $result = $this->manager->transitIfAllowed($workflowItem, $trigger->getTransitionName());
+            } else {
+                $entity = $this->resolveEntity(
+                    $trigger->getWorkflowDefinition()->getRelatedEntity(),
+                    $triggerMessage->getMainEntityId()
+                );
 
-            $result = $this->manager->transitIfAllowed($workflowItem, $trigger->getTransitionName());
+                if ($entity) {
+                    $result = $this->manager->startWorkflow(
+                        $trigger->getWorkflowName(),
+                        $entity,
+                        $trigger->getTransitionName()
+                    );
+                }
+            }
 
             if (!$result) {
                 throw new \RuntimeException('Transition not allowed');
@@ -74,19 +90,26 @@ class TransitionEventTriggerProcessor implements MessageProcessorInterface
     /**
      * @param string $className
      * @param int $id
-     * @return object
+     * @param bool $throwExceptions
+     * @return null|object
      * @throws \InvalidArgumentException|EntityNotFoundException
      */
-    protected function resolveEntity($className, $id)
+    protected function resolveEntity($className, $id, $throwExceptions = false)
     {
         if ((int)$id < 1) {
-            throw new \InvalidArgumentException(sprintf('Message should contain valid %s id', $className));
+            if ($throwExceptions) {
+                throw new \InvalidArgumentException(sprintf('Message should contain valid %s id', $className));
+            } else {
+                return null;
+            }
         }
 
         $entity = $this->registry->getManagerForClass($className)->find($className, $id);
 
         if (!$entity) {
-            throw new EntityNotFoundException(sprintf('Entity %s with identifier %s not found', $className, $id));
+            if ($throwExceptions) {
+                throw new EntityNotFoundException(sprintf('Entity %s with identifier %s not found', $className, $id));
+            }
         }
 
         return $entity;

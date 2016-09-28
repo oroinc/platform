@@ -14,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-class HandleProcessCronTriggerCommand extends ContainerAwareCommand
+class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:workflow:handle-transition-cron-trigger';
 

@@ -19,10 +19,11 @@ class TransitionEventTriggerMessageTest extends \PHPUnit_Framework_TestCase
     {
         $triggerId = 42;
         $workflowItemId = 142;
+        $mainEntityId = ['id' => 105];
 
         $this->assertEquals(
-            $this->getJson($triggerId, $workflowItemId),
-            JSON::encode($this->getTransitionEventTriggerMessage($triggerId, $workflowItemId))
+            $this->getJson($triggerId, $workflowItemId, $mainEntityId),
+            JSON::encode($this->getTransitionEventTriggerMessage($triggerId, $workflowItemId, $mainEntityId))
         );
     }
 
@@ -30,13 +31,15 @@ class TransitionEventTriggerMessageTest extends \PHPUnit_Framework_TestCase
     {
         $triggerId = 42;
         $workflowItemId = 142;
+        $mainEntityId = ['id' => 105];
 
         $this->assertEquals(
             [
                 TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => $triggerId,
-                TransitionEventTriggerMessage::WORKFLOW_ITEM => $workflowItemId
+                TransitionEventTriggerMessage::WORKFLOW_ITEM => $workflowItemId,
+                TransitionEventTriggerMessage::MAIN_ENTITY => $mainEntityId
             ],
-            $this->getTransitionEventTriggerMessage($triggerId, $workflowItemId)->toArray()
+            $this->getTransitionEventTriggerMessage($triggerId, $workflowItemId, $mainEntityId)->toArray()
         );
     }
 
@@ -82,13 +85,14 @@ class TransitionEventTriggerMessageTest extends \PHPUnit_Framework_TestCase
     {
         $triggerId = 42;
         $workflowItemId = 142;
+        $mainEntityId = ['id' => 105];
 
         $this->assertEquals(
-            $this->getTransitionEventTriggerMessage($triggerId, $workflowItemId),
-            TransitionEventTriggerMessage::createFromJson($this->getJson($triggerId, $workflowItemId))
+            $this->getTransitionEventTriggerMessage($triggerId, $workflowItemId, $mainEntityId),
+            TransitionEventTriggerMessage::createFromJson($this->getJson($triggerId, $workflowItemId, $mainEntityId))
         );
         $this->assertEquals(
-            $this->getTransitionEventTriggerMessage(null, null),
+            $this->getTransitionEventTriggerMessage(null, null, null),
             TransitionEventTriggerMessage::createFromJson('{"test":"data"}')
         );
     }
@@ -97,12 +101,14 @@ class TransitionEventTriggerMessageTest extends \PHPUnit_Framework_TestCase
     {
         $triggerId = 42;
         $workflowItemId = 142;
+        $mainEntityId = ['id' => 105];
 
         $this->assertEquals(
-            $this->getTransitionEventTriggerMessage($triggerId, $workflowItemId),
+            $this->getTransitionEventTriggerMessage($triggerId, $workflowItemId, $mainEntityId),
             TransitionEventTriggerMessage::create(
                 $this->getEventTriggerMock($triggerId),
-                $this->getEntity(WorkflowItem::class, ['id' => $workflowItemId])
+                $this->getEntity(WorkflowItem::class, ['id' => $workflowItemId]),
+                $mainEntityId
             )
         );
     }
@@ -110,10 +116,11 @@ class TransitionEventTriggerMessageTest extends \PHPUnit_Framework_TestCase
     public function testAccessors()
     {
         $this->assertPropertyAccessors(
-            $this->getTransitionEventTriggerMessage(null, null),
+            $this->getTransitionEventTriggerMessage(null, null, null),
             [
                 ['triggerId', 5, 0],
-                ['workflowItemId', 10, 0]
+                ['workflowItemId', 10, 0],
+                ['mainEntityId', ['id' => 105]]
             ]
         );
     }
@@ -133,29 +140,33 @@ class TransitionEventTriggerMessageTest extends \PHPUnit_Framework_TestCase
     /**
      * @param int $triggerId
      * @param int $workflowItemId
+     * @param mixed $mainEntityId
      * @return TransitionEventTriggerMessage
      */
-    protected function getTransitionEventTriggerMessage($triggerId, $workflowItemId)
+    protected function getTransitionEventTriggerMessage($triggerId, $workflowItemId, $mainEntityId)
     {
         return $this->getEntity(
             TransitionEventTriggerMessage::class,
-            ['triggerId' => $triggerId, 'workflowItemId' => $workflowItemId]
+            ['triggerId' => $triggerId, 'workflowItemId' => $workflowItemId, 'mainEntityId' => $mainEntityId]
         );
     }
 
     /**
      * @param int $triggerId
      * @param int $workflowItemId
+     * @param mixed $mainEntityId
      * @return string
      */
-    protected function getJson($triggerId, $workflowItemId)
+    protected function getJson($triggerId, $workflowItemId, $mainEntityId)
     {
         return sprintf(
-            '{"%s":%d,"%s":%d}',
+            '{"%s":%d,"%s":%s,"%s":%s}',
             TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER,
             $triggerId,
             TransitionEventTriggerMessage::WORKFLOW_ITEM,
-            $workflowItemId
+            $workflowItemId,
+            TransitionEventTriggerMessage::MAIN_ENTITY,
+            json_encode($mainEntityId)
         );
     }
 }

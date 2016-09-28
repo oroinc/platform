@@ -5,14 +5,19 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\AbstractEventTriggerExtension;
 
+use Oro\Component\Testing\Unit\EntityTrait;
+
 abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY = 'stdClass';
-    const FIELD = 'field';
+    use EntityTrait;
+
+    const ENTITY_CLASS = WorkflowAwareEntity::class;
+    const FIELD = 'name';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
@@ -121,5 +126,14 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_Test
         }
 
         return $expectedTriggers;
+    }
+
+    /**
+     * @param int $id
+     * @return WorkflowAwareEntity|object
+     */
+    protected function getMainEntity($id = 42)
+    {
+        return $this->getEntity(self::ENTITY_CLASS, ['id' => $id]);
     }
 }

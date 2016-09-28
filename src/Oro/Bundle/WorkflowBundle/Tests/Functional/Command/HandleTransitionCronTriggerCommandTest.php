@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Command\HandleProcessCronTriggerCommand;
+use Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -17,7 +17,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 /**
  * @dbIsolation
  */
-class HandleProcessCronTriggerCommandTest extends WebTestCase
+class HandleTransitionCronTriggerCommandTest extends WebTestCase
 {
     protected function setUp()
     {
@@ -37,7 +37,7 @@ class HandleProcessCronTriggerCommandTest extends WebTestCase
         $trigger = $this->getReference(LoadTransitionTriggers::TRIGGER_CRON);
         $this->assertNotNull($trigger);
 
-        $result = $this->runCommand(HandleProcessCronTriggerCommand::NAME, ['--id' => (string)$trigger->getId()]);
+        $result = $this->runCommand(HandleTransitionCronTriggerCommand::NAME, ['--id' => (string)$trigger->getId()]);
 
         $this->assertNotEmpty($result);
         $this->assertContains(
