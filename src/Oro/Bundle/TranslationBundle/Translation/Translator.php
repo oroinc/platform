@@ -193,7 +193,7 @@ class Translator extends BaseTranslator
         $cacheDir = $this->originalOptions['cache_dir'];
 
         if (!$cacheDir || !is_dir($cacheDir)) {
-            $this->warmUp(null);
+            $this->warmUp($cacheDir);
             return;
         }
 
@@ -201,7 +201,7 @@ class Translator extends BaseTranslator
 
         $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
 
-        $translator = new static( $this->container, $this->messageSelector, $this->loaderIds, $options);
+        $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
         $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
 
         $translator->warmUp($tmpDir);

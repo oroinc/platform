@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;

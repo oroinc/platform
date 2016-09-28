@@ -57,7 +57,7 @@ class JsTranslationDumper implements LoggerAwareInterface
         $this->router                = $router;
         $this->translationDomains    = $translationDomains;
         $this->kernelRootDir         = $kernelRootDir;
-        $this->languageProvider    = $languageProvider;
+        $this->languageProvider      = $languageProvider;
         $this->jsTranslationRoute    = $jsTranslationRoute;
 
         $this->setLogger(new NullLogger());

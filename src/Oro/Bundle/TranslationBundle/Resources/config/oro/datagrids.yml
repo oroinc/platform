@@ -71,7 +71,7 @@ datagrids:
                     data_name: language
                     options:
                         field_options:
-                            multiple: true                        
+                            multiple: true
                 enabled:
                     type: choice
                     data_name: CAST(language.enabled as int)
