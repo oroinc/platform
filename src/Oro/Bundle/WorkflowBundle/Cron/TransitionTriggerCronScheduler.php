@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Cron;
 
-use Oro\Bundle\WorkflowBundle\Command\HandleProcessCronTriggerCommand;
+use Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 
 class TransitionTriggerCronScheduler extends AbstractTriggerCronScheduler
 {
     /** @var string */
-    protected static $command = HandleProcessCronTriggerCommand::NAME;
+    protected static $command = HandleTransitionCronTriggerCommand::NAME;
 
     /**
      * @param TransitionCronTrigger $cronTrigger
