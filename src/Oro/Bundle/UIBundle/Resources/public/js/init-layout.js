@@ -197,7 +197,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         var activeDropdownsSelector = $(openDropdownsSelector.replace('open', 'active'), mainMenu);
 
         // trigger refresh of current page if active dropdown is clicked, despite the Backbone router limitations
-        $('li.active', $(activeDropdownsSelector)).on('click', function() {
+        $(document).on('click', $('li.active', $(activeDropdownsSelector)), function() {
             mediator.execute('refreshPage');
         });
 
