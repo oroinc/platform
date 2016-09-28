@@ -81,7 +81,7 @@ class EmailNotificationManager
             $emailBody = $email->getEmailBody();
             if ($emailBody) {
                 $bodyContent = $this->htmlTagHelper->shorten(
-                    $this->emailBodyHelper->getClearBody($emailBody->getBodyContent())
+                    $emailBody->getTextBody()
                 );
             }
 

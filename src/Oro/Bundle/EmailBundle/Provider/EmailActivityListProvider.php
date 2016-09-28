@@ -194,9 +194,8 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         if ($entity->getEmailBody()) {
-            $body = $entity->getEmailBody()->getBodyContent();
-            $content = $this->emailBodyHelper->getClearBody($body);
-            $content = $this->htmlTagHelper->shorten($content);
+            $body = $entity->getEmailBody()->getTextBody();
+            $content = $this->htmlTagHelper->shorten($body);
 
             return $content;
         }
