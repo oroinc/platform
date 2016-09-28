@@ -172,7 +172,7 @@ abstract class AbstractSearchMappingProvider
      *
      * @param string $entity
      *
-     * @return bool|array
+     * @return array
      */
     public function getEntityConfig($entity)
     {
@@ -181,6 +181,6 @@ abstract class AbstractSearchMappingProvider
             return $mappingConfig[(string)$entity];
         }
 
-        return false;
+        return [];
     }
 }
