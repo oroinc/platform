@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\EntityDataTransformer;
+use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
@@ -26,7 +27,8 @@ class EntityObjectNormalizerTest extends OrmRelatedTestCase
             $normalizers,
             $this->doctrineHelper,
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
+            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface')),
+            new ConfigNormalizer()
         );
 
         $normalizers->addNormalizer(

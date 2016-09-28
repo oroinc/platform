@@ -50,12 +50,13 @@ By default this command shows configuration of nesting entities. To simplify the
 php app/console oro:api:config:dump-reference --max-nesting-level=0
 ```
 
-The default nesting level is `3`. It is specified in [services.yml](../config/services.yml) via the `oro_api.config.max_nesting_level` parameter. So, if needed, you can easily change this value.
+The default nesting level is `3`. It is specified in the configuration of ApiBundle via the `config_max_nesting_level` parameter. So, if needed, you can easily change this value, for example:
 
 ```yaml
-parameters:
-    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
-    oro_api.config.max_nesting_level: 3
+# app/config/config.yml
+
+oro_api:
+    config_max_nesting_level: 3
 ```
 
 The first level sections of configuration are:
@@ -185,7 +186,6 @@ The `entities` section describes a configuration of entities.
 * **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity. For ORM entities a value of this option is retrieved from an entity metadata.
-* **post_serialize** *callable* A handler to be used to modify serialized data.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 * **form_type** *string* The form type that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default the `form` form type is used.
 * **form_options** *array* The form options that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
@@ -214,7 +214,6 @@ oro_api:
                 - HINT_TRANSLATABLE
                 - { name: HINT_FILTER_BY_CURRENT_USER }
                 - { name: HINT_CUSTOM_OUTPUT_WALKER, value: "Acme\Bundle\AcmeBundle\AST_Walker_Class"}
-            post_serialize:       ["Acme\Bundle\AcmeBundle\Serializer\MySerializationHandler", "serialize"]
             delete_handler:       acme.demo.test_entity.delete_handler
             excluded:             false
             form_type: acme_entity.api_form
@@ -238,7 +237,7 @@ This section describes entity fields' configuration.
 * **meta_property** *boolean* A flag indicates whether the field represents a meta information. For JSON.API such fields will be returned in [meta](http://jsonapi.org/format/#document-meta) section. By default `false`.
 * **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
-* **depends_on** *string[]* A list of fields on which this field depends on. This option can be helpful for computed fields. These fields will be loaded from the database even if they are excluded.
+* **depends_on** *string[]* A list of fields on which this field depends on. Also `.` can be used to specify a path to an association field. This option can be helpful for computed fields. These fields will be loaded from the database even if they are excluded.
 
 Examples:
 
@@ -301,7 +300,7 @@ oro_api:
                 # computed field
                 field9:
                     data_type: string
-                    depends_on: [field1]
+                    depends_on: [field1, association1.field11]
 ```
 
 "filters" configuration section
@@ -316,6 +315,9 @@ This section describes fields by which the result data can be filtered. It conta
     * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
     * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
+    * **type** *string* The filter type. By default the filter type is equal to the **data_type** property.
+    * **options** *array* The filter options.
+    * **operators** *array* A list of operators supported by the filter. By default the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>** and **>=** operators, etc. Usually you need to use this parameter in case if you need to make a list of supported operators more limited.
 
 Example:
 
@@ -336,6 +338,13 @@ oro_api:
                     field3:
                         data_type: boolean
                         allow_array: false
+                    field4:
+                        data_type: string
+                        type: myFilter
+                        options:
+                            my_option: value
+                    field5:
+                        operators: ['=']
 ```
 
 "sorters" configuration section
@@ -400,6 +409,16 @@ By default, the following permissions are used to restrict access to an entity i
 
 
 Examples of `actions` section configuration:
+
+Disable all action for an entity:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            # this entity does not have own Data API resource
+            actions: false
+```
 
 Disable `delete` action for an entity:
 

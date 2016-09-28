@@ -67,6 +67,7 @@ class ServiceController extends BaseController
 
             if ($installed) {
                 $this->setLanguageInstalled($code);
+                $this->dumpTranslations($code);
                 $data['success'] = true;
             } else {
                 $data['message'] = $this->get('translator')->trans('oro.translation.download.error');
@@ -117,5 +118,13 @@ class ServiceController extends BaseController
 
         // clear statistic cache
         $statisticProvider->clear();
+    }
+
+    /**
+     * @param $code
+     */
+    protected function dumpTranslations($code)
+    {
+        $this->get('oro_translation.js_dumper')->dumpTranslations([$code]);
     }
 }

@@ -78,13 +78,29 @@ datagrid:
         acl_resource: oro_email_email_user_view
         source:
             type: orm
+            count_query:
+                select:
+                    - eu.id
+                join:
+                    left:
+                        -
+                            join: eu.email
+                            alias: e
+                        -
+                            join: eu.folders
+                            alias: f
+                        -
+                            join: f.origin
+                            alias: o
+                where:
+                    and:
+                        - o.isActive = true
+                groupBy: eu.id
             query:
                 select:
                     - partial eu.{id, email}
                     - e
-                    - partial f.{id, type}
                     - eb.bodyContent AS body_content
-                    - r_to
                     - >
                         (SELECT COUNT(_ec.id)
                         FROM OroEmailBundle:Email _ec
@@ -111,24 +127,17 @@ datagrid:
                             join: eu.email
                             alias: e
                         -
-                            join: eu.mailboxOwner
-                            alias: mb
-                        -
-                            join: e.recipients
-                            alias: r_to
-                        -
-                            join: eu.folders
-                            alias: f
-                        -
-                            join: f.origin
-                            alias: o
-                        -
                             join: e.emailBody
                             alias: eb
                 where:
                     and:
-                        - o.isActive = true
-                groupBy: e.sentAt, eu.id
+                        - >
+                            EXISTS (
+                                SELECT 1 FROM OroEmailBundle:EmailUser act_eu
+                                JOIN act_eu.folders act_f
+                                JOIN act_f.origin act_o
+                                WHERE act_o.isActive = true AND eu.id = act_eu.id
+                            )
 
         columns:
             contacts:
@@ -175,10 +184,16 @@ datagrid:
     email-grid:
         extends: base-email-grid
         source:
+            count_query:
+                where:
+                    and:
+                        - e.head = true
             query:
                 where:
                     and:
                         - e.head = true
+        # joins for filters to, cc, bcc, folders, folder and mailbox processes dynamically in
+        # Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener for performance reasons
         filters:
             columns:
                 subject: { type: string,   data_name: e.subject }
@@ -325,6 +340,8 @@ datagrid:
             entityHint: email
             toolbarOptions:
                 hide: true
+                pagination:
+                    onePage: true
                 pageSize:
                     items: [10]
                     default_per_page: 10

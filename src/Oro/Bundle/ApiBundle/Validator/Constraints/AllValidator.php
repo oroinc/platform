@@ -8,7 +8,7 @@
 
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\AbstractLazyCollection;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * The difference with Symfony constraint is that uninitialized PersistentCollection is not validated.
+ * The difference with Symfony constraint is that uninitialized lazy collection is not validated.
  * @see Symfony\Component\Validator\Constraints\All
  * @see Symfony\Component\Validator\Constraints\AllValidator
  */
@@ -39,8 +39,7 @@ class AllValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'array or Traversable');
         }
 
-        if ($value instanceof PersistentCollection && !$value->isInitialized()) {
-            // skip uninitialized PersistentCollection
+        if ($value instanceof AbstractLazyCollection && !$value->isInitialized()) {
             return;
         }
 

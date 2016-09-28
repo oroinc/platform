@@ -146,3 +146,130 @@ empty_field_description:
                     description: ""
     expected: []
     error: 'The path "entity.filters.fields.field1.description" cannot contain an empty value, but got "".'
+
+null_field_type:
+    config:
+        filters:
+            fields:
+                field1:
+                    type: ~
+    expected: []
+    error: 'The path "entity.filters.fields.field1.type" cannot contain an empty value, but got null.'
+
+empty_field_type:
+    config:
+        filters:
+            fields:
+                field1:
+                    type: ""
+    expected: []
+    error: 'The path "entity.filters.fields.field1.type" cannot contain an empty value, but got "".'
+
+invalid_field_type:
+    config:
+        filters:
+            fields:
+                field1:
+                    type: []
+    expected: []
+    error: 'Invalid type for path "entity.filters.fields.field1.type". Expected scalar, but got array.'
+
+field_type:
+    config:
+        filters:
+            fields:
+                field1:
+                    type: integer
+    expected:
+        filters:
+            fields:
+                field1:
+                    type: integer
+
+null_field_options:
+    config:
+        filters:
+            fields:
+                field1:
+                    options: ~
+    expected:
+        filters:
+            fields:
+                field1: []
+
+empty_field_options:
+    config:
+        filters:
+            fields:
+                field1:
+                    options: []
+    expected:
+        filters:
+            fields:
+                field1: []
+
+invalid_field_options:
+    config:
+        filters:
+            fields:
+                field1:
+                    options: test
+    expected: []
+    error: 'Invalid type for path "entity.filters.fields.field1.options". Expected array, but got string'
+
+field_options:
+    config:
+        filters:
+            fields:
+                field1:
+                    options:
+                        option1: value1
+    expected:
+        filters:
+            fields:
+                field1:
+                    options:
+                        option1: value1
+
+null_field_operators:
+    config:
+        filters:
+            fields:
+                field1:
+                    operators: ~
+    expected:
+        filters:
+            fields:
+                field1: []
+
+empty_field_operators:
+    config:
+        filters:
+            fields:
+                field1:
+                    operators: []
+    expected:
+        filters:
+            fields:
+                field1: []
+
+invalid_field_operators:
+    config:
+        filters:
+            fields:
+                field1:
+                    operators: test
+    expected: []
+    error: 'Invalid type for path "entity.filters.fields.field1.operators". Expected array, but got string'
+
+field_operators:
+    config:
+        filters:
+            fields:
+                field1:
+                    operators: ['=', '!=']
+    expected:
+        filters:
+            fields:
+                field1:
+                    operators: ['=', '!=']

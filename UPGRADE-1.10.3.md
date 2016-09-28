@@ -55,3 +55,15 @@ oro_email.email_address.entity_manager:
 
 ####LocaleBundle
 - `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
+
+####DatagridBundle:
+- Class `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource.php`
+    - construction signature was changed now it takes next arguments:
+        `ConfigProcessorInterface` $processor,
+        `EventDispatcherInterface` $eventDispatcher,
+        `ParameterBinderInterface` $parameterBinder,
+        `QueryHintResolver` $queryHintResolver
+- Added class `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor`
+- Added interface `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface`
+- `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource::getParameterBinder` was deprecated
+- `Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface::getParameterBinder` was deprecated

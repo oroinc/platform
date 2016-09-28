@@ -175,10 +175,6 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->method('apply')
             ->will($this->returnValue(['en']));
 
-        $this->dumper->expects($this->once())
-            ->method('dumpTranslations')
-            ->with(['en']);
-
         $service->download($path, ['Oro'], 'en');
     }
 
