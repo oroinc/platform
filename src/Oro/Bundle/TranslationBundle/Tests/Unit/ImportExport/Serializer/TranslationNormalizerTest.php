@@ -50,9 +50,12 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
             ->with('test_key', 'test_value', 'test_code', 'test_domain')
             ->willReturn($translation);
 
+        $this->assertEquals(Translation::SCOPE_SYSTEM, $translation->getScope());
+
         $result = $this->normalizer->denormalize($data, Translation::class, null, $context);
 
         $this->assertSame($translation, $result);
+        $this->assertEquals(Translation::SCOPE_UI, $translation->getScope());
     }
 
     /**

@@ -9,7 +9,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\DataCollectorTranslator;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
