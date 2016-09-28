@@ -352,6 +352,7 @@ placeholders:
 
 ####EntityBundle
 - `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
+- `Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface::getName` introduced
 
 Before
 ```
