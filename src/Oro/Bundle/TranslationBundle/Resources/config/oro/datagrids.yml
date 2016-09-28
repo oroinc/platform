@@ -19,16 +19,15 @@ datagrids:
                         - { join: language.owner, alias: languageOwner }
         inline_editing:
             enable: true
+            behaviour: enable_selected
             entity_name: '%oro_translation.entity.language.class%'
         columns:
-            code:
+            language:
                 label: oro.translation.language.entity_label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Language:Datagrid/code.html.twig
             ownerName:
                 acl_resource: oro_translation_language_update
                 label: oro.translation.language.owner.label
+                frontend_type: relation
                 inline_editing:
                     enable: true
                     editor:
@@ -39,6 +38,7 @@ datagrids:
                         class: orouser/js/tools/acl-users-search-api-accessor
                         permission_check_entity_name: Oro_Bundle_TranslationBundle_Entity_Language
                         permission: EDIT
+                renderable: false
             enabled:
                 label: oro.translation.language.enabled.label
                 type: twig
@@ -66,12 +66,12 @@ datagrids:
                 code: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         filters:
             columns:
-                code:
-                    type: choice
-                    data_name: language.code
+                language:
+                    type: language
+                    data_name: language
                     options:
                         field_options:
-                            choices: "@oro_translation.provider.language->getAvailableLanguages"
+                            multiple: true                        
                 enabled:
                     type: choice
                     data_name: CAST(language.enabled as int)
@@ -91,6 +91,11 @@ datagrids:
         properties:
             id: ~
             owner: ~
+            language:
+                type: callback
+                callable: ["@oro_locale.formatter.language_code", "formatLocale"]
+                params:
+                    - code
 
     oro-translation-translations-grid:
         acl_resource: oro_translation_translation_index
@@ -122,22 +127,18 @@ datagrids:
                             condition: 'translation.language = language AND translation.translationKey = translationKey'
         inline_editing:
             enable: true
+            behaviour: enable_selected
             entity_name: '%oro_translation.entity.translation.class%'
             acl_resource: oro_translation_language_translate
         columns:
             id:
                 label: oro.translation.translation.id.label
                 renderable: false
-            code:
+            language:
                 label: oro.translation.translation.language.label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Language:Datagrid/code.html.twig
             status:
                 label: oro.translation.translation.status.label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Translation:Datagrid/status.html.twig
+                frontend_type: boolean
             originalValue:
                 label: oro.translation.translation.original_value.label
                 type: twig
@@ -163,6 +164,8 @@ datagrids:
         sorters:
             multiple_sorting: true
             columns:
+                language:
+                    data_name: language.id
                 status:
                     data_name: status
                 value:
@@ -171,22 +174,19 @@ datagrids:
                     data_name: key
                 domain:
                     data_name: domain
+            default:
+                language: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC                    
         filters:
             columns:
-                code:
-                    type: choice
-                    data_name: language.code
+                language:
+                    type: language
+                    data_name: language
                     options:
                         field_options:
-                            choices: "@oro_translation.provider.language->getAvailableLanguages"
+                            multiple: true
                 status:
-                    type: choice
+                    type: boolean
                     data_name: CAST(status as int)
-                    options:
-                        field_options:
-                            choices:
-                                true: 'oro.translation.translation.status.translated'
-                                false: 'oro.translation.translation.status.untranslated'
                 value:
                     type: string
                     data_name: value
@@ -196,10 +196,10 @@ datagrids:
                 domain:
                     type: choice
                     data_name: domain
-                    enabled: true
                     options:
                         field_options:
                             choices: "@oro_translation.manager.translation->getAvailableDomains"
+                            multiple: true
         properties:
             id: ~
             context:
@@ -209,3 +209,8 @@ datagrids:
                     - key
             locale:
                 data_name: code
+            language:
+                type: callback
+                callable: ["@oro_locale.formatter.language_code", "formatLocale"]
+                params:
+                    - code

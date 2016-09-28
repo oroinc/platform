@@ -1,3 +1,7 @@
+.oro-translation-languages .translation-completeness {
+    min-width: 200px;
+}
+
 .oro-translation-languages .translation-completeness b {
     text-align: center;
     display: block;
@@ -8,6 +12,18 @@
     color: #5eb95e;
 }
 
-.oro-translation-languages .translation-status .status-needs-update {
+.oro-translation-languages .translation-status .status-available-update {
     color: #f89406;
+}
+
+.oro-translation-languages .translation-status .status-available-install {
+    color: #5eb95e;
+}
+
+.oro-translation-translations .grid-header-cell {
+    min-width: 100px;
+}
+
+#main .oro-translation-translations label {
+    text-transform: none;
 }

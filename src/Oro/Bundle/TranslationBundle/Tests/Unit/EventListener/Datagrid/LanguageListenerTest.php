@@ -148,6 +148,13 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
                 [$lang2, true],
             ]));
 
+        $this->languageHelper->expects($this->any())
+            ->method('isAvailableInstallTranslates')
+            ->will($this->returnValueMap([
+                [$lang1, true],
+                [$lang2, false],
+            ]));
+
         $event = $this->getEvent([
             ['id' => 1, LanguageListener::STATS_COUNT => null],
             ['id' => 2, LanguageListener::STATS_COUNT => 50],
@@ -163,6 +170,7 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
                     LanguageListener::STATS_COVERAGE_NAME => 0,
                     LanguageListener::STATS_INSTALLED => false,
                     LanguageListener::STATS_AVAILABLE_UPDATE => false,
+                    LanguageListener::STATS_AVAILABLE_INSTALL => true,
                 ]),
                 new ResultRecord([
                     'id' => 2,
@@ -170,6 +178,7 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
                     LanguageListener::STATS_COVERAGE_NAME => 0.5,
                     LanguageListener::STATS_INSTALLED => true,
                     LanguageListener::STATS_AVAILABLE_UPDATE => true,
+                    LanguageListener::STATS_AVAILABLE_INSTALL => false,
                 ]),
             ],
             $event->getRecords()

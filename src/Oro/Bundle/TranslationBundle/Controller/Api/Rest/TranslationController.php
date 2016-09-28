@@ -17,6 +17,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Handler\Context;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 /**
@@ -122,7 +123,7 @@ class TranslationController extends FOSRestController
         /* @var $translationManager TranslationManager */
         $translationManager = $this->get('oro_translation.manager.translation');
 
-        $translation = $translationManager->saveValue($key, $data['value'], $locale, $domain);
+        $translation = $translationManager->saveValue($key, $data['value'], $locale, $domain, Translation::SCOPE_UI);
         $translationManager->flush();
 
         if (null !== $translation) {
