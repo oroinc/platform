@@ -16,13 +16,17 @@ class LanguageControllerTest extends WebTestCase
         $this->loadFixtures([LoadLanguages::class]);
     }
 
-    public function testIndex()
+    public function testIndexGeneral()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_translation_language_index'));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains('oro-translation-language-grid', $crawler->html());
-        $this->assertContains(LoadLanguages::LANGUAGE1_NAME, $crawler->html());
-        $this->assertContains(LoadLanguages::LANGUAGE2_NAME, $crawler->html());
+
+        $languages = $this->getContainer()->get('oro_translation.provider.language')->getAvailableLanguages();
+
+        foreach ($languages as $language) {
+            $this->assertContains(sprintf('"language":"%s"', $language), $crawler->html());
+        }
     }
 }

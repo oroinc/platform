@@ -20,7 +20,7 @@ class TranslationKeyRepository extends EntityRepository
     /**
      * Returns the list of all existing in the database translation domains.
      *
-     * @return array [['code' = '...', 'domain' => '...'], ...]
+     * @return array ['domain' => 'domain']
      */
     public function findAvailableDomains()
     {
