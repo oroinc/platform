@@ -1,5 +1,5 @@
 oro_user_google_login:
-    pattern: /login/check-google
+    path: /login/check-google
 
 oro_user_bundle:
     resource:     "@OroUserBundle/Controller"
