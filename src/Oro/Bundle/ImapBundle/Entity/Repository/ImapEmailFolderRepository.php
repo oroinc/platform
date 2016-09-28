@@ -62,7 +62,7 @@ class ImapEmailFolderRepository extends EntityRepository
             usort($imapFolders, function ($imapFolder1, $imapFolder2) {
                 $failedCount1 = $imapFolder1->getFolder()->getFailedCount();
                 $failedCount2 = $imapFolder2->getFolder()->getFailedCount();
-                if ($failedCount1 == $failedCount2) {
+                if ($failedCount1 === $failedCount2) {
                     return 0;
                 }
 
