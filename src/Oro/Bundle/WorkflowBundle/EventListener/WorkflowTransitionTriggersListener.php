@@ -12,15 +12,14 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 
 class WorkflowTransitionTriggersListener implements EventSubscriberInterface
 {
-    /**
-     * @var WorkflowTransitionTriggersAssembler
-     */
+    /** @var WorkflowTransitionTriggersAssembler */
     private $assembler;
 
-    /**
-     * @var TransitionTriggersUpdater
-     */
+    /** @var TransitionTriggersUpdater */
     private $triggersUpdater;
+
+    /** @var TriggersBag[] */
+    private $triggerBags = [];
 
     /**
      * @param WorkflowTransitionTriggersAssembler $assembler
@@ -39,11 +38,10 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
      */
     public function triggersUpdate(WorkflowChangesEvent $event)
     {
-        $triggers = $this->assembler->assembleTriggers($event->getDefinition());
-
-        $triggersBag = new TriggersBag($event->getDefinition(), $triggers);
-
-        $this->triggersUpdater->updateTriggers($triggersBag);
+        $workflowName = $event->getDefinition()->getName();
+        if (array_key_exists($workflowName, $this->triggerBags)) {
+            $this->triggersUpdater->updateTriggers($this->triggerBags[$workflowName]);
+        }
     }
 
     /**
@@ -55,16 +53,36 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
     }
 
     /**
+     * @param WorkflowChangesEvent $event
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
+     */
+    public function createTriggers(WorkflowChangesEvent $event)
+    {
+        $definition = $event->getDefinition();
+        $workflowName = $definition->getName();
+
+        $this->triggerBags[$workflowName] = new TriggersBag(
+            $event->getDefinition(),
+            $this->assembler->assembleTriggers($definition)
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return [
+            WorkflowEvents::WORKFLOW_BEFORE_CREATE => 'createTriggers',
             WorkflowEvents::WORKFLOW_AFTER_CREATE => 'triggersUpdate',
+            WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'createTriggers',
             WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'triggersUpdate',
             WorkflowEvents::WORKFLOW_AFTER_DELETE => 'triggersDelete',
             WorkflowEvents::WORKFLOW_DEACTIVATED => 'triggersDelete',
-            WorkflowEvents::WORKFLOW_ACTIVATED => 'triggersUpdate'
+            WorkflowEvents::WORKFLOW_ACTIVATED => [
+                ['createTriggers', 10],
+                ['triggersUpdate', -10]
+            ]
         ];
     }
 }

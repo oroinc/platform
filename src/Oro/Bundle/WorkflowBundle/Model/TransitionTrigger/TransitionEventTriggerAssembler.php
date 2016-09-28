@@ -4,9 +4,21 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionTriggerVerifierInterface;
 
 class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
 {
+    /** @var TransitionTriggerVerifierInterface */
+    private $triggerVerifier;
+
+    /**
+     * @param TransitionTriggerVerifierInterface $triggerVerifier
+     */
+    public function __construct(TransitionTriggerVerifierInterface $triggerVerifier)
+    {
+        $this->triggerVerifier = $triggerVerifier;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -17,6 +29,7 @@ class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
 
     /**
      * {@inheritdoc}
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException
      */
     protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
@@ -31,6 +44,8 @@ class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
             ->setField($this->getOption($options, 'field', null))
             ->setRelation($this->getOption($options, 'relation', null))
             ->setRequire($this->getOption($options, 'require', null));
+
+        $this->triggerVerifier->verifyTrigger($trigger);
 
         return $trigger;
     }
