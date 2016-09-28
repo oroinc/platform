@@ -301,8 +301,6 @@ services:
     oro_workflow.transition_trigger.verifier.event_trigger_expression:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier
         public: false
-        arguments:
-            - '@oro_workflow.helper.transition_event_trigger'
 
     oro_workflow.transition_trigger.trigger_event_verifier:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerCompoundVerifier

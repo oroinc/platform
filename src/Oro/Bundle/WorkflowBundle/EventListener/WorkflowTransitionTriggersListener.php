@@ -36,7 +36,7 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
     /**
      * @param WorkflowChangesEvent $event
      */
-    public function triggersUpdate(WorkflowChangesEvent $event)
+    public function updateTriggers(WorkflowChangesEvent $event)
     {
         $workflowName = $event->getDefinition()->getName();
         if (array_key_exists($workflowName, $this->triggerBags)) {
@@ -47,7 +47,7 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
     /**
      * @param WorkflowChangesEvent $event
      */
-    public function triggersDelete(WorkflowChangesEvent $event)
+    public function deleteTriggers(WorkflowChangesEvent $event)
     {
         $this->triggersUpdater->removeTriggers($event->getDefinition());
     }
@@ -74,14 +74,14 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
     {
         return [
             WorkflowEvents::WORKFLOW_BEFORE_CREATE => 'createTriggers',
-            WorkflowEvents::WORKFLOW_AFTER_CREATE => 'triggersUpdate',
+            WorkflowEvents::WORKFLOW_AFTER_CREATE => 'updateTriggers',
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'createTriggers',
-            WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'triggersUpdate',
-            WorkflowEvents::WORKFLOW_AFTER_DELETE => 'triggersDelete',
-            WorkflowEvents::WORKFLOW_DEACTIVATED => 'triggersDelete',
+            WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'updateTriggers',
+            WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTriggers',
+            WorkflowEvents::WORKFLOW_DEACTIVATED => 'deleteTriggers',
             WorkflowEvents::WORKFLOW_ACTIVATED => [
                 ['createTriggers', 10],
-                ['triggersUpdate', -10]
+                ['updateTriggers', -10]
             ]
         ];
     }
