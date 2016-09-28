@@ -126,27 +126,16 @@ class ApiDocMdParser
 
             $subElements = $xpath->query("//*[preceding-sibling::h1[1][normalize-space()='{$headerKey}']]");
             foreach ($subElements as $subElement) {
-                if ($subElement->tagName === 'h1') {
-                    $action = '';
-                    continue;
-                }
-                if ($subElement->tagName === 'h2') {
-                    $type = strtolower($subElement->nodeValue);
-                    if (!isset($this->loadedDocumentation[$headerKeys[$index]][$type])) {
-                        $this->loadedDocumentation[$headerKeys[$index]][$type] = [];
-                    }
-                    $action = '';
-                    continue;
-                }
-                if ($subElement->tagName === 'h3') {
-                    $element = strtolower($subElement->nodeValue);
-                    $this->loadedDocumentation[$headerKeys[$index]][$type][$element] = $type === 'fields' ? [] : '';
+                /** @var \DOMElement $subElement*/
+
+                if (in_array($subElement->tagName, ['h1', 'h2', 'h3'])) {
+                    list($type, $element) = $this->parseDocumentationHeaders($subElement, $headerKey, $type, $element);
                     $action = '';
                     continue;
                 }
 
                 if ('filters' === $type) {
-                    $this->loadedDocumentation[$headerKeys[$index]][$type][$element] .= $subElement->nodeValue;
+                    $this->loadedDocumentation[$headerKey][$type][$element] .= $subElement->nodeValue;
                 } elseif ('actions' !== $type) {
                     if ($subElement->tagName === 'h4') {
                         $action = strtolower($subElement->nodeValue);
@@ -156,21 +145,43 @@ class ApiDocMdParser
                     if ($action) {
                         $actionName = $action;
                     }
-                    if (!array_key_exists(
-                        $actionName,
-                        $this->loadedDocumentation[$headerKeys[$index]][$type][$element]
-                    )) {
-                        $this->loadedDocumentation[$headerKeys[$index]][$type][$element][$actionName] = '';
+                    if (!array_key_exists($actionName, $this->loadedDocumentation[$headerKey][$type][$element])) {
+                        $this->loadedDocumentation[$headerKey][$type][$element][$actionName] = '';
                     }
 
-                    $this->loadedDocumentation[$headerKeys[$index]][$type][$element][$actionName] .= $doc
-                        ->saveHTML($subElement);
+                    $this->loadedDocumentation[$headerKey][$type][$element][$actionName] .= $doc->saveHTML($subElement);
                 } else {
-                    $this->loadedDocumentation[$headerKeys[$index]][$type][$element] .= $doc->saveHTML($subElement);
+                    $this->loadedDocumentation[$headerKey][$type][$element] .= $doc->saveHTML($subElement);
                 }
             }
         }
     }
+
+    /**
+     * @param \DOMElement $tag
+     * @param string $headerKey
+     * @param string $type
+     * @param string $element
+     *
+     * @return array
+     */
+    protected function parseDocumentationHeaders($tag, $headerKey, $type, $element)
+    {
+        if ($tag->tagName === 'h2') {
+            $type = strtolower($tag->nodeValue);
+            if (!isset($this->loadedDocumentation[$headerKey][$type])) {
+                $this->loadedDocumentation[$headerKey][$type] = [];
+            }
+        }
+
+        if ($tag->tagName === 'h3') {
+            $element = strtolower($tag->nodeValue);
+            $this->loadedDocumentation[$headerKey][$type][$element] = $type === 'fields' ? [] : '';
+        }
+
+        return [$type, $element];
+    }
+
 
     /**
      * @param $resourceLink
