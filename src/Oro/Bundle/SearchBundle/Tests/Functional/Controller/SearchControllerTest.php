@@ -29,6 +29,7 @@ class SearchControllerTest extends WebTestCase
      */
     public function testSearchSuggestion(array $request, array $response)
     {
+        $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         if (array_key_exists('supported_engines', $request)) {
             $engine = $this->getContainer()->getParameter('oro_search.engine');
             if (!in_array($engine, $request['supported_engines'])) {
