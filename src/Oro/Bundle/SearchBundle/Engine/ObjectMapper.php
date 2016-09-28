@@ -139,8 +139,8 @@ class ObjectMapper extends AbstractMapper
      */
     public function getRegisteredDescendants($entityName)
     {
-        $config = $this->getEntityConfig($entityName);
-        if ($config['mode'] !== Mode::NORMAL) {
+        $mode = $this->getEntityModeConfig($entityName);
+        if ($mode !== Mode::NORMAL) {
             return array_filter(
                 $this->getEntities(),
                 function ($className) use ($entityName) {
@@ -158,14 +158,14 @@ class ObjectMapper extends AbstractMapper
      *
      * @param Query $query
      * @param array $resultItem
-     * @return array|null
+     * @return array
      */
     public function mapSelectedData(Query $query, $resultItem)
     {
         $dataFields = $query->getSelectDataFields();
 
         if (empty($dataFields)) {
-            return null;
+            return [];
         }
 
         $result = [];
