@@ -515,6 +515,32 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Add value from 'oro_default' route to the url
+     *
+     * @param array $data
+     * @param string $urlParameterKey
+     */
+    public function addOroDefaultPrefixToUrlInParameterArray(&$data, $urlParameterKey)
+    {
+        $oroDefaultPrefix = $this->getUrl('oro_default');
+        
+        $replaceOroDefaultPrefixCallback = function (&$value) use ($oroDefaultPrefix, $urlParameterKey) {
+            if (!is_null($value[$urlParameterKey])) {
+                $value[$urlParameterKey] = str_replace(
+                    '%oro_default_prefix%',
+                    $oroDefaultPrefix,
+                    $value[$urlParameterKey]
+                );
+            }
+        };
+
+        array_walk(
+            $data,
+            $replaceOroDefaultPrefixCallback
+        );
+    }
+
+    /**
      * Data provider for REST/SOAP API tests
      *
      * @param string $folder

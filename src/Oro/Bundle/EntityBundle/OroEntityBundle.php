@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFallbackCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
@@ -56,6 +57,7 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new EntityFieldHandlerPass());
         $container->addCompilerPass(new CustomGridFieldValidatorCompilerPass());
         $container->addCompilerPass(new DataCollectorCompilerPass());
+        $container->addCompilerPass(new EntityFallbackCompilerPass());
 
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new GeneratedValueStrategyListenerPass());
