@@ -85,6 +85,6 @@ class PasswordTooltipProvider
      */
     public function getMinLength()
     {
-        return (int) $this->configManager->get(PasswordComplexityValidator::CONFIG_MIN_LENGTH);;
+        return (int) $this->configManager->get(PasswordComplexityValidator::CONFIG_MIN_LENGTH);
     }
 }
