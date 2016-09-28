@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
+use Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension;
+
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
-use Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension;
 
 class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,19 +32,18 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $actual
      * @param array $expected
-     * @param bool $isApplied
      * @dataProvider optionsDataProvider
      */
-    public function testNormalizeOptions(array $actual, array $expected, $isApplied = true)
+    public function testNormalizeOptions(array $actual, array $expected)
     {
         $context = new LayoutContext();
-        $context['expressions_evaluate_deferred'] = !$isApplied;
 
         /** @var DataAccessorInterface $dataAccessor */
         $dataAccessor = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
-        $this->extension->normalizeOptions($actual, $context, $dataAccessor);
-        $this->assertEquals($expected, $actual);
+        $options = new Options($actual);
+        $this->extension->normalizeOptions($options, $context, $dataAccessor);
+        $this->assertEquals($expected, $options->toArray());
     }
 
     /**
@@ -54,9 +55,10 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishView(array $actual, array $expected, $isApplied = true)
     {
         $context = new LayoutContext();
-        $context['expressions_evaluate_deferred'] = $isApplied;
+        $context['expressions_evaluate'] = $isApplied;
 
         $view = new BlockView();
+
         $view->vars = $actual;
 
         /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
@@ -65,7 +67,10 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getContext')
             ->willReturn($context);
 
-        $this->extension->finishView($view, $block, ['resolve_value_bags' => $actual['resolve_value_bags']]);
+        $this->extension->finishView(
+            $view,
+            $block
+        );
         $this->assertEquals($expected, $view->vars);
     }
 
