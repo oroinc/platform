@@ -6,13 +6,13 @@
 
 Array of emails.
 
-Format of data: [first@email.com, second@email.com]
+Format of data: [{"email": first@email.com}, {"email": second@email.com}]
 
 #### Update
 
 Array of emails.
 
-Format of data: [first@email.com, second@email.com]
+Format of data: [{"email": first@email.com}, {"email": second@email.com}]
 
 The data should contain full collection of emails.
 
@@ -20,6 +20,6 @@ The data should contain full collection of emails.
 
 Array of emails.
 
-Format of data: [first@email.com, second@email.com]
+Format of data: [{"email": first@email.com}, {"email": second@email.com}]
 
 The data should contain full collection of emails.
