@@ -100,7 +100,7 @@ define(function(require) {
         },
 
         initPopover: function(container, options) {
-            var $items = container.find('[data-toggle="popover"]').filter(function () {
+            var $items = container.find('[data-toggle="popover"]').filter(function() {
                 // skip already initialized popovers
                 return !$(this).data('popover');
             });
