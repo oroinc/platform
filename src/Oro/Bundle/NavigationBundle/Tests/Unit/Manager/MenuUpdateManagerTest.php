@@ -10,6 +10,7 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
@@ -81,7 +82,25 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateMenuUpdate()
     {
+        $menuName = 'test-menu';
+
         $entity = new MenuUpdateStub();
+        $entity->setMenu($menuName);
+
+        $menu = $this->getMock(ItemInterface::class);
+        $menu->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($menuName));
+        $menu->expects($this->once())
+            ->method('getExtra')
+            ->with('max_nesting_level', 0)
+            ->will($this->returnValue(0));
+
+        $this->builderChainProvider
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
 
         $this->entityManager
             ->expects($this->once())
@@ -276,6 +295,12 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $factory = new MenuFactory();
         $menu = $factory->createItem($menuName);
 
+        $this->builderChainProvider
+            ->expects($this->any())
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
         $item = $menu->addChild('first_menu');
 
         $orderedChildren = [
@@ -355,7 +380,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($menu, $this->manager->getMenu($menuName));
     }
 
-    public function findMenuItem()
+    public function testFindMenuItem()
     {
         $menuName = 'test-menu';
 
@@ -378,5 +403,91 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($item));
 
         $this->assertEquals($item, $this->manager->findMenuItem($menuName, $key));
+    }
+
+    /**
+     * @dataProvider maxNestingLevelProvider
+     *
+     * @param int $level
+     * @param int $maxLevel
+     * @param bool $hasException
+     */
+    public function testCheckMaxNestingLevel($level, $maxLevel, $hasException)
+    {
+        $menuName = 'test-menu';
+
+        $key = 'test-key';
+        $parentKey = 'test-key';
+
+        $menu = $this->getMock(ItemInterface::class);
+        $menu->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($menuName));
+        $menu->expects($this->once())
+            ->method('getExtra')
+            ->with('max_nesting_level', 0)
+            ->will($this->returnValue($maxLevel));
+
+        $factory = new MenuFactory();
+        $item = $factory->createItem($key);
+        $startItem = $item;
+
+        $items = [$item];
+        $range = range(1, $level);
+        array_shift($range);
+        foreach ($range as $value) {
+            $item->setParent($factory->createItem($value));
+            $item = $item->getParent();
+            $items[] = $item;
+        }
+
+        $this->builderChainProvider
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('findMenuItem')
+            ->with($menu, $key)
+            ->will($this->returnValue($startItem));
+
+        $update0 = new MenuUpdateStub();
+        $update0->setParentKey($parentKey);
+        $update0->setMenu($menuName);
+        $update0->setDefaultTitle('default-title');
+
+        if ($hasException) {
+            $this->setExpectedException(InvalidMaxNestingLevelException::class, sprintf(
+                "Item \"%s\" can't be saved. Max nesting level for menu \"%s\" is %d.",
+                'default-title',
+                $menuName,
+                $maxLevel
+            ));
+        }
+
+        $this->manager->checkMaxNestingLevel($update0);
+    }
+
+    /**
+     * @return array
+     */
+    public function maxNestingLevelProvider()
+    {
+        return [
+            [1, 0, false],
+            [2, 0, false],
+            [3, 0, false],
+            [1, 1, false],
+            [2, 1, true],
+            [3, 1, true],
+            [1, 2, false],
+            [2, 2, false],
+            [3, 2, true],
+            [1, 3, false],
+            [2, 3, false],
+            [3, 3, false],
+        ];
     }
 }

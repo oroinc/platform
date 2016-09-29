@@ -11,6 +11,7 @@ use Knp\Menu\ItemInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,7 +63,7 @@ class MenuUpdateController extends Controller
             $manager->removeMenuUpdate($menuUpdate);
         } else {
             $menuUpdate->setActive(false);
-            $manager->updateMenuUpdate($menuUpdate);
+            $manager->updateMenuUpdate($menuUpdate, false);
         }
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
@@ -132,9 +133,13 @@ class MenuUpdateController extends Controller
             }
         }
 
-        $manager->updateMenuUpdate($currentUpdate);
-        $manager->reorderMenuUpdate($menuName, $order, MenuUpdate::OWNERSHIP_USER, $userId);
+        try {
+            $manager->updateMenuUpdate($currentUpdate);
+            $manager->reorderMenuUpdate($menuName, $order, MenuUpdate::OWNERSHIP_USER, $userId);
+        } catch (InvalidMaxNestingLevelException $e) {
+            return new JsonResponse(['status' => false, 'message' => $e->getMessage()], Response::HTTP_OK);
+        }
 
-        return new JsonResponse(['status' => true], 200);
+        return new JsonResponse(['status' => true], Response::HTTP_OK);
     }
 }

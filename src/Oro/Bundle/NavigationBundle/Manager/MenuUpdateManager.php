@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
@@ -73,9 +74,14 @@ class MenuUpdateManager
 
     /**
      * @param MenuUpdateInterface $update
+     * @param bool $checkMaxNestingLevel
      */
-    public function updateMenuUpdate(MenuUpdateInterface $update)
+    public function updateMenuUpdate(MenuUpdateInterface $update, $checkMaxNestingLevel = true)
     {
+        if ($checkMaxNestingLevel) {
+            $this->checkMaxNestingLevel($update);
+        }
+
         $this->getEntityManager()->persist($update);
         $this->getEntityManager()->flush($update);
     }
@@ -166,6 +172,8 @@ class MenuUpdateManager
             $update->setParentKey($parentKey != $menuName ? $parentKey : null);
             $update->setPriority($priority);
 
+            $this->checkMaxNestingLevel($update);
+
             $this->getEntityManager()->persist($update);
             $updates[] = $update;
         }
@@ -193,6 +201,41 @@ class MenuUpdateManager
         $menu = $this->getMenu($menuName);
 
         return $this->menuUpdateHelper->findMenuItem($menu, $key);
+    }
+
+    /**
+     * @param MenuUpdateInterface $update
+     */
+    public function checkMaxNestingLevel(MenuUpdateInterface $update)
+    {
+        $menu = $this->getMenu($update->getMenu());
+        $maxNestingLevel = $menu->getExtra('max_nesting_level', 0);
+        $item = $this->findMenuItem($menu->getName(), $update->getParentKey());
+        $level = $item ? $this->getLevel($item) : 0;
+        if ($maxNestingLevel && $level >= $maxNestingLevel) {
+            throw new InvalidMaxNestingLevelException(
+                sprintf(
+                    "Item \"%s\" can't be saved. Max nesting level for menu \"%s\" is %d.",
+                    $update->getDefaultTitle(),
+                    $menu->getName(),
+                    $maxNestingLevel
+                )
+            );
+        }
+    }
+
+    /**
+     * @param ItemInterface $item
+     * @param int $levelIncrement
+     * @return int|ItemInterface|null
+     */
+    private function getLevel(ItemInterface $item, $levelIncrement = 0)
+    {
+        if ($item->getParent()) {
+            $levelIncrement = $this->getLevel($item->getParent(), ++$levelIncrement);
+        }
+
+        return $levelIncrement;
     }
 
     /**

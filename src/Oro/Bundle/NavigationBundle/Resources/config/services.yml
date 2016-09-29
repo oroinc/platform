@@ -464,3 +464,10 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
             - { name: oro_ui.update_action_provider, group: activity }
+
+    oro_navigation.validator.max_nested_level:
+        class: Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator
+        arguments:
+            - '@oro_navigation.manager.menu_update_abstract'
+        tags:
+            - { name: validator.constraint_validator }
