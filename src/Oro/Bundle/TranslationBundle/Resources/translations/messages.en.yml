@@ -16,7 +16,7 @@ oro.translation:
         add: 'Add Language'
         translation_completeness.label: 'Translation Completeness:'
         install.title: 'Install "%language%" language'
-        update.title: 'Update "%language%"'
+        update.title: 'Update "%language%" language'
         rebuild_cache.label: 'Update Cache'
 
     language:

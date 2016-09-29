@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -55,20 +54,18 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             )
         );
 
-        $resourceCache = new ArrayCache();
-
-        /* @var $translator Translator */
-        $translator = $this->getContainer()->get('translator');
-        $translator->setResourceCache($resourceCache);
-
+        // backup DB loader
         $translationLoader = $this->getContainer()->get('oro_translation.database_translation.loader');
 
-        // disable database loader to not get translations from database
+        // disable DB loader to not get translations from database
         $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
 
         /* @var $translationManager TranslationManager */
         $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
         $translationManager->rebuildCache();
+
+        /* @var $translator Translator */
+        $translator = $this->getContainer()->get('translator');
 
         foreach ($locales as $locale) {
             $domains = $translator->getCatalogue($locale)->all();
@@ -94,12 +91,15 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             }
         }
 
-        // restore DB loader and clear resource loader cache
+        $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
+
+        $output->write(sprintf('<info>Rebuilding cache ... </info>'));
+
+        // restore DB loader
         $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
-        $resourceCache->deleteAll();
 
         $translationManager->rebuildCache();
 
-        $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
+        $output->writeln(sprintf('<info>Done.</info>'));
     }
 }
