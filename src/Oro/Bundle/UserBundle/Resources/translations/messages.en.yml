@@ -139,6 +139,7 @@ oro:
             login_at.label: Login At
             token.label: Token
             user.label: User
+            notification_error: Error while sending impersonation notification
 
         # extended field added in migrations
         title.label:                 Title

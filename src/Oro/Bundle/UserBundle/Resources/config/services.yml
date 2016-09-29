@@ -149,6 +149,8 @@ services:
         class: Oro\Bundle\UserBundle\EventListener\ImpersonationSuccessListener
         arguments:
             - '@oro_user.mailer.processor'
+            - '@session.flash_bag'
+            - '@logger'
         tags:
             - { name: kernel.event_listener, event: oro_user.impersonation_success, method: onImpersonationSuccess }
 
