@@ -33,7 +33,6 @@ class LanguageFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        parent::tearDown();
         unset($this->formFactory, $this->filter);
     }
 

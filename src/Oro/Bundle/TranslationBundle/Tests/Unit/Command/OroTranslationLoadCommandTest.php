@@ -85,7 +85,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        parent::tearDown();
         unset(
             $this->translator,
             $this->languageProvider,
