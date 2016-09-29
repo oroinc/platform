@@ -2,11 +2,11 @@ layout:
     actions:
         - '@setBlockTheme':
             themes: 'OroUIBundle:layouts:base/page/layout.html.twig'
-        - @add:
+        - '@add':
             id: scripts_before
             blockType: container
             parentId: head
-        - @add:
+        - '@add':
             id: requirejs_scripts_after
             blockType: container
             parentId: require_js
