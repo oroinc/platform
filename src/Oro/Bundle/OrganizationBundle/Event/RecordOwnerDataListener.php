@@ -65,7 +65,7 @@ class RecordOwnerDataListener
             ) {
                 $owner = null;
                 if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
-                    $owner = $user;
+                    $owner = $user->getOwner();
                 } elseif (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
                     && $token instanceof OrganizationContextTokenInterface
                 ) {
