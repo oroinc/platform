@@ -210,6 +210,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     'tree' => array(
                         'application_menu' => array(
                             'type' => 'application_menu',
+                            'max_nesting_level' => 1,
                             'children' => array(
                                 'customers_tab' => array(
                                     'children' => array(

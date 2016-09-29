@@ -20,6 +20,7 @@ navigation:
                 label: 'Request Quote'
         tree:
             application_menu:
+                max_nesting_level: 1
                 children:
                     customers_tab:
                         children:

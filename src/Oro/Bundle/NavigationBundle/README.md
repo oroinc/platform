@@ -112,6 +112,7 @@ menu_config:
     tree:
         <menu_alias>                            # menu alias
             type: <menu_type>                   # menu type code. Link to menu template section.
+            max_nesting_level: <integer>        # menu max nesting level
             merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
             extras:                             # extra parameters for container renderer
                 brand: <string>

@@ -148,6 +148,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('array')
                     ->children()
                         ->scalarNode('type')->end()
+                        ->scalarNode('max_nesting_level')->end()
                         ->arrayNode('extras')
                             ->useAttributeAsKey('extras')->prototype('scalar')->end()
                         ->end()
