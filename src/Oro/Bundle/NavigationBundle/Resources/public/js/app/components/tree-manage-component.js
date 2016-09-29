@@ -20,12 +20,18 @@ define(function(require) {
         menu: '',
 
         /**
+         * @property {Number}
+         */
+        ownershipType: 0,
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {
             TreeManageComponent.__super__.initialize.call(this, options);
 
             this.menu = options.menu;
+            this.ownershipType = options.ownershipType;
         },
 
         /**
@@ -65,7 +71,7 @@ define(function(require) {
             $.ajax({
                 async: false,
                 type: 'PUT',
-                url: routing.generate(self.onMoveRoute, {menuName: this.menu}),
+                url: routing.generate(self.onMoveRoute, {ownershipType: this.ownershipType, menuName: this.menu}),
                 data: {
                     key: data.node.id,
                     parentKey: data.parent,

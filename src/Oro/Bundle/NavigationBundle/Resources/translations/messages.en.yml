@@ -4,11 +4,11 @@ oro:
             title: How To Use Pinbar
             message: Use pin icon on the right top corner of page to create fast access link in the pinbar.
         menu:
-            menu_list_default.label: Menu
             pinbar.label: Pinbar
             history.label: History
             favorite.label: Favorites
             mostviewed.label: Most Viewed
+            menu_list_default.label: Menus
         messages:
             no_items: You have no items yet
         shortcuts:

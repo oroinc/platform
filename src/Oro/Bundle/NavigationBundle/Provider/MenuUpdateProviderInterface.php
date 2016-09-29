@@ -10,8 +10,9 @@ interface MenuUpdateProviderInterface
      * Retrieve list of menu updates
      *
      * @param string $menu
+     * @param int $ownershipType
      *
      * @return MenuUpdateInterface[]
      */
-    public function getUpdates($menu);
+    public function getUpdates($menu, $ownershipType);
 }

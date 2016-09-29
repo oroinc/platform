@@ -110,6 +110,8 @@ class MenuUpdateManager
     }
 
     /**
+     * Get existing or create new MenuUpdate for specified menu, key and scope
+     *
      * @param string $menuName
      * @param string $key
      * @param int $ownershipType
@@ -131,10 +133,31 @@ class MenuUpdateManager
             $update = $this->createMenuUpdate($ownershipType, $ownerId, $key);
         }
 
-        return $this->getMenuUpdateFromMenu($update, $menuName, $key);
+        return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);
     }
 
     /**
+     * @param MenuUpdateInterface $update
+     * @param string $menuName
+     * @param string $key
+     * @param int $ownershipType
+     *
+     * @return MenuUpdateInterface
+     */
+    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $ownershipType)
+    {
+        $item = $this->findMenuItem($menuName, $key, $ownershipType);
+
+        if ($item) {
+            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menuName);
+        }
+
+        return $update;
+    }
+
+    /**
+     * Save menu items order to DB
+     *
      * @param string $menuName
      * @param ItemInterface[] $orderedChildren
      * @param int $ownershipType
@@ -178,45 +201,39 @@ class MenuUpdateManager
     }
 
     /**
+     * Get menu built by BuilderChainProvider
+     *
      * @param string $name
+     * @param array $options
      *
      * @return ItemInterface
      */
-    public function getMenu($name)
+    public function getMenu($name, $options = [])
     {
-        return $this->builderChainProvider->get($name);
+        $options = array_merge($options, [
+            'ignoreCache' => true
+        ]);
+
+        return $this->builderChainProvider->get($name, $options);
     }
 
     /**
      * @param string $menuName
      * @param string $key
+     * @param int $ownershipType
+     *
      * @return ItemInterface|null
      */
-    public function findMenuItem($menuName, $key)
+    public function findMenuItem($menuName, $key, $ownershipType)
     {
-        $menu = $this->getMenu($menuName);
+        $options = [
+            'ignoreCache' => true,
+            'ownershipType' => $ownershipType
+        ];
+        $menu = $this->getMenu($menuName, $options);
 
         return $this->menuUpdateHelper->findMenuItem($menu, $key);
     }
-
-    /**
-     * @param MenuUpdateInterface $update
-     * @param string $menuName
-     * @param string $key
-     *
-     * @return MenuUpdateInterface
-     */
-    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key)
-    {
-        $item = $this->findMenuItem($menuName, $key);
-
-        if ($item) {
-            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menuName);
-        }
-
-        return $update;
-    }
-
 
     /**
      * @return EntityRepository

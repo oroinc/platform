@@ -1,6 +1,5 @@
 datagrids:
-    menu-update-grid:
-        acl_resource: oro_navigation_menu_update_view
+    menu-base-grid:
         source:
             type: menu-update-default-provider
         columns:
@@ -8,7 +7,7 @@ datagrids:
                 label: oro.navigation.menuitem.name.label
         properties:
             view_link:
-                route: oro_navigation_menu_update_view
+                route: oro_navigation_user_menu_view
                 type: url
                 params:
                     menuName: name
@@ -22,3 +21,14 @@ datagrids:
         options:
             toolbarOptions:
                 hide: true
+
+    menu-user-grid:
+        extends: menu-base-grid
+        properties:
+            view_link:
+                route: oro_navigation_user_menu_view
+    menu-organization-grid:
+        extends: menu-base-grid
+        properties:
+            view_link:
+                route: oro_navigation_org_menu_view
