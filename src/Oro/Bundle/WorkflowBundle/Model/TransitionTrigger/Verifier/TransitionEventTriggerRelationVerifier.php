@@ -21,7 +21,7 @@ class TransitionEventTriggerRelationVerifier implements TransitionTriggerVerifie
             );
         }
 
-        $relatedEntity = $trigger->getWorkflowDefinition();
+        $relatedEntity = $trigger->getWorkflowDefinition()->getRelatedEntity();
 
         if ($relatedEntity !== $trigger->getEntityClass() && empty($trigger->getRelation())) {
             throw new TransitionTriggerVerifierException(

@@ -30,6 +30,9 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
         $this->verifier->verifyTrigger(new TriggerStub());
     }
 
+    /**
+     * Covers return statement when trigger without expression comes
+     */
     public function testNotVerifyIfNoRequireExpression()
     {
         $trigger = new TransitionEventTrigger();
@@ -37,6 +40,9 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
         $this->verifier->verifyTrigger($trigger);
     }
 
+    /**
+     * Covers normal configuration processing
+     */
     public function testVerificationOk()
     {
         $trigger = $this->buildEventTriggerWithExpression(
@@ -48,6 +54,9 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
         $this->verifier->verifyTrigger($trigger);
     }
 
+    /**
+     * Covers Expression Language RuntimeException when bad method
+     */
     public function testVerificationBadMethodsCallsOk()
     {
         $trigger = $this->buildEventTriggerWithExpression(

@@ -303,7 +303,7 @@ services:
         public: false
 
     oro_workflow.transition_trigger.trigger_event_verifier:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerCompoundVerifier
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerCompoundVerifier
         public: false
         calls:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]

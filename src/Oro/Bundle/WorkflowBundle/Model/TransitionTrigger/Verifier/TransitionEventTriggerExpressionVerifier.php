@@ -68,6 +68,10 @@ class TransitionEventTriggerExpressionVerifier implements TransitionTriggerVerif
         return '';
     }
 
+    /**
+     * @param array $context
+     * @return array
+     */
     private function buildContextVarsAndTypes(array $context)
     {
         $varsAndTypes = [];
