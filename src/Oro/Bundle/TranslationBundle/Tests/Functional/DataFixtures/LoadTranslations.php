@@ -61,6 +61,7 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
             ->setTranslationKey($translationKey)
             ->setValue($key)
             ->setLanguage($language);
+
         $manager->persist($translation);
         $this->addReference($key, $translation);
 
@@ -76,7 +77,6 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
      */
     protected function createTranslationKey(ObjectManager $manager, $key, $domain)
     {
-
         $translationKey = (new TranslationKey())->setDomain($domain)->setKey($key);
         $manager->persist($translationKey);
         $this->addReference(sprintf('tk-%s-%s', $key, $domain), $translationKey);

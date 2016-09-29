@@ -33,7 +33,6 @@ class TranslationControllerTest extends WebTestCase
 
     public function testIndex()
     {
-
         $crawler = $this->client->request('GET', $this->getUrl(self::DATAGRID_ROUTE));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);

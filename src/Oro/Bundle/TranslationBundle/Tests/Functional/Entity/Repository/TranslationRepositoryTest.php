@@ -101,41 +101,36 @@ class TranslationRepositoryTest extends WebTestCase
     public function findValueDataProvider()
     {
         return [
-            'existing' =>
-                [
-                    'key' => LoadTranslations::TRANSLATION_KEY_3,
-                    'locale' => LoadLanguages::LANGUAGE2,
-                    'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
-                    'expected' => true,
-                ],
-            'not_existing_key' =>
-                [
-                    'key' => '__NON__EXISTING__KEY__',
-                    'locale' => LoadLanguages::LANGUAGE2,
-                    'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
-                    'expected' => false
-                ],
-            'not_existing_domain' =>
-                [
-                    'key' => LoadTranslations::TRANSLATION_KEY_3,
-                    'locale' => LoadLanguages::LANGUAGE2,
-                    'domain' => '__NON__EXISTING__DOMAIN__',
-                    'expected' => false
-                ],
-            'not_existing_language' =>
-                [
-                    'key' => LoadTranslations::TRANSLATION_KEY_3,
-                    'locale' => '__NON__EXISTING__LANGUAGE__',
-                    'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
-                    'expected' => false
-                ],
-            'non_valid_params' =>
-                [
-                    'key' => '__NON__EXISTING__KEY__',
-                    'locale' => '__NON__EXISTING__LANGUAGE__',
-                    'domain' => '__NON__EXISTING__DOMAIN__',
-                    'expected' => false
-                ],
+            'existing' => [
+                'key' => LoadTranslations::TRANSLATION_KEY_3,
+                'locale' => LoadLanguages::LANGUAGE2,
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'expected' => true,
+            ],
+            'not_existing_key' => [
+                'key' => '__NON__EXISTING__KEY__',
+                'locale' => LoadLanguages::LANGUAGE2,
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'expected' => false
+            ],
+            'not_existing_domain' => [
+                'key' => LoadTranslations::TRANSLATION_KEY_3,
+                'locale' => LoadLanguages::LANGUAGE2,
+                'domain' => '__NON__EXISTING__DOMAIN__',
+                'expected' => false
+            ],
+            'not_existing_language' => [
+                'key' => LoadTranslations::TRANSLATION_KEY_3,
+                'locale' => '__NON__EXISTING__LANGUAGE__',
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'expected' => false
+            ],
+            'non_valid_params' => [
+                'key' => '__NON__EXISTING__KEY__',
+                'locale' => '__NON__EXISTING__LANGUAGE__',
+                'domain' => '__NON__EXISTING__DOMAIN__',
+                'expected' => false
+            ],
         ];
     }
 }
