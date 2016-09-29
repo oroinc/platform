@@ -1,6 +1,6 @@
 <a href="{{ url }}">
     {% if label is not empty %}
-        {{ label }}
+        {{ label|default('oro.ui.empty'|trans) }}
     {% else %}
         {{ 'oro.grid.open_link'|trans }}
     {% endif %}
