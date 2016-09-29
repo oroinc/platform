@@ -50,6 +50,15 @@ class OroTranslationDumpCommandTest extends \PHPUnit_Framework_TestCase
         $this->command->setContainer($this->container);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        unset($this->jsDumper, $this->container, $this->input, $this->output, $this->command);
+    }
+
     public function testConfigure()
     {
         $this->assertNotEmpty($this->command->getDescription());

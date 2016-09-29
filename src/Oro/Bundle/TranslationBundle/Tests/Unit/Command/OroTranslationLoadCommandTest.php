@@ -80,6 +80,24 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
         $this->command->setContainer($this->container);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        unset(
+            $this->translator,
+            $this->languageProvider,
+            $this->translationManager,
+            $this->translationLoader,
+            $this->container,
+            $this->input,
+            $this->output,
+            $this->command
+        );
+    }
+
     public function testConfigure()
     {
         $this->assertNotEmpty($this->command->getDescription());

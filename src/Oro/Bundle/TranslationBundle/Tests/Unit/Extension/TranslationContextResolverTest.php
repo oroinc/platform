@@ -17,11 +17,20 @@ class TranslationContextResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->getMock(TranslatorInterface::class);
 
         $this->extension = new TranslationContextResolver($this->translator);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        unset($this->translator, $this->extension);
     }
 
     public function testResolve()
