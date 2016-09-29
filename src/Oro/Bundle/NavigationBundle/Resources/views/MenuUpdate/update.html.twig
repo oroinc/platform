@@ -21,7 +21,7 @@
 
     {% if entity.key %}
         {{ UI.deleteButton({
-            'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+            'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: entity.key}),
             'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-attribute',
