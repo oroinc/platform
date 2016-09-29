@@ -1,10 +1,14 @@
-define([
-        'underscore',
-        'backbone',
-        'jquery.select2',
-        'jquery.validate'
-], function(_, Backbone) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var module = require('module');
+    var config = _.defaults(module.config(), {
+        switchState: false
+    });
+    require('jquery.select2');
+    require('jquery.validate');
 
     var $ = Backbone.$;
 
@@ -18,6 +22,7 @@ define([
             'change': 'selectionChanged'
         },
 
+        switchState: config.switchState,
         /**
          * Constructor
          *
@@ -54,9 +59,9 @@ define([
                 if (this.regionRequired) {
                     this.addRequiredFlag(this.$simpleEl);
                 }
-                this.target.inputWidget('show');
+                this.switchInputWidget(display);
             } else {
-                this.target.inputWidget('hide');
+                this.switchInputWidget(display);
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }
@@ -117,8 +122,6 @@ define([
             if (this.collection.models.length > 0) {
                 this.target.show();
                 this.displaySelect2(true);
-                this.target.inputWidget('show');
-
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
                 this.target.val(this.target.data('selected-data') || '').trigger('change');
@@ -129,10 +132,20 @@ define([
                 this.target.hide();
                 this.target.val('');
                 this.displaySelect2(false);
-                this.target.inputWidget('hide');
                 this.$simpleEl.show();
             }
             this.$el.trigger('value:changed');
+        },
+
+        switchInputWidget: function(display) {
+            switch (this.switchState) {
+                case 'disable':
+                    this.target.inputWidget('disable', display);
+                    break;
+                default: {
+                    this.target.inputWidget(display ? 'show' : 'hide');
+                }
+            }
         }
     });
 });
