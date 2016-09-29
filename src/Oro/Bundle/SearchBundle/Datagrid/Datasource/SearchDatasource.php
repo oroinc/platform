@@ -62,10 +62,10 @@ class SearchDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $results = $this->searchQuery->execute();
-
         $event = new SearchResultBefore($this->datagrid, $this->searchQuery);
         $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
+
+        $results = $this->searchQuery->execute();
 
         $rows = [];
         foreach ($results as $result) {
