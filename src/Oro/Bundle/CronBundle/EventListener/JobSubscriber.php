@@ -33,6 +33,8 @@ class JobSubscriber implements EventSubscriberInterface
 
     /**
      * @param NewOutputEvent $event
+     *
+     * @todo Remove this listener once we get rid of dependency on JMSJobQueueBundle
      */
     public function onNewOutput(NewOutputEvent $event)
     {
