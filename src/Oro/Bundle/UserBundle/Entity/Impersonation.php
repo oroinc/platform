@@ -114,7 +114,7 @@ class Impersonation
     }
 
     /**
-     * @param \DateTime $expireAt
+     * @param \DateTime $loginAt
      * @return $this
      */
     public function setLoginAt(\DateTime $loginAt)

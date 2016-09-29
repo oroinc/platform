@@ -18,6 +18,7 @@ use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
 
@@ -129,6 +130,15 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
         return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getRoles());
     }
 
+    /**
+     * Get Impersonation by token and set it's login time
+     *
+     * @param string $token
+     * @throws AuthenticationCredentialsNotFoundException when token is not found
+     * @throws CustomUserMessageAuthenticationException when token is already used
+     * @throws CustomUserMessageAuthenticationException when token is expired
+     * @return Impersonation
+     */
     protected function getImpersonation($token)
     {
         $impersonation = $this->em
