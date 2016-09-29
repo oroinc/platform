@@ -40,9 +40,6 @@ class ListUserCommand extends ContainerAwareCommand
     {
         $limit = (int) $input->getOption('limit');
         $offset = ((int) $input->getOption('page') - 1) * $limit;
-        if ($offset < 0) {
-            $offset = 0;
-        }
 
         $builder = $this
             ->getContainer()
@@ -51,8 +48,11 @@ class ListUserCommand extends ContainerAwareCommand
             ->getRepository('OroUserBundle:User')
             ->createQueryBuilder('u')
             ->orderBy('u.enabled', 'DESC')
-            ->addOrderBy('u.id', 'ASC')
-            ->setFirstResult($offset);
+            ->addOrderBy('u.id', 'ASC');
+
+        if ($offset > 0) {
+            $builder->setFirstResult($offset);
+        }
 
         if ($limit > 0) {
             $builder->setMaxResults($limit);
