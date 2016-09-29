@@ -8,8 +8,7 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
-use JMS\JobQueueBundle\Entity\Job;
-
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,10 +53,7 @@ class EmailController extends Controller
      */
     public function purgeEmailsAttachmentsAction()
     {
-        $job = new Job(PurgeEmailAttachmentCommand::NAME);
-        $em = $this->getDoctrine()->getManagerForClass(Job::class);
-        $em->persist($job);
-        $em->flush();
+        $this->getMessageProducer()->send(Topics::PURGE_EMAIL_ATTACHMENT, []);
 
         return new JsonResponse([
             'message'    => $this->get('translator')->trans(
@@ -65,7 +61,7 @@ class EmailController extends Controller
                 [
                     '%link%' => sprintf(
                         '<a href="%s" class="job-view-link">%s</a>',
-                        $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
+                        $this->get('router')->generate('oro_message_queue_root_jobs'),
                         $this->get('translator')->trans('oro.email.controller.job_progress')
                     )
                 ]
@@ -810,5 +806,13 @@ class EmailController extends Controller
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
+    }
+
+    /**
+     * @return \Oro\Component\MessageQueue\Client\MessageProducer
+     */
+    private function getMessageProducer()
+    {
+        return $this->get('oro_message_queue.message_producer');
     }
 }
