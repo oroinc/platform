@@ -43,7 +43,13 @@ class ImpersonateUserCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $user = $this->findUser($input->getArgument('username'));
+        $username = $input->getArgument('username');
+        $user = $this->getContainer()->get('oro_user.manager')->findUserByUsername($username);
+
+        if (!$user) {
+            throw new \InvalidArgumentException(sprintf('User with username "%s" does not exists', $username));
+        }
+
         $impersonation = $this->createImpersonation($user, $input->getOption('lifetime'));
         $url = $this->generateUrl(
             $input->getOption('route'),
@@ -62,29 +68,6 @@ class ImpersonateUserCommand extends ContainerAwareCommand
         $output->writeln($url);
 
         return 0;
-    }
-
-    /**
-     * @param  string $username
-     * @return User
-     */
-    protected function findUser($username)
-    {
-        $user = $this->getContainer()
-            ->get('doctrine')
-            ->getRepository('OroUserBundle:User')
-            ->findOneBy(['username' => $username]);
-
-        if (!$user) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'User with username "%s" does not exists',
-                    $username
-                )
-            );
-        }
-
-        return $user;
     }
 
     /**
