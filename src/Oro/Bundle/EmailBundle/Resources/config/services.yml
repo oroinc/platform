@@ -347,6 +347,14 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_email.async.processor.purge_email_attachment:
+        class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_config.global'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_email.manager.autoresponserule.api:
         class: %oro_email.manager.autoresponserule.api.class%
         parent: oro_soap.manager.entity_manager.abstract
