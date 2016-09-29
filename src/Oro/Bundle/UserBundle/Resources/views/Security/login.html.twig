@@ -9,7 +9,7 @@
     <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
         <div class="title-box">
             {% if oro_theme_logo() %}
-            <h1 class="oro-title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
+            <h1 class="title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
                 <img src="{{ asset(oro_theme_logo()) }}">
             </h1>
             <span class="divider-vertical"></span>
