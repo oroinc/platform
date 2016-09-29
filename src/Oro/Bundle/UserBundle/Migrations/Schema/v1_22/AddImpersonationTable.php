@@ -26,7 +26,7 @@ class AddImpersonationTable implements Migration
     {
         $table = $schema->createTable('oro_user_impersonation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('user_id', 'integer', ['notnull' => true]);
         $table->addColumn('token', 'string', ['length' => 255]);
         $table->addColumn('expire_at', 'datetime', []);
         $table->addColumn('login_at', 'datetime', ['notnull' => false]);
