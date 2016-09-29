@@ -136,6 +136,7 @@ class ResetController extends Controller
             } catch (\Exception $e) {
                 $params['processed'] = false;
                 $params['error'] = $this->get('translator')->trans('oro.email.handler.unable_to_send_email');
+
                 return $params;
             }
             $user->setLoginDisabled(true);
