@@ -8,15 +8,9 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
         initialize: function(formElement) {
             var self = this;
 
-            /**
-             * Avoid of multiple listener called for single change event
-             */
-            var optionalValidationGroups = formElement.find('[data-validation-optional-group]');
-            var rootOptionalValidationGroups = optionalValidationGroups
-                .not('[data-validation-optional-group] [data-validation-optional-group]');
-            rootOptionalValidationGroups.on(
+            formElement.on(
                 'change',
-                'input, select',
+                'input, select, textarea',
                 function() {
                     $(this).trigger('validation-optional-group-value-changed');
                 }
@@ -25,20 +19,18 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
             /**
              * Custom event used to not interrupt default change event
              */
-            optionalValidationGroups
-                .on(
-                    'validation-optional-group-value-changed',
-                    function(event) {
-                        var shouldBeBubbled = self.handleFormChanges($(this), $(event.target));
-                        if (!shouldBeBubbled) {
-                            event.stopPropagation();
-                        }
+            formElement.on(
+                'validation-optional-group-value-changed',
+                '[data-validation-optional-group]',
+                function(event) {
+                    var shouldBeBubbled = self.handleFormChanges($(this), $(event.target));
+                    if (!shouldBeBubbled) {
+                        event.stopPropagation();
                     }
-                );
+                }
+            );
 
-            rootOptionalValidationGroups.each(function(index, group) {
-                self.handleOptionalGroupValidationInitialize($(group));
-            });
+            self.handleOptionalGroupValidationLoaded(formElement);
         },
 
         /**
@@ -54,20 +46,31 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
         },
 
         /**
-         * @param {jQuery} $group Optional validation elements group
+         * @param {jQuery} $formElement
          *
          * @return {boolean}
          */
-        handleOptionalGroupValidationInitialize: function($group) {
+        handleOptionalGroupValidationLoaded: function($formElement) {
             var self = this;
-            $group.children().each(function(index, child) {
-                self.handleOptionalGroupValidationInitialize($(child));
-            });
 
-            if ($group.data('validation-optional-group') !== undefined) {
-                var optionalValidationHandler = this.getHandler($group);
-                optionalValidationHandler.initialize($group);
-            }
+            var rootOptionalValidationGroups = this.getRootLevelOptionalValidationGroups($formElement);
+            rootOptionalValidationGroups.each(function(index, group) {
+                var $group = $(group);
+                self.handleOptionalGroupValidationLoaded($group);
+
+                var optionalValidationHandler = self.getHandler($group);
+                optionalValidationHandler.handleGroupLoaded($group);
+            });
+        },
+
+        /**
+         * @param {jQuery} $element
+         *
+         * @return {boolean}
+         */
+        getRootLevelOptionalValidationGroups: function($element){
+            return $element.find('[data-validation-optional-group]')
+                .not('[data-validation-optional-group] [data-validation-optional-group]');
         },
 
         /**
@@ -76,6 +79,9 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
          * @return {OptionalValidationHandler}
          */
         getHandler: function($group) {
+            /**
+             * Handlers should be preloaded using Controller::loadBeforeAction
+             */
             var handler = $group.data('validation-optional-group-handler');
 
             return handler ? require(handler) : defaultOptionalValidationHandler;
