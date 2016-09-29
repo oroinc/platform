@@ -28,9 +28,9 @@ system_configuration:
                     general_setup:
                         children:
                             security_options:
-                               priority: 90
-                               children:
-                                   login_attempts:
-                                       children:
-                                           - oro_user.login_attempts
-                                           - oro_user.daily_login_attempts
+                                priority: 90
+                                children:
+                                    login_attempts:
+                                        children:
+                                            - oro_user.login_attempts
+                                            - oro_user.daily_login_attempts

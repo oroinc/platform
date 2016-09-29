@@ -50,7 +50,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_21';
+        return 'v1_22';
     }
 
     /**
@@ -535,12 +535,12 @@ class OroUserBundleInstaller implements
         $table->addColumn('provider_class', 'string', ['length' => 255]);
         $table->addColumn('failed_attempts', 'integer', ['notnull' => false]);
         $table->addColumn('failed_daily_attempts', 'integer', ['notnull' => false]);
-        $table->addColumn('createdAt', 'datetime');
-        $table->addColumn('updatedAt', 'datetime');
+        $table->addColumn('created_at', 'datetime');
+        $table->addColumn('updated_at', 'datetime');
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
-            ['owner_id'],
+            ['user_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );

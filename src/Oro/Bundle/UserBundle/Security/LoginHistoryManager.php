@@ -30,9 +30,10 @@ class LoginHistoryManager
         }
 
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $diff = $now->diff($loginHistory->getUpdatedAt());
+        $updated = $loginHistory->getUpdatedAt() ?: $loginHistory->getCreatedAt();
+        $diff = $updated->diff($now);
 
-        if (intval($diff->format('%h')) > 24) {
+        if ($diff->d >= 1 || $diff->m >= 1 || $diff->d >= 1) {
             $loginHistory->setFailedDailyAttempts(0);
         }
         // increase failures
