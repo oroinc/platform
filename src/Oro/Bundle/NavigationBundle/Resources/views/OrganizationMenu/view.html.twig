@@ -1,0 +1,10 @@
+{% extends 'OroNavigationBundle:menuUpdate:view.html.twig' %}
+
+{% set routePrefix = 'oro_navigation_org_menu_' %}
+{% oro_title_set({params : {"%title%": entity.name}}) %}
+{% set breadcrumbs = {
+    'entity': entity,
+    'indexPath': path(routePrefix ~ 'index'),
+    'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans,
+    'entityTitle': entity.name
+} %}

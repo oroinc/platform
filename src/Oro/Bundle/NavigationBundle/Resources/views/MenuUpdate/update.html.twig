@@ -1,47 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
 {% set formAction = app.request.uri %}
-
 {% set entityId = entity.id %}
-
-{% if ownershipType == constant('Oro\\Bundle\\NavigationBundle\\Entity\\MenuUpdate::OWNERSHIP_ORGANIZATION') %}
-    {% set routePrefix = 'oro_navigation_org_menu_' %}
-    {% oro_title_set({params : {"%title%": entity.title|trans()}}) %}
-    {% set breadcrumbs = {
-        'entity': entity,
-        'indexPath': path(routePrefix ~ 'index'),
-        'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans,
-        'additional': [
-            {
-                'indexPath': path(routePrefix ~ 'view', {menuName: menuName}),
-                'indexLabel': menuName
-            }
-        ]
-    } %}
-{% else %}
-    {% set routePrefix = 'oro_navigation_user_menu_' %}
-    {% set fullname = app.user|oro_format_name|default('N/A') %}
-    {% oro_title_set({params : {"%username%": fullname, "%title%": entity.title|trans()}}) %}
-    {% set breadcrumbs = {
-        'entity': entity,
-        'indexPath': path('oro_user_index'),
-        'indexLabel': 'oro.user.entity_plural_label'|trans,
-        'additional': [
-            {
-                'indexPath': path('oro_user_profile_view'),
-                'indexLabel': fullname
-            },
-            {
-                'indexPath': path(routePrefix ~ 'index'),
-                'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans
-            },
-            {
-                'indexPath': path(routePrefix ~ 'view', {menuName: menuName}),
-                'indexLabel': menuName
-            }
-        ]
-    } %}
-{% endif %}
 
 {% if entity.key %}
     {% set breadcrumbs = breadcrumbs|merge({'entityTitle': entity.title|trans()}) %}

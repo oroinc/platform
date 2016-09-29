@@ -106,6 +106,8 @@ class MenuUpdateManager
     }
 
     /**
+     * Get existing or create new MenuUpdate for specified menu, key and scope
+     *
      * @param string $menuName
      * @param string $key
      * @param int $ownershipType
@@ -150,6 +152,8 @@ class MenuUpdateManager
     }
 
     /**
+     * Save menu items order to DB
+     *
      * @param string $menuName
      * @param ItemInterface[] $orderedChildren
      * @param int $ownershipType
@@ -193,6 +197,8 @@ class MenuUpdateManager
     }
 
     /**
+     * Get menu built by BuilderChainProvider
+     *
      * @param string $name
      * @param array $options
      *
@@ -200,6 +206,10 @@ class MenuUpdateManager
      */
     public function getMenu($name, $options = [])
     {
+        $options = array_merge($options, [
+            'ignoreCache' => true
+        ]);
+
         return $this->builderChainProvider->get($name, $options);
     }
 

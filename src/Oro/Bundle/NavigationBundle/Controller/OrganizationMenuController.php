@@ -24,7 +24,7 @@ class OrganizationMenuController extends AbstractMenuController
 
     /**
      * @Route("/", name="oro_navigation_org_menu_index")
-     * @Template("OroNavigationBundle:MenuUpdate:index.html.twig")
+     * @Template
      *
      * @return array
      */
@@ -35,7 +35,7 @@ class OrganizationMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}", name="oro_navigation_org_menu_view")
-     * @Template("OroNavigationBundle:MenuUpdate:view.html.twig")
+     * @Template
      *
      * @param string $menuName
      *
@@ -48,7 +48,7 @@ class OrganizationMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_org_menu_create")
-     * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
+     * @Template("OroNavigationBundle:OrganizationMenu:update.html.twig")
      *
      * @param string $menuName
      * @param string|null $parentKey
@@ -62,7 +62,7 @@ class OrganizationMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/update/{key}", name="oro_navigation_org_menu_update")
-     * @Template("OroNavigationBundle:MenuUpdate:update.html.twig")
+     * @Template
      *
      * @param string $menuName
      * @param string $key

@@ -9,8 +9,8 @@ interface MenuUpdateProviderInterface
     /**
      * Retrieve list of menu updates
      *
-     * @param int $ownershipType
      * @param string $menu
+     * @param int $ownershipType
      *
      * @return MenuUpdateInterface[]
      */
