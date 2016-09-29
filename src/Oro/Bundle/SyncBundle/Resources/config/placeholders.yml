@@ -5,6 +5,8 @@ placeholders:
                 order: 310
             maintenance_js:
                 order: 220
+            ping_js:
+                order: 230
 
 items:
     sync_js:
@@ -12,3 +14,5 @@ items:
         applicable: "@oro_security.security_facade->hasLoggedUser()"
     maintenance_js:
         template: OroSyncBundle::maintenance_js.html.twig
+    ping_js:
+        template: OroSyncBundle::ping_js.html.twig

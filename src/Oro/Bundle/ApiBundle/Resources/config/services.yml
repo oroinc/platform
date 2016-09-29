@@ -1,9 +1,3 @@
-parameters:
-    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
-    oro_api.config.max_nesting_level: 3
-    # all supported ApiDoc views
-    oro_api.api_doc.views: ['default', 'rest_json_api', 'rest_plain']
-
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -100,6 +94,11 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_accessor'
             - '@oro_api.entity_serializer.data_transformer'
+            - '@oro_api.object_normalizer.config_normalizer'
+
+    oro_api.object_normalizer.config_normalizer:
+        class: Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer
+        public: false
 
     oro_api.object_normalizer_registry:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry
@@ -122,6 +121,13 @@ services:
         arguments:
             - '@oro_api.processor_bag'
             - customize_loaded_data
+
+    oro_api.customize_form_data.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormDataProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - customize_form_data
 
     oro_api.resources_provider:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesProvider
@@ -159,7 +165,7 @@ services:
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
         arguments:
-            - %oro_api.config.max_nesting_level%
+            - 0 # config_max_nesting_level; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.config_extension.filters:
         class: Oro\Bundle\ApiBundle\Config\FiltersConfigExtension
@@ -222,6 +228,8 @@ services:
             - '@oro_api.entity_alias_loader'
             - '@oro_api.entity_alias_cache'
             - %kernel.debug%
+        calls:
+            - [ setLogger, [ '@logger' ] ]
         lazy: true
 
     oro_api.entity_alias_cache:
@@ -333,6 +341,7 @@ services:
                 - '\OutOfBoundsException'
                 - 'Oro\Bundle\ApiBundle\Exception\ExceptionInterface'
                 - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
+                - 'Symfony\Component\PropertyAccess\Exception\ExceptionInterface'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
 

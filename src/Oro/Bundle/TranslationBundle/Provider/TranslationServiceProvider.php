@@ -20,7 +20,11 @@ class TranslationServiceProvider
     /** @var AbstractAPIAdapter */
     protected $adapter;
 
-    /** @var JsTranslationDumper */
+    /**
+     * @var JsTranslationDumper
+     *
+     * @deprecated since 1.12 $jsTranslationDumper will be removed since 1.14
+     */
     protected $jsTranslationDumper;
 
     /** @var NullLogger */
@@ -41,6 +45,8 @@ class TranslationServiceProvider
      * @param TranslationLoader   $translationLoader
      * @param DatabasePersister   $databasePersister
      * @param string              $cacheDir
+     *
+     * @deprecated since 1.12 $jsTranslationDumper argument will be removed since 1.14
      */
     public function __construct(
         AbstractAPIAdapter $adapter,
@@ -163,7 +169,6 @@ class TranslationServiceProvider
             $this->apply($locale, $targetDir);
 
             $this->cleanup($targetDir);
-            $this->jsTranslationDumper->dumpTranslations([$locale]);
         }
 
         return $isExtracted && $isDownloaded;
@@ -302,7 +307,6 @@ class TranslationServiceProvider
         $this->logger = $logger;
 
         $this->adapter->setLogger($this->logger);
-        $this->jsTranslationDumper->setLogger($this->logger);
     }
 
     /**

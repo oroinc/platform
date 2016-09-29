@@ -93,7 +93,7 @@ As result, the `VIEW` permission will be used instead of `DELETE` permission.
 Disable access checks for action
 --------------------------------
  
-You can disable access checks for some action by setting `null` as a value to `acl_resource` option in `Resources/config/acl.yml`:
+You can disable access checks for some action by setting `null` as a value to `acl_resource` option in `Resources/config/oro/api.yml`:
 
 ```yaml
 oro_api:
@@ -109,7 +109,7 @@ Disable entity action
 
 When you add an entity to the API, all the actions will be available by default.
 
-In case if an action should not be accessible, you can disable it in `Resources/config/acl.yml`:
+In case if an action should not be accessible, you can disable it in `Resources/config/oro/api.yml`:
 
 ```yaml
 oro_api:
@@ -135,7 +135,7 @@ Change delete handler for entity
 
 By default, entity deletion is processed by [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
 
-If your want to use another delete handler, you can set it by the `delete_handler` option in `Resources/config/acl.yml`:
+If your want to use another delete handler, you can set it by the `delete_handler` option in `Resources/config/oro/api.yml`:
 
 ```yaml
 oro_api:
@@ -153,7 +153,7 @@ Change the maximum number of entities that can be deleted by one request
 
 By default, the [delete_list](./actions.md#delete_list-action) action can delete not more than 100 entities. This limit is set by the [SetDeleteLimit](../../Processor/DeleteList/SetDeleteLimit.php) processor.
 
-If your want to use another limit, you can set it by the `max_results` option in `Resources/config/acl.yml`:
+If your want to use another limit, you can set it by the `max_results` option in `Resources/config/oro/api.yml`:
 
 ```yaml
 oro_api:

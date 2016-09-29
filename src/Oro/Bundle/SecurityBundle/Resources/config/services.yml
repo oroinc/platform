@@ -1,4 +1,5 @@
 parameters:
+    security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
     oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 
     oro_security.acl.base_manager.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager

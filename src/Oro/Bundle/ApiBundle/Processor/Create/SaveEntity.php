@@ -45,7 +45,7 @@ class SaveEntity implements ProcessorInterface
         }
 
         $em->persist($entity);
-        $em->flush($entity);
+        $em->flush();
 
         // save entity id into the Context
         $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
