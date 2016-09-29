@@ -11,16 +11,16 @@ use Knp\Menu\ItemInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @RouteResource("menuupdates")
@@ -29,31 +29,29 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 class MenuUpdateController extends Controller
 {
     /**
-     * @Delete("/menuupdate/{menuName}/{key}")
-     *
-     * @Acl(
-     *     id="oro_navigation_menu_update_delete",
-     *     type="entity",
-     *     class="OroNavigationBundle:MenuUpdate",
-     *     permission="DELETE"
-     * )
+     * @Delete("/menu/{ownershipType}/{menuName}/{key}")
      *
      * @ApiDoc(
-     *  description="Delete menu item for user"
+     *  description="Delete menu item in specified scope."
      * )
      *
+     * @param string $ownershipType
      * @param string $menuName
      * @param string $key
      *
      * @return Response
      */
-    public function deleteAction($menuName, $key)
+    public function deleteAction($ownershipType, $menuName, $key)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $userId = $this->getUser()->getId();
-        $menuUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, MenuUpdate::OWNERSHIP_USER, $userId);
+        $menuUpdate = $manager->getMenuUpdateByKeyAndScope(
+            $menuName,
+            $key,
+            $ownershipType,
+            $this->getCurrentOwnerId($ownershipType)
+        );
 
         if ($menuUpdate === null) {
             throw $this->createNotFoundException();
@@ -70,21 +68,25 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @Delete("/menuupdate/reset/{menuName}")
-     * @AclAncestor("oro_navigation_menu_update_delete")
+     * @Delete("/menu/reset/{ownershipType}/{menuName}")
+     *
      * @ApiDoc(description="Reset menu to default state.")
      *
+     * @param int $ownershipType
      * @param string $menuName
      *
      * @return Response
      */
-    public function resetAction($menuName)
+    public function resetAction($ownershipType, $menuName)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $userId = $this->getUser()->getId();
-        $updates = $manager->getMenuUpdatesByMenuAndScope($menuName, MenuUpdate::OWNERSHIP_USER, $userId);
+        $updates = $manager->getMenuUpdatesByMenuAndScope(
+            $menuName,
+            $ownershipType,
+            $this->getCurrentOwnerId($ownershipType)
+        );
 
         foreach ($updates as $update) {
             $manager->removeMenuUpdate($update);
@@ -94,27 +96,28 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @PUT("/menuupdate/move/{menuName}")
-     * @AclAncestor("oro_navigation_menu_update_view")
-     * @ApiDoc(description="Move menu item")
+     * @PUT("/menu/move/{ownershipType}/{menuName}")
+     *
+     * @ApiDoc(description="Move menu item.")
      *
      * @param Request $request
+     * @param int $ownershipType
      * @param string $menuName
      *
      * @return Response
      */
-    public function moveAction(Request $request, $menuName)
+    public function moveAction(Request $request, $ownershipType, $menuName)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $userId = $this->getUser()->getId();
+        $ownerId = $this->getCurrentOwnerId($ownershipType);
 
         $key = $request->get('key');
-        $currentUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, MenuUpdate::OWNERSHIP_USER, $userId);
-        
+        $currentUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
+
         $parentKey = $request->get('parentKey');
-        $parent = $manager->findMenuItem($menuName, $parentKey);
+        $parent = $manager->findMenuItem($menuName, $parentKey, $ownershipType);
         $currentUpdate->setParentKey($parent ? $parent->getName() : null);
 
         $i = 0;
@@ -135,11 +138,24 @@ class MenuUpdateController extends Controller
 
         try {
             $manager->updateMenuUpdate($currentUpdate);
-            $manager->reorderMenuUpdate($menuName, $order, MenuUpdate::OWNERSHIP_USER, $userId);
+            $manager->reorderMenuUpdate($menuName, $order, $ownershipType, $ownerId);
         } catch (InvalidMaxNestingLevelException $e) {
             return new JsonResponse(['status' => false, 'message' => $e->getMessage()], Response::HTTP_OK);
         }
 
         return new JsonResponse(['status' => true], Response::HTTP_OK);
+    }
+
+    /**
+     * @param int $ownershipType
+     * @return int
+     */
+    private function getCurrentOwnerId($ownershipType)
+    {
+        if ($ownershipType == MenuUpdate::OWNERSHIP_ORGANIZATION) {
+            return $this->get('oro_security.security_facade')->getOrganization()->getId();
+        } else {
+            return $this->get('oro_security.security_facade')->getLoggedUser()->getId();
+        }
     }
 }

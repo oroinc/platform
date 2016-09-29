@@ -12,6 +12,8 @@ use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
 {
+    const OWNERSHIP_TYPE_OPTION = 'ownershipType';
+
     /** @var MenuUpdateProviderInterface[] */
     private $providers = [];
     
@@ -31,10 +33,12 @@ class MenuUpdateBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
+        $ownershipType = array_key_exists(self::OWNERSHIP_TYPE_OPTION, $options) ?
+            $options[self::OWNERSHIP_TYPE_OPTION] : false;
         $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
         $provider = $this->getProvider($area);
         $menuName = $menu->getName();
-        foreach ($provider->getUpdates($menuName) as $update) {
+        foreach ($provider->getUpdates($menuName, $ownershipType) as $update) {
             if ($update->getMenu() == $menuName) {
                 $this->menuUpdateHelper->updateMenuItem($update, $menu);
             }

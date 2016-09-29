@@ -1,5 +1,7 @@
 {% spaceless %}
-<a href="{{ path('oro_navigation_menu_update_index') }}">
-    <i class="icon-cog"></i>{{ 'oro.navigation.menuupdate.edit_menus'|trans }}
-</a>
+    {% if app.request.attributes.get('_route') == 'oro_user_profile_view' %}
+        <a href="{{ path('oro_navigation_user_menu_index') }}">
+            <i class="icon-cog"></i>{{ 'oro.navigation.menuupdate.edit_menus'|trans }}
+        </a>
+    {% endif %}
 {% endspaceless %}

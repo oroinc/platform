@@ -2,30 +2,7 @@
 
 {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-
 {% from _self import resetButton %}
-
-{% oro_title_set({params : {
-    "%title%": entity.name
-} }) %}
-
-{% set fullname = app.user|oro_format_name|default('N/A') %}
-{% set breadcrumbs = {
-    'entity': entity,
-    'indexPath': path('oro_user_index'),
-    'indexLabel': 'oro.user.entity_plural_label'|trans,
-    'additional': [
-        {
-            'indexPath': path('oro_user_profile_view'),
-            'indexLabel': fullname,
-        },
-        {
-            'indexPath': path('oro_navigation_menu_update_index'),
-            'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans,
-        }
-    ],
-    'entityTitle': entity.name
-} %}
 
 {% block content %}
     <div class="layout-content"
@@ -37,28 +14,21 @@
                     {% set actionButtons %}
                         <div class="pull-right">
                             <div class="pull-right title-buttons-container">
-                                {% if resource_granted('oro_navigation_menu_update_create') %}
-                                    {{ UI.button({
-                                        'path' : path('oro_navigation_menu_update_create', { 'menuName': menuName }),
-                                        'iCss': 'icon-folder-close',
-                                        'aCss': 'btn-primary',
-                                        'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
-                                        'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
-                                    }) }}
-                                {% endif %}
+                                {{ UI.button({
+                                    'path' : path(routePrefix ~ 'create', { 'menuName': menuName }),
+                                    'iCss': 'icon-folder-close',
+                                    'aCss': 'btn-primary',
+                                    'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
+                                    'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
+                                }) }}
 
-                                {% if resource_granted('oro_navigation_menu_update_create') and resource_granted('oro_navigation_menu_update_delete') %}
-                                    {{ UI.buttonSeparator() }}
-                                {% endif %}
+                                {{ UI.buttonSeparator() }}
 
-                                {% if resource_granted('oro_navigation_menu_update_delete') %}
-                                    {{ resetButton({
-                                        'dataUrl': path('oro_api_reset_menuupdates', {menuName: menuName}),
-                                        'dataRedirect': path('oro_navigation_menu_update_view', {menuName: menuName}),
-                                        'menuKey': menuName
-                                    }) }}
-                                {% endif %}
-
+                                {{ resetButton({
+                                    'dataUrl': path('oro_api_reset_menuupdates', {menuName: menuName, ownershipType: ownershipType}),
+                                    'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
+                                    'menuKey': menuName
+                                }) }}
                             </div>
                         </div>
                     {% endset %}
@@ -67,40 +37,7 @@
                     {%  endif %}
                     <div class="pull-left-extra">
                         {% block pageHeader %}
-                            <div class="customer-info well-small customer-simple">
-                                <div class="customer-content">
-                                    <div class="top-row">
-                                        {% block breadcrumbs %}
-                                            <div class="pull-left">
-                                                {% if breadcrumbs.indexLabel is defined %}
-                                                    <div class="sub-title">
-                                                        {%- if breadcrumbs.indexPath is defined -%}
-                                                            <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
-                                                        {%- else -%}
-                                                            {{ breadcrumbs.indexLabel }}
-                                                        {%- endif -%}
-                                                    </div>
-                                                    <span class="separator">/</span>
-                                                {% endif %}
-                                                {% if breadcrumbs.additional is defined %}
-                                                    {% for breadcrumb in breadcrumbs.additional %}
-                                                        <div class="sub-title">
-                                                            {%- if breadcrumb.indexPath is defined -%}
-                                                                <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
-                                                            {%- else -%}
-                                                                {{ breadcrumb.indexLabel }}
-                                                            {%- endif -%}
-                                                        </div>
-                                                        <span class="separator">/</span>
-                                                    {% endfor %}
-                                                {% endif %}
-                                                <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
-                                            </div>
-                                            {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
-                                        {% endblock breadcrumbs %}
-                                    </div>
-                                </div>
-                            </div>
+                            {{ include('OroNavigationBundle:menuUpdate:pageHeader.html.twig') }}
                         {% endblock pageHeader %}
                     </div>
                     {%  if isMobileVersion() %}
@@ -118,12 +55,13 @@
                             <div class="left-panel scrollable-container">
                                 <div class="menu-item">
                                     {% set treeOptions = {
-                                    'data' : tree,
-                                    'menu' : menuName,
-                                    'updateAllowed' : resource_granted('oro_navigation_menu_update_update'),
-                                    'onSelectRoute' : 'oro_navigation_menu_update_update',
-                                    'onMoveRoute' : 'oro_api_move_menuupdates',
-                                    'onRootSelectRoute' : 'oro_navigation_menu_update_view'
+                                        'data' : tree,
+                                        'menu' : menuName,
+                                        'ownershipType' : ownershipType,
+                                        'updateAllowed' : true,
+                                        'onRootSelectRoute' : routePrefix ~ 'view',
+                                        'onSelectRoute' : routePrefix ~ 'update',
+                                        'onMoveRoute' : 'oro_api_move_menuupdates'
                                     } %}
                                     <div
                                             data-page-component-module="oronavigation/js/app/components/tree-manage-component"
@@ -132,22 +70,15 @@
                                 </div>
                             </div>
                             <div class="content">
-                                {% if resource_granted('oro_navigation_menu_update_update') %}
-                                    <div class="text-center">
-                                        {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
-                                    </div>
-                                {% endif %}
+                                <div class="text-center">
+                                    {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             {% endblock content_data %}
         </div>
-
-        {% block navigation_content_tags %}
-            {# block added just for possibility to disable it in child templates if needed #}
-            {{ navigationMacro.navigationContentTags(entity) }}
-        {% endblock %}
     </div>
 {% endblock content %}
 

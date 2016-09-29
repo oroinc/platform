@@ -54,10 +54,10 @@ navigation:
                 uri: '#'
             menu_list_default:
                 label: 'oro.navigation.menu.menu_list_default.label'
-                route: 'oro_navigation_menu_update_index'
+                route: 'oro_navigation_org_menu_index'
                 extras:
                     position: 90
-                    routes: ['/^oro_navigation_menu_update_\w+$/']
+                    routes: ['/^oro_navigation_org_menu_[\w_]+$/']
                     description: 'Manage menus in default area'
 
         tree:
@@ -82,8 +82,14 @@ navigation:
         oro_shortcut_actionslist: 'Shortcut Actions List'
         oro_pinbar_help: 'How To Use Pinbar'
 
-        oro_navigation_menu_update_index: ~
-        oro_navigation_menu_update_view: '%%title%% - Menus'
+        oro_navigation_user_menu_index: '%%username%% - Menus'
+        oro_navigation_user_menu_view: '%%title%% - Menus - %%username%%'
+        oro_navigation_user_menu_create: 'Create Menu Item - Menus - %%username%%'
+        oro_navigation_user_menu_update: '%%title%% - Edit - Menus - %%username%%'
+        oro_navigation_org_menu_index: ~
+        oro_navigation_org_menu_view: '%%title%%'
+        oro_navigation_org_menu_create: 'Create Menu Item'
+        oro_navigation_org_menu_update: '%%title%% - Edit'
 
     navigation_elements:
         pinButton:
