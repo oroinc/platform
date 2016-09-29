@@ -389,6 +389,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $key = 'test-key';
 
+        $ownershipType = 1;
+
         $menu = $this->getMock(ItemInterface::class);
 
         $item = $this->getMock(ItemInterface::class);
@@ -396,7 +398,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->builderChainProvider
             ->expects($this->once())
             ->method('get')
-            ->with($menuName)
+            ->with($menuName, ['ignoreCache' => true, 'ownershipType' => $ownershipType])
             ->will($this->returnValue($menu));
 
         $this->menuUpdateHelper
@@ -405,7 +407,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->with($menu, $key)
             ->will($this->returnValue($item));
 
-        $this->assertEquals($item, $this->manager->findMenuItem($menuName, $key));
+        $this->assertEquals($item, $this->manager->findMenuItem($menuName, $key, $ownershipType));
     }
 
     /**
