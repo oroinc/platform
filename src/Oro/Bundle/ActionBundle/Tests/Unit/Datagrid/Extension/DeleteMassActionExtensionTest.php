@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class DeleteMassActionExtensionTest extends AbstractExtensionTest
@@ -49,9 +50,10 @@ class DeleteMassActionExtensionTest extends AbstractExtensionTest
      * @dataProvider isApplicableDataProvider
      *
      * @param array $actionsConfig
-     * @param bool $expected
+     * @param bool  $expected
+     * @param string $type
      */
-    public function testIsApplicable(array $actionsConfig, $expected)
+    public function testIsApplicable(array $actionsConfig, $expected, $type)
     {
         $this->manager->expects($this->once())
             ->method('getOperations')
@@ -74,6 +76,7 @@ class DeleteMassActionExtensionTest extends AbstractExtensionTest
                     'test-grid',
                     [
                         'source' => [
+                            'type'  => $type,
                             'query' => [
                                 'from' => [
                                     [
@@ -98,12 +101,14 @@ class DeleteMassActionExtensionTest extends AbstractExtensionTest
         return [
             [
                 'actionsConfig' => ['delete' => []],
-                'expected' => true
+                'expected' => true,
+                'type' => OrmDatasource::TYPE
             ],
             [
                 'actionsConfig' => [],
-                'expected' => false
-            ]
+                'expected' => false,
+                'type' => OrmDatasource::TYPE
+            ],
         ];
     }
 }

@@ -12,6 +12,7 @@ use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
@@ -93,7 +94,15 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $optionsHelper->expects($this->any())
             ->method('getFrontendOptions')
-            ->willReturn(['options' => ['option1' => 'value1', 'option2' => 'value2']]);
+            ->willReturn([
+                'options' => [
+                    'option1' => 'value1',
+                    'option2' => 'value2',
+                ],
+                'data' => [
+                    'key1' => 'value1',
+                ],
+            ]);
 
         $this->listener = new OperationListener(
             $this->manager,
@@ -202,12 +211,18 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function onConfigureActionsProvider()
     {
         return [
             'configure with provider' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['test_operation' => $this->createOperation(
                     'test_operation',
                     true,
@@ -221,7 +236,12 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'configure with single mass action' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['test_operation' => $this->createOperation(
                     'test_operation',
                     true,
@@ -235,24 +255,38 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'configure with single action' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['action3' => $this->createOperation(
                     'action3',
                     true,
                     [
                         'getName' => 'action3',
-                        'getLabel' => 'Action 3 label'
+                        'getLabel' => 'Action 3 label',
+                        'getDatagridOptions' => ['data' => ['key1' => 'value1']]
                     ]
                 )],
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'actions' => ['action3' => $this->getRowActionConfig('action3', 'Action 3 label')],
+                    'actions' => ['action3' => $this->getRowActionConfig('Action 3 label', ['key1' => 'value1'])],
                 ]
             ],
             'should not replace existing default action' => [
-                'config' => DatagridConfiguration::create(
-                    ['name' => 'datagrid1', 'actions' => ['action3' => ['label' => 'default action3']]]
-                ),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'actions' => [
+                        'action3' => [
+                            'label' => 'default action3'
+                        ]
+                    ],
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => ['action3' => $this->createOperation(
                     'action3',
                     true,
@@ -271,12 +305,17 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 'expectedConfiguration' => [
                     'actions' => [
                         'action3' => ['label' => 'default action3'],
-                        'test_operation' => $this->getRowActionConfig('test_operation'),
+                        'test_operation' => $this->getRowActionConfig(),
                     ]
                 ]
             ],
             'not configure' => [
-                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid1',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
                 'actions' => [],
                 'expected' => false
             ]
@@ -313,8 +352,8 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     'action2' => $this->createOperation('operation2', true)
                 ],
                 'expectedActions' => [
-                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
-                    'action2' => ['option1' => 'value1', 'option2' => 'value2'],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
+                    'action2' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                 ],
                 'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
@@ -326,7 +365,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     'action3' => $this->createOperation('operation3', false)
                 ],
                 'expectedActions' => [
-                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                     'action3' => false
                 ],
                 'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
@@ -338,6 +377,9 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'view' => ['key1' => 'value1'],
                         'update' => false,
                     ],
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => [
@@ -345,7 +387,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     'action3' => $this->createOperation('operation3', false)
                 ],
                 'expectedActions' => [
-                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                     'action3' => false,
                     'view' => ['key1' => 'value1'],
                     'update' => false,
@@ -361,6 +403,9 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                             'update' => true,
                         ];
                     },
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => [
@@ -368,7 +413,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     'action3' => $this->createOperation('operation3', false)
                 ],
                 'expectedActions' => [
-                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                     'action3' => false,
                     'view' => ['key2' => 'value2'],
                     'update' => true
@@ -379,22 +424,19 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $action
      * @param string $label
+     * @param array $data
      * @return array
      */
-    protected function getRowActionConfig($action, $label = null)
+    protected function getRowActionConfig($label = null, array $data = [])
     {
-        return [
+        return array_merge([
             'type' => 'action-widget',
             'label' => $label,
             'rowAction' => false,
             'link' => '#',
             'icon' => 'edit',
-            'options' => [
-                'operationName' => $action,
-            ]
-        ];
+        ], $data);
     }
 
     /**

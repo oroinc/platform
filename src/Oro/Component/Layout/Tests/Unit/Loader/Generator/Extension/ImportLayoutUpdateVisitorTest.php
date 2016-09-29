@@ -36,7 +36,6 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
 {
     private \$parentLayoutUpdate;
     private \$import;
-    private \$applicable = false;
 
     public function testMethod()
     {
@@ -45,11 +44,9 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
         }
 
         if (\$this->parentLayoutUpdate instanceof Oro\Component\Layout\IsApplicableLayoutUpdateInterface
-            && !\$this->parentLayoutUpdate->isApplicable()) {
+            && !\$this->parentLayoutUpdate->isApplicable(\$item->getContext())) {
             return;
         }
-
-        \$this->applicable = true;
 
         \$layoutManipulator  = new ImportLayoutManipulator(\$layoutManipulator, \$this->import);
         echo 123;
@@ -65,9 +62,9 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
         \$this->import = \$import;
     }
 
-    public function isApplicable()
+    public function isApplicable(\Oro\Component\Layout\ContextInterface \$context)
     {
-        return \$this->applicable;
+        return true;
     }
 
     public function getImport()

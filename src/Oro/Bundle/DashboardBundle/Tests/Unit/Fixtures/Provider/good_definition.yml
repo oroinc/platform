@@ -1,4 +1,4 @@
-oro_dashboard_config:
+dashboards:
     widgets:
         quick_launchpad:
             label:      oro.dashboard.title.quick_launchpad

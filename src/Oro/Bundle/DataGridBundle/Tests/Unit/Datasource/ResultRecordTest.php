@@ -36,6 +36,8 @@ class ResultRecordTest extends \PHPUnit_Framework_TestCase
         $obj        = new \stdClass();
         $obj->item1 = 'val1';
 
+        $dateTime = new \DateTime();
+
         return [
             [
                 'data'          => [],
@@ -71,6 +73,16 @@ class ResultRecordTest extends \PHPUnit_Framework_TestCase
                 'data'          => ['item1' => ['subItem1' => 'val1']],
                 'itemName'      => '[item1][subItem1]',
                 'expectedValue' => 'val1'
+            ],
+            [
+                'data'          => [$dateTime],
+                'itemName'      => 'timestamp',
+                'expectedValue' => $dateTime->getTimestamp()
+            ],
+            [
+                'data'          => [$dateTime],
+                'itemName'      => 'qwerty',
+                'expectedValue' => null
             ],
         ];
     }
