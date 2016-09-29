@@ -21,6 +21,7 @@ datagrids:
         options:
             toolbarOptions:
                 hide: true
+
     menu-user-grid:
         extends: menu-base-grid
         properties:

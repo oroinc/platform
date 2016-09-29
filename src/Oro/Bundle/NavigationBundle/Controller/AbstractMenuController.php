@@ -4,15 +4,14 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
@@ -131,9 +130,9 @@ abstract class AbstractMenuController extends Controller
     protected function getMenuUpdate($menuName, $key, $isExist = false)
     {
         if ($this->getOwnershipType() == MenuUpdate::OWNERSHIP_ORGANIZATION) {
-            $ownerId = $this->getCurrentOrganization()->getId();
+            $ownerId = $this->get('oro_security.security_facade')->getOrganization()->getId();
         } else {
-            $ownerId = $this->getCurrentUser()->getId();
+            $ownerId = $this->get('oro_security.security_facade')->getLoggedUser()->getId();
         }
 
         $menuUpdate = $this->getManager()->getMenuUpdateByKeyAndScope(
@@ -156,11 +155,11 @@ abstract class AbstractMenuController extends Controller
      * @param string $menuName
      *
      * @return ItemInterface
+     * @throws NotFoundHttpException
      */
     protected function getMenu($menuName)
     {
         $options = [
-            'ignoreCache' => true,
             'ownershipType' => $this->getOwnershipType()
         ];
         $menu = $this->getManager()->getMenu($menuName, $options);
@@ -180,31 +179,5 @@ abstract class AbstractMenuController extends Controller
             $this->manager = $this->get('oro_navigation.manager.menu_update_default');
         }
         return $this->manager;
-    }
-
-    /**
-     * @return null|User
-     */
-    protected function getCurrentUser()
-    {
-        $user = $this->get('oro_security.security_facade')->getLoggedUser();
-        if ($user instanceof User) {
-            return $user;
-        }
-
-        return null;
-    }
-
-    /**
-     * @return null|Organization
-     */
-    protected function getCurrentOrganization()
-    {
-        $organization = $this->get('oro_security.security_facade')->getOrganization();
-        if (!is_bool($organization)) {
-            return $organization;
-        }
-
-        return null;
     }
 }

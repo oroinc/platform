@@ -49,7 +49,7 @@ class MenuUpdateController extends Controller
             $menuName,
             $key,
             $ownershipType,
-            $this->getOwnerId($ownershipType)
+            $this->getCurrentOwnerId($ownershipType)
         );
 
         if ($menuUpdate === null) {
@@ -84,7 +84,7 @@ class MenuUpdateController extends Controller
         $updates = $manager->getMenuUpdatesByMenuAndScope(
             $menuName,
             $ownershipType,
-            $this->getOwnerId($ownershipType)
+            $this->getCurrentOwnerId($ownershipType)
         );
 
         foreach ($updates as $update) {
@@ -110,7 +110,7 @@ class MenuUpdateController extends Controller
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $ownerId = $this->getOwnerId($ownershipType);
+        $ownerId = $this->getCurrentOwnerId($ownershipType);
 
         $key = $request->get('key');
         $currentUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
@@ -145,38 +145,12 @@ class MenuUpdateController extends Controller
      * @param int $ownershipType
      * @return int
      */
-    private function getOwnerId($ownershipType)
+    private function getCurrentOwnerId($ownershipType)
     {
         if ($ownershipType == MenuUpdate::OWNERSHIP_ORGANIZATION) {
-            return $this->getCurrentOrganization()->getId();
+            return $this->get('oro_security.security_facade')->getOrganization()->getId();
         } else {
-            return $this->getCurrentUser()->getId();
+            return $this->get('oro_security.security_facade')->getLoggedUser()->getId();
         }
-    }
-
-    /**
-     * @return null|User
-     */
-    private function getCurrentUser()
-    {
-        $user = $this->get('oro_security.security_facade')->getLoggedUser();
-        if ($user instanceof User) {
-            return $user;
-        }
-
-        return null;
-    }
-
-    /**
-     * @return null|Organization
-     */
-    private function getCurrentOrganization()
-    {
-        $organization = $this->get('oro_security.security_facade')->getOrganization();
-        if (!is_bool($organization)) {
-            return $organization;
-        }
-
-        return null;
     }
 }
