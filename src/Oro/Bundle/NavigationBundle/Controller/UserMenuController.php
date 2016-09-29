@@ -48,7 +48,7 @@ class UserMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_user_menu_create")
-     * @Template
+     * @Template("OroNavigationBundle:UserMenu:update.html.twig")
      *
      * @param string $menuName
      * @param string|null $parentKey

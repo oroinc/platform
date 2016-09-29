@@ -48,7 +48,7 @@ class OrganizationMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_org_menu_create")
-     * @Template
+     * @Template("OroNavigationBundle:OrganizationMenu:update.html.twig")
      *
      * @param string $menuName
      * @param string|null $parentKey
