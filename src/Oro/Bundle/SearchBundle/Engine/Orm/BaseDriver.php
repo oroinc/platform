@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SearchBundle\Entity\AbstractItem;
+use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -492,5 +493,58 @@ abstract class BaseDriver
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param array                      $searchCondition
+     *
+     * @return string
+     */
+    public function addFilteringField(QueryBuilder $qb, $index, $searchCondition)
+    {
+        $condition = $searchCondition['condition'];
+        $type = $searchCondition['fieldType'];
+
+        $qb->setParameter(
+            sprintf('field%s', $index),
+            $searchCondition['fieldName']
+        );
+
+        switch ($condition) {
+            case Query::OPERATOR_EXISTS:
+                $operator = 'in';
+                break;
+            case Query::OPERATOR_NOT_EXISTS:
+                $operator = 'not in';
+                break;
+            default:
+                throw new ExpressionSyntaxError(
+                    sprintf('Unsupported operator "%s"', $condition)
+                );
+        }
+
+        $subIndex = $this->getUniqueId();
+        $subJoinField = sprintf('filter.%sFields', $type);
+        $subJoinAlias = $this->getJoinAlias($type, $subIndex);
+
+        $subQb = $this->em->createQueryBuilder()
+            ->select('filter.id')
+            ->from($this->entityName, 'filter')
+            ->join($subJoinField, $subJoinAlias)
+            ->andWhere(sprintf(
+                '%s.field = :field%s',
+                $subJoinAlias,
+                $index
+            ));
+
+        $queryString = '(search.id %s (%s))';
+
+        return sprintf(
+            $queryString,
+            $operator,
+            $subQb->getDQL()
+        );
     }
 }

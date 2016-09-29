@@ -7,5 +7,12 @@ use Doctrine\Common\Collections\Expr\Comparison as BaseComparison;
 class Comparison extends BaseComparison
 {
     const NOT_CONTAINS  = 'NOT CONTAINS';
-    const IS_NULL  = 'IS NULL';
+    const EXISTS  = 'EXISTS';
+    const NOT_EXISTS  = 'NOT EXISTS';
+
+    /** @var array */
+    public static $filteringOperators = [
+        self::EXISTS,
+        self::NOT_EXISTS,
+    ];
 }

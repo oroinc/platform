@@ -68,8 +68,10 @@ class Criteria extends BaseCriteria
                 return Query::OPERATOR_NOT_EQUALS;
             case Comparison::NIN:
                 return Query::OPERATOR_NOT_IN;
-            case Comparison::IS_NULL:
-                return Query::OPERATOR_IS_NULL;
+            case Comparison::EXISTS:
+                return Query::OPERATOR_EXISTS;
+            case Comparison::NOT_EXISTS:
+                return Query::OPERATOR_NOT_EXISTS;
         }
 
         return strtolower($operator);
