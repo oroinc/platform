@@ -73,3 +73,10 @@ services:
         class: 'Oro\Bundle\CronBundle\EventListener\ClassMetadataListener'
         tags:
             -  { name: doctrine.event_listener, event: loadClassMetadata }
+
+    oro_cron.listener.job_subscriber:
+        class: Oro\Bundle\CronBundle\EventListener\JobSubscriber
+        arguments:
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
