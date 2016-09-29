@@ -54,19 +54,22 @@ class MenuUpdateManager
     }
 
     /**
+     * Create menu update entity
+     *
      * @param int $ownershipType
      * @param int $ownerId
+     * @param string $key
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownershipType, $ownerId)
+    public function createMenuUpdate($ownershipType, $ownerId, $key = null)
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
         $entity
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
-            ->setKey($this->generateKey())
+            ->setKey($key ? $key : $this->generateKey())
         ;
 
         return $entity;
@@ -125,7 +128,7 @@ class MenuUpdateManager
         ]);
         
         if (!$update) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, $key);
         }
 
         return $this->getMenuUpdateFromMenu($update, $menuName, $key);
