@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 
-class TranslationServiceTest extends \PHPUnit_Framework_TestCase
+class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $adapter;

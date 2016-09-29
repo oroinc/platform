@@ -5,6 +5,8 @@ styles:
         - 'bundles/oroform/default/scss/variables/custom-checkbox-config.scss'
         - 'bundles/oroform/default/scss/variables/input-config.scss'
         - 'bundles/oroform/default/scss/variables/select-config.scss'
+        - 'bundles/oroform/default/scss/variables/oro-select2-config.scss'
+        - 'bundles/oroform/default/scss/variables/oro-toolbar-config.scss'
         - 'bundles/oroform/default/scss/variables/textarea-config.scss'
         - 'bundles/oroform/default/scss/variables/label-config.scss'
         - 'bundles/oroform/default/scss/styles.scss'
