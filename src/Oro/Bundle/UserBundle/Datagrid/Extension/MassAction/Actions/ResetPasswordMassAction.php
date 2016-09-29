@@ -23,7 +23,6 @@ class ResetPasswordMassAction extends AbstractMassAction
      */
     public function setOptions(ActionConfiguration $options)
     {
-
         if (empty($options['handler'])) {
             $options['handler'] = 'oro_datagrid.mass_action.reset_password.handler';
         }

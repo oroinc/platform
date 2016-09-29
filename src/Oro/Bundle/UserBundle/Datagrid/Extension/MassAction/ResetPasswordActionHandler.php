@@ -2,22 +2,21 @@
 
 namespace Oro\Bundle\UserBundle\Datagrid\Extension\MassAction;
 
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {
@@ -36,7 +35,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     /** @var TranslatorInterface  */
     protected $translator;
 
-    /** @var  int */
+    /** @var int */
     protected $counter = 0;
 
     /** @var string */
