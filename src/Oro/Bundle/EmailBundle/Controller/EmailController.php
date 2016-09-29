@@ -33,7 +33,6 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EmailBundle\Command\PurgeEmailAttachmentCommand;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
