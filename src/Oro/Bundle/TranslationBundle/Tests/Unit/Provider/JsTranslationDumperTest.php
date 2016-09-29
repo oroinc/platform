@@ -26,6 +26,9 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
     /** @var JsTranslationDumper */
     protected $dumper;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->translationControllerMock = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Controller\Controller')
@@ -52,9 +55,18 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
         $this->dumper->setLogger($this->logger);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
-        unset($this->translationControllerMock, $this->routerMock, $this->logger, $this->dumper);
+        unset(
+            $this->translationControllerMock,
+            $this->routerMock,
+            $this->logger,
+            $this->languageProvider,
+            $this->dumper
+        );
     }
 
     public function testDumpTranslations()

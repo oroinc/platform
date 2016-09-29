@@ -28,6 +28,13 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer = new TranslationNormalizer($this->translationManager);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->translationManager, $this->normalizer);
+    }
     public function testDenormalize()
     {
         $language = (new Language())->setCode('test_code');

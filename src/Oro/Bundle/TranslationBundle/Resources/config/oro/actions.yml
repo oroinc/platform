@@ -297,7 +297,6 @@ operations:
             - '@call_service_method':
                 service: oro_translation.js_dumper
                 method: dumpTranslations
-                method_parameters: [$.availableLanguages]
             - '@flash_message':
                 message: oro.translation.translation.message.rebuild_cache
                 type: 'success'

@@ -34,6 +34,9 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
     /** @var LanguageListener */
     protected $listener;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->languageHelper = $this->getMockBuilder(LanguageHelper::class)
@@ -59,9 +62,18 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
-        unset($this->listener, $this->languageHelper, $this->doctrineHelper);
+        unset(
+            $this->listener,
+            $this->languageHelper,
+            $this->doctrineHelper,
+            $this->gridConfigurationHelper,
+            $this->translationKeyRepository
+        );
     }
 
     public function testOnBuildBefore()

@@ -191,6 +191,9 @@ class Translator extends BaseTranslator
         parent::warmUp($cacheDir);
     }
 
+    /**
+     * Rebuilds all cached message catalogs, w/o any delay at clients side
+     */
     public function rebuildCache()
     {
         $cacheDir = $this->originalOptions['cache_dir'];

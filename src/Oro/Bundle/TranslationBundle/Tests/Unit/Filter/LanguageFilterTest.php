@@ -28,6 +28,15 @@ class LanguageFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter = new LanguageFilter($this->formFactory, new FilterUtility());
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        unset($this->formFactory, $this->filter);
+    }
+
     public function testInit()
     {
         $this->filter->init('test', []);

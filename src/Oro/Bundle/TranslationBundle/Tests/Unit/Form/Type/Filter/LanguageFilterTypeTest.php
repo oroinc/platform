@@ -32,6 +32,14 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
         $this->type = new LanguageFilterType($this->formatter);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->formatter, $this->type);
+    }
+
     public function testGetName()
     {
         $this->assertEquals(LanguageFilterType::NAME, $this->type->getName());
