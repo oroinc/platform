@@ -76,15 +76,9 @@
         }) %}
     {% endif %}
 
-    {% if id is defined and id is not empty %}
-        {% set attr = attr|merge({
-            id: id
-        }) %}
-    {% endif %}
-
     {% if placeholder is defined %}
         {% set attr = attr|merge({
-            placeholder: placeholder
+            placeholder: placeholder|block_text(translation_domain)
         }) %}
     {% endif %}
 
@@ -96,15 +90,10 @@
 
     {% if type == 'password' %}
         {% set attr = attr|merge({
-        autocomplete: 'off'
+            autocomplete: 'off'
         }) %}
     {% endif %}
 
-    {% if attr.placeholder is defined %}
-        {% set attr = attr|merge({
-            placeholder: attr.placeholder|block_text(translation_domain)
-        }) %}
-    {% endif %}
     <input{{ block('block_attributes') }}/>
 {%- endblock %}
 

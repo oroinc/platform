@@ -1,0 +1,80 @@
+@mixin placeholder {
+    ::-webkit-input-placeholder {@content}
+    :-moz-placeholder           {@content}
+    ::-moz-placeholder          {@content}
+    :-ms-input-placeholder      {@content}
+}
+
+@mixin appearance() {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+@mixin base-ui-element(
+    $use-base-style:   false,
+    $padding:          $base-ui-element-offset,
+    $font-size:        $base-ui-element-font-size,
+    $font-family:      $base-ui-font-family,
+    $line-height:      $base-ui-element-line-height,
+    $border:           $base-ui-element-border,
+    $border-radius:    $base-ui-element-border-radius,
+    $background-color: $base-ui-element-bg-color,
+    $color:            $base-ui-element-color
+    ) {
+    @if ($use-base-style) {
+        display: inline-block;
+        padding: $padding;
+
+        font-size: $font-size;
+        font-family: $font-family;
+        line-height: $line-height;
+
+        border: $border;
+        border-radius: $border-radius;
+        background-color: $background-color;
+        color: $color;
+
+        vertical-align: middle;
+
+        &--full,
+        &.full {
+            width: 100%;
+        }
+    }
+}
+
+@mixin element-state($state) {
+    @if $state == 'hover' {
+        &:hover {
+            @content;
+        }
+    }
+
+    @if $state == 'focus' {
+        &:focus {
+            @content;
+        }
+    }
+
+    @else if $state == 'warning' {
+        &--warning,
+        &.warning {
+            @content;
+        }
+    }
+
+    @else if $state == 'success' {
+        &--success,
+        &.success {
+            @content;
+        }
+    }
+
+    @else if $state == 'error' {
+        &--error,
+        &.error {
+            @content;
+        }
+    }
+}
+
