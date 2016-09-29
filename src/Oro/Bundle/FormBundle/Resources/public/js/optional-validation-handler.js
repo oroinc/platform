@@ -11,7 +11,7 @@ define(['jquery'], function($) {
          *
          * @return {boolean}        Should be bubbled
          */
-        initialize: function($group) {
+        handleGroupLoaded: function($group) {
             var self = this;
 
             var labels = this.getGroupElements($group, $group.find('label[data-required]'));
@@ -26,8 +26,6 @@ define(['jquery'], function($) {
 
                 $group.data('group-validation-required', true);
             }
-
-            return true;
         },
 
         /**
@@ -43,7 +41,7 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         hasNotEmptyInput: function($group) {
-            var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
+            var elementsSelector = 'textarea, input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
                 ' input[type="radio"][data-required]:checked,' +
                 ' input[type="checkbox"][data-required]:checked';
 
@@ -85,6 +83,7 @@ define(['jquery'], function($) {
                 case 'select':
                     this.selectHandler($group, $element);
                     break;
+                case 'textarea':
                 case 'input':
                     this.inputHandler($group, $element);
                     break;
@@ -120,7 +119,7 @@ define(['jquery'], function($) {
                 $group.data('group-validation-required', false);
             } else {
                 $group.find('label[data-required] em').show();
-                var inputs = this.getGroupElements($group, $group.find('input, select'));
+                var inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
                 inputs.data('ignore-validation', false);
                 $group.data('group-validation-required', true);
             }
@@ -140,11 +139,13 @@ define(['jquery'], function($) {
          */
         clearValidationErrorsAndDisableValidation: function($group) {
             var validator = $group.validate();
-            var inputs = this.getGroupElements($group, $group.find('input, select'));
+            var inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
             inputs.data('ignore-validation', true);
-            inputs.each(function(key, element) {
+            inputs.each(
+                function(key, element) {
                     validator.hideElementErrors($(element));
-                });
+                }
+            );
         },
 
         /**
