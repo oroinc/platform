@@ -20,6 +20,7 @@ form:
             drop_none:    None
             drop_app:     Application Tables
             drop_full:    All Tables
+            mysql_hint:   To support supplemental characters (e.g. emojis), recommended character set for MySQL is utf8mb4
         mailer:
             header:       Mailer settings
             host:         Host
