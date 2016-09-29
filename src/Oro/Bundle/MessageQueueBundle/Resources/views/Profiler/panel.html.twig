@@ -27,7 +27,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ sentMessage.topic }}</td>
                     <td><pre>{{ collector.prettyPrintMessage(sentMessage.message)|raw }}</pre></td>
-                    <td><span title="{{ sentMessage.priority }}">{{ collector.prettyPrintPriority(sentMessage.priority) }}</span></td>
+                    <td><span title="{{ sentMessage.priority is defined ? sentMessage.priority : '' }}">{{ sentMessage.priority is defined ? collector.prettyPrintPriority(sentMessage.priority) : '' }}</span></td>
                 </tr>
             {% endfor %}
         </tbody>

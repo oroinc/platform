@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\ORM\EntityManager;
 
 class IndexCommand extends ContainerAwareCommand
 {
@@ -59,7 +59,7 @@ class IndexCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return RegistryInterface
+     * @return ManagerRegistry
      */
     protected function getDoctrine()
     {

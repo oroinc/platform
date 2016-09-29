@@ -4,13 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\SearchBundle\Command\ReindexCommand;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Oro\Bundle\SearchBundle\Entity\UpdateEntity;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class SearchEntityConfigListener
