@@ -196,6 +196,7 @@ services:
         class: 'Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor'
         arguments:
             - '@oro_imap.manager.clear'
+            - '@oro_message_queue.job.runner'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
