@@ -144,7 +144,8 @@ class EmailType extends AbstractType
                 'contexts',
                 'oro_activity_contexts_select',
                 [
-                    'error_bubbling' => false,
+                    'collectionModel' => true,
+                    'error_bubbling'  => false,
                     'tooltip'   => 'oro.email.contexts.tooltip',
                     'read_only' => !$this->securityContext->isGranted(
                         'EDIT',
