@@ -10,6 +10,8 @@
                              $input-color
                             );
 
+    box-sizing: border-box;
+
     @include element-state('hover') {
         text-decoration: none;
 

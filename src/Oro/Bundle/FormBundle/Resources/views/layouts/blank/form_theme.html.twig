@@ -1,0 +1,21 @@
+{% extends 'form_div_layout.html.twig' %}
+
+{%- block form_row -%}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': attr.class|default('')
+    }) %}
+
+    <div class="form-row {{ attr.class }}">
+        <div class="form-row__label">
+            {{- form_label(form, null, { 'label_attr': {'class': 'label'}}) -}}
+        </div>
+        <div class="form-row__content">
+            {{- form_widget(form, {
+                attr: {
+                   'class': 'input input--full'
+                }
+            }) -}}
+        </div>
+        {{- form_errors(form, {}) -}}
+    </div>
+{%- endblock form_row -%}
