@@ -258,4 +258,24 @@ class MenuUpdateManager
     {
         return uniqid('menu_item_');
     }
+
+    /**
+     * Reset menu updates depending on ownership type and owner id
+     *
+     * @param int $ownershipType
+     * @param int $ownerId
+     */
+    public function resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId = null)
+    {
+        $criteria = ['ownershipType' => $ownershipType];
+
+        if ($ownerId) {
+            $criteria['ownerId'] = $ownerId;
+        }
+        $menuUpdates = $this->getRepository()->findBy($criteria);
+
+        foreach ($menuUpdates as $menuUpdate) {
+            $this->removeMenuUpdate($menuUpdate);
+        }
+    }
 }
