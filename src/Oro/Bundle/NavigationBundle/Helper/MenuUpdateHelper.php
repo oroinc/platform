@@ -45,6 +45,7 @@ class MenuUpdateHelper
 
         $update->setActive($item->isDisplayed());
         $update->setMenu($menu);
+        $update->setExistsInNavigationYml(!$item->getExtra('userDefined', false));
 
         foreach ($item->getExtras() as $key => $value) {
             if (array_key_exists($key, $extrasMapping)) {
@@ -69,8 +70,7 @@ class MenuUpdateHelper
 
         if (!$item instanceof ItemInterface) {
             $item = $parentItem->addChild($update->getKey());
-        } else {
-            $update->setExistsInNavigationYml(true);
+            $item->setExtra('userDefined', true);
         }
 
         if ($item->getParent()->getName() != $parentItem->getName()) {
@@ -129,11 +129,11 @@ class MenuUpdateHelper
         foreach (['get', 'is'] as $prefix) {
             $method = $prefix . ucfirst($key);
             if (method_exists($update, $method)) {
-                $result = $update->{$method}();
                 $method = 'set' . ucfirst($key);
-                if ($result === null && method_exists($update, $method)) {
+                if (method_exists($update, $method)) {
                     $update->{$method}($value);
                 }
+                break;
             }
         }
     }
