@@ -234,6 +234,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
         };
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
     public function setParametersDataProvider()
     {
         $entityName = 'Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity';
