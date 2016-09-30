@@ -1,6 +1,6 @@
 {% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}
     {{ form_widget(form) }}
-    {% if is_granted('oro_config_system') %}
+    {% if resource_granted('oro_config_system') %}
     <span class="help-block">
         <a class="btn btn-danger"
            href="{{ path('oro_email_purge_emails_attachments') }}"
