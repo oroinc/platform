@@ -58,7 +58,7 @@ define(function(require) {
 
         class: null,
 
-        select2ConfigData: {},
+        select2ConfigData: null,
 
         isInitSelect2: false,
 
@@ -116,7 +116,7 @@ define(function(require) {
          */
         loadValuesById: function(successEventName) {
             var self = this;
-            if (_.isEmpty(this.select2ConfigData)) {
+            if (this.select2ConfigData === null) {
                 $.ajax({
                     url: routing.generate(
                         'oro_dictionary_value',
@@ -263,7 +263,7 @@ define(function(require) {
                 placeholder: __('Choose values')
             };
 
-            if (_.isEmpty(this.select2ConfigData)) {
+            if (this.select2ConfigData === null) {
                 config.ajax = {
                     url: routing.generate(
                         'oro_dictionary_search',
