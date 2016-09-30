@@ -1,0 +1,20 @@
+layout:
+    actions:
+        - '@addTree':
+            items:
+                layout_4_wrapper:
+                    blockType: container
+                    options:
+                        attr:
+                            class: "layout-4-wrapper"
+            tree:
+                wrapper:
+                    layout_4_wrapper: ~
+
+    imports:
+        -
+            id: first_level_4
+            namespace: first_4
+            root: layout_4_wrapper
+
+    conditions: 'false'

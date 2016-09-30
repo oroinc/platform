@@ -8,7 +8,6 @@ use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Engine\Orm;
@@ -115,6 +114,7 @@ class OrmEngineTest extends WebTestCase
                     ]
                 ]
             ]));
+        $mapper->expects($this->any())->method('getEntityConfig')->willReturn([]);
 
         $objectMapper = new ObjectMapper(
             $eventDispatcher,

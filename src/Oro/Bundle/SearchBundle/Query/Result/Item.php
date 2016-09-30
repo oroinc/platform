@@ -76,16 +76,16 @@ class Item
         $recordId = null,
         $recordTitle = null,
         $recordUrl = null,
-        $selectedData = [],
-        $entityConfig = []
+        array $selectedData = [],
+        array $entityConfig = []
     ) {
         $this->em           = $em;
         $this->entityName   = $entityName;
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
-        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
-        $this->selectedData = is_array($selectedData) ? $selectedData : [];
+        $this->selectedData = $selectedData;
+        $this->entityConfig = $entityConfig;
 
         $this->propertyAccessor = new PropertyAccessor();
     }

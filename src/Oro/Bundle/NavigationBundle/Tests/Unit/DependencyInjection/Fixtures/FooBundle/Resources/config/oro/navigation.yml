@@ -1,5 +1,8 @@
 navigation:
     menu_config:
+        areas:
+            default:
+                - quicklinks
         items:
             customers_tab:
                 label: 'Customers'
@@ -13,6 +16,8 @@ navigation:
                 label: 'To move child'
             shortcut_call_list:
                 label: Show list
+            quicklinks_request_quote:
+                label: 'Request Quote'
         tree:
             application_menu:
                 children:
@@ -27,6 +32,11 @@ navigation:
             shortcuts:
                 children:
                     shortcut_call_list: ~
+
+            quicklinks:
+                type: quicklinks
+                children:
+                    quicklinks_request_quote: ~
 
     titles:
         orocrm_call_index: Calls

@@ -14,6 +14,13 @@
                     content: '\e834';
                 }
             }
+
+            &:focus {
+                ~ .custom-checkbox__icon {
+                    outline: $checkbox-outline-checked-focus-state;
+                    outline-offset: $checkbox-outline-offset-checked-focus-state;
+                }
+            }
         }
     }
 
@@ -29,5 +36,9 @@
             font-size: 17px;
             line-height: 1;
         }
+    }
+
+    &__text {
+        margin-left: $offset-x-s / 2;
     }
 }

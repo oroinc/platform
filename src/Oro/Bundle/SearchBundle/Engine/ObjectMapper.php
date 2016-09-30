@@ -139,8 +139,8 @@ class ObjectMapper extends AbstractMapper
      */
     public function getRegisteredDescendants($entityName)
     {
-        $config = $this->getEntityConfig($entityName);
-        if ($config['mode'] !== Mode::NORMAL) {
+        $mode = $this->getEntityModeConfig($entityName);
+        if ($mode !== Mode::NORMAL) {
             return array_filter(
                 $this->getEntities(),
                 function ($className) use ($entityName) {
@@ -157,32 +157,37 @@ class ObjectMapper extends AbstractMapper
      * into an output array.
      *
      * @param Query $query
-     * @param array $item
-     * @return array|null
+     * @param array $resultItem
+     * @return array
      */
-    public function mapSelectedData(Query $query, $item)
+    public function mapSelectedData(Query $query, $resultItem)
     {
-        $selects = $query->getSelect();
+        $dataFields = $query->getSelectDataFields();
 
-        if (empty($selects)) {
-            return null;
+        if (empty($dataFields)) {
+            return [];
         }
 
         $result = [];
 
-        foreach ($selects as $select) {
-            list ($type, $name) = Criteria::explodeFieldTypeName($select);
+        foreach ($dataFields as $column => $dataField) {
+            list ($type, $columnName) = Criteria::explodeFieldTypeName($column);
 
-            $result[$name] = '';
+            $value = '';
 
-            if (isset($item[$name])) {
-                $value = $item[$name];
-                if (is_array($value)) {
-                    $value = array_shift($value);
-                }
-
-                $result[$name] = $value;
+            if (isset($resultItem[$columnName])) {
+                $value = $resultItem[$columnName];
             }
+
+            if (isset($resultItem[$dataField])) {
+                $value = $resultItem[$dataField];
+            }
+
+            if (is_array($value)) {
+                $value = array_shift($value);
+            }
+
+            $result[$dataField] = $value;
         }
 
         return $result;

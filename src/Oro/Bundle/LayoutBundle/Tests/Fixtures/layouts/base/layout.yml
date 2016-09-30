@@ -1,0 +1,18 @@
+layout:
+    actions:
+        - '@addTree':
+            items:
+                head:
+                    blockType: head
+                body:
+                    blockType: body
+                wrapper:
+                    blockType: container
+                    options:
+                        attr:
+                            class: "base-wrapper"
+            tree:
+                root:
+                    head: ~
+                    body:
+                        wrapper: ~

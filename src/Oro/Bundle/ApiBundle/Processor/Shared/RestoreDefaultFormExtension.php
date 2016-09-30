@@ -43,5 +43,6 @@ class RestoreDefaultFormExtension implements ProcessorInterface
 
         $this->formExtensionSwitcher->switchToDefaultFormExtension();
         $this->metadataTypeGuesser->setMetadataAccessor();
+        $this->metadataTypeGuesser->setConfigAccessor();
     }
 }

@@ -14,13 +14,20 @@ use Doctrine\ORM\Configuration;
 class PdoMysqlTest extends AbstractDriverTest
 {
     const ENTITY_TITLE = 'test-entity-title';
-    const DRIVER = DatabaseDriverInterface::DRIVER_MYSQL;
     const ENVIRONMENT_NAME = 'MySQL';
 
     public function testGetPlainSql()
     {
         $recordString = PdoMysql::getPlainSql();
         $this->assertTrue(strpos($recordString, 'FULLTEXT') > 0);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDriverName()
+    {
+        return DatabaseDriverInterface::DRIVER_MYSQL;
     }
 
     /**

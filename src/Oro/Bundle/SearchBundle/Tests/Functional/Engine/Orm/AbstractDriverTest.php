@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine\Orm;
 
+use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
+
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Testing\QueryTracker;
 
 use Doctrine\ORM\Configuration;
 
@@ -14,8 +15,8 @@ abstract class AbstractDriverTest extends WebTestCase
     {
         $this->initClient();
 
-        if ($this->getContainer()->getParameter('database_driver') !== static::DRIVER) {
-            $this->markTestSkipped(sprintf('Test runs only on %s environment', static::ENVIRONMENT_NAME));
+        if ($this->getContainer()->getParameter('database_driver') !== $this->getDriverName()) {
+            $this->markTestSkipped(sprintf('Test doesn\'t run for currently configured DBMS'));
         }
     }
 
@@ -49,17 +50,18 @@ abstract class AbstractDriverTest extends WebTestCase
         $entityManager = $this->getContainer()->get('doctrine')->getManager('search');
         $classMetadata = $entityManager->getClassMetadata('Oro\Bundle\SearchBundle\Entity\Item');
 
-        $queryTracker = new QueryTracker($entityManager);
+        $queryAnalyzer = new QueryAnalyzer($entityManager->getConnection()->getDatabasePlatform());
 
-        $queryTracker->start();
+        $previousLogger = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
+        $entityManager->getConnection()->getConfiguration()->setSQLLogger($queryAnalyzer);
 
         $driver = $this->getDriver();
         $driver->initRepo($entityManager, $classMetadata);
         $driver->truncateIndex();
 
-        $queryTracker->stop();
+        $entityManager->getConnection()->getConfiguration()->setSQLLogger($previousLogger);
 
-        $queries = $queryTracker->getExecutedQueries();
+        $queries = $queryAnalyzer->getExecutedQueries();
 
         $this->assertTruncateQueries($queries);
     }
@@ -78,4 +80,9 @@ abstract class AbstractDriverTest extends WebTestCase
      * @return BaseDriver
      */
     abstract protected function getDriver();
+
+    /**
+     * @return string
+     */
+    abstract public function getDriverName();
 }

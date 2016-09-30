@@ -17,7 +17,6 @@ class TextFilterType extends AbstractType
     const TYPE_ENDS_WITH    = 5;
     const TYPE_IN           = 6;
     const TYPE_NOT_IN       = 7;
-    const TYPE_NOT_EQUAL    = 8;
     const NAME              = 'oro_type_text_filter';
 
     /**

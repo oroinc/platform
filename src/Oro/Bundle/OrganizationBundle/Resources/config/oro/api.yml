@@ -2,6 +2,13 @@ api:
     entities:
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             delete_handler: oro_organization.business_unit.handler.delete
+            fields:
+                createdAt:
+                    form_options:
+                        mapped: false
+                updatedAt:
+                    form_options:
+                        mapped: false
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary

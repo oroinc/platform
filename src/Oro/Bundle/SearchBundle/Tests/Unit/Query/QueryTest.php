@@ -211,7 +211,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $selectFieldsProperty = $reflectionObject->getProperty('select');
         $selectFieldsProperty->setAccessible(true);
 
-        $aliasesProperty = $reflectionObject->getProperty('fieldsAliases');
+        $aliasesProperty = $reflectionObject->getProperty('selectAliases');
         $aliasesProperty->setAccessible(true);
 
         $fields = $selectFieldsProperty->getValue($query);
@@ -226,6 +226,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         foreach ($selectFieldsProperty as $field) {
             $this->assertNotTrue(strpos($field, ' ') > 0);
         }
+
+        $query->select('newField');
+        $this->assertEmpty($query->getSelectAliases());
     }
 
     public function testGetSelectWithAliases()
@@ -244,9 +247,26 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $query = new Query();
         $query->addSelect('text.foo as bar');
         $query->addSelect('text.faa as bor');
+        $query->addSelect('text.bar');
 
         $aliases = $query->getSelectAliases();
 
         $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $aliases);
+    }
+
+    public function testGetSelectDataFields()
+    {
+        $query = new Query();
+        $this->assertSame([], $query->getSelectDataFields());
+
+        $query->addSelect('text.notes');
+        $this->assertSame(['text.notes' => 'notes'], $query->getSelectDataFields());
+
+        $query->addSelect('text.foo as name');
+        $query->addSelect('text.faa as surname');
+
+        $fields = $query->getSelectDataFields();
+
+        $this->assertSame(['text.notes' => 'notes', 'text.foo' => 'name', 'text.faa' => 'surname'], $fields);
     }
 }
