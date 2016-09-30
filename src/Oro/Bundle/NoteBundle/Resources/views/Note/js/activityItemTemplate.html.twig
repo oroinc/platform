@@ -1,9 +1,9 @@
-{% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.js.twig' %}
+{% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig' %}
 {% set entityClass = 'Oro\\Bundle\\NoteBundle\\Entity\\Note' %}
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
 
 {% block activityDetails %}
-    {{ entityName|raw }}
+    {{ entityName }}
     <% var template = (verb == 'create')
         ? {{ 'oro.note.note_added_by'|trans|json_encode|raw }}
         : {{ 'oro.note.note_updated_by'|trans|json_encode|raw }};
@@ -20,8 +20,8 @@
     {% set action %}
         <% if (editable) { %>
         <a href="#" class="action item-edit-button"
-           title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName})|raw }}">
-            <i class="icon-edit hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName})|raw }}</i>
+           title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}">
+            <i class="icon-edit hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}</i>
         </a>
         <% } %>
     {% endset %}
@@ -30,8 +30,8 @@
     {% set action %}
         <% if (removable) { %>
         <a href="#" class="action item-remove-button"
-           title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName})|raw }}">
-            <i class="icon-trash hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName})|raw }}</i>
+           title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}">
+            <i class="icon-trash hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}</i>
         </a>
         <% } %>
     {% endset %}

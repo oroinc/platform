@@ -165,7 +165,7 @@ class NoteActivityListProvider implements
      */
     public function getTemplate()
     {
-        return 'OroNoteBundle:Note:js/activityItemTemplate.js.twig';
+        return 'OroNoteBundle:Note:js/activityItemTemplate.html.twig';
     }
 
     /**
