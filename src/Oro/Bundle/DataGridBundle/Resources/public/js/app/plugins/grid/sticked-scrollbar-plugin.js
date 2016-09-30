@@ -18,7 +18,7 @@ define(function(require) {
             axis: 'x',
             contentTouchScroll: 10,
             documentTouchScroll: true,
-            theme: 'inset-dark',
+            theme: 'dark-3',
             advanced: {
                 autoExpandHorizontalScroll: 3,
                 updateOnContentResize: false,
@@ -64,7 +64,7 @@ define(function(require) {
 
             this.listenTo(mediator, 'layout:reposition', this.updateCustomScrollbar);
             this.listenTo(this.grid, 'content:update', this.updateCustomScrollbar);
-            this.updateScrollbarIntervalId = setInterval(_.bind(this.updateCustomScrollbar, this), 400);
+            this.updateScrollbarIntervalId = setInterval(_.bind(this.checkLayout, this), 400);
 
             this.connected = true;
             StickedScrollbarPlugin.__super__.enable.call(this);
@@ -138,7 +138,13 @@ define(function(require) {
         detectScrollbar: function() {
             var $grid = this.domCache.$grid;
             var $container = this.domCache.$container;
-            this.scrollState.display = $grid.width() > $container.width();
+            return this.scrollState.display = $grid.width() > $container.width();
+        },
+
+        checkLayout: function() {
+            if (this._lastContainerWidth !== this.domCache.$container.width()) {
+                this.updateCustomScrollbar();
+            }
         },
 
         updateViewport: function() {
@@ -191,6 +197,7 @@ define(function(require) {
                 'width': containerWidth + 'px'
             });
 
+            this._lastContainerWidth = containerWidth;
             this.scrollState.state = 'detached';
         },
 
