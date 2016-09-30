@@ -92,10 +92,6 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $menu->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($menuName));
-        $menu->expects($this->once())
-            ->method('getExtra')
-            ->with('max_nesting_level', 0)
-            ->will($this->returnValue(0));
 
         $this->builderChainProvider
             ->expects($this->exactly(2))
@@ -410,41 +406,18 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($item, $this->manager->findMenuItem($menuName, $key, $ownershipType));
     }
 
-    /**
-     * @dataProvider maxNestingLevelProvider
-     *
-     * @param int $level
-     * @param int $maxLevel
-     * @param bool $hasException
-     */
-    public function testCheckMaxNestingLevel($level, $maxLevel, $hasException)
+    public function testCheckMaxNestingLevel()
     {
         $menuName = 'test-menu';
 
-        $key = 'test-key';
         $parentKey = 'test-key';
 
         $menu = $this->getMock(ItemInterface::class);
         $menu->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($menuName));
-        $menu->expects($this->once())
-            ->method('getExtra')
-            ->with('max_nesting_level', 0)
-            ->will($this->returnValue($maxLevel));
 
-        $factory = new MenuFactory();
-        $item = $factory->createItem($key);
-        $startItem = $item;
-
-        $items = [$item];
-        $range = range(1, $level);
-        array_shift($range);
-        foreach ($range as $value) {
-            $item->setParent($factory->createItem($value));
-            $item = $item->getParent();
-            $items[] = $item;
-        }
+        $item = $this->getMock(ItemInterface::class);
 
         $this->builderChainProvider
             ->expects($this->exactly(2))
@@ -455,44 +428,63 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->menuUpdateHelper
             ->expects($this->once())
             ->method('findMenuItem')
-            ->with($menu, $key)
-            ->will($this->returnValue($startItem));
+            ->with($menu, $parentKey)
+            ->will($this->returnValue($item));
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('isMaxNestingLevelReached')
+            ->with($menu, $item, false)
+            ->will($this->returnValue(false));
 
         $update0 = new MenuUpdateStub();
         $update0->setParentKey($parentKey);
         $update0->setMenu($menuName);
         $update0->setDefaultTitle('default-title');
 
-        if ($hasException) {
-            $this->setExpectedException(InvalidMaxNestingLevelException::class, sprintf(
-                "Item \"%s\" can't be saved. Max nesting level for menu \"%s\" is %d.",
-                'default-title',
-                $menuName,
-                $maxLevel
-            ));
-        }
-
         $this->manager->checkMaxNestingLevel($update0);
     }
 
     /**
-     * @return array
+     * @expectedException \Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException
+     * @expectedExceptionMessage Item "default-title" can't be saved. Max nesting level for menu "test-menu" is reached.
      */
-    public function maxNestingLevelProvider()
+    public function testCheckMaxNestingLevelInvalidMaxNestingLevelException()
     {
-        return [
-            [1, 0, false],
-            [2, 0, false],
-            [3, 0, false],
-            [1, 1, false],
-            [2, 1, true],
-            [3, 1, true],
-            [1, 2, false],
-            [2, 2, false],
-            [3, 2, true],
-            [1, 3, false],
-            [2, 3, false],
-            [3, 3, false],
-        ];
+        $menuName = 'test-menu';
+
+        $parentKey = 'test-key';
+
+        $menu = $this->getMock(ItemInterface::class);
+        $menu->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($menuName));
+
+        $item = $this->getMock(ItemInterface::class);
+
+        $this->builderChainProvider
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('findMenuItem')
+            ->with($menu, $parentKey)
+            ->will($this->returnValue($item));
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('isMaxNestingLevelReached')
+            ->with($menu, $item, false)
+            ->will($this->returnValue(true));
+
+        $update0 = new MenuUpdateStub();
+        $update0->setParentKey($parentKey);
+        $update0->setMenu($menuName);
+        $update0->setDefaultTitle('default-title');
+
+        $this->manager->checkMaxNestingLevel($update0);
     }
 }

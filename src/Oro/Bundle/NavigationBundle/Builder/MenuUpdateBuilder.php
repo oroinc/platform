@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 
 use Knp\Menu\ItemInterface;
 
+use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
 use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
@@ -43,6 +44,10 @@ class MenuUpdateBuilder implements BuilderInterface
                 $this->menuUpdateHelper->updateMenuItem($update, $menu);
             }
         }
+
+        foreach ($menu->getChildren() as $item) {
+            $this->checkMaxNestingLevel($menu, $item);
+        }
     }
 
     /**
@@ -70,5 +75,26 @@ class MenuUpdateBuilder implements BuilderInterface
         }
         
         return $this->providers[$area];
+    }
+
+    /**
+     * @param ItemInterface $menu
+     * @param ItemInterface $item
+     */
+    private function checkMaxNestingLevel(ItemInterface $menu, ItemInterface $item)
+    {
+        if ($this->menuUpdateHelper->isMaxNestingLevelReached($menu, $item)) {
+            throw new InvalidMaxNestingLevelException(
+                sprintf(
+                    "Item \"%s\" exceeded max nesting level in menu \"%s\".",
+                    $item->getLabel(),
+                    $menu->getName()
+                )
+            );
+        }
+
+        foreach ($item->getChildren() as $child) {
+            $this->checkMaxNestingLevel($menu, $child);
+        }
     }
 }

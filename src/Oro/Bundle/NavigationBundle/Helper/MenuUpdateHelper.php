@@ -115,6 +115,40 @@ class MenuUpdateHelper
     }
 
     /**
+     * @param ItemInterface $menu
+     * @param ItemInterface $item
+     * @param bool $isGreaterThan
+     * @return bool
+     */
+    public function isMaxNestingLevelReached(ItemInterface $menu, ItemInterface $item, $isGreaterThan = true)
+    {
+        $maxNestingLevel = $menu->getExtra('max_nesting_level', 0);
+        if ($maxNestingLevel) {
+            if ($isGreaterThan && $this->getLevel($item) > $maxNestingLevel) {
+                return true;
+            } elseif (!$isGreaterThan && $this->getLevel($item) >= $maxNestingLevel) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ItemInterface $item
+     * @param int $levelIncrement
+     * @return int|ItemInterface|null
+     */
+    private function getLevel(ItemInterface $item, $levelIncrement = 0)
+    {
+        if ($item->getParent()) {
+            $levelIncrement = $this->getLevel($item->getParent(), ++$levelIncrement);
+        }
+
+        return $levelIncrement;
+    }
+
+    /**
      * @param MenuUpdateInterface $update
      * @param string $key
      * @param mixed $value

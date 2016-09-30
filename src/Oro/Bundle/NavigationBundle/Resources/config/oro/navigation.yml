@@ -63,6 +63,7 @@ navigation:
         tree:
             application_menu:
                 type: application_menu
+                max_nesting_level: 4
                 children:
                     system_tab:
                         children:

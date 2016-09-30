@@ -7,6 +7,7 @@ use Knp\Menu\MenuFactory;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
@@ -102,6 +103,37 @@ class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
         foreach ($expectedData['extras'] as $extraKey => $extraValue) {
             $this->assertEquals($extraValue, $childMenu->getExtra($extraKey));
         }
+    }
+
+    /**
+     * @dataProvider maxNestingLevelProvider
+     *
+     * @param int $level
+     * @param int $maxLevel
+     * @param bool $isGreaterThan
+     * @param bool $result
+     */
+    public function testIsMaxNestingLevelReached($level, $maxLevel, $isGreaterThan, $result)
+    {
+        /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject $menu */
+        $menu = $this->getMock(ItemInterface::class);
+        $menu->expects($this->once())
+            ->method('getExtra')
+            ->with('max_nesting_level', 0)
+            ->will($this->returnValue($maxLevel));
+
+        $factory = new MenuFactory();
+        $item = $factory->createItem(0);
+        $startItem = $item;
+
+        $range = range(0, $level);
+        array_shift($range);
+        foreach ($range as $value) {
+            $item->setParent($factory->createItem($value));
+            $item = $item->getParent();
+        }
+
+        $this->assertEquals($result, $this->helper->isMaxNestingLevelReached($menu, $startItem, $isGreaterThan));
     }
 
     /**
@@ -309,5 +341,39 @@ class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
         $update->setExtras($updateData['extras']);
 
         return $update;
+    }
+
+    /**
+     * @return array
+     */
+    public function maxNestingLevelProvider()
+    {
+        return [
+            [1, 0, false, false],
+            [2, 0, false, false],
+            [3, 0, false, false],
+            [1, 1, false, true],
+            [2, 1, false, true],
+            [3, 1, false, true],
+            [1, 2, false, false],
+            [2, 2, false, true],
+            [3, 2, false, true],
+            [1, 3, false, false],
+            [2, 3, false, false],
+            [3, 3, false, true],
+            // With greater than param
+            [1, 0, true, false],
+            [2, 0, true, false],
+            [3, 0, true, false],
+            [1, 1, true, false],
+            [2, 1, true, true],
+            [3, 1, true, true],
+            [1, 2, true, false],
+            [2, 2, true, false],
+            [3, 2, true, true],
+            [1, 3, true, false],
+            [2, 3, true, false],
+            [3, 3, true, false],
+        ];
     }
 }

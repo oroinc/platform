@@ -41,13 +41,54 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addProvider('default', $provider);
 
         $factory = new MenuFactory();
+
+        $item = $factory->createItem('item');
+
         $menu = $factory->createItem('menu');
         $menu->setExtra('area', 'default');
+        $menu->addChild($item);
 
         $this->menuUpdateHelper
             ->expects($this->once())
             ->method('updateMenuItem')
             ->with($menuUpdate, $menu);
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('isMaxNestingLevelReached')
+            ->with($menu, $item)
+            ->will($this->returnValue(false));
+
+        $this->builder->build($menu);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException
+     * @expectedExceptionMessage Item "item" exceeded max nesting level in menu "menu".
+     */
+    public function testBuildInvalidMaxNestingLevelException()
+    {
+        /** @var MenuUpdateProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        $provider = $this->getMock(MenuUpdateProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getUpdates')
+            ->will($this->returnValue([]));
+
+        $this->builder->addProvider('default', $provider);
+
+        $factory = new MenuFactory();
+
+        $item = $factory->createItem('item');
+
+        $menu = $factory->createItem('menu');
+        $menu->setExtra('area', 'default');
+        $menu->addChild($item);
+
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('isMaxNestingLevelReached')
+            ->with($menu, $item)
+            ->will($this->returnValue(true));
 
         $this->builder->build($menu);
     }

@@ -249,35 +249,20 @@ class MenuUpdateManager
     public function checkMaxNestingLevel(MenuUpdateInterface $update)
     {
         $menu = $this->getMenu($update->getMenu());
-        $maxNestingLevel = $menu->getExtra('max_nesting_level', 0);
+
         $item = $this->findMenuItem($menu->getName(), $update->getParentKey(), $update->getOwnershipType());
-        $level = $item ? $this->getLevel($item) : 0;
-        if ($maxNestingLevel && $level >= $maxNestingLevel) {
-            throw new InvalidMaxNestingLevelException(
-                sprintf(
-                    "Item \"%s\" can't be saved. Max nesting level for menu \"%s\" is %d.",
-                    $update->getDefaultTitle(),
-                    $menu->getName(),
-                    $maxNestingLevel
-                )
-            );
+        if ($item) {
+            if ($this->menuUpdateHelper->isMaxNestingLevelReached($menu, $item, false)) {
+                throw new InvalidMaxNestingLevelException(
+                    sprintf(
+                        "Item \"%s\" can't be saved. Max nesting level for menu \"%s\" is reached.",
+                        $update->getDefaultTitle(),
+                        $menu->getName()
+                    )
+                );
+            }
         }
     }
-
-    /**
-     * @param ItemInterface $item
-     * @param int $levelIncrement
-     * @return int|ItemInterface|null
-     */
-    private function getLevel(ItemInterface $item, $levelIncrement = 0)
-    {
-        if ($item->getParent()) {
-            $levelIncrement = $this->getLevel($item->getParent(), ++$levelIncrement);
-        }
-
-        return $levelIncrement;
-    }
-
 
     /**
      * @return EntityRepository
