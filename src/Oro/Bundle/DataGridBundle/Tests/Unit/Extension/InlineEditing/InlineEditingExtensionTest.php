@@ -179,7 +179,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         ],
                         'autocomplete_api_accessor' => [
                             'class' => 'orouser/js/tools/acl-users-search-api-accessor',
-                            'permission_check_entity_name' => 'OroCRM_Bundle_AccountBundle_Entity_Account'
+                            'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
                         ]
                     ]
                 ],
