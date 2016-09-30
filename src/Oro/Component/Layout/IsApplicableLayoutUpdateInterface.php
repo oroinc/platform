@@ -4,5 +4,9 @@ namespace Oro\Component\Layout;
 
 interface IsApplicableLayoutUpdateInterface
 {
-    public function isApplicable();
+    /**
+     * @param ContextInterface $context
+     * @return bool
+     */
+    public function isApplicable(ContextInterface $context);
 }

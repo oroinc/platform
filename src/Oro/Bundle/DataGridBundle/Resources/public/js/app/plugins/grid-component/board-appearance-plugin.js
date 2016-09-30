@@ -85,7 +85,7 @@ define(function(require) {
             this.view.$el.insertAfter(this.main.$el.find('.other-scroll-container'));
             this.main.$el.find('.other-scroll-container, .pagination, .page-size, ' +
                 '.column-manager, .extra-actions-panel').hide();
-            this.main.$el.find('.grid-toolbar .sorting, .visible-items-counter').show();
+            this.main.$el.find('.visible-items-counter').show();
             this.main.$el.find('.board').show();
 
             // disable sorting by group_by property
@@ -134,7 +134,7 @@ define(function(require) {
             this.main.$el.find('.board').hide();
             this.main.$el.find('.other-scroll-container, .pagination, .page-size, ' +
                 '.column-manager, .extra-actions-panel').show();
-            this.main.$el.find('.grid-toolbar .sorting, .visible-items-counter').hide();
+            this.main.$el.find('.visible-items-counter').hide();
 
             // restore sorting settings
             if (this.restoreSortableOnColumns && this.restoreSortableOnColumns.length) {

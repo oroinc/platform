@@ -1,4 +1,0 @@
-css:
-    'ororeport':
-        - 'bundles/ororeport/css/report.css'
-        - 'bundles/ororeport/css/view-sql-query.css'

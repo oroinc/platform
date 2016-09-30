@@ -149,10 +149,12 @@ services:
           - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_datagrid.config.dumper:
-            class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
-            public: false
-            lazy: true
-            arguments: [ %kernel.cache_dir%, %kernel.debug%, 'oro_datagrid' ]
+        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
+        public: false
+        arguments:
+            - %kernel.cache_dir%
+            - %kernel.debug%
+            - 'oro_datagrid'
 
     oro_datagrid.event_listener.mixin:
         class: Oro\Bundle\DataGridBundle\EventListener\MixinListener

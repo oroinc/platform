@@ -393,6 +393,15 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * @param string $referenceUID
+     * @return bool
+     */
+    protected function hasReference($referenceUID)
+    {
+        return $this->getReferenceRepository()->hasReference($referenceUID);
+    }
+
+    /**
      * @return ReferenceRepository|null
      */
     protected function getReferenceRepository()
@@ -503,6 +512,32 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$clientInstance;
+    }
+
+    /**
+     * Add value from 'oro_default' route to the url
+     *
+     * @param array $data
+     * @param string $urlParameterKey
+     */
+    public function addOroDefaultPrefixToUrlInParameterArray(&$data, $urlParameterKey)
+    {
+        $oroDefaultPrefix = $this->getUrl('oro_default');
+        
+        $replaceOroDefaultPrefixCallback = function (&$value) use ($oroDefaultPrefix, $urlParameterKey) {
+            if (!is_null($value[$urlParameterKey])) {
+                $value[$urlParameterKey] = str_replace(
+                    '%oro_default_prefix%',
+                    $oroDefaultPrefix,
+                    $value[$urlParameterKey]
+                );
+            }
+        };
+
+        array_walk(
+            $data,
+            $replaceOroDefaultPrefixCallback
+        );
     }
 
     /**

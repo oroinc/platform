@@ -10,17 +10,9 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 
 class PageNumberFilterTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreateExpression()
-    {
-        $filter = new PageNumberFilter(DataType::INTEGER);
-
-        $this->assertNull($filter->createExpression(null));
-        $this->assertNull($filter->createExpression(new FilterValue('path', 'value', 'operator')));
-    }
-
     public function testApplyWithoutFilter()
     {
-        $filter   = new PageNumberFilter(DataType::INTEGER);
+        $filter = new PageNumberFilter(DataType::INTEGER);
         $criteria = new Criteria();
 
         $filter->apply($criteria);
@@ -30,13 +22,13 @@ class PageNumberFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyWithFilter()
     {
-        $pageSize       = 10;
-        $pageNum        = 2;
+        $pageSize = 10;
+        $pageNum = 2;
         $expectedOffset = 10;
 
-        $filter      = new PageNumberFilter(DataType::INTEGER);
+        $filter = new PageNumberFilter(DataType::INTEGER);
         $filterValue = new FilterValue('path', $pageNum, null);
-        $criteria    = new Criteria();
+        $criteria = new Criteria();
 
         $filter->apply($criteria, $filterValue);
 

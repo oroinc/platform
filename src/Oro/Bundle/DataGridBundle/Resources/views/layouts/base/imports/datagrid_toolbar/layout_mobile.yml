@@ -1,0 +1,26 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'layout_mobile.html.twig'
+        - '@remove':
+            id: __datagrid_toolbar_extra_actions
+        - '@remove':
+            id: __datagrid_toolbar_tools_container
+        - '@move':
+            id: __datagrid_toolbar_actions
+            parentId: datagrid_toolbar
+            prepend: true
+        - '@add':
+            id: __datagrid_toolbar_pagination_container
+            parentId: __datagrid_toolbar
+            blockType: container
+        - '@move':
+            id: __datagrid_toolbar_pagination
+            parentId: __datagrid_toolbar_pagination_container
+        - '@move':
+            id: __datagrid_toolbar_page_size
+            parentId: __datagrid_toolbar_pagination_container
+            siblingId: __datagrid_toolbar_pagination
+
+    conditions: 'context["is_mobile"]==true'
+

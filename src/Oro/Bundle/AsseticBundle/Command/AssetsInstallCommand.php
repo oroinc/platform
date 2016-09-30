@@ -54,6 +54,10 @@ class AssetsInstallCommand extends BaseAssetsInstallCommand
             $containerProxy->replace('kernel', $kernelProxy);
         }
 
+        $defaultWebDirectory = $this->getContainer()->getParameter('kernel.root_dir') .
+            DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'web';
+        $this->getDefinition()->getArgument('target')->setDefault($defaultWebDirectory);
+
         parent::execute($input, $output);
     }
 

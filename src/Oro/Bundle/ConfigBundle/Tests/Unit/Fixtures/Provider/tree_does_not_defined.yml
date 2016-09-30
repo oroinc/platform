@@ -1,4 +1,4 @@
-oro_system_configuration:
+system_configuration:
     tree:
         # SYSTEM CONFIGURATION TREE IS NOT DEFINED
         # PROCESSING THIS FILE SHOULD TRIGGER ERROR

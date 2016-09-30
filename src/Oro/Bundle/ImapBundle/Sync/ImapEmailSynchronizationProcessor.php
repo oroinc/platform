@@ -78,7 +78,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->initEnv($origin);
         $processStartTime = time();
         // iterate through all folders enabled for sync and do a synchronization of emails for each one
-        $imapFolders = $this->getSyncEnabledImapFolders($origin);
+        $imapFolders = $this->getSyncEnabledImapFolders($origin, true);
         foreach ($imapFolders as $imapFolder) {
             $folder = $imapFolder->getFolder();
 
@@ -86,6 +86,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folderName = $folder->getFullName();
             try {
                 $this->manager->selectFolder($folderName);
+                $folder->setFailedCount(0);
                 $this->logger->info(sprintf('The folder "%s" is selected.', $folderName));
 
                 // register the current folder in the entity builder
@@ -105,10 +106,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
 
             } catch (UnselectableFolderException $e) {
-                $folder->setSyncEnabled(false);
-                $this->logger->info(
-                    sprintf('The folder "%s" cannot be selected and was skipped and disabled.', $folderName)
-                );
+                $this->processUnselectableFolderException($folder);
             } catch (InvalidEmailFormatException $e) {
                 $folder->setSyncEnabled(false);
                 $this->logger->info(
@@ -121,7 +119,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $processSpentTime = time() - $processStartTime;
 
-            if (false === $this->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+            if (false === $this->getSettings()->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
                 break;
             }
         }
@@ -284,8 +282,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     }
                 }
 
-                if (false === $this->isForceMode()
-                    || (true  === $this->isForceMode() && count($relatedExistingImapEmails) === 0)
+                if (false === $this->getSettings()->isForceMode()
+                    || (true  === $this->getSettings()->isForceMode() && count($relatedExistingImapEmails) === 0)
                 ) {
                     $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
                     $newImapEmails[] = $imapEmail;
@@ -395,18 +393,24 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $msg = 'Skip "%s" (UID: %d) email, because it is already synchronised.';
             $skipSync = true;
 
-            if ($this->isForceMode()) {
-                $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+            if ($this->getSettings()->isForceMode()) {
+                $msg = null;
+                if ($this->getSettings()->needShowMessage()) {
+                    $msg = 'Sync "%s" (UID: %d) email, because force mode is enabled.';
+                }
+
                 $skipSync = false;
             }
 
-            $this->logger->info(
-                sprintf(
-                    $msg,
-                    $email->getSubject(),
-                    $email->getId()->getUid()
-                )
-            );
+            if ($msg) {
+                $this->logger->info(
+                    sprintf(
+                        $msg,
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+            }
         }
 
         return $skipSync;
@@ -511,7 +515,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         EmailFolder $folder
     ) {
         $lastUid = null;
-        if (false === $this->isForceMode()) {
+        if (false === $this->getSettings()->isForceMode()) {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
         }
 
@@ -557,16 +561,41 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @return ImapEmailFolder[]
      */
-    protected function getSyncEnabledImapFolders(EmailOrigin $origin)
+    protected function getSyncEnabledImapFolders(EmailOrigin $origin, $sortByFailedCount = false)
     {
         $this->logger->info('Get folders enabled for sync...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE);
+        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE, $sortByFailedCount);
 
         $this->logger->info(sprintf('Got %d folder(s).', count($imapFolders)));
 
         return $imapFolders;
+    }
+
+    /**
+     * Process actions when email folder can't be selected.
+     *
+     * @param EmailFolder $folder
+     */
+    protected function processUnselectableFolderException(EmailFolder $folder)
+    {
+        $folderName = $folder->getFullName();
+        $folder->setFailedCount((integer)$folder->getFailedCount() + 1);
+        $this->logger->info(
+            sprintf('The folder "%s" cannot be selected and was skipped.', $folderName)
+        );
+
+        if ($folder->getFailedCount() > EmailFolder::MAX_FAILED_COUNT) {
+            $folder->setSyncEnabled(false);
+            $this->logger->info(
+                sprintf(
+                    'The folder "%s" cannot be selected %s times and was disabled.',
+                    $folderName,
+                    EmailFolder::MAX_FAILED_COUNT
+                )
+            );
+        }
     }
 }

@@ -12,7 +12,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
  *
  * Example of grid configuration:
  *
- * datagrid:
+ * datagrids:
  *   bu-update-users-grid:
  *       extends: user-relation-grid
  *       source:

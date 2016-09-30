@@ -78,7 +78,16 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
+        // test with orm datasource type
+        $config = $config->offsetSetByPath(DatagridConfiguration::DATASOURCE_TYPE_PATH, OrmDatasource::TYPE);
         $this->assertTrue($this->extension->isApplicable($config));
+
+        // test with invalid datasource type
+        $config = $config->offsetSetByPath(
+            DatagridConfiguration::DATASOURCE_TYPE_PATH,
+            'anything_but_not_orm'
+        );
+        $this->assertFalse($this->extension->isApplicable($config));
     }
 
     public function testNotApplicable()
@@ -132,7 +141,7 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->processConfigs($config);
 
-        $this->assertEquals($expectedConfig, $config);
+        $this->assertEquals($expectedConfig->toArray(), $config->toArray());
     }
 
     public function testVisitDatasourceWithCurrentLocalization()
