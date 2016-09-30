@@ -11,7 +11,8 @@ define(function(require) {
         events: {
             'keyup [data-role="widget-picker-search"]': 'onSearch',
             'change [data-role="widget-picker-search"]': 'onSearch',
-            'paste [data-role="widget-picker-search"]': 'onSearch'
+            'paste [data-role="widget-picker-search"]': 'onSearch',
+            'mouseup [data-role="widget-picker-search"]': 'onSearch'
         },
 
         /**
