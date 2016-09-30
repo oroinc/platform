@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
@@ -66,6 +67,9 @@ class RecordOwnerDataListener
                 $owner = null;
                 if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
                     $owner = $user->getOwner();
+                    if ($owner instanceof BusinessUnit) {
+                        $owner = $user;
+                    }
                 } elseif (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
                     && $token instanceof OrganizationContextTokenInterface
                 ) {
