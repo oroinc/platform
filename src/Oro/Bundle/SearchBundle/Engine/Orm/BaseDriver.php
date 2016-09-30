@@ -24,7 +24,7 @@ abstract class BaseDriver
     protected $entityName;
 
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     protected $em;
 
@@ -34,8 +34,8 @@ abstract class BaseDriver
     protected $associationMappings;
 
     /**
-     * @param \Doctrine\ORM\EntityManager         $em
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param EntityManager $em
+     * @param ClassMetadata $class
      * @throws \InvalidArgumentException
      */
     public function initRepo(EntityManager $em, ClassMetadata $class)
@@ -48,7 +48,7 @@ abstract class BaseDriver
 
         $this->associationMappings = $class->associationMappings;
         $this->entityName = $class->name;
-        $this->em         = $em;
+        $this->em = $em;
     }
 
     /**
@@ -69,7 +69,7 @@ abstract class BaseDriver
      * Search query by Query builder object
      * Can contains duplicates and we can not use HYDRATE_OBJECT because of performance issue. Will be fixed in BAP-7166
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return array
      */
@@ -96,7 +96,7 @@ abstract class BaseDriver
     /**
      * Get count of records without limit parameters in query
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return integer
      */
@@ -131,41 +131,18 @@ abstract class BaseDriver
     /**
      * Add text search to qb
      *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param array                      $searchCondition
-     * @param boolean                    $setOrderBy
+     * @param QueryBuilder $qb
+     * @param integer $index
+     * @param array $searchCondition
+     * @param boolean $setOrderBy
      *
      * @return string
      */
-    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
-    {
-        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
-        $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
-
-        // TODO Need to clarify search requirements in scope of CRM-214
-        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
-            $searchString = $this->createContainsStringQuery($index, $useFieldName);
-        } else {
-            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
-        }
-
-        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
-
-        if ($useFieldName) {
-            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-        }
-
-        if ($setOrderBy) {
-            $this->setTextOrderBy($qb, $index);
-        }
-
-        return '(' . $searchString . ' ) ';
-    }
+    abstract public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true);
 
     /**
      * @param string $fieldType
-     * @param int    $index
+     * @param int $index
      *
      * @return string
      */
@@ -198,7 +175,7 @@ abstract class BaseDriver
 
     /**
      * @param AbstractPlatform $dbPlatform
-     * @param Connection       $connection
+     * @param Connection $connection
      */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
@@ -213,20 +190,20 @@ abstract class BaseDriver
      * Truncate query for table
      *
      * @param AbstractPlatform $dbPlatform
-     * @param Connection       $connection
-     * @param string           $entityName
+     * @param Connection $connection
+     * @param string $entityName
      */
     protected function truncateTable(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
     {
         /** @var ClassMetadata $metadata */
         $metadata = $this->em->getClassMetadata($entityName);
-        $query    = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
+        $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
         $connection->executeUpdate($query);
     }
 
     /**
      * @param AbstractPlatform $dbPlatform
-     * @param string           $tableName
+     * @param string $tableName
      *
      * @return string
      */
@@ -254,70 +231,17 @@ abstract class BaseDriver
     }
 
     /**
-     * Create search string for string parameters (contains)
-     *
-     * @param integer $index
-     * @param bool    $useFieldName
-     *
-     * @return string
-     */
-    protected function createContainsStringQuery($index, $useFieldName = true)
-    {
-        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
-
-        $stringQuery = '';
-        if ($useFieldName) {
-            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
-        }
-
-        return $stringQuery . $joinAlias . '.value LIKE :value' . $index;
-    }
-
-    /**
-     * Create search string for string parameters (not contains)
-     *
-     * @param integer $index
-     * @param bool    $useFieldName
-     *
-     * @return string
-     */
-    protected function createNotContainsStringQuery($index, $useFieldName = true)
-    {
-        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
-
-        $stringQuery = '';
-        if ($useFieldName) {
-            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
-        }
-
-        return $stringQuery . $joinAlias . '.value NOT LIKE :value' . $index;
-    }
-
-    /**
-     * Set string parameter for qb
-     *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param string                     $fieldValue
-     * @param string                     $searchCondition
-     */
-    protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
-    {
-        $qb->setParameter('value' . $index, '%' . str_replace(' ', '%', $fieldValue) . '%');
-    }
-
-    /**
      * Add non string search to qb
      *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param array                      $searchCondition
+     * @param QueryBuilder $qb
+     * @param integer $index
+     * @param array $searchCondition
      *
      * @return string
      */
     public function addNonTextField(QueryBuilder $qb, $index, $searchCondition)
     {
-        $value     = $searchCondition['fieldValue'];
+        $value = $searchCondition['fieldValue'];
         $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $qb->setParameter('field' . $index, $searchCondition['fieldName']);
         $qb->setParameter('value' . $index, $value);
@@ -341,10 +265,10 @@ abstract class BaseDriver
      */
     protected function createNonTextQuery($joinAlias, $index, $condition, $operator)
     {
-        $openBrackets  = '';
+        $openBrackets = '';
         $closeBrackets = '';
         if ($operator === 'in') {
-            $openBrackets  = '(';
+            $openBrackets = '(';
             $closeBrackets = ')';
         }
 
@@ -371,10 +295,10 @@ abstract class BaseDriver
     }
 
     /**
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
-     * @param boolean                              $setOrderBy
+     * @param Query $query
+     * @param boolean $setOrderBy
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     protected function getRequestQB(Query $query, $setOrderBy = true)
     {
@@ -396,7 +320,7 @@ abstract class BaseDriver
      * Parses and applies the SELECT's columns (if selected)
      * from the casual query into the search index query.
      *
-     * @param Query        $query
+     * @param Query $query
      * @param QueryBuilder $qb
      */
     protected function applySelectToQB(Query $query, QueryBuilder $qb)
@@ -427,8 +351,8 @@ abstract class BaseDriver
      * Parses and applies the FROM part to the search engine's
      * query.
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
-     * @param \Doctrine\ORM\QueryBuilder           $qb
+     * @param Query $query
+     * @param QueryBuilder $qb
      */
     protected function applyFromToQB(Query $query, QueryBuilder $qb)
     {
@@ -447,9 +371,9 @@ abstract class BaseDriver
      * Parses and applies the WHERE expressions from the DQL
      * to the search engine's query.
      *
-     * @param Query        $query
+     * @param Query $query
      * @param QueryBuilder $qb
-     * @param string       $setOrderBy
+     * @param string $setOrderBy
      */
     protected function applyWhereToQB(Query $query, QueryBuilder $qb, $setOrderBy)
     {
@@ -466,8 +390,8 @@ abstract class BaseDriver
      * Applies the ORDER BY part from the Query to the
      * search engine's query.
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
-     * @param \Doctrine\ORM\QueryBuilder           $qb
+     * @param Query $query
+     * @param QueryBuilder $qb
      */
     protected function applyOrderByToQB(Query $query, QueryBuilder $qb)
     {
@@ -487,8 +411,8 @@ abstract class BaseDriver
     /**
      * Set fulltext range order by
      *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param int                        $index
+     * @param QueryBuilder $qb
+     * @param int $index
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {

@@ -39,6 +39,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
         //compare result
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
+
         $this->assertSameSize($response['rest']['data'], $result['data']);
 
         // remove ID references
@@ -57,5 +58,26 @@ class RestAdvancedSearchApiTest extends WebTestCase
         return $this->getApiRequestsData(
             __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'advanced_requests'
         );
+    }
+
+    public function testAdvancedSearchWithStartWithAndEmptyResult()
+    {
+        $requestUrl = 'from oro_test_item where stringValue starts_with tem';
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_search_advanced'),
+            ['query' => $requestUrl]
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $result = json_decode($result->getContent(), true);
+
+        //compare result
+        $this->assertEquals(0, $result['records_count']);
+        $this->assertEquals(0, $result['count']);
+
+        $this->assertArrayNotHasKey('data', $result);
     }
 }
