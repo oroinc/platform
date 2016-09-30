@@ -31,7 +31,7 @@ class MenuUpdateController extends Controller
      * @Delete("/menu/{ownershipType}/{menuName}/{key}")
      *
      * @ApiDoc(
-     *  description="Delete menu item in specified scope."
+     *  description="Delete or hide menu item."
      * )
      *
      * @param string $ownershipType
@@ -51,7 +51,6 @@ class MenuUpdateController extends Controller
             $ownershipType,
             $this->getCurrentOwnerId($ownershipType)
         );
-
         if ($menuUpdate === null) {
             throw $this->createNotFoundException();
         }
@@ -64,6 +63,40 @@ class MenuUpdateController extends Controller
         }
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Put("/menu/show/{ownershipType}/{menuName}/{key}")
+     *
+     * @ApiDoc(
+     *  description="Make menu item visible."
+     * )
+     *
+     * @param string $ownershipType
+     * @param string $menuName
+     * @param string $key
+     *
+     * @return Response
+     */
+    public function showAction($ownershipType, $menuName, $key)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+
+        $menuUpdate = $manager->getMenuUpdateByKeyAndScope(
+            $menuName,
+            $key,
+            $ownershipType,
+            $this->getCurrentOwnerId($ownershipType)
+        );
+        if ($menuUpdate === null) {
+            throw $this->createNotFoundException();
+        }
+
+        $menuUpdate->setActive(true);
+        $manager->updateMenuUpdate($menuUpdate);
+
+        return new JsonResponse(null, Response::HTTP_OK);
     }
 
     /**

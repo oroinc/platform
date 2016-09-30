@@ -58,10 +58,8 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
 
         /** @var ItemInterface $child */
         foreach ($root->getChildren() as $child) {
-            if ($child->isDisplayed()) {
-                $nodes[] = $child;
-                $nodes = array_merge($nodes, $this->getNodes($child, false));
-            }
+            $nodes[] = $child;
+            $nodes = array_merge($nodes, $this->getNodes($child, false));
         }
 
         return $nodes;
@@ -92,7 +90,7 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
      */
     protected function formatEntity($entity)
     {
-        return [
+        $data = [
             'id' => $entity->getName(),
             'parent' => $entity->getParent() ? $entity->getParent()->getName() : null,
             'text' => $this->translator->trans($entity->getLabel()),
@@ -100,5 +98,11 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
                 'opened' => $entity->getParent() === null
             ]
         ];
+
+        if (!$entity->isDisplayed()) {
+            $data['li_attr'] = ['class' => 'hidden'];
+        }
+
+        return $data;
     }
 }

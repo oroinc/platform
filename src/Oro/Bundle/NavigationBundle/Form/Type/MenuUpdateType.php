@@ -19,40 +19,35 @@ class MenuUpdateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add(
-                'titles',
-                LocalizedFallbackValueCollectionType::NAME,
-                [
-                    'required' => true,
-                    'label' => 'oro.navigation.menuupdate.title.label',
-                    'options' => ['constraints' => [new NotBlank()]]
-                ]
-            )
-            ->add(
+        $builder->add(
+            'titles',
+            LocalizedFallbackValueCollectionType::NAME,
+            [
+                'required' => true,
+                'label' => 'oro.navigation.menuupdate.title.label',
+                'options' => ['constraints' => [new NotBlank()]]
+            ]
+        );
+
+        if (!empty($options['validation_groups']) && in_array('UserDefined', $options['validation_groups'])) {
+            $builder->add(
                 'uri',
                 'text',
                 [
                     'required' => true,
                     'label' => 'oro.navigation.menuupdate.uri.label',
                 ]
-            )
-            ->add(
-                'key',
-                $options['menu_update_key'] ? 'hidden' : 'text',
-                [
-                    'required' => true,
-                    'label' => 'oro.navigation.menuupdate.key.label',
-                ]
-            )
-            ->add(
-                'active',
-                'checkbox',
-                [
-                    'label' => 'oro.navigation.menuupdate.active.label',
-                ]
-            )
-        ;
+            );
+        }
+
+        $builder->add(
+            'key',
+            $options['menu_update_key'] ? 'hidden' : 'text',
+            [
+                'required' => true,
+                'label' => 'oro.navigation.menuupdate.key.label',
+            ]
+        );
     }
 
     /**

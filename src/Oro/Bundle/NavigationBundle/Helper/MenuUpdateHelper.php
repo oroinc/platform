@@ -77,7 +77,9 @@ class MenuUpdateHelper
 
         if ($update->getTitles()->count()) {
             $title = $this->localizationHelper->getLocalizedValue($update->getTitles());
-            $item->setLabel($title->getString());
+            if ($title !== null) {
+                $item->setLabel($title->getString());
+            }
         }
 
         if ($update->getUri()) {
@@ -121,13 +123,14 @@ class MenuUpdateHelper
      */
     private function setMenuUpdateProperty(MenuUpdateInterface $update, $key, $value)
     {
-        $method = 'get' . ucfirst($key);
-        if (method_exists($update, $method)) {
-            $result = $update->{$method}();
-
-            $method = 'set' . ucfirst($key);
-            if ($result === null && method_exists($update, $method)) {
-                $update->{$method}($value);
+        foreach (['get', 'is'] as $prefix) {
+            $method = $prefix . ucfirst($key);
+            if (method_exists($update, $method)) {
+                $method = 'set' . ucfirst($key);
+                if (method_exists($update, $method)) {
+                    $update->{$method}($value);
+                }
+                break;
             }
         }
     }

@@ -41,7 +41,7 @@ oro:
             menu.label: Menu
             title.label: Title
             titles.label: Title
-            uri.label: Uri
+            uri.label: URI
             active.label: Active
             priority.label: Priority
             ownership_type.label: Ownership Type
@@ -50,3 +50,8 @@ oro:
             select_existing_or_create_new: Select existing menu item or create new.
             roots_plural_label: Menus
             edit_menus: Edit Menus
+            hide: Hide
+            show: Show
+            delete: Delete
+            hide_success_message: Menu item is hidden now.
+            show_success_message: Menu item is visible now.

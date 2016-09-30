@@ -40,11 +40,12 @@ class MenuUpdateTypeTest extends WebTestCase
     /**
      * @dataProvider submitProvider
      *
+     * @param array $options
      * @param array $submitData
      * @param bool $expectedFormIsValid
      * @param bool $doAssertEntity
      */
-    public function testSubmit($submitData, $expectedFormIsValid, $doAssertEntity)
+    public function testSubmit($options, $submitData, $expectedFormIsValid, $doAssertEntity)
     {
         $doctrine = $this->getContainer()->get('doctrine');
         $localizationRepository = $doctrine->getRepository('OroLocaleBundle:Localization');
@@ -65,7 +66,7 @@ class MenuUpdateTypeTest extends WebTestCase
             ];
         }
 
-        $form = $this->formFactory->create(MenuUpdateType::NAME, new MenuUpdate());
+        $form = $this->formFactory->create(MenuUpdateType::NAME, new MenuUpdate(), $options);
         $form->submit($submitData);
         $this->assertEquals($expectedFormIsValid, $form->isValid());
 
@@ -74,7 +75,9 @@ class MenuUpdateTypeTest extends WebTestCase
             $menuUpdate = $form->getData();
             $this->assertInstanceOf('Oro\Bundle\NavigationBundle\Entity\MenuUpdate', $menuUpdate);
             $this->assertEquals($submitData['titles']['values']['default'], (string)$menuUpdate->getDefaultTitle());
-            $this->assertEquals($submitData['uri'], $menuUpdate->getUri());
+            if (!empty($submitData['uri'])) {
+                $this->assertEquals($submitData['uri'], $menuUpdate->getUri());
+            }
 
             foreach ($localizations as $localization) {
                 $this->assertLocalization($localization, $menuUpdate);
@@ -86,25 +89,34 @@ class MenuUpdateTypeTest extends WebTestCase
     {
         return [
             'update' => [
+                'options' => [],
                 'submitData' => [
                     'titles' => ['values' => ['default' => 'Item Title']],
-                    'uri'    => '/some/path',
                 ],
                 'expectedFormIsValid' => true,
                 'doAssertEntity' => true,
             ],
             'update without titles should fail' => [
+                'options' => [],
                 'submitData' => [
                     'titles' => null,
-                    'uri'    => '/some/path',
                 ],
                 'expectedFormIsValid' => false,
                 'doAssertEntity' => false,
             ],
-            'update without uri should fail' => [
+            'create' => [
+                'options' => ['validation_groups' => ['Default', 'UserDefined']],
                 'submitData' => [
                     'titles' => ['values' => ['default' => 'Item Title']],
-                    'uri'    => null,
+                    'uri'    => '/some/uri',
+                ],
+                'expectedFormIsValid' => true,
+                'doAssertEntity' => true,
+            ],
+            'create without uri should fail' => [
+                'options' => ['validation_groups' => ['Default', 'UserDefined']],
+                'submitData' => [
+                    'titles' => ['values' => ['default' => 'Item Title']],
                 ],
                 'expectedFormIsValid' => false,
                 'doAssertEntity' => false,
