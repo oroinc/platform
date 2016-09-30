@@ -18,7 +18,7 @@ define(function(require) {
             axis: 'x',
             contentTouchScroll: 10,
             documentTouchScroll: true,
-            theme: 'dark-3',
+            theme: 'inset-dark',
             advanced: {
                 autoExpandHorizontalScroll: 3,
                 updateOnContentResize: false,
@@ -142,7 +142,7 @@ define(function(require) {
         },
 
         checkLayout: function() {
-            if (this._lastContainerWidth !== this.domCache.$container.width()) {
+            if (this._lastContainerWidth && this._lastContainerWidth !== this.domCache.$container.width()) {
                 this.updateCustomScrollbar();
             }
         },
@@ -172,12 +172,14 @@ define(function(require) {
 
         attachScrollbar: function() {
             var $scrollbar = this.domCache.$container.find('.mCSB_scrollTools');
+            var containerWidth = this.domCache.$container.width();
             $scrollbar.removeAttr('style');
 
             if (!this.scrollState.display) {
                 $scrollbar.css('display', 'none');
             }
 
+            this._lastContainerWidth = containerWidth;
             this.scrollState.state = 'attached';
         },
 

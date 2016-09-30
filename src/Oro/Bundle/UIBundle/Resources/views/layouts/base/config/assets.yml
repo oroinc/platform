@@ -5,7 +5,6 @@ styles:
         - 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.css'
         - 'bundles/oroui/css/jquery-ui.grid.css'
         - 'bundles/oroui/css/jquery-ui-1.10.2.custom.css'
-        - 'bundles/oroui/lib/mcustomscrollbar/jquery.mCustomScrollbar.css'
         - 'bundles/oroui/css/less/uniform.less'
         - 'bundles/oroui/css/less/font-awesome.less'
         - 'bundles/oroui/css/less/base.less'
