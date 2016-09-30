@@ -6,7 +6,7 @@ oro_menu_config:
             extras:
                 position: 40
         oro_email_emailtemplate_list:
-            label: 'oro.email.emailtemplate.entity_plural_label'
+            label: 'oro.email.menu.emailtemplate.entity_plural_label'
             route: 'oro_email_emailtemplate_index'
             extras:
                 routes: ['oro_email_emailtemplate_*']
