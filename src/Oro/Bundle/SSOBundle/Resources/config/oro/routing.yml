@@ -1,2 +1,2 @@
 oro_sso_google_login:
-    pattern: /login/check-google
+    path: /login/check-google

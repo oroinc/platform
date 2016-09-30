@@ -69,7 +69,7 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
             ->setParameter('group', $group)
         ;
 
-        $this->queryExecutor->execute(
+        $affectedRecords = $this->queryExecutor->execute(
             'OroTestFrameworkBundle:Item',
             [
                 'stringValue',
@@ -82,14 +82,18 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
             ],
             $queryBuilder
         );
+        $this->assertEquals(1, $affectedRecords);
 
-        /** @var User[] $result */
-        $users = $this->registry->getManagerForClass('OroUserBundle:User')
-            ->getRepository('OroUserBundle:User')->findAll();
+        /** @var User[] $users */
+        $users = $this->registry
+            ->getManagerForClass(User::class)
+            ->getRepository(User::class)
+            ->findAll();
 
         /** @var Item[] $items */
-        $items = $this->registry->getManagerForClass('OroTestFrameworkBundle:Item')
-            ->getRepository('OroTestFrameworkBundle:Item')->findAll();
+        $items = $this->registry->getManagerForClass(Item::class)
+            ->getRepository(Item::class)
+            ->findAll();
 
         $this->assertNotEmpty($items);
         $this->assertCount(count($users), $items);
