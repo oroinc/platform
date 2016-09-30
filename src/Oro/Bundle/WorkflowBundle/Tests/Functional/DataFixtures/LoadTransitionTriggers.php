@@ -52,7 +52,7 @@ class LoadTransitionTriggers extends AbstractFixture implements DependentFixture
             'active' => true,
             'class' => TransitionCronTrigger::class,
             'definition' => LoadWorkflowDefinitions::WITH_GROUPS1,
-            'transition_name' => 'starting_point_transition',
+            'transition_name' => 'second_point_transition',
             'cron' => '*/1 * * * *'
         ],
         self::TRIGGER_DISABLED => [
@@ -87,7 +87,9 @@ class LoadTransitionTriggers extends AbstractFixture implements DependentFixture
 
             /** @var BaseTransitionTrigger $trigger */
             $trigger = new $className();
-            $trigger->setWorkflowDefinition($definition)->setTransitionName($config['transition_name']);
+            $trigger->setWorkflowDefinition($definition)
+                ->setTransitionName($config['transition_name'])
+                ->setQueued(false);
 
             if ($trigger instanceof TransitionEventTrigger) {
                 $trigger->setEvent($config['event'])->setField($config['field']);

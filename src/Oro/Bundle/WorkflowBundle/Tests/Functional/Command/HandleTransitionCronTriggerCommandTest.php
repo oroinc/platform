@@ -52,7 +52,7 @@ class HandleTransitionCronTriggerCommandTest extends WebTestCase
         $workflowItem = $this->getWorkflowItem($entity->getId());
 
         $this->assertNotNull($workflowItem);
-        $this->assertEquals('second_point', $workflowItem->getCurrentStep()->getName());
+        $this->assertEquals('third_point', $workflowItem->getCurrentStep()->getName());
     }
 
     /**

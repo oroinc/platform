@@ -61,7 +61,7 @@ services:
             - '@oro_workflow.cache.transition_trigger_event'
             - '@oro_message_queue.client.message_producer'
             - '@oro_workflow.helper.transition_event_trigger'
-            - '@oro_workflow.manager'
+            - '@oro_workflow.handler.transition_event_trigger'
         tags:
             - { name: oro_workflow.listener.event_trigger_collector.extension }
 

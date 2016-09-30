@@ -3,74 +3,73 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
 {
     const TRANSITION_NAME = 'test_transition';
     const RELATED_CLASS_NAME = 'stdClass';
     const RELATED_CLASS_ID_FIELD = 'id';
-    const WORKFLOW_NAME = 'test_workflow';
     const FILTER = 'filter != null';
-
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowManager;
 
     /** @var WorkflowItemRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
-    protected $registry;
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
+    /** @var WorkflowAwareEntityFetcher|\PHPUnit_Framework_MockObject_MockObject */
+    protected $fetcher;
 
     /** @var TransitionCronTriggerHelper */
     protected $helper;
-
-    /** @var WorkflowDefinition */
-    protected $workflowDefinition;
 
     /** @var TransitionCronTrigger */
     protected $trigger;
 
     protected function setUp()
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
-
         $this->repository = $this->getMockBuilder(WorkflowItemRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metadata = new ClassMetadataInfo(self::RELATED_CLASS_NAME);
-        $metadata->setIdentifier([self::RELATED_CLASS_ID_FIELD]);
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepositoryForClass')
+            ->with(WorkflowItem::class)
+            ->willReturn($this->repository);
 
-        $em = $this->getMock(ObjectManager::class);
-        $em->expects($this->any())->method('getClassMetadata')->with(self::RELATED_CLASS_NAME)->willReturn($metadata);
+        $this->fetcher = $this->getMockBuilder(WorkflowAwareEntityFetcher::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->registry = $this->getMock(ManagerRegistry::class);
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->with(self::RELATED_CLASS_NAME)
-            ->willReturn($em);
-
-        $this->helper = new TransitionCronTriggerHelper($this->workflowManager, $this->repository, $this->registry);
-
-        $this->workflowDefinition = new WorkflowDefinition();
-        $this->workflowDefinition->setName(self::WORKFLOW_NAME)->setRelatedEntity(self::RELATED_CLASS_NAME);
+        $this->helper = new TransitionCronTriggerHelper($this->doctrineHelper, $this->fetcher);
 
         $this->trigger = new TransitionCronTrigger();
-        $this->trigger->setWorkflowDefinition($this->workflowDefinition)
-            ->setTransitionName(self::TRANSITION_NAME)
-            ->setFilter(self::FILTER);
+        $this->trigger->setTransitionName(self::TRANSITION_NAME)->setFilter(self::FILTER);
+    }
+
+    public function testFetchEntitiesWithoutWorkflowItems()
+    {
+        $workflow = $this->getWorkflowMock();
+        $expected = [new \stdClass(), new \stdClass()];
+
+        $this->fetcher->expects($this->any())
+            ->method('getEntitiesWithoutWorkflowItem')
+            ->with($workflow->getDefinition(), self::FILTER)
+            ->willReturn($expected);
+
+        $this->assertEquals($expected, $this->helper->fetchEntitiesWithoutWorkflowItems($this->trigger, $workflow));
     }
 
     public function testFetchWorkflowItems()
@@ -78,7 +77,10 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
         $data = [1, 2, 3, 4, 5];
         $steps = ['step1', 'step2'];
 
-        $this->setUpWorkflowManager(self::WORKFLOW_NAME, $steps);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with(self::RELATED_CLASS_NAME)
+            ->willReturn(self::RELATED_CLASS_ID_FIELD);
 
         $this->repository->expects($this->once())
             ->method('findByStepNamesAndEntityClass')
@@ -90,14 +92,17 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn($data);
 
-        $this->assertEquals($data, $this->helper->fetchWorkflowItemsForTrigger($this->trigger));
+        $this->assertEquals(
+            $data,
+            $this->helper->fetchWorkflowItemsForTrigger($this->trigger, $this->getWorkflowMock($steps))
+        );
     }
 
     /**
-     * @param string $workflowName
      * @param array $steps
+     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function setUpWorkflowManager($workflowName, array $steps = [])
+    private function getWorkflowMock(array $steps = [])
     {
         $steps = array_map(
             function ($name) {
@@ -109,14 +114,13 @@ class TransitionCronTriggerHelperTest extends \PHPUnit_Framework_TestCase
             $steps
         );
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition->setRelatedEntity(self::RELATED_CLASS_NAME);
+
         $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
         $workflow->expects($this->any())->method('getStepManager')->willReturn(new StepManager($steps));
-        $workflow->expects($this->any())->method('getDefinition')->willReturn($this->workflowDefinition);
+        $workflow->expects($this->any())->method('getDefinition')->willReturn($workflowDefinition);
 
-        $this->workflowManager->expects($this->once())
-            ->method('getWorkflow')
-            ->with($workflowName)
-            ->willReturn($workflow);
+        return $workflow;
     }
 }

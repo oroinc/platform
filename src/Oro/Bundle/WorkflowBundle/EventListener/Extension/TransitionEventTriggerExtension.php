@@ -6,28 +6,27 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Async\Model\TransitionEventTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
+use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
 {
-    const TOPIC_NAME = 'oro_message_queue.transition_trigger_event_message';
-
     /** @var MessageProducerInterface */
     protected $producer;
 
     /** @var TransitionEventTriggerHelper */
     protected $helper;
 
-    /** @var WorkflowManager */
-    protected $workflowManager;
+    /** @var TransitionEventTriggerHandler */
+    protected $handler;
 
     /** @var array */
     protected $scheduled = [];
@@ -37,20 +36,20 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      * @param EventTriggerCache $triggerCache
      * @param MessageProducerInterface $producer
      * @param TransitionEventTriggerHelper $helper
-     * @param WorkflowManager $workflowManager
+     * @param TransitionEventTriggerHandler $handler
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EventTriggerCache $triggerCache,
         MessageProducerInterface $producer,
         TransitionEventTriggerHelper $helper,
-        WorkflowManager $workflowManager
+        TransitionEventTriggerHandler $handler
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->triggerCache = $triggerCache;
         $this->producer = $producer;
         $this->helper = $helper;
-        $this->workflowManager = $workflowManager;
+        $this->handler = $handler;
     }
 
     /**
@@ -125,26 +124,13 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
             return;
         }
 
-        $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $trigger->getWorkflowName());
+        $entityId = $this->doctrineHelper->getEntityIdentifier($mainEntity);
+        $message = TransitionTriggerMessage::create($trigger, $entityId);
 
         if ($trigger->isQueued() || $this->forceQueued) {
-            $message = TransitionEventTriggerMessage::create(
-                $trigger,
-                $workflowItem,
-                $this->doctrineHelper->getEntityIdentifier($mainEntity)
-            );
-
-            $this->producer->send(self::TOPIC_NAME, $message->toArray());
-        } elseif ($workflowItem) {
-            $this->workflowManager->transitIfAllowed($workflowItem, $trigger->getTransitionName());
+            $this->producer->send(TransitionTriggerProcessor::EVENT_TOPIC_NAME, $message->toArray());
         } else {
-            $this->workflowManager->startWorkflow(
-                $trigger->getWorkflowName(),
-                $entity,
-                $trigger->getTransitionName(),
-                [],
-                false
-            );
+            $this->handler->process($trigger, $message);
         }
     }
 

@@ -9,10 +9,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler;
+
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
 {
@@ -51,24 +53,15 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
             return;
         }
 
-        $workflowItems = $this->getTransitionCronTriggerHelper()->fetchWorkflowItemsForTrigger($trigger);
-
-        $data = array_map(
-            function (WorkflowItem $workflowItem) use ($trigger) {
-                return [
-                    'workflowItem' => $workflowItem,
-                    'transition' => $trigger->getTransitionName()
-                ];
-            },
-            $workflowItems
-        );
-
-        $manager = $this->getWorkflowManager();
-
         try {
             $start = microtime(true);
+            $message = TransitionTriggerMessage::create($trigger);
 
-            $manager->massTransit($data);
+            if ($trigger->isQueued()) {
+                $this->getProducer()->send(TransitionTriggerProcessor::CRON_TOPIC_NAME, $message->toArray());
+            } else {
+                $this->getTransitionCronTriggerHandler()->process($trigger, $message);
+            }
 
             $output->writeln(
                 sprintf(
@@ -105,18 +98,19 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return TransitionCronTriggerHelper
+     * @return TransitionCronTriggerHandler
      */
-    protected function getTransitionCronTriggerHelper()
+    protected function getTransitionCronTriggerHandler()
     {
-        return $this->getContainer()->get('oro_workflow.helper.transition_cron_trigger');
+        return $this->getContainer()->get('oro_workflow.handler.transition_cron_trigger');
     }
 
+
     /**
-     * @return WorkflowManager
+     * @return MessageProducerInterface
      */
-    protected function getWorkflowManager()
+    protected function getProducer()
     {
-        return $this->getContainer()->get('oro_workflow.manager');
+        return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
 }

@@ -2,48 +2,48 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class TransitionCronTriggerHelper
 {
-    /** @var WorkflowManager */
-    private $workflowManager;
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var WorkflowItemRepository */
-    private $repository;
-
-    /** @var ManagerRegistry */
-    private $registry;
+    /** @var WorkflowAwareEntityFetcher */
+    private $entityFetcher;
 
     /**
-     * @param WorkflowManager $workflowManager
-     * @param WorkflowItemRepository $repository
-     * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
+     * @param WorkflowAwareEntityFetcher $entityFetcher
      */
-    public function __construct(
-        WorkflowManager $workflowManager,
-        WorkflowItemRepository $repository,
-        ManagerRegistry $registry
-    ) {
-        $this->workflowManager = $workflowManager;
-        $this->repository = $repository;
-        $this->registry = $registry;
+    public function __construct(DoctrineHelper $doctrineHelper, WorkflowAwareEntityFetcher $entityFetcher)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->entityFetcher = $entityFetcher;
     }
 
     /**
      * @param TransitionCronTrigger $trigger
+     * @param Workflow $workflow
+     * @return array|\object[]
+     */
+    public function fetchEntitiesWithoutWorkflowItems(TransitionCronTrigger $trigger, Workflow $workflow)
+    {
+        return $this->entityFetcher->getEntitiesWithoutWorkflowItem($workflow->getDefinition(), $trigger->getFilter());
+    }
+
+    /**
+     * @param TransitionCronTrigger $trigger
+     * @param Workflow $workflow
      * @return array an array of integers as ids of matched workflowItems
      */
-    public function fetchWorkflowItemsForTrigger(TransitionCronTrigger $trigger)
+    public function fetchWorkflowItemsForTrigger(TransitionCronTrigger $trigger, Workflow $workflow)
     {
-        $workflow = $this->workflowManager->getWorkflow($trigger->getWorkflowDefinition()->getName());
-
         $steps = $workflow->getStepManager()
             ->getRelatedTransitionSteps($trigger->getTransitionName())
             ->map(
@@ -54,23 +54,20 @@ class TransitionCronTriggerHelper
 
         $entityClass = $workflow->getDefinition()->getRelatedEntity();
 
-        return $this->repository->findByStepNamesAndEntityClass(
-            $steps,
-            $entityClass,
-            $this->getIdentifierField($entityClass),
-            $trigger->getFilter()
-        );
+        return $this->getWorkflowItemRepository()
+            ->findByStepNamesAndEntityClass(
+                $steps,
+                $entityClass,
+                $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass),
+                $trigger->getFilter()
+            );
     }
 
     /**
-     * @param string $entityClass
-     * @return string
+     * @return WorkflowItemRepository
      */
-    protected function getIdentifierField($entityClass)
+    protected function getWorkflowItemRepository()
     {
-        /** @var ClassMetadataInfo $metadata */
-        $metadata = $this->registry->getManagerForClass($entityClass)->getClassMetadata($entityClass);
-
-        return $metadata->getSingleIdentifierFieldName();
+        return $this->doctrineHelper->getEntityRepositoryForClass(WorkflowItem::class);
     }
 }

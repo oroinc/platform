@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 
-use Oro\Bundle\WorkflowBundle\Async\Model\TransitionEventTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExtension;
+use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -25,8 +25,8 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
     /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionEventTriggerHelper */
     protected $helper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowManager */
-    protected $workflowManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionEventTriggerHandler */
+    protected $handler;
 
     protected function setUp()
     {
@@ -48,14 +48,16 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+        $this->handler = $this->getMockBuilder(TransitionEventTriggerHandler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->extension = new TransitionEventTriggerExtension(
             $this->doctrineHelper,
             $this->triggerCache,
             $this->producer,
             $this->helper,
-            $this->workflowManager
+            $this->handler
         );
     }
 
@@ -63,7 +65,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
     {
         parent::tearDown();
 
-        unset($this->producer, $this->helper, $this->workflowManager, $this->repository);
+        unset($this->producer, $this->helper, $this->handler, $this->repository);
     }
 
     /**
@@ -207,8 +209,6 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
 
         $mainEntity = $this->getMainEntity();
 
-        $workflowItem = $this->getEntity(WorkflowItem::class);
-
         /** @var TransitionEventTrigger $expectedTrigger */
         $expectedTrigger = $this->getTriggers('create');
         $expectedTrigger->setQueued(false)->setTransitionName('test_transition');
@@ -222,15 +222,12 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             ->with($expectedTrigger, $entity)
             ->willReturn($mainEntity);
 
-        $this->workflowManager->expects($this->once())
-            ->method('getWorkflowItem')
-            ->with($mainEntity, $expectedTrigger->getWorkflowName())
-            ->willReturn($workflowItem);
-        $this->workflowManager->expects($this->once())
-            ->method('transitIfAllowed')
-            ->with($workflowItem, $expectedTrigger->getTransitionName());
+        $this->producer->expects($this->never())->method($this->anything());
 
-        $this->producer->expects($this->never())->method('send');
+        $this->handler->expects($this->once())
+            ->method('process')
+            ->with($expectedTrigger, TransitionTriggerMessage::create($expectedTrigger, null))
+            ->willReturn(true);
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
@@ -245,44 +242,10 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->helper->expects($this->any())->method('isRequirePass')->willReturn(true);
         $this->helper->expects($this->any())->method('getMainEntity')->willReturn(null);
 
-        $this->workflowManager->expects($this->never())->method($this->anything());
+        $this->handler->expects($this->never())->method($this->anything());
         $this->producer->expects($this->never())->method($this->anything());
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $this->getMainEntity());
-
-        $this->extension->process($this->entityManager);
-    }
-
-    public function testProcessNotQueuedWithoutWorkflowItem()
-    {
-        $entity = $this->getMainEntity();
-
-        /** @var TransitionEventTrigger $expectedTrigger */
-        $expectedTrigger = $this->getTriggers('create');
-        $expectedTrigger->setQueued(false);
-
-        $this->prepareRepository();
-        $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
-
-        $this->helper->expects($this->any())->method('isRequirePass')->willReturn(true);
-        $this->helper->expects($this->any())->method('getMainEntity')->willReturn($entity);
-
-        $this->workflowManager->expects($this->once())->method('getWorkflowItem')->willReturn(null);
-        $this->workflowManager->expects($this->never())->method('transitIfAllowed');
-        $this->workflowManager->expects($this->once())
-            ->method('startWorkflow')
-            ->with(
-                $expectedTrigger->getWorkflowName(),
-                $entity,
-                $expectedTrigger->getTransitionName(),
-                [],
-                false
-            );
-
-
-        $this->producer->expects($this->never())->method('send');
-
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
         $this->extension->process($this->entityManager);
     }
@@ -292,9 +255,8 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
      *
      * @param bool $triggerQueued
      * @param bool $forceQueued
-     * @param WorkflowItem $workflowItem
      */
-    public function testProcessQueued($triggerQueued, $forceQueued, WorkflowItem $workflowItem = null)
+    public function testProcessQueued($triggerQueued, $forceQueued)
     {
         $entity = $this->getMainEntity();
 
@@ -311,21 +273,15 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             ->with($expectedTrigger, $entity)
             ->willReturn($entity);
 
-        $this->workflowManager->expects($this->once())
-            ->method('getWorkflowItem')
-            ->with($entity, $expectedTrigger->getWorkflowName())
-            ->willReturn($workflowItem);
-        $this->workflowManager->expects($this->never())->method('transitIfAllowed');
-        $this->workflowManager->expects($this->never())->method('startWorkflow');
+        $this->handler->expects($this->never())->method($this->anything());
 
         $this->producer->expects($this->once())
             ->method('send')
             ->with(
-                TransitionEventTriggerExtension::TOPIC_NAME,
+                TransitionTriggerProcessor::EVENT_TOPIC_NAME,
                 [
-                    TransitionEventTriggerMessage::TRANSITION_EVENT_TRIGGER => $expectedTrigger->getId(),
-                    TransitionEventTriggerMessage::WORKFLOW_ITEM => $workflowItem ? $workflowItem->getId() : null,
-                    TransitionEventTriggerMessage::MAIN_ENTITY => null
+                    TransitionTriggerMessage::TRANSITION_TRIGGER => $expectedTrigger->getId(),
+                    TransitionTriggerMessage::MAIN_ENTITY => null
                 ]
             );
 
@@ -340,24 +296,14 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
      */
     public function processQueuedProvider()
     {
-        /** @var WorkflowItem $workflowItem */
-        $workflowItem = $this->getEntity(WorkflowItem::class, ['id' => 100]);
-
         return [
             'queued' => [
                 'triggerQueued' => true,
-                'forceQueued' => false,
-                'workflowItem' => $workflowItem
-            ],
-            'queued without workflo item' => [
-                'triggerQueued' => true,
-                'forceQueued' => false,
-                'workflowItem' => null
+                'forceQueued' => false
             ],
             'force queued' => [
                 'triggerQueued' => false,
-                'forceQueued' => true,
-                'workflowItem' => $workflowItem
+                'forceQueued' => true
             ]
         ];
     }

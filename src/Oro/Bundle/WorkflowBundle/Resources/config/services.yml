@@ -248,6 +248,12 @@ services:
         arguments:
             - '%oro_workflow.entity.transition_trigger_event.class%'
 
+    oro_workflow.helper.workflow_aware_entity_fetcher:
+        class: Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher
+        public: true
+        arguments:
+            - '@doctrine'
+
     oro_workflow.helper.transition_event_trigger:
         class: Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper
         public: false
@@ -257,9 +263,8 @@ services:
     oro_workflow.helper.transition_cron_trigger:
         class: Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper
         arguments:
-            - '@oro_workflow.manager'
-            - '@oro_workflow.repository.workflow_item'
-            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.helper.workflow_aware_entity_fetcher'
 
     oro_workflow.transition_trigger.cron_scheduler:
         class: Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler

@@ -42,7 +42,7 @@ class WorkflowItemRepository extends EntityRepository
     public function findOneByEntityMetadata($entityClass, $entityIdentifier, $workflowName)
     {
         return $this->findOneBy([
-            'entityId' => $entityIdentifier,
+            'entityId' => (string)$entityIdentifier,
             'entityClass' => $entityClass,
             'workflowName' => $workflowName,
         ]);
