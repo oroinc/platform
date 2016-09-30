@@ -1,31 +1,22 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Dbal\Extension;
 
-use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
+use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
 use Psr\Log\NullLogger;
 
 class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
 {
+    use DbalSchemaExtensionTrait;
+
     protected function setUp()
     {
         $this->initClient();
 
-        $connection = $this->createConnection();
-
-        try {
-            $connection->getDBALConnection()->getSchemaManager()->dropTable('message_queue');
-        } catch (DriverException $e) {
-        }
-
-        $session = new DbalSession($connection);
-        $session->declareQueue(new DbalDestination('default'));
+        $this->messageQueueEnsureTableExists('message_queue');
 
         $this->startTransaction();
     }
@@ -39,7 +30,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
 
     public function testShouldRedeliverOrphanMessages()
     {
-        $connection = $this->createConnection();
+        $connection = $this->messageQueueCreateConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -68,15 +59,5 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $this->assertNull($messages[0]['consumer_id']);
         $this->assertNull($messages[0]['delivered_at']);
         $this->assertTrue((bool) $messages[0]['redelivered']);
-    }
-
-    /**
-     * @return DbalConnection
-     */
-    private function createConnection()
-    {
-        $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
-
-        return new DbalConnection($dbal, 'message_queue');
     }
 }

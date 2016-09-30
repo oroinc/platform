@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Functional\Transport\Dbal;
 
 use Doctrine\DBAL\Exception\DriverException;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
@@ -11,21 +11,15 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 
 class DbalMessageProducerTest extends WebTestCase
 {
+    use DbalSchemaExtensionTrait;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->initClient();
 
-        $connection = $this->createConnection();
-
-        try {
-            $connection->getDBALConnection()->getSchemaManager()->dropTable('message_queue');
-        } catch (DriverException $e) {
-        }
-
-        $session = new DbalSession($connection);
-        $session->declareQueue(new DbalDestination('default'));
+        $this->messageQueueEnsureTableExists('message_queue');
 
         $this->startTransaction();
     }
@@ -39,7 +33,7 @@ class DbalMessageProducerTest extends WebTestCase
 
     public function testShouldCreateMessageInDb()
     {
-        $connection = $this->createConnection();
+        $connection = $this->messageQueueCreateConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $producer = new DbalMessageProducer($connection);
@@ -74,7 +68,7 @@ class DbalMessageProducerTest extends WebTestCase
 
     public function testCouldSetMessagePriority()
     {
-        $connection = $this->createConnection();
+        $connection = $this->messageQueueCreateConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $producer = new DbalMessageProducer($connection);
@@ -99,15 +93,5 @@ class DbalMessageProducerTest extends WebTestCase
         $messages = $dbal->executeQuery('SELECT * FROM message_queue ORDER BY id ASC')->fetchAll();
         $this->assertCount(2, $messages);
         $this->assertEquals(10, $messages[1]['priority']);
-    }
-
-    /**
-     * @return DbalConnection
-     */
-    private function createConnection()
-    {
-        $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
-
-        return new DbalConnection($dbal, 'message_queue');
     }
 }
