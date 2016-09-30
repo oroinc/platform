@@ -30,11 +30,14 @@ class MenuUpdateHelper
         MenuUpdateInterface $update,
         ItemInterface $item,
         $menu,
-        array $extrasMapping = ['position' => 'priority']
+        array $extrasMapping = ['position' => 'priority', 'existsInNavigationYml' => 'existsInNavigationYml']
     ) {
         $this->setMenuUpdateProperty($update, 'key', $item->getName());
         $this->setMenuUpdateProperty($update, 'uri', $item->getUri());
-        $this->setMenuUpdateProperty($update, 'defaultTitle', $item->getLabel());
+
+        if ($update->getId() === null || $update->getTitles()->count() <= 0) {
+            $this->setMenuUpdateProperty($update, 'defaultTitle', $item->getLabel());
+        }
 
         if ($item->getParent()) {
             $this->setMenuUpdateProperty($update, 'parentKey', $item->getParent()->getName());
