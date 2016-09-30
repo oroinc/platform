@@ -8,7 +8,6 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Psr\Log\NullLogger;
 
@@ -78,6 +77,6 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
     {
         $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
 
-        return new DbalConnection($dbal, new DbalSchema($dbal, 'message_queue'), 'message_queue');
+        return new DbalConnection($dbal, 'message_queue');
     }
 }
