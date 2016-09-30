@@ -58,7 +58,8 @@ class RestRolesTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_roles')
+            $this->getUrl('oro_api_get_roles'),
+            ['limit' => 20]
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

@@ -10,16 +10,16 @@ be excluded from optimization process.
 
 Example of assets.yml file:
 ```yaml
-css:
-    first_group:
-        - 'First/Assets/Path/To/Css/first.css'
-        - 'First/Assets/Path/To/Css/second.css'
-        - 'First/Assets/Path/To/Css/third.css'
-    second_group:
-        - 'Second/Assets/Path/To/Css/first.css'
-        - 'Second/Assets/Path/To/Css/second.css'
-        - 'Second/Assets/Path/To/Css/third.css'
-
+assets:
+    css:
+        first_group:
+            - 'First/Assets/Path/To/Css/first.css'
+            - 'First/Assets/Path/To/Css/second.css'
+            - 'First/Assets/Path/To/Css/third.css'
+        second_group:
+            - 'Second/Assets/Path/To/Css/first.css'
+            - 'Second/Assets/Path/To/Css/second.css'
+            - 'Second/Assets/Path/To/Css/third.css'
 ```
 
 CSS section contain groups of files. This groups can be excluded from optimization process debugging purposes.

@@ -7,6 +7,8 @@ use Symfony\Component\Form\FormView;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class FormFieldType extends AbstractFormType
 {
@@ -24,17 +26,18 @@ class FormFieldType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
-
         $view->vars['form'] = $formAccessor->getView($options['field_path']);
+
+        BlockUtils::setViewVarsFromOptions($view, $options, ['field_path']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         // prevent the form field rendering by form_rest() method,
         // if the corresponding layout block is invisible

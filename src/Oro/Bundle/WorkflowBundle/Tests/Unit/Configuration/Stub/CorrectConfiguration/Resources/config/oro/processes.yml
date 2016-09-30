@@ -1,0 +1,38 @@
+processes:
+    definitions:
+        test_definition:
+            label: 'Test Definition'
+            enabled: true
+            entity: Oro\Bundle\UserBundle\Entity\User
+            order: 20
+            exclude_definitions: [another_definition]
+            preconditions:
+                '@or':
+                    - '@true'
+                    - '@false'
+            actions_configuration:
+                - '@assign_value': [$entity.field, 'value']
+            pre_conditions:
+                '@condition1': ~
+
+        another_definition:
+            label: 'Another definition'
+            entity: My\Entity
+            actions_configuration: []
+
+    triggers:
+        test_definition:
+            -
+                event: update
+                field: some_field
+                priority: 10
+                queued: true
+                time_shift: 123456
+            -
+                event: create
+                queued: true
+                time_shift: P1DT5M
+            -
+                event: delete
+            -
+                cron: '*/1 * * * *'
