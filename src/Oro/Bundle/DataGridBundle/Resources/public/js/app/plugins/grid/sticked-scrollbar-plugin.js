@@ -165,7 +165,6 @@ define(function(require) {
 
         attachScrollbar: function() {
             var $scrollbar = this.domCache.$container.find('.mCSB_scrollTools');
-            var containerWidth = this.domCache.$container.width();
             $scrollbar.removeAttr('style');
 
             if (!this.scrollState.display) {
