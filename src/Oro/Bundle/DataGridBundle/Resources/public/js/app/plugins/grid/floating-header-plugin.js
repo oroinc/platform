@@ -192,6 +192,8 @@ define(function(require) {
                 width: totalWidth
             });
 
+            mediator.trigger('gridHeaderCellWidth:updated');
+
             this.selectMode();
         },
 

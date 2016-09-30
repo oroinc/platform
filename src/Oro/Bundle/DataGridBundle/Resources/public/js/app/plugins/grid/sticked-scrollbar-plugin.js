@@ -63,8 +63,8 @@ define(function(require) {
             this.enableCustomScrollbar();
 
             this.listenTo(mediator, 'layout:reposition', this.updateCustomScrollbar);
+            this.listenTo(mediator, 'gridHeaderCellWidth:updated', this.updateCustomScrollbar);
             this.listenTo(this.grid, 'content:update', this.updateCustomScrollbar);
-            this.updateScrollbarIntervalId = setInterval(_.bind(this.checkLayout, this), 400);
 
             this.connected = true;
             StickedScrollbarPlugin.__super__.enable.call(this);
@@ -75,7 +75,6 @@ define(function(require) {
          */
         disable: function() {
             this.connected = false;
-            clearInterval(this.updateScrollbarIntervalId);
             this.domCache.$container.mCustomScrollbar('destroy');
 
             StickedScrollbarPlugin.__super__.disable.call(this);
@@ -141,12 +140,6 @@ define(function(require) {
             return this.scrollState.display = $grid.width() > $container.width();
         },
 
-        checkLayout: function() {
-            if (this._lastContainerWidth && this._lastContainerWidth !== this.domCache.$container.width()) {
-                this.updateCustomScrollbar();
-            }
-        },
-
         updateViewport: function() {
             if (!this.scrollState.display) {
                 return;
@@ -179,7 +172,6 @@ define(function(require) {
                 $scrollbar.css('display', 'none');
             }
 
-            this._lastContainerWidth = containerWidth;
             this.scrollState.state = 'attached';
         },
 
@@ -199,7 +191,6 @@ define(function(require) {
                 'width': containerWidth + 'px'
             });
 
-            this._lastContainerWidth = containerWidth;
             this.scrollState.state = 'detached';
         },
 
