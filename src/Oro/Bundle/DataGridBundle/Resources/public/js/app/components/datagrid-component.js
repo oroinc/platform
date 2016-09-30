@@ -384,8 +384,10 @@ define(function(require) {
                 plugins.push(ToolbarMassActionPlugin);
             }
 
-            if (this.themeOptions.stickedScrollbar) {
-                plugins.push(StickedScrollbarPlugin);
+            if (!this.themeOptions.disableStickedScrollbar) {
+                if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
+                    plugins.push(StickedScrollbarPlugin);
+                }
             }
 
             var appearances = metadata.options.appearances || [];

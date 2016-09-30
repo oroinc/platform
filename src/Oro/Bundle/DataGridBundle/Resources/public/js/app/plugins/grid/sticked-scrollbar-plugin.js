@@ -3,6 +3,7 @@ define(function(require) {
 
     var StickedScrollbarPlugin;
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var _ = require('underscore');
     require('mCustomScrollbar');
@@ -17,9 +18,9 @@ define(function(require) {
             axis: 'x',
             contentTouchScroll: 10,
             documentTouchScroll: true,
-            theme: 'dark',
+            theme: 'inset-dark',
             advanced: {
-                autoExpandHorizontalScroll: true,
+                autoExpandHorizontalScroll: 3,
                 updateOnContentResize: false,
                 updateOnImageLoad: false
             }
@@ -38,9 +39,7 @@ define(function(require) {
          */
         initialize: function(grid) {
             this.grid = grid;
-
             this.grid.on('shown', _.bind(this.onGridShown, this));
-            this.grid.on('content:update', _.bind(this.updateCustomScrollbar, this));
         },
 
         onGridShown: function() {
@@ -59,17 +58,13 @@ define(function(require) {
                 return;
             }
 
-            _.extend(this.mcsOptions, {
-                callbacks: {
-                    onCreate: _.bind(this.onCreate, this),
-                    onOverflowX: _.bind(this.onOverflowX, this),
-                    onOverflowXNone: _.bind(this.onOverflowXNone, this)
-                }
-            });
-
             this.setupCache();
             this.setupEvents();
             this.enableCustomScrollbar();
+
+            this.listenTo(mediator, 'layout:reposition', this.updateCustomScrollbar);
+            this.listenTo(this.grid, 'content:update', this.updateCustomScrollbar);
+            this.updateScrollbarIntervalId = setInterval(_.bind(this.updateCustomScrollbar, this), 400);
 
             this.connected = true;
             StickedScrollbarPlugin.__super__.enable.call(this);
@@ -80,17 +75,14 @@ define(function(require) {
          */
         disable: function() {
             this.connected = false;
+            clearInterval(this.updateScrollbarIntervalId);
             this.domCache.$container.mCustomScrollbar('destroy');
+
             StickedScrollbarPlugin.__super__.disable.call(this);
         },
 
         setupCache: function() {
-            this.domCache = {
-                $window: $(window),
-                $document: $(document),
-                $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
-                $thead: this.grid.$grid.find('thead:first')
-            };
+            this.setupDomCache();
             this.timeouts = {
                 resizeTimeout: 50,
                 scrollTimeout: 40
@@ -106,24 +98,32 @@ define(function(require) {
             };
         },
 
+        setupDomCache: function() {
+            this.domCache = {
+                $window: $(window),
+                $document: $(document),
+                $grid: this.grid.$grid,
+                $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
+                $scrollbar: this.grid.$grid.find('.mCSB_scrollTools'),
+                $thead: this.grid.$grid.find('thead:first')
+            };
+        },
+
         setupEvents: function() {
-            this.domCache.$document.on('scroll', _.debounce(_.bind(this.manageScroll, this), this.timeouts.scrollTimeout));
-            this.domCache.$window.on('resize', _.debounce(_.bind(this.updateCustomScrollbar, this), this.timeouts.resizeTimeout));
-        },
-
-        onOverflowX: function() {
-            this.scrollState.display = true;
-        },
-
-        onOverflowXNone: function() {
-            this.scrollState.display = false;
-        },
-
-        onCreate: function() {
-            this.manageScroll();
+            this.domCache.$document.on('scroll',
+                _.debounce(_.bind(this.manageScroll, this), this.timeouts.scrollTimeout)
+            );
+            this.domCache.$window.on('resize',
+                _.debounce(_.bind(this.updateCustomScrollbar, this), this.timeouts.resizeTimeout)
+            );
         },
 
         manageScroll: function() {
+            if (!this.domCache) {
+                return;
+            }
+
+            this.detectScrollbar();
             this.updateViewport();
 
             if (this.viewport.bottom <= 0 &&
@@ -135,11 +135,20 @@ define(function(require) {
             }
         },
 
+        detectScrollbar: function() {
+            var $grid = this.domCache.$grid;
+            var $container = this.domCache.$container;
+            this.scrollState.display = $grid.width() > $container.width();
+        },
+
         updateViewport: function() {
-            var $scrollbar = this.domCache.$container.find('.mCSB_scrollTools');
+            if (!this.scrollState.display) {
+                return;
+            }
+
             this.viewport.top = this.domCache.$container.offset().top - this.domCache.$window.scrollTop();
             this.viewport.bottom = this.domCache.$window.height() - this.viewport.top - this.domCache.$container.height();
-            this.viewport.lowLevel = this.domCache.$window.height() + this.domCache.$window.scrollTop() - this.domCache.$thead.height() - $scrollbar.height();
+            this.viewport.lowLevel = this.domCache.$window.height() + this.domCache.$window.scrollTop() - this.domCache.$thead.height() - this.domCache.$scrollbar.height();
         },
 
         enableCustomScrollbar: function() {
@@ -147,6 +156,10 @@ define(function(require) {
         },
 
         updateCustomScrollbar: function() {
+            if (!this.domCache) {
+                return;
+            }
+
             this.manageScroll();
             this.domCache.$container.mCustomScrollbar('update');
         },
@@ -185,6 +198,10 @@ define(function(require) {
          * @inheritDoc
          */
         dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
             this.domCache.$document.off('scroll', _.bind(this.manageScroll, this));
             this.domCache.$window.off('resize', _.bind(this.updateCustomScrollbar, this));
 
