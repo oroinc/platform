@@ -10,15 +10,6 @@
 {% endif %}
 
 {% block navButtons %}
-    {{ UI.button({
-        'path' : path(routePrefix ~ 'create', {menuName: menuName, parentKey: entity.key}),
-        'iCss': 'icon-folder-close',
-        'aCss': 'btn-primary',
-        'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
-        'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
-    }) }}
-    {{ UI.buttonSeparator() }}
-
     {% if entity.key %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: entity.key}),
@@ -27,36 +18,71 @@
             'id': 'btn-remove-attribute',
             'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
         }) }}
-        {{ UI.buttonSeparator() }}
     {% endif %}
+
     {% set html = UI.saveAndStayButton({
         'route': routePrefix ~ 'update',
         'params': {'menuName': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
     }) %}
+
     {% set html = html ~ UI.saveAndNewButton({
         'route': routePrefix ~ 'create',
         'params': {'menuName': '$menu', 'parentKey': '$parentKey'}
     }) %}
+
     {{ UI.dropdownSaveButton({'html': html}) }}
+
+    {% if entity.isDivider == false and (entity.existsInNavigationYml or entity.id is null) %}
+        {{ UI.buttonSeparator() }}
+
+        {% set html = UI.button({
+            'path' : path(routePrefix ~ 'create', {menuName: menuName, parentKey: entity.key}),
+            'aCss': 'btn-primary',
+            'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
+            'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
+        }) %}
+
+        {% set html = html ~ UI.button({
+            'path' : path(routePrefix ~ 'create_divider', {menuName: menuName, parentKey: entity.key}),
+            'aCss': 'btn-primary',
+            'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+            'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans})
+        }) %}
+
+        {% set parameters = {
+            'html': html,
+            'groupKey': 'createButtons',
+            'options': {
+                'moreButtonAttrs': {
+                    'class': 'btn-primary'
+                }
+            }
+        } %}
+
+        {{ UI.pinnedDropdownButton(parameters) }}
+    {% endif %}
 {% endblock navButtons %}
 
 {% block content_data %}
     {% set id = 'menu-update-form' %}
 
-    {% set dataBlocks = [{
-        'title': 'General Information'|trans,
-        'class': 'active',
-        'subblocks': [
-            {
-                'title': '',
-                'data': [
-                    form_row(form.titles),
-                    form_row(form.uri),
-                    form_row(form.active)
-                ]
-            }
-        ]
-    }] %}
+    {% set dataBlocks = [] %}
+    {% if entity.isDivider == false %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [
+                {
+                    'title': '',
+                    'data': [
+                        form_row(form.titles),
+                        form_row(form.uri),
+                        form_row(form.active)
+                    ]
+                }
+            ]
+        }]) %}
+    {% endif %}
 
     {% set additionalData = [] %}
     {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}

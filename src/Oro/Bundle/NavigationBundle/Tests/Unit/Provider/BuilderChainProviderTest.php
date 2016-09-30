@@ -86,8 +86,37 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $options = array();
 
+        $item = $this->getMockBuilder('Knp\Menu\ItemInterface')
+            ->getMock();
+
+        $item->expects($this->once())
+            ->method('getExtra')
+            ->with('divider', false)
+            ->will($this->returnValue(true));
+
+        $item->expects($this->once())
+            ->method('setAttribute')
+            ->with('class', 'divider');
+
+        $item->expects($this->once())
+            ->method('setLabel')
+            ->with(BuilderChainProvider::MENU_ITEM_DIVIDER_LABEL);
+
+        $item->expects($this->once())
+            ->method('getChildren')
+            ->will($this->returnValue([]));
+
         $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
             ->getMock();
+
+        $menu->expects($this->once())
+            ->method('getExtra')
+            ->with('divider', false)
+            ->will($this->returnValue(false));
+
+        $menu->expects($this->once())
+            ->method('getChildren')
+            ->will($this->returnValue([$item]));
 
         $this->factory->expects($this->once())
             ->method('createItem')
@@ -239,13 +268,18 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $child = $this->getMockBuilder('Knp\Menu\ItemInterface')
             ->getMock();
-        $child->expects($this->once())
+        $child->expects($this->exactly(2))
             ->method('getExtra')
-            ->with('position')
-            ->will($this->returnValue($position));
+            ->will($this->returnValueMap([
+                ['position', null, $position],
+                ['divider', false, false]
+            ]));
         $child->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));
+        $child->expects($this->once())
+            ->method('getChildren')
+            ->will($this->returnValue([]));
 
         return $child;
     }

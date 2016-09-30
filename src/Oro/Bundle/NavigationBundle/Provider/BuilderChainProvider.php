@@ -18,6 +18,7 @@ class BuilderChainProvider implements MenuProviderInterface
 {
     const COMMON_BUILDER_ALIAS = '_common_builder';
     const IGNORE_CACHE_OPTION = 'ignoreCache';
+    const MENU_ITEM_DIVIDER_LABEL = '---------------';
 
     /**
      * Collection of builders grouped by alias.
@@ -124,6 +125,7 @@ class BuilderChainProvider implements MenuProviderInterface
                 );
 
                 $this->sort($menu);
+                $this->applyDivider($menu);
                 if ($this->cache) {
                     $this->cache->save($alias, $menu->toArray());
                 }
@@ -188,6 +190,22 @@ class BuilderChainProvider implements MenuProviderInterface
     {
         if (empty($alias)) {
             throw new \InvalidArgumentException('Menu alias was not set.');
+        }
+    }
+
+    /**
+     * @param ItemInterface $item
+     */
+    private function applyDivider(ItemInterface $item)
+    {
+        if ($item->getExtra('divider', false)) {
+            $class = trim(sprintf("%s %s", $item->getAttribute('class', ''), 'divider'));
+            $item->setAttribute('class', $class);
+            $item->setLabel(self::MENU_ITEM_DIVIDER_LABEL);
+        }
+
+        foreach ($item->getChildren() as $child) {
+            $this->applyDivider($child);
         }
     }
 }

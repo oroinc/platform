@@ -163,6 +163,18 @@ interface MenuUpdateInterface
     public function setPriority($priority);
 
     /**
+     * @return boolean
+     */
+    public function isDivider();
+
+    /**
+     * @param boolean $divider
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setDivider($divider);
+
+    /**
      * Get array of extra data that is not declared in MenuUpdateInterface model
      *
      * @return array

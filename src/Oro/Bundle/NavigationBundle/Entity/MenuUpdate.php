@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
@@ -49,7 +48,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
 {
     use MenuUpdateTrait;
 
-    const OWNERSHIP_USER            = 3;
+    const OWNERSHIP_USER = 3;
 
     /**
      * {@inheritdoc}
@@ -67,7 +66,8 @@ class MenuUpdate extends ExtendMenuUpdate implements
     public function getExtras()
     {
         $extras = [
-            'existsInNavigationYml' => $this->isExistsInNavigationYml()
+            'existsInNavigationYml' => $this->isExistsInNavigationYml(),
+            'divider' => $this->isDivider()
         ];
 
         if ($this->getPriority() !== null) {

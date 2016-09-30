@@ -40,7 +40,7 @@ class UserMenuBuilder implements BuilderInterface
 
         $menu->addChild('divider-' . rand(1, 99999))
             ->setLabel('')
-            ->setAttribute('class', 'divider');
+            ->setExtra('divider', true);
         $menu->addChild(
             'Logout',
             array(

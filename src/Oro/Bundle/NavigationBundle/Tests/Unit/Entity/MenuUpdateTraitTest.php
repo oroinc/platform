@@ -24,6 +24,8 @@ class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
             ['ownershipType', MenuUpdateInterface::OWNERSHIP_ORGANIZATION],
             ['ownerId', 3],
             ['active', true],
+            ['existsInNavigationYml', true],
+            ['divider', true],
             ['priority', 1],
         ];
 

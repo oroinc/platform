@@ -28,6 +28,9 @@ abstract class AbstractMenuController extends Controller
      */
     abstract protected function getOwnershipType();
 
+    /**
+     * @return array
+     */
     public function indexAction()
     {
         return [
@@ -51,13 +54,15 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param string $menuName
      * @param string|null $parentKey
+     * @param bool $isDivider
      *
      * @return array|RedirectResponse
      */
-    public function createAction($menuName, $parentKey = null)
+    public function createAction($menuName, $parentKey = null, $isDivider = false)
     {
         /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $this->getManager()->createMenuUpdate($this->getOwnershipType(), $this->getUser()->getId());
+        $menuUpdate->setDivider($isDivider);
 
         if ($parentKey) {
             $parent = $this->getMenuUpdate($menuName, $parentKey, true);
@@ -79,7 +84,7 @@ abstract class AbstractMenuController extends Controller
      */
     public function updateAction($menuName, $key)
     {
-        $menuUpdate = $this->getMenuUpdate($menuName, $key);
+        $menuUpdate = $this->getMenuUpdate($menuName, $key, true);
         $menu = $this->getMenu($menuName);
 
         return $this->getResponse($this->update($menuUpdate), $menu);
