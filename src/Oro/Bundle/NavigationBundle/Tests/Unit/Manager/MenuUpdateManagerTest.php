@@ -73,6 +73,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->setEntityClass(MenuUpdateStub::class);
         $result = $this->manager->createMenuUpdate($ownershipType, $ownerId);
+        $entity->setKey($result->getKey());
 
         $this->assertEquals($entity, $result);
         $this->assertEquals($entity->getOwnershipType(), $result->getOwnershipType());
@@ -189,6 +190,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
+            ->setKey($key)
         ;
 
         $menu = $this->getMock(ItemInterface::class);
@@ -236,6 +238,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
+            ->setKey($key)
         ;
 
         $menu = $this->getMock(ItemInterface::class);

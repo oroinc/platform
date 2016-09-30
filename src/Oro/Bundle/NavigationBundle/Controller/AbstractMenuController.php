@@ -92,7 +92,7 @@ abstract class AbstractMenuController extends Controller
      */
     protected function update(MenuUpdateInterface $menuUpdate)
     {
-        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_update_key' => $menuUpdate->getKey()]);
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
 
         return $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
