@@ -1,4 +1,4 @@
-{% if not dumpContext and documentationPath is not null%}
+{% if documentationPath is not null%}
     <div class="motd" style="font-size: 1.2em; padding: 5px 40px;">
         <a href="{{ asset(documentationPath) }}">The documentation</a>
     </div>
@@ -71,14 +71,12 @@
                 $('input.value', header).val(headerValue);
             };
 
-        {% if not dumpContext %}
         $apiDocLink.after('<div id="api_type" style="float: left; font-size: 1.2em; padding: 13px 16px;">type: ' +
             '<a href="' + apiDocHref + '">plain</a>' +
             '&nbsp;|&nbsp;' +
             '<a href="' + apiDocHref + '/rest_json_api">JSON.API</a>' +
             '</div>'
         );
-        {% endif %}
 
         /**
          * Add the authentication type selector
