@@ -4,7 +4,6 @@ namespace Oro\Component\MessageQueue\Tests\Functional\Transport\Dbal;
 use Doctrine\DBAL\Exception\DriverException;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 
 class DbalSessionTest extends WebTestCase
@@ -51,6 +50,6 @@ class DbalSessionTest extends WebTestCase
     {
         $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
 
-        return new DbalConnection($dbal, new DbalSchema($dbal, 'message_queue'), 'message_queue');
+        return new DbalConnection($dbal, 'message_queue');
     }
 }

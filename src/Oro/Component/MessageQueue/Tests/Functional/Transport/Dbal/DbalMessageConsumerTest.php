@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 
 class DbalMessageConsumerTest extends WebTestCase
@@ -286,6 +285,6 @@ class DbalMessageConsumerTest extends WebTestCase
     {
         $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
 
-        return new DbalConnection($dbal, new DbalSchema($dbal, 'message_queue'), 'message_queue');
+        return new DbalConnection($dbal, 'message_queue');
     }
 }

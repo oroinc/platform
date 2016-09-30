@@ -44,48 +44,6 @@ class DbalSchemaTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('table-name', $table->getName());
     }
 
-    public function testShouldReturnSchemaManagerTablesExistResult()
-    {
-        $schemaManger = $this->createSchemaManagerMock();
-        $schemaManger
-            ->expects($this->once())
-            ->method('tablesExist')
-            ->with(['table-name'])
-            ->will($this->returnValue('return-value'))
-        ;
-
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManger))
-        ;
-
-        $schema = new DbalSchema($connection, 'table-name');
-
-        $this->assertEquals('return-value', $schema->isTableExists());
-    }
-
-    public function testShouldCallSchemaManagerCreateTable()
-    {
-        $schemaManger = $this->createSchemaManagerMock();
-        $schemaManger
-            ->expects($this->once())
-            ->method('createTable')
-            ->with($this->isInstanceOf(Table::class))
-        ;
-
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManger))
-        ;
-
-        $schema = new DbalSchema($connection, 'table-name');
-        $schema->createTables();
-    }
-
     private function createSchemaManagerMock()
     {
         return $this->getMock(AbstractSchemaManager::class, [], [], '', false);

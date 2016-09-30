@@ -33,8 +33,7 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
         $config = new Config('', '', '', '');
 
         $doctrineConnection = $this->getMock(Connection::class, [], [], '', false);
-        $dbalSchema = $this->getMock(DbalSchema::class, [], [], '', false);
-        $connection = new DbalConnection($doctrineConnection, $dbalSchema, 'aTableName');
+        $connection = new DbalConnection($doctrineConnection, 'aTableName');
 
         $factory = new DriverFactory([DbalConnection::class => DbalDriver::class]);
         $driver = $factory->create($connection, $config);

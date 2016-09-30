@@ -39,27 +39,6 @@ class DbalSchema extends BaseSchema
     }
 
     /**
-     * @return bool
-     */
-    public function isTableExists()
-    {
-        return $this->schemaManager->tablesExist([$this->tableName]);
-    }
-
-    public function createTables()
-    {
-        if (empty($this->getTables())) {
-            throw new \LogicException('List of tables is empty');
-        }
-
-        foreach ($this->getTables() as $table) {
-            $this->schemaManager->createTable($table);
-        }
-    }
-
-    /**
-     * Merges ACL schema with the given schema.
-     *
      * @param BaseSchema $schema
      */
     public function addToSchema(BaseSchema $schema)

@@ -19,33 +19,26 @@ class DbalConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new DbalConnection($this->createDBALConnectionMock(), $this->createDbalSchemaMock(), 'table');
+        new DbalConnection($this->createDBALConnectionMock(), 'table');
     }
 
     public function testShouldCreateSessionInstance()
     {
-        $connection = new DbalConnection($this->createDBALConnectionMock(), $this->createDbalSchemaMock(), 'table');
+        $connection = new DbalConnection($this->createDBALConnectionMock(), 'table');
 
         $this->assertInstanceOf(DbalSession::class, $connection->createSession());
     }
 
     public function testShouldReturnDBALConnectionInstance()
     {
-        $connection = new DbalConnection($this->createDBALConnectionMock(), $this->createDbalSchemaMock(), 'table');
+        $connection = new DbalConnection($this->createDBALConnectionMock(), 'table');
 
         $this->assertInstanceOf(Connection::class, $connection->getDBALConnection());
     }
 
-    public function testShouldReturnDBALSchemaInstance()
-    {
-        $connection = new DbalConnection($this->createDBALConnectionMock(), $this->createDbalSchemaMock(), 'table');
-
-        $this->assertInstanceOf(DbalSchema::class, $connection->getDBALSchema());
-    }
-
     public function testShouldReturnTableName()
     {
-        $connection = new DbalConnection($this->createDBALConnectionMock(), $this->createDbalSchemaMock(), 'table');
+        $connection = new DbalConnection($this->createDBALConnectionMock(), 'table');
 
         $this->assertEquals('table', $connection->getTableName());
     }
@@ -58,7 +51,7 @@ class DbalConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('close')
         ;
 
-        $connection = new DbalConnection($dbalConnection, $this->createDbalSchemaMock(), 'table');
+        $connection = new DbalConnection($dbalConnection, 'table');
         $connection->close();
     }
 
@@ -68,13 +61,5 @@ class DbalConnectionTest extends \PHPUnit_Framework_TestCase
     private function createDBALConnectionMock()
     {
         return $this->getMock(Connection::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSchema
-     */
-    private function createDbalSchemaMock()
-    {
-        return $this->getMock(DbalSchema::class, [], [], '', false);
     }
 }

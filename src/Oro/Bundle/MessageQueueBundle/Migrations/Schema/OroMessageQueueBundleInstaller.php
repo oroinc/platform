@@ -51,7 +51,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
     {
         $uniqueJobSchema = new UniqueJobSchema(
             $this->getDbalConnection(),
-            $this->container->getParameter('oro_message_queue.job.unique_job_table_name')
+            'oro_message_queue_job_unique'
         );
 
         $uniqueJobSchema->addToSchema($schema);

@@ -84,7 +84,7 @@ class DbalSession implements SessionInterface
      */
     public function declareTopic(DestinationInterface $destination)
     {
-        $this->declareQueue($destination);
+        // does nothing, installer creates all required tables
     }
 
     /**
@@ -92,11 +92,7 @@ class DbalSession implements SessionInterface
      */
     public function declareQueue(DestinationInterface $destination)
     {
-        $schema = $this->connection->getDBALSchema();
-
-        if (! $schema->isTableExists()) {
-            $schema->createTables();
-        }
+        // does nothing, installer creates all required tables
     }
 
     /**
