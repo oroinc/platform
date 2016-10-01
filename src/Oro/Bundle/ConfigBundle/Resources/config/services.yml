@@ -100,6 +100,7 @@ services:
         class:                        %oro_config.type.form.class%
         arguments:
             - '@oro_config.form.config_subscriber'
+            - '@service_container'
         tags:
             - { name: form.type, alias: oro_config_form_type }
 
