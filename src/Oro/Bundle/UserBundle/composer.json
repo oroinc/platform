@@ -12,7 +12,7 @@
         "nelmio/api-doc-bundle": "dev-master",
         "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
         "jms/serializer-bundle": "0.12.*@dev",
-        "liip/imagine-bundle": "dev-master",
+        "liip/imagine-bundle": "1.5.*",
         "doctrine/data-fixtures": "@dev",
         "doctrine/doctrine-fixtures-bundle": "@dev",
         "oro/ui-bundle": "dev-master",

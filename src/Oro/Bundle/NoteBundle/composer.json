@@ -7,7 +7,7 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/symfony": "2.8.*, !=2.8.10",
-        "liip/imagine-bundle": "0.17.*",
+        "liip/imagine-bundle": "1.5.*",
         "oro/ui-bundle": "dev-master",
         "oro/user-bundle": "dev-master",
         "oro/organization-bundle": "dev-master",
