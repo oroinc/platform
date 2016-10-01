@@ -210,4 +210,12 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             ['en'],
         ];
     }
+
+    public function testRebuildCache()
+    {
+        $this->translator->expects($this->once())
+            ->method('rebuildCache');
+
+        $this->manager->rebuildCache();
+    }
 }

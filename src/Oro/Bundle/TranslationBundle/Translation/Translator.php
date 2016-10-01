@@ -222,6 +222,9 @@ class Translator extends BaseTranslator
         }
 
         rmdir($tmpDir);
+
+        // cleanup local cache
+        $this->catalogues = [];
     }
 
     /**

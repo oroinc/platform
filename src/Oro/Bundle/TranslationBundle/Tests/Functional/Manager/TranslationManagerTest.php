@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -51,8 +48,6 @@ class TranslationManagerTest extends WebTestCase
         $translation = $this->manager->findValue($key, $locale, $domain);
 
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
-
-        return ['key' => $key, 'locale' => $locale];
     }
 
     public function testUpdateScopeSystemValue()
@@ -134,31 +129,34 @@ class TranslationManagerTest extends WebTestCase
         $this->assertEquals($domain, $translation->getTranslationKey()->getDomain());
     }
 
-//    public function testRebuildCache()
-//    {
-//        $key = uniqid('TRANSLATION_KEY_', true);
-//        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
-//        $locale = LoadLanguages::LANGUAGE2;
-//        $expectedValue = uniqid('TEST_VALUE_', true);
-//
-//        /** @var Translator $translator */
-//        $translator = $this->getContainer()->get('translator.default');
-//
-//        $this->manager->saveValue($key, $expectedValue, $locale, $domain);
-//        $this->manager->flush();
-//        $this->manager->clear();
-//
-//        //Ensure that catalog still contains old translated value
-//        $actualValue = $translator->trans($key, [], $domain, $locale);
-//        $this->assertNotEquals($expectedValue, $actualValue);
-//
-//        /** @var Translator $translator */
-//        $translator = $this->getContainer()->get('translator.default');
-//
-//        $this->manager->rebuildCache();
-//
-//        //Ensure that catalog now contains new translated value
-//        $actualValue = $translator->trans($key, [], $domain, $locale);
-//        $this->assertEquals($expectedValue, $actualValue);
-//    }
+    public function testRebuildCache()
+    {
+        // build initial cache
+        $this->manager->rebuildCache();
+
+        $key = uniqid('TRANSLATION_KEY_', true);
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+        $locale = LoadLanguages::LANGUAGE2;
+        $expectedValue = uniqid('TEST_VALUE_', true);
+
+        /** @var Translator $translator */
+        $translator = $this->getContainer()->get('translator.default');
+
+        $this->manager->saveValue($key, $expectedValue, $locale, $domain);
+        $this->manager->flush();
+        $this->manager->clear();
+
+        //Ensure that catalog still contains old translated value
+        $actualValue = $translator->trans($key, [], $domain, $locale);
+        $this->assertNotEquals($expectedValue, $actualValue);
+
+        /** @var Translator $translator */
+        $translator = $this->getContainer()->get('translator.default');
+
+        $this->manager->rebuildCache();
+
+        //Ensure that catalog now contains new translated value
+        $actualValue = $translator->trans($key, [], $domain, $locale);
+        $this->assertEquals($expectedValue, $actualValue);
+    }
 }
