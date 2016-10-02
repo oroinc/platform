@@ -52,7 +52,7 @@ class MenuUpdateProviderPassTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
-            ->with($this->equalTo(MenuUpdateProviderPass::TAG))
+            ->with($this->equalTo(MenuUpdateProviderPass::UPDATE_PROVIDER_TAG))
             ->will($this->returnValue([]));
 
         $this->container->expects($this->never())
@@ -70,7 +70,7 @@ class MenuUpdateProviderPassTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
-            ->with($this->equalTo(MenuUpdateProviderPass::TAG))
+            ->with($this->equalTo(MenuUpdateProviderPass::UPDATE_PROVIDER_TAG))
             ->will($this->returnValue(['provider' => [['area' => 'test.area']]]));
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');

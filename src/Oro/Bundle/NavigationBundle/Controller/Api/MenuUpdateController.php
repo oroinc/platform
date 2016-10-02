@@ -16,10 +16,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Model\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @RouteResource("menuupdates")
@@ -95,7 +93,7 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @PUT("/menu/move/{ownershipType}/{menuName}")
+     * @Put("/menu/move/{ownershipType}/{menuName}")
      *
      * @ApiDoc(description="Move menu item.")
      *
@@ -147,7 +145,7 @@ class MenuUpdateController extends Controller
      */
     private function getCurrentOwnerId($ownershipType)
     {
-        if ($ownershipType == MenuUpdate::OWNERSHIP_ORGANIZATION) {
+        if ($ownershipType == GlobalOwnershipProvider::TYPE) {
             return $this->get('oro_security.security_facade')->getOrganization()->getId();
         } else {
             return $this->get('oro_security.security_facade')->getLoggedUser()->getId();

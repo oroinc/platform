@@ -7,8 +7,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-
 /**
  * @Route("/menu/user")
  */
@@ -17,9 +15,9 @@ class UserMenuController extends AbstractMenuController
     /**
      * {@inheritdoc}
      */
-    protected function getOwnershipType()
+    protected function getOwnershipProvider()
     {
-        return MenuUpdate::OWNERSHIP_USER;
+        return $this->get('oro_navigation.ownership_provider.user');
     }
 
     /**

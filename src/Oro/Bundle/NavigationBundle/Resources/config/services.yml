@@ -422,11 +422,24 @@ services:
         tags:
             - { name: oro_menu.builder }
 
-    oro_navigation.menu_update_provider.default:
-        class: Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider
+    oro_navigation.ownership_provider.global:
+        class: Oro\Bundle\NavigationBundle\Model\GlobalOwnershipProvider
+        tags:
+            - { name: oro_navigation.ownership_provider, area: default, priority: 200 }
+
+    oro_navigation.ownership_provider.user:
+        class: Oro\Bundle\NavigationBundle\Model\UserOwnershipProvider
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.token_storage'
+        tags:
+            - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
+
+    oro_navigation.menu_update_provider.default:
+        class: Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider
+        arguments:
             - '@oro_entity.doctrine_helper'
+        calls:
+            - [ setEntityClass, [ 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate' ]]
         tags:
             - { name: oro_navigation.menu_update_provider, area: default }
 

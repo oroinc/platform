@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
-use Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider;
+use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -24,7 +24,7 @@ class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /**
-     * @var DefaultMenuUpdateProvider
+     * @var MenuUpdateProvider
      */
     protected $defaultMenuUpdateProvider;
 
@@ -38,7 +38,7 @@ class DefaultMenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->defaultMenuUpdateProvider = new DefaultMenuUpdateProvider($this->securityFacade, $this->doctrineHelper);
+        $this->defaultMenuUpdateProvider = new MenuUpdateProvider($this->securityFacade, $this->doctrineHelper);
     }
 
     public function testGetUpdates()

@@ -9,8 +9,6 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 interface MenuUpdateInterface
 {
-    const OWNERSHIP_ORGANIZATION  = 1;
-
     /**
      * @return int
      */
@@ -103,7 +101,7 @@ interface MenuUpdateInterface
     public function setMenu($menu);
 
     /**
-     * @return int
+     * @return string
      */
     public function getOwnershipType();
 

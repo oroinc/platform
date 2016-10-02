@@ -49,8 +49,6 @@ class MenuUpdate extends ExtendMenuUpdate implements
 {
     use MenuUpdateTrait;
 
-    const OWNERSHIP_USER            = 3;
-
     /**
      * {@inheritdoc}
      */

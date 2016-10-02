@@ -8,6 +8,7 @@ use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
+use Oro\Bundle\NavigationBundle\Model\UserOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
@@ -34,7 +35,7 @@ class MenuUpdateBuilder implements BuilderInterface
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $ownershipType = array_key_exists(self::OWNERSHIP_TYPE_OPTION, $options) ?
-            $options[self::OWNERSHIP_TYPE_OPTION] : false;
+            $options[self::OWNERSHIP_TYPE_OPTION] : UserOwnershipProvider::TYPE;
         $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
         $provider = $this->getProvider($area);
         $menuName = $menu->getName();
