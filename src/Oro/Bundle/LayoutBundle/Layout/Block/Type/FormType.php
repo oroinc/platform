@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
 class FormType extends AbstractType
@@ -38,7 +39,7 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
 
         $this->addBlockType(
@@ -96,16 +97,16 @@ class FormType extends AbstractType
     /**
      * @param BlockBuilderInterface $builder
      * @param string                $name
-     * @param array                 $options
+     * @param Options               $options
      * @param array                 $passedOptions
      */
-    protected function addBlockType(BlockBuilderInterface $builder, $name, array $options, array $passedOptions)
+    protected function addBlockType(BlockBuilderInterface $builder, $name, Options $options, array $passedOptions)
     {
         $builder->getLayoutManipulator()->add(
             $builder->getId().self::FIELD_SEPARATOR.$name,
             $builder->getId(),
             $name,
-            array_intersect_key($options, array_flip($passedOptions))
+            array_intersect_key($options->toArray(), array_flip($passedOptions))
         );
     }
 }

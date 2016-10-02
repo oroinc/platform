@@ -1,11 +1,10 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
 {% endblock %}
 
 {% block menu %}
-    <span class="label">
+    <span class="label {{ not collector.sentMessages ? 'disabled' }}">
         <strong>Message Queue</strong>
     </span>
 {% endblock %}

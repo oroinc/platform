@@ -31,6 +31,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
      */
     public function testAdvancedSearch(array $request, array $response)
     {
+        $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         $requestUrl = $request['query'];
         $this->client->request(
             'GET',

@@ -90,6 +90,7 @@ class SoapSearchApiTest extends WebTestCase
             }
         }
 
+        $this->addOroDefaultPrefixToUrlInParameterArray($response['soap']['item'], 'recordUrl');
         $this->assertResultHasItems($response['soap']['item'], $result['elements']['item']);
     }
 
