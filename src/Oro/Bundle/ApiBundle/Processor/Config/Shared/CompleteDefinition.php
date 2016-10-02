@@ -209,8 +209,8 @@ class CompleteDefinition implements ProcessorInterface
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 $dataType = $field->getDataType();
-                if ($dataType && 0 === strpos($dataType, 'association:')) {
-                    list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
+                if (DataType::isExtendedAssociation($dataType)) {
+                    list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
                     $targetClass = $field->getTargetClass();
                     if (!$targetClass) {
                         $targetClass = EntityIdentifier::class;
