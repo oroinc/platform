@@ -4,12 +4,23 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ not collector.sentMessages ? 'disabled' }}">
+    <span class="label {{ collector.sentMessages is empty ? 'disabled' }}">
         <strong>Message Queue</strong>
     </span>
 {% endblock %}
 
 {% block panel %}
+    {% if collector.sentMessages|length %}
+        {{ block('sentMessages') }}
+    {% else %}
+        <h2>Message Queue</h2>
+        <div class="empty">
+            <p>No messages were sent during this request.</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block sentMessages %}
     <h2>Sent messages</h2>
     <table>
         <thead>
@@ -32,4 +43,4 @@
         </tbody>
 
     </table>
-{% endblock %}
+{% endblock sentMessages %}
