@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\SearchExtensionTrait;
 
-/**
- * @dbIsolation
- * @dbReindex
- */
 class SearchControllerTest extends WebTestCase
 {
+    use SearchExtensionTrait;
+
     /**
      * @var bool
      */
@@ -17,8 +18,19 @@ class SearchControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
+        parent::setUp();
+
+        $this->initClient([], $this->generateBasicAuthHeader(), true);
+        $this->startTransaction();
+        $this->loadFixtures([LoadSearchItemData::class], true);
+        $this->getSearchIndexer()->reindex(Item::class);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->rollbackTransaction();
     }
 
     /**
@@ -29,6 +41,7 @@ class SearchControllerTest extends WebTestCase
      */
     public function testSearchSuggestion(array $request, array $response)
     {
+        $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         if (array_key_exists('supported_engines', $request)) {
             $engine = $this->getContainer()->getParameter('oro_search.engine');
             if (!in_array($engine, $request['supported_engines'])) {

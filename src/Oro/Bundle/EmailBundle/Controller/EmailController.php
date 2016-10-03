@@ -370,11 +370,11 @@ class EmailController extends Controller
                 $width,
                 $height
             );
-            $content = (string)$thumbnail->getImage();
+            $content = $thumbnail->getBinary()->getContent();
             $fileManager->writeToStorage($content, $path);
         }
 
-        return new Response($content, 200, ['Content-Type' => $attachment->getContentType()]);
+        return new Response($content, Response::HTTP_OK, ['Content-Type' => $attachment->getContentType()]);
     }
 
     /**

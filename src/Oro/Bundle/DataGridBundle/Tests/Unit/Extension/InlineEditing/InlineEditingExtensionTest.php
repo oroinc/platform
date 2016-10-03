@@ -180,6 +180,22 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         'two' => 'Two',
                     ]
                 ],
+                'testRel' => [
+                    'label' => 'test_rel',
+                    PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                    Configuration::BASE_CONFIG_KEY => [
+                        'enable' => 'true',
+                        'editor' => [
+                            'view_options' => [
+                                'value_field_name' => 'owner'
+                            ]
+                        ],
+                        'autocomplete_api_accessor' => [
+                            'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                            'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                        ]
+                    ]
+                ],
                 'testAnotherText' => [
                     'label' => 'test_config_overwrite',
                     'inline_editing' => ['enable' => false]
@@ -216,6 +232,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'one' => 'One',
                             'two' => 'Two',
                         ]
+                    ];
+                case 'testRel':
+                    return [
+                        Configuration::BASE_CONFIG_KEY => [],
+                        PropertyInterface::FRONTEND_TYPE_KEY => 'relation'
                     ];
                 case 'nonAvailable1':
                 case 'nonAvailable2':
@@ -290,6 +311,22 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'label' => 'test_select',
                             PropertyInterface::FRONTEND_TYPE_KEY => 'string',
                         ],
+                        'testRel' => [
+                            'label' => 'test_rel',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                            Configuration::BASE_CONFIG_KEY => [
+                                'enable' => 'true',
+                                'editor' => [
+                                    'view_options' => [
+                                        'value_field_name' => 'owner'
+                                    ]
+                                ],
+                                'autocomplete_api_accessor' => [
+                                    'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                                    'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                                ]
+                            ],
+                        ],
                         'testAnotherText' => [
                             'label' => 'test_config_overwrite',
                             'inline_editing' => ['enable' => false]
@@ -327,6 +364,22 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'label' => 'test_select',
                             PropertyInterface::FRONTEND_TYPE_KEY => 'string',
                         ],
+                        'testRel' => [
+                            'label' => 'test_rel',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                            Configuration::BASE_CONFIG_KEY => [
+                                'enable' => 'true',
+                                'editor' => [
+                                    'view_options' => [
+                                        'value_field_name' => 'owner'
+                                    ]
+                                ],
+                                'autocomplete_api_accessor' => [
+                                    'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                                    'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                                ]
+                            ],
+                        ],
                         'testAnotherText' => [
                             'label' => 'test_config_overwrite',
                             'inline_editing' => ['enable' => false]
@@ -356,6 +409,22 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         'testSelect' => [
                             'label' => 'test_select',
                             PropertyInterface::FRONTEND_TYPE_KEY => 'string',
+                        ],
+                        'testRel' => [
+                            'label' => 'test_rel',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                            Configuration::BASE_CONFIG_KEY => [
+                                'enable' => 'true',
+                                'editor' => [
+                                    'view_options' => [
+                                        'value_field_name' => 'owner'
+                                    ]
+                                ],
+                                'autocomplete_api_accessor' => [
+                                    'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                                    'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                                ]
+                            ],
                         ],
                         'testAnotherText' => [
                             'label' => 'test_config_overwrite',

@@ -384,10 +384,11 @@ services:
     oro_entity_extend.listener.search_entity_config_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
         arguments:
-            - "@doctrine"
             - "@oro_search.provider.search_mapping"
+            - "@oro_search.async.indexer"
         tags:
-            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush, priority: -255 }
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }
 
     oro_entity_extend.association_manager:
         class: %oro_entity_extend.association_manager.class%
