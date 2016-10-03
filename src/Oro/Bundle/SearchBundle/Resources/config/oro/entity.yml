@@ -6,4 +6,3 @@ oro_entity:
         - Oro\Bundle\SearchBundle\Entity\IndexText
         - Oro\Bundle\SearchBundle\Entity\Item
         - Oro\Bundle\SearchBundle\Entity\Query
-        - Oro\Bundle\SearchBundle\Entity\UpdateEntity
