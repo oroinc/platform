@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
@@ -15,6 +14,8 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class IndexListener implements OptionalListenerInterface
 {
+    use IndexationListenerTrait;
+
     /**
      * @var DoctrineHelper
      */
@@ -35,11 +36,6 @@ class IndexListener implements OptionalListenerInterface
      * @deprecated since 1.8 Please use mappingProvider for mapping config
      */
     protected $entitiesConfig = [];
-
-    /**
-     * @var SearchMappingProvider
-     */
-    protected $mappingProvider;
 
     /**
      * @var array
@@ -134,38 +130,6 @@ class IndexListener implements OptionalListenerInterface
                 );
             }
         }
-    }
-
-    /**
-     * @param UnitOfWork $uow
-     *
-     * @return object[]
-     */
-    protected function getEntitiesWithUpdatedIndexedFields(UnitOfWork $uow)
-    {
-        $entitiesToReindex = [];
-
-        foreach ($uow->getScheduledEntityUpdates() as $hash => $entity) {
-            $className = ClassUtils::getClass($entity);
-            if (!$this->mappingProvider->isFieldsMappingExists($className)) {
-                continue;
-            }
-
-            $entityConfig = $this->mappingProvider->getEntityConfig($className);
-
-            $indexedFields = [];
-            foreach ($entityConfig['fields'] as $fieldConfig) {
-                $indexedFields[] = $fieldConfig['name'];
-            }
-
-            $changeSet = $uow->getEntityChangeSet($entity);
-            $fieldsToReindex = array_intersect($indexedFields, array_keys($changeSet));
-            if ($fieldsToReindex) {
-                $entitiesToReindex[$hash] = $entity;
-            }
-        }
-
-        return $entitiesToReindex;
     }
 
     /**

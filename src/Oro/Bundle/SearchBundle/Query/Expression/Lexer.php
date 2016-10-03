@@ -18,7 +18,9 @@ class Lexer
 
         Query::KEYWORD_ORDER_BY,
         Query::KEYWORD_OFFSET,
-        Query::KEYWORD_MAX_RESULTS
+        Query::KEYWORD_MAX_RESULTS,
+
+        Query::KEYWORD_AS
     ];
 
     /**

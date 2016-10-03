@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Form;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
@@ -143,7 +144,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(5))
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field1'         => self::FIELD_PREFIX . 'field1',
@@ -237,7 +238,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(6))
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field2.field22' => self::FIELD_PREFIX . 'field2:field22',
@@ -331,7 +332,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(6))
             ->method('add');
 
-        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
             [
                 'field1'         => self::FIELD_PREFIX . 'field1',

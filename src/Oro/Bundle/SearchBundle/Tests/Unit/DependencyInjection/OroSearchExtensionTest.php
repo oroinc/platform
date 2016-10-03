@@ -9,8 +9,8 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,7 +49,6 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider testMergeConfigProvider
-     *
      * @param array $firstConfig
      * @param array $secondConfig
      * @param array $expected
@@ -63,19 +62,18 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testMergeConfigProvider()
     {
         $firstConfig = [
-            'alias'           => 'test_alias',
-            'title_fields'    => ['name'],
+            'alias' => 'test_alias',
+            'title_fields' => ['name'],
             'search_template' => 'test_template',
-            'fields'          => [
+            'fields' => [
                 [
-                    'name'          => 'name',
-                    'target_type'   => 'text',
+                    'name' => 'name',
+                    'target_type' => 'text',
                     'target_fields' => ['name']
                 ]
             ]
@@ -83,89 +81,89 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $secondConfig = [
             [
-                'alias'           => 'test_alias',
-                'title_fields'    => ['id'],
-                'fields'          => [
+                'alias' => 'test_alias',
+                'title_fields' => ['id'],
+                'fields' => [
                     [
-                        'name'          => 'subject',
-                        'target_type'   => 'text',
+                        'name' => 'subject',
+                        'target_type' => 'text',
                         'target_fields' => ['subject']
                     ]
                 ]
             ],
             [
-                'alias'           => 'test_alias',
-                'title_fields'    => ['id', 'name'],
-                'fields'          => [
+                'alias' => 'test_alias',
+                'title_fields' => ['id', 'name'],
+                'fields' => [
                     [
-                        'name'          => 'name',
-                        'target_type'   => 'text',
+                        'name' => 'name',
+                        'target_type' => 'text',
                         'target_fields' => ['name', 'all_text']
                     ],
                     [
-                        'name'          => 'subject',
-                        'target_type'   => 'text',
+                        'name' => 'subject',
+                        'target_type' => 'text',
                         'target_fields' => ['subject']
                     ]
                 ]
             ],
             [
-                'alias'           => 'test_alias',
-                'title_fields'    => ['name'],
+                'alias' => 'test_alias',
+                'title_fields' => ['name'],
                 'search_template' => 'test_template'
             ]
         ];
 
         $expected = [
             [
-                'alias'           => 'test_alias',
-                'title_fields'    => ['id'],
+                'alias' => 'test_alias',
+                'title_fields' => ['id'],
                 'search_template' => 'test_template',
-                'fields'          => [
+                'fields' => [
                     [
-                        'name'          => 'name',
-                        'target_type'   => 'text',
+                        'name' => 'name',
+                        'target_type' => 'text',
                         'target_fields' => ['name']
                     ],
                     [
-                        'name'          => 'subject',
-                        'target_type'   => 'text',
+                        'name' => 'subject',
+                        'target_type' => 'text',
                         'target_fields' => ['subject']
                     ]
                 ]
             ],
             [
-                'alias'           => 'test_alias',
-                'title_fields'    => ['id', 'name'],
+                'alias' => 'test_alias',
+                'title_fields' => ['id', 'name'],
                 'search_template' => 'test_template',
-                'fields'          => [
+                'fields' => [
                     [
-                        'name'          => 'name',
-                        'target_type'   => 'text',
+                        'name' => 'name',
+                        'target_type' => 'text',
                         'target_fields' => ['name', 'all_text']
                     ],
                     [
-                        'name'          => 'subject',
-                        'target_type'   => 'text',
+                        'name' => 'subject',
+                        'target_type' => 'text',
                         'target_fields' => ['subject']
                     ]
                 ]
             ],
             [
-                'alias'           => 'test_alias',
-                'title_fields'    => ['name'],
+                'alias' => 'test_alias',
+                'title_fields' => ['name'],
                 'search_template' => 'test_template',
-                'fields'          => [
+                'fields' => [
                     [
-                        'name'          => 'name',
-                        'target_type'   => 'text',
+                        'name' => 'name',
+                        'target_type' => 'text',
                         'target_fields' => ['name']
                     ]
                 ]
             ]
         ];
 
-        $data =  [
+        $data = [
             'Test replace' => [
                 'firstConfig' => $firstConfig,
                 'secondConfig' => $secondConfig[0],
@@ -192,7 +190,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $config = array(
             'oro_search' => array(
-                'engine'          => 'some-engine',
+                'engine' => 'some-engine',
                 'realtime_update' => true
             )
         );
@@ -206,16 +204,16 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $config = array(
             'oro_search' => array(
-                'engine'          => 'some-engine',
+                'engine' => 'some-engine',
                 'realtime_update' => true,
                 'entities_config' => array(
                     'Oro\Bundle\DataBundle\Entity\Product' => array(
-                        'alias'           => 'test_alias',
+                        'alias' => 'test_alias',
                         'search_template' => 'test_template',
-                        'fields'          => array(
+                        'fields' => array(
                             array(
-                                'name'          => 'name',
-                                'target_type'   => 'text',
+                                'name' => 'name',
+                                'target_type' => 'text',
                                 'target_fields' => array('name', 'all_data')
                             )
                         )
@@ -232,7 +230,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $searchExtension = new OroSearchExtension();
         $config = array(
             'oro_search' => array(
-                'engine'          => Configuration::DEFAULT_ENGINE,
+                'engine' => Configuration::DEFAULT_ENGINE,
                 'realtime_update' => true
             )
         );
@@ -243,8 +241,8 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadAllDefinedEngineConfigurationsForElasticEngine()
     {
-        $firstBundle = new FirstESEngineBundle();
-        $secondBundle = new SecondESEngineBundle();
+        $firstBundle = new FirstEngineBundle();
+        $secondBundle = new SecondEngineBundle();
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -255,7 +253,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $config = [
             'oro_search' => [
-                'engine' => 'elastic_search',
+                'engine' => 'other_engine',
             ]
         ];
 
@@ -264,25 +262,26 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         $expectedResourceFiles = [
             $this->getSearchBundleResource('services.yml'),
-            $this->getResourcePath('FirstESEngineBundle', 'elastic_search.yml'),
-            $this->getResourcePath('SecondESEngineBundle', 'elastic_search.yml')
+            $this->getSearchBundleResource('filters.yml'),
+            $this->getResourcePath('FirstEngineBundle', 'other_engine.yml'),
+            $this->getResourcePath('SecondEngineBundle', 'other_engine.yml')
         ];
 
         $this->assertResourceFilesMatch($expectedResourceFiles);
 
         $this->assertServiceHasClass(
-            'test_es_service',
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'
+            'test_engine_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle'
         );
 
         $this->assertServiceHasClass(
-            'test_es_second_bundle_service',
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondESEngineBundle\SecondESEngineBundle'
+            'test_engine_second_bundle_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle'
         );
 
         $this->assertServiceHasClass(
-            'test_es_first_bundle_service',
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstESEngineBundle\FirstESEngineBundle'
+            'test_engine_first_bundle_service',
+            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle'
         );
 
         $this->assertFalse($this->container->has('test_orm_service'));
@@ -298,7 +297,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
         foreach ($resources as $resource) {
             if ($resource instanceof FileResource) {
-                $resourceFiles[] = (string) $resource;
+                $resourceFiles[] = (string)$resource;
             }
         }
 
@@ -327,8 +326,20 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $directory = dirname(__DIR__);
         $ds = DIRECTORY_SEPARATOR;
 
-        return $directory.$ds.'Fixture'.$ds.'Bundle'.$ds.$bundleName.$ds.'Resources'.$ds.'config'.$ds.'oro'.$ds
-            .'search_engine'.$ds.$resourceName;
+        return implode(
+            $ds,
+            [
+                $directory,
+                'Fixture',
+                'Bundle',
+                $bundleName,
+                'Resources',
+                'config',
+                'oro',
+                'search_engine',
+                $resourceName
+            ]
+        );
     }
 
     /**

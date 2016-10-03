@@ -25,6 +25,7 @@ class Query
     const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
     const KEYWORD_ORDER_BY    = 'order_by';
+    const KEYWORD_AS          = 'as';
 
     const OPERATOR_EQUALS              = '=';
     const OPERATOR_NOT_EQUALS          = '!=';
@@ -61,7 +62,7 @@ class Query
     protected $fields;
 
     /** @var array */
-    protected $fieldsAliases = [];
+    protected $selectAliases = [];
 
     /** @var Criteria */
     protected $criteria;
@@ -168,7 +169,7 @@ class Query
      */
     public function select($field, $enforcedFieldType = null)
     {
-        $this->select = [];
+        $this->select = $this->selectAliases = [];
 
         if (is_array($field)) {
             foreach ($field as $_field) {
@@ -188,7 +189,7 @@ class Query
      */
     public function addSelect($fieldNames, $enforcedFieldType = null)
     {
-        foreach ((array) $fieldNames as $fieldName) {
+        foreach ((array)$fieldNames as $fieldName) {
             $fieldName = $this->parseFieldAliasing($fieldName);
 
             $this->addToSelect($fieldName, $enforcedFieldType);
@@ -318,9 +319,7 @@ class Query
      */
     public function getSelect()
     {
-        $result = array_values($this->select);
-
-        return $result;
+        return array_values($this->select);
     }
 
     /**
@@ -563,11 +562,44 @@ class Query
      */
     public function getSelectAliases()
     {
-        return $this->fieldsAliases;
+        return $this->selectAliases;
     }
 
     /**
-     * @param $fieldName
+     * Returns a combination of getSelect() and getSelectAlias().
+     * Returns an array of fields that will be returned in the
+     * dataset.
+     *
+     * @return array
+     */
+    public function getSelectDataFields()
+    {
+        if (empty($this->select)) {
+            return [];
+        }
+
+        $aliases = $this->selectAliases;
+        $result  = [];
+
+        foreach ($this->select as $select) {
+            list ($fieldType, $fieldName) = Criteria::explodeFieldTypeName($select);
+            if (isset($aliases[$fieldName])) {
+                $resultName = $aliases[$fieldName];
+            } elseif (isset($aliases[$select])) {
+                $resultName = $aliases[$select];
+            } else {
+                $resultName = $fieldName;
+            }
+
+            $result[$select] = $resultName;
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param      $fieldName
      * @param null $enforcedFieldType
      * @return $this
      */
@@ -600,7 +632,6 @@ class Query
 
         return $this;
     }
-
 
     /**
      * Returns the WHERE string part for getStringQuery.
@@ -690,13 +721,13 @@ class Query
         $part = preg_split('/ sa /im', $part, 2);
         if (count($part) > 1) {
             // splitting with ' ' and taking first word as a field name - does not allow spaces in field name
-            $rev = strrev($part[1]);
-            $rev = explode(' ', $rev);
+            $rev   = strrev($part[1]);
+            $rev   = explode(' ', $rev);
             $field = array_shift($rev);
 
             $alias = strrev($part[0]);
 
-            $this->fieldsAliases[$field] = $alias;
+            $this->selectAliases[$field] = $alias;
         }
 
         return $field;

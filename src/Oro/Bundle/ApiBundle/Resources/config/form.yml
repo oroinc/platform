@@ -14,10 +14,18 @@ services:
             - [] # All services with tag "oro.api.form.type_extension" are inserted here by ConfigurationCompilerPass
             - [] # All services with tag "oro.api.form.type_guesser" are inserted here by ConfigurationCompilerPass
 
+    oro_api.form.extension.customize_form_data:
+        class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension
+        arguments:
+            - '@oro_api.customize_form_data.processor'
+        tags:
+            - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
         arguments:
             - [] # Data type mappings are inserted here by ConfigurationCompilerPass
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.form.type_guesser, priority: 10 }
 
@@ -32,6 +40,31 @@ services:
             - '@doctrine'
         tags:
             - { name: oro.api.form.type, alias: oro_api_entity }
+
+    oro_api.form.type.compound_entity:
+        class: Oro\Bundle\ApiBundle\Form\Type\CompoundEntityType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_compound_entity }
+
+    oro_api.form.type.collection:
+        class: Oro\Bundle\ApiBundle\Form\Type\CollectionType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_collection }
+
+    oro_api.form.type.collection.entity:
+        class: Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_entity_collection }
+
+    oro_api.form.type.scalar_collection:
+        class: Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_scalar_collection }
+
+    oro_api.form.type.scalar_collection.entity:
+        class: Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_entity_scalar_collection }
 
     oro_api.validator.access_granted:
         class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator

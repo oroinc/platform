@@ -5,13 +5,18 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
+use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Orm extends AbstractEngine
 {
     /** @var SearchIndexRepository */
@@ -34,6 +39,12 @@ class Orm extends AbstractEngine
      */
     public function setDrivers(array $drivers)
     {
+        foreach ($drivers as $driver) {
+            if (!is_a($driver, BaseDriver::class, true)) {
+                throw new InvalidConfigurationException('Wrong driver class passed, please check configuration');
+            }
+        }
+
         $this->drivers = $drivers;
     }
 

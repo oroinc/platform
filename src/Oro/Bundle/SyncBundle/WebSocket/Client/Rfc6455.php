@@ -9,6 +9,8 @@ class Rfc6455
      */
     const SOCKET_TIMEOUT = 2;
 
+    const SERVER_HANDSHAKE_STATUS_LINE = 'HTTP/1.1 101 Switching Protocols';
+
     /** @var resource */
     protected $socket;
 
@@ -43,6 +45,19 @@ class Rfc6455
 
         if (!fwrite($this->socket, $header)) {
             throw new \RuntimeException('WebSocket write error');
+        }
+
+        $serverHandshake = fread($this->socket, 32);
+        if (!$serverHandshake) {
+            throw new \RuntimeException('WebSocket read error');
+        }
+
+        if (strpos($serverHandshake, static::SERVER_HANDSHAKE_STATUS_LINE) !== 0) {
+            throw new \RuntimeException(sprintf(
+                'Websocket server handshake expect status line to be "%s", but "%s" was returned',
+                static::SERVER_HANDSHAKE_STATUS_LINE,
+                $serverHandshake
+            ));
         }
 
         stream_set_blocking($this->socket, false);

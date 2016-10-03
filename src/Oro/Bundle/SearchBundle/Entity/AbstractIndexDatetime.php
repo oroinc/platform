@@ -51,7 +51,7 @@ abstract class AbstractIndexDatetime implements ItemFieldInterface
     /**
      * {@inheritdoc}
      */
-    public function setItem(AbstractItem $item = null)
+    public function setItem(AbstractItem $item)
     {
         $this->item = $item;
 

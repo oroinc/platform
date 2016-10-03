@@ -4,8 +4,8 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Datasource\SearchDatasource;
-use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 class SearchResultsGridListener
 {
@@ -29,9 +29,11 @@ class SearchResultsGridListener
             $searchEntity = empty($searchEntity) ? '*' : $searchEntity;
             $searchString = $parameters->get('search', '');
 
-            $datasource->getQuery()
+            $datasource->getSearchQuery()
+                ->getQuery()
                 ->from($searchEntity)
-                ->andWhere(Indexer::TEXT_ALL_DATA_FIELD, Query::OPERATOR_CONTAINS, $searchString, Query::TYPE_TEXT);
+                ->getCriteria()
+                ->andWhere(Criteria::expr()->contains(Indexer::TEXT_ALL_DATA_FIELD, $searchString));
         }
     }
 }
