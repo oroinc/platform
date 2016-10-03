@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
