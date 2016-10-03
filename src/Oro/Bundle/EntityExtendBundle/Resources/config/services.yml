@@ -385,7 +385,6 @@ services:
     oro_entity_extend.listener.search_entity_config_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
         arguments:
-            - "@doctrine"
             - "@oro_search.provider.search_mapping"
             - "@oro_search.async.indexer"
         tags:

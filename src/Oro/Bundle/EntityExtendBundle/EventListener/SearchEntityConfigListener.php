@@ -2,42 +2,31 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class SearchEntityConfigListener
 {
-    /** @var ManagerRegistry */
-    protected $registry;
-
     /** @var SearchMappingProvider */
     protected $searchMappingProvider;
 
-    /**
-     * @var IndexerInterface
-     */
+    /** @var IndexerInterface */
     protected $searchIndexer;
 
-    /**
-     * @var string
-     */
+    /** @var string[] */
     protected $classNames = [];
 
     /**
-     * @param ManagerRegistry       $registry
      * @param SearchMappingProvider $searchMappingProvider
      * @param IndexerInterface      $searchIndexer
      */
     public function __construct(
-        ManagerRegistry $registry,
         SearchMappingProvider $searchMappingProvider,
         IndexerInterface $searchIndexer
     ) {
-        $this->registry              = $registry;
         $this->searchMappingProvider = $searchMappingProvider;
         $this->searchIndexer = $searchIndexer;
     }
@@ -47,23 +36,12 @@ class SearchEntityConfigListener
      */
     public function preFlush(PreFlushConfigEvent $event)
     {
-        $config = $event->getConfig('search');
-        if (null === $config) {
-            return;
+        if ($this->isReindexRequired($event)) {
+            $entityClass = $event->getClassName();
+            if (!in_array($entityClass, $this->classNames, true)) {
+                $this->classNames[] = $entityClass;
+            }
         }
-
-        $configManager = $event->getConfigManager();
-        $changeSet     = $configManager->getConfigChangeSet($config);
-        if (!isset($changeSet['searchable'])) {
-            return;
-        }
-
-        /**
-         * On any configuration changes related to search the search mapping cache should be cleaned.
-         */
-        $this->searchMappingProvider->clearMappingCache();
-
-        $this->classNames[] = $config->getId()->getClassName();
     }
 
     /**
@@ -72,9 +50,35 @@ class SearchEntityConfigListener
     public function postFlush(PostFlushConfigEvent $event)
     {
         if ($this->classNames) {
+            $this->searchMappingProvider->clearMappingCache();
             $this->searchIndexer->reindex($this->classNames);
 
             $this->classNames = [];
         }
+    }
+
+    /**
+     * @param PreFlushConfigEvent $event
+     *
+     * @return bool
+     */
+    protected function isReindexRequired(PreFlushConfigEvent $event)
+    {
+        $searchConfig = $event->getConfig('search');
+        if (null === $searchConfig) {
+            return false;
+        }
+
+        $configManager = $event->getConfigManager();
+        $searchChangeSet = $configManager->getConfigChangeSet($searchConfig);
+        if (!isset($searchChangeSet['searchable'])) {
+            return false;
+        }
+
+        $extendConfig = $event->getConfig('extend');
+
+        return
+            null !== $extendConfig
+            && $extendConfig->is('state', ExtendScope::STATE_ACTIVE);
     }
 }
