@@ -9,7 +9,7 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item1@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
                 selected_data:
                     aliasOfStringValue: item1@mail.com
     soap:
@@ -17,7 +17,7 @@ response:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item1@mail.com
-                recordUrl: http://localhost/search/
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData:
                     item:
                         key: aliasOfStringValue

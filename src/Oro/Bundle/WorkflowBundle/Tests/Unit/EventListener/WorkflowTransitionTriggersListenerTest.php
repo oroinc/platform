@@ -11,9 +11,12 @@ use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var WorkflowTransitionTriggersListener */
     private $listener;
 
@@ -38,28 +41,43 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [
-                WorkflowEvents::WORKFLOW_AFTER_CREATE => 'triggersUpdate',
-                WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'triggersUpdate',
-                WorkflowEvents::WORKFLOW_AFTER_DELETE => 'triggersDelete',
-                WorkflowEvents::WORKFLOW_ACTIVATED => 'triggersUpdate',
-                WorkflowEvents::WORKFLOW_DEACTIVATED => 'triggersDelete'
+                WorkflowEvents::WORKFLOW_BEFORE_CREATE => 'createTriggers',
+                WorkflowEvents::WORKFLOW_AFTER_CREATE => 'updateTriggers',
+                WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'createTriggers',
+                WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'updateTriggers',
+                WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTriggers',
+                WorkflowEvents::WORKFLOW_DEACTIVATED => 'deleteTriggers',
+                WorkflowEvents::WORKFLOW_ACTIVATED => [
+                    ['createTriggers', 10],
+                    ['updateTriggers', -10]
+                ]
             ],
             WorkflowTransitionTriggersListener::getSubscribedEvents()
         );
 
-        foreach (array_unique(array_values(WorkflowTransitionTriggersListener::getSubscribedEvents())) as $method) {
-            $this->assertTrue(method_exists($this->listener, $method));
+        $calls = array_values(WorkflowTransitionTriggersListener::getSubscribedEvents());
+
+        foreach ($calls as $call) {
+            if (is_string($call)) {
+                $this->assertTrue(method_exists($this->listener, $call));
+            } elseif (is_array($call)) {
+                foreach ($call as $method) {
+                    list($method) = $method;
+                    $this->assertTrue(method_exists($this->listener, $method));
+                }
+            }
         }
     }
 
-    public function testTriggersUpdate()
+    public function testCreateAndUpdateTriggers()
     {
-        $definition = new WorkflowDefinition();
-
-        $event = new WorkflowChangesEvent($definition);
+        $definition = (new WorkflowDefinition())->setName('test');
 
         $trigger1 = new TransitionCronTrigger();
         $trigger2 = new TransitionEventTrigger();
+
+        $event = new WorkflowChangesEvent($definition);
+
         $this->assembler->expects($this->once())->method('assembleTriggers')->with($definition)->willReturn(
             [
                 $trigger1,
@@ -67,11 +85,13 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->updater->expects($this->once())
-            ->method('updateTriggers')
-            ->with(new TriggersBag($definition, [$trigger1, $trigger2]));
+        $this->listener->createTriggers($event);//pre event job
 
-        $this->listener->triggersUpdate($event);
+        $triggersBag = new TriggersBag($definition, [$trigger1, $trigger2]);
+
+        $this->updater->expects($this->once())->method('updateTriggers')->with($triggersBag);
+
+        $this->listener->updateTriggers($event);//after event job
     }
 
     public function testTriggersDelete()
@@ -79,9 +99,8 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
         $definition = new WorkflowDefinition();
         $event = new WorkflowChangesEvent($definition);
 
-        $this->updater->expects($this->once())
-            ->method('removeTriggers')->with($definition);
+        $this->updater->expects($this->once())->method('removeTriggers')->with($definition);
 
-        $this->listener->triggersDelete($event);
+        $this->listener->deleteTriggers($event);
     }
 }

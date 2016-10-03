@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -106,5 +107,58 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
             ->setRelation('mainEntity');
 
         $this->assertNull($this->helper->getMainEntity($this->trigger, $entity));
+    }
+
+    /**
+     * @dataProvider buildContextValuesProvider
+     *
+     * @param array $expected
+     * @param array $arguments
+     */
+    public function testBuildContextValues(array $expected, array $arguments)
+    {
+        $this->assertSame(
+            $expected,
+            call_user_func_array([$this->helper, 'buildContextValues'], $arguments)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function buildContextValuesProvider()
+    {
+        $item = new WorkflowItem();
+        $definition = new WorkflowDefinition();
+        $triggerEntity = new \stdClass();
+        $workflowEntity = new \stdClass();
+
+        return [
+            'emptyness' => [
+                [
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_DEFINITION => null,
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ITEM => null,
+                    TransitionEventTriggerHelper::TRIGGER_ENTITY => null,
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ENTITY => null
+                ],
+                [
+                    null,
+                    null,
+                    null,
+                    null
+                ]
+            ],
+            'types' => [
+                [
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_DEFINITION => $definition,
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ITEM => $item,
+                    TransitionEventTriggerHelper::TRIGGER_ENTITY => $triggerEntity,
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ENTITY => $workflowEntity
+                ],
+                [
+                    $definition, $triggerEntity, $workflowEntity, $item
+                ]
+            ]
+        ];
     }
 }

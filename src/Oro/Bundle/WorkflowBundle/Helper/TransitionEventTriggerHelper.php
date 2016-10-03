@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class TransitionEventTriggerHelper
 {
@@ -91,11 +91,27 @@ class TransitionEventTriggerHelper
 
         $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $workflowDefinition->getName());
 
+        return self::buildContextValues($workflowDefinition, $entity, $mainEntity, $workflowItem);
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @param object $entity
+     * @param object $mainEntity
+     * @param WorkflowItem $item
+     * @return array
+     */
+    public static function buildContextValues(
+        WorkflowDefinition $workflowDefinition = null,
+        $entity = null,
+        $mainEntity = null,
+        WorkflowItem $item = null
+    ) {
         return [
             self::TRIGGER_WORKFLOW_DEFINITION => $workflowDefinition,
-            self::TRIGGER_WORKFLOW_ITEM => $workflowItem,
+            self::TRIGGER_WORKFLOW_ITEM => $item,
             self::TRIGGER_ENTITY => $entity,
-            self::TRIGGER_WORKFLOW_ENTITY => $mainEntity,
+            self::TRIGGER_WORKFLOW_ENTITY => $mainEntity
         ];
     }
 }

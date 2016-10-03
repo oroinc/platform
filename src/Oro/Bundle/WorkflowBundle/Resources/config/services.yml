@@ -298,3 +298,18 @@ services:
         calls:
             - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
+
+    oro_workflow.transition_trigger.verifier.event_trigger_relation:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerRelationVerifier
+        public: false
+
+    oro_workflow.transition_trigger.verifier.event_trigger_expression:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier
+        public: false
+
+    oro_workflow.transition_trigger.trigger_event_verifier:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerCompoundVerifier
+        public: false
+        calls:
+            - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
+            - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]

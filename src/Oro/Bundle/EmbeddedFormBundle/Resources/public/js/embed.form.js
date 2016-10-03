@@ -79,6 +79,11 @@ var ORO = (function(ORO) {
         onSubmit: function(e) {
             e.preventDefault();
 
+            var button = this.container.querySelector('button');
+            if (button) {
+                button.disable();
+            }
+
             this.ajax(this.options.url, {
                 method: 'POST',
                 data: new FormData(e.target),

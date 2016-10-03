@@ -216,6 +216,10 @@ services:
         class: %oro_entity.entity_field_provider.class%
         parent: oro_entity.entity_field_provider.abstract
 
+    oro_entity.entity_field_provider.link:
+        tags:
+            - { name: oro_service_link,  service: oro_entity.entity_field_provider }
+
     oro_entity.entity_field_list_provider:
         class: %oro_entity.entity_field_list_provider.class%
         arguments:

@@ -16,6 +16,7 @@ abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAs
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function assemble(array $options, $transitionName, WorkflowDefinition $workflowDefinition)
     {
