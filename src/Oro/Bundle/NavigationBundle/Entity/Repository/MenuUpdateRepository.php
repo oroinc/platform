@@ -10,7 +10,7 @@ class MenuUpdateRepository extends EntityRepository
      * @param string  $menu
      * @param string  $ownershipType
      * @param integer $ownerId
-     * @return \Oro\Bundle\NavigationBundle\Entity\MenuUpdate[]
+     * @return \Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface[]
      *
      */
     public function getMenuUpdates($menu, $ownershipType, $ownerId)

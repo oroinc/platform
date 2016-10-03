@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Model;
 
-class GlobalOwnershipProvider implements OwnershipProviderInterface
+class GlobalOwnershipProvider extends AbstractOwnershipProvider
 {
     const TYPE = 'global';
 

@@ -13,4 +13,10 @@ interface OwnershipProviderInterface
      * @return integer
      */
     public function getId();
+
+    /**
+     * @param $menuName
+     * @return \Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface[]
+     */
+    public function getMenuUpdates($menuName);
 }

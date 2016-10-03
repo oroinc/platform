@@ -2,20 +2,26 @@
 
 namespace Oro\Bundle\NavigationBundle\Model;
 
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
-class UserOwnershipProvider implements OwnershipProviderInterface
+class UserOwnershipProvider extends AbstractOwnershipProvider
 {
     const TYPE = 'user';
 
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    public function __construct(TokenStorageInterface $tokenStorage)
+    /**
+     * @param EntityRepository      $repository
+     * @param TokenStorageInterface $tokenStorage
+     */
+    public function __construct(EntityRepository $repository, TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
+        parent::__construct($repository);
     }
 
     /**
