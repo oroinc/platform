@@ -46,7 +46,7 @@ abstract class AbstractIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function getClassesForReindex($class = null, $context = [])
+    public function getClassesForReindex($class = null, array $context = [])
     {
         if (false == $class) {
             return $this->mapper->getEntities([Mode::NORMAL, Mode::WITH_DESCENDANTS]);
@@ -68,7 +68,7 @@ abstract class AbstractIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function reindex($class = null, $context = [])
+    public function reindex($class = null, array $context = [])
     {
         if (false == $class) {
             $this->resetIndex();

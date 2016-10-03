@@ -32,7 +32,7 @@ interface IndexerInterface
      *
      * @return string[]
      */
-    public function getClassesForReindex($class = null);
+    public function getClassesForReindex($class = null, array $context = []);
 
     /**
      * Resets data for one or several classes in index
@@ -40,7 +40,7 @@ interface IndexerInterface
      *
      * @param string|string[] $class
      */
-    public function resetIndex($class = null);
+    public function resetIndex($class = null, array $context = []);
 
     /**
      * Reindex data for one or several classes in index
