@@ -17,6 +17,8 @@ Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
             - Valid: ~
         recurrence:
             - Valid: ~
+        reminders:
+            - Valid: ~
 
 Oro\Bundle\CalendarBundle\Entity\CalendarProperty:
     properties:

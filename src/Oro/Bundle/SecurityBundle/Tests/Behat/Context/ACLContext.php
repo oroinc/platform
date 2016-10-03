@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
-use Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -11,17 +11,30 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 
 class ACLContext extends OroFeatureContext implements OroElementFactoryAware, KernelAwareContext
 {
     use ElementFactoryDictionary, KernelDictionary;
 
+    /**
+     * @var OroMainContext
+     */
+    private $oroMainContext;
+
+    /**
+     * @BeforeScenario
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+        $this->oroMainContext = $environment->getContext(OroMainContext::class);
+    }
     /**
      * @Given /^(?:|I am )logged in under (?P<organization>(\D*)) organization$/
      */
@@ -87,11 +100,7 @@ class ACLContext extends OroFeatureContext implements OroElementFactoryAware, Ke
 
     protected function loginAsAdmin()
     {
-        $this->visitPath('/user/login');
-        /** @var Form $login */
-        $login = $this->createElement('Login');
-        $login->fill(new TableNode([['Username', 'admin'], ['Password', 'admin']]));
-        $login->pressButton('Log in');
+        $this->oroMainContext->loginAsUserWithPassword();
         $this->waitForAjax();
     }
 
