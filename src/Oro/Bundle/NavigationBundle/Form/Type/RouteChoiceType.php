@@ -25,6 +25,7 @@ class RouteChoiceType extends AbstractType
      * @var ManagerRegistry
      */
     private $registry;
+
     /**
      * @var TranslatorInterface
      */
@@ -215,6 +216,9 @@ class RouteChoiceType extends AbstractType
         return self::NAME;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'genemu_jqueryselect2_choice';
