@@ -55,7 +55,7 @@ oro:
             disable.alert: Disabling Tags will irreversibly erase all existing tags
 
         taxonomy:
-            owner.label:         Owner
+            label: Taxonomy
 
     taxonomy:
         label: Taxonomy
