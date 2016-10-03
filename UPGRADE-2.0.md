@@ -234,7 +234,6 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Removed twig extension `Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension`.
 - Added new command "oro:translation:load", that allows to transfer all translations from files (YML & etc) into Database
 - Added entity `\Oro\Bundle\TranslationBundle\Entity\TranslationKey`
-- Added entity `\Oro\Bundle\TranslationBundle\Entity\`
 - Added datagrid listener `\Oro\Bundle\TranslationBundle\EventListener\Datagrid`
 - Added interface `\Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface`
 - Added default translation context resolver `\Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver`
