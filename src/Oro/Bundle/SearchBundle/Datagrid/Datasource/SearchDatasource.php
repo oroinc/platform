@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -50,7 +49,7 @@ class SearchDatasource implements DatasourceInterface
     {
         $this->datagrid = $grid;
 
-        $this->searchQuery = $this->queryFactory->create($grid, $config);
+        $this->searchQuery = $this->queryFactory->create($config);
 
         $this->yamlToSearchQueryConverter->process($this->searchQuery, $config);
 

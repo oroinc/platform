@@ -21,11 +21,10 @@ class QueryFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('select')
             ->willReturn($query);
 
-        $grid   = $this->getMock(DatagridInterface::class);
         $config = [];
 
         $factory = new QueryFactory($indexer);
-        $result  = $factory->create($grid, $config);
+        $result  = $factory->create($config);
 
         $this->assertInstanceOf(IndexerQuery::class, $result);
     }
