@@ -4,15 +4,15 @@
 
 <script type="text/template" id="activity-context-activity-list">
     <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
-        <span data-id="<%= entity.get('targetId') %>">
-            <span class="<%= entity.get('icon') %>"></span>
+        <span data-id="<%- entity.get('targetId') %>">
+            <span class="<%- entity.get('icon') %>"></span>
 
             <% if (entity.get('link')) { %>
-                <a href="<%= entity.get('link') %>">
-                    <span class="context-label"><%= entity.get('title') %></span>
+                <a href="<%- entity.get('link') %>">
+                    <span class="context-label"><%- entity.get('title') %></span>
                 </a>
             <% } else { %>
-                <span class="context-label"><%= entity.get('title') %></span>
+                <span class="context-label"><%- entity.get('title') %></span>
             <% } %>
             <% if (editable) { %>
                 <i class="icon-remove"></i>
