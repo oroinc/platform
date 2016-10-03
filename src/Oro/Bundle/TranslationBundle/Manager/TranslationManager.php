@@ -160,7 +160,7 @@ class TranslationManager
      */
     protected function canUpdateTranslation($scope, Translation $translation = null)
     {
-        return $scope === Translation::SCOPE_UI || null === $translation || $translation->getScope() === $scope;
+        return null === $translation || $translation->getScope() <= $scope;
     }
 
     /**

@@ -17,12 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TranslationControllerTest extends WebTestCase
 {
-    const DATAGRID_ROUTE = 'oro_translation_translation_index';
     const DATAGRID_NAME = 'oro-translation-translations-grid';
 
     /** @var  ManagerRegistry */
     protected $registry;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -33,13 +35,10 @@ class TranslationControllerTest extends WebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', $this->getUrl(self::DATAGRID_ROUTE));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_translation_translation_index'));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(self::DATAGRID_NAME, $crawler->html());
-
-        $response = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $domains = $this->registry->getManagerForClass(TranslationKey::class)
             ->getRepository(TranslationKey::class)
@@ -71,6 +70,11 @@ class TranslationControllerTest extends WebTestCase
         }
     }
 
+    /**
+     * @param array $filter
+     * @param array $gridOptions
+     * @return string
+     */
     protected function getDatagridJsonResponse(array $filter = [], array $gridOptions = [])
     {
         $response = $this->client->requestGrid(

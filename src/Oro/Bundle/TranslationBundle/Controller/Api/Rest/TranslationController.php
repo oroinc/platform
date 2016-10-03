@@ -126,11 +126,14 @@ class TranslationController extends FOSRestController
         $translation = $translationManager->saveValue($key, $data['value'], $locale, $domain, Translation::SCOPE_UI);
         $translationManager->flush();
 
-        if (null !== $translation) {
-            $data['id'] = $translation->getId();
-            $data['value'] = $translation->getValue();
-        }
+        $translated = null !== $translation;
 
-        return parent::handleView($this->view($data, Codes::HTTP_OK));
+        $response = [
+            'status' => $translated,
+            'id' => $translated ? $translation->getId() : '',
+            'value' => $translated ? $translation->getValue() : '',
+        ];
+
+        return parent::handleView($this->view($response, Codes::HTTP_OK));
     }
 }

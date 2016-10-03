@@ -120,27 +120,25 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->translationManager->expects($this->at(0))->method('rebuildCache');
 
-        $this->translationManager->expects($this->at(1))->method('findValue')
-            ->with('key1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(2))->method('createValue')
-            ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1', true);
-        $this->translationManager->expects($this->at(3))->method('flush');
+        $this->translationManager->expects($this->at(1))->method('saveValue')
+            ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
+        $this->translationManager->expects($this->at(2))->method('flush');
 
 
-        $this->translationManager->expects($this->at(4))->method('findValue')
-            ->with('key1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(5))->method('flush');
+        $this->translationManager->expects($this->at(3))->method('saveValue')
+            ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
+        $this->translationManager->expects($this->at(4))->method('flush');
 
-        $this->translationManager->expects($this->at(6))->method('findValue')
-            ->with('key1', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(7))->method('findValue')
-            ->with('key2', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(8))->method('flush');
+        $this->translationManager->expects($this->at(5))->method('saveValue')
+            ->with('key1', 'domain1-currentLocale-message1', 'currentLocale', 'domain1')->willReturn(new \stdClass());
+        $this->translationManager->expects($this->at(6))->method('saveValue')
+            ->with('key2', 'domain1-currentLocale-message2', 'currentLocale', 'domain1')->willReturn(new \stdClass());
+        $this->translationManager->expects($this->at(7))->method('flush');
 
         $this->container->expects($this->at(5))->method('set')
             ->with('oro_translation.database_translation.loader', $loader);
 
-        $this->translationManager->expects($this->at(9))->method('rebuildCache');
+        $this->translationManager->expects($this->at(8))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
@@ -149,12 +147,12 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 'Available locales: locale1, currentLocale. Should be processed: locale1, currentLocale.',
                 'Loading translations [locale1] (2) ...',
                 '  > loading [domain1] (1) ... ',
-                'added 1 records.',
+                'processed 1 records.',
                 '  > loading [domain2] (1) ... ',
-                'added 0 records.',
+                'processed 1 records.',
                 'Loading translations [currentLocale] (1) ...',
                 '  > loading [domain1] (2) ... ',
-                'added 0 records.',
+                'processed 2 records.',
                 'All messages successfully loaded.',
                 'Rebuilding cache ... ',
                 'Done.',
@@ -173,18 +171,16 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->translationManager->expects($this->at(0))->method('rebuildCache');
 
-        $this->translationManager->expects($this->at(1))->method('findValue')
-            ->with('key1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(2))->method('createValue')
-            ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1', true);
-        $this->translationManager->expects($this->at(3))->method('flush');
+        $this->translationManager->expects($this->at(1))->method('saveValue')
+            ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
+        $this->translationManager->expects($this->at(2))->method('flush');
 
 
-        $this->translationManager->expects($this->at(4))->method('findValue')
-            ->with('key1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(5))->method('flush');
+        $this->translationManager->expects($this->at(3))->method('saveValue')
+            ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
+        $this->translationManager->expects($this->at(4))->method('flush');
 
-        $this->translationManager->expects($this->at(6))->method('rebuildCache');
+        $this->translationManager->expects($this->at(5))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
@@ -193,9 +189,9 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 'Available locales: locale1, currentLocale. Should be processed: locale1.',
                 'Loading translations [locale1] (2) ...',
                 '  > loading [domain1] (1) ... ',
-                'added 1 records.',
+                'processed 1 records.',
                 '  > loading [domain2] (1) ... ',
-                'added 0 records.',
+                'processed 1 records.',
                 'All messages successfully loaded.',
                 'Rebuilding cache ... ',
                 'Done.',

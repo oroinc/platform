@@ -70,7 +70,13 @@ class DatabasePersister
                     }
 
                     $writeCount++;
-                    $this->toWrite[] = $this->translationManager->saveValue($key, $translation, $locale, $domain);
+                    $this->toWrite[] = $this->translationManager->saveValue(
+                        $key,
+                        $translation,
+                        $locale,
+                        $domain,
+                        Translation::SCOPE_INSTALLED
+                    );
                     if (0 === $writeCount % $this->batchSize) {
                         $this->write($this->toWrite);
 

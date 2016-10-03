@@ -14,10 +14,14 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
     const TRANSLATION1 = 'translation.trans1';
     const TRANSLATION2 = 'translation.trans2';
     const TRANSLATION3 = 'translation.trans3';
+    const TRANSLATION4 = 'translation.trans4';
+    const TRANSLATION5 = 'translation.trans5';
 
     const TRANSLATION_KEY_1 = 'translation.trans1';
     const TRANSLATION_KEY_2 = 'translation.trans2';
     const TRANSLATION_KEY_3 = 'translation.trans3';
+    const TRANSLATION_KEY_4 = 'translation.trans4';
+    const TRANSLATION_KEY_5 = 'translation.trans5';
 
     const TRANSLATION_KEY_DOMAIN = 'test_domain';
 
@@ -37,10 +41,14 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
         $this->createTranslationKey($manager, self::TRANSLATION_KEY_1, self::TRANSLATION_KEY_DOMAIN);
         $this->createTranslationKey($manager, self::TRANSLATION_KEY_2, self::TRANSLATION_KEY_DOMAIN);
         $this->createTranslationKey($manager, self::TRANSLATION_KEY_3, self::TRANSLATION_KEY_DOMAIN);
+        $this->createTranslationKey($manager, self::TRANSLATION_KEY_4, self::TRANSLATION_KEY_DOMAIN);
+        $this->createTranslationKey($manager, self::TRANSLATION_KEY_5, self::TRANSLATION_KEY_DOMAIN);
 
         $this->createTranslation($manager, self::TRANSLATION1, LoadLanguages::LANGUAGE1);
         $this->createTranslation($manager, self::TRANSLATION2, LoadLanguages::LANGUAGE1);
         $this->createTranslation($manager, self::TRANSLATION3, LoadLanguages::LANGUAGE2);
+        $this->createTranslation($manager, self::TRANSLATION4, LoadLanguages::LANGUAGE2, Translation::SCOPE_INSTALLED);
+        $this->createTranslation($manager, self::TRANSLATION5, LoadLanguages::LANGUAGE2, Translation::SCOPE_UI);
 
         $manager->flush();
     }
@@ -49,10 +57,11 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
      * @param ObjectManager $manager
      * @param string $key
      * @param string $locale
+     * @param int $scope
      *
      * @return Translation
      */
-    protected function createTranslation(ObjectManager $manager, $key, $locale)
+    protected function createTranslation(ObjectManager $manager, $key, $locale, $scope = Translation::SCOPE_SYSTEM)
     {
         $translation = new Translation();
         $translationKey = $this->getReference(sprintf('tk-%s-%s', $key, self::TRANSLATION_KEY_DOMAIN));
@@ -60,7 +69,8 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
         $translation
             ->setTranslationKey($translationKey)
             ->setValue($key)
-            ->setLanguage($language);
+            ->setLanguage($language)
+            ->setScope($scope);
 
         $manager->persist($translation);
         $this->addReference($key, $translation);

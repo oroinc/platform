@@ -57,11 +57,9 @@ class TranslationManagerTest extends WebTestCase
         $locale = LoadLanguages::LANGUAGE1;
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
-        $translation = $this->manager->findValue($key, $locale, $domain);
-        $this->ensureTranslationIsCorrect($translation, $key, LoadTranslations::TRANSLATION1, $domain, $locale);
+        $this->createValue($key, 'initial value', $locale, $domain, Translation::SCOPE_SYSTEM);
 
-        $this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_SYSTEM);
-
+        $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_SYSTEM));
         $this->manager->flush();
 
         $translation = $this->manager->findValue($key, $locale, $domain);
@@ -69,26 +67,50 @@ class TranslationManagerTest extends WebTestCase
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
     }
 
-    public function testUpdateScopeUIValue()
+    public function testUpdateScopeInstalledValue()
     {
         $key = LoadTranslations::TRANSLATION_KEY_2;
         $value = uniqid('TEST_VALUE', true);
         $locale = LoadLanguages::LANGUAGE1;
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
-        $translation = $this->manager->findValue($key, $locale, $domain);
-        $this->ensureTranslationIsCorrect($translation, $key, LoadTranslations::TRANSLATION2, $domain, $locale);
+        $this->createValue($key, 'initial value', $locale, $domain, Translation::SCOPE_SYSTEM);
 
-        $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI));
-
+        $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_INSTALLED));
         $this->manager->flush();
 
+        // Ensure That We Overwrite SCOPE_SYSTEM
+        $translation = $this->manager->findValue($key, $locale, $domain);
+        $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
+
+        // Ensure That We cannot Overwrite SCOPE_INSTALLED
+        $this->assertNull(
+            $this->manager->saveValue($key, uniqid('', true), $locale, $domain, Translation::SCOPE_SYSTEM)
+        );
+
+        $translation = $this->manager->findValue($key, $locale, $domain);
+        $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
+    }
+
+    public function testUpdateScopeUIValue()
+    {
+        $key = LoadTranslations::TRANSLATION_KEY_3;
+        $value = uniqid('TEST_VALUE', true);
+        $locale = LoadLanguages::LANGUAGE1;
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+
+        $this->createValue($key, 'initial value', $locale, $domain, Translation::SCOPE_INSTALLED);
+
+        $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI));
+        $this->manager->flush();
+
+        // Ensure That We Overwrite SCOPE_INSTALLED
         $translation = $this->manager->findValue($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
 
         //Ensure That We cannot Overwrite SCOPE_UI
         $this->assertNull(
-            $this->manager->saveValue($key, uniqid('', true), $locale, $domain, Translation::SCOPE_SYSTEM)
+            $this->manager->saveValue($key, uniqid('', true), $locale, $domain, Translation::SCOPE_INSTALLED)
         );
         $translation = $this->manager->findValue($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
@@ -101,15 +123,53 @@ class TranslationManagerTest extends WebTestCase
         $locale = LoadLanguages::LANGUAGE2;
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
-        $translation = $this->manager->findValue($key, $locale, $domain);
-        $this->ensureTranslationIsCorrect($translation, $key, LoadTranslations::TRANSLATION3, $domain, $locale);
+        $this->createValue($key, 'initial value', $locale, $domain, Translation::SCOPE_UI);
 
-        $this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI);
-
+        $this->assertNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI));
         $this->manager->flush();
 
         $translation = $this->manager->findValue($key, $locale, $domain);
         $this->assertNull($translation);
+    }
+
+    public function testRebuildCache()
+    {
+        // build initial cache
+        $this->manager->rebuildCache();
+
+        $key = uniqid('TRANSLATION_KEY_', true);
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+        $locale = LoadLanguages::LANGUAGE2;
+        $expectedValue = uniqid('TEST_VALUE_', true);
+
+        $this->manager->saveValue($key, $expectedValue, $locale, $domain, Translation::SCOPE_UI);
+
+        $this->manager->flush();
+        $this->manager->clear();
+
+        /** @var Translator $translator */
+        $translator = $this->getContainer()->get('translator');
+
+        // Ensure that catalog still contains old translated value
+        $this->assertNotEquals($expectedValue, $translator->trans($key, [], $domain, $locale));
+
+        $this->manager->rebuildCache();
+
+        // Ensure that catalog now contains new translated value
+        $this->assertEquals($expectedValue, $translator->trans($key, [], $domain, $locale));
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     * @param string $domain
+     * @param int $scope
+     */
+    protected function createValue($key, $value, $locale, $domain, $scope)
+    {
+        $this->manager->saveValue($key, $value, $locale, $domain, $scope);
+        $this->manager->flush();
     }
 
     /**
@@ -127,36 +187,5 @@ class TranslationManagerTest extends WebTestCase
         $this->assertInstanceOf(TranslationKey::class, $translation->getTranslationKey());
         $this->assertEquals($key, $translation->getTranslationKey()->getKey());
         $this->assertEquals($domain, $translation->getTranslationKey()->getDomain());
-    }
-
-    public function testRebuildCache()
-    {
-        // build initial cache
-        $this->manager->rebuildCache();
-
-        $key = uniqid('TRANSLATION_KEY_', true);
-        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
-        $locale = LoadLanguages::LANGUAGE2;
-        $expectedValue = uniqid('TEST_VALUE_', true);
-
-        /** @var Translator $translator */
-        $translator = $this->getContainer()->get('translator.default');
-
-        $this->manager->saveValue($key, $expectedValue, $locale, $domain);
-        $this->manager->flush();
-        $this->manager->clear();
-
-        //Ensure that catalog still contains old translated value
-        $actualValue = $translator->trans($key, [], $domain, $locale);
-        $this->assertNotEquals($expectedValue, $actualValue);
-
-        /** @var Translator $translator */
-        $translator = $this->getContainer()->get('translator.default');
-
-        $this->manager->rebuildCache();
-
-        //Ensure that catalog now contains new translated value
-        $actualValue = $translator->trans($key, [], $domain, $locale);
-        $this->assertEquals($expectedValue, $actualValue);
     }
 }

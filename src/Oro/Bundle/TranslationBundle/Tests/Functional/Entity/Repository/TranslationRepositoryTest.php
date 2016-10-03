@@ -62,7 +62,7 @@ class TranslationRepositoryTest extends WebTestCase
                 'code' => LoadLanguages::LANGUAGE1,
             ],
             'language2' => [
-                'count' => 1,
+                'count' => 3,
                 'code' => LoadLanguages::LANGUAGE2,
             ],
         ];
@@ -132,5 +132,26 @@ class TranslationRepositoryTest extends WebTestCase
                 'expected' => false
             ],
         ];
+    }
+
+    public function testFindAllByLanguageAndDomain()
+    {
+        $result = array_column(
+            $this->repository->findAllByLanguageAndDomain(
+                LoadLanguages::LANGUAGE2,
+                LoadTranslations::TRANSLATION_KEY_DOMAIN
+            ),
+            'key'
+        );
+
+        sort($result);
+
+        $this->assertEquals(
+            [
+                LoadTranslations::TRANSLATION_KEY_4,
+                LoadTranslations::TRANSLATION_KEY_5,
+            ],
+            $result
+        );
     }
 }
