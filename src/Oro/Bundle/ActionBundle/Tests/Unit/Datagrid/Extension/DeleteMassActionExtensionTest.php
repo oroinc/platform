@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
 use Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -119,6 +120,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
             'test-grid',
             [
                 'source' => [
+                    'type' => OrmDatasource::TYPE,
                     'query' => [
                         'from' => [
                             [

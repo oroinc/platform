@@ -3,10 +3,10 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\OptionValueBag;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\TitleType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-use Oro\Component\Layout\OptionValueBag;
 
 class TitleTypeTest extends BlockTypeTestCase
 {
@@ -35,7 +35,7 @@ class TitleTypeTest extends BlockTypeTestCase
         $this->assertTrue($view->vars['reverse']);
     }
 
-    public function testBuildViewWithOptionValueBag()
+    public function testFinishViewWithOptionValueBag()
     {
         $optionBag = new OptionValueBag();
         $optionBag->add(['first', 'second']);

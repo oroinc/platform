@@ -7,6 +7,7 @@ use CG\Generator\PhpParameter;
 use CG\Generator\PhpProperty;
 
 use Doctrine\Common\Inflector\Inflector;
+use Symfony\Component\PropertyAccess\StringUtil;
 
 /**
  * The main extension of the entity generator. This extension is responsible for generate extend entity skeleton
@@ -44,6 +45,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
         $this->generateProperties('relation', $schema, $class);
         $this->generateProperties('default', $schema, $class);
         $this->generateCollectionMethods($schema, $class);
+        $this->generateDeprecatedCollectionMethods($schema, $class);
     }
 
     /**
@@ -207,6 +209,44 @@ METHOD_BODY;
     }
 
     /**
+     * @param array    $schema
+     * @param PhpClass $class
+     */
+    protected function generateDeprecatedCollectionMethods(array $schema, PhpClass $class)
+    {
+        foreach ($schema['addremove'] as $fieldName => $config) {
+            $selfFieldName = $config['self'];
+            $addMethodName = $this->generateAddMethodName($selfFieldName);
+            $removeMethodName = $this->generateRemoveMethodName($selfFieldName);
+            $deprecatedAddMethodName = $this->generateDeprecatedAddMethodName($selfFieldName);
+            $deprecatedRemoveMethodName = $this->generateDeprecatedRemoveMethodName($selfFieldName);
+
+            if ($deprecatedAddMethodName !== $addMethodName) {
+                $class->setMethod(
+                    $this->generateClassMethod(
+                        $deprecatedAddMethodName,
+                        "\$this->{$addMethodName}(\$value);",
+                        ['value']
+                    )->setDocblock(
+                        "/**\n * @deprecated since 1.10. Use " . $addMethodName . " instead\n */"
+                    )
+                );
+            }
+            if ($deprecatedRemoveMethodName !== $removeMethodName) {
+                $class->setMethod(
+                    $this->generateClassMethod(
+                        $deprecatedRemoveMethodName,
+                        "\$this->{$removeMethodName}(\$value);",
+                        ['value']
+                    )->setDocblock(
+                        "/**\n * @deprecated since 1.10. Use " . $removeMethodName . " instead\n */"
+                    )
+                );
+            }
+        }
+    }
+
+    /**
      * @param string $fieldName
      * @return string
      */
@@ -230,7 +270,7 @@ METHOD_BODY;
      */
     protected function generateAddMethodName($fieldName)
     {
-        return 'add' . ucfirst(Inflector::camelize($fieldName));
+        return 'add' . ucfirst($this->getSingular($fieldName));
     }
 
     /**
@@ -239,6 +279,39 @@ METHOD_BODY;
      */
     protected function generateRemoveMethodName($fieldName)
     {
+        return 'remove' . ucfirst($this->getSingular($fieldName));
+    }
+
+    /**
+     * @param string $fieldName
+     * @return string
+     */
+    protected function generateDeprecatedAddMethodName($fieldName)
+    {
+        return 'add' . ucfirst(Inflector::camelize($fieldName));
+    }
+
+    /**
+     * @param string $fieldName
+     * @return string
+     */
+    protected function generateDeprecatedRemoveMethodName($fieldName)
+    {
         return 'remove' . ucfirst(Inflector::camelize($fieldName));
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    protected function getSingular($fieldName)
+    {
+        $singular = StringUtil::singularify(Inflector::classify($fieldName));
+        if (is_array($singular)) {
+            $singular = reset($singular);
+        }
+
+        return $singular;
     }
 }

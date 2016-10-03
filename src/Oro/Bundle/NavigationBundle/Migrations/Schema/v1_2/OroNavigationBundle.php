@@ -81,7 +81,6 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
                         $navItem['id']
                     )
                 );
-
             } catch (\RuntimeException $e) {
                 $queries->addPostQuery(
                     sprintf(
