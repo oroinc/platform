@@ -144,6 +144,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.token.factory.username_password_organization'
             - '@event_dispatcher'
+            - '@router'
 
     oro_user.event_listener.impersonation_success_listener:
         class: Oro\Bundle\UserBundle\EventListener\ImpersonationSuccessListener

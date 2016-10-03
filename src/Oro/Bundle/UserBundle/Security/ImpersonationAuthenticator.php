@@ -5,13 +5,16 @@ namespace Oro\Bundle\UserBundle\Security;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
@@ -34,7 +37,10 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     protected $tokenFactory;
 
     /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    protected $eventDispatcher;
+
+    /** @var UrlGeneratorInterface */
+    protected $router;
 
     /**
      * @param EntityManager $em
@@ -44,11 +50,13 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     public function __construct(
         EntityManager $em,
         UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        UrlGeneratorInterface $router
     ) {
         $this->em = $em;
         $this->tokenFactory = $tokenFactory;
         $this->eventDispatcher = $eventDispatcher;
+        $this->router = $router;
     }
 
     /**
@@ -93,9 +101,9 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        $message = strtr($exception->getMessageKey(), $exception->getMessageData());
+        $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
 
-        return new Response($message, 403);
+        return new RedirectResponse($this->router->generate('oro_user_security_login'));
     }
 
     /**
@@ -150,12 +158,12 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
         }
 
         if ($impersonation->getLoginAt()) {
-            throw new CustomUserMessageAuthenticationException('Token is already used.');
+            throw new CustomUserMessageAuthenticationException('Impersonation token is already used.');
         }
 
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         if ($impersonation->getExpireAt() <= $now) {
-            throw new CustomUserMessageAuthenticationException('Token has expired.');
+            throw new CustomUserMessageAuthenticationException('Impersonation token has expired.');
         }
 
         $impersonation->setLoginAt($now);
