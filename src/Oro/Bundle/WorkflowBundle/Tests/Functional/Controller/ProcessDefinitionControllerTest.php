@@ -38,6 +38,7 @@ class ProcessDefinitionControllerTest extends WebTestCase
             [
                 'gridName' => 'process-definitions-grid',
                 'process-definitions-grid[_sort_by][id]' => 'DESC',
+                'process-definitions-grid[_pager][_per_page]' => '100',
             ]
         );
 
