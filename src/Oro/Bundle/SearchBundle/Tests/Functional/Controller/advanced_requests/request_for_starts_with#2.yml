@@ -1,6 +1,6 @@
 # test case for testing start_with
 request:
-    query: "from oro_test_item where stringValue starts_with item max_results 3"
+    query: "from oro_test_item where stringValue starts_with item order_by stringValue asc max_results 3"
 response:
     records_count: 9
     count: 3
@@ -9,29 +9,29 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item1@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item2@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item3@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
     soap:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item1@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item2@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item3@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
                 selectedData: []
