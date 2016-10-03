@@ -469,5 +469,6 @@ services:
         class: Oro\Bundle\NavigationBundle\EventListener\NavigationListener
         arguments:
             - '@oro_security.security_facade'
+            - '@oro_navigation.helper.menu_update'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

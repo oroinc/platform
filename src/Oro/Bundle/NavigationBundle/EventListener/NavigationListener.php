@@ -3,21 +3,25 @@
 namespace Oro\Bundle\NavigationBundle\EventListener;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var MenuUpdateHelper */
+    protected $menuUpdateHelper;
 
     /**
      * @param SecurityFacade $securityFacade
+     * @param MenuUpdateHelper $menuUpdateHelper
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(SecurityFacade $securityFacade, MenuUpdateHelper $menuUpdateHelper)
     {
         $this->securityFacade = $securityFacade;
+        $this->menuUpdateHelper = $menuUpdateHelper;
     }
 
     /**
@@ -25,14 +29,9 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $systemTab = $event->getMenu()->getChild('system_tab');
-        if (!$systemTab || !$this->securityFacade->hasLoggedUser()) {
-            return;
-        }
-
-        $menusItem = $systemTab->getChild('menu_list_default');
-        if ($menusItem && !$this->securityFacade->isGranted('oro_config_system')) {
-            $menusItem->setDisplay(false);
+        $manageMenusItem = $this->menuUpdateHelper->findMenuItem($event->getMenu(), 'menu_list_default');
+        if ($manageMenusItem !== null && !$this->securityFacade->isGranted('oro_config_system')) {
+            $manageMenusItem->setDisplay(false);
         }
     }
 }

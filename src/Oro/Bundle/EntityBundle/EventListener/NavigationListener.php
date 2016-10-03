@@ -4,19 +4,21 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var MenuUpdateHelper */
+    protected $menuUpdateHelper;
 
     /** @var ConfigManager $configManager */
     protected $configManager;
@@ -26,17 +28,20 @@ class NavigationListener
 
     /**
      * @param SecurityFacade      $securityFacade
+     * @param MenuUpdateHelper    $menuUpdateHelper
      * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
+        MenuUpdateHelper $menuUpdateHelper,
         ConfigManager $configManager,
         TranslatorInterface $translator
     ) {
-        $this->securityFacade = $securityFacade;
-        $this->configManager  = $configManager;
-        $this->translator     = $translator;
+        $this->securityFacade   = $securityFacade;
+        $this->menuUpdateHelper = $menuUpdateHelper;
+        $this->configManager    = $configManager;
+        $this->translator       = $translator;
     }
 
     /**
@@ -44,11 +49,9 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $menu     = $event->getMenu();
-        $children = array();
-
-        $entitiesMenuItem = $menu->getChild('system_tab')->getChild('entities_list');
-        if ($entitiesMenuItem) {
+        $children = [];
+        $entitiesMenuItem = $this->menuUpdateHelper->findMenuItem($event->getMenu(), 'entities_list');
+        if ($entitiesMenuItem !== null) {
             /** @var ConfigProvider $entityConfigProvider */
             $entityConfigProvider = $this->configManager->getProvider('entity');
 
@@ -67,19 +70,19 @@ class NavigationListener
                         continue;
                     }
 
-                    $children[$config->get('label')] = array(
+                    $children[$config->get('label')] = [
                         'label'   => $this->translator->trans($config->get('label')),
-                        'options' => array(
+                        'options' => [
                             'route'           => 'oro_entity_index',
-                            'routeParameters' => array(
-                                'entityName' => str_replace('\\', '_', $config->getId()->getClassName())
-                            ),
-                            'extras'          => array(
-                                'safe_label' => true,
-                                'routes'     => array('oro_entity_*')
-                            ),
-                        )
-                    );
+                            'routeParameters' => [
+                                'entityName'  => str_replace('\\', '_', $config->getId()->getClassName())
+                            ],
+                            'extras'          => [
+                                'safe_label'  => true,
+                                'routes'      => array('oro_entity_*')
+                            ],
+                        ]
+                    ];
                 }
             }
 
@@ -92,11 +95,11 @@ class NavigationListener
     }
 
     /**
-     * @param Config $extendConfig
+     * @param ConfigInterface $extendConfig
      *
      * @return bool
      */
-    protected function checkAvailability(Config $extendConfig)
+    protected function checkAvailability(ConfigInterface $extendConfig)
     {
         return
             $extendConfig->is('is_extend')

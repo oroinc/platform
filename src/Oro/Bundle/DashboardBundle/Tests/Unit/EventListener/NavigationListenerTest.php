@@ -19,6 +19,11 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $menuUpdateManager;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $manager;
 
     protected function setUp()
@@ -27,12 +32,20 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->menuUpdateManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->manager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\Manager')
             ->setMethods(['getDashboards', 'findAllowedDashboards'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->navigationListener = new NavigationListener($this->securityFacade, $this->manager);
+        $this->navigationListener = new NavigationListener(
+            $this->securityFacade,
+            $this->menuUpdateManager,
+            $this->manager
+        );
     }
 
     public function testOnNavigationConfigureCheckIfMenuAndUserExists()
@@ -49,8 +62,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
         $item = $this->getMock('Knp\Menu\ItemInterface');
 
-        $menu->expects($this->at(0))->method('getChild')->will($this->returnValue(null));
-        $menu->expects($this->at(1))->method('getChild')->will($this->returnValue($item));
+        $this->menuUpdateManager->expects($this->at(0))->method('findMenuItem')->will($this->returnValue(null));
+        $this->menuUpdateManager->expects($this->at(1))->method('findMenuItem')->will($this->returnValue($item));
 
         $this->navigationListener->onNavigationConfigure($event);
         $this->navigationListener->onNavigationConfigure($event);
@@ -132,8 +145,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($child));
         $item->expects($this->at(2))->method('addChild')->will($this->returnValue($divider));
 
-
-        $menu->expects($this->once())->method('getChild')->will($this->returnValue($item));
+        $this->menuUpdateManager->expects($this->once())->method('findMenuItem')->will($this->returnValue($item));
         $event->expects($this->once())->method('getMenu')->will($this->returnValue($menu));
         $this->securityFacade->expects($this->once())->method('hasLoggedUser')->will($this->returnValue(true));
         $this->manager->expects($this->once())->method('findAllowedDashboards')->will($this->returnValue($dashboards));

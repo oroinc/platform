@@ -6,46 +6,45 @@ use Doctrine\ORM\EntityManager;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var MenuUpdateHelper */
+    protected $menuUpdateHelper;
+
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider = null;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @var AclHelper
-     */
+    /** @var AclHelper */
     protected $aclHelper;
 
     /**
-     * @param EntityManager  $entityManager
-     * @param ConfigProvider $entityConfigProvider
-     * @param SecurityFacade $securityFacade
-     * @param AclHelper      $aclHelper
+     * @param MenuUpdateHelper $menuUpdateHelper
+     * @param EntityManager    $entityManager
+     * @param ConfigProvider   $entityConfigProvider
+     * @param SecurityFacade   $securityFacade
+     * @param AclHelper        $aclHelper
      */
     public function __construct(
+        MenuUpdateHelper $menuUpdateHelper,
         EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
         SecurityFacade $securityFacade,
         AclHelper $aclHelper
     ) {
+        $this->menuUpdateHelper     = $menuUpdateHelper;
         $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->securityFacade       = $securityFacade;
@@ -57,9 +56,8 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        /** @var ItemInterface $reportsMenuItem */
-        $reportsMenuItem = $event->getMenu()->getChild('reports_tab');
-        if ($reportsMenuItem && $this->securityFacade->hasLoggedUser()) {
+        $reportsMenuItem = $this->menuUpdateHelper->findMenuItem($event->getMenu(), 'reports_tab');
+        if ($reportsMenuItem !== null && $this->securityFacade->hasLoggedUser()) {
             $qb = $this->em->getRepository('OroReportBundle:Report')
                 ->createQueryBuilder('report')
                 ->orderBy('report.name', 'ASC');
@@ -87,11 +85,11 @@ class NavigationListener
     /**
      * Checks whether an entity with given config could be shown within navigation of reports
      *
-     * @param Config $config
+     * @param ConfigInterface $config
      *
      * @return bool
      */
-    protected function checkAvailability(Config $config)
+    protected function checkAvailability(ConfigInterface $config)
     {
         return true;
     }

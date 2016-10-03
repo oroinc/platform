@@ -94,6 +94,7 @@ services:
         class: %oro_dashboard.navigation_listener.class%
         arguments:
             - '@oro_security.security_facade'
+            - '@oro_navigation.helper.menu_update'
             - '@oro_dashboard.manager'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
