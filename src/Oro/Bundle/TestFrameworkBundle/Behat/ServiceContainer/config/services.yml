@@ -58,6 +58,13 @@ services:
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
+    oro_test.listener.message_queue_consumer_process_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueConsumerProcessSubscriber'
+        arguments:
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
     oro_test.listener.dump_environment_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\DumpEnvironmentSubscriber'
         arguments:

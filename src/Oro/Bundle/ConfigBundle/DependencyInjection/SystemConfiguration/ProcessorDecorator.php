@@ -93,6 +93,13 @@ class ProcessorDecorator
                             $node
                         );
                         break;
+                    // groups need to be merged manually due to 'configurator' and 'handler' options
+                    case self::GROUPS_NODE:
+                        $source[self::ROOT][$nodeName] = $this->mergeGroups(
+                            $source[self::ROOT][$nodeName],
+                            $node
+                        );
+                        break;
                     // replace all overrides in other nodes
                     default:
                         $source[self::ROOT][$nodeName] = array_replace_recursive(
@@ -104,6 +111,47 @@ class ProcessorDecorator
         }
 
         return $source;
+    }
+
+    /**
+     * @param array $existing
+     * @param mixed $new
+     *
+     * @return array
+     */
+    protected function mergeGroups(array $existing, $new)
+    {
+        if (!empty($new) && is_array($new)) {
+            foreach ($new as $key => $value) {
+                $existing[$key] = $this->mergeGroup(
+                    isset($existing[$key]) ? $existing[$key] : [],
+                    $value
+                );
+            }
+        }
+
+        return $existing;
+    }
+
+    /**
+     * @param array $existing
+     * @param mixed $new
+     *
+     * @return array
+     */
+    protected function mergeGroup(array $existing, $new)
+    {
+        if (!empty($new) && is_array($new)) {
+            foreach ($new as $key => $value) {
+                if (('configurator' === $key || 'handler' === $key) && isset($existing[$key])) {
+                    $existing[$key] = array_merge((array)$existing[$key], (array)$new[$key]);
+                } else {
+                    $existing[$key] = $value;
+                }
+            }
+        }
+
+        return $existing;
     }
 
     /**
@@ -156,7 +204,24 @@ class ProcessorDecorator
                     ->scalarNode('title')->isRequired()->end()
                     ->scalarNode('icon')->end()
                     ->scalarNode('description')->end()
-                    ->scalarNode('configurator')->end()
+                    ->arrayNode('configurator')
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(function ($value) {
+                                return [$value];
+                            })
+                        ->end()
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->arrayNode('handler')
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(function ($value) {
+                                return [$value];
+                            })
+                        ->end()
+                        ->prototype('scalar')->end()
+                    ->end()
                     ->booleanNode('page_reload')
                         ->defaultValue(false)
                     ->end()
