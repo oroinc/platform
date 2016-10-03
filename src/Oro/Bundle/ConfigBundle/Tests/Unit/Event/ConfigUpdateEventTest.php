@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
@@ -27,9 +28,21 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
         $this->event = new ConfigUpdateEvent($this->changeSet);
     }
 
-    public function testChangeSet()
+    /**
+     * @dataProvider changeSetProvider
+     */
+    public function testChangeSet($changeSet)
     {
-        $this->assertEquals($this->changeSet, $this->event->getChangeSet());
+        $event = new ConfigUpdateEvent($changeSet);
+        $this->assertEquals($this->changeSet, $event->getChangeSet());
+    }
+
+    public function changeSetProvider()
+    {
+        return [
+            'object' => [new ConfigChangeSet($this->changeSet)],
+            'array'  => [$this->changeSet]
+        ];
     }
 
     /**

@@ -1,6 +1,14 @@
 UPGRADE FROM 1.10 to 2.0 
 ========================
 
+####General
+- LiipImagineBundle updated to 1.5.* version.
+
+####Action Component
+- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
+- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
+- Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
+
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
@@ -151,7 +159,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added method `Oro\Component\Layout\Templating\Helper\LayoutHelper::parentBlockWidget` for rendering parent block widget.
 - Added method `getUpdateFileNamePatterns` to `Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface`.
 - Added method `getUpdateFilenamePattern` to `Oro\Component\Layout\Loader\Driver\DriverInterface`.
-- Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list. 
+- Added `Oro\Component\Layout\Block\Type\Options` class that wraps the `array` of options and can evaluate option type (is `option` instanceof `Expression`).
+- Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list.
+- Updated `Oro\Component\Layout\BlockTypeInterface`, `Oro\Component\Layout\BlockTypeExtensionInterface`, `Oro\Component\Layout\LayoutRegistryInterface` to use the `Options` object instead of `array`.
 
 ####LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
@@ -167,6 +177,10 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Updated class `Oro\Bundle\LayoutBundle\Form\RendererEngine\TemplatingRendererEngine` that extends `Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine` and implements `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface`.
 - Updated class `Oro\Bundle\LayoutBundle\Form\TwigRendererEngine` to extend new `Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine`.
 - Updated class `Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer` to implement `Oro\Bundle\LayoutBundle\Form\TwigRendererInterface`.
+- Added class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\DataCollectorExtension` that collects layout debug information in data collector used in Layouts section of Symfony Profiler.
+- Class `Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider` added to provide available image types collected from all themes
+- Class `Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader` added to dynamically load Imagine filters
+- Dependency injection tag `layout.image_filter.provider` added to support custom Imagine filter providers
 
 ####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
@@ -174,6 +188,10 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
 - System configuration now loads from `Resources/config/oro/system_configuration.yml` instead of `Resources/config/system_configuration.yml` file.
 - Root node for system configuration in `Resources/config/oro/system_configuration.yml` file were changed from `oro_system_configuration` to `system_configuration`.
+- Form type `Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType` added to allow file management in the system configuration
+
+####AttachmentBundle:
+- Class `Oro\Bundle\AttachmentBundle\Resizer\ImageResizer` introduced to resize images by filter name
 
 ####DatagridBundle:
 - Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
@@ -280,7 +298,7 @@ tag if it works with extend classes
 ####HelpBundle:
 - Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
 - Root node `help` were added for help configuration in `Resources/config/oro/help.yml` file.
- 
+
 ####SearchBundle:
 - Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
 - Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
@@ -299,6 +317,12 @@ tag if it works with extend classes
 - `\Oro\Bundle\SearchBundle\Query\Result\Item` is now compatible with the default backend datagrid templates.
 - `\Oro\Bundle\SearchBundle\Datasource\SearchDatasource` can now be defined as the datasource of any datagrid (both frontend and backend).
 - Datagrids having search datasource expect an indexed array of search indexes in 'from' part of datagrid configuration, as opposed to ORM format
+- Introduced new interface Oro\Bundle\SearchBundle\Engine\IndexerInterface. Next methods were extracted from
+  Oro\Bundle\SearchBundle\Engine\EngineInterface into this new interface: `save`, `delete`, `reindex`.
+- Configuration parameter **realtime_update** and container parameter `oro_search.realtime_update` were removed. All index operations are async now.
+- Oro/Bundle/SearchBundle/Entity/UpdateEntity and Oro/Bundle/SearchBundle/EventListener/UpdateSchemaDoctrineListener were removed
+- `oro_search.search.engine.indexer` service was replaced with async implementation `oro_search.async.indexer`. Use sync indexer only for test environment.
+- New helper trait Oro/Component/Testing/SearchExtensionTrait - easy access to sync indexer for test environment
 
 ####UiBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
@@ -309,6 +333,7 @@ placeholders:
     placeholders: ...
     items: ...
 ```
+- Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
 
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
@@ -321,7 +346,16 @@ placeholders:
     * `oro_titles` to `titles`
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
-    
+- Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
+- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
+- Added `areas` node to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
+- Added interface `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
+- Added trait `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
+- Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate`, implements `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface` and using `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
+- Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
+- Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
+- Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
@@ -363,6 +397,14 @@ After
 oro_email.email_address.entity_manager:
     parent: oro_entity.abstract_entity_manager
 ```
+
+- Added entity fallback functionality
+- Added EntityFieldFallbackValue entity to store fallback information
+- Added EntityFallbackResolver service which handles fallback resolution
+- Added SystemConfigFallbackProvider service which handles `systemConfig` fallback type
+- Added EntityFallbackExtension service which reads fallback values of entities in twig
+- Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer
+to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
 
 ####CacheBundle
 - `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers

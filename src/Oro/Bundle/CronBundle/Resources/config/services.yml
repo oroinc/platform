@@ -60,3 +60,15 @@ services:
 
     oro_cron.helper.cron:
         class: 'Oro\Bundle\CronBundle\Helper\CronHelper'
+
+    oro_cron.listener.load_class_metadata_subscriber:
+        class: Oro\Bundle\CronBundle\EventListener\LoadClassMetadataSubscriber
+        tags:
+            - { name: doctrine.event_subscriber }
+
+    oro_cron.listener.job_subscriber:
+        class: Oro\Bundle\CronBundle\EventListener\JobSubscriber
+        arguments:
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }

@@ -47,7 +47,9 @@ class FileType extends AbstractType
             ]
         );
 
-        $builder->addEventSubscriber($this->eventSubscriber);
+        if ($options['addEventSubscriber']) {
+            $builder->addEventSubscriber($this->eventSubscriber);
+        }
     }
 
     /**
@@ -75,7 +77,8 @@ class FileType extends AbstractType
             [
                 'data_class'     => 'Oro\Bundle\AttachmentBundle\Entity\File',
                 'checkEmptyFile' => false,
-                'allowDelete' => true
+                'allowDelete' => true,
+                'addEventSubscriber' => true
             ]
         );
     }

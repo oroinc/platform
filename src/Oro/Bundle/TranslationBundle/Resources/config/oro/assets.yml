@@ -1,0 +1,4 @@
+assets:
+    css:
+        'orotranslation':
+          - 'bundles/orotranslation/css/style.css'

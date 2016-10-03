@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-use Doctrine\ORM\Event\OnClearEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
-use Oro\Bundle\SearchBundle\Engine\EngineInterface;
+use Doctrine\ORM\Event\OnClearEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class IndexListener implements OptionalListenerInterface
@@ -21,14 +20,9 @@ class IndexListener implements OptionalListenerInterface
     protected $doctrineHelper;
 
     /**
-     * @var EngineInterface
+     * @var IndexerInterface
      */
-    protected $searchEngine;
-
-    /**
-     * @var bool
-     */
-    protected $realTimeUpdate = true;
+    protected $searchIndexer;
 
     /**
      * @var array
@@ -58,12 +52,12 @@ class IndexListener implements OptionalListenerInterface
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param EngineInterface $searchEngine
+     * @param IndexerInterface $searchIndexer
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EngineInterface $searchEngine)
+    public function __construct(DoctrineHelper $doctrineHelper, IndexerInterface $searchIndexer)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->searchEngine   = $searchEngine;
+        $this->searchIndexer   = $searchIndexer;
     }
 
     /**
@@ -72,14 +66,6 @@ class IndexListener implements OptionalListenerInterface
     public function setEnabled($enabled = true)
     {
         $this->enabled = $enabled;
-    }
-
-    /**
-     * @param $realTime bool
-     */
-    public function setRealTimeUpdate($realTime)
-    {
-        $this->realTimeUpdate = $realTime;
     }
 
     /**
@@ -201,18 +187,16 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function indexEntities()
     {
-        // process saved entities
         if ($this->savedEntities) {
-            $savedEntities = $this->savedEntities;
+            $this->searchIndexer->save($this->savedEntities);
+
             $this->savedEntities = [];
-            $this->searchEngine->save($savedEntities, $this->realTimeUpdate);
         }
 
-        // process deleted entities
         if ($this->deletedEntities) {
-            $deletedEntities = $this->deletedEntities;
+            $this->searchIndexer->delete($this->deletedEntities);
+
             $this->deletedEntities = [];
-            $this->searchEngine->delete($deletedEntities, $this->realTimeUpdate);
         }
     }
 
