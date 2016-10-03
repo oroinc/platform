@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 
 abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAssemblerInterface
 {
@@ -13,6 +14,13 @@ abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAs
      * @return BaseTransitionTrigger
      */
     abstract protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition);
+
+    /**
+     * @param BaseTransitionTrigger $trigger
+     * @return void
+     * @throws TransitionTriggerVerifierException
+     */
+    abstract protected function verifyTrigger(BaseTransitionTrigger $trigger);
 
     /**
      * {@inheritdoc}
@@ -33,9 +41,13 @@ abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAs
 
         $trigger = $this->assembleTrigger($options, $workflowDefinition);
 
-        return $trigger->setWorkflowDefinition($workflowDefinition)
+        $trigger->setWorkflowDefinition($workflowDefinition)
             ->setTransitionName($transitionName)
             ->setQueued($this->getOption($options, 'queued', true));
+
+        $this->verifyTrigger($trigger);
+
+        return $trigger;
     }
 
     /**

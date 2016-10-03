@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub;
 
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\AbstractTransitionTriggerAssembler;
 
 class AbstractTransitionTriggerAssemblerStub extends AbstractTransitionTriggerAssembler
@@ -26,6 +28,14 @@ class AbstractTransitionTriggerAssemblerStub extends AbstractTransitionTriggerAs
     public function canAssemble(array $options)
     {
         return $this->canAssemble;
+    }
+
+    /**
+     * @param BaseTransitionTrigger $trigger
+     */
+    protected function verifyTrigger(BaseTransitionTrigger $trigger)
+    {
+        //void
     }
 
     /**
