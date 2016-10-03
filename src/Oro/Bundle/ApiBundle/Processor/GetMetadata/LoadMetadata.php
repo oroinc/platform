@@ -295,21 +295,17 @@ class LoadMetadata implements ProcessorInterface
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setCollapsed($field->isCollapsed());
-        if (0 !== strpos($dataType, 'association:')) {
-            $associationMetadata->setDataType($dataType);
-            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
-            $associationMetadata->addAcceptableTargetClassName($targetClass);
-        } else {
-            list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
-            $targets = $this->getExtendedAssociationTargets(
-                $entityClass,
-                $associationType,
-                $associationKind
-            );
+        if (DataType::isExtendedAssociation($dataType)) {
+            list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+            $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
             $this->setAssociationDataType($associationMetadata, $field);
             $associationMetadata->setAssociationType($associationType);
             $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
             $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
+        } else {
+            $associationMetadata->setDataType($dataType);
+            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
+            $associationMetadata->addAcceptableTargetClassName($targetClass);
         }
     }
 
