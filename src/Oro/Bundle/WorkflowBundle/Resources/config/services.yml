@@ -102,8 +102,8 @@ services:
     oro_workflow.process.process_factory:
         class: %oro_workflow.process.process_factory.class%
         arguments:
-            - '@oro_workflow.action_assembler'
-            - '@oro_workflow.expression.factory'
+            - '@oro_action.action_assembler'
+            - '@oro_action.expression.factory'
 
     oro_workflow.process.process_handler:
         class: %oro_workflow.process.process_handler.class%

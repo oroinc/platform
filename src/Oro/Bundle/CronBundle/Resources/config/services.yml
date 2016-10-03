@@ -63,7 +63,6 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_action.action, alias: create_job }
-            - { name: oro_workflow.action, alias: create_job }
 
     oro_cron.helper.cron:
         class: 'Oro\Bundle\CronBundle\Helper\CronHelper'

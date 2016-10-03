@@ -327,7 +327,7 @@ services:
             - '@oro_action.context_accessor'
             - '@doctrine'
         tags:
-            - { name: oro_workflow.action, alias: create_calendar_event }
+            - { name: oro_action.action, alias: create_calendar_event }
 
     oro_calendar.autocomplete.attendee_search_handler:
         class: Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler

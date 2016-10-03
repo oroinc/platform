@@ -500,7 +500,7 @@ services:
             - '@oro_action.context_accessor'
             - '@doctrine'
         tags:
-            - { name: oro_workflow.action, alias: request_enum_entity }
+            - { name: oro_action.action, alias: request_enum_entity }
 
     oro_entity_extend.cache_warmer:
         class: 'Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate'

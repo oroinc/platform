@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 

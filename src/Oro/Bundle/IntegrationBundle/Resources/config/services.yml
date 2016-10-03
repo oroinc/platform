@@ -267,7 +267,7 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: oro_workflow.condition, alias: 'has_active_integration' }
+            - { name: oro_action.condition, alias: 'has_active_integration' }
 
     oro_integration.action.abstract_fields_changes:
         abstract: true
@@ -280,13 +280,13 @@ services:
         class: %oro_integration.action.save_fields_changes.class%
         parent: oro_integration.action.abstract_fields_changes
         tags:
-            - { name: oro_workflow.action, alias: save_fields_changes }
+            - { name: oro_action.action, alias: save_fields_changes }
 
     oro_integration.action.remove_fields_changes:
         class: %oro_integration.action.remove_fields_changes.class%
         parent: oro_integration.action.abstract_fields_changes
         tags:
-            - { name: oro_workflow.action, alias: remove_fields_changes }
+            - { name: oro_action.action, alias: remove_fields_changes }
 
     oro_integration.workflow.action.populate_integration_owner:
         class: %oro_integration.workflow.action.populate_integration_owner.class%
@@ -294,7 +294,7 @@ services:
             - '@oro_action.context_accessor'
             - '@oro_integration.helper.default_owner_helper'
         tags:
-            - { name: oro_workflow.action, alias: populate_integration_owner }
+            - { name: oro_action.action, alias: populate_integration_owner }
 
     oro_integration.twig.integration:
         class: %oro_integration.twig.integration.class%

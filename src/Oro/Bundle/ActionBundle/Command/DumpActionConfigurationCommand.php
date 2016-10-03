@@ -22,7 +22,7 @@ class DumpActionConfigurationCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:action:configuration:dump')
+        $this->setName('oro:debug:action:configuration')
             ->setDescription('Dump action configuration')
             ->addArgument('name', InputArgument::OPTIONAL, 'Names of the name of node that should be dumped')
             ->addOption('action-group', null, InputOption::VALUE_NONE, 'Dump action_group')

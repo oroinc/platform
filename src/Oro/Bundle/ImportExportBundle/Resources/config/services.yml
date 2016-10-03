@@ -20,7 +20,7 @@ services:
             - '@oro_action.context_accessor'
             - '@oro_importexport.job_executor'
         tags:
-            - { name: oro_workflow.action, alias: execute_job }
+            - { name: oro_action.action, alias: execute_job }
 
     oro_importexport.formatter.formatter_provider:
         class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider

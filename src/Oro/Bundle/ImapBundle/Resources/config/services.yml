@@ -152,7 +152,7 @@ services:
             - '@oro_action.context_accessor'
             - '@doctrine'
         tags:
-            - { name: oro_workflow.action, alias: job_add_dependency }
+            - { name: oro_action.action, alias: job_add_dependency }
 
     oro_imap.form.type.google_sync_checkbox:
         class: %oro_imap.form.type.google_sync_checkbox.class%
