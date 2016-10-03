@@ -3,6 +3,7 @@ services:
         class: Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector
         public: false
         arguments:
+            - '@oro_layout.layout_context_holder'
             - '@oro_config.user'
             - '%kernel.debug%'
         tags:

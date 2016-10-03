@@ -16,19 +16,19 @@ oro_note_bundle_api:
 # REST actions
 #
 oro_api_get_notes:
-    pattern: api/rest/{version}/notes/{entityClass}/{entityId}.{_format}
+    path: api/rest/{version}/notes/{entityClass}/{entityId}.{_format}
     defaults: {_controller: OroNoteBundle:Api/Rest/Note:cget, _format: json}
     requirements:
          _method: GET
 
 oro_api_get_note:
-    pattern: api/rest/{version}/notes/{id}.{_format}
+    path: api/rest/{version}/notes/{id}.{_format}
     defaults: {_controller: OroNoteBundle:Api/Rest/Note:get, _format: json}
     requirements:
          _method: GET
 
 oro_api_post_note:
-    pattern: api/rest/{version}/notes.{_format}
+    path: api/rest/{version}/notes.{_format}
     defaults: {_controller: OroNoteBundle:Api/Rest/Note:post, _format: json}
     requirements:
          _method: POST

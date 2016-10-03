@@ -2,32 +2,33 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
+use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class SearchEntityConfigListener
 {
     /** @var SearchMappingProvider */
     protected $searchMappingProvider;
 
+    /** @var IndexerInterface */
+    protected $searchIndexer;
 
-    /**
-     * @var MessageProducerInterface
-     */
-    protected $producer;
+    /** @var string[] */
+    protected $classNames = [];
 
     /**
      * @param SearchMappingProvider $searchMappingProvider
-     * @param MessageProducerInterface $producer
+     * @param IndexerInterface      $searchIndexer
      */
     public function __construct(
         SearchMappingProvider $searchMappingProvider,
-        MessageProducerInterface $producer
+        IndexerInterface $searchIndexer
     ) {
         $this->searchMappingProvider = $searchMappingProvider;
-        $this->producer = $producer;
+        $this->searchIndexer = $searchIndexer;
     }
 
     /**
@@ -35,31 +36,49 @@ class SearchEntityConfigListener
      */
     public function preFlush(PreFlushConfigEvent $event)
     {
-        $config = $event->getConfig('search');
-        if (null === $config) {
-            return;
+        if ($this->isReindexRequired($event)) {
+            $entityClass = $event->getClassName();
+            if (!in_array($entityClass, $this->classNames, true)) {
+                $this->classNames[] = $entityClass;
+            }
+        }
+    }
+
+    /**
+     * @param PostFlushConfigEvent $event
+     */
+    public function postFlush(PostFlushConfigEvent $event)
+    {
+        if ($this->classNames) {
+            $this->searchMappingProvider->clearMappingCache();
+            $this->searchIndexer->reindex($this->classNames);
+
+            $this->classNames = [];
+        }
+    }
+
+    /**
+     * @param PreFlushConfigEvent $event
+     *
+     * @return bool
+     */
+    protected function isReindexRequired(PreFlushConfigEvent $event)
+    {
+        $searchConfig = $event->getConfig('search');
+        if (null === $searchConfig) {
+            return false;
         }
 
         $configManager = $event->getConfigManager();
-        $changeSet     = $configManager->getConfigChangeSet($config);
-        if (!isset($changeSet['searchable'])) {
-            return;
+        $searchChangeSet = $configManager->getConfigChangeSet($searchConfig);
+        if (!isset($searchChangeSet['searchable'])) {
+            return false;
         }
 
-        /**
-         * On any configuration changes related to search the search mapping cache should be cleaned.
-         */
-        $this->searchMappingProvider->clearMappingCache();
+        $extendConfig = $event->getConfig('extend');
 
-        $this->reindex($config->getId()->getClassName());
-    }
-
-
-    /**
-     * @param string $entityClass
-     */
-    protected function reindex($entityClass)
-    {
-        $this->producer->send(Topics::REINDEX, [$entityClass]);
+        return
+            null !== $extendConfig
+            && $extendConfig->is('state', ExtendScope::STATE_ACTIVE);
     }
 }

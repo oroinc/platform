@@ -64,6 +64,7 @@ define(function(require) {
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
     var _ = require('underscore');
+    var $ = require('jquery');
     require('jquery.select2');
 
     SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
@@ -154,11 +155,6 @@ define(function(require) {
                             e.preventDefault();
                             _this.$('input[name=value]').inputWidget('close');
                             _this.onGenericEnterKeydown(e);
-                        } else if (!select2options.multiple) {
-                            _this.$('input[name=value]').on('select2-selecting', function(event) {
-                                _this.$('input[name=value]').val(event.val);
-                                _this.onGenericEnterKeydown(e);
-                            });
                         }
                         break;
                     case _this.TAB_KEY_CODE:
@@ -275,7 +271,11 @@ define(function(require) {
             if (this._isSelection) {
                 this.$('.select2-focused').focus();
             } else if (!select2 || !select2.opened()) {
-                SelectEditorView.__super__.onFocusout.call(this, e);
+                _.defer(_.bind(function() {
+                    if (!this.disposed && !$.contains(this.el, document.activeElement)) {
+                        SelectEditorView.__super__.onFocusout.call(this, e);
+                    }
+                }, this));
             }
         },
 
