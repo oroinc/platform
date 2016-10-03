@@ -29,6 +29,9 @@ class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
 
     /**
      * {@inheritdoc}
+     * @throws \Doctrine\ORM\EntityNotFoundException
+     * @throws \InvalidArgumentException
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException
      */
     public function process(BaseTransitionTrigger $trigger, TransitionTriggerMessage $message)
     {

@@ -73,6 +73,7 @@ class TransitionTriggerProcessor implements MessageProcessorInterface
     /**
      * @param MessageInterface $message
      * @return TransitionTriggerMessage
+     * @throws \InvalidArgumentException
      */
     protected function createTransitionTriggerMessage(MessageInterface $message)
     {

@@ -33,6 +33,9 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
+     * @throws \InvalidArgumentException
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      */
     public function process(BaseTransitionTrigger $trigger, TransitionTriggerMessage $message)
     {
@@ -86,6 +89,7 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     /**
      * @param TransitionCronTrigger $trigger
      * @param Workflow $workflow
+     * @throws \Exception
      */
     protected function processTransition(TransitionCronTrigger $trigger, Workflow $workflow)
     {

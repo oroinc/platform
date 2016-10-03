@@ -161,7 +161,6 @@ class WorkflowManager
      * @param array $data
      * @param bool $throwGroupException
      * @return WorkflowItem
-     * @throws \Exception
      * @throws WorkflowRecordGroupException
      */
     public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)

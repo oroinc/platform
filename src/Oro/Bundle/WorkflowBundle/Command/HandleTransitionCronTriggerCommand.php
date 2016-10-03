@@ -43,14 +43,14 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
         $triggerId = $input->getOption('id');
         if (!filter_var($triggerId, FILTER_VALIDATE_INT)) {
             $output->writeln('<error>No workflow transition cron trigger identifier defined</error>');
-            return;
+            return 1;
         }
 
         /** @var TransitionCronTrigger $trigger */
         $trigger = $this->getTransitionCronTriggerRepository()->find($triggerId);
         if (!$trigger) {
             $output->writeln('<error>Transition cron trigger not found</error>');
-            return;
+            return 1;
         }
 
         try {

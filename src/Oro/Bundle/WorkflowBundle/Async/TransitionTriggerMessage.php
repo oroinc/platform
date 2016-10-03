@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 
 use Oro\Component\MessageQueue\Util\JSON;
 
-final class TransitionTriggerMessage
+class TransitionTriggerMessage
 {
     const TRANSITION_TRIGGER = 'transitionTrigger';
     const MAIN_ENTITY = 'mainEntity';
@@ -40,6 +40,7 @@ final class TransitionTriggerMessage
     /**
      * @param string $json
      * @return static
+     * @throws \InvalidArgumentException
      */
     public static function createFromJson($json)
     {
@@ -78,6 +79,7 @@ final class TransitionTriggerMessage
     /**
      * @param string $json
      * @return array
+     * @throws \InvalidArgumentException
      */
     protected static function jsonToArray($json)
     {
