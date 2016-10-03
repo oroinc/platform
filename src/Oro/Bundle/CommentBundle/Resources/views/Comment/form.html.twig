@@ -10,7 +10,7 @@
             <% if (attachmentURL) { %>
             <div class="attachment-item">
                 <i class="icon-paper-clip"></i>
-                <a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %></a> (<%= attachmentSize %>)
+                <a href="<%- attachmentURL %>" class="no-hash" title="<%- attachmentFileName %>"><%- attachmentFileName %></a> (<%- attachmentSize %>)
                 <button class="btn btn-link icon-remove remove-attachment" type="button"></button>
             </div>
             <% } %>
