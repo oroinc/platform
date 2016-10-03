@@ -6,8 +6,8 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Model\GlobalOwnershipProvider;
-use Oro\Bundle\NavigationBundle\Model\UserOwnershipProvider;
+use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
+use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 
 class MenuUpdateData extends AbstractFixture

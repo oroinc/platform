@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\NavigationBundle\Model\GlobalOwnershipProvider;
+use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
 /**
@@ -69,7 +69,7 @@ class MenuUpdateController extends Controller
      *
      * @ApiDoc(description="Reset menu to default state.")
      *
-     * @param int $ownershipType
+     * @param int    $ownershipType
      * @param string $menuName
      *
      * @return Response
@@ -98,8 +98,8 @@ class MenuUpdateController extends Controller
      * @ApiDoc(description="Move menu item.")
      *
      * @param Request $request
-     * @param int $ownershipType
-     * @param string $menuName
+     * @param int     $ownershipType
+     * @param string  $menuName
      *
      * @return Response
      */
@@ -140,15 +140,14 @@ class MenuUpdateController extends Controller
     }
 
     /**
-     * @param int $ownershipType
+     * @param string $ownershipType
      * @return int
      */
     private function getCurrentOwnerId($ownershipType)
     {
-        if ($ownershipType == GlobalOwnershipProvider::TYPE) {
-            return $this->get('oro_security.security_facade')->getOrganization()->getId();
-        } else {
-            return $this->get('oro_security.security_facade')->getLoggedUser()->getId();
-        }
+        $area = ConfigurationBuilder::DEFAULT_AREA;
+        $provider = $this->get('oro_navigation.menu_update.builder')->getProvider($area, $ownershipType);
+
+        return $provider->getId();
     }
 }

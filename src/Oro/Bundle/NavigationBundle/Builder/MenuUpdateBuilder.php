@@ -7,8 +7,7 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
-use Oro\Bundle\NavigationBundle\Model\OwnershipProviderInterface;
-use Oro\Bundle\NavigationBundle\Model\UserOwnershipProvider;
+use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
 {
@@ -83,6 +82,18 @@ class MenuUpdateBuilder implements BuilderInterface
     }
 
     /**
+     * @param string $area
+     * @param string $type
+     * @return null|OwnershipProviderInterface
+     */
+    public function getProvider($area, $type)
+    {
+        $providers = $this->getProviders($area);
+
+        return isset($providers[$type]) ? $providers[$type] : null;
+    }
+
+    /**
      * @param string      $area
      * @param string      $menuName
      * @param string|null $ownershipType
@@ -105,7 +116,7 @@ class MenuUpdateBuilder implements BuilderInterface
      * Return ordered list of ownership providers started by $ownershipType
      * @param string      $area
      * @param string|null $ownershipType
-     * @return \Oro\Bundle\NavigationBundle\Model\OwnershipProviderInterface[]
+     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface[]
      */
     protected function getProviders($area, $ownershipType = null)
     {

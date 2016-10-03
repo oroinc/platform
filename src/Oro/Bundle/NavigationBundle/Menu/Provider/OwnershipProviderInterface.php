@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Model;
+namespace Oro\Bundle\NavigationBundle\Menu\Provider;
 
 interface OwnershipProviderInterface
 {
