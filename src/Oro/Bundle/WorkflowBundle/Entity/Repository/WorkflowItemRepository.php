@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -40,7 +42,7 @@ class WorkflowItemRepository extends EntityRepository
     public function findOneByEntityMetadata($entityClass, $entityIdentifier, $workflowName)
     {
         return $this->findOneBy([
-            'entityId' => $entityIdentifier,
+            'entityId' => (string)$entityIdentifier,
             'entityClass' => $entityClass,
             'workflowName' => $workflowName,
         ]);
@@ -237,5 +239,60 @@ class WorkflowItemRepository extends EntityRepository
             },
             $qb->getQuery()->getArrayResult()
         );
+    }
+
+    /**
+     * @param Collection $stepNames
+     * @param string $entityClass
+     * @param string $entityIdentifier
+     * @param null $dqlFilter
+     * @return QueryBuilder
+     */
+    public function findByStepNamesAndEntityClassQueryBuilder(
+        Collection $stepNames,
+        $entityClass,
+        $entityIdentifier,
+        $dqlFilter = null
+    ) {
+        $queryBuilder = $this->createQueryBuilder('wi')
+            ->select('wi')
+            ->innerJoin('wi.definition', 'wd')
+            ->innerJoin('wi.currentStep', 'ws')
+            ->innerJoin(
+                $entityClass,
+                'e',
+                Query\Expr\Join::WITH,
+                sprintf('CAST(wi.entityId as string) = CAST(e.%s as string)', $entityIdentifier)
+            );
+
+        $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
+            ->setParameter('workflowSteps', $stepNames->getValues());
+
+        $queryBuilder->andWhere('wd.relatedEntity = :entityClass')
+            ->setParameter('entityClass', $entityClass);
+
+        if ($dqlFilter) {
+            $queryBuilder->andWhere($dqlFilter);
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param Collection $stepNames
+     * @param string $entityClass
+     * @param string $entityIdentifier
+     * @param null $dqlFilter
+     * @return array|\Oro\Bundle\WorkflowBundle\Entity\WorkflowItem[]
+     */
+    public function findByStepNamesAndEntityClass(
+        Collection $stepNames,
+        $entityClass,
+        $entityIdentifier,
+        $dqlFilter = null
+    ) {
+        return $this->findByStepNamesAndEntityClassQueryBuilder($stepNames, $entityClass, $entityIdentifier, $dqlFilter)
+            ->getQuery()
+            ->getResult();
     }
 }
