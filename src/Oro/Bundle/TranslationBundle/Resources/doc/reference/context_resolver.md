@@ -1,7 +1,7 @@
 Translation Context Resolver
 -------------
 
-Translation context resolver (TCR) should be used to humanize translation keys and give some additional info to developers and translators.
+Translation context resolver should be used to humanize translation keys and give some additional info to developers and translators.
 
 
 ### Classes Description
@@ -11,7 +11,7 @@ Translation context resolver (TCR) should be used to humanize translation keys a
 
 ### Configuration
 
-Class implemetation
+The context resolver must implement `\Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface` and may look like following
 ```php
 class TranslationContextResolver implements TranslationContextResolverInterface
 {
@@ -39,7 +39,7 @@ class TranslationContextResolver implements TranslationContextResolverInterface
 }
 ```
 
-Register context resolver.
+Context resolver should be registered as shown below:
 
 ```yml
     oro_translation.extension.translation_context_resolver:
