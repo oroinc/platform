@@ -72,6 +72,8 @@ services:
     oro_workflow.assembler.transition_trigger.event:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler
         public: false
+        arguments:
+            - '@oro_workflow.transition_trigger.trigger_event_verifier'
 
     oro_workflow.transition_trigger_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler'
