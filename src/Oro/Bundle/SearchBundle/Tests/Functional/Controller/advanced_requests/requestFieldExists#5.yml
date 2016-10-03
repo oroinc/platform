@@ -8,11 +8,11 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item5@mail.com
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
     soap:
         data:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item5@mail.com
-                recordUrl: http://localhost/search/
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
