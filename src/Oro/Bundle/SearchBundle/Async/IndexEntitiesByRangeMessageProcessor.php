@@ -61,14 +61,17 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
 
         $result = $this->jobRunner->runDelayed($payload['jobId'], function () use ($message, $payload) {
             if (! isset($payload['entityClass'], $payload['offset'], $payload['limit'])) {
-                $this->logger->error(sprintf('Message is not valid: "%s"', $message->getBody()));
+                $this->logger->error('Message is not valid', ['message' => $payload]);
 
                 return false;
             }
 
             /** @var EntityManager $em */
             if (! $em = $this->doctrine->getManagerForClass($payload['entityClass'])) {
-                $this->logger->error(sprintf('Entity manager is not defined for class: "%s"', $payload['entityClass']));
+                $this->logger->error(
+                    sprintf('Entity manager is not defined for class: "%s"', $payload['entityClass']),
+                    ['message' => $payload]
+                );
 
                 return false;
             }

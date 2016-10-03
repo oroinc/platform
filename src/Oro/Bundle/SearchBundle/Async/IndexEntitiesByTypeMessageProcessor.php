@@ -65,7 +65,10 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
         $result = $this->jobRunner->runDelayed($payload['jobId'], function (JobRunner $jobRunner) use ($payload) {
             /** @var EntityManager $em */
             if (! $em = $this->doctrine->getManagerForClass($payload['entityClass'])) {
-                $this->logger->error(sprintf('Entity manager is not defined for class: "%s"', $payload['entityClass']));
+                $this->logger->error(
+                    sprintf('Entity manager is not defined for class: "%s"', $payload['entityClass']),
+                    ['message' => $payload]
+                );
 
                 return false;
             }

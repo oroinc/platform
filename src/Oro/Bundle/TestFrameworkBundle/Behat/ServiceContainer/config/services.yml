@@ -55,7 +55,6 @@ services:
             - '@oro_element_factory'
             - '@oro_test.kernel_service_factory'
             - '@oro_test.reference_repository_initializer'
-            - '@symfony2_extension.kernel'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 

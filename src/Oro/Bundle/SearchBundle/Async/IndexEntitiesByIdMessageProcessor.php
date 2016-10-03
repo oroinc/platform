@@ -49,18 +49,18 @@ class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, To
 
         foreach ($entities as $entity) {
             if (empty($entity['class'])) {
-                $this->logger->error(sprintf(
-                    'Message is invalid. Class was not found. message: "%s"',
-                    json_encode($entities)
-                ));
+                $this->logger->error(
+                    'Message is invalid. Class was not found. ',
+                    ['entity' => $entity]
+                );
 
                 continue;
             }
 
             if (empty($entity['id'])) {
                 $this->logger->error(sprintf(
-                    'Message is invalid. Id was not found. message: "%s"',
-                    json_encode($entities)
+                    'Message is invalid. Id was not found. ',
+                    ['entity' => $entity]
                 ));
 
                 continue;

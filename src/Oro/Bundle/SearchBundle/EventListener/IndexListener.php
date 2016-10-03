@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-use Doctrine\ORM\Event\OnClearEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Doctrine\ORM\Event\OnClearEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
@@ -187,10 +187,15 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function indexEntities()
     {
-        if ($this->savedEntities || $this->deletedEntities) {
-            $this->searchIndexer->save(array_merge($this->savedEntities, $this->deletedEntities));
+        if ($this->savedEntities) {
+            $this->searchIndexer->save($this->savedEntities);
 
             $this->savedEntities = [];
+        }
+
+        if ($this->deletedEntities) {
+            $this->searchIndexer->delete($this->deletedEntities);
+
             $this->deletedEntities = [];
         }
     }

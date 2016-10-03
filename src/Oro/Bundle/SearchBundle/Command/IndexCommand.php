@@ -44,7 +44,7 @@ class IndexCommand extends ContainerAwareCommand
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManagerForClass($class);
-        if (false == $em) {
+        if (null === $em) {
             throw new \LogicException(sprintf('Entity manager was not found for class: "%s"', $class));
         }
 
