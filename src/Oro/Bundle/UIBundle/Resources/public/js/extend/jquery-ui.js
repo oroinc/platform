@@ -124,8 +124,8 @@ define(['jquery', 'jquery-ui'], function($) {
             if (!this._curInst) {
                 return;
             }
-            if (this._curInst.dpDiv) {
-                this._curInst.dpDiv.remove();
+            if (this._curInst.input) {
+                this._curInst.input.datepicker('hide');
             }
             original._destroyDatepicker.apply(this, arguments);
         };
