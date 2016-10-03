@@ -21,7 +21,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *      mode="hidden"
  * )
- * @todo: setup needed indexes in BAP-11776
  */
 abstract class BaseTransitionTrigger
 {
