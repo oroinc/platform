@@ -1,8 +1,4 @@
 {%- block form_row -%}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': attr.class|default('')
-    }) %}
-
     <div class="form-row">
         <div class="form-row__label">
             {{- form_label(form, null, { 'label_attr': {'class': 'label'}}) -}}
