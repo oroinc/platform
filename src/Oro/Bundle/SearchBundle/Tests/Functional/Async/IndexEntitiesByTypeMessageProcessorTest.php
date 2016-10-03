@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
@@ -18,6 +19,7 @@ use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 {
     use SearchExtensionTrait;
+    use MessageQueueAssertTrait;
 
     protected function setUp()
     {
@@ -60,12 +62,12 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         ]));
 
         $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->getMessageProducer()->enable();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->enable();
+        self::getMessageCollector()->clear();
 
         $this->getIndexEntitiesByTypeMessageProcessor()->process($message, $this->createQueueSessionMock());
 
-        $messages = $this->getMessageProducer()->getSentMessages();
+        $messages = self::getSentMessages();
 
         $this->assertCount(4, $messages);
         $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[0]['topic']);
@@ -86,14 +88,6 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
     private function getJobProcessor()
     {
         return $this->getContainer()->get('oro_message_queue.job.processor');
-    }
-
-    /**
-     * @return \Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
-     */
-    private function getMessageProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
 
     /**

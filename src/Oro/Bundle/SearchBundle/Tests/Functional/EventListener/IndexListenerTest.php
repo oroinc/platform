@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
 
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -8,6 +9,8 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class IndexListenerTest extends WebTestCase
 {
+    use MessageQueueAssertTrait;
+
     protected function setUp()
     {
         parent::setUp();
@@ -26,28 +29,23 @@ class IndexListenerTest extends WebTestCase
     public function testShouldCreateSearchIndexForEntityIfItWasCreated()
     {
         $em = $this->getDoctrine()->getManagerForClass(Item::class);
-        $this->getMessageProducer()->enable();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->enable();
+        self::getMessageCollector()->clear();
 
         // test
         $item = new Item();
         $em->persist($item);
         $em->flush();
 
-        $messages = $this->getMessageProducer()->getSentMessages();
-
-        $this->assertNotNull($item->getId());
-        $this->assertCount(1, $messages);
-        $this->assertEquals(Topics::INDEX_ENTITIES, $messages[0]['topic']);
-
-        $expectedMessage = [
+        self::assertMessageSent(
+            Topics::INDEX_ENTITIES,
             [
-                'class' => Item::class,
-                'id' => $item->getId(),
-            ],
-        ];
-
-        $this->assertEquals($expectedMessage, $messages[0]['message']);
+                [
+                    'class' => Item::class,
+                    'id' => $item->getId(),
+                ]
+            ]
+        );
     }
 
     public function testShouldUpdateSearchIndexForEntityIfItWasUpdated()
@@ -57,27 +55,22 @@ class IndexListenerTest extends WebTestCase
         $item = new Item();
         $em->persist($item);
         $em->flush();
-        $this->getMessageProducer()->enable();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->enable();
+        self::getMessageCollector()->clear();
 
         // test
         $item->stringValue = 'value';
         $em->flush();
 
-        $messages = $this->getMessageProducer()->getSentMessages();
-
-        $this->assertNotEmpty($item->getId());
-        $this->assertCount(1, $messages);
-        $this->assertEquals(Topics::INDEX_ENTITIES, $messages[0]['topic']);
-
-        $expectedMessage = [
+        self::assertMessageSent(
+            Topics::INDEX_ENTITIES,
             [
-                'class' => Item::class,
-                'id' => $item->getId(),
-            ],
-        ];
-
-        $this->assertEquals($expectedMessage, $messages[0]['message']);
+                [
+                    'class' => Item::class,
+                    'id' => $item->getId(),
+                ]
+            ]
+        );
     }
 
     public function testShouldDeleteSearchIndexForEntityIfItWasDeleted()
@@ -87,8 +80,8 @@ class IndexListenerTest extends WebTestCase
         $item = new Item();
         $em->persist($item);
         $em->flush();
-        $this->getMessageProducer()->enable();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->enable();
+        self::getMessageCollector()->clear();
 
         $itemId = $item->getId();
         $this->assertNotNull($itemId);
@@ -97,19 +90,15 @@ class IndexListenerTest extends WebTestCase
         $em->remove($item);
         $em->flush();
 
-        $messages = $this->getMessageProducer()->getSentMessages();
-
-        $this->assertCount(1, $messages);
-        $this->assertEquals(Topics::INDEX_ENTITIES, $messages[0]['topic']);
-
-        $expectedMessage = [
+        self::assertMessageSent(
+            Topics::INDEX_ENTITIES,
             [
-                'class' => Item::class,
-                'id' => $itemId,
-            ],
-        ];
-
-        $this->assertEquals($expectedMessage, $messages[0]['message']);
+                [
+                    'class' => Item::class,
+                    'id' => $itemId,
+                ]
+            ]
+        );
     }
 
     /**
@@ -118,13 +107,5 @@ class IndexListenerTest extends WebTestCase
     private function getDoctrine()
     {
         return $this->getContainer()->get('doctrine');
-    }
-
-    /**
-     * @return \Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
-     */
-    private function getMessageProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
 }
