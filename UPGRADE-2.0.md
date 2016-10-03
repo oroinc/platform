@@ -35,7 +35,6 @@ UPGRADE FROM 1.10 to 2.0
 - Service `oro_workflow.entity_connector` (`Oro\Bundle\WorkflowBundle\Model\EntityConnector.php`) removed;
 - Parameter `oro_workflow.entity_connector.class` removed;
 - Removed parameter `EntityConnector $entityConnector` from constructor of `Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener`;
-- Removed parameter `EntityConnector $entityConnector` from constructor of `Oro\Bundle\WorkflowBundle\Model\TriggerScheduleOptionsVerifier`;
 - Removed form type `Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType`;
 - Service `oro_workflow.entity_connector` (`Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector`) was added with purpose to check whether entity can be used in workflow as related.
 - Now entity can have more than one active workflows.
@@ -50,7 +49,6 @@ UPGRADE FROM 1.10 to 2.0
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder through optionally specified workflowItem alias
         Note: `joinWorkflowStep` internally checks for workflowItem alias join to be already present in QueryBuilder instance to use it or creates new one otherwise.
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
-* Now entity can have more than one active workflows.
 * Activation or deactivation of workflow now triggers removal for all data in affected entity flows. So when workflow is deactivated or reactivated - WorkflowItems will be removed from storage.
 * Controllers methods (REST as well) for activation/deactivation now takes `workflowName` as `WorkflowDefinition` identifier instead of related entity class string.
 * Steps retrieval for an entity now returns steps for all currently active workflows for related entity with `workflow` node in each as name of corresponding workflow for steps in `stepsData`. Example: `{"workflowName":{"workflow": "workflowName", "steps":["step1", "step2"], "currentStep": "step1"}}`
@@ -112,7 +110,24 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Entity config `workflow.active_workflows` was removed. Use workflows configuration boolean node `defaults.active` instead.
 * Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
 * Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
-- `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`
+- `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`.
+- Service `oro_workflow.generator.trigger_schedule_options_verifier` (`Oro\Bundle\WorkflowBundle\Model\TriggerScheduleOptionsVerifier`) removed.
+- Service `oro_workflow.transition_schedule.process_configuration_generator` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator`) removed.
+- Service `oro_workflow.transition_schedule.items_fetcher` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher`) removed.
+- Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) removed.
+- Model `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` removed.
+- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` 
+and constructor signature changed to `DeferredScheduler $deferredScheduler`. 
+- Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger`.
+- Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger`.
+- Added new interface `Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface`.
+- Added new interface `Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface`.
+- Added new command `oro:workflow:handle-transition-cron-trigger` to handle transition cron trigger.
+- Removed schedule feature for workflow transitions. Now triggers can be used for schedule transitions.
+- Removed listener `Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener`.
+- Removed parameter `oro_workflow.listener.process_collector.class`.
+- Removed listener `Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener`.
+- Removed action group `oro_workflow_transition_process_schedule`.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
