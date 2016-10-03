@@ -60,7 +60,7 @@
                                                     <span class="separator">/</span>
                                                     {% endfor %}
                                                 {% endif %}
-                                                {% if breadcrumbs.escapeEntityTitle is defined and not breadcrumbs.escapeEntityTitle %}
+                                                {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
                                                     <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
                                                 {% else %}
                                                     <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
