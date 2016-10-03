@@ -289,7 +289,7 @@ operations:
         button_options:
             icon: icon-refresh
             class: btn-danger icons-holder-text
-        acl_resource: oro_translation_translation_update
+        acl_resource: oro_translation_language_translate
         actions:
             - '@call_service_method':
                 service: oro_translation.manager.translation

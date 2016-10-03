@@ -73,17 +73,15 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($domains)));
 
             foreach ($domains as $domain => $messages) {
-                $records = 0;
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
 
                 foreach ($messages as $key => $value) {
                     $translationManager->saveValue($key, $value, $locale, $domain);
-                    $records++;
                 }
 
                 $translationManager->flush();
 
-                $output->writeln(sprintf('processed %d records.', $records));
+                $output->writeln(sprintf('processed %d records.', count($messages)));
             }
         }
 
