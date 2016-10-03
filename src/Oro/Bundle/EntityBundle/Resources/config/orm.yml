@@ -15,8 +15,8 @@ services:
         arguments:
             - '@doctrine'
 
-    oro_entity.pdo_exception_helper:
-        class: Oro\Bundle\EntityBundle\ORM\PDOExceptionHelper
+    oro_entity.database_exception_helper:
+        class: Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper
         arguments:
             - '@doctrine'
 

@@ -7,9 +7,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Oro\Bundle\EntityBundle\ORM\PDOExceptionHelper;
+use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 
-class PDOExceptionHelperTest extends \PHPUnit_Framework_TestCase
+class DatabaseExceptionHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
@@ -17,14 +17,14 @@ class PDOExceptionHelperTest extends \PHPUnit_Framework_TestCase
     protected $registry;
 
     /**
-     * @var PDOExceptionHelper
+     * @var DatabaseExceptionHelper
      */
-    protected $pdoExceptionHelper;
+    protected $databaseExceptionHelper;
 
     protected function setUp()
     {
         $this->registry = $this->getMock(ManagerRegistry::class);
-        $this->pdoExceptionHelper = new PDOExceptionHelper($this->registry);
+        $this->databaseExceptionHelper = new DatabaseExceptionHelper($this->registry);
     }
 
     public function testIsDeadlockMySQL()
@@ -43,7 +43,7 @@ class PDOExceptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $this->assertTrue($this->pdoExceptionHelper->isDeadlock($exception));
+        $this->assertTrue($this->databaseExceptionHelper->isDeadlock($exception));
     }
 
     public function testIsDeadlockPostgreSQL()
@@ -64,7 +64,7 @@ class PDOExceptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $this->assertTrue($this->pdoExceptionHelper->isDeadlock($exception));
+        $this->assertTrue($this->databaseExceptionHelper->isDeadlock($exception));
     }
 
     public function testNotDeadlock()
@@ -83,6 +83,6 @@ class PDOExceptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $this->assertFalse($this->pdoExceptionHelper->isDeadlock($exception));
+        $this->assertFalse($this->databaseExceptionHelper->isDeadlock($exception));
     }
 }

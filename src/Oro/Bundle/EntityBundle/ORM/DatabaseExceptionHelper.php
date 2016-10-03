@@ -7,7 +7,7 @@ use Doctrine\DBAL\Driver\DriverException;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 
-class PDOExceptionHelper
+class DatabaseExceptionHelper
 {
     /**
      * @var ManagerRegistry
@@ -28,19 +28,17 @@ class PDOExceptionHelper
      */
     public function isDeadlock(DriverException $exception)
     {
-        $isDeadlock = false;
-
-        $code = $exception->getErrorCode();
+        $code = (string)$exception->getErrorCode();
         $platform = $this->registry->getConnection()->getDatabasePlatform();
 
-        if ($platform instanceof MySqlPlatform && $code == '1213') {
+        if ($platform instanceof MySqlPlatform) {
             //Error: 1213 SQLSTATE: 40001 (ER_LOCK_DEADLOCK)
-            $isDeadlock = true;
-        } elseif ($platform instanceof PostgreSqlPlatform && $code == '40P01') {
+            return $code === '1213';
+        } elseif ($platform instanceof PostgreSqlPlatform) {
             //40P01 DEADLOCK DETECTED deadlock_detected
-            $isDeadlock = true;
+            return $code === '40P01';
         }
 
-        return $isDeadlock;
+        return false;
     }
 }
