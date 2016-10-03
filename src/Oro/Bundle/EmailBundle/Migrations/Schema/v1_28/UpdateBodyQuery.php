@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_27;
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_28;
 
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;

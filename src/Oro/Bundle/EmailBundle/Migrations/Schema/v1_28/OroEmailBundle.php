@@ -1,12 +1,32 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: yurio
- * Date: 03.10.16
- * Time: 19:42
- */
-class OroEmailBundle
-{
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_28;
 
+use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
+
+class OroEmailBundle implements Migration
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function up(Schema $schema, QueryBag $queries)
+    {
+        static::addTextBodyFieldToEmailBodyTable($schema);
+        $queries->addPostQuery(new UpdateBodyQuery());
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    public static function addTextBodyFieldToEmailBodyTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_body');
+        if (!$table->hasColumn('text_body')) {
+            $table->addColumn('text_body', 'text', []);
+        }
+    }
 }
