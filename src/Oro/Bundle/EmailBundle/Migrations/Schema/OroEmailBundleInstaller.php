@@ -119,5 +119,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle123::oroEmailTable($schema);
         OroEmailBundle124::removeIndex($schema);
         OroEmailBundle126::addEmailUserMailboxOwnerSeenIndex($schema);
+
+        OroEmailBundle127::oroEmailFolderTable($schema);
     }
 }

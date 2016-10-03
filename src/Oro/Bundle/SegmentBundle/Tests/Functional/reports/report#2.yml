@@ -15,7 +15,10 @@ request:
         oro_segment_form[owner]: 1
         oro_segment_form[type]: static
 response:
-        - [admin,1,/user/view/1]
+        -
+          c1: admin
+          id: 1
+          view_link: %oro_default_prefix%user/view/1
 export:
         - [admin]
 export_filter:

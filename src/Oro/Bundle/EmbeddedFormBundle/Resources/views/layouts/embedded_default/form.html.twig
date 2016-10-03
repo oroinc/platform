@@ -16,6 +16,19 @@
 <body{{ block('block_attributes') }}>
     <div id="page">
         {{ block('container_widget') }}
+        {% block javascript %}
+            <script type="text/javascript">
+                var form = document.querySelector('form');
+                if (form) {
+                    form.addEventListener('submit', function () {
+                        var button = this.querySelector('button');
+                        if (button) {
+                            button.disabled = true;
+                        }
+                    });
+                }
+            </script>
+        {% endblock javascript %}
     </div>
 </body>
 {% endblock %}

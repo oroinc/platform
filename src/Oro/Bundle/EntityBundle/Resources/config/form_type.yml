@@ -90,3 +90,10 @@ services:
         tags:
             - { name: form.type_guesser, priority: 10 }
 
+
+    oro_entity.form.type.entity_field_fallback_value:
+        class: 'Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType'
+        arguments:
+            - "@oro_entity.fallback.resolver.entity_fallback_resolver"
+        tags:
+            - { name: form.type, alias: oro_entity_fallback_value }
