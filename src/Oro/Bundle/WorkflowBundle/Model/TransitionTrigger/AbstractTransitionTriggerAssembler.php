@@ -17,7 +17,6 @@ abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAs
 
     /**
      * @param BaseTransitionTrigger $trigger
-     * @return void
      * @throws TransitionTriggerVerifierException
      */
     abstract protected function verifyTrigger(BaseTransitionTrigger $trigger);
