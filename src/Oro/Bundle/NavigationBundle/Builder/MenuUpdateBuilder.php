@@ -4,12 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Exception\InvalidMaxNestingLevelException;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
 use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
-use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
 class MenuUpdateBuilder implements BuilderInterface
 {
@@ -18,17 +19,17 @@ class MenuUpdateBuilder implements BuilderInterface
     /** @var MenuUpdateProviderInterface[] */
     private $providers = [];
     
-    /** @var MenuUpdateHelper */
-    protected $menuUpdateHelper;
-    
-    /**
-     * @param MenuUpdateHelper $menuUpdateHelper
-     */
-    public function __construct(MenuUpdateHelper $menuUpdateHelper)
-    {
-        $this->menuUpdateHelper = $menuUpdateHelper;
-    }
+    /** @var LocalizationHelper */
+    private $localizationHelper;
 
+    /**
+     * @param LocalizationHelper $localizationHelper
+     */
+    public function __construct(LocalizationHelper $localizationHelper)
+    {
+        $this->localizationHelper = $localizationHelper;
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -41,12 +42,22 @@ class MenuUpdateBuilder implements BuilderInterface
         $menuName = $menu->getName();
         foreach ($provider->getUpdates($menuName, $ownershipType) as $update) {
             if ($update->getMenu() == $menuName) {
-                $this->menuUpdateHelper->updateMenuItem($update, $menu);
+                MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
             }
         }
 
+        /** @var ItemInterface $item */
         foreach ($menu->getChildren() as $item) {
-            $this->checkMaxNestingLevel($menu, $item);
+            $item = MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item);
+            if ($item) {
+                throw new MaxNestingLevelExceededException(
+                    sprintf(
+                        "Item \"%s\" exceeded max nesting level in menu \"%s\".",
+                        $item->getLabel(),
+                        $menu->getLabel()
+                    )
+                );
+            }
         }
     }
 
@@ -75,26 +86,5 @@ class MenuUpdateBuilder implements BuilderInterface
         }
         
         return $this->providers[$area];
-    }
-
-    /**
-     * @param ItemInterface $menu
-     * @param ItemInterface $item
-     */
-    private function checkMaxNestingLevel(ItemInterface $menu, ItemInterface $item)
-    {
-        if ($this->menuUpdateHelper->isMaxNestingLevelReached($menu, $item)) {
-            throw new InvalidMaxNestingLevelException(
-                sprintf(
-                    "Item \"%s\" exceeded max nesting level in menu \"%s\".",
-                    $item->getLabel(),
-                    $menu->getName()
-                )
-            );
-        }
-
-        foreach ($item->getChildren() as $child) {
-            $this->checkMaxNestingLevel($menu, $child);
-        }
     }
 }
