@@ -133,7 +133,6 @@ class OperationListener
     protected function getRowConfigurationClosure($actionConfiguration)
     {
         return function (ResultRecordInterface $record, array $config) use ($actionConfiguration) {
-
             $configuration = $this->retrieveConfiguration($actionConfiguration, $record, $config);
 
             foreach ($this->operations as $operationName => $operation) {
