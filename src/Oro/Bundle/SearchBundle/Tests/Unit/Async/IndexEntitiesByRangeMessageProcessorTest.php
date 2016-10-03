@@ -37,12 +37,26 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
     {
         $doctrine = $this->createDoctrineMock();
 
+
+        $message = new NullMessage();
+        $message->setBody(JSON::encode([
+            'offset' => 123,
+            'limit' => 1000,
+            'jobId' => 12345,
+        ]));
+
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Message is not valid: "{"offset":123,"limit":1000,"jobId":12345}"')
-        ;
+            ->with(
+                'Message is not valid.',
+                ['message' => [
+                    'offset' => 123,
+                    'limit' => 1000,
+                    'jobId' => 12345,
+                ]]
+            );
 
         $producer = $this->createSearchIndexerMock();
 
@@ -55,14 +69,6 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
                 $callback($jobRunner);
             }))
         ;
-
-        $message = new NullMessage();
-        $message->setBody(JSON::encode([
-            'offset' => 123,
-            'limit' => 1000,
-            'jobId' => 12345,
-        ]));
-
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
@@ -73,11 +79,27 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
     {
         $doctrine = $this->createDoctrineMock();
 
+
+        $message = new NullMessage();
+        $message->setBody(JSON::encode([
+            'entityClass' => 'entity-name',
+            'limit' => 6789,
+            'jobId' => 12345,
+        ]));
+
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Message is not valid: "{"entityClass":"entity-name","limit":6789,"jobId":12345}"')
+            ->with(
+                'Message is not valid.',
+                ['message' => [
+                        'entityClass' => 'entity-name',
+                        'limit' => 6789,
+                        'jobId' => 12345,
+                    ]
+                ]
+            )
         ;
 
         $producer = $this->createSearchIndexerMock();
@@ -91,13 +113,6 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
                 $callback($jobRunner);
             }))
         ;
-
-        $message = new NullMessage();
-        $message->setBody(JSON::encode([
-            'entityClass' => 'entity-name',
-            'limit' => 6789,
-            'jobId' => 12345,
-        ]));
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
@@ -109,11 +124,28 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
     {
         $doctrine = $this->createDoctrineMock();
 
+
+        $message = new NullMessage();
+        $message->setBody(JSON::encode([
+            'entityClass' => 'entity-name',
+            'offset' => 6789,
+            'jobId' => 12345,
+        ]));
+
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Message is not valid: "{"entityClass":"entity-name","offset":6789,"jobId":12345}"')
+            ->with(
+                'Message is not valid.',
+                [
+                    'message' => [
+                        'entityClass' => 'entity-name',
+                        'offset' => 6789,
+                        'jobId' => 12345,
+                    ]
+                ]
+            )
         ;
 
         $producer = $this->createSearchIndexerMock();
@@ -128,12 +160,6 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
             }))
         ;
 
-        $message = new NullMessage();
-        $message->setBody(JSON::encode([
-            'entityClass' => 'entity-name',
-            'offset' => 6789,
-            'jobId' => 12345,
-        ]));
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
@@ -149,11 +175,29 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
             ->method('getManagerForClass')
         ;
 
+
+        $message = new NullMessage();
+        $message->setBody(json_encode([
+            'entityClass' => 'entity-name',
+            'offset' => 1235,
+            'limit' => 6789,
+            'jobId' => 12345,
+        ]));
+
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Entity manager is not defined for class: "entity-name"')
+            ->with(
+                'Entity manager is not defined for class: "entity-name"',
+                ['message' => [
+                        'entityClass' => 'entity-name',
+                        'offset' => 1235,
+                        'limit' => 6789,
+                        'jobId' => 12345,
+                    ]
+                ]
+            )
         ;
 
         $producer = $this->createSearchIndexerMock();
@@ -167,14 +211,6 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
                 $callback($jobRunner);
             }))
         ;
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'entityClass' => 'entity-name',
-            'offset' => 1235,
-            'limit' => 6789,
-            'jobId' => 12345,
-        ]));
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));

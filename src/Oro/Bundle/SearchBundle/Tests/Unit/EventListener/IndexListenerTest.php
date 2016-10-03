@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\EventListener\IndexListener;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -144,7 +143,13 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $this->searchIndexer
             ->expects($this->once())
             ->method('save')
-            ->with(array_merge($insertedEntities, $deletedEntities))
+            ->with($insertedEntities)
+        ;
+
+        $this->searchIndexer
+            ->expects($this->once())
+            ->method('delete')
+            ->with($deletedEntities)
         ;
 
         $listener = $this->createListener();

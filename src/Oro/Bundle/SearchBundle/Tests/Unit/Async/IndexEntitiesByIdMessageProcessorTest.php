@@ -59,19 +59,19 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('Message is invalid. Class was not found. message: "[[]]"')
-        ;
-
-        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
-
         $message = new NullMessage();
         $message->setBody(json_encode(
             [[]]
         ));
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with('Message is invalid. Class was not found.', ['entity' => []])
+        ;
+
+        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
@@ -86,14 +86,6 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('Message is invalid. Id was not found. message: "[{"class":"class-name"}]"')
-        ;
-
-        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
 
         $message = new NullMessage();
         $message->setBody(json_encode(
@@ -103,6 +95,15 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         ));
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with('Message is invalid. Id was not found.', ['entity' => ['class' => 'class-name']])
+        ;
+
+        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 

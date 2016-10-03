@@ -38,19 +38,24 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $doctrine = $this->createDoctrineMock();
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('Message is invalid. Class was not found. message: "{"key":"value"}"')
-        ;
-
         $message = new NullMessage();
         $message->setBody(json_encode(
             [
                 'key' => 'value',
             ]
         ));
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with(
+                'Message is invalid. Class was not found.',
+                [
+                    'message' => $message
+                ]
+            )
+        ;
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -64,19 +69,22 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $doctrine = $this->createDoctrineMock();
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('Message is invalid. Id was not found. message: "{"class":"class-name"}"')
-        ;
-
         $message = new NullMessage();
         $message->setBody(json_encode(
             [
                 'class' => 'class-name',
             ]
         ));
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with(
+                'Message is invalid. Id was not found.',
+                ['message' => $message]
+            )
+        ;
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createSessionMock());
