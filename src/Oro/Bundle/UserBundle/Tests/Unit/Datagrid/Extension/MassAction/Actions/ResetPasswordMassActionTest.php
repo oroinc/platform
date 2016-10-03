@@ -31,6 +31,6 @@ class ResetPasswordMassActionTest extends \PHPUnit_Framework_TestCase
 
         $options = $this->resetAction->getOptions();
         $this->assertEquals('oro_user_mass_password_reset', $options->offsetGet('route'));
-        $this->assertEquals('oro_datagrid.mass_action.reset_password.handler', $options->offsetGet('handler'));
+        $this->assertEquals('oro_datagrid.mass_action.forced_password_reset.handler', $options->offsetGet('handler'));
     }
 }

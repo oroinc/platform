@@ -10,7 +10,7 @@ class ResetPasswordMassAction extends AbstractMassAction
     /** @var array */
     protected $defaultOptions = [
         'frontend_handle'  => 'redirect',
-        'handler'          => 'oro_datagrid.mass_action.reset_password.handler',
+        'handler'          => 'oro_datagrid.mass_action.forced_password_reset.handler',
         'icon'             => 'shield',
         'frontend_type'    => 'dialog',
         'route'            => 'oro_user_mass_password_reset',
@@ -24,7 +24,7 @@ class ResetPasswordMassAction extends AbstractMassAction
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['handler'])) {
-            $options['handler'] = 'oro_datagrid.mass_action.reset_password.handler';
+            $options['handler'] = 'oro_datagrid.mass_action.forced_password_reset.handler';
         }
 
         if (empty($options['route'])) {

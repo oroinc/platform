@@ -20,24 +20,18 @@ class ResetController extends Controller
     const SESSION_EMAIL = 'oro_user_reset_email';
 
     /**
-     * @Route("/reset-request", name="oro_user_reset_request")
-     * @Method({"GET"})
-     * @Template
-     */
-    public function requestAction()
-    {
-        return array();
-    }
-
-    /**
      * Request reset user password
      *
+     * @param Request $request
      * @Route("/send-email", name="oro_user_reset_send_email")
      * @Method({"POST"})
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function sendEmailAction()
+    public function sendEmailAction(Request $request)
     {
-        $username = $this->getRequest()->request->get('username');
+        $username = $request->request->get('username');
+        $frontend = $request->get('frontend', false);
         $user = $this->get('oro_user.manager')->findUserByUsernameOrEmail($username);
 
         if (null === $user || !$user->isEnabled()) {
@@ -45,12 +39,14 @@ class ResetController extends Controller
         }
 
         if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))) {
-            $this->get('session')->getFlashBag()->add(
-                'warn',
-                'oro.user.password.reset.ttl_already_requested.message'
-            );
+            if (!($frontend && null == $user->getPasswordRequestedAt())) {
+                $this->get('session')->getFlashBag()->add(
+                    'warn',
+                    'oro.user.password.reset.ttl_already_requested.message'
+                );
 
-            return $this->redirect($this->generateUrl('oro_user_reset_request'));
+                return $this->redirect($this->generateUrl('oro_user_reset_request'));
+            }
         }
 
         if (null === $user->getConfirmationToken()) {
@@ -72,6 +68,16 @@ class ResetController extends Controller
         $this->get('oro_user.manager')->updateUser($user);
 
         return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
+    }
+
+    /**
+     * @Route("/reset-request", name="oro_user_reset_request")
+     * @Method({"GET"})
+     * @Template
+     */
+    public function requestAction()
+    {
+        return array();
     }
 
     /**

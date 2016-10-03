@@ -109,7 +109,7 @@ operations:
             - oro_user_index
             - oro_user_view
         order: 50
-        acl_resource: [EDIT, entity:Oro\Bundle\UserBundle\Entity\User]
+        acl_resource: [password_management]
         button_options:
             icon: icon-shield
         frontend_options:
@@ -127,13 +127,18 @@ operations:
                 route: oro_user_mass_password_reset
                 data_identifier: u.id
                 confirmation: true
+                defaultMessages:
+                    confirm_title: oro.user.reset_password.mass_action.title
+                    confirm_content: oro.user.reset_password.mass_action.question
+                    confirm_ok: oro.user.reset_password.mass_action.label
+                acl_resource: password_management
                 frontend_options:
                     title: oro.user.reset_password.popup.title
                     dialogOptions:
                         modal: true
                 messages:
-                    - success: oro.user.password.reset.mass_action.success
-                    - failure: oro.user.password.reset.mass_action.failure
+                    - success: oro.user.password.force_reset.mass_action.success
+                    - failure: oro.user.password.force_reset.mass_action.failure
         actions:
             - '@call_method':
                 object: $.data
@@ -168,7 +173,7 @@ operations:
                         - '@eq': [$.sent, true]
                 actions:
                     - '@flash_message':
-                        message: oro.user.password.reset.success.message
+                        message: oro.user.password.force_reset.success.message
                         type: 'success'
             - '@tree':
                 conditions:
@@ -176,5 +181,5 @@ operations:
                         - '@eq': [$.sent, false]
                 actions:
                     - '@flash_message':
-                        message: oro.user.password.reset.failure.message
+                        message: oro.user.password.force_reset.failure.message
                         type: 'error'

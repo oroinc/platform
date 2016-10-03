@@ -57,7 +57,10 @@ class ControllersResetTest extends WebTestCase
         $this->client->request(
             'POST',
             $this->getUrl('oro_user_reset_send_email'),
-            ['username' => self::USER_NAME],
+            [
+                'username' => self::USER_NAME,
+                'frontend' => 1
+            ],
             [],
             $this->generateNoHashNavigationHeader()
         );

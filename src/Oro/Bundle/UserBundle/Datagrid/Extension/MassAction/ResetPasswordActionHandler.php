@@ -80,7 +80,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
 
             if (!$entity instanceof User) {
                 // hydration failed
-                $responseMessage = $massActionOptions->offsetGetByPath('[messages][success]', $this->errorMessage);
+                $responseMessage = $massActionOptions->offsetGetByPath('[messages][failure]', $this->errorMessage);
                 return new MassActionResponse(
                     false,
                     $this->translator->trans($responseMessage)
@@ -96,6 +96,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
             } catch (\Exception $e) {
                 if (null !== $this->logger) {
                     $this->logger->error(sprintf('Sending email to %s failed.', $entity->getEmail()));
+                    $this->logger->error($e->getMessage());
                 }
             }
 

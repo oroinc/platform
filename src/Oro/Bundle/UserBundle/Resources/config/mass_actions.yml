@@ -1,11 +1,11 @@
 services:
-    oro_datagrid.mass_action.reset_password:
+    oro_datagrid.mass_action.forced_password_reset:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\Actions\ResetPasswordMassAction
         shared: false
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: resetpassword }
 
-    oro_datagrid.mass_action.reset_password.handler:
+    oro_datagrid.mass_action.forced_password_reset.handler:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler
         arguments:
             - '@oro_user.mailer.processor'
