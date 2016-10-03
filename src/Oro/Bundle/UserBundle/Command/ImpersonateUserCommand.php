@@ -57,12 +57,17 @@ class ImpersonateUserCommand extends ContainerAwareCommand
             !$input->getOption('silent')
         );
 
+        $datetimeFormatter = $this->getContainer()->get('oro_locale.formatter.date_time');
         $output->writeln(
             sprintf(
                 '<info>To login as user <comment>%s</comment> open the following URL ' .
                 '(expires <comment>%s</comment>):</info>',
                 $user->getUsername(),
-                $impersonation->getExpireAt()->format('Y-m-d h:i:s e')
+                $datetimeFormatter->format(
+                    $impersonation->getExpireAt(),
+                    \IntlDateFormatter::MEDIUM,
+                    \IntlDateFormatter::FULL
+                )
             )
         );
         $output->writeln($url);
