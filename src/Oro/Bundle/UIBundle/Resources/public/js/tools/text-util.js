@@ -79,7 +79,7 @@ define(['underscore', 'orotranslation/js/translator'], function(_, __) {
             if (!_.isString(text)) {
                 return text;
             }
-            var words = text.split(/\W+/);
+            var words = _.compact(text.split(/\W+/));
             if (words.length < minWordsCount) {
                 return text;
             }

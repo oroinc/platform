@@ -7,8 +7,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
@@ -60,7 +58,7 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->willReturn($token);
 
-        $this->assertEquals($expectedResult, $this->helper->isApplicationsValid($this->createAction($applications)));
+        $this->assertEquals($expectedResult, $this->helper->isApplicationsValid($applications));
     }
 
     /**
@@ -139,26 +137,6 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
                 'expectedResult' => null,
             ],
         ];
-    }
-
-    /**
-     * @param array $applications
-     * @return Operation
-     */
-    protected function createAction(array $applications)
-    {
-        $definition = new OperationDefinition();
-        $definition->setApplications($applications);
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
-        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $operation->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($definition);
-
-        return $operation;
     }
 
     /**

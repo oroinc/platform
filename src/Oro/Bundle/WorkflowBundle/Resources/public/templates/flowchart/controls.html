@@ -1,4 +1,4 @@
 <% checkboxUid =  Math.random().toString().replace('0.', 'checkbox-') %>
 <div class="checkbox-group pull-left">
-    <input id="<%=checkboxUid %>" type="checkbox" name="toggle-transition-labels"<% if (transitionLabelsVisible){ %> checked<% } %>><label for="<%=checkboxUid %>"><%= _.__('Show Transition Labels') %></label>
+    <input id="<%-checkboxUid %>" type="checkbox" name="toggle-transition-labels"<% if (transitionLabelsVisible){ %> checked<% } %>><label for="<%-checkboxUid %>"><%= _.__('Show Transition Labels') %></label>
 </div>

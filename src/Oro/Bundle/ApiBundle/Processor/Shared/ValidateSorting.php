@@ -159,7 +159,7 @@ class ValidateSorting implements ProcessorInterface
             return null;
         }
 
-        return $sorter->getPropertyPath() ?: $fieldName;
+        return $sorter->getPropertyPath($fieldName);
     }
 
     /**
@@ -208,7 +208,7 @@ class ValidateSorting implements ProcessorInterface
                 return [null, null];
             }
 
-            $associationName = $config->getField($fieldName)->getPropertyPath() ?: $fieldName;
+            $associationName = $config->getField($fieldName)->getPropertyPath($fieldName);
             if (!$metadata->hasAssociation($associationName)) {
                 return [null, null];
             }

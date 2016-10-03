@@ -24,24 +24,24 @@ class ChainFilterFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('createFilter')
             ->willReturnMap(
                 [
-                    ['known1', $knownFilter1],
-                    ['known3', $knownFilter31],
-                    ['unknown1', null],
+                    ['known1', [], $knownFilter1],
+                    ['known3', ['some_option' => 'val'], $knownFilter31],
+                    ['unknown1', [], null],
                 ]
             );
         $childFactory2->expects($this->any())
             ->method('createFilter')
             ->willReturnMap(
                 [
-                    ['known2', $knownFilter2],
-                    ['known3', $knownFilter32],
-                    ['unknown2', null],
+                    ['known2', [], $knownFilter2],
+                    ['known3', ['some_option' => 'val'], $knownFilter32],
+                    ['unknown2', [], null],
                 ]
             );
 
         $this->assertSame($knownFilter1, $chainFactory->createFilter('known1'));
         $this->assertSame($knownFilter2, $chainFactory->createFilter('known2'));
-        $this->assertSame($knownFilter31, $chainFactory->createFilter('known3'));
+        $this->assertSame($knownFilter31, $chainFactory->createFilter('known3', ['some_option' => 'val']));
         $this->assertNull($chainFactory->createFilter('unknown1'));
         $this->assertNull($chainFactory->createFilter('unknown2'));
     }
