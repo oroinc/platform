@@ -40,11 +40,6 @@ class RestAdvancedSearchApiTest extends WebTestCase
         //compare result
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
-        if (!isset($result['data'])) {
-            $this->assertSameSize($response['rest']['data'], []);
-
-            return;
-        }
 
         $this->assertSameSize($response['rest']['data'], $result['data']);
 
