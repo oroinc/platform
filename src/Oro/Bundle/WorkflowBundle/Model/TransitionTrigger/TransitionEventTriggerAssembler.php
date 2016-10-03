@@ -4,17 +4,17 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionTriggerVerifierInterface;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerVerifierInterface;
 
 class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
 {
-    /** @var TransitionTriggerVerifierInterface */
+    /** @var TransitionEventTriggerVerifierInterface */
     private $triggerVerifier;
 
     /**
-     * @param TransitionTriggerVerifierInterface $triggerVerifier
+     * @param TransitionEventTriggerVerifierInterface $triggerVerifier
      */
-    public function __construct(TransitionTriggerVerifierInterface $triggerVerifier)
+    public function __construct(TransitionEventTriggerVerifierInterface $triggerVerifier)
     {
         $this->triggerVerifier = $triggerVerifier;
     }

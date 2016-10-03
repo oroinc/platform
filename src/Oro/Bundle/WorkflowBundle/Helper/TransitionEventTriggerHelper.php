@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
-use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class TransitionEventTriggerHelper
 {
@@ -98,8 +96,8 @@ class TransitionEventTriggerHelper
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @param $entity
-     * @param $mainEntity
+     * @param object $entity
+     * @param object $mainEntity
      * @param WorkflowItem $item
      * @return array
      */

@@ -55,12 +55,14 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
             WorkflowTransitionTriggersListener::getSubscribedEvents()
         );
 
-        foreach (array_values(WorkflowTransitionTriggersListener::getSubscribedEvents()) as $call) {
+        $calls = array_values(WorkflowTransitionTriggersListener::getSubscribedEvents());
+
+        foreach ($calls as $call) {
             if (is_string($call)) {
                 $this->assertTrue(method_exists($this->listener, $call));
             } elseif (is_array($call)) {
                 foreach ($call as $method) {
-                    list($method, $priority) = $method;
+                    list($method) = $method;
                     $this->assertTrue(method_exists($this->listener, $method));
                 }
             }
@@ -87,12 +89,9 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
 
         $triggersBag = new TriggersBag($definition, [$trigger1, $trigger2]);
 
-        $this->updater->expects($this->once())
-            ->method('updateTriggers')
-            ->with($triggersBag);
+        $this->updater->expects($this->once())->method('updateTriggers')->with($triggersBag);
 
         $this->listener->updateTriggers($event);//after event job
-
     }
 
     public function testTriggersDelete()
@@ -100,8 +99,7 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
         $definition = new WorkflowDefinition();
         $event = new WorkflowChangesEvent($definition);
 
-        $this->updater->expects($this->once())
-            ->method('removeTriggers')->with($definition);
+        $this->updater->expects($this->once())->method('removeTriggers')->with($definition);
 
         $this->listener->deleteTriggers($event);
     }

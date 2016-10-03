@@ -5,12 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler;
-use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionTriggerVerifierInterface;
+use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerVerifierInterface;
 
 class TransitionEventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var TransitionTriggerVerifierInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TransitionEventTriggerVerifierInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $verifier;
 
@@ -21,12 +21,13 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->verifier = $this->getMock(TransitionTriggerVerifierInterface::class);
+        $this->verifier = $this->getMock(TransitionEventTriggerVerifierInterface::class);
         $this->assembler = new TransitionEventTriggerAssembler($this->verifier);
     }
 
     /**
      * @dataProvider canAssembleData
+     *
      * @param bool $expected
      * @param array $options
      */

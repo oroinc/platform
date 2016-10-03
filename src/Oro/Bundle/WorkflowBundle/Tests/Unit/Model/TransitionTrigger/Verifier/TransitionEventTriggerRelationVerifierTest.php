@@ -7,7 +7,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerRelationVerifier;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\TriggerStub;
 
 class TransitionEventTriggerRelationVerifierTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,17 +18,6 @@ class TransitionEventTriggerRelationVerifierTest extends \PHPUnit_Framework_Test
     protected function setUp()
     {
         $this->verifier = new TransitionEventTriggerRelationVerifier();
-    }
-
-    public function testWrongArgumentException()
-    {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            'Unexpected type of trigger. Expected Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger ' .
-            'got Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\TriggerStub'
-        );
-
-        $this->verifier->verifyTrigger(new TriggerStub());
     }
 
     public function testRelationExpectedException()
@@ -46,7 +34,8 @@ class TransitionEventTriggerRelationVerifierTest extends \PHPUnit_Framework_Test
         $this->setExpectedException(
             TransitionTriggerVerifierException::class,
             'Relation option is mandatory for non workflow related entity based event triggers. ' .
-            'Empty relation property met in `test_workflow` workflow for `test_transition` transition with entity `stdClass` by event `update`'
+            'Empty relation property met in `test_workflow` workflow for `test_transition` transition ' .
+            'with entity `stdClass` by event `update`'
         );
 
         $this->verifier->verifyTrigger($trigger);

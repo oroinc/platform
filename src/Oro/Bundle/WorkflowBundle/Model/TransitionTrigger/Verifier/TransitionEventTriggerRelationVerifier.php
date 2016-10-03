@@ -2,25 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier;
 
-use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 
-class TransitionEventTriggerRelationVerifier implements TransitionTriggerVerifierInterface
+class TransitionEventTriggerRelationVerifier implements TransitionEventTriggerVerifierInterface
 {
-    /** {@inheritdoc} @throws \InvalidArgumentException */
-    public function verifyTrigger(BaseTransitionTrigger $trigger)
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function verifyTrigger(TransitionEventTrigger $trigger)
     {
-        if (!$trigger instanceof TransitionEventTrigger) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Unexpected type of trigger. Expected %s got %s',
-                    TransitionEventTrigger::class,
-                    get_class($trigger)
-                )
-            );
-        }
-
         $relatedEntity = $trigger->getWorkflowDefinition()->getRelatedEntity();
 
         if ($relatedEntity !== $trigger->getEntityClass() && empty($trigger->getRelation())) {

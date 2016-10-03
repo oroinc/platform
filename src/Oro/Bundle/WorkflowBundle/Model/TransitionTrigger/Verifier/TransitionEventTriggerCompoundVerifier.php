@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier;
 
-use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
-use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 
-class TransitionEventTriggerCompoundVerifier implements TransitionTriggerVerifierInterface
+class TransitionEventTriggerCompoundVerifier implements TransitionEventTriggerVerifierInterface
 {
-    /**
-     * @var TransitionTriggerVerifierInterface[]
-     */
+    /** @var array|TransitionEventTriggerVerifierInterface[] */
     protected $verifiers = [];
 
     /**
-     * @param TransitionTriggerVerifierInterface $triggerVerifier
+     * @param TransitionEventTriggerVerifierInterface $triggerVerifier
      */
-    public function addVerifier(TransitionTriggerVerifierInterface $triggerVerifier)
+    public function addVerifier(TransitionEventTriggerVerifierInterface $triggerVerifier)
     {
         $this->verifiers[] = $triggerVerifier;
     }
@@ -24,18 +20,8 @@ class TransitionEventTriggerCompoundVerifier implements TransitionTriggerVerifie
     /**
      * {@inheritdoc}
      */
-    public function verifyTrigger(BaseTransitionTrigger $trigger)
+    public function verifyTrigger(TransitionEventTrigger $trigger)
     {
-        if (!$trigger instanceof TransitionEventTrigger) {
-            throw new TransitionTriggerVerifierException(
-                sprintf(
-                    'Trigger should be an instance of %s but %s retrieved',
-                    TransitionEventTrigger::class,
-                    get_class($trigger)
-                )
-            );
-        }
-
         foreach ($this->verifiers as $triggerVerifier) {
             $triggerVerifier->verifyTrigger($trigger);
         }

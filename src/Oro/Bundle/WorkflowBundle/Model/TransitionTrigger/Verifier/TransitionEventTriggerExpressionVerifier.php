@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier;
 
-use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
@@ -10,21 +9,15 @@ use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
-class TransitionEventTriggerExpressionVerifier implements TransitionTriggerVerifierInterface
+class TransitionEventTriggerExpressionVerifier implements TransitionEventTriggerVerifierInterface
 {
-    /** {@inheritdoc} @throws \InvalidArgumentException */
-    public function verifyTrigger(BaseTransitionTrigger $trigger)
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function verifyTrigger(TransitionEventTrigger $trigger)
     {
-        if (!$trigger instanceof TransitionEventTrigger) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Unexpected type of trigger. Expected %s but got %s',
-                    TransitionEventTrigger::class,
-                    get_class($trigger)
-                )
-            );
-        }
-
         $expression = $trigger->getRequire();
 
         if (null === $expression) {
@@ -77,11 +70,7 @@ class TransitionEventTriggerExpressionVerifier implements TransitionTriggerVerif
         $varsAndTypes = [];
 
         foreach ($context as $var => $val) {
-            $varsAndTypes[] = sprintf(
-                '%s [%s]',
-                $var,
-                get_class($val)
-            );
+            $varsAndTypes[] = sprintf('%s [%s]', $var, get_class($val));
         }
 
         return $varsAndTypes;
@@ -97,10 +86,13 @@ class TransitionEventTriggerExpressionVerifier implements TransitionTriggerVerif
         $mainEntityClass = $definition->getRelatedEntity();
 
         $mainEntity = $this->createClassStub($mainEntityClass);
-
         $eventEntityClass = $trigger->getEntityClass();
 
-        $eventEntity = $eventEntityClass === $mainEntityClass ? $mainEntity : $this->createClassStub($eventEntityClass);
+        if ($eventEntityClass === $mainEntityClass) {
+            $eventEntity = $mainEntity;
+        } else {
+            $eventEntity = $this->createClassStub($eventEntityClass);
+        }
 
         return TransitionEventTriggerHelper::buildContextValues(
             $trigger->getWorkflowDefinition(),

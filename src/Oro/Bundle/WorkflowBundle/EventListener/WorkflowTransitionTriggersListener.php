@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
@@ -41,6 +42,8 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
         $workflowName = $event->getDefinition()->getName();
         if (array_key_exists($workflowName, $this->triggerBags)) {
             $this->triggersUpdater->updateTriggers($this->triggerBags[$workflowName]);
+
+            unset($this->triggerBags[$workflowName]);
         }
     }
 
@@ -54,7 +57,7 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
 
     /**
      * @param WorkflowChangesEvent $event
-     * @throws \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
+     * @throws AssemblerException
      */
     public function createTriggers(WorkflowChangesEvent $event)
     {

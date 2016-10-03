@@ -7,7 +7,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\TriggerStub;
 
 class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,17 +16,6 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
     protected function setUp()
     {
         $this->verifier = new TransitionEventTriggerExpressionVerifier();
-    }
-
-    public function testWrongArgumentException()
-    {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            'Unexpected type of trigger. Expected Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger but got' .
-            ' Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\TriggerStub'
-        );
-
-        $this->verifier->verifyTrigger(new TriggerStub());
     }
 
     /**
@@ -70,17 +58,14 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
 
     public function testVerificationBadTypesOperandsOk()
     {
-        $trigger = $this->buildEventTriggerWithExpression(
-            'wi.get()[0]',
-            EntityStub::class,
-            EntityStub::class
-        );
+        $trigger = $this->buildEventTriggerWithExpression('wi.get()[0]', EntityStub::class, EntityStub::class);
 
         $this->verifier->verifyTrigger($trigger);
     }
 
     /**
      * @dataProvider verifyFailures
+     *
      * @param string $exceptionMessage
      * @param TransitionEventTrigger $trigger
      */
@@ -101,7 +86,8 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
     {
         return [
             'other' => [
-                'Requirement field: "entity.a w < a.b" - syntax error: "Unexpected token "name" of value "w" around position 10."',
+                'Requirement field: "entity.a w < a.b" - syntax error: ' .
+                '"Unexpected token "name" of value "w" around position 10."',
                 $this->buildEventTriggerWithExpression('entity.a w < a.b', EntityStub::class, EntityStub::class)
             ],
             'variable' => [
@@ -122,17 +108,13 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
      * @param string $workflowEntity
      * @return TransitionEventTrigger
      */
-    private function buildEventTriggerWithExpression(
-        $require,
-        $entity,
-        $workflowEntity
-    ) {
+    private function buildEventTriggerWithExpression($require, $entity, $workflowEntity)
+    {
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity($workflowEntity);
+
         $trigger = new TransitionEventTrigger();
-        $trigger->setWorkflowDefinition($definition);
-        $trigger->setEntityClass($entity);
-        $trigger->setRequire($require);
+        $trigger->setWorkflowDefinition($definition)->setEntityClass($entity)->setRequire($require);
 
         return $trigger;
     }
