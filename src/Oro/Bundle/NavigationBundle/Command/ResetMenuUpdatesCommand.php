@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Command;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,6 +31,12 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'Email of existing user'
             )
+            ->addOption(
+                'menu',
+                'm',
+                InputArgument::OPTIONAL,
+                'Menu name to reset'
+            )
             ->setDescription('Resets menu updates depends on scope (organization/user).')
             ->setHelp('If “user” param is not set - reset global scope, otherwise reset user scope.');
     }
@@ -40,6 +47,7 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $userMail = $input->getOption('user');
+        $menu = $input->getOption('menu');
 
         if ($userMail) {
             $user = $this
@@ -54,28 +62,45 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
             $this
                 ->getContainer()
                 ->get('oro_navigation.manager.menu_update_default')
-                ->resetMenuUpdatesWithOwnershipType(MenuUpdate::OWNERSHIP_USER, $user->getId());
+                ->resetMenuUpdatesWithOwnershipType(MenuUpdate::OWNERSHIP_USER, $user->getId(), $menu);
 
-            $output->writeln(sprintf('The menu for the user %s is successfully reset.', $userMail));
+            if ($menu) {
+                $output->writeln(sprintf(
+                    'The menu for the user %s and menu %s is successfully reset.',
+                    $userMail,
+                    $menu
+                ));
+            } else {
+                $output->writeln(sprintf(
+                    'The menu for the user %s is successfully reset.',
+                    $userMail
+                ));
+            }
         } else {
             $helper = $this->getHelper('question');
-            $question = new ConfirmationQuestion(
-                '<question>WARNING! Menu for organization will be reset. Continue (y/n)?</question>',
-                true
-            );
 
-            if (!$helper->ask($input, $output, $question)) {
-                $output->writeln('<error>Command aborted</error>');
+            if (!$menu) {
+                $question = new ConfirmationQuestion(
+                    '<question>WARNING! Menu for organization will be reset. Continue (y/n)?</question>',
+                    true
+                );
 
-                return;
+                if (!$helper->ask($input, $output, $question)) {
+                    $output->writeln('<error>Command aborted</error>');
+
+                    return;
+                }
             }
 
             $this
                 ->getContainer()
                 ->get('oro_navigation.manager.menu_update_default')
-                ->resetMenuUpdatesWithOwnershipType(MenuUpdate::OWNERSHIP_ORGANIZATION);
+                ->resetMenuUpdatesWithOwnershipType(MenuUpdate::OWNERSHIP_ORGANIZATION, null, $menu);
 
-            $output->writeln(sprintf('The menu for the organization is successfully reset.', $userMail));
+            $output->writeln(sprintf(
+                'The menu for the %s is successfully reset.',
+                ($menu) ? " menu" : 'organization'
+            ));
         }
     }
 }

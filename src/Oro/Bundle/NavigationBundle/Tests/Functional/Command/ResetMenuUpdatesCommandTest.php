@@ -41,22 +41,28 @@ class ResetMenuUpdatesCommand extends WebTestCase
     public function paramProvider()
     {
         return [
-            'should show help'                            => [
+            'should show help' => [
                 '$expectedContent' => "Usage:\n  oro:navigation:menu:reset [options]",
                 '$params'          => ['--help'],
-                '$rowsCount'       => 2
+                '$rowsCount'       => 3
             ],
             'should show failed reset for non existing user' => [
                 '$expectedContent' => "User with email nonexist@user.com not exists.",
                 '$params'          => ['--user=nonexist@user.com'],
+                '$rowsCount'       => 3
+            ],
+            'should show success reset for user and menu' => [
+                '$expectedContent' =>
+                    "The menu for the user admin@example.com and menu other_menu is successfully reset.",
+                '$params'          => ['--user=admin@example.com', '--menu=other_menu'],
                 '$rowsCount'       => 2
             ],
-            'should show success reset for user'          => [
+            'should show success reset for user' => [
                 '$expectedContent' => "The menu for the user admin@example.com is successfully reset.",
                 '$params'          => ['--user=admin@example.com'],
                 '$rowsCount'       => 1
             ],
-            'should show success reset for organization'  => [
+            'should show success reset for organization' => [
                 '$expectedContent' => "The menu for the organization is successfully reset.",
                 '$params'          => [],
                 '$rowsCount'       => 0
