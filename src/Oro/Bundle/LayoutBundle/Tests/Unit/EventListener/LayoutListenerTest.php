@@ -15,7 +15,6 @@ use Oro\Component\Layout\LayoutBuilderInterface;
 
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
-use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 
@@ -33,9 +32,6 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutHelper;
 
-    /** @var LayoutDataCollector|\PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutDataCollector;
-
     /** @var LayoutContextHolder|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutContextHolder;
 
@@ -48,10 +44,6 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->layoutHelper = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Request\LayoutHelper')
             ->disableOriginalConstructor()->getMock();
 
-        $this->layoutDataCollector = $this->getMockBuilder('Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->layoutContextHolder = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder')
             ->disableOriginalConstructor()
             ->getMock();
@@ -59,8 +51,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new LayoutListener(
             $this->layoutHelper,
             $this->layoutManager,
-            $this->layoutContextHolder,
-            $this->layoutDataCollector
+            $this->layoutContextHolder
         );
     }
 

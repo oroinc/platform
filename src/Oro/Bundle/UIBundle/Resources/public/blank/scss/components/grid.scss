@@ -1,0 +1,70 @@
+.grid {
+    &__row {
+        margin-bottom: $offset-y;
+
+        @include clearfix;
+
+        &--offset {
+            &-none {
+                margin-bottom: 0;
+            }
+
+            &-s {
+                margin-bottom: $offset-y-s;
+            }
+
+            &-m {
+                margin-bottom: $offset-y-m;
+            }
+        }
+
+        &--has-twin-row {
+            &:not(:last-child) {
+                margin-bottom: 50px;
+            }
+        }
+    }
+
+    &__column {
+        &-half {
+            float: left;
+
+            width: (100% - $grid-offset) / 2;
+
+            &:first-child {
+                margin-right: $grid-offset;
+            }
+
+            @media (max-width: 991px) {
+                clear: left;
+
+                width: 100%;
+                margin-right: auto;
+            }
+        }
+
+        &--both {
+            clear: both;
+        }
+
+        &--offset {
+            &-m {
+                margin-right: $grid-offset;
+            }
+        }
+    }
+
+    &__column {
+        float: left;
+
+        box-sizing: border-box;
+
+        padding: 0 9px;
+    }
+
+    @for $i from 1 through $grid-count {
+        &__column--#{$i} {
+            width: (($i* 100%) / $grid-count);
+        }
+    }
+}

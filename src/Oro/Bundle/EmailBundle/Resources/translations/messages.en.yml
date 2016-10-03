@@ -74,6 +74,9 @@ oro:
                 label: System Mailboxes
                 add_mailbox.label: Add Mailbox
 
+            template_configuration:
+                label: HTML in templates
+
             show_recent_emails_in_user_bar:
                 label: Show recent emails
 
@@ -85,9 +88,13 @@ oro:
                 preview_limit:
                     label: Attachments preview limit
 
+            sanitize_html:
+                label: Enable HTML purifier
+                tooltip: Disabling HTML purifier will allow users to paste any HTML code into template or email body editor without tag stripping.
+
         emailtemplate:
-            entity_label:        Template
-            entity_plural_label: Templates
+            entity_label:        Email Template
+            entity_plural_label: Email Templates
             edit_entity:         Edit email template "%name%"
             clone_entity:        Clone email template
             entity_description:  Represent email template
@@ -137,6 +144,7 @@ oro:
             view: View
 
         menu:
+            emailtemplate.entity_plural_label: Templates
             emailtemplate_list.description: List of email templates
             user_emails: My Emails
             compose: Compose

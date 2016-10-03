@@ -32,6 +32,7 @@ class InlineEditingExtension extends AbstractExtension
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
      * @param SecurityFacade $securityFacade
      * @param EntityClassNameHelper $entityClassNameHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
@@ -93,28 +94,23 @@ class InlineEditingExtension extends AbstractExtension
         $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
         $blackList = $configuration->getBlackList();
         $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
+        $objectIdentity = new ObjectIdentity('entity', $configItems['entity_name']);
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
-                // Check access to edit field in Class level.
-                // If access not granted - skip inline editing for such field.
-                $dadaFieldName = $this->getColummFieldName($columnName, $column);
-                if (!$this->authChecker->isGranted(
-                    'EDIT',
-                    new FieldVote(new ObjectIdentity('entity', $configItems['entity_name']), $dadaFieldName)
-                )
-                ) {
-                    if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)) {
-                        $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY] = false;
-                    }
-                    continue;
-                }
                 $newColumn = $this->guesser->getColumnOptions(
                     $columnName,
                     $configItems['entity_name'],
                     $column,
                     $behaviour
                 );
+
+                // Check access to edit field in Class level.
+                // If access not granted - skip inline editing for such field.
+                if (!$this->isFieldEditable($newColumn, $objectIdentity, $columnName, $column)) {
+                    $column = $this->disableColumnEdit($column);
+                    continue;
+                }
 
                 // frontend type key must not be replaced with default value
                 $frontendTypeKey = PropertyInterface::FRONTEND_TYPE_KEY;
@@ -171,5 +167,56 @@ class InlineEditingExtension extends AbstractExtension
         }
 
         return $dadaFieldName;
+    }
+
+    /**
+     * @param array $newColumn
+     * @param array $column
+     *
+     * @return bool
+     */
+    protected function isEnabledEdit($newColumn, $column)
+    {
+        if (array_key_exists(Configuration::BASE_CONFIG_KEY, $newColumn)
+            && isset($newColumn[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY])) {
+            return $newColumn[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY];
+        }
+        if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)
+            && isset($column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY])) {
+            return $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $column
+     *
+     * @return mixed
+     */
+    protected function disableColumnEdit($column)
+    {
+        if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)) {
+            $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY] = false;
+        }
+
+        return $column;
+    }
+
+    /**
+     * @param array $newColumn
+     * @param $objectIdentity
+     * @param string $columnName
+     * @param array $column
+     *
+     * @return bool
+     */
+    protected function isFieldEditable($newColumn, $objectIdentity, $columnName, $column)
+    {
+        return $this->isEnabledEdit($newColumn, $column)
+        && $this->authChecker->isGranted(
+            'EDIT',
+            new FieldVote($objectIdentity, $this->getColummFieldName($columnName, $column))
+        );
     }
 }

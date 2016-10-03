@@ -16,7 +16,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 {
     const COMPILER_PASS_NAME = 'oro_datagrid';
     const CACHE_POSTFIX      = 'data';
-    const ROOT_PARAMETER     = 'datagrid';
+    const ROOT_PARAMETER     = 'datagrids';
+    const LOADED_FLAG        = 'loaded';
 
     /** @var array */
     protected $rawConfiguration = [];
@@ -87,6 +88,10 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     protected function ensureConfigurationLoaded($gridName)
     {
         if (!isset($this->rawConfiguration[$gridName])) {
+            if (!$this->cache->contains(self::LOADED_FLAG) || !$this->cache->fetch(self::LOADED_FLAG)) {
+                $this->loadConfiguration();
+            }
+
             $data = $this->cache->fetch($gridName.'_'.self::CACHE_POSTFIX);
             if ($data) {
                 $this->rawConfiguration = array_merge($this->rawConfiguration, $data);
@@ -140,6 +145,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             }
             $this->cache->save($gridName.'_'.self::CACHE_POSTFIX, $aggregatedConfig);
         }
+
+        $this->cache->save(self::LOADED_FLAG, true);
     }
 
     /**
@@ -149,7 +156,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     {
         return new CumulativeConfigLoader(
             self::COMPILER_PASS_NAME,
-            new YamlCumulativeFileLoader('Resources/config/datagrid.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/datagrids.yml')
         );
     }
 }

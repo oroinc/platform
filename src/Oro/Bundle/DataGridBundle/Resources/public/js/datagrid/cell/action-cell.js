@@ -142,28 +142,30 @@ define([
         createActions: function() {
             var result = [];
             var actions = this.column.get('actions');
-            var config = this.model.get('action_configuration');
+            var config = this.model.get('action_configuration') || {};
 
             _.each(actions, function(action, name) {
                 // filter available actions for current row
                 if (!config || config[name] !== false) {
-                    result.push(this.createAction(action));
+                    result.push(this.createAction(action, config[name] || {}));
                 }
             }, this);
 
-            return result;
+            return _.sortBy(result, 'order');
         },
 
         /**
          * Creates action
          *
          * @param {Function} Action
+         * @param {Object} configuration
          * @protected
          */
-        createAction: function(Action) {
+        createAction: function(Action, configuration) {
             return new Action({
                 model: this.model,
-                datagrid: this.column.get('datagrid')
+                datagrid: this.column.get('datagrid'),
+                configuration: configuration
             });
         },
 

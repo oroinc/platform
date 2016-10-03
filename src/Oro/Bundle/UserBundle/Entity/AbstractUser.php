@@ -315,7 +315,7 @@ abstract class AbstractUser implements
      *
      * @return AbstractUser
      */
-    public function setLastLogin(\DateTime $time)
+    public function setLastLogin(\DateTime $time = null)
     {
         $this->lastLogin = $time;
 

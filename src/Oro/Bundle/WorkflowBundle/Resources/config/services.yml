@@ -129,6 +129,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.permission_registry:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
@@ -235,8 +236,8 @@ services:
             - '@doctrine'
 
     oro_workflow.repository.workflow_item:
-        class: Doctrine\ORM\EntityRepository
-        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
+        parent: oro_entity.abstract_repository
         arguments:
             - '%oro_workflow.workflow_item.entity.class%'
 

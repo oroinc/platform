@@ -43,7 +43,7 @@
             "kriswallsmith/assetic": "1.1.2",
             "leafo/lessphp": "0.4.0",
             "lexik/maintenance-bundle": "dev-master",
-            "liip/imagine-bundle": "0.17.*",
+            "liip/imagine-bundle": "1.5.*",
             "luxifer/doctrine-functions": "1.2.1",
             "monolog/monolog": "1.7.*",
             "mtdowling/cron-expression": "1.0.*",
@@ -60,7 +60,7 @@
             "symfony/icu": "~1.1",
             "symfony/monolog-bundle": "2.3.0",
             "symfony/swiftmailer-bundle": "2.3.*",
-            "symfony/symfony": "2.8.*",
+            "symfony/symfony": "2.8.*, !=2.8.10",
             "twig/extensions": "1.0.1",
             "zendframework/zend-mail": "2.1.*"
         },

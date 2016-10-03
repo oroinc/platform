@@ -230,12 +230,14 @@ class ConfigManager
      *
      * @param array $settings
      * @param null|int|object $scopeIdentifier
+     *
+     * @return ConfigChangeSet
      */
     public function save($settings, $scopeIdentifier = null)
     {
         $settings = $this->normalizeSettings($settings);
         if (empty($settings)) {
-            return;
+            return new ConfigChangeSet([]);
         }
 
         $oldValues = [];
@@ -248,11 +250,14 @@ class ConfigManager
 
         list($updated, $removed) = $this->getScopeManager()->save($event->getSettings(), $scopeIdentifier);
 
-        $event = new ConfigUpdateEvent($this->buildChangeSet($updated, $removed, $oldValues));
-        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
-
         // clear a local cache
         $this->localCache->clear();
+
+        $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
+        $event = new ConfigUpdateEvent($changeSet);
+        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
+
+        return $changeSet;
     }
 
     /**

@@ -18,6 +18,6 @@ abstract class AbstractGridFilterItem extends Element
 
     public function isOpen()
     {
-        $this->hasClass('open-filter');
+        return $this->hasClass('open-filter');
     }
 }

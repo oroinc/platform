@@ -1,0 +1,23 @@
+navigation:
+    menu_config:
+        areas:
+            default:
+                - application_menu
+            custom:
+                - shortcuts
+        tree:
+            application_menu:
+                type: application_menu
+
+            shortcuts:
+                type: shortcuts
+
+    navigation_elements:
+        favoriteButton:
+            default: true
+            routes:
+                call_list: false
+        shortcutsPanel:
+            default: false
+            routes:
+                call_list: true

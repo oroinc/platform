@@ -9,6 +9,9 @@ class LayoutUpdateLoader implements LayoutUpdateLoaderInterface
     /** @var DriverInterface[] */
     protected $drivers = [];
 
+    /** @var array */
+    protected $updateFileNamePatterns = [];
+
     /**
      * @param string          $fileExt
      * @param DriverInterface $driver
@@ -16,6 +19,7 @@ class LayoutUpdateLoader implements LayoutUpdateLoaderInterface
     public function addDriver($fileExt, DriverInterface $driver)
     {
         $this->drivers[$fileExt] = $driver;
+        $this->updateFileNamePatterns[] = $driver->getUpdateFilenamePattern($fileExt);
     }
 
     /**
@@ -31,5 +35,13 @@ class LayoutUpdateLoader implements LayoutUpdateLoaderInterface
         $driver = $this->drivers[$fileExt];
 
         return $driver->load($file);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdateFileNamePatterns()
+    {
+        return $this->updateFileNamePatterns;
     }
 }

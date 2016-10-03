@@ -47,7 +47,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
         $this->resolveOptions(FormFieldType::NAME, []);
     }
 
-    public function testBuildView()
+    public function testGetBlockView()
     {
         $formName = 'test_form';
         $formPath = 'firstName';
@@ -74,7 +74,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
      * @expectedException \OutOfBoundsException
      * @expectedExceptionMessage Undefined index: test_form.
      */
-    public function testBuildViewWithoutForm()
+    public function testGetBlockViewWithoutForm()
     {
         $this->getBlockView(
             FormFieldType::NAME,
@@ -100,7 +100,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testFinishViewForVisibleField()
+    public function testGetBlockViewForVisibleField()
     {
         $formName = 'test_form';
         $formPath = 'firstName';
@@ -123,7 +123,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    public function testFinishViewForInvisibleField()
+    public function testGetBlockViewForInvisibleField()
     {
         $formName = 'test_form';
         $formPath = 'firstName';
@@ -146,7 +146,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
         $this->assertTrue($formView->isRendered());
     }
 
-    public function testFinishViewForFieldWithVisibleOptionAsNotEvaluatedExpression()
+    public function testGetBlockViewForFieldWithVisibleOptionAsNotEvaluatedExpression()
     {
         $formName = 'test_form';
         $formPath = 'firstName';

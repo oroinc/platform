@@ -3,21 +3,19 @@
 namespace Oro\Bundle\EntityMergeBundle\EventListener\DataGrid;
 
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class MergeMassActionListener
 {
-    /**
-     * @var MetadataRegistry
-     */
-    protected $metadataRegistry;
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
 
     /**
-     * @param MetadataRegistry $metadataRegistry
+     * @param ConfigProvider $entityConfigProvider
      */
-    public function __construct(MetadataRegistry $metadataRegistry)
+    public function __construct(ConfigProvider $entityConfigProvider)
     {
-        $this->metadataRegistry = $metadataRegistry;
+        $this->entityConfigProvider = $entityConfigProvider;
     }
 
     /**
@@ -28,18 +26,15 @@ class MergeMassActionListener
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
-
-        $massActions = isset($config['mass_actions']) ? $config['mass_actions'] : array();
-
-        if (empty($massActions['merge']['entity_name'])) {
+        if (!isset($config['mass_actions'])
+            || empty($config['mass_actions']['merge']['entity_name'])
+        ) {
             return;
         }
 
-        $entityName = $massActions['merge']['entity_name'];
-
-        $entityMergeEnable = $this->metadataRegistry->getEntityMetadata($entityName)->is('enable');
-
-        if (!$entityMergeEnable) {
+        $entityClassName = $config['mass_actions']['merge']['entity_name'];
+        $entityMergeEnabled = $this->entityConfigProvider->getConfig($entityClassName)->is('enable');
+        if (!$entityMergeEnabled) {
             $config->offsetUnsetByPath('[mass_actions][merge]');
         }
     }

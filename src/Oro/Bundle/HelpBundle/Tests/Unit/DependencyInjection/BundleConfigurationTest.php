@@ -142,7 +142,7 @@ class BundleConfigurationTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'Invalid configuration for path "resources.resources.AcmeFooBundle:Foo:bar.server": '
+                'Invalid configuration for path "help.resources.AcmeFooBundle:Foo:bar.server": '
                     . 'Invalid URL "server".'
             ),
             'invalid_link' => array(
@@ -154,7 +154,7 @@ class BundleConfigurationTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'Invalid configuration for path "resources.resources.AcmeFooBundle:Foo:bar.link": Invalid URL "link".'
+                'Invalid configuration for path "help.resources.AcmeFooBundle:Foo:bar.link": Invalid URL "link".'
             ),
             'invalid_vendor_too_many_sections' => array(
                 array(

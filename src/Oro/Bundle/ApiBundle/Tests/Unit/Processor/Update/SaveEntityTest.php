@@ -69,7 +69,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $em->expects($this->once())
             ->method('flush')
-            ->with($this->identicalTo($entity));
+            ->with(null);
 
         $this->context->setResult($entity);
         $this->processor->process($this->context);

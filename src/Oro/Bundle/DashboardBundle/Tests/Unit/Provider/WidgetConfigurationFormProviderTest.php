@@ -81,7 +81,7 @@ class DashboardConfigurationFormProviderTest extends FormIntegrationTestCase
 
         $config = $this->getConfig($configPath);
         $provider = new WidgetConfigurationFormProvider(
-            new ConfigProvider($config['oro_dashboard_config'], $eventDispatcher),
+            new ConfigProvider($config['dashboards'], $eventDispatcher),
             $this->factory
         );
 

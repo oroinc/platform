@@ -1,10 +1,14 @@
 <?php
-namespace ConfigBundle\Tests\Provider;
+
+namespace Oro\Bundle\ConfigBundle\Tests\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 
+use Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition;
+use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -175,7 +179,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             'bad - undefined field in api_tree'        => array(
                 'filename'  => 'bad_undefined_field_in_api_tree.yml',
                 'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                'message'   => 'The field "some_field" is used in "system_configuration.section1.some_field",'
                     . ' but it is not defined in "fields" section.',
                 'method'    => 'getTree',
                 'arguments' => array()
@@ -183,7 +187,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             'bad - ui_only field in api_tree'          => array(
                 'filename'  => 'bad_ui_only_field_in_api_tree.yml',
                 'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                'message'   => 'The field "some_field" is used in "system_configuration.section1.some_field",'
                     . ' but "data_type" is not defined in "fields" section.',
                 'method'    => 'getTree',
                 'arguments' => array()
@@ -294,8 +298,9 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
         $subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(array('__construct'))
             ->disableOriginalConstructor()->getMock();
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $formType       = new FormType($subscriber);
+        $formType       = new FormType($subscriber, $container);
         $formFieldType  = new FormFieldType();
         $useParentScope = new ParentScopeCheckbox();
 
@@ -309,5 +314,120 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
                 array()
             ),
         );
+    }
+
+    /**
+     * @dataProvider featuresCheckDataProvider
+     * @param string $disabledNode
+     * @param array $expected
+     */
+    public function testGetFilteredTree($disabledNode, array $expected)
+    {
+        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturnCallback(
+                function ($resource) use ($disabledNode) {
+                    return $resource !== $disabledNode;
+                }
+            );
+
+        $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
+        $provider->setFeatureChecker($featureChecker);
+        $tree = $this->getNodeNamesTree($provider->getTree());
+        $this->assertEquals($expected, $tree, '', 0.0, 10, true);
+    }
+
+    /**
+     * @return array
+     */
+    public function featuresCheckDataProvider()
+    {
+        return [
+            [
+                'another_branch_first',
+                [
+                    'system_configuration' => [
+                        'children' => [
+                            'first_group' => [
+                                'children' => [
+                                    'second_group' => [
+                                        'children' => [
+                                            'third_group' => [
+                                                'children' => [
+                                                    'fourth_group' => [
+                                                        'children' => [
+                                                            'some_another_field',
+                                                            'some_field',
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'some_another_field',
+                [
+                    'system_configuration' => [
+                        'children' => [
+                            'first_group' => [
+                                'children' => [
+                                    'second_group' => [
+                                        'children' => [
+                                            'third_group' => [
+                                                'children' => [
+                                                    'fourth_group' => [
+                                                        'children' => [
+                                                            'some_field',
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                            'another_branch_first' => [
+                                                'children' => [
+                                                    'another_branch_second' => [
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param AbstractNodeDefinition|GroupNodeDefinition $node
+     * @return array
+     */
+    protected function getNodeNamesTree(AbstractNodeDefinition $node)
+    {
+        $result = [];
+        if ($node instanceof GroupNodeDefinition) {
+            $result[$node->getName()]['children'] = [];
+            foreach ($node as $childNode) {
+                $result[$node->getName()]['children'] = array_merge(
+                    $result[$node->getName()]['children'],
+                    $this->getNodeNamesTree($childNode)
+                );
+            }
+
+            return $result;
+        }
+
+        return [$node->getName()];
     }
 }

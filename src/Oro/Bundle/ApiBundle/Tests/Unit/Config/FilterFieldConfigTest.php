@@ -52,10 +52,12 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config = new FilterFieldConfig();
         $this->assertFalse($config->hasPropertyPath());
         $this->assertNull($config->getPropertyPath());
+        $this->assertEquals('default', $config->getPropertyPath('default'));
 
         $config->setPropertyPath('path');
         $this->assertTrue($config->hasPropertyPath());
         $this->assertEquals('path', $config->getPropertyPath());
+        $this->assertEquals('path', $config->getPropertyPath('default'));
         $this->assertEquals(['property_path' => 'path'], $config->toArray());
 
         $config->setPropertyPath(null);
@@ -67,6 +69,7 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setPropertyPath('');
         $this->assertFalse($config->hasPropertyPath());
         $this->assertNull($config->getPropertyPath());
+        $this->assertEquals('default', $config->getPropertyPath('default'));
         $this->assertEquals([], $config->toArray());
     }
 
@@ -130,6 +133,48 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setArrayAllowed(false);
         $this->assertTrue($config->hasArrayAllowed());
         $this->assertFalse($config->isArrayAllowed());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testType()
+    {
+        $config = new FilterFieldConfig();
+        $this->assertNull($config->getType());
+
+        $config->setType('test');
+        $this->assertEquals('test', $config->getType());
+        $this->assertEquals(['type' => 'test'], $config->toArray());
+
+        $config->setType(null);
+        $this->assertNull($config->getType());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testOptions()
+    {
+        $config = new FilterFieldConfig();
+        $this->assertNull($config->getOptions());
+
+        $config->setOptions(['key' => 'val']);
+        $this->assertEquals(['key' => 'val'], $config->getOptions());
+        $this->assertEquals(['options' => ['key' => 'val']], $config->toArray());
+
+        $config->setOptions(null);
+        $this->assertNull($config->getOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testOperators()
+    {
+        $config = new FilterFieldConfig();
+        $this->assertNull($config->getOperators());
+
+        $config->setOperators(['=', '!=']);
+        $this->assertEquals(['=', '!='], $config->getOperators());
+        $this->assertEquals(['operators' => ['=', '!=']], $config->toArray());
+
+        $config->setOperators(null);
+        $this->assertNull($config->getOperators());
         $this->assertEquals([], $config->toArray());
     }
 }

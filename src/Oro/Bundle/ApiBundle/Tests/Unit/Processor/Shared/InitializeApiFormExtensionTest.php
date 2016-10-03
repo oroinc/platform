@@ -39,6 +39,9 @@ class InitializeApiFormExtensionTest extends FormProcessorTestCase
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
             ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\ContextMetadataAccessor'));
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('setConfigAccessor')
+            ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\ContextConfigAccessor'));
 
         $this->processor->process($this->context);
     }

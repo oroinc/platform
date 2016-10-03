@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\DataGrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
 use Oro\Bundle\EntityMergeBundle\EventListener\DataGrid\MergeMassActionListener;
 
 class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
@@ -9,158 +12,115 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var MergeMassActionListener
      */
-    private $target;
+    private $mergeMassActionListener;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $entityMetadata;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $buildBefore;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $datagridConfig;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $metadataRegistry;
-
-    /**
-     * @var string
-     */
-    private $entityName;
-
-    /**
-     * @var array
-     */
-    private $config;
+    private $entityConfigProvider;
 
     protected function setUp()
     {
-        $this->metadataRegistry = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->buildBefore = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildBefore')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityName = 'testEntityName';
-        $this->config = array('mass_actions' => array('merge' => array('entity_name' => $this->entityName)));
-
-        $this->datagridConfig = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->buildBefore->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($this->datagridConfig));
-
-        $this->target = new MergeMassActionListener($this->metadataRegistry);
+        $this->mergeMassActionListener = new MergeMassActionListener($this->entityConfigProvider);
     }
 
     public function testOnBuildUnsetMergeMassAction()
     {
-        $this->init();
+        $entityName = 'testEntityName';
+        $datagridConfig = DatagridConfiguration::create(
+            ['mass_actions' => ['merge' => ['entity_name' => $entityName]]]
+        );
+        $entityConfig = $this->getEntityConfig();
 
-        $this->entityMetadata->expects($this->once())
-            ->method('is')
-            ->with('enable', true)
-            ->will($this->returnValue(false));
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($entityName)
+            ->willReturn($entityConfig);
 
-        $this->datagridConfig->expects($this->once())
-            ->method('offsetUnsetByPath')
-            ->with('[mass_actions][merge]');
+        $event = $this->getBuildBeforeEvent($datagridConfig);
+        $this->mergeMassActionListener->onBuildBefore($event);
 
-        $this->target->onBuildBefore($this->buildBefore);
+        $this->assertEquals(
+            ['mass_actions' => []],
+            $datagridConfig->toArray()
+        );
     }
 
     public function testOnBuildNotUnsetMergeMass()
     {
-        $this->init();
+        $entityName = 'testEntityName';
+        $datagridConfig = DatagridConfiguration::create(
+            ['mass_actions' => ['merge' => ['entity_name' => $entityName]]]
+        );
+        $entityConfig = $this->getEntityConfig(['enable' => true]);
 
-        $this->entityMetadata->expects($this->once())
-            ->method('is')
-            ->with('enable', true)
-            ->will($this->returnValue(true));
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($entityName)
+            ->willReturn($entityConfig);
 
-        $this->datagridConfig->expects($this->never())
-            ->method('offsetUnsetByPath')
-            ->withAnyParameters();
+        $event = $this->getBuildBeforeEvent($datagridConfig);
+        $this->mergeMassActionListener->onBuildBefore($event);
 
-
-        $this->target->onBuildBefore($this->buildBefore);
+        $this->assertEquals(
+            ['mass_actions' => ['merge' => ['entity_name' => $entityName]]],
+            $datagridConfig->toArray()
+        );
     }
 
     public function testOnBuildBeforeSkipsForEmptyMassActions()
     {
-        $this->initDatagridConfig(array('mass_actions' => array()));
+        $datagridConfig = DatagridConfiguration::create(
+            ['mass_actions' => []]
+        );
 
-        $this->metadataRegistry->expects($this->never())
-            ->method('getEntityMetadata')
-            ->withAnyParameters();
+        $this->entityConfigProvider->expects($this->never())
+            ->method('getConfig');
 
-        $this->target->onBuildBefore($this->buildBefore);
+        $event = $this->getBuildBeforeEvent($datagridConfig);
+        $this->mergeMassActionListener->onBuildBefore($event);
     }
 
     public function testOnBuildBeforeForEmptyEntityName()
     {
-        $this->initDatagridConfig(array('mass_actions' => array('merge' => array('entity_name' => ''))));
+        $datagridConfig = DatagridConfiguration::create(
+            ['mass_actions' => ['merge' => ['entity_name' => '']]]
+        );
 
-        $this->metadataRegistry->expects($this->never())
-            ->method('getEntityMetadata')
-            ->withAnyParameters();
+        $this->entityConfigProvider->expects($this->never())
+            ->method('getConfig');
 
-        $this->target->onBuildBefore($this->buildBefore);
+        $event = $this->getBuildBeforeEvent($datagridConfig);
+        $this->mergeMassActionListener->onBuildBefore($event);
     }
 
-    protected function initMetadataRegistry()
+    /**
+     * @param DatagridConfiguration $datagridConfig
+     *
+     * @return BuildBefore
+     */
+    protected function getBuildBeforeEvent(DatagridConfiguration $datagridConfig)
     {
-        $this->metadataRegistry->expects($this->any())
-            ->method('getEntityMetadata')
-            ->will($this->returnValue($this->entityMetadata));
+        return new BuildBefore(
+            $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface'),
+            $datagridConfig
+        );
     }
 
-    protected function initDatagridConfig($offsetResult = null)
+    /**
+     * @param array $values
+     *
+     * @return EntityConfig
+     */
+    protected function getEntityConfig(array $values = [])
     {
-        $rawConfig = $this->config;
-        $offsetResult = $offsetResult === null ? $this->config['mass_actions'] : $offsetResult;
-
-        $this->datagridConfig->expects($this->any())
-            ->method('offsetExists')
-            ->with('mass_actions')
-            ->will(
-                $this->returnCallback(
-                    function ($offset) use ($rawConfig) {
-                        return isset($rawConfig[$offset]);
-                    }
-                )
-            );
-
-        $this->datagridConfig->expects($this->any())
-            ->method('offsetGet')
-            ->with('mass_actions')
-            ->will($this->returnValue($offsetResult));
-
-        $this->datagridConfig->expects($this->any())
-            ->method('offsetGet')
-            ->with('mass_actions')
-            ->will($this->returnValue($offsetResult));
-    }
-
-    protected function init()
-    {
-        $this->initMetadataRegistry();
-        $this->initDatagridConfig();
+        return new EntityConfig(
+            $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
+            $values
+        );
     }
 }

@@ -2287,6 +2287,8 @@ div.selector select {
   box-sizing: border-box;
 }
 
+div.selector.input-widget-select select {width: 100%;}
+
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
 .controls select {width: 279px;}
 .controls .selector select {width: 100%;}
@@ -3043,6 +3045,9 @@ span.validation-failed {
   .popover-content {
     padding: 13px 30px 13px 15px;
     height: 100%;
+    &.popover-no-close-button {
+      padding-right: 15px;
+    }
   }
   .oro-popover-content {
     overflow-y: auto;

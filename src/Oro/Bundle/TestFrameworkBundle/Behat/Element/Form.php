@@ -97,6 +97,10 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('DateTimePicker', $field->getParent()->getParent());
             }
 
+            if ($field->hasAttribute('type') && 'checkbox' === $field->getAttribute('type')) {
+                return $this->elementFactory->wrapElement('Checkbox', $field);
+            }
+
             return $field;
         }
 

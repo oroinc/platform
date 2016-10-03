@@ -1,4 +1,5 @@
 # The layout theme that is used to add the page content and common page elements
 # for all themes in "main" group
+parent: blank
 label:  ~ # this is a "hidden" theme
 groups: [ main ]

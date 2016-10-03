@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\Extension\ClassAttributeExtension as BaseClassAttributeExtension;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\OptionValueBag;
@@ -30,11 +31,11 @@ class ClassAttributeExtension extends BaseClassAttributeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $context = $block->getContext();
         if ($context->getOr('expressions_evaluate')) {
-            parent::finishView($view, $block, $options);
+            parent::finishView($view, $block);
         } else {
             $encoding = $context->getOr('expressions_encoding');
             if ($encoding !== null) {
