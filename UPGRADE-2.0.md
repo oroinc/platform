@@ -232,6 +232,20 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
         - `string $locale (default null)`.
 - Removed form `Oro\Bundle\TranslationBundle\Form\Type\AvailableTranslationsConfigurationType`.
 - Removed twig extension `Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension`.
+- Added new command "oro:translation:load", that allows to transfer all translations from files (YML & etc) into Database
+- Added entity `\Oro\Bundle\TranslationBundle\Entity\TranslationKey`
+- Added entity `\Oro\Bundle\TranslationBundle\Entity\`
+- Added datagrid listener `\Oro\Bundle\TranslationBundle\EventListener\Datagrid`
+- Added interface `\Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface`
+- Added default translation context resolver `\Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver`
+- Added translation context provider `\Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider`
+- Added custom datagrid filter `\Oro\Bundle\TranslationBundle\Filter\LanguageFilter`, that allow to handle available language choices for dropdown.
+- Added custom datagrid filter form type `\Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType`, that display only enabled and available languages.
+- Changed constructor of `\Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer`, now it takes an instance of `\Oro\Bundle\TranslationBundle\Manager\TranslationManager`
+- Changed constructor of `\Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy`, now it takes an instance of `\Oro\Bundle\TranslationBundle\Manager\TranslationManager`
+- Added new manager `\Oro\Bundle\TranslationBundle\Manager\TranslationManager`, that provides all required functionality to work with Translation and related entities.
+- Added new ACL permission `TRANSLATE`, should be used to determine if user has access to modify translations per language.
+- Removed `\Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface`
 
 ####EntityExtendBundle
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
@@ -256,6 +270,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 throws `\RuntimeException` if cache initialization failed. Make sure you don't autoload extended entity classes during container compilation.
 - `cache_warmer` is decorated to allow disable cache warming during extend commands calls. Tag your warmer with `oro_entity_extend.warmer`
 tag if it works with extend classes
+- Constructor of `Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer` changed. Fourth argument has been changed from `\Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache` to `\Oro\Bundle\TranslationBundle\Manager\TranslationManager`.
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
@@ -278,6 +293,7 @@ tag if it works with extend classes
 ####EntityConfigBundle:
 - Entity configuration now loads from `Resources/config/oro/entity_config.yml` file instead of `Resources/config/entity_config.yml`.
 - Root node for entity configuration in file `Resources/config/oro/entity_config.yml` were changed from `oro_entity_config` to `entity_config`.
+- Constructor of `\Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` changed. Now it takes as first argument instance of `\Oro\Bundle\TranslationBundle\Manager\TranslationManager` and second argument still instance of `\Symfony\Component\Translation\TranslatorInterface`.
 
 ####HelpBundle:
 - Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
@@ -381,3 +397,6 @@ oro_email.email_address.entity_manager:
 
 ####MigrationBundle
 - `Oro\Bundle\MigrationBundle\Migration\MigrationExecutor` now clears cache at all cache providers after successful migration load
+
+####Component
+- Added trait `\Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`

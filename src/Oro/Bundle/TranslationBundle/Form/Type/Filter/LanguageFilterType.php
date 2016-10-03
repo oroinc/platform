@@ -14,6 +14,11 @@ class LanguageFilterType extends AbstractType
     const NAME = 'oro_translation_filter_language';
 
     /**
+     * @var LanguageCodeFormatter
+     */
+    protected $formatter;
+
+    /**
      * @param LanguageCodeFormatter $formatter
      */
     public function __construct(LanguageCodeFormatter $formatter)
