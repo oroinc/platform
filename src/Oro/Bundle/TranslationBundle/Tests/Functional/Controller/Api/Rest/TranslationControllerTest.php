@@ -83,8 +83,7 @@ class TranslationControllerTest extends WebTestCase
             json_encode(['value' => $inputValue])
         );
 
-        $response = $this->client->getResponse();
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $translation = $this->manager->findValue(
             LoadTranslations::TRANSLATION1,

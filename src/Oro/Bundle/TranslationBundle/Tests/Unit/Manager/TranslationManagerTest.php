@@ -1,9 +1,11 @@
 <?php
+
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -172,6 +174,9 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($translation1, $translation2);
     }
 
+    /**
+     * @return array
+     */
     public function createValueDataProvider()
     {
         return [
@@ -203,6 +208,9 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->invalidateCache($with);
     }
 
+    /**
+     * @return array
+     */
     public function invalidateCacheDataProvider()
     {
         return [

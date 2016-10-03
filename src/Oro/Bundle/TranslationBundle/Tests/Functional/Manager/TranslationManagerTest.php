@@ -42,7 +42,6 @@ class TranslationManagerTest extends WebTestCase
         $this->assertNull($translation);
 
         $this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI);
-
         $this->manager->flush();
 
         $translation = $this->manager->findValue($key, $locale, $domain);
@@ -63,7 +62,6 @@ class TranslationManagerTest extends WebTestCase
         $this->manager->flush();
 
         $translation = $this->manager->findValue($key, $locale, $domain);
-
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
     }
 
@@ -76,10 +74,10 @@ class TranslationManagerTest extends WebTestCase
 
         $this->createValue($key, 'initial value', $locale, $domain, Translation::SCOPE_SYSTEM);
 
+        // Ensure That We Overwrite SCOPE_SYSTEM
         $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_INSTALLED));
         $this->manager->flush();
 
-        // Ensure That We Overwrite SCOPE_SYSTEM
         $translation = $this->manager->findValue($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
 
@@ -101,10 +99,10 @@ class TranslationManagerTest extends WebTestCase
 
         $this->createValue($key, 'initial value', $locale, $domain, Translation::SCOPE_INSTALLED);
 
+        // Ensure That We Overwrite SCOPE_INSTALLED
         $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI));
         $this->manager->flush();
 
-        // Ensure That We Overwrite SCOPE_INSTALLED
         $translation = $this->manager->findValue($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
 

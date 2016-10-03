@@ -22,9 +22,6 @@ class TranslationRepositoryTest extends WebTestCase
     /** @var TranslationRepository */
     protected $repository;
 
-    /** @var Translation */
-    protected $expectedForFind;
-
     /**
      * {@inheritdoc}
      */
@@ -36,8 +33,6 @@ class TranslationRepositoryTest extends WebTestCase
 
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Translation::class);
         $this->repository = $this->em->getRepository(Translation::class);
-
-        $this->expectedForFind = $this->getReference(LoadTranslations::TRANSLATION3);
     }
 
     /**
