@@ -93,8 +93,7 @@ abstract class AbstractMenuController extends Controller
     protected function update(MenuUpdateInterface $menuUpdate)
     {
         $options = [
-            'validation_groups' => $menuUpdate->isExistsInNavigationYml() ? ['Default'] : ['Default', 'UserDefined'],
-            'menu_update_key' => $menuUpdate->getKey()
+            'validation_groups' => $menuUpdate->isExistsInNavigationYml() ? ['Default'] : ['Default', 'UserDefined']
         ];
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, $options);
 

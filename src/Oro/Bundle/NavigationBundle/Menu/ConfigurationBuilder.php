@@ -9,6 +9,7 @@ use Knp\Menu\ItemInterface;
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_AREA = 'default';
+    const EDITABLE_EXTRA_OPTION_KEY = 'editable';
 
     /**
      * @var array $container
@@ -52,11 +53,11 @@ class ConfigurationBuilder implements BuilderInterface
                         $menu->setExtras($menuTreeElement['extras']);
                     }
 
-                    if (!empty($menuTreeElement['type'])) {
-                        $menu->setExtra('type', $menuTreeElement['type']);
-                    }
-
-                    $menu->setExtra('area', $this->getMenuArea($alias, $menuConfig['areas']));
+                    $defaultArea = ConfigurationBuilder::DEFAULT_AREA;
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'type', 'type');
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'area', 'area', $defaultArea);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', 'readOnly', false);
+                    $menu->setExtra(self::EDITABLE_EXTRA_OPTION_KEY, true);
 
                     $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
                 }
@@ -65,20 +66,19 @@ class ConfigurationBuilder implements BuilderInterface
     }
 
     /**
-     * @param string $alias
-     * @param array $areasConfig
-     * @return string
-     * @throws \Exception
+     * @param ItemInterface $menu
+     * @param array $config
+     * @param string $optionName
+     * @param string $extraOptionName
+     * @param mixed $default
      */
-    private function getMenuArea($alias, $areasConfig)
+    private function setExtraFromConfig($menu, $config, $optionName, $extraOptionName, $default = null)
     {
-        foreach ($areasConfig as $area => $menuAliases) {
-            if (in_array($alias, $menuAliases)) {
-                return $area;
-            }
+        if (!empty($config[$optionName])) {
+            $menu->setExtra($extraOptionName, $config[$optionName]);
+        } elseif ($default !== null) {
+            $menu->setExtra($extraOptionName, $default);
         }
-
-        return self::DEFAULT_AREA;
     }
 
     /**
@@ -123,6 +123,12 @@ class ConfigurationBuilder implements BuilderInterface
                 $this->moveToExtras($itemOptions, 'translateParameters');
 
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
+
+                $editable = true;
+                if (!empty($itemOptions['readOnly'])) {
+                    $editable = !$itemOptions['readOnly'];
+                }
+                $newMenuItem->setExtra(self::EDITABLE_EXTRA_OPTION_KEY, $editable);
 
                 if (!empty($itemData['children'])) {
                     $this->createFromArray($newMenuItem, $itemData['children'], $itemList, $options, $itemCodes);

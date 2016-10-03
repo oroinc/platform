@@ -34,7 +34,10 @@ class MenuUpdateHelper
     ) {
         $this->setMenuUpdateProperty($update, 'key', $item->getName());
         $this->setMenuUpdateProperty($update, 'uri', $item->getUri());
-        $this->setMenuUpdateProperty($update, 'defaultTitle', $item->getLabel());
+
+        if ($update->getId() === null || $update->getTitles()->count() <= 0) {
+            $this->setMenuUpdateProperty($update, 'defaultTitle', $item->getLabel());
+        }
 
         if ($item->getParent()) {
             $this->setMenuUpdateProperty($update, 'parentKey', $item->getParent()->getName());
@@ -42,6 +45,7 @@ class MenuUpdateHelper
 
         $update->setActive($item->isDisplayed());
         $update->setMenu($menu);
+        $update->setExistsInNavigationYml(!$item->getExtra('userDefined', false));
 
         foreach ($item->getExtras() as $key => $value) {
             if (array_key_exists($key, $extrasMapping)) {
@@ -66,8 +70,7 @@ class MenuUpdateHelper
 
         if (!$item instanceof ItemInterface) {
             $item = $parentItem->addChild($update->getKey());
-        } else {
-            $update->setExistsInNavigationYml(true);
+            $item->setExtra('userDefined', true);
         }
 
         if ($item->getParent()->getName() != $parentItem->getName()) {
@@ -77,9 +80,7 @@ class MenuUpdateHelper
 
         if ($update->getTitles()->count()) {
             $title = $this->localizationHelper->getLocalizedValue($update->getTitles());
-            if ($title !== null) {
-                $item->setLabel($title->getString());
-            }
+            $item->setLabel($title->getString());
         }
 
         if ($update->getUri()) {
@@ -91,6 +92,8 @@ class MenuUpdateHelper
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
         }
+
+        $item->setExtra('editable', true);
 
         return $item;
     }
@@ -123,14 +126,11 @@ class MenuUpdateHelper
      */
     private function setMenuUpdateProperty(MenuUpdateInterface $update, $key, $value)
     {
-        foreach (['get', 'is'] as $prefix) {
-            $method = $prefix . ucfirst($key);
+        $method = 'get' . ucfirst($key);
+        if (method_exists($update, $method)) {
+            $method = 'set' . ucfirst($key);
             if (method_exists($update, $method)) {
-                $method = 'set' . ucfirst($key);
-                if (method_exists($update, $method)) {
-                    $update->{$method}($value);
-                }
-                break;
+                $update->{$method}($value);
             }
         }
     }

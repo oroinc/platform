@@ -313,4 +313,22 @@ trait MenuUpdateTrait
 
         return $this;
     }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        if ($this->key === null) {
+            $this->key = $this->generateKey();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function generateKey()
+    {
+        return uniqid('menu_item_');
+    }
 }

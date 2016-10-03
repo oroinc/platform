@@ -70,6 +70,7 @@ navigation:
 
             dots_menu:
                 type: dots_menu
+                read_only: true
                 children:
                     history: ~
                     favorite: ~

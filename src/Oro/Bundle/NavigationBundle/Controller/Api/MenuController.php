@@ -25,7 +25,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @RouteResource("menuupdates")
  * @NamePrefix("oro_api_")
  */
-class MenuUpdateController extends Controller
+class MenuController extends Controller
 {
     /**
      * @Delete("/menu/{ownershipType}/{menuName}/{key}")
@@ -55,7 +55,7 @@ class MenuUpdateController extends Controller
             throw $this->createNotFoundException();
         }
 
-        if (!$menuUpdate->isExistsInNavigationYml()) {
+        if ($menuUpdate->getId() !== null && !$menuUpdate->isExistsInNavigationYml()) {
             $manager->removeMenuUpdate($menuUpdate);
         } else {
             $menuUpdate->setActive(false);
