@@ -34,6 +34,11 @@ class Runner
     protected $environment;
 
     /**
+     * @var int
+     */
+    public $timeout = 600;
+
+    /**
      * @param InstallationManager $installationManager
      * @param LoggerInterface $logger
      * @param string $applicationRootDir
@@ -101,7 +106,12 @@ class Runner
      */
     public function runPlatformUpdate()
     {
-        return $this->runCommand('oro:platform:update --force');
+        return $this->runCommand(
+            sprintf(
+                'oro:platform:update --force --timeout=%s',
+                $this->timeout
+            )
+        );
     }
 
     /**
@@ -206,7 +216,7 @@ class Runner
 
         $process = new Process($command);
         $process->setWorkingDirectory(realpath($this->applicationRootDir . '/..')); // project root
-        $process->setTimeout(600);
+        $process->setTimeout($this->timeout);
 
         $process->run();
 

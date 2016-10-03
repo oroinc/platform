@@ -49,7 +49,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -61,6 +61,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestActivityTargetTable($schema);
         $this->createTestWorkflowAwareEntityTable($schema);
         $this->createTestSearchItemTable($schema);
+        $this->createTestSearchItem2Table($schema);
         $this->createTestSearchItemValueTable($schema);
         $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
@@ -186,6 +187,18 @@ class OroTestFrameworkBundleInstaller implements
         $table->addColumn('guidvalue', 'guid', ['notnull' => false]);
         $table->addColumn('objectvalue', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $table->addColumn('phone1', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_search_item2 table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestSearchItem2Table(Schema $schema)
+    {
+        $table = $schema->createTable('test_search_item2');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey(['id']);
     }
 

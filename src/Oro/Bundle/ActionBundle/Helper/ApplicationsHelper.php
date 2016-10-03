@@ -4,17 +4,17 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ApplicationsHelper
 {
     const DEFAULT_APPLICATION = 'default';
 
-    /**
-     * @var TokenStorageInterface
-     */
+    /** @var TokenStorageInterface */
     protected $tokenStorage;
+
+    /** @var string */
+    protected $currentApplication = false;
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -25,17 +25,20 @@ class ApplicationsHelper
     }
 
     /**
-     * @param Operation $operation
+     * @param array $applications
      * @return bool
      */
-    public function isApplicationsValid(Operation $operation)
+    public function isApplicationsValid(array $applications)
     {
-        $applications = $operation->getDefinition()->getApplications();
         if (empty($applications)) {
             return true;
         }
 
-        return in_array($this->getCurrentApplication(), $applications, true);
+        if ($this->currentApplication === false) {
+            $this->currentApplication = $this->getCurrentApplication();
+        }
+
+        return in_array($this->currentApplication, $applications, true);
     }
 
     /**

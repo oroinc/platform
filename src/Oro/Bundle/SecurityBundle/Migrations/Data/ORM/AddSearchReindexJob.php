@@ -8,6 +8,11 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -15,8 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
-    const INDEXATION_LIMIT = 10000;
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -82,6 +85,9 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
     {
         return $this->container->get('oro_search.index');
     }
+        // sync reindex as this is a fixture
+        $this->getSearchIndexer()->reindex();
+    }
 
     /**
      * @return MessageProducerInterface
@@ -89,5 +95,11 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
     private function getProducer()
     {
         return $this->container->get('oro_message_queue.client.message_producer');
+    /**
+     * @return IndexerInterface
+     */
+    protected function getSearchIndexer()
+    {
+        return $this->container->get('oro_search.search.engine.indexer');
     }
 }
