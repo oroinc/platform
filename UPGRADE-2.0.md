@@ -1,6 +1,9 @@
 UPGRADE FROM 1.10 to 2.0 
 ========================
 
+####General
+- LiipImagineBundle updated to 1.5.* version.
+
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
@@ -181,6 +184,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Updated class `Oro\Bundle\LayoutBundle\Form\TwigRendererEngine` to extend new `Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine`.
 - Updated class `Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer` to implement `Oro\Bundle\LayoutBundle\Form\TwigRendererInterface`.
 - Added class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\DataCollectorExtension` that collects layout debug information in data collector used in Layouts section of Symfony Profiler.
+- Class `Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider` added to provide available image types collected from all themes
+- Class `Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader` added to dynamically load Imagine filters
+- Dependency injection tag `layout.image_filter.provider` added to support custom Imagine filter providers
 
 ####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
@@ -188,6 +194,10 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
 - System configuration now loads from `Resources/config/oro/system_configuration.yml` instead of `Resources/config/system_configuration.yml` file.
 - Root node for system configuration in `Resources/config/oro/system_configuration.yml` file were changed from `oro_system_configuration` to `system_configuration`.
+- Form type `Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType` added to allow file management in the system configuration
+
+####AttachmentBundle:
+- Class `Oro\Bundle\AttachmentBundle\Resizer\ImageResizer` introduced to resize images by filter name
 
 ####DatagridBundle:
 - Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
