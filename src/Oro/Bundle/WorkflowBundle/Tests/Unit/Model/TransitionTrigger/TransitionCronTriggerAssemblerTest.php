@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier;
@@ -129,5 +130,18 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($queuedOpt, $trigger->isQueued());
         $this->assertSame($transitionOpt, $trigger->getTransitionName());
         $this->assertSame($workflowDefinitionOpt, $trigger->getWorkflowDefinition());
+    }
+
+    public function testVerifyTriggerException()
+    {
+        $this->setExpectedException(
+            \InvalidArgumentException::class,
+            'Expected instance of Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger ' .
+            'got Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger'
+        );
+
+        $stub = new Stub\AbstractTransitionTriggerAssemblerStub();
+
+        $stub->verifyProxy($this->assembler, new TransitionEventTrigger());
     }
 }
