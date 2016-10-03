@@ -190,7 +190,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 'expectedMenu' => array(
                     'items' => array(
-                        'customers_tab' => array_merge(array('label' => 'Customers', 'readOnly' => true), $defaultItemParameters),
+                        'customers_tab' => array_merge(array('label' => 'Customers', 'read_only' => true), $defaultItemParameters),
                         'call_list' => array_merge(array('label' => 'Calls RENAMED'), $defaultItemParameters),
                         'to_replace' => array_merge(array('label' => 'Replaced'), $defaultItemParameters),
                         'to_move_top' => array_merge(array('label' => 'To move'), $defaultItemParameters),

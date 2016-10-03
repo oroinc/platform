@@ -7,6 +7,8 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
+
 class MenuUpdateHelper
 {
     /** @var LocalizationHelper */
@@ -30,17 +32,18 @@ class MenuUpdateHelper
         MenuUpdateInterface $update,
         ItemInterface $item,
         $menu,
-        array $extrasMapping = ['position' => 'priority', 'existsInNavigationYml' => 'existsInNavigationYml']
+        array $extrasMapping = ['position' => 'priority']
     ) {
-        $this->setMenuUpdateProperty($update, 'key', $item->getName());
-        $this->setMenuUpdateProperty($update, 'uri', $item->getUri());
+        $propertyAccessor = new PropertyAccessor();
+        $propertyAccessor->setValue($update, 'key', $item->getName());
+        $propertyAccessor->setValue($update, 'uri', $item->getUri());
 
         if ($update->getId() === null || $update->getTitles()->count() <= 0) {
-            $this->setMenuUpdateProperty($update, 'defaultTitle', $item->getLabel());
+            $propertyAccessor->setValue($update, 'defaultTitle', $item->getLabel());
         }
 
         if ($item->getParent()) {
-            $this->setMenuUpdateProperty($update, 'parentKey', $item->getParent()->getName());
+            $propertyAccessor->setValue($update, 'parentKey', $item->getParent()->getName());
         }
 
         $update->setActive($item->isDisplayed());
@@ -51,8 +54,9 @@ class MenuUpdateHelper
             if (array_key_exists($key, $extrasMapping)) {
                 $key = $extrasMapping[$key];
             }
-
-            $this->setMenuUpdateProperty($update, $key, $value);
+            if ($propertyAccessor->isWritable($update, $key)) {
+                $propertyAccessor->setValue($update, $key, $value);
+            }
         }
     }
 
@@ -117,24 +121,5 @@ class MenuUpdateHelper
         }
 
         return $item;
-    }
-
-    /**
-     * @param MenuUpdateInterface $update
-     * @param string $key
-     * @param mixed $value
-     */
-    private function setMenuUpdateProperty(MenuUpdateInterface $update, $key, $value)
-    {
-        foreach (['get', 'is'] as $prefix) {
-            $method = $prefix . ucfirst($key);
-            if (method_exists($update, $method)) {
-                $method = 'set' . ucfirst($key);
-                if (method_exists($update, $method)) {
-                    $update->{$method}($value);
-                }
-                break;
-            }
-        }
     }
 }

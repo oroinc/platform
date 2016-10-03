@@ -95,7 +95,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('label')->end()
                     ->scalarNode('uri')->end()
                     ->scalarNode('route')->end()
-                    ->scalarNode('readOnly')->end()
+                    ->scalarNode('read_only')->end()
                     ->scalarNode('aclResourceId')->end()
                     ->scalarNode('translateDomain')->end()
                     ->arrayNode('translateParameters')

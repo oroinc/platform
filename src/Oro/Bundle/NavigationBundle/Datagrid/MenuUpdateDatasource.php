@@ -64,7 +64,7 @@ class MenuUpdateDatasource implements DatasourceInterface
 
         foreach ($this->menuConfiguration['tree'] as $name => $item) {
             $menuItem = $this->chainProvider->get($name);
-            if ($menuItem->getExtra('area') === $this->area && !$menuItem->getExtra('readOnly')) {
+            if ($menuItem->getExtra('area') === $this->area && !$menuItem->getExtra('read_only')) {
                 $rows[] = new ResultRecord($this->menuManipulator->toArray($menuItem));
             }
         }

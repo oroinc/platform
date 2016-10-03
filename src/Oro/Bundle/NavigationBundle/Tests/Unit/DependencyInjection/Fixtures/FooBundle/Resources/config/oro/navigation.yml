@@ -3,7 +3,7 @@ navigation:
         items:
             customers_tab:
                 label: 'Customers'
-                readOnly: true
+                read_only: true
             call_list:
                 label: 'Calls'
             to_replace:

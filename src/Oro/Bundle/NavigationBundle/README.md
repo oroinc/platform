@@ -93,7 +93,7 @@ menu_config:
             label: <label>                    # label text or translation string template
             name:  <name>                     # name of menu item, used as default for route
             uri: <uri_string>                 # uri string, if no route parameter set
-            readOnly: <boolean>               # disable ability to edit menu item in UI
+            read_only: <boolean>              # disable ability to edit menu item in UI
             route: <route_name>               # route name for uri generation, if not set and uri not set - loads from key
                 routeParameters:              # router parameters
             attributes: <attr_list>           # <li> item attributes

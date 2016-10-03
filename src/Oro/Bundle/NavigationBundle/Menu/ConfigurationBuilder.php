@@ -9,7 +9,6 @@ use Knp\Menu\ItemInterface;
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_AREA = 'default';
-    const EDITABLE_EXTRA_OPTION_KEY = 'editable';
 
     /**
      * @var array $container
@@ -54,10 +53,10 @@ class ConfigurationBuilder implements BuilderInterface
                     }
 
                     $defaultArea = ConfigurationBuilder::DEFAULT_AREA;
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'type', 'type');
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'area', 'area', $defaultArea);
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', 'readOnly', false);
-                    $menu->setExtra(self::EDITABLE_EXTRA_OPTION_KEY, true);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'type');
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'area', $defaultArea);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
+                    $menu->setExtra('editable', true);
 
                     $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
                 }
@@ -69,15 +68,14 @@ class ConfigurationBuilder implements BuilderInterface
      * @param ItemInterface $menu
      * @param array $config
      * @param string $optionName
-     * @param string $extraOptionName
      * @param mixed $default
      */
-    private function setExtraFromConfig($menu, $config, $optionName, $extraOptionName, $default = null)
+    private function setExtraFromConfig($menu, $config, $optionName, $default = null)
     {
         if (!empty($config[$optionName])) {
-            $menu->setExtra($extraOptionName, $config[$optionName]);
+            $menu->setExtra($optionName, $config[$optionName]);
         } elseif ($default !== null) {
-            $menu->setExtra($extraOptionName, $default);
+            $menu->setExtra($optionName, $default);
         }
     }
 
@@ -87,8 +85,6 @@ class ConfigurationBuilder implements BuilderInterface
      * @param array         $itemList
      * @param array         $options
      * @param array         $itemCodes
-     *
-     * @return \Knp\Menu\ItemInterface
      */
     private function createFromArray(
         ItemInterface $menu,
@@ -125,10 +121,10 @@ class ConfigurationBuilder implements BuilderInterface
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
 
                 $editable = true;
-                if (!empty($itemOptions['readOnly'])) {
-                    $editable = !$itemOptions['readOnly'];
+                if (!empty($itemOptions['read_only'])) {
+                    $editable = !$itemOptions['read_only'];
                 }
-                $newMenuItem->setExtra(self::EDITABLE_EXTRA_OPTION_KEY, $editable);
+                $newMenuItem->setExtra('editable', $editable);
 
                 if (!empty($itemData['children'])) {
                     $this->createFromArray($newMenuItem, $itemData['children'], $itemList, $options, $itemCodes);
