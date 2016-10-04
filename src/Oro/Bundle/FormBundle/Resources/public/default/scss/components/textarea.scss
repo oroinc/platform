@@ -1,0 +1,21 @@
+.textarea {
+    &--size-m {
+        padding: $textarea-padding--m;
+    }
+
+    &--size-s {
+        padding: $textarea-padding--s;
+    }
+
+    @include element-state('hover') {
+        box-shadow: $textarea-box-shadow-hover-state;
+    }
+
+    @include element-state('focus') {
+        box-shadow: $textarea-box-shadow-focus-state;
+    }
+
+    @include element-state('error') {
+        box-shadow: $textarea-box-shadow-error-state;
+    }
+}

@@ -2000,7 +2000,7 @@ For simplify block attribute configuration use twig function `layout_attr_defaul
 {% set attr = layout_attr_defaults(attr, {
     required: 'required',
     autofocus: true,
-    '~class': " input input_block input_md {{ class_prefix }}__form__input"
+    '~class': " input input--full input--size-m {{ class_prefix }}--another-modifier"
 }) %}
 ```
 If you use prefix `~` value `attr` concatenate `default_attr` value with this prefix.
