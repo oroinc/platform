@@ -253,7 +253,6 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added new command "oro:translation:load", that allows to transfer all translations from files into Database
 - Added entity `Oro\Bundle\TranslationBundle\Entity\TranslationKey`
 - Updated entity `Oro\Bundle\TranslationBundle\Entity\Translation`
-    - added options "collate"="utf8_bin" and "charset"="utf8" to support case-sensitive values for "value" column
     - added constant SCOPE_INSTALLED
     - used relation to `Oro\Bundle\TranslationBundle\Entity\TranslationKey` instead of `key` and `domain` fields
     - used relation to `Oro\Bundle\TranslationBundle\Entity\Language` instead of `code` field

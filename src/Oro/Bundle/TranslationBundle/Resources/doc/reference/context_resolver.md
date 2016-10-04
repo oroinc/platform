@@ -46,7 +46,7 @@ class TranslationContextResolver implements TranslationContextResolverInterface
 }
 ```
 
-Context resolver should be registered by tag `oro_translation.extension.translation_context_resolver`, for example
+Context resolver should be registered with tag `oro_translation.extension.translation_context_resolver`, for example:
 
 ```yml
     # default context resolver definition
