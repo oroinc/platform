@@ -178,10 +178,14 @@ class EntityDescriptionProvider
         $result = null;
         $config = $this->findFieldConfig($entityClass, $propertyPath);
         if (null !== $config) {
-            $label = $config->get('label');
+            $label = $config->get('description');
             if ($label) {
                 $translated = $this->translator->trans($label);
-                $result = $translated ?: $label;
+                if ($translated === $label) {
+                    $label = $config->get('label');
+                    $translated = $this->translator->trans($label);
+                }
+                $result = $translated ? : $label;
             }
         }
 
@@ -243,7 +247,7 @@ class EntityDescriptionProvider
      */
     protected function normalizeEntityDescription($description)
     {
-        return ucwords($description);
+        return $description;
     }
 
     /**
@@ -253,7 +257,7 @@ class EntityDescriptionProvider
      */
     protected function normalizeFieldDescription($description)
     {
-        return ucwords($description);
+        return $description;
     }
 
     /**
@@ -263,6 +267,6 @@ class EntityDescriptionProvider
      */
     protected function normalizeAssociationDescription($description)
     {
-        return ucwords($description);
+        return $description;
     }
 }

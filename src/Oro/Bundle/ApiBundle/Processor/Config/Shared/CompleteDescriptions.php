@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -75,7 +76,7 @@ class CompleteDescriptions implements ProcessorInterface
         $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
         $filters = $context->getFilters();
         if (null !== $filters) {
-            $this->setDescriptionsForFilters($filters, $entityClass, $targetAction);
+            $this->setDescriptionsForFilters($filters, $definition, $entityClass, $targetAction);
         }
     }
 
@@ -253,7 +254,7 @@ class CompleteDescriptions implements ProcessorInterface
                     $field->setDescription($loadedDescription);
                     continue;
                 }
-                
+
                 $propertyPath = $field->getPropertyPath($fieldName);
                 if ($fieldPrefix) {
                     $propertyPath = $fieldPrefix . $propertyPath;
@@ -294,11 +295,17 @@ class CompleteDescriptions implements ProcessorInterface
     }
 
     /**
-     * @param FiltersConfig $filters
-     * @param string        $entityClass
+     * @param FiltersConfig          $filters
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param string                 $targetAction
      */
-    protected function setDescriptionsForFilters(FiltersConfig $filters, $entityClass, $targetAction)
-    {
+    protected function setDescriptionsForFilters(
+        FiltersConfig $filters,
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $targetAction
+    ) {
         $fields = $filters->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
@@ -312,6 +319,19 @@ class CompleteDescriptions implements ProcessorInterface
                     $field->setDescription($loadedDescription);
                     continue;
                 }
+
+                $fieldsDefinition = $definition->getField($fieldName);
+                if ($fieldsDefinition && $fieldsDefinition->hasTargetEntity()) {
+                    $description = sprintf(
+                        'Filter \'%s\' by \'%s\' relation value, accepts \'%s\' type values.',
+                        ValueNormalizerUtil::humanizeClassName($entityClass),
+                        $fieldName,
+                        $field->getDataType()
+                    );
+                    $field->setDescription($description);
+                    continue;
+                }
+
                 $propertyPath = $field->getPropertyPath($fieldName);
                 $description = $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath);
                 if ($description) {

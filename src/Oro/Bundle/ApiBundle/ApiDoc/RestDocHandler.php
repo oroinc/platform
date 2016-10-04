@@ -24,6 +24,10 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * TODO: Add unit tests and refactor class to resolve overall complexity (BAP-12042).
+ */
 class RestDocHandler implements HandlerInterface
 {
     const ID_ATTRIBUTE   = 'id';
