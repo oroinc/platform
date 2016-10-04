@@ -1,1 +1,24 @@
+$select-padding: 12px 28px 12px 9px;
+$select-padding--m: 10px 28px 10px 9px;
+$select-padding--s: 8px 28px 8px 9px;
+$select-font-size: $base-ui-element-font-size;
+$select-font-family: $base-ui-element-font-family;
+$select-line-height: $base-ui-element-line-height;
+$select-border: $base-ui-element-border;
+$select-border-radius: $base-ui-element-border-radius;
+$select-background-color: $base-ui-element-bg-color;
+$select-color: $base-ui-element-color;
+$select-bg: url('#{$global-url}/oroform/default/images/icons/arrow-down--gray.svg') no-repeat right 12px center get-color('additional', 'ultra');
 
+// Hover
+$select-border-color-hover-state: get-color('ui', 'normal');
+$select-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
+0 0 8px transparentize(get-color('ui', 'focus'), .6);
+
+// Focus
+$select-border-color-focus-state: get-color('ui', 'normal');
+$select-box-shadow-focus-state: $select-box-shadow-hover-state;
+
+// Error
+$select-border-color-error-state: get-color('ui', 'error-dark');
+$select-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);

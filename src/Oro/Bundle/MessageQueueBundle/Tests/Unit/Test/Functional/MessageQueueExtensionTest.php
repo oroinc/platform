@@ -80,6 +80,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains('Failed asserting that the message', $exception->getMessage());
+            self::assertContains('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
             self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
@@ -96,14 +97,50 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertMessageSent($topic, $message);
     }
 
-    public function testAssertMessagesSentShouldThrowValidExceptionIfAssertionIsFalse()
+    public function testAssertMessagesSentShouldThrowValidExceptionIfOneOfMessageAssertionIsFalse()
     {
+        $topic = 'test topic';
+        $message1 = 'test message 1';
+        $message2 = 'test message 2';
+
+        self::$messageCollector->send($topic, $message1);
+        self::$messageCollector->send($topic, $message2);
+
         $exception = false;
         try {
-            self::assertMessagesSent([['topic' => 'test topic', 'message' => 'test message']]);
+            self::assertMessagesSent($topic, [$message1, 'another message']);
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that exactly all messages were sent', $exception->getMessage());
+            self::assertContains('Failed asserting that the message', $exception->getMessage());
+            self::assertContains('All sent messages', $exception->getMessage());
+        }
+        if (!$exception) {
+            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+        }
+    }
+
+    public function testAssertMessagesSentShouldThrowValidExceptionIfCountAssertionIsFalse()
+    {
+        $topic = 'test topic';
+        $message1 = 'test message 1';
+        $message2 = 'test message 2';
+
+        self::$messageCollector->send($topic, $message1);
+        self::$messageCollector->send($topic, $message2);
+
+        $exception = false;
+        try {
+            self::assertMessagesSent($topic, [$message2]);
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            $exception = $e;
+            self::assertContains(
+                'Failed asserting that exactly given messages were sent to "test topic" topic',
+                $exception->getMessage()
+            );
+            self::assertContains(
+                'actual size 2 matches expected size 1',
+                $exception->getMessage()
+            );
         }
         if (!$exception) {
             self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
@@ -113,10 +150,74 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAssertMessagesSentShouldNotThrowExceptionIfAssertionIsTrue()
     {
         $topic = 'test topic';
+        $message1 = 'test message 1';
+        $message2 = 'test message 2';
+
+        $anotherTopic = 'another topic';
+        $anotherMessage = 'another message';
+
+        self::$messageCollector->send($topic, $message1);
+        self::$messageCollector->send($topic, $message2);
+        self::$messageCollector->send($anotherTopic, $anotherMessage);
+
+        self::assertMessagesSent($topic, [$message1, $message2]);
+        // test that send order is not taken into account
+        self::assertMessagesSent($topic, [$message2, $message1]);
+        // do test for another topic
+        self::assertMessagesSent($anotherTopic, [$anotherMessage]);
+    }
+
+    public function testAssertEmptyMessagesShouldThrowValidExceptionIfAssertionIsFalse()
+    {
+        $topic = 'test topic';
+
+        self::$messageCollector->send($topic, 'test message');
+
+        $exception = false;
+        try {
+            self::assertEmptyMessages($topic);
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            $exception = $e;
+            self::assertContains(
+                'Failed asserting that exactly given messages were sent to "test topic" topic',
+                $exception->getMessage()
+            );
+            self::assertContains(
+                'actual size 1 matches expected size 0',
+                $exception->getMessage()
+            );
+        }
+        if (!$exception) {
+            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+        }
+    }
+
+    public function testAssertEmptyMessagesShouldNotThrowExceptionIfAssertionIsTrue()
+    {
+        self::assertEmptyMessages('test topic');
+    }
+
+    public function testAssertAllMessagesSentShouldThrowValidExceptionIfAssertionIsFalse()
+    {
+        $exception = false;
+        try {
+            self::assertAllMessagesSent([['topic' => 'test topic', 'message' => 'test message']]);
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            $exception = $e;
+            self::assertContains('Failed asserting that exactly all messages were sent', $exception->getMessage());
+        }
+        if (!$exception) {
+            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+        }
+    }
+
+    public function testAssertAllMessagesSentShouldNotThrowExceptionIfAssertionIsTrue()
+    {
+        $topic = 'test topic';
         $message = 'test message';
 
         self::$messageCollector->send($topic, $message);
 
-        self::assertMessagesSent([['topic' => $topic, 'message' => $message]]);
+        self::assertAllMessagesSent([['topic' => $topic, 'message' => $message]]);
     }
 }
