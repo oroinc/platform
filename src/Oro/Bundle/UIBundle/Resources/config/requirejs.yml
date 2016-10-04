@@ -73,7 +73,7 @@ config:
             deps:
                 - 'lightgallery'
                 - 'jquery'
-        'mCustomScrollbar':
+        'jquery.mCustomScrollbar':
             deps:
                 - 'jquery'
     map:
@@ -143,6 +143,7 @@ config:
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/oroui/lib/jquery/jquery.cookie.js'
         'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
+        'jquery.mCustomScrollbar': 'bundles/oroui/lib/jquery/jquery.mCustomScrollbar.min.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
 #        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
         'underscore': 'bundles/components/underscore/underscore.js'
@@ -157,7 +158,6 @@ config:
         'cryptojs/pbkdf2': 'bundles/oroui/lib/cryptojs/pbkdf2-min.js'
         'lightgallery': 'bundles/oroui/lib/lightgallery/js/lightgallery-all.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
-        'mCustomScrollbar': 'bundles/oroui/lib/mcustomscrollbar/jquery.mCustomScrollbar.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'

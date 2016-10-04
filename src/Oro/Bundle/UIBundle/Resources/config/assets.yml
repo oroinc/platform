@@ -11,7 +11,8 @@ css:
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
         - 'bundles/oroui/lib/lightgallery/css/lg-transitions.css'
         - 'bundles/oroui/lib/lightgallery/css/lightgallery.css'
-        - 'bundles/oroui/lib/mcustomscrollbar/jquery.mCustomScrollbar.css'
+        - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar.css'
+
         # customized libraries' styles
         - 'bundles/oroui/css/font-awesome-4.3/font-awesome.css'
         - 'bundles/oroui/css/jquery-ui.grid.css'
@@ -19,7 +20,7 @@ css:
         - 'bundles/oroui/lib/multiselect/jquery.multiselect.css'
         - 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.css'
         - 'bundles/oroui/css/lightgallery/lightgallery.css'
-        - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar.css'
+        - 'bundles/oroui/css/mcustomscrollbar/customize/jquery.mCustomScrollbar.css'
         # custom styles
         - 'bundles/oroui/css/less/main.less'
         - 'bundles/oroui/css/all.css'

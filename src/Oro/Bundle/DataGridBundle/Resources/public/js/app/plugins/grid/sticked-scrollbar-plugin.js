@@ -6,7 +6,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var _ = require('underscore');
-    require('mCustomScrollbar');
+    require('jquery.mCustomScrollbar');
     require('jquery.mousewheel');
 
     StickedScrollbarPlugin = BasePlugin.extend({
@@ -104,11 +104,20 @@ define(function(require) {
                 $grid: this.grid.$grid,
                 $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
                 $scrollbar: this.grid.$grid.find('.mCSB_scrollTools'),
+                $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]'),
                 $thead: this.grid.$grid.find('thead:first')
             };
         },
 
         setupEvents: function() {
+            /*
+            * For cases, when layout has full screen container with own scrollbar and window doesn't have scrollbar
+            */
+            if (this.domCache.$spyScroll) {
+                this.domCache.$spyScroll.on('scroll',
+                    _.debounce(_.bind(this.manageScroll, this), this.timeouts.scrollTimeout)
+                );
+            }
             this.domCache.$document.on('scroll',
                 _.debounce(_.bind(this.manageScroll, this), this.timeouts.scrollTimeout)
             );
@@ -201,6 +210,7 @@ define(function(require) {
                 return;
             }
 
+            this.domCache.$spyScroll.off('scroll', _.bind(this.manageScroll, this));
             this.domCache.$document.off('scroll', _.bind(this.manageScroll, this));
             this.domCache.$window.off('resize', _.bind(this.updateCustomScrollbar, this));
 
