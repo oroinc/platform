@@ -15,7 +15,6 @@ oro_search:
     engine_parameters:
         ...
     log_queries: true
-    realtime_update: false
     item_container_template: MyBundle:Search:itemContainer.html.twig
     entities_config:
         ...
@@ -29,9 +28,6 @@ used to perform search and indexation (see section [Search Engine Configuration]
 of search engine used for initialization (f.e. IP, port, credentials etc);
 - **log_queries**, default false (converted to container parameter _oro_search.log_queries_) - flag that defines
 whether need to log search queries to the database;
-- **realtime_update**, default true (converted to container parameter _oro_search.realtime_update_) - flag that
-specifies is search index should be updated in the real time, i.e. right after indexed entity was changed;
-if set this flag to false then reindex jobs will be put to the queue and processed later;
 - **item_container_template**, default "OroSearchBundle:Datagrid:itemContainer.html.twig"
 (converted to container parameter _oro_search.twig.item_container_template_) - template used to render entity row
 in search results;
@@ -178,10 +174,12 @@ Used search engine defines in configuration under `oro_search.engine` key. To ma
 at least one bundle must have file with name _Resources/config/oro/search_engine/\<engine_name\>.yml_
 that contains configuration of search engine services that will be added to container services.
 
-The only one required service that must be defined in engine configuration is _oro_search.search.engine_.
-Search engine class must implement interface _Oro\Bundle\SearchBundle\Engine\EngineInterface_ and implement
-all required methods. To make implementation easier there is abstract engine
-_Oro\Bundle\SearchBundle\Engine\AbstractEngine_ that provides useful functionality (logging, queuing etc).
+To make engine work two services must be defined in engine configuration:
+* Search service _oro_search.search.engine_ must implement _Oro\Bundle\SearchBundle\Engine\EngineInterface_.
+* Indexer service _oro_search.search.engine.indexer_ must implement _Oro\Bundle\SearchBundle\Engine\IndexerInterface_.
+
+To make implementation easier there is abstract classes _Oro\Bundle\SearchBundle\Engine\AbstractEngine_ and
+_Oro\Bundle\SearchBundle\Engine\AbstractIndexer_ that provides useful functionality (logging, queuing etc).
 
 If search engine requires some additional parameters (credentials, index configuration etc.) then they can be
 passed through configuration using key _oro_search.engine_parameters_, so these parameters can be injected into

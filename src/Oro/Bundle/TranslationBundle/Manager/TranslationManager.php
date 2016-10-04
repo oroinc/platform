@@ -160,7 +160,7 @@ class TranslationManager
      */
     protected function canUpdateTranslation($scope, Translation $translation = null)
     {
-        return $scope === Translation::SCOPE_UI || null === $translation || $translation->getScope() === $scope;
+        return null === $translation || $translation->getScope() <= $scope;
     }
 
     /**
@@ -182,11 +182,11 @@ class TranslationManager
     }
 
     /**
-     * @param Translation[]|null $translations
+     * Flushes all changes
      */
-    public function flush($translations = null)
+    public function flush()
     {
-        $this->getEntityManager(Translation::class)->flush($translations);
+        $this->getEntityManager(Translation::class)->flush();
 
         // clear local cache
         $this->languages = [];

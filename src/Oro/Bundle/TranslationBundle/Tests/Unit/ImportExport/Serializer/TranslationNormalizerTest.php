@@ -35,6 +35,7 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         unset($this->translationManager, $this->normalizer);
     }
+
     public function testDenormalize()
     {
         $language = (new Language())->setCode('test_code');

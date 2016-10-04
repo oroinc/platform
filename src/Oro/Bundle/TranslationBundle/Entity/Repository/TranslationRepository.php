@@ -70,10 +70,11 @@ class TranslationRepository extends EntityRepository
             ->select('t.id, t.value, k.key, k.domain, l.code')
             ->join('t.language', 'l')
             ->join('t.translationKey', 'k')
-            ->where('l.code = :code')
+            ->where('l.code = :code AND t.scope > :scope')
             ->andWhere('k.domain = :domain')
             ->setParameter('code', $languageCode)
-            ->setParameter('domain', $domain, Type::STRING);
+            ->setParameter('domain', $domain, Type::STRING)
+            ->setParameter('scope', Translation::SCOPE_SYSTEM);
 
         return $qb->getQuery()->getArrayResult();
     }

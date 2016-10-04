@@ -55,7 +55,6 @@ class OroTranslationDumpCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        parent::tearDown();
         unset($this->jsDumper, $this->container, $this->input, $this->output, $this->command);
     }
 

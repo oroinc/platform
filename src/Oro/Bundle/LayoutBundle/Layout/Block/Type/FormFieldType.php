@@ -28,9 +28,10 @@ class FormFieldType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        BlockUtils::setViewVarsFromOptions($view, $options, ['field_path']);
-        parent::buildView($view, $block, $options);
+        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        $view->vars['form'] = $formAccessor->getView($options['field_path']);
 
+        BlockUtils::setViewVarsFromOptions($view, $options, ['field_path']);
     }
 
     /**
@@ -38,10 +39,6 @@ class FormFieldType extends AbstractFormType
      */
     public function finishView(BlockView $view, BlockInterface $block)
     {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
-
-        $view->vars['form'] = $formAccessor->getView($view->vars['field_path']);
-
         // prevent the form field rendering by form_rest() method,
         // if the corresponding layout block is invisible
         if ($view->vars['visible'] === false) {
