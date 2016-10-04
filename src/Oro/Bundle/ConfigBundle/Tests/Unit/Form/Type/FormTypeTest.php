@@ -1,6 +1,6 @@
 <?php
 
-namespace ConfigBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
@@ -77,7 +77,7 @@ class FormTypeTest extends TypeTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected that "ConfigBundle\Tests\Unit\Form\Type\FormTypeTest::undefinedMethod" is a callable.
+     * @expectedExceptionMessage Expected that "Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type\FormTypeTest::undefinedMethod" is a callable.
      */
     // @codingStandardsIgnoreEnd
     public function testAdditionalStaticConfiguratorWithUndefinedMethodName()
