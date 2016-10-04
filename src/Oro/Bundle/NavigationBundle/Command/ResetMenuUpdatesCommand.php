@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Command;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,61 +47,69 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $userMail = $input->getOption('user');
         $menu = $input->getOption('menu');
+        $user = null;
 
-        if ($userMail) {
+        $email = $input->getOption('user');
+        if ($email) {
+            /** @var User $user */
             $user = $this
                 ->getContainer()
                 ->get('oro_user.manager')
-                ->findUserByEmail($userMail);
+                ->findUserByEmail($email);
 
             if (is_null($user)) {
-                throw new \Exception(sprintf('User with email %s not exists.', $userMail));
+                throw new \Exception(sprintf('User with email %s not exists.', $email));
             }
+        }
 
-            $this
-                ->getContainer()
-                ->get('oro_navigation.manager.menu_update_default')
-                ->resetMenuUpdatesWithOwnershipType(MenuUpdate::OWNERSHIP_USER, $user->getId(), $menu);
+        if (!$user && !$menu) {
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion(
+                '<question>WARNING! Menu for GLOBAL scope will be reset. Continue (y/n)?</question>',
+                true
+            );
 
+            if (!$helper->ask($input, $output, $question)) {
+                $output->writeln('<error>Command aborted</error>');
+
+                return;
+            }
+        }
+
+        $this->resetMenuUpdates($user, $menu);
+
+        if ($user) {
             if ($menu) {
-                $output->writeln(sprintf(
-                    'The menu for the user %s and menu %s is successfully reset.',
-                    $userMail,
-                    $menu
-                ));
+                $message = sprintf('The menu "%s" for user "%s" is successfully reset.', $menu, $email);
             } else {
-                $output->writeln(sprintf(
-                    'The menu for the user %s is successfully reset.',
-                    $userMail
-                ));
+                $message = sprintf('All menus for user "%s" is successfully reset.', $email);
             }
         } else {
-            $helper = $this->getHelper('question');
-
-            if (!$menu) {
-                $question = new ConfirmationQuestion(
-                    '<question>WARNING! Menu for organization will be reset. Continue (y/n)?</question>',
-                    true
-                );
-
-                if (!$helper->ask($input, $output, $question)) {
-                    $output->writeln('<error>Command aborted</error>');
-
-                    return;
-                }
+            if ($menu) {
+                $message = sprintf('The menu "%s" for global scope is successfully reset.', $menu);
+            } else {
+                $message = sprintf('All menus in global scope is successfully reset.');
             }
-
-            $this
-                ->getContainer()
-                ->get('oro_navigation.manager.menu_update_default')
-                ->resetMenuUpdatesWithOwnershipType(MenuUpdate::OWNERSHIP_ORGANIZATION, null, $menu);
-
-            $output->writeln(sprintf(
-                'The menu for the %s is successfully reset.',
-                ($menu) ? " menu" : 'organization'
-            ));
         }
+
+        $output->writeln($message);
+    }
+
+    /**=
+     * @param User|null $user
+     * @param string|null $menuName
+     */
+    private function resetMenuUpdates($user = null, $menuName = null)
+    {
+        // TODO after merging BB-4781 change MenuUpdate::OWNERSHIP_ORGANIZATION to MenuUpdate::OWNERSHIP_GLOBAL
+        $ownershipType = $user ? MenuUpdate::OWNERSHIP_USER : MenuUpdate::OWNERSHIP_ORGANIZATION;
+
+        $userId = $user ? $user->getId() : null;
+
+        $this
+            ->getContainer()
+            ->get('oro_navigation.manager.menu_update_default')
+            ->resetMenuUpdatesWithOwnershipType($ownershipType, $userId, $menuName);
     }
 }
