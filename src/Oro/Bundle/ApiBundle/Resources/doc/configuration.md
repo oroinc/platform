@@ -177,6 +177,7 @@ api:
 
 The `entities` section describes a configuration of entities.
 
+* **documentation_resource** *string* May contain the link to a Markdown type file that contains a detailed description for single or multiple API resources. For more details about format rules for documentation see [Documentation resource format](./documentation_format.md).
 * **exclude** *boolean* Indicates whether the entity should be excluded from Data API. By default `false`.
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
@@ -204,6 +205,7 @@ Example:
 api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            documentation_resource: "@AcmeAcmeBundle/Resources/doc/api.md"
             inherit:              false
             exclusion_policy:     all
             max_results:          25
@@ -227,7 +229,7 @@ api:
 This section describes entity fields' configuration.
 
 * **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
-* **description** *string* A human-readable description of the field. Used in auto generated documentation only.
+* **description** *string* A human-readable description of the field or a link to the [documentation resource](./documentation_format.md). Used in auto generated documentation only.
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
 * **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name.
 * **collapse** *boolean* Indicates whether the entity should be collapsed. It is applicable for associations only. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by [get_relation_config](./actions.md#get_relation_config-action) processors to get identifier of the related entity.
@@ -311,7 +313,7 @@ This section describes fields by which the result data can be filtered. It conta
 * **exclusion_policy** *string* Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
 * **fields** This section describes a configuration of each field that can be used to filter the result data. Each filter can have the following properties:
     * **exclude** *boolean* Indicates whether filtering by this field should be disabled. By default `false`.
-    * **description** *string* A human-readable description of the filter. Used in auto generated documentation only.
+    * **description** *string* A human-readable description of the filter or a link to the [documentation resource](./documentation_format.md). Used in auto generated documentation only.
     * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
     * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
