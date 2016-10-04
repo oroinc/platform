@@ -157,12 +157,8 @@ define(function(require) {
                 return;
             }
             if (this._curInst.input) {
-                $(this._curInst.input)
-                    .off('click', this._showDatepicker)
-                    .datepicker('hide');
-            }
-            if (this._curInst.dpDiv) {
-                this._curInst.dpDiv.remove();
+                this._curInst.input.datepicker('hide')
+                    .off('click', this._showDatepicker);
             }
             original._destroyDatepicker.apply(this, arguments);
         };
