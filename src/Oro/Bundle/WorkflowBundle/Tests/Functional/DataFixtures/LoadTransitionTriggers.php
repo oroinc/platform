@@ -24,30 +24,30 @@ class LoadTransitionTriggers extends AbstractFixture implements DependentFixture
 
     /** @var array */
     protected static $triggers = [
-        self::TRIGGER_CREATE => [
-            'active' => true,
-            'class' => TransitionEventTrigger::class,
-            'definition' => LoadWorkflowDefinitions::WITH_GROUPS1,
-            'transition_name' => 'starting_point_transition',
-            'event' => EventTriggerInterface::EVENT_CREATE,
-            'field' => null
-        ],
-        self::TRIGGER_UPDATE => [
-            'active' => true,
-            'class' => TransitionEventTrigger::class,
-            'definition' => LoadWorkflowDefinitions::WITH_GROUPS1,
-            'transition_name' => 'starting_point_transition',
-            'event' => EventTriggerInterface::EVENT_UPDATE,
-            'field' => self::UPDATE_TRIGGER_FIELD
-        ],
-        self::TRIGGER_DELETE => [
-            'active' => true,
-            'class' => TransitionEventTrigger::class,
-            'definition' => LoadWorkflowDefinitions::WITH_GROUPS1,
-            'transition_name' => 'starting_point_transition',
-            'event' => EventTriggerInterface::EVENT_DELETE,
-            'field' => null
-        ],
+        //self::TRIGGER_CREATE => [
+        //    'active' => true,
+        //    'class' => TransitionEventTrigger::class,
+        //    'definition' => LoadWorkflowDefinitions::WITH_GROUPS1,
+        //    'transition_name' => 'starting_point_transition',
+        //    'event' => EventTriggerInterface::EVENT_CREATE,
+        //    'field' => null
+        //],
+        //self::TRIGGER_UPDATE => [
+        //    'active' => true,
+        //    'class' => TransitionEventTrigger::class,
+        //    'definition' => LoadWorkflowDefinitions::WITH_GROUPS1,
+        //    'transition_name' => 'starting_point_transition',
+        //    'event' => EventTriggerInterface::EVENT_UPDATE,
+        //    'field' => self::UPDATE_TRIGGER_FIELD
+        //],
+        //self::TRIGGER_DELETE => [
+        //    'active' => true,
+        //    'class' => TransitionEventTrigger::class,
+        //    'definition' => LoadWorkflowDefinitions::WITH_GROUPS1,
+        //    'transition_name' => 'starting_point_transition',
+        //    'event' => EventTriggerInterface::EVENT_DELETE,
+        //    'field' => null
+        //],
         self::TRIGGER_CRON => [
             'active' => true,
             'class' => TransitionCronTrigger::class,
@@ -55,14 +55,14 @@ class LoadTransitionTriggers extends AbstractFixture implements DependentFixture
             'transition_name' => 'second_point_transition',
             'cron' => '*/1 * * * *'
         ],
-        self::TRIGGER_DISABLED => [
-            'active' => false,
-            'class' => TransitionEventTrigger::class,
-            'definition' => LoadWorkflowDefinitions::WITH_GROUPS2,
-            'transition_name' => 'starting_point_transition',
-            'event' => EventTriggerInterface::EVENT_CREATE,
-            'field' => null
-        ],
+        //self::TRIGGER_DISABLED => [
+        //    'active' => false,
+        //    'class' => TransitionEventTrigger::class,
+        //    'definition' => LoadWorkflowDefinitions::WITH_GROUPS2,
+        //    'transition_name' => 'starting_point_transition',
+        //    'event' => EventTriggerInterface::EVENT_CREATE,
+        //    'field' => null
+        //],
     ];
 
     /**
