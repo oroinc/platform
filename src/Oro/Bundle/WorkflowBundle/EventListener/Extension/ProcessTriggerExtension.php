@@ -108,8 +108,8 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         // handle processes
         $hasQueuedOrHandledProcesses = false;
         $handledProcesses = [];
-        foreach ($this->scheduledProcesses as $entityClass => $entityProcesses) {
-            foreach ($entityProcesses as $entityProcess) {
+        foreach ($this->scheduledProcesses as &$entityProcesses) {
+            while ($entityProcess = array_shift($entityProcesses)) {
                 /** @var ProcessTrigger $trigger */
                 $trigger = $entityProcess['trigger'];
                 /** @var ProcessData $data */
@@ -133,8 +133,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
 
                 $hasQueuedOrHandledProcesses = true;
             }
-
-            unset($this->scheduledProcesses[$entityClass]);
         }
 
         // save both handled entities and queued process jobs
