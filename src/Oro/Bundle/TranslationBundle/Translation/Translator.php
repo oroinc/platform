@@ -11,6 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Translator extends BaseTranslator
 {
     /** @var DynamicTranslationMetadataCache|null */
