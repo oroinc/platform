@@ -69,11 +69,23 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
+        /**
+         * Pre-load English Catalog, because it used as main fallback
+         */
+        if (!isset($this->catalogues['en'])) {
+            $this->loadCatalogue('en');
+        }
+
         $fallbackCatalogues   = array();
         $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $fallbackCatalogues[] = $catalogue;
         }
+
+        /**
+         * Append Collection of Fallback catalogs with system default English catalog.
+         */
+        $fallbackCatalogues[] = $this->catalogues['en'];
 
         $domains      = array_flip($domains);
         $translations = array();
