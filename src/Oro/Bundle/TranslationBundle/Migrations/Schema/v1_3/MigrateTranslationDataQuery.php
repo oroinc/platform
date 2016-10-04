@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_2;
+namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Types\Type;
