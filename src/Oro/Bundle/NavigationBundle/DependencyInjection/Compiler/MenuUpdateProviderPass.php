@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 class MenuUpdateProviderPass implements CompilerPassInterface
 {
     const BUILDER_SERVICE_ID = 'oro_navigation.menu_update.builder';
-
-    const MENU_UPDATE_PROVIDER_SERVICE_ID = 'oro_navigation.menu_update_provider.default';
     const OWNERSHIP_PROVIDER_TAG = 'oro_navigation.ownership_provider';
 
     /**
