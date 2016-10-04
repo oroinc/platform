@@ -80,8 +80,7 @@ SQL;
      */
     public function createPreserveQuery()
     {
-        $query = new ParametrizedSqlMigrationQuery(
-            $sql = <<<'SQL'
+        $sql = <<<'SQL'
 INSERT INTO oro_config_value
     (config_id, name, section, text_value, object_value, array_value, type, created_at, updated_at)
 SELECT
@@ -96,8 +95,10 @@ SELECT
     :created_at
 FROM oro_config c
 WHERE c.entity = :entity
-SQL
-            ,
+SQL;
+
+        $query = new ParametrizedSqlMigrationQuery(
+            $sql,
             [
                 'entity' => 'app',
                 'name' => 'dynamic_tracking_enabled',
