@@ -271,3 +271,7 @@ services:
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
             - '%oro_workflow.workflow_item.entity.class%'
+
+    oro_workflow.translation.processor:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
+        public: false
