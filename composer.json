@@ -48,7 +48,7 @@
         "besimple/soap": "0.2.2",
         "stof/doctrine-extensions-bundle": "1.1.0",
         "escapestudios/wsse-authentication-bundle": "1.0.2",
-        "liip/imagine-bundle": "0.17.*",
+        "liip/imagine-bundle": "1.5.*",
         "leafo/lessphp": "0.4.0",
         "genemu/form-bundle": "2.2.1",
         "zendframework/zend-mail": "2.1.5",

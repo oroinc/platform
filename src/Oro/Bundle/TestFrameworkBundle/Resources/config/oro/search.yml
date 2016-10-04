@@ -34,3 +34,10 @@ search:
                 name: phone
                 target_type: text
                 target_fields: [phone]
+
+    Oro\Bundle\TestFrameworkBundle\Entity\Item2:
+        label:           Test Search Bundle Item2
+        alias:           oro_test_item2
+        search_template: OroSearchBundle:Test:searchResult.html.twig
+        route:
+            name: oro_search_results2

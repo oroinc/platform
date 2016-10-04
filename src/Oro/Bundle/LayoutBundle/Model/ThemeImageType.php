@@ -27,15 +27,18 @@ class ThemeImageType
     /**
      * @param string $name
      * @param string $label
-     * @param array $dimensions
+     * @param ThemeImageTypeDimension[] $dimensions
      * @param int|null $maxNumber
      */
     public function __construct($name, $label, array $dimensions, $maxNumber = null)
     {
         $this->name = $name;
         $this->label = $label;
-        $this->dimensions = $dimensions;
         $this->maxNumber = $maxNumber;
+
+        foreach ($dimensions as $dimension) {
+            $this->addDimension($dimension);
+        }
     }
 
     /**
@@ -55,7 +58,7 @@ class ThemeImageType
     }
 
     /**
-     * @return array
+     * @return ThemeImageTypeDimension[]
      */
     public function getDimensions()
     {
@@ -68,5 +71,23 @@ class ThemeImageType
     public function getMaxNumber()
     {
         return $this->maxNumber;
+    }
+
+    /**
+     * @param ThemeImageTypeDimension[] $dimensions
+     */
+    public function mergeDimensions(array $dimensions)
+    {
+        foreach ($dimensions as $dimension) {
+            $this->addDimension($dimension);
+        }
+    }
+
+    /**
+     * @param ThemeImageTypeDimension $dimension
+     */
+    private function addDimension(ThemeImageTypeDimension $dimension)
+    {
+        $this->dimensions[$dimension->getName()] = $dimension;
     }
 }
