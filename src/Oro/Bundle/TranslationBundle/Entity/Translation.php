@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * "utf8_bin" required for mysql to support case-sensitive values for "key" column
+ * "utf8_bin" required for mysql to support case-sensitive values for "value" column
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
  * @ORM\Table(name="oro_translation", options={"collate"="utf8_bin", "charset"="utf8"}, uniqueConstraints={
