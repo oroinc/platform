@@ -11,7 +11,7 @@ class MenuUpdateProviderPass implements CompilerPassInterface
     const BUILDER_SERVICE_ID = 'oro_navigation.menu_update.builder';
 
     const MENU_UPDATE_PROVIDER_SERVICE_ID = 'oro_navigation.menu_update_provider.default';
-    const SCOPE_PROVIDER_TAG = 'oro_navigation.ownership_provider';
+    const OWNERSHIP_PROVIDER_TAG = 'oro_navigation.ownership_provider';
 
     /**
      * {@inheritdoc}
@@ -30,13 +30,12 @@ class MenuUpdateProviderPass implements CompilerPassInterface
             return;
         }
 
-        $providers = $container->findTaggedServiceIds(self::SCOPE_PROVIDER_TAG);
+        $providers = $container->findTaggedServiceIds(self::OWNERSHIP_PROVIDER_TAG);
         if (!$providers) {
             return;
         }
 
         $builderService = $container->getDefinition(self::BUILDER_SERVICE_ID);
-
 
         foreach ($providers as $id => $tags) {
             foreach ($tags as $attributes) {
