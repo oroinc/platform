@@ -3,10 +3,11 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Provider;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UserOwnershipProviderTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Provider;
 
 use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 
 class GlobalOwnershipProviderTest extends \PHPUnit_Framework_TestCase
