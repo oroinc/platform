@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Oro\Bundle\SearchBundle\Engine\EngineV2Interface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -34,7 +35,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-        $this->engine        = $this->getMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
+        $this->engine        = $this->getMock(EngineV2Interface::class);
         $this->mapper        = new ObjectMapper(
             $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
             $this->config
