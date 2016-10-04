@@ -54,7 +54,9 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->getChild('item-1-1')
             ->getChild('item-1-1-1');
 
-        $child->addChild('item-1-1-1-1');
+         $child->addChild('item-1-1-1-1')
+            ->setExtra('userDefined', true)
+            ->setExtra('editable', true);
         $this->assertEquals($result, $menu);
     }
 

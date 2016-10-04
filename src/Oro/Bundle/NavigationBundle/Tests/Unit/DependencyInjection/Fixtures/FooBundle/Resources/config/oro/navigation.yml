@@ -1,11 +1,9 @@
 navigation:
     menu_config:
-        areas:
-            default:
-                - quicklinks
         items:
             customers_tab:
                 label: 'Customers'
+                read_only: true
             call_list:
                 label: 'Calls'
             to_replace:
@@ -31,6 +29,7 @@ navigation:
                                     to_move_child: ~
 
             shortcuts:
+                read_only: true
                 children:
                     shortcut_call_list: ~
 

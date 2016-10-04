@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Knp\Menu\ItemInterface;
@@ -211,9 +212,15 @@ class MenuUpdateManager
      */
     private function getRepository()
     {
-        $entityManager = $this->managerRegistry->getManagerForClass($this->entityClass);
+        return $this->getEntityManager()->getRepository($this->entityClass);
+    }
 
-        return $entityManager->getRepository($this->entityClass);
+    /**
+     * @return EntityManager
+     */
+    private function getEntityManager()
+    {
+        return $this->managerRegistry->getManagerForClass($this->entityClass);
     }
 
     /**
@@ -222,5 +229,33 @@ class MenuUpdateManager
     public function generateKey()
     {
         return uniqid('menu_item_');
+    }
+
+    /**
+     * Reset menu updates depending on ownership type and owner id
+     *
+     * @param int    $ownershipType
+     * @param int    $ownerId
+     * @param string $menu
+     */
+    public function resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId = null, $menu = null)
+    {
+        $criteria = ['ownershipType' => $ownershipType];
+
+        if ($ownerId) {
+            $criteria['ownerId'] = $ownerId;
+        }
+
+        if ($menu) {
+            $criteria['menu'] = $menu;
+        }
+
+        $menuUpdates = $this->getRepository()->findBy($criteria);
+
+        foreach ($menuUpdates as $menuUpdate) {
+            $this->getEntityManager()->remove($menuUpdate);
+        }
+
+        $this->getEntityManager()->flush($menuUpdates);
     }
 }

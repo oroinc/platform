@@ -24,13 +24,16 @@ class MenuUpdateUtils
         MenuUpdateInterface $update,
         ItemInterface $item,
         $menuName,
-        array $extrasMapping = ['position' => 'priority']
+        array $extrasMapping = ['position' => 'priority', 'userDefined' => 'existsInNavigationYml']
     ) {
         $accessor = PropertyAccess::createPropertyAccessor();
 
         self::setValue($accessor, $update, 'key', $item->getName());
         self::setValue($accessor, $update, 'uri', $item->getUri());
-        self::setValue($accessor, $update, 'defaultTitle', $item->getLabel());
+
+        if ($update->getTitles()->count() <= 0) {
+            self::setValue($accessor, $update, 'defaultTitle', $item->getLabel());
+        }
 
         $parentKey = $item->getParent() ? $item->getParent()->getName() : null;
         self::setValue($accessor, $update, 'parentKey', $parentKey);
@@ -67,8 +70,7 @@ class MenuUpdateUtils
 
         if (!$item instanceof ItemInterface) {
             $item = $parentItem->addChild($update->getKey());
-        } else {
-            $update->setExistsInNavigationYml(true);
+            $item->setExtra('userDefined', true);
         }
 
         if ($item->getParent()->getName() != $parentItem->getName()) {
@@ -89,6 +91,8 @@ class MenuUpdateUtils
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
         }
+
+        $item->setExtra('editable', true);
     }
 
     /**

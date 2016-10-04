@@ -265,4 +265,32 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($item, $this->manager->findMenuItem('menu', 'item-1-1-1', $ownershipType));
     }
+
+    public function testResetMenuUpdatesWithOwnershipType()
+    {
+        $ownershipType = MenuUpdate::OWNERSHIP_USER;
+        $ownerId = 1;
+
+        $update = new MenuUpdateStub();
+
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+
+        $this->entityRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['ownershipType' => $ownershipType, 'ownerId' => $ownerId])
+            ->will($this->returnValue([$update]));
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('remove')
+            ->with($update);
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('flush')
+            ->with([$update]);
+
+        $this->manager->resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId);
+    }
 }

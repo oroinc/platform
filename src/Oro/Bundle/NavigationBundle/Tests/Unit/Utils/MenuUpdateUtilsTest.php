@@ -46,6 +46,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setUri('URI');
+        $expectedItem->setExtra('editable', true);
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
         $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
@@ -66,6 +67,8 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedItem = $this->createItem('item-1-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setUri('URI');
+        $expectedItem->setExtra('userDefined', true);
+        $expectedItem->setExtra('editable', true);
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
         $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);

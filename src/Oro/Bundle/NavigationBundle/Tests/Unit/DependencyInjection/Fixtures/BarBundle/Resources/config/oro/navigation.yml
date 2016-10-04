@@ -1,16 +1,13 @@
 navigation:
     menu_config:
-        areas:
-            default:
-                - application_menu
-            custom:
-                - shortcuts
         tree:
             application_menu:
                 type: application_menu
+                area: default
 
             shortcuts:
                 type: shortcuts
+                area: custom
 
     navigation_elements:
         favoriteButton:

@@ -33,7 +33,7 @@ oro_navigation_api_pagestate:
         version:  latest
 
 oro_navigation_api_menuupdate:
-    resource:     "@OroNavigationBundle/Controller/Api/MenuUpdateController.php"
+    resource:     "@OroNavigationBundle/Controller/Api/MenuController.php"
     type:         rest
     prefix:       api/rest/{version}/
     requirements:
