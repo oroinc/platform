@@ -54,18 +54,22 @@ class MenuUpdateManager
     }
 
     /**
+     * Create menu update entity
+     *
      * @param int $ownershipType
      * @param int $ownerId
+     * @param string $key
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownershipType, $ownerId)
+    public function createMenuUpdate($ownershipType, $ownerId, $key = null)
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
         $entity
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
+            ->setKey($key ? $key : $this->generateKey())
         ;
 
         return $entity;
@@ -126,7 +130,7 @@ class MenuUpdateManager
         ]);
         
         if (!$update) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, $key);
         }
 
         return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);
@@ -245,5 +249,39 @@ class MenuUpdateManager
     private function getEntityManager()
     {
         return $this->managerRegistry->getManagerForClass($this->entityClass);
+    }
+
+    /**
+     * @return string
+     */
+    public function generateKey()
+    {
+        return uniqid('menu_item_');
+    }
+
+    /**
+     * Reset menu updates depending on ownership type and owner id
+     *
+     * @param int    $ownershipType
+     * @param int    $ownerId
+     * @param string $menu
+     */
+    public function resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId = null, $menu = null)
+    {
+        $criteria = ['ownershipType' => $ownershipType];
+
+        if ($ownerId) {
+            $criteria['ownerId'] = $ownerId;
+        }
+
+        if ($menu) {
+            $criteria['menu'] = $menu;
+        }
+
+        $menuUpdates = $this->getRepository()->findBy($criteria);
+
+        foreach ($menuUpdates as $menuUpdate) {
+            $this->removeMenuUpdate($menuUpdate);
+        }
     }
 }

@@ -25,7 +25,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @RouteResource("menuupdates")
  * @NamePrefix("oro_api_")
  */
-class MenuUpdateController extends Controller
+class MenuController extends Controller
 {
     /**
      * @Delete("/menu/{ownershipType}/{menuName}/{key}")
