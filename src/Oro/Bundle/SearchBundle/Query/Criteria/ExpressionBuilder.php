@@ -18,11 +18,19 @@ class ExpressionBuilder extends BaseExpressionBuilder
         return new Comparison($field, Comparison::NOT_CONTAINS, new Value($value));
     }
 
+    /**
+     * @param string $field
+     * @return Comparison
+     */
     public function exists($field)
     {
         return new Comparison($field, Comparison::EXISTS, new Value(null));
     }
 
+    /**
+     * @param string $field
+     * @return Comparison
+     */
     public function notExists($field)
     {
         return new Comparison($field, Comparison::NOT_EXISTS, new Value(null));
