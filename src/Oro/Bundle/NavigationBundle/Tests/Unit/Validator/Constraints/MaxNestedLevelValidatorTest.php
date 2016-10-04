@@ -45,6 +45,45 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = new MaxNestedLevel();
 
         $menu = $this->getMenu();
+        $menu->setExtra('max_nesting_level', 2);
+
+        $update = new MenuUpdateStub();
+        $update->setOwnershipType(1);
+        $update->setDefaultTitle('title');
+        $update->setMenu('menu');
+        $update->setKey('item-1-1-1');
+        $update->setParentKey('item-1-1');
+        $update->setUri('#');
+
+        $this->builderChainProvider
+            ->expects($this->once())
+            ->method('get')
+            ->with('menu', [
+                'ignoreCache' => true,
+                'ownershipType' => $update->getOwnershipType()
+            ])
+            ->will($this->returnValue($menu));
+
+        $this->context
+            ->expects($this->once())
+            ->method('addViolation')
+            ->with("Item \"item-1-1-1\" can't be saved. Max nesting level is reached.");
+
+
+        $this->validator->validate($update, $constraint);
+
+        $item = $menu->getChild('item-1')
+            ->getChild('item-1-1')
+            ->getChild('item-1-1-1');
+
+        $this->assertNotNull($item);
+    }
+
+    public function testValidateNotValidNew()
+    {
+        $constraint = new MaxNestedLevel();
+
+        $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 3);
 
         $update = new MenuUpdateStub();
@@ -70,6 +109,13 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
             ->with("Item \"item-1-1-1-1\" can't be saved. Max nesting level is reached.");
 
         $this->validator->validate($update, $constraint);
+
+        $item = $menu->getChild('item-1')
+            ->getChild('item-1-1')
+            ->getChild('item-1-1-1')
+            ->getChild('item-1-1-1-1');
+
+        $this->assertNull($item);
     }
 
     public function testValidateIsValid()

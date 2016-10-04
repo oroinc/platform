@@ -44,6 +44,8 @@ class MaxNestedLevelValidator extends ConstraintValidator
 
         $menu = $this->builderChainProvider->get($entity->getMenu(), $options);
 
+        $itemExist = MenuUpdateUtils::findMenuItem($menu, $entity->getKey()) ? true : false;
+
         MenuUpdateUtils::updateMenuItem($entity, $menu, $this->localizationHelper);
 
         /** @var ItemInterface $item */
@@ -53,6 +55,10 @@ class MaxNestedLevelValidator extends ConstraintValidator
                 $this->context->addViolation(
                     sprintf("Item \"%s\" can't be saved. Max nesting level is reached.", $item->getLabel())
                 );
+
+                if (!$itemExist) {
+                    $item->getParent()->removeChild($item->getName());
+                }
 
                 break;
             }

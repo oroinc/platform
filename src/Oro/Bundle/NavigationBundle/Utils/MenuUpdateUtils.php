@@ -56,8 +56,6 @@ class MenuUpdateUtils
      * @param MenuUpdateInterface $update
      * @param ItemInterface $menu
      * @param LocalizationHelper $localizationHelper
-     *
-     * @return ItemInterface
      */
     public static function updateMenuItem(
         MenuUpdateInterface $update,
