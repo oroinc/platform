@@ -12,7 +12,6 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity as PasswordComplexityAssert;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -79,8 +78,6 @@ abstract class AbstractUser implements
      * Plain password. Used for model validation. Must not be persisted.
      *
      * @var string
-     *
-     * @PasswordComplexityAssert
      */
     protected $plainPassword;
 

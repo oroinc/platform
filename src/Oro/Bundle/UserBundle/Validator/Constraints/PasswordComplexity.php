@@ -4,9 +4,6 @@ namespace Oro\Bundle\UserBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- */
 class PasswordComplexity extends Constraint
 {
     /**

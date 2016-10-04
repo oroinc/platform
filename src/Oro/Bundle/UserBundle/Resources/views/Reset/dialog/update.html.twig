@@ -51,7 +51,7 @@
                 var rules = requirements.split(',');
                 var pass = '';
 
-                {# make sure we have at least on symbol for each rule #}
+                {# make sure we have at least one symbol for each rule #}
                 rules.forEach(function(rule) {
                     var ruleIndex = parseInt(rule) || 0;
                     pass += charsets[ruleIndex].charAt(getRnd(charsets[ruleIndex].length));
