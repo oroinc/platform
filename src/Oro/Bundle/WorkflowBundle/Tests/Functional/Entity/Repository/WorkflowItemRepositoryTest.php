@@ -197,8 +197,8 @@ class WorkflowItemRepositoryTest extends WebTestCase
     public function testFindByStepNamesAndEntityClass()
     {
         $items = $this->repository->findByStepNamesAndEntityClass(
-            new ArrayCollection(['starting_point']),
-            WorkflowAwareEntity::class,
+            new ArrayCollection(['second_point']),
+            'Oro\\Bundle\\TestFrameworkBundle\\Entity\\WorkflowAwareEntity',
             'id'
         );
 

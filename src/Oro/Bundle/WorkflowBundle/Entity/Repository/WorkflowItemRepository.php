@@ -256,7 +256,6 @@ class WorkflowItemRepository extends EntityRepository
     ) {
         $queryBuilder = $this->createQueryBuilder('wi')
             ->select('wi')
-            ->innerJoin('wi.definition', 'wd')
             ->innerJoin('wi.currentStep', 'ws')
             ->innerJoin(
                 $entityClass,
@@ -268,7 +267,7 @@ class WorkflowItemRepository extends EntityRepository
         $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
             ->setParameter('workflowSteps', $stepNames->getValues());
 
-        $queryBuilder->andWhere('wd.relatedEntity = :entityClass')
+        $queryBuilder->andWhere('wi.entityClass = :entityClass')
             ->setParameter('entityClass', $entityClass);
 
         if ($dqlFilter) {

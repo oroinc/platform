@@ -101,15 +101,13 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      */
     public function process(ObjectManager $manager)
     {
-        foreach ($this->scheduled as $entityClass => $messages) {
-            foreach ($messages as $message) {
+        foreach ($this->scheduled as &$messages) {
+            while ($message = array_shift($messages)) {
                 /** @var TransitionEventTrigger $trigger */
                 $trigger = $message['trigger'];
 
                 $this->processMessage($trigger, $message['entity']);
             }
-
-            $this->clear($entityClass);
         }
     }
 

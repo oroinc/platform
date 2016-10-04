@@ -41,7 +41,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         for ($i = 1; $i <= self::COUNT; $i++) {
             $entity = new WorkflowAwareEntity();
             $entity->setName('workflow_aware_entity_' . $this->lastEntityId);
-            $entities[$i] = $entity;
+            $entities[] = $entity;
             $manager->persist($entity);
 
             $this->setReference('workflow_aware_entity.' . $this->lastEntityId, $entity);
@@ -59,8 +59,6 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
                 foreach ($entities as $entity) {
                     $workflowItem = new WorkflowItem();
                     $workflowItem->setDefinition($definition)
-                        ->setWorkflowName($definition->getName())
-                        ->setEntity($entity)
                         ->setEntityId($entity->getId())
                         ->setEntityClass($definition->getRelatedEntity())
                         ->setCurrentStep($definition->getSteps()->first());
