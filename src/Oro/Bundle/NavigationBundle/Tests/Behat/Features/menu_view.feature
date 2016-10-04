@@ -4,7 +4,7 @@ Feature: Change menu view
   I want to change menu view from configuration and navigate to menu
 
 Scenario: Try navigate on top menu
-  Given I login as "admin" user with "admin" password
+  Given I login as administrator
   And menu is at the top
   And I go to System/User Management/Users
   When click view John Doe in grid
