@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\DependencyInjection;
 
-use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
