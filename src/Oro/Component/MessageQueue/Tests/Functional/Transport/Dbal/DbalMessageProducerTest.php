@@ -1,13 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Functional\Transport\Dbal;
 
-use Doctrine\DBAL\Exception\DriverException;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 
 class DbalMessageProducerTest extends WebTestCase
 {
@@ -29,6 +27,8 @@ class DbalMessageProducerTest extends WebTestCase
         parent::tearDown();
 
         $this->rollbackTransaction();
+
+        $this->messageQueueDropTable('message_queue');
     }
 
     public function testShouldCreateMessageInDb()

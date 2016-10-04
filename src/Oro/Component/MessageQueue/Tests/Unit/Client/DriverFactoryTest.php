@@ -8,7 +8,6 @@ use Oro\Component\MessageQueue\Client\DriverFactory;
 use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;

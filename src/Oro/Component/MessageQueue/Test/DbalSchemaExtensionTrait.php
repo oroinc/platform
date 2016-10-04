@@ -27,6 +27,21 @@ trait DbalSchemaExtensionTrait
         }
     }
 
+     /**
+     * @param string $tableName
+     */
+    public function messageQueueDropTable($tableName)
+    {
+        $connection = $this->messageQueueCreateConnection($tableName);
+        $dbalConnection = $connection->getDBALConnection();
+        $schemaManager = $dbalConnection->getSchemaManager();
+
+        try {
+            $schemaManager->dropTable($tableName);
+        } catch (DriverException $e) {
+        }
+    }
+
     /**
      * @param string $tableName
      *

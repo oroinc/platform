@@ -4,7 +4,6 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\Testing\ClassExtensionTrait;
 
