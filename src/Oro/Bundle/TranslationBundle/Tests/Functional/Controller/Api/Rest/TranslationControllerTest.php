@@ -66,13 +66,13 @@ class TranslationControllerTest extends WebTestCase
     /**
      * @param string|null $value
      *
-     * @dataProvider updateActionProvider
+     * @dataProvider patchActionProvider
      */
-    public function testUpdateAction($inputValue, $expectedValue, $expectedStatus)
+    public function testPatchAction($inputValue, $expectedValue, $expectedStatus)
     {
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_update_translation', [
+            $this->getUrl('oro_api_patch_translation', [
                 'locale' => LoadLanguages::LANGUAGE1,
                 'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
                 'key' => LoadTranslations::TRANSLATION1,
@@ -104,7 +104,7 @@ class TranslationControllerTest extends WebTestCase
     /**
      * @return array
      */
-    public function updateActionProvider()
+    public function patchActionProvider()
     {
         return [
             'update value' => [

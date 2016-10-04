@@ -36,15 +36,19 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
      */
     protected function migrateData(LoggerInterface $logger, $dryRun = false)
     {
+        $queries = [];
+
+        foreach ($this->getNewLanguages($logger) as $languageCode) {
+            $queries[] = [
+                'INSERT INTO oro_language (code, created_at, updated_at) VALUES(:code, now(), now())',
+                ['code' => $languageCode],
+                ['code' => Type::STRING]
+            ];
+        }
+
         $keyField = $this->connection->getDatabasePlatform() instanceof MySqlPlatform ? '`key`' : 'key';
 
-        $queries = [
-            [
-                'INSERT INTO oro_language (code, created_at, updated_at) '
-                    . 'SELECT DISTINCT locale, now(), now() FROM oro_translation',
-                [],
-                []
-            ],
+        $queries = array_merge($queries, [
             [
                 'UPDATE oro_translation t SET language_id = (SELECT id FROM oro_language l WHERE l.code = t.locale)',
                 [],
@@ -62,7 +66,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
                 [],
                 []
             ],
-        ];
+        ]);
 
         foreach ($this->getDuplicatedKeys($logger) as $id) {
             $queries[] = [
@@ -78,6 +82,19 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
                 $this->connection->executeUpdate($query[0], $query[1], $query[2]);
             }
         }
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @return array
+     */
+    private function getNewLanguages(LoggerInterface $logger)
+    {
+        $query = 'SELECT DISTINCT locale FROM oro_translation WHERE locale NOT IN (SELECT code FROM oro_language)';
+
+        $this->logQuery($logger, $query);
+
+        return array_column($this->connection->fetchAll($query), 'locale');
     }
 
     /**

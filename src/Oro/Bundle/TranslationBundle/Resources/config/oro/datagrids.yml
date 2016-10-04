@@ -149,7 +149,7 @@ datagrids:
                     editor:
                         view: orotranslation/js/app/views/editor/text-editor-view
                     save_api_accessor:
-                        route: oro_api_update_translation
+                        route: oro_api_patch_translation
                         query_parameter_names:
                             - key
                             - locale
