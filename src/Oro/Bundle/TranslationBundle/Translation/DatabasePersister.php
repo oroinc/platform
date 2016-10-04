@@ -30,10 +30,8 @@ class DatabasePersister
      * @param Registry $registry
      * @param TranslationManager $translationManager
      */
-    public function __construct(
-        Registry $registry,
-        TranslationManager $translationManager
-    ) {
+    public function __construct(Registry $registry, TranslationManager $translationManager)
+    {
         $this->registry = $registry;
         $this->translationManager = $translationManager;
     }

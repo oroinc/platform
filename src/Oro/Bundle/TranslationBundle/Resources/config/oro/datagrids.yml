@@ -62,8 +62,6 @@ datagrids:
                     data_name: language.createdAt
                 updatedAt:
                     data_name: language.updatedAt
-            default:
-                code: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         filters:
             columns:
                 language:
