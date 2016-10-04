@@ -271,3 +271,7 @@ services:
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
             - '%oro_workflow.workflow_item.entity.class%'
+
+    oro_workflow.generator.translation_key:
+        class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
+        public: false
