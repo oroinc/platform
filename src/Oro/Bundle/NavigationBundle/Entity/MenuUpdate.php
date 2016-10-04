@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
@@ -48,8 +47,6 @@ class MenuUpdate extends ExtendMenuUpdate implements
     MenuUpdateInterface
 {
     use MenuUpdateTrait;
-
-    const OWNERSHIP_USER            = 3;
 
     /**
      * {@inheritdoc}

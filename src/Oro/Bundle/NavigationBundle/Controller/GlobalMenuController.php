@@ -7,19 +7,17 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-
 /**
- * @Route("/menu/organization")
+ * @Route("/menu/global")
  */
-class OrganizationMenuController extends AbstractMenuController
+class GlobalMenuController extends AbstractMenuController
 {
     /**
      * {@inheritdoc}
      */
-    protected function getOwnershipType()
+    protected function getOwnershipProvider()
     {
-        return MenuUpdate::OWNERSHIP_ORGANIZATION;
+        return $this->get('oro_navigation.ownership_provider.global');
     }
 
     /**
@@ -48,7 +46,7 @@ class OrganizationMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_org_menu_create")
-     * @Template("OroNavigationBundle:OrganizationMenu:update.html.twig")
+     * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
      *
      * @param string $menuName
      * @param string|null $parentKey
