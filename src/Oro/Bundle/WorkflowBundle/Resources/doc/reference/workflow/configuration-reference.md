@@ -435,7 +435,7 @@ Event trigger configuration has next options.
 * **queue**
     [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
 * **require**
-    String of Symfony Language Expression that should much to handle the trigger. Can use the following aliases:
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
     * `entity` - Entity object, that dispatched event,
     * `mainEntity` - Entity object of triggers' workflow,
     * `wd` - Workflow Definition object,
@@ -473,7 +473,7 @@ Cron trigger configuration has next options.
 * **queue**
     [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
 * **filter**
-    String of Symfony Language Expression that should much to handle the trigger. Can use the following aliases:
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
     * `e` - Entity,
     * `wd` - Workflow Definition,
     * `wi` - Workflow Item,

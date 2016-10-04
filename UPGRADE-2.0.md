@@ -115,6 +115,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Service `oro_workflow.transition_schedule.process_configuration_generator` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator`) removed.
 - Service `oro_workflow.transition_schedule.items_fetcher` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher`) removed.
 - Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) removed.
+- Service `oro_workflow.cache.process_trigger` (`Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache`) removed.
 - Model `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` removed.
 - Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` 
 and constructor signature changed to `DeferredScheduler $deferredScheduler`. 
@@ -126,7 +127,7 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Removed schedule feature for workflow transitions. Now triggers can be used for schedule transitions.
 - Removed listener `Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener`.
 - Removed parameter `oro_workflow.listener.process_collector.class`.
-- Removed listener `Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener`.
+- Removed listener `oro_workflow.event_listener.scheduled_transitions_listener` (`Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener`).
 - Removed action group `oro_workflow_transition_process_schedule`.
 
 ####LocaleBundle:
