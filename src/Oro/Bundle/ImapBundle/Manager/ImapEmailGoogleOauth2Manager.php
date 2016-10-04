@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
 use Buzz\Message\MessageInterface;
 use Buzz\Client\ClientInterface;
@@ -16,6 +18,7 @@ use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
 
 class ImapEmailGoogleOauth2Manager
 {
@@ -33,20 +36,20 @@ class ImapEmailGoogleOauth2Manager
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     private $doctrine;
 
     /**
      * @param ClientInterface $httpClient
      * @param ResourceOwnerMap $resourceOwnerMap
      * @param ConfigManager $configManager
-     * @param Registry $doctrine
+     * @param ManagerRegistry $doctrine
      */
     public function __construct(
         ClientInterface $httpClient,
         ResourceOwnerMap $resourceOwnerMap,
         ConfigManager $configManager,
-        Registry $doctrine
+        ManagerRegistry $doctrine
     ) {
         $this->httpClient = $httpClient;
         $this->resourceOwnerMap = $resourceOwnerMap;
@@ -98,35 +101,20 @@ class ImapEmailGoogleOauth2Manager
     /**
      * @param UserEmailOrigin $origin
      *
-     * @return mixed
+     * @return string
+     *
+     * @deprecated since 1.10. Use refreshAccessToken or getAccessTokenWithCheckingExpiration
      */
     public function getAccessToken(UserEmailOrigin $origin)
     {
-        $utcTimeZone = new \DateTimeZone('UTC');
-        $parameters = [
-            'refresh_token' => $origin->getRefreshToken(),
-            'grant_type' => 'refresh_token'
-        ];
+        $this->refreshAccessToken($origin);
 
-        $attemptNumber = 0;
-        do {
-            $attemptNumber++;
-            $response = $this->doHttpRequest($parameters);
+        /** @var EntityManager $em */
+        $em = $this->doctrine->getManagerForClass(ClassUtils::getClass($origin));
+        $em->persist($origin);
+        $em->flush();
 
-            if (!empty($response['access_token'])) {
-                $token = $response['access_token'];
-                $origin->setAccessToken($token);
-                $newExpireDate = new \DateTime('+' . ((int)$response['expires_in'] - 5) . ' seconds', $utcTimeZone);
-                $origin->setAccessTokenExpiresAt($newExpireDate);
-
-                $this->doctrine->getManager()->persist($origin);
-                $this->doctrine->getManager()->flush();
-
-                return $token;
-            }
-        } while ($attemptNumber <= self::RETRY_TIMES && empty($response['access_token']));
-
-        throw new \Exception('Cannot refresh OAuth2 token for origin.');
+        return $origin->getAccessToken();
     }
 
     /**
@@ -136,21 +124,78 @@ class ImapEmailGoogleOauth2Manager
      */
     public function getAccessTokenWithCheckingExpiration(UserEmailOrigin $origin)
     {
-        $expiresAt = $origin->getAccessTokenExpiresAt();
-        $utcTimeZone = new \DateTimeZone('UTC');
-        $now = new \DateTime('now', $utcTimeZone);
-
         $token = $origin->getAccessToken();
 
         //if token had been expired, the new one must be generated and saved to DB
-        if ($now > $expiresAt
+        if ($this->isAccessTokenExpired($origin)
             && $this->configManager->get('oro_imap.enable_google_imap')
             && $origin->getRefreshToken()
         ) {
-            $token = $this->getAccessToken($origin);
+            $this->refreshAccessToken($origin);
+
+            /** @var EntityManager $em */
+            $em = $this->doctrine->getManagerForClass(ClassUtils::getClass($origin));
+            $em->persist($origin);
+            $em->flush($origin);
+
+            $token = $origin->getAccessToken();
         }
 
         return $token;
+    }
+
+    /**
+     * @param UserEmailOrigin $origin
+     *
+     * @return bool
+     */
+    public function isAccessTokenExpired(UserEmailOrigin $origin)
+    {
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        return $now > $origin->getAccessTokenExpiresAt();
+    }
+
+    /**
+     * @param UserEmailOrigin $origin
+     *
+     * @throws RefreshOAuthAccessTokenFailureException
+     */
+    public function refreshAccessToken(UserEmailOrigin $origin)
+    {
+        $refreshToken = $origin->getRefreshToken();
+        if (empty($refreshToken)) {
+            throw new RefreshOAuthAccessTokenFailureException('The RefreshToken is empty', $refreshToken);
+        }
+
+        $parameters = [
+            'refresh_token' => $refreshToken,
+            'grant_type'    => 'refresh_token'
+        ];
+
+        $response = [];
+        $attemptNumber = 0;
+        while ($attemptNumber <= self::RETRY_TIMES && empty($response['access_token'])) {
+            $response = $this->doHttpRequest($parameters);
+            $attemptNumber++;
+        }
+
+        if (empty($response['access_token'])) {
+            $failureReason = '';
+            if (!empty($response['error'])) {
+                $failureReason .= $response['error'];
+            }
+            if (!empty($response['error_description'])) {
+                $failureReason .= sprintf(' (%s)', $response['error_description']);
+            }
+
+            throw new RefreshOAuthAccessTokenFailureException($failureReason, $refreshToken);
+        }
+
+        $origin->setAccessToken($response['access_token']);
+        $origin->setAccessTokenExpiresAt(
+            new \DateTime('+' . ((int)$response['expires_in'] - 5) . ' seconds', new \DateTimeZone('UTC'))
+        );
     }
 
     /**

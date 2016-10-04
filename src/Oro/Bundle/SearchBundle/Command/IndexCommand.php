@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Doctrine\ORM\EntityManager;
 
 class IndexCommand extends ContainerAwareCommand
 {
@@ -38,72 +39,38 @@ class IndexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $engine      = $this->getContainer()->get('oro_search.search.engine');
-        $class       = $input->getArgument('class');
+        $class = $input->getArgument('class');
         $identifiers = $input->getArgument('identifiers');
 
-        // convert from short format to FQСN
-        $class = $this->getContainer()->get('doctrine')
-            ->getManagerForClass($class)->getClassMetadata($class)->getName();
-
-        list($savedEntities, $deletedEntities) = $this->getSavedAndDeletedEntities($class, $identifiers);
-
-        if ($savedEntities) {
-            if ($engine->save($savedEntities, true)) {
-                $output->writeln('<info>Entities successfully updated in index</info>');
-            } else {
-                $output->writeln('<error>Can\'t update entities in index</error>');
-            }
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass($class);
+        if (null === $em) {
+            throw new \LogicException(sprintf('Entity manager was not found for class: "%s"', $class));
         }
 
-        if ($deletedEntities) {
-            if ($engine->delete($deletedEntities, true)) {
-                $output->writeln('<info>Entities successfully deleted from index</info>');
-            } else {
-                $output->writeln('<error>Can\'t delete entities from index</error>');
-            }
+        $entities = [];
+        foreach ($identifiers as $id) {
+            $entities[] = $em->getReference($class, $id);
         }
+
+        $this->getSearchIndexer()->save($entities);
+
+        $output->writeln('Started index update for entities.');
     }
 
     /**
-     * @param string $class
-     * @param array $identifiers
-     * @return array
-     * @throws \LogicException
+     * @return ManagerRegistry
      */
-    protected function getSavedAndDeletedEntities($class, array $identifiers)
+    protected function getDoctrine()
     {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getContainer()->get('doctrine')->getManagerForClass($class);
-        if (!$entityManager) {
-            throw new \LogicException(sprintf('Entity manager for class %s is not defined', $class));
-        }
+        return $this->getContainer()->get('doctrine');
+    }
 
-        $repository = $entityManager->getRepository($class);
-        $metadata = $entityManager->getClassMetadata($class);
-
-        $identifierColumn = $metadata->getSingleIdentifierFieldName();
-        $queryBuilder = $repository->createQueryBuilder('e');
-
-        // get entities to save
-        $savedEntityIds = array();
-        $savedEntities = $queryBuilder->andWhere($queryBuilder->expr()->in('e.' . $identifierColumn, $identifiers))
-            ->getQuery()
-            ->getResult();
-
-        foreach ($savedEntities as $entity) {
-            $ids = $metadata->getIdentifierValues($entity);
-            $savedEntityIds[] = current($ids);
-        }
-
-        // get entities to delete
-        $deletedEntityIds = array_diff($identifiers, $savedEntityIds);
-        $deletedEntities = array();
-
-        foreach ($deletedEntityIds as $id) {
-            $deletedEntities[] = $entityManager->getReference($class, $id);
-        }
-
-        return array($savedEntities, $deletedEntities);
+    /**
+     * @return IndexerInterface
+     */
+    protected function getSearchIndexer()
+    {
+        return $this->getContainer()->get('oro_search.async.indexer');
     }
 }

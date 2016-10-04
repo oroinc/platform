@@ -3,16 +3,16 @@
 namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension as BaseDeleteMassActionExtension;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class DeleteMassActionExtension extends BaseDeleteMassActionExtension
 {
+    const OPERATION_NAME = 'DELETE';
+
     /** @var OperationManager */
     protected $operationManager;
 
@@ -43,41 +43,7 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
             return parent::isDeleteActionExists($config, $key);
         }
 
-        $datagridContext = $this->getDatagridContext($config);
-        $operations = $this->getOperations(
-            $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),
-            $datagridContext
-        );
-
-        foreach ($operations as $operation) {
-            if (strtolower($operation->getName()) === static::ACTION_TYPE_DELETE) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets operations from registry if they not already exist in datagrid config as actions
-     * @param array $datagridActionsConfig
-     * @param array $datagridContext
-     * @return Operation[]
-     */
-    protected function getOperations(array $datagridActionsConfig, array $datagridContext)
-    {
-        $result = [];
-
-        $operations = $this->operationManager->getOperations($datagridContext);
-
-        foreach ($operations as $operationName => $action) {
-            $operationName = strtolower($operationName);
-            if (array_key_exists($operationName, $datagridActionsConfig)) {
-                $result[$operationName] = $action;
-            }
-        }
-
-        return $result;
+        return $this->operationManager->hasOperation(self::OPERATION_NAME, $this->getDatagridContext($config));
     }
 
     /**

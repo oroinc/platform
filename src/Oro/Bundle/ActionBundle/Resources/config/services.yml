@@ -67,6 +67,7 @@ services:
             - '@oro_action.configuration.provider.operations'
             - '@oro_action.assembler.operation'
             - '@oro_action.helper.applications'
+            - '@oro_entity.doctrine_helper'
 
     oro_action.action_group_registry:
         class: %oro_action.action_group_registry.class%
