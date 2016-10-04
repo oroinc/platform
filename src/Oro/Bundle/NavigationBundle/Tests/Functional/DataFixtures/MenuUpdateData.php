@@ -13,6 +13,7 @@ class MenuUpdateData extends AbstractFixture
     use UserUtilityTrait;
 
     const MENU = 'default_menu';
+    const OTHER_MENU = 'other_menu';
     const ORGANIZATION = 'default_organization';
     const USER = 'default_user';
 
@@ -34,19 +35,27 @@ class MenuUpdateData extends AbstractFixture
             [
                 'ownershipType' => MenuUpdate::OWNERSHIP_ORGANIZATION,
                 'ownerId' => $this->getReference(self::ORGANIZATION)->getId(),
-                'key' => 'product'
+                'key' => 'product',
+                'menu' => self::MENU,
             ],
             [
                 'ownershipType' => MenuUpdate::OWNERSHIP_USER,
                 'ownerId' => $this->getReference(self::USER)->getId(),
-                'key' => 'lists'
+                'key' => 'lists',
+                'menu' => self::MENU,
+            ],
+            [
+                'ownershipType' => MenuUpdate::OWNERSHIP_USER,
+                'ownerId' => $this->getReference(self::USER)->getId(),
+                'key' => 'menu_item_other',
+                'menu' => self::OTHER_MENU,
             ],
         ];
         foreach ($updatesData as $updateData) {
             $update = new MenuUpdate();
             $update
                 ->setKey($updateData['key'])
-                ->setMenu(self::MENU)
+                ->setMenu($updateData['menu'])
                 ->setOwnershipType($updateData['ownershipType'])
                 ->setOwnerId($updateData['ownerId'])
             ;
