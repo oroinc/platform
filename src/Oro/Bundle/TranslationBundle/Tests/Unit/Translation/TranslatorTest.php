@@ -97,23 +97,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
-                'fr',
-                [
-                    'validators' => [
-                        'other choice' =>
-                            '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
-                        'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
-                    ],
-                    'jsmessages' => [
-                        'foobarfoo' => 'foobarfoo (PT-PT)',
-                        'foobar' => 'foobar (ES)',
-                        'foo' => 'foo (FR)',
-                        'bar' => 'bar (EN)',
-                        'baz' => 'baz (EN)',
-                    ],
-                ]
-            ],
-            [
                 'en',
                 [
                     'jsmessages' => [

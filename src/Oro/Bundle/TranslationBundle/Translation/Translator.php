@@ -72,9 +72,7 @@ class Translator extends BaseTranslator
         /**
          * Pre-load English Catalog, because it used as main fallback
          */
-        if (!isset($this->catalogues['en'])) {
-            $this->loadCatalogue('en');
-        }
+        $this->loadCatalogue('en');
 
         $fallbackCatalogues   = array();
         $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
