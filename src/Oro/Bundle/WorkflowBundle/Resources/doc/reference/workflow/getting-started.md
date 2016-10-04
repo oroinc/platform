@@ -276,7 +276,7 @@ workflows:
                             [$email_entity]                       # add email from temporary attribute
                     - @unset_value:                               # unset temporary properties
                             [$email_string, $email_entity]        # clear email string and entity
-            schedule_transition_definition:                       # definitions for transition "set_name", no extra conditions or actions here
+            schedule_transition_definition:                       # definitions for transition "schedule_transition", no extra conditions or actions here
                 actions:                                          # list of action which will be performed after transition
                     - '@assign_value': [$user.status, 'processed']# change user's status
 
