@@ -40,8 +40,6 @@ class LanguageProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAvailableLanguages()
     {
-        IntlTestHelper::requireIntl($this);
-
         $this->repository->expects($this->once())
             ->method('getAvailableLanguageCodes')
             ->with(false)
