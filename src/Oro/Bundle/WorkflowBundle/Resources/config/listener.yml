@@ -51,13 +51,17 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: onClear }
 
-    oro_workflow.entity_listener.activation_validator:
-        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowActivationValidatorEntityListener
+    oro_workflow.entity_listener.workflow_definition:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener'
         arguments:
             - '@oro_workflow.registry'
+            - '@oro_workflow.translation.processor'
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.workflow_definition.entity.class%', event: prePersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.workflow_definition.entity.class%', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.workflow_definition.entity.class%', event: preRemove }
+            - { name: doctrine.orm.entity_listener, event: postFlush }
+            - { name: doctrine.orm.entity_listener, event: onClear }
 
     oro_workflow.event_listener.scheduled_transitions_listener:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener'

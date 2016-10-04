@@ -9,8 +9,9 @@ class TranslationProcessor
     /**
      * @param WorkflowDefinition $workflow
      * @param array|null $changeSet
+     * @param bool $delete
      */
-    public function process(WorkflowDefinition $workflow, array $changeSet = null)
+    public function process(WorkflowDefinition $workflow, array $changeSet = null, $delete = false)
     {
 
     }
