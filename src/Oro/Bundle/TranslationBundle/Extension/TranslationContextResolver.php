@@ -4,6 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Extension;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Default context resolver
+ */
 class TranslationContextResolver implements TranslationContextResolverInterface
 {
     /** @var TranslatorInterface */

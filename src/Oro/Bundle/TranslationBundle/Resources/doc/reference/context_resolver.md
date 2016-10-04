@@ -11,8 +11,15 @@ Translation context resolver should be used to humanize translation keys and giv
 
 ### Configuration
 
-The context resolver must implement `\Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface` and may look like following
+The context resolver must implement `Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface`, for example:
 ```php
+namespace Oro\Bundle\TranslationBundle\Extension;
+
+use Symfony\Component\Translation\TranslatorInterface;
+
+/**
+ * Default context resolver
+ */
 class TranslationContextResolver implements TranslationContextResolverInterface
 {
     /** @var TranslatorInterface */
@@ -39,9 +46,10 @@ class TranslationContextResolver implements TranslationContextResolverInterface
 }
 ```
 
-Context resolver should be registered as shown below:
+Context resolver should be registered by tag `oro_translation.extension.translation_context_resolver`, for example
 
 ```yml
+    # default context resolver definition
     oro_translation.extension.translation_context_resolver:
         class: 'Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver'
         arguments:
