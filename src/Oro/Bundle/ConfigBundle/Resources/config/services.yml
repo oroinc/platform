@@ -118,6 +118,13 @@ services:
         tags:
             - { name: form.type, alias: oro_config_checkbox }
 
+    oro_config.type.config_file:
+        class: 'Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType'
+        arguments:
+            - '@oro_config.form.config_file_data_transformer'
+        tags:
+            - { name: form.type }
+
     oro_config.form.handler.config:
         class: %oro_config.form.handler.config.class%
         arguments:
@@ -127,3 +134,10 @@ services:
         class: %oro_config.manager.api.class%
         arguments:
             - '@oro_config.provider.system_configuration.form_provider'
+
+    oro_config.form.config_file_data_transformer:
+        class: 'Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@validator'
+            - '@oro_attachment.file_manager'

@@ -1,85 +1,84 @@
-{% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
 {% endblock %}
 
 {% block menu %}
-    {% if not collector.empty %}
-    <span class="label">
+    <span class="label {{ collector.empty ? 'disabled' }}">
         <strong>Data API</strong>
-        <span class="count">
-            <span>{{ '%0.0f'|format(collector.totalTime * 1000) }} ms</span>
-        </span>
     </span>
-    {% endif %}
 {% endblock %}
 
 {% block panel %}
-    {{ block('stats') }}
-    {{ block('actions') }}
-    {{ block('applicableCheckers') }}
-    {{ block('processors') }}
+    {% if collector.empty %}
+        <h2>Data API</h2>
+        <div class="empty">
+            <p>No Data API actions were executed.</p>
+        </div>
+    {% else %}
+        {{ block('stats') }}
+        {{ block('actions') }}
+        {{ block('applicableCheckers') }}
+        {{ block('processors') }}
 
-    <script type="text/javascript">//<![CDATA[
+        <script type="text/javascript">//<![CDATA[
 
-        function sortTable(header, column, targetId) {
-            "use strict";
+            function sortTable(header, column, targetId) {
+                "use strict";
 
-            var direction = parseInt(header.getAttribute('data-sort-direction')) || 1,
-                items = [],
-                target = document.getElementById(targetId),
-                rows = target.children,
-                headers = header.parentElement.children,
-                i;
+                var direction = parseInt(header.getAttribute('data-sort-direction')) || 1,
+                    items = [],
+                    target = document.getElementById(targetId),
+                    rows = target.children,
+                    headers = header.parentElement.children,
+                    i;
 
-            for (i = 0; i < rows.length; ++i) {
-                items.push(rows[i]);
-            }
+                for (i = 0; i < rows.length; ++i) {
+                    items.push(rows[i]);
+                }
 
-            for (i = 0; i < headers.length; ++i) {
-                headers[i].removeAttribute('data-sort-direction');
-                if (headers[i].children.length > 0) {
-                    headers[i].children[0].innerHTML = '';
+                for (i = 0; i < headers.length; ++i) {
+                    headers[i].removeAttribute('data-sort-direction');
+                    if (headers[i].children.length > 0) {
+                        headers[i].children[0].innerHTML = '';
+                    }
+                }
+
+                header.setAttribute('data-sort-direction', (-1*direction).toString());
+                header.children[0].innerHTML = direction > 0 ? '&#9650;' : '&#9660;';
+
+                items.sort(function(a, b) {
+                    return direction*(parseFloat(a.children[column].innerHTML) - parseFloat(b.children[column].innerHTML));
+                });
+
+                for (i = 0; i < items.length; ++i) {
+                    Sfjs.removeClass(items[i], i % 2 ? 'even' : 'odd');
+                    Sfjs.addClass(items[i], i % 2 ? 'odd' : 'even');
+                    target.appendChild(items[i]);
                 }
             }
 
-            header.setAttribute('data-sort-direction', (-1*direction).toString());
-            header.children[0].innerHTML = direction > 0 ? '&#9650;' : '&#9660;';
-
-            items.sort(function(a, b) {
-                return direction*(parseFloat(a.children[column].innerHTML) - parseFloat(b.children[column].innerHTML));
-            });
-
-            for (i = 0; i < items.length; ++i) {
-                Sfjs.removeClass(items[i], i % 2 ? 'even' : 'odd');
-                Sfjs.addClass(items[i], i % 2 ? 'odd' : 'even');
-                target.appendChild(items[i]);
-            }
-        }
-
-    //]]></script>
+        //]]></script>
+    {% endif %}
 {% endblock %}
 
 {% block stats %}
-    <h2>Data API Stats</h2>
+    <h2>Data API Metrics</h2>
 
-    <table>
-        <tbody>
-            <tr>
-                <th>The number of executed actions</th>
-                <td><pre>{{ collector.actionCount }}</pre></td>
-            </tr>
-            <tr>
-                <th>The number of executed processors</th>
-                <td><pre>{{ collector.processorCount }}</pre></td>
-            </tr>
-            <tr>
-                <th>Total time</th>
-                <td><pre>{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</pre></td>
-            </tr>
-        </tbody>
-    </table>
-
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</span>
+            <span class="label">Total time</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.actionCount }}</span>
+            <span class="label">Executed actions</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.processorCount }}</span>
+            <span class="label">Executed processors</span>
+        </div>
+    </div>
 {% endblock stats %}
 
 {% block actions %}
