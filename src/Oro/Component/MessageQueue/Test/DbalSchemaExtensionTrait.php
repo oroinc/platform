@@ -10,9 +10,9 @@ trait DbalSchemaExtensionTrait
     /**
      * @param string $tableName
      */
-    public function messageQueueEnsureTableExists($tableName)
+    public function ensureTableExists($tableName)
     {
-        $connection = $this->messageQueueCreateConnection($tableName);
+        $connection = $this->createConnection($tableName);
         $dbalConnection = $connection->getDBALConnection();
         $schemaManager = $dbalConnection->getSchemaManager();
 
@@ -30,9 +30,9 @@ trait DbalSchemaExtensionTrait
      /**
      * @param string $tableName
      */
-    public function messageQueueDropTable($tableName)
+    public function dropTable($tableName)
     {
-        $connection = $this->messageQueueCreateConnection($tableName);
+        $connection = $this->createConnection($tableName);
         $dbalConnection = $connection->getDBALConnection();
         $schemaManager = $dbalConnection->getSchemaManager();
 
@@ -47,7 +47,7 @@ trait DbalSchemaExtensionTrait
      *
      * @return DbalConnection
      */
-    public function messageQueueCreateConnection($tableName)
+    public function createConnection($tableName)
     {
         $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
 

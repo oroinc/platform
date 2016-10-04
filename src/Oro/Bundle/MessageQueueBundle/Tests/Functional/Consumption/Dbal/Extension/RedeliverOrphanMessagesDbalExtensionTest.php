@@ -16,7 +16,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->messageQueueEnsureTableExists('message_queue');
+        $this->ensureTableExists('message_queue');
 
         $this->startTransaction();
     }
@@ -26,11 +26,13 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         parent::tearDown();
 
         $this->rollbackTransaction();
+
+        $this->dropTable('message_queue');
     }
 
     public function testShouldRedeliverOrphanMessages()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [

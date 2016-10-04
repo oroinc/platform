@@ -18,7 +18,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
         $this->initClient();
 
-        $this->messageQueueEnsureTableExists('message_queue');
+        $this->ensureTableExists('message_queue');
 
         $this->startTransaction();
     }
@@ -29,12 +29,12 @@ class DbalMessageConsumerTest extends WebTestCase
 
         $this->rollbackTransaction();
 
-        $this->messageQueueDropTable('message_queue');
+        $this->dropTable('message_queue');
     }
 
     public function testShouldRemoveRecordIfMessageIsAcknowledged()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -62,7 +62,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
     public function testShouldRemoveRecordIfMessageIsRejected()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -90,7 +90,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
     public function testShouldRemoveRecordAndCreateNewOneIfMessageIsRequeued()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -127,7 +127,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
     public function testShouldReceiveMessage()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -153,7 +153,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
     public function testShouldReceiveMessageWithHighestPriorityFirst()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -190,7 +190,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
     public function testShouldReceiveMessagesWithSamePriorityInIncomeOrder()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -227,7 +227,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
     public function testShouldNotReceiveDelayedMessageIfDelayedUntilTimeInTheFuture()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [
@@ -251,7 +251,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
     public function testShouldReceiveDelayedMessageIfDelayedUntilTimeInThePast()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $dbal->insert('message_queue', [

@@ -17,7 +17,7 @@ class DbalMessageProducerTest extends WebTestCase
 
         $this->initClient();
 
-        $this->messageQueueEnsureTableExists('message_queue');
+        $this->ensureTableExists('message_queue');
 
         $this->startTransaction();
     }
@@ -28,12 +28,12 @@ class DbalMessageProducerTest extends WebTestCase
 
         $this->rollbackTransaction();
 
-        $this->messageQueueDropTable('message_queue');
+        $this->dropTable('message_queue');
     }
 
     public function testShouldCreateMessageInDb()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $producer = new DbalMessageProducer($connection);
@@ -68,7 +68,7 @@ class DbalMessageProducerTest extends WebTestCase
 
     public function testCouldSetMessagePriority()
     {
-        $connection = $this->messageQueueCreateConnection('message_queue');
+        $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
         $producer = new DbalMessageProducer($connection);
