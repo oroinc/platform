@@ -4,8 +4,8 @@ UPGRADE FROM 1.10 to 2.0
 - LiipImagineBundle updated to 1.5.* version.
 
 ####Action Component
-- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
-- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
+- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
+- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
 
 ####ActionBundle

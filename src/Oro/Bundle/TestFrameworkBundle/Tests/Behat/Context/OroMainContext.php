@@ -236,17 +236,16 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
+     * @Given /^(?:|I )login as "(?P<loginAndPassword>(?:[^"]|\\")*)" user$/
      * @Given /^(?:|I )login as administrator$/
      */
-    public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
+    public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
         $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
         $this->visit($uri);
-        $this->fillField('_username', $login);
-        $this->fillField('_password', $password);
+        $this->fillField('_username', $loginAndPassword);
+        $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
-
     }
 
     /**
@@ -339,7 +338,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @When /^(?:|I )save form$/
+     * @When /^(?:|I )(save|submit) form$/
      */
     public function iSaveForm()
     {
@@ -457,6 +456,15 @@ class OroMainContext extends MinkContext implements
         $select = $this->fixStepArgument($select);
         $option = $this->fixStepArgument($option);
         $this->createOroForm()->selectFieldOption($select, $option);
+    }
+
+    /**
+     * @Then /^(?P<label>[\w\s]+) is a required field$/
+     */
+    public function fieldIsRequired($label)
+    {
+        $labelElement = $this->getPage()->findElementContains('Label', $label);
+        self::assertTrue($labelElement->hasClass('required'));
     }
 
     /**.

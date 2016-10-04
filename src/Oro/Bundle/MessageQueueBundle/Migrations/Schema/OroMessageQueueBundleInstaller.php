@@ -5,6 +5,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Component\MessageQueue\Job\Schema as UniqueJobSchema;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -25,8 +26,22 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $this->createDbalQueueTable($schema);
         $this->createJobTable($schema);
         $this->createUniqueJobTable($schema);
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function createDbalQueueTable(Schema $schema)
+    {
+        $queueSchema = new DbalSchema(
+            $this->getDbalConnection(),
+            'oro_message_queue'
+        );
+
+        $queueSchema->addToSchema($schema);
     }
 
     /**
@@ -36,7 +51,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
     {
         $uniqueJobSchema = new UniqueJobSchema(
             $this->getDbalConnection(),
-            $this->container->getParameter('oro_message_queue.job.unique_job_table_name')
+            'oro_message_queue_job_unique'
         );
 
         $uniqueJobSchema->addToSchema($schema);
