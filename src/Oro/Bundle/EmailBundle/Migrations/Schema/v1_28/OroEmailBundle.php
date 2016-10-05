@@ -31,7 +31,8 @@ class OroEmailBundle implements Migration, ContainerAwareInterface
         static::addTextBodyFieldToEmailBodyTable($schema);
 
         // send migration message to queue
-        $this->container->get('oro_message_queue.message_producer')->send('testTopic', '');
+        $this->container->get('oro_message_queue.message_producer')
+            ->send(UpgradeEmailBodyMessageProcessor::TOPIC_NAME, '');
     }
 
     /**
