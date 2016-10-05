@@ -64,8 +64,12 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider preSetDataProvider
+     * @param array $data
+     * @param ConfigModel $model
+     * @param array $trans
+     * @param array $expectedData
      */
-    public function testPreSetData($data, $model, $trans, $expectedData)
+    public function testPreSetData(array $data, ConfigModel $model, array $trans, array $expectedData = null)
     {
         $provider1 = $this->getConfigProvider(
             'entity',
@@ -150,9 +154,21 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider postSubmitProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @param array $data
+     * @param bool $isValid
+     * @param ConfigModel $model
+     * @param array $trans
+     * @param array|null $expectedConfigData
+     * @param array $expectedTrans
      */
-    public function testPostSubmit($data, $isValid, $model, $trans, $expectedConfigData, $expectedTrans)
-    {
+    public function testPostSubmit(
+        array $data,
+        $isValid,
+        ConfigModel $model,
+        array $trans,
+        $expectedConfigData,
+        array $expectedTrans
+    ) {
         $extendProvider = $this->getConfigProvider('extend', [], false);
         $extendProvider->expects($this->once())
             ->method('getConfigById')

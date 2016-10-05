@@ -233,10 +233,7 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
         arguments:
             - '@doctrine'
-            - '@oro_translation.provider.language'
             - '@oro_translation.database_translation.metadata.cache'
-            - '@translator.default'
-            - '%kernel.cache_dir%/translations'
 
     oro_translation.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'

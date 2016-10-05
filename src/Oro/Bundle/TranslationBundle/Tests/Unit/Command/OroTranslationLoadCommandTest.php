@@ -7,12 +7,12 @@ use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\OutputStub;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -118,27 +118,27 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
             ->with('oro_translation.database_translation.loader', new EmptyArrayLoader())
             ->willReturn($this->translationManager);
 
-        $this->translationManager->expects($this->at(0))->method('rebuildCache');
+        $this->translator->expects($this->at(0))->method('rebuildCache');
 
-        $this->translationManager->expects($this->at(1))->method('saveValue')
+        $this->translationManager->expects($this->at(0))->method('saveValue')
             ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(2))->method('flush');
+        $this->translationManager->expects($this->at(1))->method('flush');
 
 
-        $this->translationManager->expects($this->at(3))->method('saveValue')
+        $this->translationManager->expects($this->at(2))->method('saveValue')
             ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(4))->method('flush');
+        $this->translationManager->expects($this->at(3))->method('flush');
 
-        $this->translationManager->expects($this->at(5))->method('saveValue')
+        $this->translationManager->expects($this->at(4))->method('saveValue')
             ->with('key1', 'domain1-currentLocale-message1', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(6))->method('saveValue')
+        $this->translationManager->expects($this->at(5))->method('saveValue')
             ->with('key2', 'domain1-currentLocale-message2', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(7))->method('flush');
+        $this->translationManager->expects($this->at(6))->method('flush');
 
         $this->container->expects($this->at(5))->method('set')
             ->with('oro_translation.database_translation.loader', $loader);
 
-        $this->translationManager->expects($this->at(8))->method('rebuildCache');
+        $this->translator->expects($this->at(1))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
@@ -169,18 +169,18 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getAvailableLanguages')
             ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
 
-        $this->translationManager->expects($this->at(0))->method('rebuildCache');
+        $this->translator->expects($this->at(0))->method('rebuildCache');
 
-        $this->translationManager->expects($this->at(1))->method('saveValue')
+        $this->translationManager->expects($this->at(0))->method('saveValue')
             ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(2))->method('flush');
+        $this->translationManager->expects($this->at(1))->method('flush');
 
 
-        $this->translationManager->expects($this->at(3))->method('saveValue')
+        $this->translationManager->expects($this->at(2))->method('saveValue')
             ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(4))->method('flush');
+        $this->translationManager->expects($this->at(3))->method('flush');
 
-        $this->translationManager->expects($this->at(5))->method('rebuildCache');
+        $this->translator->expects($this->at(1))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 

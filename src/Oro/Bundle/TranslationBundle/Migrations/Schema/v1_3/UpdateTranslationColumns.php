@@ -34,7 +34,7 @@ class UpdateTranslationColumns implements Migration, OrderedMigrationInterface
     {
         $table = $schema->getTable('oro_translation');
 
-        $table->changeColumn('key_id', ['notnull' => true]);
+        $table->changeColumn('translation_key_id', ['notnull' => true]);
         $table->changeColumn('language_id', ['notnull' => true]);
 
         $table->dropColumn('locale');
@@ -42,7 +42,7 @@ class UpdateTranslationColumns implements Migration, OrderedMigrationInterface
         $table->dropColumn('domain');
 
         $table->addIndex(['language_id']);
-        $table->addUniqueIndex(['language_id', 'key_id'], 'language_key_uniq');
+        $table->addUniqueIndex(['language_id', 'translation_key_id'], 'language_key_uniq');
     }
 
     /**
@@ -53,7 +53,7 @@ class UpdateTranslationColumns implements Migration, OrderedMigrationInterface
         $table = $schema->getTable('oro_translation');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_translation_key'),
-            ['key_id'],
+            ['translation_key_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );

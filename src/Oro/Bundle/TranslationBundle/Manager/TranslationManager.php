@@ -12,13 +12,8 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
-use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class TranslationManager
 {
     const DEFAULT_DOMAIN = 'messages';
@@ -26,17 +21,8 @@ class TranslationManager
     /** @var Registry */
     protected $registry;
 
-    /** @var LanguageProvider */
-    protected $languageProvider;
-
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
-
-    /** @var Translator */
-    protected $translator;
-
-    /** @var string */
-    protected $translationCacheDir;
 
     /** @var array */
     protected $availableDomains;
@@ -52,38 +38,12 @@ class TranslationManager
 
     /**
      * @param Registry $registry
-     * @param LanguageProvider $languageProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
-     * @param Translator $translator
-     * @param string $translationCacheDir
      */
-    public function __construct(
-        Registry $registry,
-        LanguageProvider $languageProvider,
-        DynamicTranslationMetadataCache $dbTranslationMetadataCache,
-        Translator $translator,
-        $translationCacheDir
-    ) {
-        $this->registry = $registry;
-        $this->languageProvider = $languageProvider;
-        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
-        $this->translator = $translator;
-        $this->translationCacheDir = $translationCacheDir;
-    }
-
-    /**
-     * @param string $key
-     * @param string $locale
-     * @param string $domain
-     *
-     * @return Translation|null
-     */
-    public function findValue($key, $locale, $domain = self::DEFAULT_DOMAIN)
+    public function __construct(Registry $registry, DynamicTranslationMetadataCache $dbTranslationMetadataCache)
     {
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-
-        return $repo->findValue($key, $locale, $domain);
+        $this->registry = $registry;
+        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
     /**
@@ -133,7 +93,10 @@ class TranslationManager
      */
     public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
-        $translationValue = $this->findValue($key, $locale, $domain);
+        /** @var TranslationRepository $repo */
+        $repo = $this->getEntityRepository(Translation::class);
+
+        $translationValue = $repo->findValue($key, $locale, $domain);
         if (!$this->canUpdateTranslation($scope, $translationValue)) {
             return null;
         }
@@ -161,24 +124,6 @@ class TranslationManager
     protected function canUpdateTranslation($scope, Translation $translation = null)
     {
         return null === $translation || $translation->getScope() <= $scope;
-    }
-
-    /**
-     * @param Language $language
-     *
-     * @return int
-     */
-    public function getCountByLanguage(Language $language)
-    {
-        return $this->getEntityRepository(Translation::class)->getCountByLanguage($language);
-    }
-
-    /**
-     * @param Language $language
-     */
-    public function deleteByLanguage(Language $language)
-    {
-        return $this->getEntityRepository(Translation::class)->deleteByLanguage($language);
     }
 
     /**
@@ -246,7 +191,7 @@ class TranslationManager
      *
      * @return Language|null
      */
-    public function getLanguageByCode($code)
+    protected function getLanguageByCode($code)
     {
         if (!array_key_exists($code, $this->languages)) {
             /** @var LanguageRepository $repo */
@@ -293,14 +238,6 @@ class TranslationManager
     public function invalidateCache($locale = null)
     {
         $this->dbTranslationMetadataCache->updateTimestamp($locale);
-    }
-
-    /**
-     * Rebuilds translation cache
-     */
-    public function rebuildCache()
-    {
-        $this->translator->rebuildCache();
     }
 
     /**

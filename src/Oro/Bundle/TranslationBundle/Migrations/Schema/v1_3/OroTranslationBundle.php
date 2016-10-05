@@ -55,7 +55,7 @@ class OroTranslationBundle implements Migration, OrderedMigrationInterface
     protected function updateOroTranslationTable(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_translation');
-        $table->addColumn('key_id', 'integer', ['notnull' => false]);
+        $table->addColumn('translation_key_id', 'integer', ['notnull' => false]);
         $table->addColumn('language_id', 'integer', ['notnull' => false]);
 
         $table->dropIndex('MESSAGES_IDX');

@@ -6,9 +6,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class TranslationResetStrategy extends TranslationImportStrategy
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $processedLanguages = [];
 
     /**
@@ -21,11 +19,10 @@ class TranslationResetStrategy extends TranslationImportStrategy
         if ($entity instanceof Translation) {
             $language = $entity->getLanguage();
             if ($language && empty($this->processedLanguages[$language->getId()])) {
-                $this->context->incrementDeleteCount(
-                    $this->translationManager->getCountByLanguage($language)
-                );
+                $repository = $this->getTranslationRepository();
 
-                $this->translationManager->deleteByLanguage($language);
+                $this->context->incrementDeleteCount($repository->getCountByLanguage($language));
+                $repository->deleteByLanguage($language);
 
                 $this->processedLanguages[$language->getId()] = true;
             }

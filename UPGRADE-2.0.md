@@ -257,13 +257,21 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - used relation to `Oro\Bundle\TranslationBundle\Entity\TranslationKey` instead of `key` and `domain` fields
     - used relation to `Oro\Bundle\TranslationBundle\Entity\Language` instead of `code` field
 - Added entity repository `Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository`
+- Removed methods from entity repository `Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository`:
+    - `findValues()`
+    - `findAvailableDomains()`
+    - `findAvailableDomainsForLocales()`
+    - `saveValue()`
+    - `renameKey()`
+    - `copyValue()`
+    - `getCountByLocale()`
+    - `deleteByLocale()`
 - Added interface `Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface`
 - Added default translation context resolver `Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver`
 - Added translation context provider `Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider`
 - Added custom datagrid filter `Oro\Bundle\TranslationBundle\Filter\LanguageFilter`, that allow to handle available language choices for dropdown.
 - Added custom datagrid filter form type `\Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType`, that display only enabled and available languages.
-- Changed constructor of `Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer`, now it takes an instance of `Oro\Bundle\TranslationBundle\Manager\TranslationManager`
-- Changed constructor of `Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy`, now it takes an instance of `Oro\Bundle\TranslationBundle\Manager\TranslationManager`
+- Added constructor for `Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer`, now it takes an instance of `Oro\Bundle\TranslationBundle\Manager\TranslationManager`
 - Added new manager `Oro\Bundle\TranslationBundle\Manager\TranslationManager`, that provides all required functionality to work with Translation and related entities.
 - Added new ACL permission `TRANSLATE`, should be used to determine if user has access to modify translations per language.
 - Removed `Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface`

@@ -61,7 +61,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
                 []
             ],
             [
-                'UPDATE oro_translation t SET key_id = '
+                'UPDATE oro_translation t SET translation_key_id = '
                     . '(SELECT id FROM oro_translation_key k WHERE k.key = t.key AND k.domain = t.domain)',
                 [],
                 []

@@ -25,7 +25,6 @@ datagrids:
             language:
                 label: oro.translation.language.entity_label
             ownerName:
-                acl_resource: oro_translation_language_update
                 label: oro.translation.language.owner.label
                 frontend_type: relation
                 inline_editing:
