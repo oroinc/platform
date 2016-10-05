@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <form action="{{ path('oro_user_reset_reset', { token: token }) }}" {{ form_enctype(form) }} method="post" class="form-signin">
+    <form action="{{ path('oro_user_reset_reset', { token: token }) }}" {{ form_enctype(form) }} method="post" class="form-signin reset">
         <div class="title-box">
             {% if oro_theme_logo() %}
                 <h1 class="oro-title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
@@ -15,8 +15,23 @@
             <h2 class="title">{{ 'Password Reset'|trans }}</h2>
         </div>
         <fieldset>
-            {{ form_widget(form) }}
             <div>
+                {{ form_errors(form.plainPassword.first) }}
+            </div>
+            <div class="input-prepend">
+                {{ form_label(form.plainPassword.first, null, {'label_attr': {'class': 'add-on'}}) }}
+                {{ form_widget(form.plainPassword.first) }}
+            </div>
+            <div>
+                {{ form_errors(form.plainPassword.second) }}
+            </div>
+            <div class="input-prepend">
+                {{ form_label(form.plainPassword.second, null, {'label_attr': {'class': 'add-on'}}) }}
+                {{ form_errors(form.plainPassword.second) }}
+                {{ form_widget(form.plainPassword.second) }}
+            </div>
+            <div>
+                {{ form_widget(form._token) }}
                 <button class="btn btn-large extra-submit btn-primary" type="submit">{{ 'Reset'|trans }}</button>
                 <a href="{{ path('oro_user_security_login') }}" class="btn btn-large extra-btn-large">{{ 'Cancel'|trans }}</a>
             </div>

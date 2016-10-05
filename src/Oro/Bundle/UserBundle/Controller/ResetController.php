@@ -124,7 +124,7 @@ class ResetController extends Controller
      *     requirements={"id"="\d+"}
      * )
      * @AclAncestor("password_management")
-     * @Template("OroUserBundle:Reset/widget:sendEmailConfirmation.html.twig")
+     * @Template("OroUserBundle:Reset/widget:forcePasswordResetConfirmation.html.twig")
      */
     public function sendForcedResetEmailAction(Request $request, User $user)
     {

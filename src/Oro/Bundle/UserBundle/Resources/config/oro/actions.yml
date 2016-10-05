@@ -119,6 +119,7 @@ operations:
                 message: oro.user.reset_password.popup.question
                 message_parameters:
                     user: $.data.username
+                component: oroui/js/standart-confirmation
         datagrid_options:
             mass_action:
                 type: resetpassword

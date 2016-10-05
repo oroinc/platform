@@ -39,10 +39,10 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     protected $counter = 0;
 
     /** @var string */
-    protected $successMessage = 'oro.user.password.reset.mass_action.success';
+    protected $successMessage = 'oro.user.password.force_reset.mass_action.success';
 
     /** @var string */
-    protected $errorMessage = 'oro.user.password.reset.mass_action.failure';
+    protected $errorMessage = 'oro.user.password.force_reset.mass_action.failure';
 
     public function __construct(
         Processor $mailerProcessor,
