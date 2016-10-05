@@ -11,6 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Translator extends BaseTranslator
 {
     /** @var DynamicTranslationMetadataCache|null */
@@ -53,6 +56,9 @@ class Translator extends BaseTranslator
      * @param string|null $locale  locale of translations, by default is current locale
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getTranslations(array $domains = array(), $locale = null)
     {
@@ -69,10 +75,24 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
+        /**
+         * Pre-load English Catalog, because it used as main fallback
+         */
+        if ((!isset($this->catalogues['en'])) && ('en' !== $locale)) {
+            $this->loadCatalogue('en');
+        }
+
         $fallbackCatalogues   = array();
         $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $fallbackCatalogues[] = $catalogue;
+        }
+
+        /**
+         * Append Collection of Fallback catalogs with system default English catalog.
+         */
+        if ('en' !== $locale) {
+            $fallbackCatalogues[] = $this->catalogues['en'];
         }
 
         $domains      = array_flip($domains);
