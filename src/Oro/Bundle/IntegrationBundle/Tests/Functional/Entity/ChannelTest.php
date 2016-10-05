@@ -9,7 +9,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 
 /**
  * @dbIsolationPerTest
@@ -24,7 +23,6 @@ class ChannelTest extends WebTestCase
 
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);
-        $this->getMessageProducer()->clear();
     }
 
     public function testShouldScheduleIntegrationSyncMessageOnCreate()
@@ -45,7 +43,7 @@ class ChannelTest extends WebTestCase
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 
-        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
+        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
         self::assertCount(1, $traces);
         self::assertEquals([
             'integration_id' => $integration->getId(),
@@ -71,7 +69,7 @@ class ChannelTest extends WebTestCase
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 
-        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
+        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
         self::assertCount(1, $traces);
         self::assertEquals([
             'integration_id' => $integration->getId(),
@@ -88,13 +86,5 @@ class ChannelTest extends WebTestCase
     private function getEntityManager()
     {
         return self::getContainer()->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return TraceableMessageProducer
-     */
-    private function getMessageProducer()
-    {
-        return self::getContainer()->get('oro_message_queue.message_producer');
     }
 }

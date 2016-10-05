@@ -9,7 +9,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Symfony\Component\DomCrawler\Form;
 
 /**
@@ -50,6 +49,24 @@ class IntegrationControllerTest extends WebTestCase
         $result  = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Integrations - System', $crawler->html());
+    }
+
+
+    public function testShouldScheduleSyncJobIfIntegrationActive()
+    {
+        $channel = $this->createChannel();
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
+
+        $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertTrue($result['successful']);
+
+        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
+        $this->assertCount(1, $traces);
     }
 
     public function testCreate()
@@ -151,22 +168,6 @@ class IntegrationControllerTest extends WebTestCase
         return $integration;
     }
 
-    public function testShouldScheduleSyncJobIfIntegrationActive()
-    {
-        $channel = $this->createChannel();
-        $this->entityManager->persist($channel);
-        $this->entityManager->flush();
-
-        $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        $this->assertTrue($result['successful']);
-
-        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
-        $this->assertCount(1, $traces);
-    }
 
     public function testShouldNotScheduleSyncJobIfIntegrationNotActive()
     {
@@ -223,13 +224,5 @@ class IntegrationControllerTest extends WebTestCase
         $channel->setEnabled(true);
 
         return $channel;
-    }
-
-    /**
-     * @return TraceableMessageProducer
-     */
-    private function getMessageProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.message_producer');
     }
 }

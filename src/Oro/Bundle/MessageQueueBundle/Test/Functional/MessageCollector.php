@@ -19,10 +19,6 @@ class MessageCollector implements MessageProducerInterface
      */
     private $sentMessages = [];
 
-    /**
-     * @var bool
-     */
-    private $enabled = false;
 
     /**
      * @param MessageProducerInterface $messageProducer
@@ -39,9 +35,7 @@ class MessageCollector implements MessageProducerInterface
     {
         $this->messageProducer->send($topic, $message);
 
-        if ($this->enabled) {
-            $this->sentMessages[] = ['topic' => $topic, 'message' => $message];
-        }
+        $this->sentMessages[] = ['topic' => $topic, 'message' => $message];
     }
 
     /**
@@ -79,30 +73,6 @@ class MessageCollector implements MessageProducerInterface
     public function clear()
     {
         $this->sentMessages = [];
-
-        return $this;
-    }
-
-    /**
-     * Disables the collecting of messages.
-     *
-     * $return self
-     */
-    public function disable()
-    {
-        $this->enabled = false;
-
-        return $this;
-    }
-
-    /**
-     * Enables the collecting of messages.
-     *
-     * $return self
-     */
-    public function enable()
-    {
-        $this->enabled = true;
 
         return $this;
     }
