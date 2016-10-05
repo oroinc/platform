@@ -317,7 +317,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testDynamicResourcesWithoutDatabaseTranslationMetadataCache()
     {
         $locale     = 'en';
-        $locales = array_keys($this->messages);
         $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
@@ -327,7 +326,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 ->setMethods(['addResource'])
                 ->getMock();
         $translator->setLocale($locale);
-        $translator->setFallbackLocales($locales);
 
         $translator->expects($this->never())->method('addResource');
         $translator->hasTrans('foo');
