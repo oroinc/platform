@@ -59,6 +59,9 @@ navigation:
                     position: 90
                     routes: ['/^oro_navigation_org_menu_[\w_]+$/']
                     description: 'Manage menus in default area'
+            user_list:
+                extras:
+                    routes: ['/^oro_navigation_user_menu_[\w_]+$/']
 
         tree:
             application_menu:
@@ -70,6 +73,7 @@ navigation:
 
             dots_menu:
                 type: dots_menu
+                read_only: true
                 children:
                     history: ~
                     favorite: ~
