@@ -109,6 +109,7 @@ menu_config:
             type: <menu_type>                   # menu type code. Link to menu template section.
             area: <string>                      # menu area identifier
             read_only: <boolean>                # disable ability to edit menu in UI
+            max_nesting_level: <integer>        # menu max nesting level
             merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
             extras:                             # extra parameters for container renderer
                 brand: <string>

@@ -56,6 +56,7 @@ class ConfigurationBuilder implements BuilderInterface
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'type');
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'area', $defaultArea);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
                     $menu->setExtra('editable', true);
 
                     $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
