@@ -118,7 +118,6 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
                         $stopExecution = true;
                         continue;
                     }
-
                 } catch (InvalidItemException $e) {
                     $this->handleStepExecutionWarning($this->reader, $e, $warningHandler);
 

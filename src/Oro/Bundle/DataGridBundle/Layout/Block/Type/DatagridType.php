@@ -41,7 +41,6 @@ class DatagridType extends AbstractContainerType
         $this->nameStrategy = $nameStrategy;
         $this->manager = $manager;
         $this->securityFacade = $securityFacade;
-
     }
 
     /**
