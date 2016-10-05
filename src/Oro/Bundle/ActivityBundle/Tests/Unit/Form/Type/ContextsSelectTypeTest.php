@@ -126,7 +126,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver
         );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
-
     }
 
     public function testGetName()

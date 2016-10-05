@@ -1209,7 +1209,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $manager = $this->createPackageManager($composer);
         $this->assertTrue($manager->isUpdateAvailable($packageName));
-
     }
 
     /**

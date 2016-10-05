@@ -95,7 +95,6 @@ class ResultRecord implements ResultRecordInterface
                 } catch (ExceptionInterface $e) {
                     return null;
                 }
-
             }
         }
 
