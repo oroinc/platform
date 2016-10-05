@@ -69,7 +69,7 @@ class SaveParentEntityTest extends ChangeRelationshipTestCase
 
         $em->expects($this->once())
             ->method('flush')
-            ->with($this->identicalTo($entity));
+            ->with(null);
 
         $this->context->setParentEntity($entity);
         $this->processor->process($this->context);

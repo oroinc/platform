@@ -50,7 +50,11 @@ class ConfigHandler
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             $form->submit($request);
             if ($form->isValid()) {
-                $this->manager->save($form->getData());
+                $changeSet = $this->manager->save($form->getData());
+                $handler = $form->getConfig()->getAttribute('handler');
+                if (null !== $handler && is_callable($handler)) {
+                    call_user_func($handler, $this->manager, $changeSet);
+                }
 
                 return true;
             }

@@ -71,10 +71,12 @@ class ActionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config = new ActionFieldConfig();
         $this->assertFalse($config->hasPropertyPath());
         $this->assertNull($config->getPropertyPath());
+        $this->assertEquals('default', $config->getPropertyPath('default'));
 
         $config->setPropertyPath('path');
         $this->assertTrue($config->hasPropertyPath());
         $this->assertEquals('path', $config->getPropertyPath());
+        $this->assertEquals('path', $config->getPropertyPath('default'));
         $this->assertEquals(['property_path' => 'path'], $config->toArray());
 
         $config->setPropertyPath(null);
@@ -86,6 +88,7 @@ class ActionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setPropertyPath('');
         $this->assertFalse($config->hasPropertyPath());
         $this->assertNull($config->getPropertyPath());
+        $this->assertEquals('default', $config->getPropertyPath('default'));
         $this->assertEquals([], $config->toArray());
     }
 

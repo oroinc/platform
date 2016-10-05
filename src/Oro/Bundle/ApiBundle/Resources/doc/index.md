@@ -29,6 +29,7 @@ OroApiBundle Documentation
    - [**add_relationship** action](./actions.md#add_relationship-action)
    - [**delete_relationship** action](./actions.md#delete_relationship-action)
    - [**customize_loaded_data** action](./actions.md#customize_loaded_data-action)
+   - [**customize_form_data** action](./actions.md#customize_form_data-action)
    - [**get_config** action](./actions.md#get_config-action)
    - [**get_relation_config** action](./actions.md#get_relation_config-action)
    - [**get_metadata** action](./actions.md#get_metadata-action)

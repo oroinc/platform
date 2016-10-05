@@ -43,7 +43,7 @@
             "kriswallsmith/assetic": "1.1.2",
             "leafo/lessphp": "0.4.0",
             "lexik/maintenance-bundle": "dev-master",
-            "liip/imagine-bundle": "0.17.*",
+            "liip/imagine-bundle": "1.5.*",
             "luxifer/doctrine-functions": "1.2.1",
             "monolog/monolog": "1.7.*",
             "mtdowling/cron-expression": "1.0.*",

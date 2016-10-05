@@ -21,9 +21,9 @@ abstract class AbstractPass implements CompilerPassInterface
         }
 
         $types = [];
-        $conditions = $container->findTaggedServiceIds($tag);
+        $items = $container->findTaggedServiceIds($tag);
 
-        foreach ($conditions as $id => $attributes) {
+        foreach ($items as $id => $attributes) {
             $this->prepareDefinition($container->getDefinition($id));
 
             foreach ($attributes as $eachTag) {

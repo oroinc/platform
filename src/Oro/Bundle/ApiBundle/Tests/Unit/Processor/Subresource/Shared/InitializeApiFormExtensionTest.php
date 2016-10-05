@@ -38,11 +38,10 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
             ->method('switchToApiFormExtension');
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
-            ->with(
-                $this->isInstanceOf(
-                    'Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentMetadataAccessor'
-                )
-            );
+            ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentMetadataAccessor'));
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('setConfigAccessor')
+            ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor'));
 
         $this->processor->process($this->context);
     }
