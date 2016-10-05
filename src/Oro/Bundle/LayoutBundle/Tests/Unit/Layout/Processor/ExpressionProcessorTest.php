@@ -148,7 +148,6 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['third'] = '=true == first';
 
         $this->processor->processExpressions($values, $context, $data, true, null);
-
     }
 
 
