@@ -4,23 +4,18 @@ namespace Oro\Bundle\CalendarBundle\EventListener;
 
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
 class NavigationListener
 {
-    /** @var MenuUpdateHelper */
-    protected $menuUpdateHelper;
-
     /** @var SystemCalendarConfig */
     protected $calendarConfig;
 
     /**
-     * @param MenuUpdateHelper $menuUpdateHelper
      * @param SystemCalendarConfig $calendarConfig
      */
-    public function __construct(MenuUpdateHelper $menuUpdateHelper, SystemCalendarConfig $calendarConfig)
+    public function __construct(SystemCalendarConfig $calendarConfig)
     {
-        $this->menuUpdateHelper = $menuUpdateHelper;
         $this->calendarConfig = $calendarConfig;
     }
 
@@ -30,7 +25,7 @@ class NavigationListener
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->calendarConfig->isPublicCalendarEnabled() && !$this->calendarConfig->isSystemCalendarEnabled()) {
-            $calendarListItem = $this->menuUpdateHelper->findMenuItem($event->getMenu(), 'oro_system_calendar_list');
+            $calendarListItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'oro_system_calendar_list');
             if ($calendarListItem !== null) {
                 $calendarListItem->setDisplay(false);
             }

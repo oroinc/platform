@@ -9,16 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var MenuUpdateHelper */
-    protected $menuUpdateHelper;
 
     /** @var ConfigManager $configManager */
     protected $configManager;
@@ -28,18 +25,15 @@ class NavigationListener
 
     /**
      * @param SecurityFacade      $securityFacade
-     * @param MenuUpdateHelper    $menuUpdateHelper
      * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
-        MenuUpdateHelper $menuUpdateHelper,
         ConfigManager $configManager,
         TranslatorInterface $translator
     ) {
         $this->securityFacade   = $securityFacade;
-        $this->menuUpdateHelper = $menuUpdateHelper;
         $this->configManager    = $configManager;
         $this->translator       = $translator;
     }
@@ -50,7 +44,7 @@ class NavigationListener
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         $children = [];
-        $entitiesMenuItem = $this->menuUpdateHelper->findMenuItem($event->getMenu(), 'entities_list');
+        $entitiesMenuItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'entities_list');
         if ($entitiesMenuItem !== null) {
             /** @var ConfigProvider $entityConfigProvider */
             $entityConfigProvider = $this->configManager->getProvider('entity');
@@ -91,7 +85,6 @@ class NavigationListener
                 $entitiesMenuItem->addChild($child['label'], $child['options']);
             }
         }
-
     }
 
     /**

@@ -9,15 +9,12 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
-    /** @var MenuUpdateHelper */
-    protected $menuUpdateHelper;
-
     /** @var EntityManager */
     protected $em;
 
@@ -31,20 +28,17 @@ class NavigationListener
     protected $aclHelper;
 
     /**
-     * @param MenuUpdateHelper $menuUpdateHelper
      * @param EntityManager    $entityManager
      * @param ConfigProvider   $entityConfigProvider
      * @param SecurityFacade   $securityFacade
      * @param AclHelper        $aclHelper
      */
     public function __construct(
-        MenuUpdateHelper $menuUpdateHelper,
         EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
         SecurityFacade $securityFacade,
         AclHelper $aclHelper
     ) {
-        $this->menuUpdateHelper     = $menuUpdateHelper;
         $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->securityFacade       = $securityFacade;
@@ -56,7 +50,7 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $reportsMenuItem = $this->menuUpdateHelper->findMenuItem($event->getMenu(), 'reports_tab');
+        $reportsMenuItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'reports_tab');
         if ($reportsMenuItem !== null && $this->securityFacade->hasLoggedUser()) {
             $qb = $this->em->getRepository('OroReportBundle:Report')
                 ->createQueryBuilder('report')

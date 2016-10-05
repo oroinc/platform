@@ -296,7 +296,6 @@ services:
     oro_calendar.event_listener.navigation:
         class: %oro_calendar.event_listener.navigation.class%
         arguments:
-            - '@oro_navigation.helper.menu_update'
             - '@oro_calendar.system_calendar_config'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

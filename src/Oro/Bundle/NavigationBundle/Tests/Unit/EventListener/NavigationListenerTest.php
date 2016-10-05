@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\EventListener\NavigationListener;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,14 +14,9 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     protected $navigationListener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityFacade;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $menuUpdateManager;
 
     protected function setUp()
     {
@@ -27,26 +24,23 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->menuUpdateManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->navigationListener = new NavigationListener($this->securityFacade, $this->menuUpdateManager);
+        $this->navigationListener = new NavigationListener($this->securityFacade);
     }
 
     public function testDisplayIsSet()
     {
-        $menu = $this->getMock('Knp\Menu\ItemInterface');
         $item = $this->getMock('Knp\Menu\ItemInterface');
+        $menu = $this->getMock('Knp\Menu\ItemInterface');
+
+        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
+
         $event->expects($this->once())->method('getMenu')->willReturn($menu);
-
+        $menu->expects($this->once())->method('getChild')->willReturn($item);
         $item->expects($this->once())->method('setDisplay')->with(false);
-
         $this->securityFacade->expects($this->once())->method('isGranted')->willReturn(false);
-        $this->menuUpdateManager->expects($this->once())->method('findMenuItem')->willReturn($item);
 
         $this->navigationListener->onNavigationConfigure($event);
     }
@@ -60,13 +54,16 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function testDisplayIsNotSet($item, $isGranted)
     {
         $menu = $this->getMock('Knp\Menu\ItemInterface');
+
+        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
-        $event->expects($this->once())->method('getMenu')->willReturn($menu);
 
+        $event->expects($this->once())->method('getMenu')->willReturn($menu);
+        $menu->expects($this->once())->method('getChild')->willReturn($item);
+        $menu->expects($this->any())->method('getChildren')->willReturn([]);
         $this->securityFacade->expects($this->any())->method('isGranted')->willReturn($isGranted);
-        $this->menuUpdateManager->expects($this->once())->method('findMenuItem')->willReturn($item);
 
         $this->navigationListener->onNavigationConfigure($event);
     }

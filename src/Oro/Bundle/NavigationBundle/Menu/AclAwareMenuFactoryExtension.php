@@ -85,7 +85,6 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     public function buildItem(ItemInterface $item, array $options)
     {
-
     }
 
     /**

@@ -9,8 +9,8 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
 class MenuUpdateManager
 {
@@ -20,25 +20,17 @@ class MenuUpdateManager
     /** @var BuilderChainProvider */
     private $builderChainProvider;
 
-    /** @var MenuUpdateHelper */
-    private $menuUpdateHelper;
-
     /** @var string */
     private $entityClass;
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
-     * @param MenuUpdateHelper $menuUpdateHelper
      */
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        BuilderChainProvider $builderChainProvider,
-        MenuUpdateHelper $menuUpdateHelper
-    ) {
+    public function __construct(ManagerRegistry $managerRegistry, BuilderChainProvider $builderChainProvider)
+    {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
-        $this->menuUpdateHelper = $menuUpdateHelper;
     }
 
     /**
@@ -54,39 +46,25 @@ class MenuUpdateManager
     }
 
     /**
+     * Create menu update entity
+     *
      * @param int $ownershipType
      * @param int $ownerId
+     * @param string $key
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownershipType, $ownerId)
+    public function createMenuUpdate($ownershipType, $ownerId, $key = null)
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
         $entity
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
+            ->setKey($key ? $key : $this->generateKey())
         ;
 
         return $entity;
-    }
-
-    /**
-     * @param MenuUpdateInterface $update
-     */
-    public function updateMenuUpdate(MenuUpdateInterface $update)
-    {
-        $this->getEntityManager()->persist($update);
-        $this->getEntityManager()->flush($update);
-    }
-
-    /**
-     * @param MenuUpdateInterface $update
-     */
-    public function removeMenuUpdate(MenuUpdateInterface $update)
-    {
-        $this->getEntityManager()->remove($update);
-        $this->getEntityManager()->flush($update);
     }
 
     /**
@@ -126,40 +104,23 @@ class MenuUpdateManager
         ]);
         
         if (!$update) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, $key);
         }
 
         return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);
     }
 
     /**
-     * @param MenuUpdateInterface $update
-     * @param string $menuName
-     * @param string $key
-     * @param int $ownershipType
-     *
-     * @return MenuUpdateInterface
-     */
-    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $ownershipType)
-    {
-        $item = $this->findMenuItem($menuName, $key, $ownershipType);
-
-        if ($item) {
-            $this->menuUpdateHelper->updateMenuUpdate($update, $item, $menuName);
-        }
-
-        return $update;
-    }
-
-    /**
-     * Save menu items order to DB
+     * Get list of menu update with new position
      *
      * @param string $menuName
      * @param ItemInterface[] $orderedChildren
      * @param int $ownershipType
      * @param int $ownerId
+     *
+     * @return MenuUpdateInterface[]
      */
-    public function reorderMenuUpdate($menuName, $orderedChildren, $ownershipType, $ownerId)
+    public function getReorderedMenuUpdates($menuName, $orderedChildren, $ownershipType, $ownerId)
     {
         $order = [];
         foreach ($orderedChildren as $priority => $child) {
@@ -176,8 +137,6 @@ class MenuUpdateManager
         
         foreach ($updates as $update) {
             $update->setPriority($order[$update->getKey()]);
-            $this->getEntityManager()->persist($update);
-
             unset($orderedChildren[$order[$update->getKey()]]);
         }
 
@@ -188,12 +147,10 @@ class MenuUpdateManager
             $parentKey = $child->getParent()->getName();
             $update->setParentKey($parentKey != $menuName ? $parentKey : null);
             $update->setPriority($priority);
-
-            $this->getEntityManager()->persist($update);
             $updates[] = $update;
         }
-
-        $this->getEntityManager()->flush($updates);
+        
+        return $updates;
     }
 
     /**
@@ -228,7 +185,26 @@ class MenuUpdateManager
         ];
         $menu = $this->getMenu($menuName, $options);
 
-        return $this->menuUpdateHelper->findMenuItem($menu, $key);
+        return MenuUpdateUtils::findMenuItem($menu, $key);
+    }
+
+    /**
+     * @param MenuUpdateInterface $update
+     * @param string $menuName
+     * @param string $key
+     * @param int $ownershipType
+     *
+     * @return MenuUpdateInterface
+     */
+    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $ownershipType)
+    {
+        $item = $this->findMenuItem($menuName, $key, $ownershipType);
+
+        if ($item) {
+            MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName);
+        }
+
+        return $update;
     }
 
     /**
@@ -245,5 +221,41 @@ class MenuUpdateManager
     private function getEntityManager()
     {
         return $this->managerRegistry->getManagerForClass($this->entityClass);
+    }
+
+    /**
+     * @return string
+     */
+    public function generateKey()
+    {
+        return uniqid('menu_item_');
+    }
+
+    /**
+     * Reset menu updates depending on ownership type and owner id
+     *
+     * @param int    $ownershipType
+     * @param int    $ownerId
+     * @param string $menu
+     */
+    public function resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId = null, $menu = null)
+    {
+        $criteria = ['ownershipType' => $ownershipType];
+
+        if ($ownerId) {
+            $criteria['ownerId'] = $ownerId;
+        }
+
+        if ($menu) {
+            $criteria['menu'] = $menu;
+        }
+
+        $menuUpdates = $this->getRepository()->findBy($criteria);
+
+        foreach ($menuUpdates as $menuUpdate) {
+            $this->getEntityManager()->remove($menuUpdate);
+        }
+
+        $this->getEntityManager()->flush($menuUpdates);
     }
 }

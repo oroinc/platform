@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\EventListener;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
@@ -11,17 +11,12 @@ class NavigationListener
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var MenuUpdateHelper */
-    protected $menuUpdateHelper;
-
     /**
      * @param SecurityFacade $securityFacade
-     * @param MenuUpdateHelper $menuUpdateHelper
      */
-    public function __construct(SecurityFacade $securityFacade, MenuUpdateHelper $menuUpdateHelper)
+    public function __construct(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
-        $this->menuUpdateHelper = $menuUpdateHelper;
     }
 
     /**
@@ -29,7 +24,7 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $manageMenusItem = $this->menuUpdateHelper->findMenuItem($event->getMenu(), 'menu_list_default');
+        $manageMenusItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'menu_list_default');
         if ($manageMenusItem !== null && !$this->securityFacade->isGranted('oro_config_system')) {
             $manageMenusItem->setDisplay(false);
         }

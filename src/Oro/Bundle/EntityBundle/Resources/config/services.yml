@@ -66,7 +66,6 @@ services:
         class: %oro_entity.listener.navigation_listener.class%
         arguments:
             - '@oro_security.security_facade'
-            - '@oro_navigation.helper.menu_update'
             - '@oro_entity_config.config_manager'
             - '@translator'
         tags:
