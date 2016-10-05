@@ -29,6 +29,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation 
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\CreateLoginHistoryTable;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -131,6 +132,7 @@ class OroUserBundleInstaller implements
         AddEmailUserColumn::updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
+        CreateLoginHistoryTable::createOroUserLoginHistoryTable($schema);
     }
 
     /**
@@ -520,30 +522,5 @@ class OroUserBundleInstaller implements
         $table = $schema->getTable('oro_access_group');
         $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
-    }
-
-    /**
-     * Create oro_security_permission table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroUserLoginHistoryTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_user_login_history');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('provider_class', 'string', ['length' => 255]);
-        $table->addColumn('failed_attempts', 'integer', ['notnull' => false]);
-        $table->addColumn('failed_daily_attempts', 'integer', ['notnull' => false]);
-        $table->addColumn('created_at', 'datetime');
-        $table->addColumn('updated_at', 'datetime');
-        $table->setPrimaryKey(['id']);
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
-        );
-        $table->addUniqueIndex(['user_id', 'provider_class']);
     }
 }

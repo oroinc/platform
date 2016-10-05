@@ -2,77 +2,39 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\UserBundle\Entity\LoginHistory;
-use Oro\Bundle\UserBundle\Entity\Repository\LoginHistoryRepository;
 
 class LoginHistoryManager
 {
-    /** @var Registry */
-    protected $doctrine;
+    /** @var ObjectManager $objectManager */
+    protected $objectManager;
 
-    public function __construct(Registry $registry)
+    /**
+     * @param  ObjectManager $objectManager
+     */
+    public function __construct(ObjectManager $objectManager)
     {
-        $this->doctrine = $registry;
-    }
-
-    public function addLoginFailure(UserInterface $user, $providerClass)
-    {
-        /** @var LoginHistoryRepository $repository */
-        $repository = $this->getLoginHistoryRepository();
-        $loginHistory = $repository->getByUserAndProviderClass($user, $providerClass);
-
-        if (!$loginHistory) {
-            $loginHistory = $this->createLoginHistory($user, $providerClass);
-        }
-
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $updated = $loginHistory->getUpdatedAt() ?: $loginHistory->getCreatedAt();
-        $diff = $updated->diff($now);
-
-        if ($diff->d >= 1 || $diff->m >= 1 || $diff->d >= 1) {
-            $loginHistory->setFailedDailyAttempts(0);
-        }
-        // increase failures
-        $loginHistory->increaseFailedAttempts();
-        $loginHistory->increaseFailedDailyAttempts();
-
-        // save changes
-        $em = $this->doctrine->getManagerForClass('OroUserBundle:LoginHistory');
-        $em->persist($loginHistory);
-        $em->flush();
+        $this->objectManager = $objectManager;
     }
 
     /**
-     * @param UserInterface $user
-     * @param $providerClass
-     * @return LoginHistory|void
+     * @param  UserInterface $user
+     * @param  bool $isSuccessful
+     * @return LoginHistory
      */
-    public function createLoginHistory(UserInterface $user, $providerClass)
+    public function logUserLogin(UserInterface $user, $isSuccessful)
     {
-        if (!$user || !$providerClass) {
-            return null;
-        }
+        $history = new LoginHistory();
+        $history->setUser($user);
+        $history->setSuccessful($isSuccessful);
 
-        $entity = new LoginHistory($user, $providerClass);
-        $entity->setUser($user);
-        $entity->setProviderClass($providerClass);
+        $this->objectManager->persist($history);
+        $this->objectManager->flush();
 
-        $em = $this->doctrine->getManagerForClass('OroUserBundle:LoginHistory');
-        $em->persist($entity);
-        $em->flush();
-
-        return $entity;
-    }
-
-    /**
-     * @return LoginHistoryRepository
-     */
-    protected function getLoginHistoryRepository()
-    {
-        return $this->doctrine->getRepository('OroUserBundle:LoginHistory');
+        return $history;
     }
 }

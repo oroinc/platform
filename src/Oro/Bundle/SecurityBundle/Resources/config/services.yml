@@ -573,8 +573,6 @@ services:
             - %security.authentication.hide_user_not_found%
         calls:
             - [setTokenFactory, ['@oro_security.token.factory.username_password_organization']]
-            - [setRegistry, ['@doctrine']]
-            - [setLoginHistoryManager, ['@oro_user.security.login_history_manager']]
         abstract: true
         public: false
 

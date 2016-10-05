@@ -25,11 +25,8 @@ class CreateLoginHistoryTable implements Migration
         $table = $schema->createTable('oro_user_login_history');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('provider_class', 'string', ['length' => 255]);
-        $table->addColumn('failed_attempts', 'integer', ['notnull' => false]);
-        $table->addColumn('failed_daily_attempts', 'integer', ['notnull' => false]);
+        $table->addColumn('successful', 'boolean', ['notnull' => true, 'default' => false]);
         $table->addColumn('created_at', 'datetime');
-        $table->addColumn('updated_at', 'datetime');
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
@@ -37,6 +34,5 @@ class CreateLoginHistoryTable implements Migration
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-        $table->addUniqueIndex(['user_id', 'provider_class']);
     }
 }

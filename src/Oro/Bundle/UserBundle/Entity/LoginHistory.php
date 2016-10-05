@@ -7,8 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table("oro_user_login_history")
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\LoginHistoryRepository")
- *
- * @ORM\HasLifecycleCallbacks()
  */
 class LoginHistory
 {
@@ -30,25 +28,11 @@ class LoginHistory
     protected $user;
 
     /**
-     * @var string
+     * @var bool
      *
-     * @ORM\Column(name="provider_class", type="string", length=255, unique=true)
+     * @ORM\Column(name="successful", type="boolean", nullable=false, options={"default"=0})
      */
-    protected $providerClass;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="failed_attempts", type="integer", options={"default"=0})
-     */
-    protected $failedAttempts;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="failed_daily_attempts", type="integer", options={"default"=0})
-     */
-    protected $failedDailyAttempts;
+    protected $successful;
 
     /**
      * @var \DateTime $createdAt
@@ -57,19 +41,10 @@ class LoginHistory
      */
     protected $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    protected $updatedAt;
-
     public function __construct()
     {
-        $this->failedAttempts = 0;
-        $this->failedDailyAttempts = 0;
+        $this->successful = false;
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -89,51 +64,19 @@ class LoginHistory
     }
 
     /**
-     * @return string
+     * @return boolean
      */
-    public function getProviderClass()
+    public function isSuccessful()
     {
-        return $this->providerClass;
+        return $this->successful;
     }
 
     /**
-     * @param string $providerClass
+     * @param bool $successful
      */
-    public function setProviderClass($providerClass)
+    public function setSuccessful($successful)
     {
-        $this->providerClass = $providerClass;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFailedAttempts()
-    {
-        return $this->failedAttempts;
-    }
-
-    /**
-     * @param int $failedAttempts
-     */
-    public function setFailedAttempts($failedAttempts)
-    {
-        $this->failedAttempts = $failedAttempts;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFailedDailyAttempts()
-    {
-        return $this->failedDailyAttempts;
-    }
-
-    /**
-     * @param int $failedDailyAttempts
-     */
-    public function setFailedDailyAttempts($failedDailyAttempts)
-    {
-        $this->failedDailyAttempts = $failedDailyAttempts;
+        $this->successful = $successful;
     }
 
     /**
@@ -150,41 +93,5 @@ class LoginHistory
     public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /** increase login failures by one */
-    public function increaseFailedAttempts()
-    {
-        $this->failedAttempts++;
-    }
-
-    /** increase daily login failures by one */
-    public function increaseFailedDailyAttempts()
-    {
-        $this->failedDailyAttempts++;
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

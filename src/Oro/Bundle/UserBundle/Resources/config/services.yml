@@ -429,9 +429,20 @@ services:
     oro_user.security.login_history_manager:
         class: Oro\Bundle\UserBundle\Security\LoginHistoryManager
         arguments:
-            - '@doctrine'
+            - '@doctrine.orm.entity_manager'
 
-    oro_user.security.login_history_provider:
-        class: Oro\Bundle\UserBundle\Security\LoginHistoryProvider
+    oro_user.security.login_attempts_provider:
+        class: Oro\Bundle\UserBundle\Security\LoginAttemptsProvider
         arguments:
             - '@doctrine'
+            - '@oro_config.user'
+            - '@oro_user.manager'
+
+    oro_user.security.login_history_subscriber:
+        class: Oro\Bundle\UserBundle\EventListener\LoginHistorySubscriber
+        arguments:
+            - '@oro_user.security.login_history_manager'
+            - '@oro_user.security.login_attempts_provider'
+            - '@oro_user.manager'
+        tags:
+            - { name: kernel.event_subscriber }

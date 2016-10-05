@@ -2,18 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Provider;
 
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Security\LoginHistoryManager;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 
@@ -23,21 +17,6 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
      * @var UsernamePasswordOrganizationTokenFactoryInterface
      */
     protected $tokenFactory;
-
-    /**
-     * @var UserInterface
-     */
-    protected $user;
-
-    /**
-     * @var  Registry
-     */
-    protected $doctrine;
-
-    /**
-     * @var LoginHistoryManager
-     */
-    protected $loginHistoryManager;
 
     /**
      * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
@@ -59,16 +38,8 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
         }
 
         $guesser = new UserOrganizationGuesser();
-        try {
-            /**  @var TokenInterface $token */
-            $authenticatedToken = parent::authenticate($token);
-        } catch (BadCredentialsException $bce) {
-            if ($this->user) {
-                $this->loginHistoryManager->addLoginFailure($this->user, ClassUtils::getClass($this));
-            }
-
-            throw $bce;
-        }
+        /**  @var TokenInterface $token */
+        $authenticatedToken = parent::authenticate($token);
 
         /** @var User $user */
         $user         = $authenticatedToken->getUser();
@@ -91,35 +62,5 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
         );
 
         return $authenticatedToken;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function retrieveUser($username, UsernamePasswordToken $token)
-    {
-        $user = parent::retrieveUser($username, $token);
-
-        if ($user) {
-            $this->user = $user;
-        }
-
-        return $user;
-    }
-
-    /**
-     * @param Registry $registry
-     */
-    public function setRegistry(Registry $registry)
-    {
-        $this->doctrine = $registry;
-    }
-
-    /**
-     * @param LoginHistoryManager $loginHistoryManager
-     */
-    public function setLoginHistoryManager(LoginHistoryManager $loginHistoryManager)
-    {
-        $this->loginHistoryManager = $loginHistoryManager;
     }
 }
