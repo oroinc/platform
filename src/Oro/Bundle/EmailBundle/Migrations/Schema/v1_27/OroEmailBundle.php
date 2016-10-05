@@ -25,5 +25,6 @@ class OroEmailBundle implements Migration
         $table = $schema->getTable('oro_email_folder');
         if (!$table->hasColumn('failed_count')) {
             $table->addColumn('failed_count', 'integer', ['notnull' => true]);
+        }
     }
 }
