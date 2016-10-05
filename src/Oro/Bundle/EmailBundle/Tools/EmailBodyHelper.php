@@ -36,7 +36,7 @@ class EmailBodyHelper
 
         // strip tags, clear extra spaces and non printed symbols and convert data to utf-8
         $clearBodyText = iconv(
-            'UTF-8"',
+            mb_detect_encoding($body),
             'UTF-8//IGNORE',
             preg_replace('/(\s\s+|\n+|[^[:print:]])/', ' ', trim(strip_tags($body)))
         );
@@ -46,7 +46,7 @@ class EmailBodyHelper
             $clearBodyText = substr($clearBodyText, 0, self::MAX_STRING_LENGTH);
             $lastOccurrencePos = strrpos($clearBodyText, ' ', null);
             if ($lastOccurrencePos !== false) {
-                $clearBodyText = mb_substr($clearBodyText, 0, $lastOccurrencePos);
+                $clearBodyText = substr($clearBodyText, 0, $lastOccurrencePos);
             }
         }
 

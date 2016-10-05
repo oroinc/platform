@@ -36,7 +36,7 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        if ((int)$message->getBody()) {
+        if ($message->getBody() !== '') {
             return $this->processBatch((int)$message->getBody());
         }
 
