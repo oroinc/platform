@@ -63,7 +63,7 @@ class EmailBodyBuilder
         $this->emailBody
             ->setBodyContent($content)
             ->setBodyIsText($bodyIsText)
-            ->setTextBody(!$bodyIsText ? $this->getEmailBodyHelper()->getClearBody($content) : $content);
+            ->setTextBody(!$bodyIsText ? $this->getEmailBodyHelper()->getTrimmedClearText($content) : $content);
     }
 
     /**

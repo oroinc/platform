@@ -58,7 +58,7 @@ class EmailBody
     /**
      * @var string
      *
-     * @ORM\Column(name="text_body", type="text")
+     * @ORM\Column(name="text_body", type="text", nullable=true)
      */
     protected $textBody;
 
@@ -285,12 +285,6 @@ class EmailBody
      */
     public function getTextBody()
     {
-        if (empty($this->textBody) && !empty($this->bodyContent)) {
-            $emailBodyHelper = new EmailBodyHelper();
-
-            return $emailBodyHelper->getClearBody($this->bodyContent);
-        }
-
         return $this->textBody;
     }
 

@@ -255,7 +255,7 @@ class EmailEntityBuilder
             ->setBodyContent($content)
             ->setBodyIsText(!$isHtml)
             ->setPersistent($persistent)
-            ->setTextBody($isHtml ? $this->getEmailBodyHelper()->getClearBody($content) : $content);
+            ->setTextBody($isHtml ? $this->getEmailBodyHelper()->getTrimmedClearText($content) : $content);
 
         return $result;
     }
