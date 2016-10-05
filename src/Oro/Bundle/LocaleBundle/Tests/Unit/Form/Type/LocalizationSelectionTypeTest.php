@@ -91,8 +91,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
                 'choices' => function () {
                 },
                 'compact' => false,
-                'localizations_list' => null,
-                'additional_localizations' => null,
                 'full_localization_list' => null,
             ]);
 
