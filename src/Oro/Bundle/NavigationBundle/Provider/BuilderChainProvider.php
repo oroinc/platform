@@ -18,7 +18,6 @@ class BuilderChainProvider implements MenuProviderInterface
 {
     const COMMON_BUILDER_ALIAS = '_common_builder';
     const IGNORE_CACHE_OPTION = 'ignoreCache';
-    const MENU_ITEM_DIVIDER_LABEL = '---------------';
 
     /**
      * Collection of builders grouped by alias.
@@ -201,7 +200,6 @@ class BuilderChainProvider implements MenuProviderInterface
         if ($item->getExtra('divider', false)) {
             $class = trim(sprintf("%s %s", $item->getAttribute('class', ''), 'divider'));
             $item->setAttribute('class', $class);
-            $item->setLabel(self::MENU_ITEM_DIVIDER_LABEL);
         }
 
         foreach ($item->getChildren() as $child) {

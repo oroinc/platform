@@ -24,7 +24,7 @@ class MenuUpdateUtils
         MenuUpdateInterface $update,
         ItemInterface $item,
         $menuName,
-        array $extrasMapping = ['position' => 'priority', 'userDefined' => 'existsInNavigationYml']
+        array $extrasMapping = ['position' => 'priority']
     ) {
         $accessor = PropertyAccess::createPropertyAccessor();
 
@@ -48,6 +48,8 @@ class MenuUpdateUtils
 
             self::setValue($accessor, $update, $key, $value);
         }
+
+        $update->setExistsInNavigationYml(!$item->getExtra("userDefined", false));
     }
 
     /**

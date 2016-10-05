@@ -136,7 +136,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setDefaultTitle('item-1-1-1')
             ->setParentKey('item-1-1')
             ->setMenu('menu')
-            ->setUri('uri');
+            ->setUri('uri')
+            ->setExistsInNavigationYml(true);
 
         $this->assertEquals($update, $result);
     }

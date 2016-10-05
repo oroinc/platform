@@ -10,7 +10,7 @@
 {% endif %}
 
 {% block navButtons %}
-    {% if entity.key %}
+    {% if entity.existsInNavigationYml == true or entity.id is not null %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: entity.key}),
             'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
@@ -20,19 +20,21 @@
         }) }}
     {% endif %}
 
-    {% set html = UI.saveAndStayButton({
-        'route': routePrefix ~ 'update',
-        'params': {'menuName': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
-    }) %}
+    {% if entity.isDivider == false or entity.id is null %}
+        {% set html = UI.saveAndStayButton({
+            'route': routePrefix ~ 'update',
+            'params': {'menuName': '$menu', 'parentKey': '$parentKey', 'key': '$key'}
+        }) %}
 
-    {% set html = html ~ UI.saveAndNewButton({
-        'route': routePrefix ~ 'create',
-        'params': {'menuName': '$menu', 'parentKey': '$parentKey'}
-    }) %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': routePrefix ~ 'create',
+            'params': {'menuName': '$menu', 'parentKey': '$parentKey'}
+        }) %}
 
-    {{ UI.dropdownSaveButton({'html': html}) }}
+        {{ UI.dropdownSaveButton({'html': html}) }}
+    {% endif %}
 
-    {% if entity.isDivider == false and (entity.existsInNavigationYml or entity.id is null) %}
+    {% if entity.isDivider == false and (entity.existsInNavigationYml or entity.id is not null) %}
         {{ UI.buttonSeparator() }}
 
         {% set html = UI.button({

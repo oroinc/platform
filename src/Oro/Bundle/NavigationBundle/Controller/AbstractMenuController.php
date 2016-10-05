@@ -8,9 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
@@ -62,7 +59,12 @@ abstract class AbstractMenuController extends Controller
     {
         /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $this->getManager()->createMenuUpdate($this->getOwnershipType(), $this->getUser()->getId());
-        $menuUpdate->setDivider($isDivider);
+
+        if ($isDivider) {
+            $menuUpdate->setDivider($isDivider);
+            $menuUpdate->setDefaultTitle('--------');
+            $menuUpdate->setUri('#');
+        }
 
         if ($parentKey) {
             $parent = $this->getMenuUpdate($menuName, $parentKey, true);

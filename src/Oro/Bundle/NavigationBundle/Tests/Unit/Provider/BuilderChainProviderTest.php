@@ -2,6 +2,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Knp\Menu\FactoryInterface;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
@@ -84,39 +85,13 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet($alias, $menuName)
     {
-        $options = array();
+        $options = [];
 
-        $item = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
+        $item = new MenuItemStub();
+        $item->setExtra('divider', true);
 
-        $item->expects($this->once())
-            ->method('getExtra')
-            ->with('divider', false)
-            ->will($this->returnValue(true));
-
-        $item->expects($this->once())
-            ->method('setAttribute')
-            ->with('class', 'divider');
-
-        $item->expects($this->once())
-            ->method('setLabel')
-            ->with(BuilderChainProvider::MENU_ITEM_DIVIDER_LABEL);
-
-        $item->expects($this->once())
-            ->method('getChildren')
-            ->will($this->returnValue([]));
-
-        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
-
-        $menu->expects($this->once())
-            ->method('getExtra')
-            ->with('divider', false)
-            ->will($this->returnValue(false));
-
-        $menu->expects($this->once())
-            ->method('getChildren')
-            ->will($this->returnValue([$item]));
+        $menu = new MenuItemStub();
+        $menu->addChild($item);
 
         $this->factory->expects($this->once())
             ->method('createItem')
@@ -140,6 +115,7 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Knp\Menu\ItemInterface', $this->provider->get($menuName, $options));
 
         $this->assertAttributeCount(1, 'menus', $this->provider);
+        $this->assertEquals('divider', $item->getAttribute('class'));
     }
 
     public function testGetCached()

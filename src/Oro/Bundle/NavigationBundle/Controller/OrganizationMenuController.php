@@ -62,7 +62,7 @@ class OrganizationMenuController extends AbstractMenuController
     }
 
     /**
-     * @Route("/{menuName}/create/divider/{parentKey}", name="oro_navigation_org_menu_create_divider")
+     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_org_menu_create_divider")
      * @Template("OroNavigationBundle:UserMenu:update.html.twig")
      *
      * @param string $menuName
@@ -70,7 +70,7 @@ class OrganizationMenuController extends AbstractMenuController
      *
      * @return RedirectResponse
      */
-    public function createDividerAction($menuName, $parentKey)
+    public function createDividerAction($menuName, $parentKey = null)
     {
         return $this->createAction($menuName, $parentKey, true);
     }
