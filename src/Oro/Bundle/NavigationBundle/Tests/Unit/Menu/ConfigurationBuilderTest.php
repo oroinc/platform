@@ -26,7 +26,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->configurationBuilder = new ConfigurationBuilder($resolver);
 
         $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
-            ->setMethods(array('getRouteInfo', 'processRoute'))
+            ->setMethods(['getRouteInfo', 'processRoute'])
             ->getMock();
 
         $this->factory->expects($this->any())
@@ -47,7 +47,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->configurationBuilder->setConfiguration($options);
 
         $menu = new MenuItem('navbar', $this->factory);
-        $this->configurationBuilder->build($menu, array(), 'navbar');
+        $this->configurationBuilder->build($menu, [], 'navbar');
 
         $this->assertCount(2, $menu->getChildren());
         $this->assertEquals($options['tree']['navbar']['type'], $menu->getExtra('type'));
@@ -68,54 +68,70 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->configurationBuilder->setConfiguration($options);
 
         $menu = new MenuItem('navbar', $this->factory);
-        $this->configurationBuilder->build($menu, array(), 'navbar');
+        $this->configurationBuilder->build($menu, [], 'navbar');
 
         $this->assertEquals($expectedArea, $menu->getExtra('area'));
     }
 
     public function setAreaToExtraProvider()
     {
-        $defaultConfig = array(
-            'items' => array(
-                'homepage' => array(
-                    'name' => 'Home page 2',
-                    'label' => 'Home page title',
-                    'route' => 'oro_menu_index',
-                    'translateDomain' => 'SomeBundle',
-                    'translateParameters' => array(),
-                    'routeParameters' => array(),
-                    'extras' => array()
-                )
-            ),
-            'tree' => array(
-                'navbar' => array(
-                    'type' => 'navbar',
-                    'children' => array(
-                        'homepage' => array(
-                            'position' => 7,
-                            'children' => array()
-                        )
-                    )
-                )
-            )
-        );
-
-        return array(
-            'with no area specified' => array(
-                'options' => $defaultConfig,
+        return [
+            'with no area specified' => [
+                'options' => [
+                    'items' => [
+                        'homepage' => [
+                            'name' => 'Home page 2',
+                            'label' => 'Home page title',
+                            'route' => 'oro_menu_index',
+                            'translateDomain' => 'SomeBundle',
+                            'translateParameters' => [],
+                            'routeParameters' => [],
+                            'extras' => []
+                        ]
+                    ],
+                    'tree' => [
+                        'navbar' => [
+                            'type' => 'navbar',
+                            'children' => [
+                                'homepage' => [
+                                    'position' => 7,
+                                    'children' => []
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
                 'expectedArea' => 'default',
-            ),
-            'with area' => array(
-                'options' => array_replace_recursive($defaultConfig, array(
-                    'tree' => array(
-                        'navbar' => array(
-                            'area' => 'frontend'
-                        )
-                    )
-                )),
+            ],
+            'with area' => [
+                'options' => [
+                    'items' => [
+                        'homepage' => [
+                            'name' => 'Home page 2',
+                            'label' => 'Home page title',
+                            'route' => 'oro_menu_index',
+                            'translateDomain' => 'SomeBundle',
+                            'translateParameters' => [],
+                            'routeParameters' => [],
+                            'extras' => []
+                        ]
+                    ],
+                    'tree' => [
+                        'navbar' => [
+                            'type' => 'navbar',
+                            'area' => 'frontend',
+                            'children' => [
+                                'homepage' => [
+                                    'position' => 7,
+                                    'children' => []
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
                 'expectedArea' => 'frontend',
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -123,73 +139,73 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function menuStructureProvider()
     {
-        return array(
-            'full_menu' => array(array(
-                'areas' => array(),
-                'templates' => array(
-                    'navbar' => array(
+        return [
+            'full_menu' => [[
+                'areas' => [],
+                'templates' => [
+                    'navbar' => [
                         'template' => 'OroNavigationBundle:Menu:navbar.html.twig'
-                        ),
-                    'dropdown' => array(
+                    ],
+                    'dropdown' => [
                         'template' => 'OroNavigationBundle:Menu:dropdown.html.twig'
-                    )
-                ),
-                'items' => array(
-                    'homepage' => array(
+                    ]
+                ],
+                'items' => [
+                    'homepage' => [
                         'name' => 'Home page 2',
                         'label' => 'Home page title',
                         'route' => 'oro_menu_index',
                         'translateDomain' => 'SomeBundle',
-                        'translateParameters' => array(),
-                        'routeParameters' => array(),
-                        'extras' => array()
-                    ),
-                    'user_registration_register' => array(
+                        'translateParameters' => [],
+                        'routeParameters' => [],
+                        'extras' => []
+                    ],
+                    'user_registration_register' => [
                         'route' => 'oro_menu_submenu',
                         'translateDomain' => 'SomeBundle',
-                        'translateParameters' => array(),
-                        'routeParameters' => array(),
-                        'extras' => array()
-                    ),
-                    'user_user_show' => array(
+                        'translateParameters' => [],
+                        'routeParameters' => [],
+                        'extras' => []
+                    ],
+                    'user_user_show' => [
                         'translateDomain' => 'SomeBundle',
-                        'translateParameters' => array(),
-                        'routeParameters' => array(),
-                        'extras' => array()
-                    ),
-                ),
-                'tree' => array(
-                    'navbar' => array(
+                        'translateParameters' => [],
+                        'routeParameters' => [],
+                        'extras' => []
+                    ],
+                ],
+                'tree' => [
+                    'navbar' => [
                         'type' => 'navbar',
-                        'extras' => array(
+                        'extras' => [
                             'brand' => 'Oro',
                             'brandLink' => '/'
-                        ),
-                        'children' => array(
-                            'user_user_show' => array(
+                        ],
+                        'children' => [
+                            'user_user_show' => [
                                 'position' => '10',
-                                'children' => array(
-                                    'user_registration_register' => array(
-                                        'children' => array()
-                                    )
-                                )
-                            ),
-                            'homepage' => array(
+                                'children' => [
+                                    'user_registration_register' => [
+                                        'children' => []
+                                    ]
+                                ]
+                            ],
+                            'homepage' => [
                                 'position' => 7,
-                                'children' => array()
-                            )
-                        )
-                    )
-                )
-            ))
-        );
+                                'children' => []
+                            ]
+                        ]
+                    ]
+                ]
+            ]]
+        ];
     }
 
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Item key "user_user_show" duplicated in tree menu "navbar".
      */
-    public function testBuildDiblicatedItemTreeCallException()
+    public function testBuildDuplicatedItemTreeCallException()
     {
         $options = [
             'areas' => [],
@@ -211,10 +227,10 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                         'user_user_show' => [
                             'position' => '10',
                             'children' => [
-                            'user_registration_register' => [
-                                'children' => [
-                                    'user_user_show' => [
-                                        'children' => []
+                                'user_registration_register' => [
+                                    'children' => [
+                                        'user_user_show' => [
+                                            'children' => []
                                         ]
                                     ]
                                 ]

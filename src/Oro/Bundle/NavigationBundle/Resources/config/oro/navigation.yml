@@ -59,10 +59,14 @@ navigation:
                     position: 90
                     routes: ['/^oro_navigation_org_menu_[\w_]+$/']
                     description: 'Manage menus in default area'
+            user_list:
+                extras:
+                    routes: ['/^oro_navigation_user_menu_[\w_]+$/']
 
         tree:
             application_menu:
                 type: application_menu
+                max_nesting_level: 4
                 children:
                     system_tab:
                         children:

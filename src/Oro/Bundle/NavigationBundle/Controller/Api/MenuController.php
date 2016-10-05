@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Doctrine\ORM\EntityManager;
+
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -18,8 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @RouteResource("menuupdates")
@@ -55,12 +55,17 @@ class MenuController extends Controller
             throw $this->createNotFoundException();
         }
 
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+
         if ($menuUpdate->getId() !== null && !$menuUpdate->isExistsInNavigationYml()) {
-            $manager->removeMenuUpdate($menuUpdate);
+            $em->remove($menuUpdate);
         } else {
             $menuUpdate->setActive(false);
-            $manager->updateMenuUpdate($menuUpdate);
+            $em->persist($menuUpdate);
         }
+
+        $em->flush($menuUpdate);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -93,8 +98,13 @@ class MenuController extends Controller
             throw $this->createNotFoundException();
         }
 
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+
         $menuUpdate->setActive(true);
-        $manager->updateMenuUpdate($menuUpdate);
+
+        $em->persist($menuUpdate);
+        $em->flush();
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -120,9 +130,14 @@ class MenuController extends Controller
             $this->getCurrentOwnerId($ownershipType)
         );
 
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+
         foreach ($updates as $update) {
-            $manager->removeMenuUpdate($update);
+            $em->remove($update);
         }
+
+        $em->flush($updates);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -168,10 +183,30 @@ class MenuController extends Controller
             }
         }
 
-        $manager->updateMenuUpdate($currentUpdate);
-        $manager->reorderMenuUpdate($menuName, $order, $ownershipType, $ownerId);
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-        return new JsonResponse(['status' => true], 200);
+        $updates = array_merge(
+            [$currentUpdate],
+            $manager->getReorderedMenuUpdates($menuName, $order, $ownershipType, $ownerId)
+        );
+
+        $errors = [];
+        foreach ($updates as $update) {
+            $errors = $this->get('validator')->validate($currentUpdate);
+            if (count($errors)) {
+                break;
+            }
+
+            $em->persist($update);
+        }
+
+        if (!count($errors)) {
+            $em->flush($updates);
+            return new JsonResponse(['status' => true], Response::HTTP_OK);
+        }
+
+        return new JsonResponse(['status' => false, 'message' => (string) $errors], Response::HTTP_OK);
     }
 
     /**
