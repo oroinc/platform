@@ -275,3 +275,7 @@ services:
     oro_workflow.generator.translation_key:
         class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
         public: false
+
+    oro_workflow.translation.processor:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
+        public: false

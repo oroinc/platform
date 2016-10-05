@@ -219,6 +219,7 @@ services:
         arguments:
             - '@oro_translation.repository.language'
             - '@oro_locale.settings'
+            - '@oro_security.acl_helper'
 
     oro_translation.helper.language:
         class: 'Oro\Bundle\TranslationBundle\Helper\LanguageHelper'
