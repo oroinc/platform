@@ -125,10 +125,10 @@ define(function(require) {
                 multiple: true,
                 id: 'label',
                 formatSelection: function(item) {
-                    return item.label;
+                    return _.escape(item.label);
                 },
                 formatResult: function(item) {
-                    return item.label + (item.isNew ?
+                    return _.escape(item.label) + (item.isNew ?
                             (' <span class="select2__result-entry-info">(' +
                             __('oro.tag.inline_editing.new_tag') + ')</span>') :
                             '');

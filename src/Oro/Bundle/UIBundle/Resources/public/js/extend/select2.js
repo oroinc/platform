@@ -6,6 +6,11 @@ define(function(require) {
     var Select2 = require('jquery.select2');
     require('oroui/js/select2-l10n');
 
+    // disable scroll on IOS when select2 drop is visible
+    $(document).on('wheel mousewheel touchmove keydown', '#select2-drop-mask', function(e) {
+        e.preventDefault();
+    });
+
     /**
      * An overload of populateResults method,
      * renders search results with collapsible groups
