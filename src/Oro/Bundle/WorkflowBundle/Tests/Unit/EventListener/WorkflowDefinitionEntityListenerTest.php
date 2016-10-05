@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\Event\OnClearEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -19,9 +16,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var WorkflowDefinitionEntityListener */
     protected $listener;
-
-    /** @var TranslationProcessor|\PHPUnit_Framework_MockObject_MockObject */
-    protected $translationProcessor;
 
     /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowRegistry;
@@ -32,11 +26,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translationProcessor = $this->getMockBuilder(TranslationProcessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->listener = new WorkflowDefinitionEntityListener($this->workflowRegistry, $this->translationProcessor);
+        $this->listener = new WorkflowDefinitionEntityListener($this->workflowRegistry);
     }
 
     public function testPrePersistNonActiveSkip()
@@ -112,152 +102,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->listener->prePersist($definitionMock);
-    }
-
-    public function testPrePersistAndFlush()
-    {
-        $definition = $this->createDefinition('test', []);
-        $event = $this->getMockBuilder(PostFlushEventArgs::class)->disableOriginalConstructor()->getMock();
-
-        $this->translationProcessor->expects($this->once())
-            ->method('process')
-            ->with($definition, null, false);
-
-        $this->listener->prePersist($definition);
-        $this->listener->postFlush($event);
-    }
-
-    public function testPreUpdateWithoutChangesWithoutChanges()
-    {
-        $updateEvent = $this->getMockBuilder(PreUpdateEventArgs::class)->disableOriginalConstructor()->getMock();
-        $updateEvent->expects($this->once())->method('hasChangedField')->with('active')->willReturn(false);
-        $updateEvent->expects($this->once())->method('getEntityChangeSet')->willReturn([]);
-
-        $flushEvent = $this->getMockBuilder(PostFlushEventArgs::class)->disableOriginalConstructor()->getMock();
-
-        $this->translationProcessor->expects($this->never())->method($this->anything());
-
-        $this->listener->preUpdate($this->createDefinition('test', []), $updateEvent);
-        $this->listener->postFlush($flushEvent);
-    }
-
-    /**
-     * @dataProvider preUpdateDataProvider
-     *
-     * @param array $changeSet
-     * @param array $expectedChangeSet
-     */
-    public function testPreUpdateAndFlush(array $changeSet, array $expectedChangeSet)
-    {
-        $updateEvent = $this->getMockBuilder(PreUpdateEventArgs::class)->disableOriginalConstructor()->getMock();
-        $updateEvent->expects($this->once())->method('hasChangedField')->with('active')->willReturn(false);
-        $updateEvent->expects($this->once())->method('getEntityChangeSet')->willReturn($changeSet);
-
-        $flushEvent = $this->getMockBuilder(PostFlushEventArgs::class)->disableOriginalConstructor()->getMock();
-
-        $definition = $this->createDefinition('test', []);
-
-        $this->translationProcessor->expects($this->once())
-            ->method('process')
-            ->with($definition, $expectedChangeSet, false);
-
-        $this->listener->preUpdate($definition, $updateEvent);
-        $this->listener->postFlush($flushEvent);
-    }
-
-    /**
-     * @return array
-     */
-    public function preUpdateDataProvider()
-    {
-        return [
-            'field "name"' => [
-                'changeSet' => ['name' => ['old_name', 'new_name'], 'priority' => [0, 1]],
-                'expectedChangeSet' => ['name' => ['old_name', 'new_name']]
-            ],
-            'field "label"' => [
-                'changeSet' => ['label' => ['old_label', 'new_label'], 'priority' => [0, 1]],
-                'expectedChangeSet' => ['label' => ['old_label', 'new_label']]
-            ],
-            'field "configuration"' => [
-                'changeSet' => ['configuration' => [['old_data'], ['new_data']], 'priority' => [0, 1]],
-                'expectedChangeSet' => ['configuration' => [['old_data'], ['new_data']]]
-            ],
-            'all fields' => [
-                'changeSet' => [
-                    'name' => ['old_name', 'new_name'],
-                    'label' => ['oldlabel', 'new_label'],
-                    'configuration' => [['old_data'], ['new_data']],
-                    'priority' => [0, 1]
-                ],
-                'expectedChangeSet' => [
-                    'name' => ['old_name', 'new_name'],
-                    'label' => ['oldlabel', 'new_label'],
-                    'configuration' => [['old_data'], ['new_data']]
-                ]
-            ],
-        ];
-    }
-
-    public function testPreRemoveAndFlush()
-    {
-        $definition = $this->createDefinition('test', []);
-        $event = $this->getMockBuilder(PostFlushEventArgs::class)->disableOriginalConstructor()->getMock();
-
-        $this->translationProcessor->expects($this->once())
-            ->method('process')
-            ->with($definition, null, true);
-
-        $this->listener->preRemove($definition);
-        $this->listener->postFlush($event);
-    }
-
-    /**
-     * @dataProvider onClearDataProvider
-     *
-     * @param bool $clearsAllEntities
-     * @param string|null $entityClass
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expected
-     */
-    public function testOnClearAndFlush($clearsAllEntities, $entityClass, $expected)
-    {
-        $definition = $this->createDefinition('test', []);
-
-        $clearEvent = $this->getMockBuilder(OnClearEventArgs::class)->disableOriginalConstructor()->getMock();
-        $clearEvent->expects($this->any())->method('clearsAllEntities')->willReturn($clearsAllEntities);
-        $clearEvent->expects($this->any())->method('getEntityClass')->willReturn($entityClass);
-
-        $flushEvent = $this->getMockBuilder(PostFlushEventArgs::class)->disableOriginalConstructor()->getMock();
-
-        $this->translationProcessor->expects($expected)->method('process');
-
-        $this->listener->prePersist($definition);
-        $this->listener->onClear($clearEvent);
-        $this->listener->postFlush($flushEvent);
-    }
-
-    /**
-     * @return array
-     */
-    public function onClearDataProvider()
-    {
-        return [
-            'all entities' => [
-                'clearsAllEntities' => true,
-                'entityClass' => null,
-                'expected' => $this->never()
-            ],
-            'workflow definition entity' => [
-                'clearsAllEntities' => false,
-                'entityClass' => WorkflowDefinition::class,
-                'expected' => $this->never()
-            ],
-            'unknown entity' => [
-                'clearsAllEntities' => false,
-                'entityClass' => 'stdClass',
-                'expected' => $this->once()
-            ]
-        ];
     }
 
     public function testPreUpdateConflictsException()
