@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
-use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ChangePasswordType extends AbstractType
 {
@@ -17,17 +17,17 @@ class ChangePasswordType extends AbstractType
     /** @var ChangePasswordSubscriber */
     protected $subscriber;
 
-    /** @var PasswordTooltipProvider */
-    protected $passwordTooltip;
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
 
     /**
      * @param ChangePasswordSubscriber $subscriber
-     * @param PasswordTooltipProvider $passwordTooltip
+     * @param PasswordFieldOptionsProvider $optionsProvider
      */
-    public function __construct(ChangePasswordSubscriber $subscriber, PasswordTooltipProvider $passwordTooltip)
+    public function __construct(ChangePasswordSubscriber $subscriber, PasswordFieldOptionsProvider $optionsProvider)
     {
         $this->subscriber = $subscriber;
-        $this->passwordTooltip = $passwordTooltip;
+        $this->optionsProvider = $optionsProvider;
     }
 
     /**
@@ -36,7 +36,6 @@ class ChangePasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->subscriber);
-
         $builder
             ->add(
                 'currentPassword',
@@ -62,10 +61,11 @@ class ChangePasswordType extends AbstractType
                             'class' => 'password-field'
                         ]
                     ],
-                    'first_options' => [
-                        'label' => $options['first_options_label'],
-                        'hint' => $this->passwordTooltip->getTooltip(),
-                    ],
+                    'first_options' => $this->optionsProvider->getOptions(
+                        [
+                            'label' => $options['first_options_label'],
+                        ]
+                    ),
                     'second_options' => ['label' => $options['second_options_label']],
                     'mapped' => false,
                     'cascade_validation' => true,

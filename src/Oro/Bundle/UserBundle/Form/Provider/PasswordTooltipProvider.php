@@ -4,8 +4,7 @@ namespace Oro\Bundle\UserBundle\Form\Provider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator;
+use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 
 /**
  * Generates a tooltip text for the system configured password complexity requirements
@@ -23,22 +22,22 @@ class PasswordTooltipProvider
     /**
      * @var array Map of the config keys and their corresponding tooltip translation keys
      */
-    public static $tooltipPartsMap = [
-        PasswordComplexityValidator::CONFIG_MIN_LENGTH => self::MIN_LENGTH,
-        PasswordComplexityValidator::CONFIG_UPPER_CASE => self::UPPER_CASE,
-        PasswordComplexityValidator::CONFIG_NUMBERS => self::NUMBERS,
-        PasswordComplexityValidator::CONFIG_SPECIAL_CHARS => self::SPECIAL_CHARS,
+    public static $tooltipTransKeysMap = [
+        PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH => self::MIN_LENGTH,
+        PasswordComplexityConfigProvider::CONFIG_UPPER_CASE => self::UPPER_CASE,
+        PasswordComplexityConfigProvider::CONFIG_NUMBERS => self::NUMBERS,
+        PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS => self::SPECIAL_CHARS,
     ];
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var PasswordComplexityConfigProvider */
+    protected $configProvider;
 
     /** @var TranslatorInterface */
     protected $translator;
 
-    public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
+    public function __construct(PasswordComplexityConfigProvider $configProvider, TranslatorInterface $translator)
     {
-        $this->configManager = $configManager;
+        $this->configProvider = $configProvider;
         $this->translator = $translator;
     }
 
@@ -49,42 +48,15 @@ class PasswordTooltipProvider
      */
     public function getTooltip()
     {
-        $parts = $this->getEnabledRules();
-        $minLength = $this->getMinLength();
+        $enabledRules = array_filter($this->configProvider->getAllRules());
+        $parts = array_intersect_key(self::$tooltipTransKeysMap, $enabledRules);
         $transKey = self::UNRESTRICTED;
 
         if (count($parts) > 0) {
+            // compose a translation key from enabled rules
             $transKey = self::BASE . join(self::SEPARATOR, $parts);
         }
 
-        return $this->translator->trans($transKey, ['{{ length }}' => $minLength]);
-    }
-
-    /**
-     * Return a map of configured rules
-     *
-     * @return array
-     */
-    public function getEnabledRules()
-    {
-        $parts = [];
-        foreach (self::$tooltipPartsMap as $configKey => $partKey) {
-            $config = $this->configManager->get($configKey);
-            if ($config) {
-                $parts[] = $partKey;
-            }
-        }
-
-        return $parts;
-    }
-
-    /**
-     * Get the min length requirement for passwords
-     *
-     * @return int
-     */
-    public function getMinLength()
-    {
-        return (int) $this->configManager->get(PasswordComplexityValidator::CONFIG_MIN_LENGTH);
+        return $this->translator->trans($transKey, ['{{ length }}' => $this->configProvider->getMinLength()]);
     }
 }

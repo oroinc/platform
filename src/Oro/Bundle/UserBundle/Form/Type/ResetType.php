@@ -6,23 +6,24 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ResetType extends AbstractType
 {
     /** @var string */
     protected $class;
 
-    /** @var PasswordTooltipProvider */
-    protected $passwordTooltip;
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
 
     /**
      * @param string $class User entity class
+     * @param PasswordFieldOptionsProvider $optionsProvider
      */
-    public function __construct($class, PasswordTooltipProvider $passwordTooltip)
+    public function __construct($class, PasswordFieldOptionsProvider $optionsProvider)
     {
         $this->class = $class;
-        $this->passwordTooltip = $passwordTooltip;
+        $this->optionsProvider = $optionsProvider;
     }
 
     /**
@@ -33,10 +34,11 @@ class ResetType extends AbstractType
         $builder->add('plainPassword', 'repeated', [
             'type'            => 'password',
             'required'        => true,
-            'first_options' => [
-                'label' => 'oro.user.password.enter_new_password.label',
-                'hint' => $this->passwordTooltip->getTooltip(),
-            ],
+            'first_options' => $this->optionsProvider->getOptions(
+                [
+                    'label' => 'oro.user.password.enter_new_password.label',
+                ]
+            ),
             'second_options'  => ['label' => 'oro.user.password.enter_new_password_again.label'],
         ]);
     }

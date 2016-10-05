@@ -42,23 +42,24 @@
                 var requireLength = $passwordInput.data('require-length') || 1;
                 var requirements = $passwordInput.data('require-rules') || '';
                 var length = requireLength ? Math.max(requireLength, 8) : 8;
-                var charsets = [
-                    'abcdefghijklnopqrstuvwxyz',
-                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-                    '0123456789',
-                    ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-                ];
+                var charsets = {
+                    'lower_case': 'abcdefghijklnopqrstuvwxyz',
+                    'upper_case':'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                    'numbers':'0123456789',
+                    'special_chars':' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+                };
                 var rules = requirements.split(',');
                 var pass = '';
 
                 {# make sure we have at least one symbol for each rule #}
                 rules.forEach(function(rule) {
-                    var ruleIndex = parseInt(rule) || 0;
-                    pass += charsets[ruleIndex].charAt(getRnd(charsets[ruleIndex].length));
+                    if (charsets.hasOwnProperty(rule)) {
+                        pass += charsets[rule].charAt(getRnd(charsets[rule].length));
+                    }
                 });
 
                 {# create a pool for picking random chars that is reasonably strong #}
-                var charset = charsets[0] + charsets[1] + charsets[2];
+                var charset = charsets['lower_case'] + charsets['upper_case'] + charsets['numbers'];
 
                 {# fill up to the minLength with random symbols #}
                 for (var i = pass.length; i < length; ++i) {

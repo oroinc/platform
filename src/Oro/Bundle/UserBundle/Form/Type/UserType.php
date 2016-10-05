@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
-use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserType extends AbstractType
@@ -28,26 +28,26 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
-    /** @var PasswordTooltipProvider */
-    private $passwordTooltip;
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
 
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade $securityFacade
      * @param Request $request                   Request
-     * @param PasswordTooltipProvider $passwordTooltip
+     * @param PasswordFieldOptionsProvider $optionsProvider
      */
     public function __construct(
         SecurityContextInterface $security,
         SecurityFacade           $securityFacade,
         Request $request,
-        PasswordTooltipProvider $passwordTooltip
+        PasswordFieldOptionsProvider $optionsProvider
     ) {
         $this->security          = $security;
         $this->securityFacade    = $securityFacade;
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
-        $this->passwordTooltip = $passwordTooltip;
+        $this->optionsProvider = $optionsProvider;
     }
 
     /**
@@ -116,10 +116,11 @@ class UserType extends AbstractType
                     'label'          => 'oro.user.password.label',
                     'type'           => 'password',
                     'required'       => true,
-                    'first_options' => [
-                        'label' => 'oro.user.password.label',
-                        'hint' => $this->passwordTooltip->getTooltip(),
-                    ],
+                    'first_options' => $this->optionsProvider->getOptions(
+                        [
+                            'label' => 'oro.user.password.label',
+                        ]
+                    ),
                     'second_options' => ['label' => 'oro.user.password_re.label'],
                 ]
             )

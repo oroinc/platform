@@ -83,7 +83,7 @@ services:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
-            - '@oro_user.form.provider.password_tooltip'
+            - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -104,14 +104,14 @@ services:
         class: Oro\Bundle\UserBundle\Form\Type\ChangePasswordType
         arguments:
              - '@oro_user.change_password.subscriber'
-             - '@oro_user.form.provider.password_tooltip'
+             - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_change_password }
 
     oro_user.form.type.set_password.form.type:
         class: Oro\Bundle\UserBundle\Form\Type\SetPasswordType
         arguments:
-             - '@oro_user.form.provider.password_tooltip'
+             - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_set_password }
 
@@ -147,7 +147,7 @@ services:
         class:                        %oro_user.form.type.reset.class%
         arguments:
             - %oro_user.entity.class%
-            - '@oro_user.form.provider.password_tooltip'
+            - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_user_reset }
 
@@ -286,8 +286,14 @@ services:
     oro_user.form.provider.password_tooltip:
         class: Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider
         arguments:
-            - '@oro_config.user'
+            - '@oro_user.provider.password_complexity_config_provider'
             - '@translator'
+
+    oro_user.form.provider.password_field_options_provider:
+        class: Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider
+        arguments:
+            - '@oro_user.provider.password_complexity_config_provider'
+            - '@oro_user.form.provider.password_tooltip'
 
     # Dashboard
     oro_user.form.type.widget_owners:

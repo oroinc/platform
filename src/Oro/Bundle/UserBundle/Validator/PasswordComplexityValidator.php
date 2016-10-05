@@ -4,58 +4,56 @@ namespace Oro\Bundle\UserBundle\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 
 /**
- * Validates a password against requirements stored in the system config
+ * Validates a password against requirements from the constraint or stored in the system config (if not set)
  */
 class PasswordComplexityValidator extends ConstraintValidator
 {
-    const CONFIG_MIN_LENGTH = 'oro_user.password_min_length';
-    const CONFIG_UPPER_CASE = 'oro_user.password_upper_case';
-    const CONFIG_NUMBERS = 'oro_user.password_numbers';
-    const CONFIG_SPECIAL_CHARS = 'oro_user.password_special_chars';
     const REGEX_UPPER_CASE = '/\p{Lu}/u';
     const REGEX_NUMBERS = '/\pN/u';
     const REGEX_SPECIAL_CHARS = '/[^p{Ll}\p{Lu}\pL\pN]/u';
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var PasswordComplexityConfigProvider */
+    private $configProvider;
 
-    public function __construct(ConfigManager $configManager)
+    public function __construct(PasswordComplexityConfigProvider $configProvider)
     {
-        $this->configManager = $configManager;
+        $this->configProvider = $configProvider;
     }
 
     /**
-     * Validates the password field
-     *
-     * @param string $value
-     * @param PasswordComplexity|Constraint $constraint
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
-        if (null === $value || '' === $value) {
+        if (!$constraint instanceof PasswordComplexity) {
+            throw new UnexpectedTypeException($constraint, PasswordComplexity::class);
+        }
+
+        if (empty($value)) {
             return;
         }
 
         // collect all messages
         $messages = [];
-        if (!$this->validMinLength($value)) {
+        if (!$this->validMinLength($value, $constraint)) {
             $messages[] = $constraint->requireMinLengthKey;
         }
 
-        if (!$this->validUpperCase($value)) {
+        if (!$this->validUpperCase($value, $constraint)) {
             $messages[] = $constraint->requireUpperCaseKey;
         }
 
-        if (!$this->validNumbers($value)) {
+        if (!$this->validNumbers($value, $constraint)) {
             $messages[] = $constraint->requireNumbersKey;
         }
 
-        if (!$this->validSpecialChars($value)) {
+        if (!$this->validSpecialChars($value, $constraint)) {
             $messages[] = $constraint->requireSpecialCharacterKey;
         }
 
@@ -63,57 +61,87 @@ class PasswordComplexityValidator extends ConstraintValidator
             // construct an error message translation key
             $message = $constraint->baseKey . join('_', $messages);
             $this->context->buildViolation($message)
-                ->setParameters(['{{ length }}' => $this->configManager->get(self::CONFIG_MIN_LENGTH)])
+                ->setParameters(['{{ length }}' => (int) $this->configProvider->getMinLength()])
                 ->setInvalidValue($value)
                 ->addViolation();
         }
     }
 
     /**
+     * Get configured minimal length
+     *
+     * @param PasswordComplexity $constraint
+     *
+     * @return int
+     */
+    protected function getMinLength(PasswordComplexity $constraint)
+    {
+        return null === $constraint->requireMinLength
+            ? (int) $this->configProvider->getMinLength()
+            : (int) $constraint->requireMinLength;
+    }
+
+    /**
      * Validate minimal length requirement
      *
      * @param $value
+     * @param PasswordComplexity $constraint
      *
      * @return bool
      */
-    protected function validMinLength($value)
+    protected function validMinLength($value, PasswordComplexity $constraint)
     {
-        return strlen($value) >= (int) $this->configManager->get(self::CONFIG_MIN_LENGTH);
+        return strlen($value) >= $this->getMinLength($constraint);
     }
 
     /**
      * Validate upper case requirement if enabled
      *
      * @param $value
+     * @param PasswordComplexity $constraint
      *
      * @return bool
      */
-    protected function validUpperCase($value)
+    protected function validUpperCase($value, PasswordComplexity $constraint)
     {
-        return !$this->configManager->get(self::CONFIG_UPPER_CASE) || preg_match(self::REGEX_UPPER_CASE, $value);
+        $isEnabled = null === $constraint->requireUpperCase
+            ? $this->configProvider->getMinLength()
+            : $constraint->requireUpperCase;
+
+        return !$isEnabled || preg_match(self::REGEX_UPPER_CASE, $value);
     }
 
     /**
      * Validate numbers requirement if enabled
      *
      * @param $value
+     * @param PasswordComplexity $constraint
      *
      * @return bool
      */
-    protected function validNumbers($value)
+    protected function validNumbers($value, PasswordComplexity $constraint)
     {
-        return !$this->configManager->get(self::CONFIG_NUMBERS) || preg_match(self::REGEX_NUMBERS, $value);
+        $isEnabled = null === $constraint->requireNumbers
+            ? $this->configProvider->getNumbers()
+            : $constraint->requireNumbers;
+
+        return !$isEnabled || preg_match(self::REGEX_NUMBERS, $value);
     }
 
     /**
      * Validate special chars requirement if enabled
      *
      * @param $value
+     * @param PasswordComplexity $constraint
      *
      * @return bool
      */
-    protected function validSpecialChars($value)
+    protected function validSpecialChars($value, PasswordComplexity $constraint)
     {
-        return !$this->configManager->get(self::CONFIG_SPECIAL_CHARS) || preg_match(self::REGEX_SPECIAL_CHARS, $value);
+        $isEnabled = null === $constraint->requireSpecialCharacter
+            ? $this->configProvider->getSpecialChars()
+            : $constraint->requireSpecialCharacter;
+
+        return !$isEnabled || preg_match(self::REGEX_SPECIAL_CHARS, $value);
     }
 }

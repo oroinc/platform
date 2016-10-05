@@ -9,15 +9,19 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class SetPasswordType extends AbstractType
 {
     /** @var PasswordTooltipProvider */
     protected $passwordTooltip;
 
-    public function __construct(PasswordTooltipProvider $passwordTooltip)
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
+
+    public function __construct(PasswordFieldOptionsProvider $optionsProvider)
     {
-        $this->passwordTooltip = $passwordTooltip;
+        $this->optionsProvider = $optionsProvider;
     }
 
     /**
@@ -25,23 +29,17 @@ class SetPasswordType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // build a list of indexes of the rules (1,2,3)
-        $requireRules = join(',', array_keys(array_filter((array)$this->passwordTooltip->getEnabledRules())));
-
-        $builder->add('password', 'password', [
-            'required'      => true,
-            'label'         => 'oro.user.new_password.label',
-            'hint'          => $this->passwordTooltip->getTooltip(),
-            'attr'          => [
-                // config of Suggest password
-                'data-require-length' => $this->passwordTooltip->getMinLength(),
-                'data-require-rules' => $requireRules
-            ],
-            'constraints'   => [
-                new NotBlank(),
-                new PasswordComplexity(),
-            ],
-        ]);
+        $builder->add('password', 'password', $this->optionsProvider->getOptions(
+            [
+                'required' => true,
+                'label' => 'oro.user.new_password.label',
+                'attr' => $this->optionsProvider->getSuggestPasswordOptions(),
+                'constraints' => [
+                    new NotBlank(),
+                    new PasswordComplexity(),
+                ],
+            ]
+        ));
     }
 
     /**

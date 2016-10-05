@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 class PasswordComplexity extends Constraint
 {
     /**
-     * @var string Base key of the message, the trans key is constructed by concatenation of the required rule keys
+     * @var string Base key of the message, the final trans key should be constructed from the enabled rule keys
      */
     public $baseKey = 'oro.user.message.invalid_password.';
 
@@ -18,6 +18,17 @@ class PasswordComplexity extends Constraint
     public $requireNumbersKey = 'numbers';
 
     public $requireSpecialCharacterKey = 'special_chars';
+
+    /**
+     * @var int Known constraint options
+     */
+    public $requireMinLength;
+
+    public $requireUpperCase;
+
+    public $requireNumbers;
+
+    public $requireSpecialCharacter;
 
     /**
      * {@inheritdoc}

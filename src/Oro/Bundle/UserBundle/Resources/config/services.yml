@@ -395,9 +395,14 @@ services:
     oro_user.validator.password_complexity_validator:
         class: Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator
         arguments:
-            - '@oro_config.user'
+            - '@oro_user.provider.password_complexity_config_provider'
         tags:
             - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
+
+    oro_user.provider.password_complexity_config_provider:
+        class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
+        arguments:
+            - '@oro_config.user'
 
     # Dashboard
     oro_user.dashboard.owner_helper:
