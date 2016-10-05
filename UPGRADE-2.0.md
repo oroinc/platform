@@ -380,6 +380,8 @@ placeholders:
 - `oro_email.email_address.entity_manager` inherits `oro_entity.abstract_entity_manager`
 - `Oro/Bundle/EmailBundle/Entity/MailboxProcessSettings` no longer inherits `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings`
 - `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` removed
+- Class `Oro\Bundle\EmailBundle\Form\Model\Email`
+    - method `getContexts` now returns `Doctrine\Common\Collections\Collection` instead of array
 
 ####EntityBundle
 - `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
