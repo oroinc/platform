@@ -17,7 +17,7 @@ class WorkflowDefinitionEntityListener
     /**
      * @param WorkflowRegistry $workflowRegistry
      */
-    public function __construct($workflowRegistry)
+    public function __construct(WorkflowRegistry $workflowRegistry)
     {
         $this->workflowRegistry = $workflowRegistry;
     }
