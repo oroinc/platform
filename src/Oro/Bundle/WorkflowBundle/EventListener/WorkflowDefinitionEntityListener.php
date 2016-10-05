@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;

@@ -7,11 +7,10 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 class TranslationProcessor
 {
     /**
-     * @param WorkflowDefinition $workflow
-     * @param array|null $changeSet
-     * @param bool $delete
+     * @param WorkflowDefinition $actualDefinition
+     * @param WorkflowDefinition $previousDefinition
      */
-    public function process(WorkflowDefinition $workflow, array $changeSet = null, $delete = false)
+    public function process(WorkflowDefinition $actualDefinition = null, WorkflowDefinition $previousDefinition = null)
     {
 
     }
