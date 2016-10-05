@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 /**
  * @dbIsolation
  */
-class MenuUpdateControllerTest extends WebTestCase
+class MenuControllerTest extends WebTestCase
 {
     protected function setUp()
     {

@@ -93,6 +93,7 @@ menu_config:
             label: <label>                    # label text or translation string template
             name:  <name>                     # name of menu item, used as default for route
             uri: <uri_string>                 # uri string, if no route parameter set
+            read_only: <boolean>              # disable ability to edit menu item in UI
             route: <route_name>               # route name for uri generation, if not set and uri not set - loads from key
                 routeParameters:              # router parameters
             attributes: <attr_list>           # <li> item attributes
@@ -103,15 +104,12 @@ menu_config:
             display: <boolean>                # disable showing of menu item
             displayChildren: <boolean>        # disable showing of menu item children
 
-    areas:                                    # menu area identifier
-        default:                              # identifier area for menu in admin panel
-            - application_menu                # application menu in admin panel
-        custom:                               # identifier area for menu in custom place
-            - custom_menu                     # custom menu in admin panel
-
     tree:
         <menu_alias>                            # menu alias
             type: <menu_type>                   # menu type code. Link to menu template section.
+            area: <string>                      # menu area identifier
+            read_only: <boolean>                # disable ability to edit menu in UI
+            max_nesting_level: <integer>        # menu max nesting level
             merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
             extras:                             # extra parameters for container renderer
                 brand: <string>

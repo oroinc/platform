@@ -418,7 +418,7 @@ services:
     oro_navigation.menu_update.builder:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
-            - '@oro_navigation.helper.menu_update'
+            - '@oro_locale.helper.localization'
         tags:
             - { name: oro_menu.builder }
 
@@ -439,17 +439,11 @@ services:
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }
 
-    oro_navigation.helper.menu_update:
-        class: Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper
-        arguments:
-            - '@oro_locale.helper.localization'
-
     oro_navigation.manager.menu_update_abstract:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
         arguments:
             - "@doctrine"
             - "@oro_menu.builder_chain"
-            - '@oro_navigation.helper.menu_update'
 
     oro_navigation.manager.menu_update_default:
         parent: oro_navigation.manager.menu_update_abstract
@@ -464,3 +458,11 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
             - { name: oro_ui.update_action_provider, group: activity }
+
+    oro_navigation.validator.max_nested_level:
+        class: Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator
+        arguments:
+            - '@oro_menu.builder_chain'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: validator.constraint_validator }
