@@ -3,6 +3,13 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
@@ -11,10 +18,6 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassD
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
@@ -45,12 +48,13 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
 
     /**
-     * @param RegistryInterface       $registry
-     * @param TranslatorInterface     $translator
-     * @param SecurityFacade          $securityFacade
-     * @param MassDeleteLimiter       $limiter
-     * @param RequestStack            $requestStack
-     * @param OptionalListenerManager $listenerManager
+     * @param RegistryInterface        $registry
+     * @param TranslatorInterface      $translator
+     * @param SecurityFacade           $securityFacade
+     * @param MassDeleteLimiter        $limiter
+     * @param RequestStack             $requestStack
+     * @param OptionalListenerManager  $listenerManager
+     * @param MessageProducerInterface $producer
      */
     public function __construct(
         RegistryInterface $registry,
