@@ -225,7 +225,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
         foreach ($sortBy as $column => $direction) {
             if (!array_key_exists($column, $sorters)) {
                 throw new LogicException(
-                    sprintf('Could not found column "%s" for sorting', $column)
+                    sprintf('Could not find column "%s" for sorting', $column)
                 );
             }
 
