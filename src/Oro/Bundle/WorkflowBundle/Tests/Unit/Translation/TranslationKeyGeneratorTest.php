@@ -10,7 +10,7 @@ class TranslationKeyGeneratorTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationKeyGenerator */
     protected $generator;
 
-    /** @var \Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationKeySourceInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $keySource;
 
     protected function setUp()
