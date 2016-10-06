@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -39,7 +41,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['body', 'testBody'],
             ['gridName', 'testGridName'],
             ['template', new EmailTemplate('test')],
-            ['contexts', [new \stdClass()]],
+            ['contexts', new ArrayCollection([new \stdClass()])],
             ['organization', new Organization()]
         ];
     }
