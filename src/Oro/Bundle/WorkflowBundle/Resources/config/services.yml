@@ -302,13 +302,6 @@ services:
     oro_workflow.transition_trigger.verifier.event_trigger_relation:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerRelationVerifier
         public: false
-        arguments:
-            - '@oro_workflow.generator.trigger_schedule_options_verifier'
-            - '%oro_workflow.workflow_item.entity.class%'
-
-    oro_workflow.translation.processor:
-        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
-        public: false
 
     oro_workflow.transition_trigger.verifier.event_trigger_expression:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier
@@ -320,3 +313,7 @@ services:
         calls:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]
+
+    oro_workflow.translation.processor:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
+        public: false
