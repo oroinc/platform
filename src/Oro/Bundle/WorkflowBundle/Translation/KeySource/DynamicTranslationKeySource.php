@@ -28,6 +28,7 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
     /**
      * @param TranslationKeyTemplateInterface $keyTemplate
      * @param array|null $data
+     * @return $this
      * @throws \InvalidArgumentException
      */
     public function configure(TranslationKeyTemplateInterface $keyTemplate, array $data = null)
@@ -45,6 +46,8 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
                 );
             }
         }
+
+        return $this;
     }
 
     /**

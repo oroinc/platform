@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
-class TransitionNameTemplate extends TransitionTemplate
+class StepLabelTemplate extends StepTemplate
 {
     /**
      * @return string
      */
     public function getTemplate()
     {
-        return parent::getTemplate() . '.name';
+        return parent::getTemplate() . '.label';
     }
 }
