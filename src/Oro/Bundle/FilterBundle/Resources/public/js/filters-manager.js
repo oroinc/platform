@@ -97,6 +97,7 @@ define(function(require) {
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
+            this.defaultFilters = {};
 
             _.extend(this, _.pick(options, ['addButtonHint']));
 
@@ -290,6 +291,16 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        resetFilters: function() {
+            _.each(this.filters, function(filter) {
+                filter.reset();
+            });
+            mediator.trigger('datagrid:doRefresh:' + this.collection.inputName);
+        },
+
+        /**
          * Render filter list
          *
          * @return {*}
@@ -410,7 +421,8 @@ define(function(require) {
          * Reset button click handler
          */
         _onReset: function() {
-            mediator.trigger('datagrid:doReset:' + this.collection.inputName);
+            this.resetFilters();
+            //mediator.trigger('datagrid:doReset:' + this.collection.inputName);
         },
 
         /**
