@@ -80,7 +80,7 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
                     'en' => [],
                 ],
                 'locale' => 'ru',
-                'expectedFallbackLocales' => ['en'],
+                'expectedFallbackLocales' => [],
             ],
             'complex tree defined locale first level' => [
                 'fallbackTree' => [
