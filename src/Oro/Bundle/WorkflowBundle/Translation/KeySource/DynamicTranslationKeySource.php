@@ -35,7 +35,7 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
         $this->keyTemplate = $keyTemplate;
 
         if (null !== $data) {
-            $this->data = $data;
+            $this->data = array_merge($this->data, $data);
         }
 
         foreach ($keyTemplate->getRequiredKeys() as $key) {
