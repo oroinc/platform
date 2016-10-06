@@ -16,9 +16,7 @@ processes:
             -
                 event:    update
                 priority: 50
-                queued:   true
                 field:    enabled
             -
                 event:    create
                 priority: 50
-                queued:   true
