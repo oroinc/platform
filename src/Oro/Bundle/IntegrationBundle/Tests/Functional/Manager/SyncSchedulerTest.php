@@ -22,4 +22,3 @@ class SyncSchedulerTest extends WebTestCase
         $this->assertInstanceOf(SyncScheduler::class, $service);
     }
 }
-
