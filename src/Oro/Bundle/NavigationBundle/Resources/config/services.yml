@@ -424,7 +424,7 @@ services:
             - { name: oro_menu.builder }
 
     oro_navigation.repository.menu_update:
-        class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'
+        class: 'Doctrine\ORM\EntityRepository'
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_navigation.entity.menu_update.class%'

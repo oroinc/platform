@@ -102,14 +102,15 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
      */
     private function resetMenuUpdates($user = null, $menuName = null)
     {
-        // TODO after merging BB-4781 change MenuUpdate::OWNERSHIP_ORGANIZATION to MenuUpdate::OWNERSHIP_GLOBAL
-        $ownershipType = $user ? MenuUpdate::OWNERSHIP_USER : MenuUpdate::OWNERSHIP_ORGANIZATION;
-
-        $userId = $user ? $user->getId() : null;
+        if (null !== $user) {
+            $provider = $this->getContainer()->get('oro_navigation.ownership_provider.user');
+        } else {
+            $provider = $this->getContainer()->get('oro_navigation.ownership_provider.global');
+        }
 
         $this
             ->getContainer()
             ->get('oro_navigation.manager.menu_update_default')
-            ->resetMenuUpdatesWithOwnershipType($ownershipType, $userId, $menuName);
+            ->resetMenuUpdatesWithOwnershipType($provider, $menuName);
     }
 }

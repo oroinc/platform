@@ -33,6 +33,12 @@ abstract class AbstractOwnershipProvider implements OwnershipProviderInterface
      */
     public function getMenuUpdates($menuName)
     {
-        return $this->repository->getMenuUpdates($menuName, $this->getType(), $this->getId());
+        return $this->repository->findBy(
+            [
+                'menu' => $menuName,
+                'ownershipType' => $this->getType(),
+                'ownerId' => $this->getId()
+            ]
+        );
     }
 }
