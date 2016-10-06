@@ -34,6 +34,13 @@ class EntityNameProvider implements EntityNameProviderInterface
             }
         }
 
+        if ($format === self::FULL) {
+            $fieldNames = $this->getFieldNames(ClassUtils::getClass($entity));
+            if (count($fieldNames) > 0) {
+                return implode(' ', $fieldNames);
+            }
+        }
+
         return false;
     }
 
@@ -47,6 +54,25 @@ class EntityNameProvider implements EntityNameProviderInterface
             if ($fieldName) {
                 return $alias . '.' . $fieldName;
             }
+        }
+
+        if ($format === self::FULL) {
+            $fieldNames = $this->getFieldNames($className);
+            if (0 === count($fieldNames)) {
+                return false;
+            }
+
+            // append table alias
+            $fieldNames = array_map(function ($fieldName) use ($alias) {
+                return $alias . '.' . $fieldName;
+            }, $fieldNames);
+
+            if (1 === count($fieldNames)) {
+                return reset($fieldNames);
+            }
+
+            // more than one field name
+            return sprintf("CONCAT_WS(' ', %s)", implode(', ', $fieldNames));
         }
 
         return false;
@@ -88,5 +114,24 @@ class EntityNameProvider implements EntityNameProviderInterface
     protected function getFieldValue($entity, $fieldName)
     {
         return $entity->{'get' . Inflector::camelize($fieldName)}();
+    }
+
+    /**
+     * Return string field names of className
+     * @param  string $className
+     * @return array
+     */
+    protected function getFieldNames($className)
+    {
+        if (null === $manager = $this->doctrine->getManagerForClass($className)) {
+            return [];
+        }
+
+        $metadata = $manager->getClassMetadata($className);
+        $fieldNames = $metadata->getFieldNames();
+
+        return array_filter($fieldNames, function ($fieldName) use ($metadata) {
+            return 'string' === $metadata->getTypeOfField($fieldName);
+        });
     }
 }
