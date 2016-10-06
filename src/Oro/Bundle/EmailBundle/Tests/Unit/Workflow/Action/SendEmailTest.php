@@ -64,7 +64,6 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
 
         $this->action->setDispatcher($this->dispatcher);
 
-
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
         $this->action->setLogger($this->logger);
     }
@@ -449,7 +448,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
 
         $this->logger->expects($this->once())
             ->method('error')
-            ->with('Workflow send email action.An email was not delivered.');
+            ->with('Workflow send email action.');
 
         $this->action->initialize($options);
         $this->action->execute($context);
