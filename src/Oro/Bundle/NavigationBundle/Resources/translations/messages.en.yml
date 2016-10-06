@@ -51,3 +51,7 @@ oro:
             roots_plural_label: Menus
             edit_menus: Edit Menus
             divider: Divider
+        action:
+            manage_menus:
+                label: Manage Menus
+                description: Allows users to add/edit/remove menu items

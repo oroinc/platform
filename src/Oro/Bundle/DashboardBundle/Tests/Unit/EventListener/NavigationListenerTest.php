@@ -3,6 +3,9 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DashboardBundle\EventListener\NavigationListener;
+use Oro\Bundle\DashboardBundle\Model\Manager;
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,12 +15,12 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     protected $navigationListener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityFacade;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Manager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $manager;
 
@@ -32,25 +35,29 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->navigationListener = new NavigationListener($this->securityFacade, $this->manager);
+        $this->navigationListener = new NavigationListener(
+            $this->securityFacade,
+            $this->manager
+        );
     }
 
     public function testOnNavigationConfigureCheckIfMenuAndUserExists()
     {
-        $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
+        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        $event = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
 
         $menu = $this->getMock('Knp\Menu\ItemInterface');
+        $item = $this->getMock('Knp\Menu\ItemInterface');
 
         $event->expects($this->exactly(2))->method('getMenu')->will($this->returnValue($menu));
 
         $this->manager->expects($this->never())->method('getDashboards');
 
-        $item = $this->getMock('Knp\Menu\ItemInterface');
-
         $menu->expects($this->at(0))->method('getChild')->will($this->returnValue(null));
         $menu->expects($this->at(1))->method('getChild')->will($this->returnValue($item));
+        $menu->expects($this->any())->method('getChildren')->will($this->returnValue([]));
 
         $this->navigationListener->onNavigationConfigure($event);
         $this->navigationListener->onNavigationConfigure($event);
@@ -135,7 +142,6 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->with($secondMenuItemAlias, $this->equalTo($secondExpectedOptions))
             ->will($this->returnValue($child));
         $item->expects($this->at(2))->method('addChild')->will($this->returnValue($divider));
-
 
         $menu->expects($this->once())->method('getChild')->will($this->returnValue($item));
         $event->expects($this->once())->method('getMenu')->will($this->returnValue($menu));
