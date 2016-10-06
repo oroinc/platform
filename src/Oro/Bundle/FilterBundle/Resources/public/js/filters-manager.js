@@ -97,7 +97,6 @@ define(function(require) {
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
-            this.defaultFilters = {};
 
             _.extend(this, _.pick(options, ['addButtonHint']));
 
