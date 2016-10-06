@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Builder;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
-use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
+use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 
@@ -35,13 +35,13 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('item-1-1-1');
 
-        /** @var MenuUpdateProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
-        $provider = $this->getMock(MenuUpdateProviderInterface::class);
+        /** @var OwnershipProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        $provider = $this->getMock(OwnershipProviderInterface::class);
         $provider->expects($this->once())
-            ->method('getUpdates')
+            ->method('getMenuUpdates')
             ->will($this->returnValue([$menuUpdate]));
 
-        $this->builder->addProvider('default', $provider);
+        $this->builder->addProvider($provider, 'default', 100);
 
         $menu = $this->getMenu();
         $menu->setExtra('area', 'default');
@@ -71,34 +71,17 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('item-1-1-1');
 
-        /** @var MenuUpdateProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
-        $provider = $this->getMock(MenuUpdateProviderInterface::class);
+        /** @var OwnershipProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        $provider = $this->getMock(OwnershipProviderInterface::class);
         $provider->expects($this->once())
-            ->method('getUpdates')
+            ->method('getMenuUpdates')
             ->will($this->returnValue([$menuUpdate]));
 
-        $this->builder->addProvider('default', $provider);
+        $this->builder->addProvider($provider, 'default', 100);
 
         $menu = $this->getMenu();
         $menu->setExtra('area', 'default');
         $menu->setExtra('max_nesting_level', 3);
-
-        $this->builder->build($menu);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException
-     * @expectedExceptionMessage Provider related to "custom" area not found.
-     */
-    public function testBuildProviderNotFoundException()
-    {
-        /** @var MenuUpdateProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
-        $provider = $this->getMock(MenuUpdateProviderInterface::class);
-
-        $this->builder->addProvider('default', $provider);
-
-        $menu = $this->getMenu();
-        $menu->setExtra('area', 'custom');
 
         $this->builder->build($menu);
     }

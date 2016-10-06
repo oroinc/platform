@@ -18,9 +18,9 @@ class UserMenuController extends AbstractMenuController
     /**
      * {@inheritdoc}
      */
-    protected function getOwnershipType()
+    protected function getOwnershipProvider()
     {
-        return MenuUpdate::OWNERSHIP_USER;
+        return $this->get('oro_navigation.ownership_provider.user');
     }
 
     /**
