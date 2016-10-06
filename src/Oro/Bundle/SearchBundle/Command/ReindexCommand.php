@@ -73,7 +73,9 @@ class ReindexCommand extends ContainerAwareCommand
         /** @var $searchEngine EngineInterface */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
 
-        if ($searchEngine instanceof ProgressLoggerAwareInterface) {
+        if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG &&
+            $searchEngine instanceof ProgressLoggerAwareInterface
+        ) {
             $searchEngine->setProgressLogger(new ConsoleProgressLogger($output));
         }
         $recordsCount = $searchEngine->reindex($class, $offset, $limit);
