@@ -55,3 +55,7 @@ oro:
             delete: Delete
             hide_success_message: Menu item is hidden now.
             show_success_message: Menu item is visible now.
+        action:
+            manage_menus:
+                label: Manage Menus
+                description: Allows users to add/edit/remove menu items

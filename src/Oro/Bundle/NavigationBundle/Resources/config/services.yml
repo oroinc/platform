@@ -459,6 +459,13 @@ services:
             - { name: oro_ui.view_action_provider, group: activity }
             - { name: oro_ui.update_action_provider, group: activity }
 
+    oro_navigation.event_listener.navigation:
+        class: Oro\Bundle\NavigationBundle\EventListener\NavigationListener
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
     oro_navigation.validator.max_nested_level:
         class: Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator
         arguments:
