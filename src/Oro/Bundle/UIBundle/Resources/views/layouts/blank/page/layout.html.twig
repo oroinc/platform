@@ -23,3 +23,13 @@
         {{ block_widget(block) }}
     </body>
 {% endblock %}
+
++{% block _wrapper_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' wrapper'
+    }) %}
+
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
