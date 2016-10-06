@@ -12,7 +12,8 @@
         "oro/attachment-bundle": "dev-master",
         "oro/user-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
-        "oro/workflow-bundle": "dev-master"
+        "oro/workflow-bundle": "dev-master",
+        "oro/calendar-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\EmailBundle": "" }
