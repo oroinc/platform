@@ -78,9 +78,12 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('priority', $result);
         $this->assertArrayHasKey('description', $result);
         $this->assertArrayHasKey('page_reload', $result);
+        $this->assertArrayHasKey('configurator', $result);
+        $this->assertArrayHasKey('handler', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('icon', $result);
         $this->assertArrayHasKey('tooltip', $result);
+        $this->assertCount(7, $result);
     }
 
     /**
@@ -98,7 +101,10 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('icon', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('page_reload', $result);
+        $this->assertArrayNotHasKey('configurator', $result);
+        $this->assertArrayNotHasKey('handler', $result);
         $this->assertArrayHasKey('tooltip', $result);
+        $this->assertCount(5, $result);
     }
 
     /**
@@ -114,6 +120,8 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
                 'description'  => 'some desc',
                 'icon'         => 'real icon',
                 'page_reload'  => true,
+                'configurator' => ['Test\Class::method'],
+                'handler'      => ['Test\Class::method'],
                 'some_another' => '',
                 'tooltip'      => 'some tooltip'
             )

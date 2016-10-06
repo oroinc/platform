@@ -30,9 +30,7 @@ function PackageManager(Urls, util) {
         });
     }
 
-    function installCompleteCallback(xhr) {
-        var response = xhr.responseJSON;
-
+    function installCompleteCallback(response) {
         switch (response && response.code) {
             case InstallStatus.INSTALLED:
                 util.redirect(Urls.installed, 'Package installed successfully');
@@ -81,9 +79,7 @@ function PackageManager(Urls, util) {
 
     }
 
-    function updateCompleteCallback(xhr) {
-        var response = xhr.responseJSON;
-
+    function updateCompleteCallback(response) {
         switch (response && response.code) {
             case UpdateStatus.UPDATED:
                 util.redirect(Urls.installed, 'Package updated successfully');

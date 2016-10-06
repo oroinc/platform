@@ -9,6 +9,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixtureInterface
 {
@@ -41,7 +42,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         for ($i = 1; $i <= self::COUNT; $i++) {
             $entity = new WorkflowAwareEntity();
             $entity->setName('workflow_aware_entity_' . $this->lastEntityId);
-            $entities[$i] = $entity;
+            $entities[] = $entity;
             $manager->persist($entity);
 
             $this->setReference('workflow_aware_entity.' . $this->lastEntityId, $entity);
@@ -56,14 +57,23 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         foreach ($workflowNames as $workflowName) {
             $definition = $workflowDefinitionRepository->find($workflowName);
             if ($definition instanceof WorkflowDefinition) {
+                $steps = $definition->getSteps()->toArray();
+
+                usort(
+                    $steps,
+                    function (WorkflowStep $a, WorkflowStep $b) {
+                        return strcmp($a->getName(), $b->getName());
+                    }
+                );
+
+                $firstStep = array_shift($steps);
+
                 foreach ($entities as $entity) {
                     $workflowItem = new WorkflowItem();
                     $workflowItem->setDefinition($definition)
-                        ->setWorkflowName($definition->getName())
-                        ->setEntity($entity)
                         ->setEntityId($entity->getId())
                         ->setEntityClass($definition->getRelatedEntity())
-                        ->setCurrentStep($definition->getSteps()->first());
+                        ->setCurrentStep($firstStep);
                     $manager->persist($workflowItem);
 
                     $this->setReference($workflowName . '_item.' . $this->lastItemId, $workflowItem);

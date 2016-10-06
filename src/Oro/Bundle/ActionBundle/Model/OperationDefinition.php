@@ -2,11 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyFields)
- * @SuppressWarnings(PHPMD.ExcessivePublicCount)
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class OperationDefinition
 {
     const PREACTIONS = 'preactions';
@@ -27,33 +22,6 @@ class OperationDefinition
 
     /** @var string */
     private $substituteOperation;
-
-    /** @var bool */
-    private $forAllEntities = false;
-
-    /** @var array */
-    private $entities = [];
-
-    /** @var array */
-    private $excludeEntities = [];
-
-    /** @var bool */
-    private $forAllDatagrids = false;
-
-    /** @var array */
-    private $excludeDatagrids = [];
-
-    /** @var array */
-    private $datagrids = [];
-
-    /** @var array */
-    private $routes = [];
-
-    /** * @var array */
-    private $groups = [];
-
-    /** @var array */
-    private $applications = [];
 
     /** @var integer */
     private $order = 0;
@@ -175,158 +143,6 @@ class OperationDefinition
     public function getOrder()
     {
         return $this->order;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isForAllEntities()
-    {
-        return $this->forAllEntities;
-    }
-
-    /**
-     * @param bool $forAllEntities
-     * @return $this
-     */
-    public function setForAllEntities($forAllEntities)
-    {
-        $this->forAllEntities = $forAllEntities;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getEntities()
-    {
-        return $this->entities;
-    }
-
-    /**
-     * @param array $entities
-     * @return $this
-     */
-    public function setEntities(array $entities)
-    {
-        $this->entities = $entities;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getExcludeEntities()
-    {
-        return $this->excludeEntities;
-    }
-
-    /**
-     * @param array $excludeEntities
-     * @return $this
-     */
-    public function setExcludeEntities(array $excludeEntities)
-    {
-        $this->excludeEntities = $excludeEntities;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isForAllDatagrids()
-    {
-        return $this->forAllDatagrids;
-    }
-
-    /**
-     * @param bool $forAllDatagrids
-     * @return $this
-     */
-    public function setForAllDatagrids($forAllDatagrids)
-    {
-        $this->forAllDatagrids = $forAllDatagrids;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDatagrids()
-    {
-        return $this->datagrids;
-    }
-
-    /**
-     * @param array $datagrids
-     * @return $this
-     */
-    public function setDatagrids(array $datagrids)
-    {
-        $this->datagrids = $datagrids;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getExcludeDatagrids()
-    {
-        return $this->excludeDatagrids;
-    }
-
-    /**
-     * @param array $excludedDatagrids
-     * @return $this
-     */
-    public function setExcludeDatagrids(array $excludedDatagrids)
-    {
-        $this->excludeDatagrids = $excludedDatagrids;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getApplications()
-    {
-        return $this->applications;
-    }
-
-    /**
-     * @param array $applications
-     * @return $this
-     */
-    public function setApplications(array $applications)
-    {
-        $this->applications = $applications;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRoutes()
-    {
-        return $this->routes;
-    }
-
-    /**
-     * @param array $routes
-     * @return $this
-     */
-    public function setRoutes(array $routes)
-    {
-        $this->routes = $routes;
-
-        return $this;
     }
 
     /**
@@ -527,25 +343,6 @@ class OperationDefinition
     public function setSubstituteOperation($substituteOperation)
     {
         $this->substituteOperation = $substituteOperation;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getGroups()
-    {
-        return $this->groups;
-    }
-
-    /**
-     * @param array $groups
-     * @return $this
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
 
         return $this;
     }
