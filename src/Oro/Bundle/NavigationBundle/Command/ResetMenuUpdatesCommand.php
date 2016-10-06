@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Command;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\Console\Input\InputArgument;

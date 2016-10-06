@@ -46,12 +46,6 @@ class MenuUpdateData extends AbstractFixture
                 'key' => 'lists',
                 'menu' => self::MENU,
             ],
-            [
-                'ownershipType' => MenuUpdate::OWNERSHIP_USER,
-                'ownerId' => $this->getReference(self::USER)->getId(),
-                'key' => 'menu_item_other',
-                'menu' => self::OTHER_MENU,
-            ],
         ];
         foreach ($updatesData as $updateData) {
             $update = new MenuUpdate();

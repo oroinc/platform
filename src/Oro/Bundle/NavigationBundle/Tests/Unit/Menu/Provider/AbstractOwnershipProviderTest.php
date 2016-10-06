@@ -19,7 +19,6 @@ class AbstractOwnershipProviderTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
-            ->setMethods(['getMenuUpdates'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -31,8 +30,12 @@ class AbstractOwnershipProviderTest extends \PHPUnit_Framework_TestCase
         $menuName = 'test_menu';
 
         $this->entityRepository->expects($this->once())
-            ->method('getMenuUpdates')
-            ->with($menuName, $this->provider->getType(), $this->provider->getId());
+            ->method('findBy')
+            ->with([
+                'menu' => $menuName,
+                'ownershipType' => 'stub_type',
+                'ownerId' => 34
+            ]);
 
         $this->provider->getMenuUpdates($menuName);
     }
