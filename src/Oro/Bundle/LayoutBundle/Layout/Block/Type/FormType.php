@@ -49,6 +49,7 @@ class FormType extends AbstractType
         $this->addBlockType(
             $builder,
             FormStartType::NAME,
+            FormStartType::SHORT_NAME,
             $options,
             [
                 'form',
@@ -66,6 +67,7 @@ class FormType extends AbstractType
         $this->addBlockType(
             $builder,
             FormFieldsType::NAME,
+            FormFieldsType::SHORT_NAME,
             $options,
             [
                 'form',
@@ -85,6 +87,7 @@ class FormType extends AbstractType
         $this->addBlockType(
             $builder,
             FormEndType::NAME,
+            FormEndType::SHORT_NAME,
             $options,
             [
                 'form',
@@ -107,22 +110,25 @@ class FormType extends AbstractType
     /**
      * @param BlockBuilderInterface $builder
      * @param string                $name
+     * @param string                $shortName
      * @param Options               $options
      * @param array                 $passedOptions
      */
-    protected function addBlockType(BlockBuilderInterface $builder, $name, Options $options, array $passedOptions)
-    {
-        $idRegex = '/' . self::FIELD_SEPARATOR . self::NAME . '$/';
-        $idSufix = self::FIELD_SEPARATOR . $name;
-
+    protected function addBlockType(
+        BlockBuilderInterface $builder,
+        $name,
+        $shortName,
+        Options $options,
+        array $passedOptions
+    ) {
         $options = $options->toArray();
         foreach ($options['additional_block_prefixes'] as &$blockPrefix) {
-            $blockPrefix = preg_replace($idRegex, '', $blockPrefix) . $idSufix;
+            $blockPrefix .=  self::FIELD_SEPARATOR . $shortName;
         }
         unset($blockPrefix);
 
         $builder->getLayoutManipulator()->add(
-            preg_replace($idRegex, '', $builder->getId()) . $idSufix,
+            $builder->getId() . self::FIELD_SEPARATOR . $shortName,
             $builder->getId(),
             $name,
             array_intersect_key($options, array_flip($passedOptions))

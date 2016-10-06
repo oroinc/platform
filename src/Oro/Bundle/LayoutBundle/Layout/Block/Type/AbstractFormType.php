@@ -15,6 +15,8 @@ use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface;
 
 abstract class AbstractFormType extends AbstractType
 {
+    const SHORT_NAME = '';
+
     /**
      * {@inheritdoc}
      */
