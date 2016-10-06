@@ -11,7 +11,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_SESSION_FIELD_NAME = '_test_sid';
     const TEST_PHP_SESSION_NAME   = 'test_php_sid';
-    const TEST_URL_PREFIX         = '/embedded/form/';
+    const TEST_ROUTE_NAME         = 'test_route';
     const TEST_CSRF_TOKEN_ID      = 'test_token_id';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -37,7 +37,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
             $this->embeddedFormTokenStorage,
             $this->requestStack,
             ['name' => self::TEST_PHP_SESSION_NAME],
-            self::TEST_URL_PREFIX,
+            self::TEST_ROUTE_NAME,
             self::TEST_SESSION_FIELD_NAME
         );
     }
@@ -79,13 +79,10 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider notEmbeddedFormPathProvider
-     */
-    public function testGetTokenForNotEmbeddedFormUrl($path)
+    public function testGetTokenForNotEmbeddedFormRoute()
     {
         $request = Request::create('http://test');
-        $request->server->set('PATH_INFO', $path);
+        $request->attributes->set('_route', 'not_embedded_form_route');
 
         $this->requestStack->expects(self::once())
             ->method('getMasterRequest')
@@ -102,25 +99,10 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function notEmbeddedFormPathProvider()
-    {
-        return [
-            [''],
-            ['/page'],
-            ['/embedded'],
-            ['/embedded/'],
-            ['/embedded/form'],
-            ['/page/embedded/form/123'],
-        ];
-    }
-
-    /**
-     * @dataProvider embeddedFormPathProvider
-     */
-    public function testGetTokenForEmbeddedFormUrl($path)
+    public function testGetTokenForEmbeddedFormRoute()
     {
         $request = Request::create('http://test');
-        $request->server->set('PATH_INFO', $path);
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
             ->method('getMasterRequest')
@@ -137,18 +119,10 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function embeddedFormPathProvider()
-    {
-        return [
-            ['/embedded/form/'],
-            ['/embedded/form/123'],
-        ];
-    }
-
-    public function testGetTokenForEmbeddedFormUrlButWithSessionIdCookir()
+    public function testGetTokenForEmbeddedFormRouteButWithSessionIdCookie()
     {
         $request = Request::create('http://test');
-        $request->server->set('PATH_INFO', '/embedded/form/123');
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
         $request->cookies->set(self::TEST_PHP_SESSION_NAME, 'php_sid');
 
         $this->requestStack->expects(self::once())
@@ -169,7 +143,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
     public function testHasToken()
     {
         $request = Request::create('http://test');
-        $request->server->set('PATH_INFO', '/embedded/form/123');
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
             ->method('getMasterRequest')
@@ -188,7 +162,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
     public function testSetToken()
     {
         $request = Request::create('http://test');
-        $request->server->set('PATH_INFO', '/embedded/form/123');
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
             ->method('getMasterRequest')
@@ -204,7 +178,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
     public function testRemoveToken()
     {
         $request = Request::create('http://test');
-        $request->server->set('PATH_INFO', '/embedded/form/123');
+        $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
             ->method('getMasterRequest')
