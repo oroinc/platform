@@ -24,7 +24,7 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface
     protected $sessionOptions;
 
     /** @var string */
-    protected $embeddedFormUrlPrefix;
+    protected $embeddedFormRouteName;
 
     /** @var string */
     protected $sessionIdFieldName;
@@ -34,7 +34,7 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface
      * @param TokenStorageInterface $embeddedFormTokenStorage
      * @param RequestStack          $requestStack
      * @param array                 $sessionOptions
-     * @param string                $embeddedFormUrlPrefix
+     * @param string                $embeddedFormRouteName
      * @param string                $sessionIdFieldName
      */
     public function __construct(
@@ -42,14 +42,14 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface
         TokenStorageInterface $embeddedFormTokenStorage,
         RequestStack $requestStack,
         array $sessionOptions,
-        $embeddedFormUrlPrefix,
+        $embeddedFormRouteName,
         $sessionIdFieldName
     ) {
         $this->mainTokenStorage = $mainTokenStorage;
         $this->embeddedFormTokenStorage = $embeddedFormTokenStorage;
         $this->requestStack = $requestStack;
         $this->sessionOptions = $sessionOptions;
-        $this->embeddedFormUrlPrefix = $embeddedFormUrlPrefix;
+        $this->embeddedFormRouteName = $embeddedFormRouteName;
         $this->sessionIdFieldName = $sessionIdFieldName;
     }
 
@@ -96,7 +96,7 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface
             $isEmbeddedFormRequest =
                 null !== $request
                 && !$request->cookies->has($this->sessionOptions['name'])
-                && 0 === strpos($request->server->get('PATH_INFO'), $this->embeddedFormUrlPrefix);
+                && $request->attributes->get('_route') === $this->embeddedFormRouteName;
         }
 
         return $isEmbeddedFormRequest
