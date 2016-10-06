@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
-use Oro\Bundle\WorkflowBundle\Translation\KeySource\TranslationKeySourceInterface;
+use Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator;
 
 class TranslationKeyGeneratorTest extends \PHPUnit_Framework_TestCase
@@ -10,7 +10,7 @@ class TranslationKeyGeneratorTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationKeyGenerator */
     protected $generator;
 
-    /** @var TranslationKeySourceInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $keySource;
 
     protected function setUp()
