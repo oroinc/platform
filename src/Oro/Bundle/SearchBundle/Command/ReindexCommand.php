@@ -7,7 +7,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\SearchBundle\Engine\EngineInterface;
+use Oro\Component\Log\ConsoleProgressLogger;
+use Oro\Component\Log\ProgressLoggerAwareInterface;
 
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).
@@ -72,7 +73,9 @@ class ReindexCommand extends ContainerAwareCommand
         /** @var $searchEngine EngineInterface */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
 
-
+        if ($searchEngine instanceof ProgressLoggerAwareInterface) {
+            $searchEngine->setProgressLogger(new ConsoleProgressLogger($output));
+        }
         $recordsCount = $searchEngine->reindex($class, $offset, $limit);
 
         $output->writeln(sprintf('Total indexed items: %u', $recordsCount));
