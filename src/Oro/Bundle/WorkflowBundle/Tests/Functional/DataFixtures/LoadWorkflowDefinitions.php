@@ -56,6 +56,7 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
             }
 
             $manager->persist($workflowDefinition);
+            $this->addReference('workflow.' . $workflowDefinition->getName(), $workflowDefinition);
             $hasDefinitions = true;
         }
 

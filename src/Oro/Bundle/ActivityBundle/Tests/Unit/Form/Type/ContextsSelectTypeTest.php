@@ -82,7 +82,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->dispatcher,
             $this->entityTitleResolver
         );
-        $type->buildForm($builder, []);
+        $type->buildForm($builder, ['collectionModel' => false]);
     }
 
     public function testSetDefaultOptions()
@@ -92,7 +92,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->method('setDefaults')
             ->with(
                 [
-                    'tooltip' => false,
+                    'tooltip'         => false,
+                    'collectionModel' => false,
                     'configs' => [
                         'placeholder'        => 'oro.activity.contexts.placeholder',
                         'allowClear'         => true,
@@ -126,7 +127,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver
         );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
-
     }
 
     public function testGetName()

@@ -80,7 +80,6 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
         foreach ($entities as $entity) {
             $args = new LifecycleEventArgs($entity['entity'], $this->entityManager);
             $this->listener->preRemove($args);
-
         }
 
         $repository = $this->getMockBuilder('Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository')

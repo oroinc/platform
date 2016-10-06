@@ -50,7 +50,6 @@ class Grid
                 $this->formatString .= ' ' . $this->delimiters[$i] . ' ';
             }
         }
-
     }
 
     /**

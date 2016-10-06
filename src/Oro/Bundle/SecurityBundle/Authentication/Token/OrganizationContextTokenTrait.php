@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 trait OrganizationContextTokenTrait
 {
     /** @var  Organization */
-    protected $organization;
+    protected $organizationContext;
 
     /**
      * Returns organization
@@ -16,7 +16,7 @@ trait OrganizationContextTokenTrait
      */
     public function getOrganizationContext()
     {
-        return $this->organization;
+        return $this->organizationContext;
     }
 
     /**
@@ -26,6 +26,6 @@ trait OrganizationContextTokenTrait
      */
     public function setOrganizationContext(Organization $organization)
     {
-        $this->organization = $organization;
+        $this->organizationContext = $organization;
     }
 }

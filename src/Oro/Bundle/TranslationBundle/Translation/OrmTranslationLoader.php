@@ -38,15 +38,9 @@ class OrmTranslationLoader implements LoaderInterface
 
         if ($this->checkDatabase()) {
             $messages = [];
-            /** @var TranslationRepository $translationRepo */
-            $translationRepo = $this->getEntityManager()->getRepository(Translation::ENTITY_NAME);
-            /** @var Translation[] $translations */
-            $translations = $translationRepo->findValues($locale, $domain);
+            $translations = $this->getTranslationRepository()->findAllByLanguageAndDomain($locale, $domain);
             foreach ($translations as $translation) {
-                // UI scope should override SYSTEM values if exist
-                if (!isset($messages[$translation->getKey()]) || $translation->getScope() == Translation::SCOPE_UI) {
-                    $messages[$translation->getKey()] = $translation->getValue();
-                }
+                $messages[$translation['key']] = $translation['value'];
             }
 
             $catalogue->add($messages, $domain);
@@ -65,7 +59,7 @@ class OrmTranslationLoader implements LoaderInterface
         if (null === $this->dbCheck) {
             $this->dbCheck = SafeDatabaseChecker::tablesExist(
                 $this->getEntityManager()->getConnection(),
-                SafeDatabaseChecker::getTableName($this->doctrine, Translation::ENTITY_NAME)
+                SafeDatabaseChecker::getTableName($this->doctrine, Translation::class)
             );
         }
 
@@ -77,6 +71,14 @@ class OrmTranslationLoader implements LoaderInterface
      */
     protected function getEntityManager()
     {
-        return $this->doctrine->getManagerForClass(Translation::ENTITY_NAME);
+        return $this->doctrine->getManagerForClass(Translation::class);
+    }
+
+    /**
+     * @return TranslationRepository
+     */
+    protected function getTranslationRepository()
+    {
+        return $this->getEntityManager()->getRepository(Translation::class);
     }
 }
