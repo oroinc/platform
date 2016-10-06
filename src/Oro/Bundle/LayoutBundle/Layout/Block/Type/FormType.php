@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
@@ -17,7 +18,10 @@ class FormType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('form_name', 'form');
+        $resolver->setDefaults([
+            'form_name' => 'form',
+            'instance_name' => '',
+        ]);
         $resolver->setDefined([
             'form',
             'form_action',
@@ -54,6 +58,8 @@ class FormType extends AbstractType
                 'form_route_parameters',
                 'form_method',
                 'form_enctype',
+                'additional_block_prefixes',
+                'instance_name',
             ]
         );
 
@@ -70,7 +76,9 @@ class FormType extends AbstractType
                 'form_group_prefix',
                 'split_to_fields',
                 'form_data',
-                'preferred_fields'
+                'preferred_fields',
+                'additional_block_prefixes',
+                'instance_name',
             ]
         );
 
@@ -82,6 +90,8 @@ class FormType extends AbstractType
                 'form',
                 'form_name',
                 'render_rest',
+                'additional_block_prefixes',
+                'instance_name',
             ]
         );
     }
@@ -102,11 +112,28 @@ class FormType extends AbstractType
      */
     protected function addBlockType(BlockBuilderInterface $builder, $name, Options $options, array $passedOptions)
     {
+        $idRegex = '/' . self::FIELD_SEPARATOR . self::NAME . '$/';
+        $idSufix = self::FIELD_SEPARATOR . $name;
+
+        $options = $options->toArray();
+        foreach ($options['additional_block_prefixes'] as &$blockPrefix) {
+            $blockPrefix = preg_replace($idRegex, '', $blockPrefix) . $idSufix;
+        }
+        unset($blockPrefix);
+
         $builder->getLayoutManipulator()->add(
-            $builder->getId().self::FIELD_SEPARATOR.$name,
+            preg_replace($idRegex, '', $builder->getId()) . $idSufix,
             $builder->getId(),
             $name,
-            array_intersect_key($options->toArray(), array_flip($passedOptions))
+            array_intersect_key($options, array_flip($passedOptions))
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParent()
+    {
+        return ContainerType::NAME;
     }
 }

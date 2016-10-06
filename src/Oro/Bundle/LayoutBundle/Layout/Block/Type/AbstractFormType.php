@@ -25,6 +25,7 @@ abstract class AbstractFormType extends AbstractType
                 [
                     'form' => null,
                     'form_name' => 'form',
+                    'instance_name' => '',
                 ]
             );
     }
@@ -34,7 +35,7 @@ abstract class AbstractFormType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        BlockUtils::setViewVarsFromOptions($view, $options, ['form', 'form_name']);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['form', 'form_name', 'instance_name']);
     }
 
     /**
