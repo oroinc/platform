@@ -3,7 +3,7 @@
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
-            {{ UI.renderProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label) }}
+            {{ UI.renderProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label|trans({},'workflows')) }}
 
             {{ UI.renderProperty(
                 'oro.workflow.workflowdefinition.related_entity.label'|trans,
@@ -11,7 +11,7 @@
             ) }}
             {{ UI.renderProperty(
                 'oro.workflow.block.view.workflow.default_step'|trans,
-                entity.startStep ? entity.startStep.label : ''
+                entity.startStep ? entity.startStep.label|trans({},'workflows') : ''
             ) }}
             {{ UI.renderProperty(
                 'oro.workflow.workflowdefinition.steps_display_ordered.label'|trans,

@@ -147,9 +147,9 @@
                         {% set currentTransition = entity.configuration.transitions[transitionName] %}
                         {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
                         <li>
-                            <span>{{ currentTransition.label }}</span>
+                            <span>{{ currentTransition.label|trans({},'workflows') }}</span>
                             <i class="icon-long-arrow-right"></i>
-                            <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ toStep.label }}</span>
+                            <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ toStep.label|trans({},'workflows') }}</span>
                         </li>
                     {% endfor %}
                 </ul>
