@@ -16,28 +16,25 @@ class WorkflowDefinitionCloner
      */
     public static function cloneDefinition(WorkflowDefinition $definition)
     {
-        $startStep = $definition->getStartStep();
-
         $steps = self::copySteps($definition->getSteps());
-        $startStep = $steps->get($startStep ? $startStep->getName() : null);
-        $entityAcls = self::copyEntityAcls($definition->getEntityAcls());
-        $restrictions = self::copyRestrictions($definition->getRestrictions());
 
         $newDefinition = new WorkflowDefinition();
-        $newDefinition->import($definition)
-            ->setSteps($steps)
-            ->setStartStep($startStep)
-            ->setEntityAcls($entityAcls)
-            ->setRestrictions($restrictions);
+        $newDefinition->import($definition)->setSteps($steps);
 
-        return $newDefinition;
+        $startStep = $definition->getStartStep();
+        $startStep = $steps->get($startStep ? $startStep->getName() : null);
+
+        $entityAcls = self::copyEntityAcls($definition);
+        $restrictions = self::copyRestrictions($definition);
+
+        return $newDefinition->setStartStep($startStep)->setEntityAcls($entityAcls)->setRestrictions($restrictions);
     }
 
     /**
      * @param ArrayCollection|WorkflowStep[] $steps
      * @return ArrayCollection
      */
-    protected static function copySteps(ArrayCollection $steps)
+    private static function copySteps(ArrayCollection $steps)
     {
         $newSteps = new ArrayCollection();
         foreach ($steps as $step) {
@@ -51,15 +48,15 @@ class WorkflowDefinitionCloner
     }
 
     /**
-     * @param ArrayCollection|WorkflowEntityAcl[] $entityAcls
+     * @param WorkflowDefinition $definition
      * @return ArrayCollection
      */
-    protected static function copyEntityAcls(ArrayCollection $entityAcls)
+    private static function copyEntityAcls(WorkflowDefinition $definition)
     {
         $newEntityAcls = new ArrayCollection();
-        foreach ($entityAcls as $entityAcl) {
+        foreach ($definition->getEntityAcls() as $entityAcl) {
             $newEntityAcl = new WorkflowEntityAcl();
-            $newEntityAcl->import($entityAcl);
+            $newEntityAcl->setDefinition($definition)->import($entityAcl);
 
             $newEntityAcls->add($newEntityAcl);
         }
@@ -68,19 +65,19 @@ class WorkflowDefinitionCloner
     }
 
     /**
-     * @param ArrayCollection|WorkflowRestriction[] $restrictions
+     * @param WorkflowDefinition $definition
      * @return ArrayCollection
      */
-    protected static function copyRestrictions(ArrayCollection $restrictions)
+    private static function copyRestrictions(WorkflowDefinition $definition)
     {
         $newsRestrictions = new ArrayCollection();
-        foreach ($restrictions as $restriction) {
+        foreach ($definition->getRestrictions() as $restriction) {
             $newsRestriction = new WorkflowRestriction();
-            $newsRestriction->import($restriction);
+            $newsRestriction->setDefinition($definition)->import($restriction);
 
             $newsRestrictions->add($newsRestriction);
         }
 
-        return $restrictions;
+        return $newsRestrictions;
     }
 }
