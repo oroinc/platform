@@ -83,7 +83,8 @@ class ImportVisitor implements VisitorInterface
             );
         }
 
-        foreach ($imports as $importData) {
+        $importsReversed = array_reverse($imports);
+        foreach ($importsReversed as $importData) {
             $import = $this->createImport($importData);
             if ($parentUpdate instanceof LayoutUpdateImportInterface) {
                 $import->setParent($parentUpdate->getImport());
@@ -123,9 +124,9 @@ class ImportVisitor implements VisitorInterface
         $parentUpdateIndex = array_search($parentUpdate, $this->updates[$el]);
 
         $this->updates[$el] = array_merge(
-            array_slice($this->updates[$el], 0, $parentUpdateIndex + 1, true),
+            array_slice($this->updates[$el], 0, $parentUpdateIndex, true),
             [$update],
-            array_slice($this->updates[$el], $parentUpdateIndex + 1, null, true)
+            array_slice($this->updates[$el], $parentUpdateIndex, null, true)
         );
     }
 

@@ -84,6 +84,6 @@ class MessageQueueCollector extends DataCollector
      */
     public function getName()
     {
-        return 'oro.message_queue';
+        return 'message_queue';
     }
 }

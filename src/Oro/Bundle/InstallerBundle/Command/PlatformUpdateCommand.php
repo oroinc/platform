@@ -66,7 +66,6 @@ class PlatformUpdateCommand extends AbstractCommand
                 ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
                 ->runCommand('router:cache:clear', array('--process-isolation' => true))
-                ->runCommand('oro:message-queue:create-queues', array('--process-isolation' => true))
             ;
 
             if (!$input->getOption('skip-assets')) {
@@ -85,10 +84,7 @@ class PlatformUpdateCommand extends AbstractCommand
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'
             );
-            $output->writeln(
-                '           Please make sure that application cache is up-to-date or empty before run this command.'
-            );
-            $output->writeln('           Use <info>cache:clear --no-optional-warmers</info> if needed.');
+            $output->writeln('           Please, remove application cache before run this command.');
             $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));

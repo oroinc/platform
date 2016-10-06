@@ -4,7 +4,7 @@ Feature: User Notes
   I need to have ability create, reade update and delete entity notes
 
 Scenario: Add note to user entity
-  Given I login as "admin" user with "admin" password
+  Given I login as administrator
   And I go to System/Entities/Entity Management
   And filter Name as is equal to "User"
   And click Edit User in grid

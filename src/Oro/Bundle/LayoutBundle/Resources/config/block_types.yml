@@ -185,18 +185,7 @@ services:
             - { name: layout.block_type_extension, alias: block }
 
     oro_layout.block_type.input:
-        parent: oro_layout.block_type.abstract_configurable
-        calls:
-            -
-                - setOptionsConfig
-                -
-                    -
-                        type: {default: 'text'}
-                        id: {default: null}
-                        name: ~
-                        value: ~
-                        placeholder: ~
-            - [setName, ['input']]
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\InputType
         tags:
              - { name: layout.block_type, alias: input }
 

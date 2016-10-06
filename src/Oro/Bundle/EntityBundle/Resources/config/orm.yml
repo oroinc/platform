@@ -15,6 +15,11 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_entity.database_exception_helper:
+        class: Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper
+        arguments:
+            - '@doctrine'
+
     oro_entity.abstract_repository:
         class: Doctrine\ORM\EntityRepository
         factory: ['@oro_entity.doctrine_helper', getEntityRepository]
