@@ -117,7 +117,7 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Are you sure you want to proceed?', $result->getContent());
+        $this->assertContains('/user/send-forced-password-reset-email', $result->getContent());
 
         $form = $crawler->selectButton('Reset')->form();
         $this->client->submit($form);
