@@ -433,3 +433,9 @@ services:
         shared: false
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_user.security.kernel_listener:
+        class: Oro\Bundle\UserBundle\Security\KernelListener
+        arguments: ['@service_container']
+        tags:
+            - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
