@@ -49,7 +49,6 @@ class SortByExtension extends \Twig_Extension
             if ($sortingType === 'string-case') {
                 $sortingFlags |= SORT_FLAG_CASE;
             }
-
         }
 
         ArrayUtil::sortBy(

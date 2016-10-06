@@ -24,6 +24,13 @@ services:
             - '@doctrine'
             - '%oro_cron.entity.schedule.class%'
 
+    oro_cron.deferred_scheduler:
+        class: Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler
+        arguments:
+            - '@oro_cron.schedule_manager'
+            - '@doctrine'
+            - '%oro_cron.entity.schedule.class%'
+
     oro_cron.command_args_tokenizer:
         class: 'Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer'
         public: false

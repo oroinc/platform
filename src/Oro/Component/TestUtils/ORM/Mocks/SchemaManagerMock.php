@@ -16,6 +16,5 @@ class SchemaManagerMock extends \Doctrine\DBAL\Schema\AbstractSchemaManager
     // @codingStandardsIgnoreStart
     protected function _getPortableTableColumnDefinition($tableColumn) {
     // @codingStandardsIgnoreEnd
-
     }
 }

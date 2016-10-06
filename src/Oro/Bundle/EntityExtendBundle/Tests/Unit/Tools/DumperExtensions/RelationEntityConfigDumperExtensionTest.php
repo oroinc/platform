@@ -58,7 +58,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                                 break;
                             }
                         }
-
                     }
 
                     return $result;
