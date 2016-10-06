@@ -38,6 +38,13 @@ class Impersonation
     protected $token;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean", nullable=false, options="{default=false}")
+     */
+    protected $notify;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="expire_at", type="datetime")
@@ -55,6 +62,7 @@ class Impersonation
     {
         $this->token = bin2hex(hash('sha1', uniqid(mt_rand(), true), true));
         $this->expireAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->notify = true;
     }
 
     /**
@@ -130,5 +138,21 @@ class Impersonation
     public function getLoginAt()
     {
         return $this->loginAt;
+    }
+
+    /**
+     * @param bool $notify
+     */
+    public function setNotify($notify)
+    {
+        $this->notify = $notify;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasNotify()
+    {
+        return $this->notify;
     }
 }

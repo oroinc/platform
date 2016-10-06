@@ -28,7 +28,6 @@ use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
 class ImpersonationAuthenticator implements GuardAuthenticatorInterface
 {
     const TOKEN_PARAMETER = '_impersonation_token';
-    const NOTIFY_PARAMETER = '_impersonation_notify';
 
     /** @var EntityManager */
     protected $em;
@@ -72,8 +71,10 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        // always returns an Impersonation object or throws an exception
-        return $this->getImpersonation($credentials)->getUser();
+        $impersonation = $this->getImpersonation($credentials);
+        $this->checkImpersonation($impersonation);
+
+        return $impersonation->getUser();
     }
 
     /**
@@ -90,10 +91,13 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        if ($request->query->get(static::NOTIFY_PARAMETER)) {
-            $event = new ImpersonationSuccessEvent($token->getUser());
-            $this->eventDispatcher->dispatch(ImpersonationSuccessEvent::EVENT_NAME, $event);
-        }
+        $impersonation = $this->getImpersonation($this->getCredentials($request));
+
+        $event = new ImpersonationSuccessEvent($impersonation);
+        $this->eventDispatcher->dispatch(ImpersonationSuccessEvent::EVENT_NAME, $event);
+
+        $impersonation->setLoginAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->em->flush();
     }
 
     /**
@@ -139,20 +143,26 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     }
 
     /**
-     * Get Impersonation by token and set it's login time
+     * Get Impersonation by token
      *
      * @param string $token
-     * @throws AuthenticationCredentialsNotFoundException when token is not found
-     * @throws CustomUserMessageAuthenticationException when token is already used
-     * @throws CustomUserMessageAuthenticationException when token is expired
      * @return Impersonation
      */
     protected function getImpersonation($token)
     {
-        $impersonation = $this->em
+        return $impersonation = $this->em
             ->getRepository('OroUserBundle:Impersonation')
             ->findOneBy(['token' => $token]);
+    }
 
+    /**
+     * @param  Impersonation $impersonation
+     * @throws AuthenticationCredentialsNotFoundException when token is not found
+     * @throws CustomUserMessageAuthenticationException when token is already used
+     * @throws CustomUserMessageAuthenticationException when token is expired
+     */
+    protected function checkImpersonation(Impersonation $impersonation = null)
+    {
         if (!$impersonation) {
             throw new AuthenticationCredentialsNotFoundException();
         }
@@ -165,9 +175,5 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
         if ($impersonation->getExpireAt() <= $now) {
             throw new CustomUserMessageAuthenticationException('Impersonation token has expired.');
         }
-
-        $impersonation->setLoginAt($now);
-
-        return $impersonation;
     }
 }

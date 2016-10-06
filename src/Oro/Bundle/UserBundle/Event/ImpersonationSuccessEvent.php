@@ -4,33 +4,33 @@ namespace Oro\Bundle\UserBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\UserBundle\Entity\UserInterface;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 
 /**
- * Allows to react on successful impersonation login
+ * Triggers on successful impersonation login
  */
 class ImpersonationSuccessEvent extends Event
 {
     const EVENT_NAME = 'oro_user.impersonation_success';
 
     /**
-     * @var UserInterface
+     * @var Impersonation
      */
-    protected $user;
+    protected $impersonation;
 
     /**
-     * @param UserInterface $user Impersonated user
+     * @param Impersonation $impersonation
      */
-    public function __construct(UserInterface $user)
+    public function __construct(Impersonation $impersonation)
     {
-        $this->user = $user;
+        $this->impersonation = $impersonation;
     }
 
     /**
-     * @return UserInterface
+     * @return Impersonation
      */
-    public function getUser()
+    public function getImpersonation()
     {
-        return $this->user;
+        return $this->impersonation;
     }
 }

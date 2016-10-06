@@ -43,8 +43,12 @@ class ImpersonationSuccessListener
      */
     public function onImpersonationSuccess(ImpersonationSuccessEvent $event)
     {
+        if (!$event->getImpersonation()->hasNotify()) {
+            return;
+        }
+
         try {
-            $this->mailProcessor->sendImpersonateEmail($event->getUser());
+            $this->mailProcessor->sendImpersonateEmail($event->getImpersonation()->getUser());
         } catch (\Exception $e) {
             $this->flashBag->add('error', 'oro.user.impersonation.notification_error');
             $this->logger->error($e->getMessage());

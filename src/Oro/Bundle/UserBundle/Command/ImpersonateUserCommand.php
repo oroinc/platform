@@ -50,12 +50,12 @@ class ImpersonateUserCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException(sprintf('User with username "%s" does not exists', $username));
         }
 
-        $impersonation = $this->createImpersonation($user, $input->getOption('lifetime'));
-        $url = $this->generateUrl(
-            $input->getOption('route'),
-            $impersonation->getToken(),
+        $impersonation = $this->createImpersonation(
+            $user,
+            $input->getOption('lifetime'),
             !$input->getOption('silent')
         );
+        $url = $this->generateUrl($input->getOption('route'), $impersonation->getToken());
 
         $datetimeFormatter = $this->getContainer()->get('oro_locale.formatter.date_time');
         $output->writeln(
@@ -78,9 +78,10 @@ class ImpersonateUserCommand extends ContainerAwareCommand
     /**
      * @param  User   $user
      * @param  string $lifetime
+     * @param  bool   $notify Enable email notification to impersonated user
      * @return Impersonation
      */
-    protected function createImpersonation(User $user, $lifetime)
+    protected function createImpersonation(User $user, $lifetime, $notify)
     {
         $manager = $this->getContainer()->get('doctrine')->getManager();
 
@@ -91,6 +92,7 @@ class ImpersonateUserCommand extends ContainerAwareCommand
         $impersonation = new Impersonation();
         $impersonation->setUser($user);
         $impersonation->getExpireAt()->add(\DateInterval::createFromDateString($lifetime));
+        $impersonation->setNotify($notify);
 
         $manager->persist($impersonation);
         $manager->flush();
@@ -101,10 +103,9 @@ class ImpersonateUserCommand extends ContainerAwareCommand
     /**
      * @param  string $route
      * @param  string $token
-     * @param  bool   $notify
      * @return string
      */
-    protected function generateUrl($route, $token, $notify)
+    protected function generateUrl($route, $token)
     {
         $router = $this->getContainer()->get('router');
         $applicationUrl = $this->getContainer()->get('oro_config.manager')->get('oro_ui.application_url');
@@ -113,7 +114,6 @@ class ImpersonateUserCommand extends ContainerAwareCommand
             $route,
             [
                 ImpersonationAuthenticator::TOKEN_PARAMETER => $token,
-                ImpersonationAuthenticator::NOTIFY_PARAMETER => $notify,
             ]
         );
     }
