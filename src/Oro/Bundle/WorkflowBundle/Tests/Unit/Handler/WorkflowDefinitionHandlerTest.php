@@ -11,6 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
+use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +20,9 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $entityManager;
+
+    /** @var TranslationProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationProcessor;
 
     /** @var WorkflowDefinitionHandler */
     protected $handler;
@@ -55,10 +59,15 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
+        $this->translationProcessor = $this->getMockBuilder(TranslationProcessor::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->handler = new WorkflowDefinitionHandler(
             $assembler,
             $eventDispatcher,
             $managerRegistry,
+            $this->translationProcessor,
             'OroWorkflowBundle:WorkflowDefinition'
         );
     }
@@ -88,6 +97,13 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         if (!$existingDefinition && !$newDefinition) {
             $this->entityManager->expects($this->once())->method('persist')->with($definition);
         }
+
+        $previousDefinition = new WorkflowDefinition();
+        $previousDefinition->import($definition);
+
+        $this->translationProcessor->expects($this->once())
+            ->method('process')
+            ->with($definition, $previousDefinition);
 
         $this->handler->updateWorkflowDefinition($definition, $newDefinition);
 
@@ -154,6 +170,10 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager
             ->expects($this->exactly((int)$expected))
             ->method('flush');
+
+        $this->translationProcessor->expects($this->exactly((int)$expected))
+            ->method('process')
+            ->with(null, $definition);
 
         $this->assertEquals($expected, $this->handler->deleteWorkflowDefinition($definition));
     }
