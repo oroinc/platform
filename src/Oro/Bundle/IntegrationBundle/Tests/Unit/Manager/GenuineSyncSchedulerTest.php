@@ -68,7 +68,6 @@ class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $internalMessageProducer = $this->getMock(MessageProducerInterface::class);
 
         $collector = new MessageCollector($internalMessageProducer);
-        $collector->enable();
 
         return $collector;
     }
