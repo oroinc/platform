@@ -52,7 +52,7 @@ class LoadCommentData extends AbstractCommentFixture implements ContainerAwareIn
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadCalendarData'];
+        return ['Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures\LoadNoteData'];
     }
 
     /**

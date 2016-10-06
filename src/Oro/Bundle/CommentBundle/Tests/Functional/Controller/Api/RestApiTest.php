@@ -25,7 +25,7 @@ class RestApiTest extends WebTestCase
             $this->getUrl(
                 'oro_api_comment_get_items',
                 [
-                    'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
+                    'relationClass' => 'Oro_Bundle_NoteBundle_Entity_Note',
                     'relationId'    => $this->getReference('default_activity')->getId()
                 ]
             )
@@ -46,7 +46,7 @@ class RestApiTest extends WebTestCase
             $this->getUrl(
                 'oro_api_comment_get_items',
                 [
-                    'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
+                    'relationClass' => 'Oro_Bundle_NoteBundle_Entity_Note',
                     'relationId'    => $this->getReference('default_activity')->getId()
                 ]
             ) . '?createdAt<' . urlencode($date->format('c'))
@@ -67,7 +67,7 @@ class RestApiTest extends WebTestCase
             $this->getUrl(
                 'oro_api_comment_get_items',
                 [
-                    'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
+                    'relationClass' => 'Oro_Bundle_NoteBundle_Entity_Note',
                     'relationId'    => $this->getReference('default_activity')->getId()
                 ]
             ) . '?updatedAt>' . urlencode($date->format('c'))
@@ -101,7 +101,7 @@ class RestApiTest extends WebTestCase
             $this->getUrl(
                 'oro_api_comment_create_item',
                 [
-                    'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
+                    'relationClass' => 'Oro_Bundle_NoteBundle_Entity_Note',
                     'relationId'    => $this->getReference('default_activity')->getId()
                 ]
             ),
