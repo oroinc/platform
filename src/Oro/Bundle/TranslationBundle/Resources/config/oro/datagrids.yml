@@ -25,7 +25,6 @@ datagrids:
             language:
                 label: oro.translation.language.entity_label
             ownerName:
-                acl_resource: oro_translation_language_update
                 label: oro.translation.language.owner.label
                 frontend_type: relation
                 inline_editing:
@@ -62,8 +61,6 @@ datagrids:
                     data_name: language.createdAt
                 updatedAt:
                     data_name: language.updatedAt
-            default:
-                code: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         filters:
             columns:
                 language:
@@ -151,7 +148,7 @@ datagrids:
                     editor:
                         view: orotranslation/js/app/views/editor/text-editor-view
                     save_api_accessor:
-                        route: oro_api_update_translation
+                        route: oro_api_patch_translation
                         query_parameter_names:
                             - key
                             - locale

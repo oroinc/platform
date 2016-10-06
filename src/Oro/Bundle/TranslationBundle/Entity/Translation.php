@@ -5,11 +5,9 @@ namespace Oro\Bundle\TranslationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * "utf8_bin" required for mysql to support case-sensitive values for "key" column
- *
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
- * @ORM\Table(name="oro_translation", options={"collate"="utf8_bin", "charset"="utf8"}, uniqueConstraints={
- *      @ORM\UniqueConstraint(name="language_key_uniq", columns={"language_id", "key_id"})
+ * @ORM\Table(name="oro_translation", uniqueConstraints={
+ *      @ORM\UniqueConstraint(name="language_key_uniq", columns={"language_id", "translation_key_id"})
  * })
  */
 class Translation
@@ -31,7 +29,7 @@ class Translation
      * @var TranslationKey
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\TranslationKey")
-     * @ORM\JoinColumn(name="key_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
+     * @ORM\JoinColumn(name="translation_key_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
     protected $translationKey;
 

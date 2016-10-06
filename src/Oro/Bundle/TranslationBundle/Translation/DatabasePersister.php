@@ -14,9 +14,6 @@ class DatabasePersister
     /** @var int */
     private $batchSize = 200;
 
-    /** @var EntityManager */
-    private $em;
-
     /** @var Registry */
     private $registry;
 
@@ -30,24 +27,10 @@ class DatabasePersister
      * @param Registry $registry
      * @param TranslationManager $translationManager
      */
-    public function __construct(
-        Registry $registry,
-        TranslationManager $translationManager
-    ) {
+    public function __construct(Registry $registry, TranslationManager $translationManager)
+    {
         $this->registry = $registry;
         $this->translationManager = $translationManager;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        if (null === $this->em) {
-            $this->em = $this->registry->getManagerForClass(Translation::class);
-        }
-
-        return $this->em;
     }
 
     /**
@@ -61,8 +44,10 @@ class DatabasePersister
     public function persist($locale, array $data)
     {
         $writeCount = 0;
+        $em = $this->getEntityManager();
+
         try {
-            $this->getEntityManager()->beginTransaction();
+            $em->beginTransaction();
             foreach ($data as $domain => $domainData) {
                 foreach ($domainData as $key => $translation) {
                     if (strlen($key) > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
@@ -70,15 +55,9 @@ class DatabasePersister
                     }
 
                     $writeCount++;
-                    $this->toWrite[] = $this->translationManager->saveValue(
-                        $key,
-                        $translation,
-                        $locale,
-                        $domain,
-                        Translation::SCOPE_INSTALLED
-                    );
+                    $this->toWrite[] = ['key' => $key, 'translation' => $translation, 'domain' => $domain];
                     if (0 === $writeCount % $this->batchSize) {
-                        $this->write($this->toWrite);
+                        $this->write($locale, $this->toWrite);
 
                         $this->toWrite = [];
                     }
@@ -86,12 +65,14 @@ class DatabasePersister
             }
 
             if (count($this->toWrite) > 0) {
-                $this->write($this->toWrite);
+                $this->write($locale, $this->toWrite);
+
+                $this->toWrite = [];
             }
 
-            $this->getEntityManager()->commit();
+            $em->commit();
         } catch (\Exception $exception) {
-            $this->getEntityManager()->rollback();
+            $em->rollback();
 
             throw $exception;
         }
@@ -102,10 +83,31 @@ class DatabasePersister
 
     /**
      * Flush all changes
+     *
+     * @param string $locale
+     * @param array $items
      */
-    private function write()
+    private function write($locale, array $items)
     {
+        foreach ($items as $item) {
+            $this->translationManager->saveValue(
+                $item['key'],
+                $item['translation'],
+                $locale,
+                $item['domain'],
+                Translation::SCOPE_INSTALLED
+            );
+        }
+
         $this->translationManager->flush();
         $this->translationManager->clear();
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->registry->getManagerForClass(Translation::class);
     }
 }

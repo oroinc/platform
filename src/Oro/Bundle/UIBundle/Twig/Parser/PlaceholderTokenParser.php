@@ -36,7 +36,6 @@ class PlaceholderTokenParser extends \Twig_TokenParser
             );
 
             $stream->next();
-
         } else {
             $name = $expressionParser->parseExpression();
         }

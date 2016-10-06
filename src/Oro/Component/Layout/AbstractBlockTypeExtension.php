@@ -40,6 +40,5 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
      */
     public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
     {
-
     }
 }

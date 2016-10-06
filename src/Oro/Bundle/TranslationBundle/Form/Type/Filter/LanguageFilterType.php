@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Form\Type\Filter;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;

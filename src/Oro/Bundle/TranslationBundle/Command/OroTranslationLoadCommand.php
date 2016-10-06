@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,9 +14,6 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class OroTranslationLoadCommand extends ContainerAwareCommand
 {
-    /** @var EntityManagerInterface */
-    protected $entityManager;
-
     /**
      * {@inheritdoc}
      */
@@ -62,10 +57,9 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
 
         /* @var $translationManager TranslationManager */
         $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
-        $translationManager->rebuildCache();
 
-        /* @var $translator Translator */
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->getTranslator();
+        $translator->rebuildCache();
 
         foreach ($locales as $locale) {
             $domains = $translator->getCatalogue($locale)->all();
@@ -73,17 +67,15 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($domains)));
 
             foreach ($domains as $domain => $messages) {
-                $records = 0;
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
 
                 foreach ($messages as $key => $value) {
                     $translationManager->saveValue($key, $value, $locale, $domain);
-                    $records++;
                 }
 
                 $translationManager->flush();
 
-                $output->writeln(sprintf('processed %d records.', $records));
+                $output->writeln(sprintf('processed %d records.', count($messages)));
             }
         }
 
@@ -94,8 +86,16 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         // restore DB loader
         $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
 
-        $translationManager->rebuildCache();
+        $translator->rebuildCache();
 
         $output->writeln(sprintf('<info>Done.</info>'));
+    }
+
+    /**
+     * @return Translator
+     */
+    protected function getTranslator()
+    {
+        return $this->getContainer()->get('translator');
     }
 }

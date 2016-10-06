@@ -41,7 +41,6 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Twig_SimpleFunction', $functions[3]);
         $this->assertEquals('oro_currency_symbol_prepend', $functions[3]->getName());
-
     }
 
     public function testGetFilters()

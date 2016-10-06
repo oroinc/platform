@@ -537,12 +537,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     '--process-isolation' => true,
                 )
             )
-            ->runCommand(
-                'oro:message-queue:create-queues',
-                array(
-                    '--process-isolation' => true,
-                )
-            )
         ;
 
         if (!$skipAssets) {

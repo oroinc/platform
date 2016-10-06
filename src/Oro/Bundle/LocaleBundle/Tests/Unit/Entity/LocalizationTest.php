@@ -132,19 +132,19 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $localization
+     * @param string $value
      * @param bool|false $default
      * @return LocalizedFallbackValue
      */
-    protected function createLocalizedValue($localization, $default = false)
+    protected function createLocalizedValue($value, $default = false)
     {
         $localized = (new LocalizedFallbackValue())->setString('some string');
 
         if (!$default) {
-            $localizationNew = new Localization();
-            $localizationNew->setDefaultTitle($localization);
+            $localization = new Localization();
+            $localization->setDefaultTitle($value);
 
-            $localized->setLocalization($localizationNew);
+            $localized->setLocalization($localization);
         }
 
         return $localized;
