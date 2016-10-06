@@ -66,8 +66,8 @@ class RecordOwnerDataListener
             ) {
                 $owner = null;
                 if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
-                    $owner = $user->getOwner();
-                    if ($owner instanceof BusinessUnit) {
+                    $owner =  $user->getOwner();
+                    if (!$owner || $owner instanceof BusinessUnit) {
                         $owner = $user;
                     }
                 } elseif (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
