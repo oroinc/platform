@@ -65,7 +65,7 @@ class WorkflowDefinitionHandler
         $created = false;
 
         $previousDefinition = new WorkflowDefinition();
-        $previousDefinition->import($workflowDefinition);
+        $previousDefinition->import($workflowDefinition, true);
 
         if ($newDefinition) {
             $workflowDefinition->import($newDefinition);

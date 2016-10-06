@@ -615,25 +615,89 @@ class WorkflowDefinition implements DomainObjectInterface
 
     /**
      * @param WorkflowDefinition $definition
+     * @param bool $copyRelationObjects
      * @return WorkflowDefinition
      */
-    public function import(WorkflowDefinition $definition)
+    public function import(WorkflowDefinition $definition, $copyRelationObjects = false)
     {
+        $steps = $definition->getSteps();
+        $startStep = $definition->getStartStep();
+        $entityAcls = $definition->getEntityAcls();
+        $restrictions = $definition->getRestrictions();
+
+        if ($copyRelationObjects) {
+            $steps = $this->copySteps($steps);
+            $startStep = $steps->get($startStep ? $startStep->getName() : null);
+            $entityAcls = $this->copyEntityAcls($entityAcls);
+            $restrictions = $this->copyRestrictions($restrictions);
+        }
+
         $this->setName($definition->getName())
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())
             ->setEntityAttributeName($definition->getEntityAttributeName())
             ->setConfiguration($definition->getConfiguration())
-            ->setSteps($definition->getSteps())
-            ->setStartStep($definition->getStartStep())
+            ->setSteps($steps)
+            ->setStartStep($startStep)
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
-            ->setEntityAcls($definition->getEntityAcls())
-            ->setRestrictions($definition->getRestrictions())
+            ->setEntityAcls($entityAcls)
+            ->setRestrictions($restrictions)
             ->setSystem($definition->isSystem())
             ->setPriority($definition->getPriority())
             ->setGroups($definition->groups);
 
         return $this;
+    }
+
+    /**
+     * @param Collection $steps
+     * @return Collection
+     */
+    protected function copySteps(Collection $steps)
+    {
+        $newSteps = new ArrayCollection();
+        foreach ($steps as $step) {
+            $newStep = new WorkflowStep();
+            $newStep->import($step);
+
+            $newSteps->set($newStep->getName(), $newStep);
+        }
+
+        return $newSteps;
+    }
+
+    /**
+     * @param Collection $entityAcls
+     * @return Collection
+     */
+    protected function copyEntityAcls(Collection $entityAcls)
+    {
+        $newEntityAcls = new ArrayCollection();
+        foreach ($entityAcls as $entityAcl) {
+            $newEntityAcl = new WorkflowEntityAcl();
+            $newEntityAcl->import($entityAcl);
+
+            $newEntityAcls->add($newEntityAcl);
+        }
+
+        return $newEntityAcls;
+    }
+
+    /**
+     * @param Collection $restrictions
+     * @return Collection
+     */
+    protected function copyRestrictions(Collection $restrictions)
+    {
+        $newsRestrictions = new ArrayCollection();
+        foreach ($restrictions as $restriction) {
+            $newsRestriction = new WorkflowRestriction();
+            $newsRestriction->import($restriction);
+
+            $newsRestrictions->add($newsRestriction);
+        }
+
+        return $restrictions;
     }
 
     /**
