@@ -133,10 +133,15 @@ class SendEmailTemplate extends AbstractSendEmail
         $emailModel->setBody($templateRendered);
         $emailModel->setType($emailTemplate->getType());
 
-        $emailUser = $this->emailProcessor->process(
-            $emailModel,
-            $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
-        );
+        try {
+            $emailUser = $this->emailProcessor->process(
+                $emailModel,
+                $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
+            );
+        }
+        catch (\Swift_SwiftException $exception) {
+            $this->logger->error('Workflow send email template action.' . $exception->getMessage());
+        }
 
         if (array_key_exists('attribute', $this->options)) {
             $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
