@@ -1,4 +1,8 @@
 parameters:
+    # this parameter is set by OroEmbeddedFormExtension
+    oro_embedded_form.session_id_field_name: ~
+    oro_embedded_form.csrf_token_lifetime: ~
+
     oro.embedded_form.form_type.available_form.class:        Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
     oro_embedded_form.manager.class:                         Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
     oro_embedded_form.back_link.twig.extension.class:        Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
@@ -37,6 +41,36 @@ services:
         arguments:
             - '@oro_layout.layout_manager'
             - '@oro_embedded_form.manager'
+        calls:
+            - [setSessionIdProvider, ['@oro_embedded_form.session_id_provider']]
+            - [setSessionIdFieldName, ['%oro_embedded_form.session_id_field_name%']]
+
+    oro_embedded_form.csrf_token_storage.decorator:
+        class: Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorageDecorator
+        public: false
+        decorates: security.csrf.token_storage
+        arguments:
+            - '@oro_embedded_form.csrf_token_storage.decorator.inner'
+            - '@oro_embedded_form.csrf_token_storage'
+            - '@request_stack'
+            - '%session.storage.options%'
+            - '%web_backend_prefix%/embedded-form/submit/'
+            - '%oro_embedded_form.session_id_field_name%'
+
+    oro_embedded_form.csrf_token_storage:
+        class: Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage
+        public: false
+        arguments:
+            - ~ # the cache service is set by OroEmbeddedFormExtension
+            - '%oro_embedded_form.csrf_token_lifetime%'
+            - '@oro_embedded_form.session_id_provider'
+
+    oro_embedded_form.session_id_provider:
+        class: Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProvider
+        public: false
+        arguments:
+            - '@request_stack'
+            - '%oro_embedded_form.session_id_field_name%'
 
     oro_embedded_form.layout.block_type.success_message:
         parent: oro_layout.block_type.abstract_configurable
