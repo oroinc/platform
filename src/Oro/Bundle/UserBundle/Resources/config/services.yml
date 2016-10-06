@@ -444,5 +444,6 @@ services:
             - '@oro_user.security.login_history_manager'
             - '@oro_user.security.login_attempts_provider'
             - '@oro_user.manager'
+            - '@oro_user.mailer.processor'
         tags:
             - { name: kernel.event_subscriber }

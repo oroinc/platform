@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Migrations\Data\ORM;
 
-use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
+use Doctrine\Common\Persistence\ObjectManager;
 
-class LoadEmailTemplates extends AbstractEmailFixture
+use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
+
+class LoadEmailTemplates extends AbstractEmailFixture implements VersionedFixtureInterface
 {
     /**
      * Return path to email templates
@@ -15,5 +19,26 @@ class LoadEmailTemplates extends AbstractEmailFixture
         return $this->container
             ->get('kernel')
             ->locateResource('@OroUserBundle/Migrations/Data/ORM/emails');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.0';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    protected function findExistingTemplate(ObjectManager $manager, array $template)
+    {
+        if (empty($template['params']['name'])) {
+            return null;
+        }
+        return $manager->getRepository('OroEmailBundle:EmailTemplate')->findOneBy([
+            'name' => $template['params']['name'],
+            'entityName' => 'Oro\Bundle\UserBundle\Entity\User',
+        ]);
     }
 }
