@@ -7,6 +7,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
 /**
  * @Route("/menu/user")
  */
@@ -23,6 +26,7 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/", name="oro_navigation_user_menu_index")
      * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @return array
      */
@@ -34,6 +38,7 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}", name="oro_navigation_user_menu_view")
      * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      *
@@ -47,6 +52,7 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_user_menu_create")
      * @Template("OroNavigationBundle:UserMenu:update.html.twig")
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      * @param string|null $parentKey
@@ -61,6 +67,7 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}/update/{key}", name="oro_navigation_user_menu_update")
      * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      * @param string $key

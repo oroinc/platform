@@ -1,0 +1,7 @@
+acls:
+    oro_navigation_manage_menus:
+        label: oro.navigation.action.manage_menus.label
+        description: oro.navigation.action.manage_menus.description
+        type: action
+        group_name: ""
+        category: "application"

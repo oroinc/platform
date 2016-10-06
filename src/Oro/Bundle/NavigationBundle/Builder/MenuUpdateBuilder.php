@@ -4,9 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Helper\MenuUpdateHelper;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
+use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
+use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
@@ -40,16 +44,16 @@ class MenuUpdateBuilder implements BuilderInterface
      *
      */
     private $providers = [];
-
-    /** @var MenuUpdateHelper */
-    protected $menuUpdateHelper;
+    
+    /** @var LocalizationHelper */
+    private $localizationHelper;
 
     /**
-     * @param MenuUpdateHelper $menuUpdateHelper
+     * @param LocalizationHelper $localizationHelper
      */
-    public function __construct(MenuUpdateHelper $menuUpdateHelper)
+    public function __construct(LocalizationHelper $localizationHelper)
     {
-        $this->menuUpdateHelper = $menuUpdateHelper;
+        $this->localizationHelper = $localizationHelper;
     }
 
     /**
@@ -63,7 +67,21 @@ class MenuUpdateBuilder implements BuilderInterface
         $menuName = $menu->getName();
         foreach ($this->getUpdates($area, $menuName, $ownershipType) as $update) {
             if ($update->getMenu() == $menuName) {
-                $this->menuUpdateHelper->updateMenuItem($update, $menu);
+                MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
+            }
+        }
+
+        /** @var ItemInterface $item */
+        foreach ($menu->getChildren() as $item) {
+            $item = MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item);
+            if ($item) {
+                throw new MaxNestingLevelExceededException(
+                    sprintf(
+                        "Item \"%s\" exceeded max nesting level in menu \"%s\".",
+                        $item->getLabel(),
+                        $menu->getLabel()
+                    )
+                );
             }
         }
     }

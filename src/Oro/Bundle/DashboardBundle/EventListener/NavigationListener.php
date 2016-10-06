@@ -4,23 +4,20 @@ namespace Oro\Bundle\DashboardBundle\EventListener;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @var Manager
-     */
+    /** @var Manager */
     protected $manager;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param Manager        $manager
+     * @param SecurityFacade   $securityFacade
+     * @param Manager          $manager
      */
     public function __construct(SecurityFacade $securityFacade, Manager $manager)
     {
@@ -33,9 +30,8 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $dashboardTab = $event->getMenu()->getChild('dashboard_tab');
-
-        if (!$dashboardTab || !$this->securityFacade->hasLoggedUser()) {
+        $dashboardTab = MenuUpdateUtils::findMenuItem($event->getMenu(), 'dashboard_tab');
+        if ($dashboardTab === null || !$this->securityFacade->hasLoggedUser()) {
             return;
         }
 
