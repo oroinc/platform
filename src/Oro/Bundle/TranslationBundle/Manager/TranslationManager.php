@@ -117,6 +117,22 @@ class TranslationManager
     }
 
     /**
+     * Remove Translation Key
+     *
+     * @param string $key
+     * @param string $domain
+     */
+    public function removeTranslationKey($key, $domain)
+    {
+        $translationKey = $this->getEntityRepository(TranslationKey::class)
+            ->findOneBy(['key' => $key, 'domain' => $domain]);
+
+        if ($translationKey) {
+            $this->getEntityManager(TranslationKey::class)->remove($translationKey);
+        }
+    }
+
+    /**
      * @param int $scope
      * @param Translation $translation
      * @return bool
