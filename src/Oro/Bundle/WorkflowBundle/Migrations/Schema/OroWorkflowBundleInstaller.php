@@ -18,7 +18,7 @@ class OroWorkflowBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_15';
     }
 
     /**
@@ -36,6 +36,7 @@ class OroWorkflowBundleInstaller implements Installation
         $this->createOroWorkflowDefinitionTable($schema);
         $this->createOroProcessDefinitionTable($schema);
         $this->createOroWorkflowStepTable($schema);
+        $this->createOroWorkflowTransTriggerTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroWorkflowItemForeignKeys($schema);
@@ -46,6 +47,7 @@ class OroWorkflowBundleInstaller implements Installation
         $this->addOroWorkflowEntityAclIdentForeignKeys($schema);
         $this->addOroWorkflowDefinitionForeignKeys($schema);
         $this->addOroWorkflowStepForeignKeys($schema);
+        $this->addOroWorkflowTransTriggerForeignKeys($schema);
 
         CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
     }
@@ -252,6 +254,31 @@ class OroWorkflowBundleInstaller implements Installation
     }
 
     /**
+     * Create oro_workflow_trans_trigger table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroWorkflowTransTriggerTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_workflow_trans_trigger');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('workflow_name', 'string', ['length' => 255]);
+        $table->addColumn('entity_class', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('queued', 'boolean', []);
+        $table->addColumn('transition_name', 'string', ['length' => 255]);
+        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('type', 'string', ['length' => 255]);
+        $table->addColumn('cron', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('filter', 'text', ['notnull' => false]);
+        $table->addColumn('event', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('field', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('require', 'text', ['notnull' => false]);
+        $table->addColumn('relation', 'text', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
      * Add oro_workflow_item foreign keys.
      *
      * @param Schema $schema
@@ -406,6 +433,22 @@ class OroWorkflowBundleInstaller implements Installation
             ['workflow_name'],
             ['name'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Add oro_workflow_trans_trigger foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroWorkflowTransTriggerForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_workflow_trans_trigger');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_workflow_definition'),
+            ['workflow_name'],
+            ['name'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }

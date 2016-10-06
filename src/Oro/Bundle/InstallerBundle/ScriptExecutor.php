@@ -77,7 +77,6 @@ class ScriptExecutor
                     )
                 );
             }
-
         } else {
             $this->output->writeln(sprintf('File "%s" not found', $fileName));
         }

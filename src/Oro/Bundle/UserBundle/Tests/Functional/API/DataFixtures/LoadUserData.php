@@ -62,6 +62,5 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setSalt('');
 
         $userManager->updateUser($user);
-
     }
 }
