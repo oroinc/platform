@@ -134,7 +134,6 @@ class CrowdinAdapter extends AbstractAPIAdapter
                     sprintf('%0.2f%% [uploaded] <info>%s</info>', $percent, $apiPath)
                 );
             }
-
         }
 
         $failedCount = count($failed);

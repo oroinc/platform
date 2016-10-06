@@ -16,6 +16,9 @@ parameters:
     oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
     oro_workflow.handler.start_transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler
 
+    oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger
+    oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
+
 services:
     oro_workflow.attribute_guesser:
         class: %oro_workflow.attribute_guesser.class%
@@ -199,11 +202,9 @@ services:
             - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
-        class: Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler
+        class: Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler
         arguments:
-            - '@oro_cron.schedule_manager'
-            - '@doctrine'
-            - '%oro_cron.entity.schedule.class%'
+            - '@oro_cron.deferred_scheduler'
 
     oro_workflow.process.definitions_configurator:
         class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator
@@ -229,25 +230,46 @@ services:
             - '@oro_workflow.process.triggers_configurator'
             - '%oro_workflow.process_definition.entity.class%'
 
-    oro_workflow.transition_schedule.query_factory:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory
-        public: false
-        arguments:
-            - '@doctrine'
-
     oro_workflow.repository.workflow_item:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_workflow.workflow_item.entity.class%'
 
-    oro_workflow.transition_schedule.items_fetcher:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher
+    oro_workflow.repository.process_trigger:
+        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_workflow.process_trigger.entity.class%'
+
+    oro_workflow.repository.transition_event_trigger:
+        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_workflow.entity.transition_trigger_event.class%'
+
+    oro_workflow.helper.workflow_aware_entity_fetcher:
+        class: Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher
         public: true
         arguments:
-            - '@oro_workflow.transition_schedule.query_factory'
+            - '@doctrine'
+
+    oro_workflow.helper.transition_event_trigger:
+        class: Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper
+        public: false
+        arguments:
             - '@oro_workflow.manager'
-            - '@oro_workflow.repository.workflow_item'
+
+    oro_workflow.helper.transition_cron_trigger:
+        class: Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.helper.workflow_aware_entity_fetcher'
+
+    oro_workflow.transition_trigger.cron_scheduler:
+        class: Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler
+        arguments:
+            - '@oro_cron.deferred_scheduler'
 
     oro_workflow.validator_expression.dql_expression_verifier:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
@@ -255,18 +277,30 @@ services:
     oro_workflow.validator_expression.cron_expression_verifier:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier
 
-    oro_workflow.generator.trigger_schedule_options_verifier:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier
+    oro_workflow.transition_trigger.update_decider:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider
+        public: false
+
+    oro_workflow.transition_trigger_updater:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.transition_trigger.update_decider'
+            - '@oro_workflow.transition_trigger.cron_scheduler'
+            - '@oro_workflow.cache.transition_trigger_event'
+
+    oro_workflow.transition_trigger.trigger_cron_verifier:
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier'
         public: false
         arguments:
             - '@oro_workflow.workflow_assembler'
-            - '@oro_workflow.transition_schedule.query_factory'
+            - '@doctrine'
         calls:
             - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
 
-    oro_workflow.transition_schedule.process_configuration_generator:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator
+    oro_workflow.transition_trigger.verifier.event_trigger_relation:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerRelationVerifier
         public: false
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
@@ -275,3 +309,14 @@ services:
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         public: false
+
+    oro_workflow.transition_trigger.verifier.event_trigger_expression:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier
+        public: false
+
+    oro_workflow.transition_trigger.trigger_event_verifier:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerCompoundVerifier
+        public: false
+        calls:
+            - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
+            - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]

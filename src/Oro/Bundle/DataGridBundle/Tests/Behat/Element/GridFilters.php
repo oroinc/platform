@@ -17,7 +17,7 @@ class GridFilters extends Element
     public function getFilterItem($name, $text)
     {
         $filterItem = $this->elementFactory->findElementContains($name, $text);
-        self::assertNotNull($filterItem, sprintf('Can\'t find filter with "%s" name', $text));
+        self::assertTrue($filterItem->isValid(), sprintf('Can\'t find filter with "%s" name', $text));
 
         return $filterItem;
     }

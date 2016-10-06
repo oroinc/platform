@@ -11,7 +11,6 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
-use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -23,9 +22,6 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageProvider */
-    protected $languageProvider;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
@@ -34,9 +30,6 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|JsTranslationDumper */
     protected $jsTranslationDumper;
-
-    /** @var string */
-    protected $translationCacheDir = '/translations';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager */
     protected $objectManager;
@@ -47,10 +40,6 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->registry = $this->getMockBuilder(Registry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -84,11 +73,9 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager = new TranslationManager(
             $this->registry,
-            $this->languageProvider,
             $this->dbTranslationMetadataCache,
             $this->translator,
-            $this->jsTranslationDumper,
-            $this->translationCacheDir
+            $this->jsTranslationDumper
         );
     }
 
@@ -96,7 +83,6 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->registry,
-            $this->languageProvider,
             $this->dbTranslationMetadataCache,
             $this->translator,
             $this->jsTranslationDumper,
@@ -122,25 +108,6 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(TranslationKey::class, $translationKey1);
         $this->assertSame($translationKey1, $translationKey2);
-    }
-
-    public function testGetLanguageByCode()
-    {
-        $locale = 'en';
-
-        $this->objectManager->expects($this->never())->method('persist');
-        $this->objectManager->expects($this->never())->method('flush');
-
-        $this->objectRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['code' => $locale])
-            ->willReturn((new Language())->setCode($locale));
-
-        $language1 = $this->manager->getLanguageByCode($locale);
-        $language2 = $this->manager->getLanguageByCode($locale);
-
-        $this->assertInstanceOf(Language::class, $language1);
-        $this->assertSame($language1, $language2);
     }
 
     /**
@@ -217,13 +184,5 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             [null],
             ['en'],
         ];
-    }
-
-    public function testRebuildCache()
-    {
-        $this->translator->expects($this->once())
-            ->method('rebuildCache');
-
-        $this->manager->rebuildCache();
     }
 }

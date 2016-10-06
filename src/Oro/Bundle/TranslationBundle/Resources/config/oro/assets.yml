@@ -1,5 +1,5 @@
 assets:
     css:
         'orotranslation':
-          - 'bundles/orotranslation/css/style.css'
-          - 'bundles/orotranslation/css/inline-editing.css'
+          - 'bundles/orotranslation/css/less/style.less'
+          - 'bundles/orotranslation/css/less/inline-editing.less'

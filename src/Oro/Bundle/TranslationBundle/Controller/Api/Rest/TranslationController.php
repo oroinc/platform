@@ -3,9 +3,9 @@
 namespace Oro\Bundle\TranslationBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 
@@ -113,10 +113,10 @@ class TranslationController extends FOSRestController
      *
      * @return Response
      *
-     * @Patch("translations/{locale}/{domain}/{key}/update")
+     * @Patch("translations/{locale}/{domain}/{key}/patch")
      * @AclAncestor("oro_translation_language_translate")
      */
-    public function updateAction($locale, $domain, $key)
+    public function patchAction($locale, $domain, $key)
     {
         $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
 

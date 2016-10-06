@@ -34,7 +34,6 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
         $this->strategy = $this->getStrategyObject();
         $this->strategy->setImportExportContext(new Context([]));
         $this->strategy->setEntityName(Translation::class);
-        $this->strategy->setTranslationManager($this->getContainer()->get('oro_translation.manager.translation'));
     }
 
     protected function tearDown()

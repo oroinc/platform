@@ -5,19 +5,10 @@ namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_2;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroTranslationBundle implements Migration, OrderedMigrationInterface
+class OroTranslationBundle implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
-    {
-        return 0;
-    }
-
     /**
      * @inheritdoc
      */
@@ -25,9 +16,6 @@ class OroTranslationBundle implements Migration, OrderedMigrationInterface
     {
         /** Tables generation **/
         $this->createOroLanguageTable($schema);
-        $this->createOroTranslationKeyTable($schema);
-
-        $this->updateOroTranslationTable($schema, $queries);
 
         /** Foreign keys generation **/
         $this->addOroLanguageForeignKeys($schema);
@@ -51,41 +39,6 @@ class OroTranslationBundle implements Migration, OrderedMigrationInterface
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['code']);
-    }
-
-    /**
-     * Create oro_translation_key table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroTranslationKeyTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_translation_key');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('key', 'string', ['length' => 255]);
-        $table->addColumn('domain', 'string', ['default' => 'messages', 'length' => 255]);
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['key', 'domain'], 'key_domain_uniq');
-        /**
-         * Required to support Case Sensitive keys in MySQL
-         */
-        $table->addOption('charset', 'utf8');
-        $table->addOption('collate', 'utf8_bin');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    protected function updateOroTranslationTable(Schema $schema, QueryBag $queries)
-    {
-        $table = $schema->getTable('oro_translation');
-        $table->addColumn('key_id', 'integer', ['notnull' => false]);
-        $table->addColumn('language_id', 'integer', ['notnull' => false]);
-
-        $table->dropIndex('MESSAGES_IDX');
-        $table->dropIndex('MESSAGE_IDX');
-
-        $queries->addQuery(new MigrateTranslationDataQuery());
     }
 
     /**

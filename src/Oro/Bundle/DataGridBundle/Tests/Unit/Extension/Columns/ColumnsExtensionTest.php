@@ -35,6 +35,11 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->securityFacade
+            ->expects(static::any())
+            ->method('isGranted')
+            ->will(static::returnValue(true));
+
         $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -87,38 +92,6 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
                 'result' => false
             ]
         ];
-    }
-
-    public function testProcessConfigsAndAclResource()
-    {
-        $config = DatagridConfiguration::create([
-            ColumnsExtension::COLUMNS_PATH => [
-                'column1' => [],
-                'column2' => [
-                    ColumnsExtension::ACL_PATH => 'resource2',
-                ],
-                'column3' => [
-                    ColumnsExtension::ACL_PATH => 'resource3',
-                ],
-            ],
-        ]);
-
-        $this->securityFacade->expects($this->at(0))->method('isGranted')->with('resource2')->willReturn(true);
-        $this->securityFacade->expects($this->at(1))->method('isGranted')->with('resource3')->willReturn(false);
-
-        $this->extension->processConfigs($config);
-
-        $this->assertEquals(
-            [
-                ColumnsExtension::COLUMNS_PATH => [
-                    'column1' => [],
-                    'column2' => [
-                        ColumnsExtension::ACL_PATH => 'resource2',
-                    ],
-                ],
-            ],
-            $config->toArray()
-        );
     }
 
     /**

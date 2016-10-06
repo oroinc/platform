@@ -4,15 +4,11 @@ services:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy'
         parent: 'oro_importexport.strategy.configurable_add_or_replace'
         public: false
-        calls:
-             - [setTranslationManager, ['@oro_translation.manager.translation']]
 
     oro_translation.importexport.strategy.translation.reset:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy'
         parent: 'oro_translation.importexport.strategy.translation.add_or_replace'
         public: false
-        calls:
-             - [setTranslationManager, ['@oro_translation.manager.translation']]
 
     # Import processor
     oro_translation.importexport.processor.import.translation:
