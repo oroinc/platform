@@ -7,10 +7,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
+use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
-use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
@@ -52,7 +52,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->processCronScheduler = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler')
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler')
             ->disableOriginalConstructor()
             ->getMock();
 

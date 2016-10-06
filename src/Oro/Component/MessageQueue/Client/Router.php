@@ -17,6 +17,7 @@ class Router implements RecipientListRouterInterface
      * @var array
      */
     protected $routes;
+    
     /**
      * @var DestinationMetaRegistry
      */

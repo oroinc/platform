@@ -52,6 +52,10 @@ abstract class AbstractTagsFilter extends AbstractFilter
     {
         $expr = false;
 
+        if (empty($data['value'])) {
+            return $expr;
+        }
+
         $qb            = $ds->getQueryBuilder();
         $entityIdAlias = $this->get(FilterUtility::DATA_NAME_KEY);
 

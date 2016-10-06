@@ -8,32 +8,12 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class ConsoleToken extends AbstractToken implements OrganizationContextTokenInterface
 {
-    /**
-     * @var Organization
-     */
-    private $organization;
-
+    use OrganizationContextTokenTrait;
     /**
      * {@inheritdoc}
      */
     public function getCredentials()
     {
         return ''; // anonymous credentials
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrganizationContext()
-    {
-        return $this->organization;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setOrganizationContext(Organization $organization)
-    {
-        $this->organization = $organization;
     }
 }
