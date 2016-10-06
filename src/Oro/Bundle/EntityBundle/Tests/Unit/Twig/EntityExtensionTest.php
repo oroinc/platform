@@ -55,7 +55,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(3, $functions);
+        $this->assertCount(4, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $function = $functions[0];
@@ -64,9 +64,13 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$this->twigExtension, 'getClassName'], $function->getCallable());
         $function = $functions[1];
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_url_class_name', $function->getName());
+        $this->assertEquals([$this->twigExtension, 'getUrlClassName'], $function->getCallable());
+        $function = $functions[2];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_class_alias', $function->getName());
         $this->assertEquals([$this->twigExtension, 'getClassAlias'], $function->getCallable());
-        $function = $functions[2];
+        $function = $functions[3];
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_action_params', $function->getName());
         $this->assertEquals([$this->twigExtension, 'getActionParams'], $function->getCallable());
@@ -201,5 +205,18 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $this->assertEquals('oro_entity', $this->twigExtension->getName());
+    }
+
+    public function testGetUrlClassName()
+    {
+        $originalClass = 'Test\\Class';
+        $urlSafeClass = 'Test_Class';
+
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('getUrlSafeClassName')
+            ->with($originalClass)
+            ->willReturn($urlSafeClass);
+
+        $this->assertEquals($urlSafeClass, $this->twigExtension->getUrlClassName($originalClass));
     }
 }
