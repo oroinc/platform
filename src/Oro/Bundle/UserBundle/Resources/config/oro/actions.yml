@@ -101,7 +101,6 @@ operations:
         entities:
             - Oro\Bundle\UserBundle\Entity\User
         groups:
-            - update_navButtons
             - datagridRowAction
         datagrids:
             - users-grid
