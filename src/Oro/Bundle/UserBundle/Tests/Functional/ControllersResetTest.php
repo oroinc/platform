@@ -75,32 +75,6 @@ class ControllersResetTest extends WebTestCase
         $this->assertNotNull($user->getPasswordRequestedAt());
     }
 
-    public function testSendEmailAsAdminAction()
-    {
-        /** @var User $user */
-        $user = $this->getReference('simple_user');
-
-        $crawler = $this->client->request(
-            'GET',
-            $this->getUrl(
-                'oro_user_reset_send_email_as_admin',
-                ['id' => $user->getId(), '_widgetContainer' => 'dialog']
-            )
-        );
-        $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-
-        $this->assertContains('Are you sure you want to proceed?', $result->getContent());
-
-        $form = $crawler->selectButton('Reset')->form();
-        $this->client->submit($form);
-        $result = $this->client->getResponse();
-        $this->assertContains('oro.user.reset_password.flash.success', $result->getContent());
-
-        $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
-        $this->assertNotNull($user->getPasswordRequestedAt());
-    }
-
     public function testSendForcedResetEmailAction()
     {
         /** @var User $user */

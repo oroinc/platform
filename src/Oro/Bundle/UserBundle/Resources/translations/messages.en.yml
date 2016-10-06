@@ -181,9 +181,7 @@ oro:
         password:
             change_dialog.title: Change password
             reset_dialog.title: Reset password
-            prompt_password_reset_dialog.title: Prompt password reset
             reset_password.label: Reset password
-            prompt_password_reset.label: Prompt password reset
             change_password.label: Change password
             new_password.label: New password
             enter_new_password.label: Enter new password

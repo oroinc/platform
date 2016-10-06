@@ -81,43 +81,6 @@ class ResetController extends Controller
     }
 
     /**
-     * @Route("/send-email-as-admin/{id}", name="oro_user_reset_send_email_as_admin", requirements={"id"="\d+"})
-     * @AclAncestor("password_management")
-     * @Template("OroUserBundle:Reset/widget:sendEmailConfirmation.html.twig")
-     */
-    public function sendEmailAsAdminAction(User $user)
-    {
-        $params = [
-            'entity' => $user,
-        ];
-
-        if ($this->getRequest()->isMethod('POST')) {
-            if (null === $user->getConfirmationToken()) {
-                $user->setConfirmationToken($user->generateToken());
-            }
-
-            $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
-            try {
-                $this->get('oro_user.mailer.processor')->sendResetPasswordAsAdminEmail($user);
-            } catch (\Exception $e) {
-                $params['processed'] = false;
-                $params['error'] = $this->get('translator')->trans('oro.email.handler.unable_to_send_email');
-                return $params;
-            }
-            $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-            $this->get('oro_user.manager')->updateUser($user);
-            $params['processed'] = true;
-        } else {
-            $params['formAction'] = $this->get('router')->generate(
-                'oro_user_reset_send_email_as_admin',
-                ['id' => $user->getId()]
-            );
-        }
-
-        return $params;
-    }
-
-    /**
      * @Route(
      *     "/send-forced-password-reset-email/{id}",
      *     name="oro_user_send_forced_password_reset_email",
