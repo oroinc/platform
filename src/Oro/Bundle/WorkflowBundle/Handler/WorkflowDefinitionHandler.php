@@ -65,14 +65,20 @@ class WorkflowDefinitionHandler
         $em = $this->getEntityManager();
         $created = false;
 
-        $previousDefinition = WorkflowDefinitionCloner::cloneDefinition($workflowDefinition);
+        $previousDefinition = null;
 
         if ($newDefinition) {
+            if ($workflowDefinition->getName()) {
+                $previousDefinition = WorkflowDefinitionCloner::cloneDefinition($workflowDefinition);
+            }
+
             $workflowDefinition->import($newDefinition);
         } else {
             /** @var WorkflowDefinition $existingDefinition */
             $existingDefinition = $this->getEntityRepository()->find($workflowDefinition->getName());
             if ($existingDefinition) {
+                $previousDefinition = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
+
                 $workflowDefinition = $existingDefinition->import($workflowDefinition);
             } else {
                 $created = true;

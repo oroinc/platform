@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Handler\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
@@ -31,10 +33,10 @@ class WorkflowDefinitionCloner
     }
 
     /**
-     * @param ArrayCollection|WorkflowStep[] $steps
+     * @param Collection|WorkflowStep[] $steps
      * @return ArrayCollection
      */
-    private static function copySteps(ArrayCollection $steps)
+    private static function copySteps(Collection $steps)
     {
         $newSteps = new ArrayCollection();
         foreach ($steps as $step) {
