@@ -47,7 +47,6 @@ return array(
                 'is_unavailable_hidden' => true,
                 'acl_resource' => 'some_acl',
                 'acl_message' => 'Test ACL message',
-                'message' => 'Test message',
                 'transition_definition' => 'first_transition_definition',
                 'display_type' => 'page',
                 'frontend_options' => array(
@@ -118,7 +117,6 @@ return array(
                 'is_unavailable_hidden' => false,
                 'acl_resource' => null,
                 'acl_message' => null,
-                'message' => null,
                 'transition_definition' => 'second_transition_definition',
                 'display_type' => 'dialog',
                 'frontend_options' => array(

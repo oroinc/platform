@@ -125,7 +125,6 @@ return array(
                 'is_unavailable_hidden' => false,
                 'acl_resource' => null,
                 'acl_message' => null,
-                'message' => null,
                 'transition_definition' => 'second_transition_definition',
                 'display_type' => 'dialog',
                 'frontend_options' => array(
