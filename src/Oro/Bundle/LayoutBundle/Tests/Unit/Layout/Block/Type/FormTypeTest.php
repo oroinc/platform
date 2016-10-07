@@ -30,7 +30,7 @@ class FormTypeTest extends BlockTypeTestCase
             ->method('add')
             ->withConsecutive(
                 [
-                    'form_id_form_start',
+                    'form_id_start',
                     'form_id',
                     'form_start',
                     [
@@ -44,7 +44,7 @@ class FormTypeTest extends BlockTypeTestCase
                     ],
                 ],
                 [
-                    'form_id_form_fields',
+                    'form_id_fields',
                     'form_id',
                     'form_fields',
                     [
@@ -61,7 +61,7 @@ class FormTypeTest extends BlockTypeTestCase
                     ],
                 ],
                 [
-                    'form_id_form_end',
+                    'form_id_end',
                     'form_id',
                     'form_end',
                     [
