@@ -6,6 +6,8 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
+use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 
 class MenuUpdateData extends AbstractFixture
@@ -33,22 +35,16 @@ class MenuUpdateData extends AbstractFixture
 
         $updatesData = [
             [
-                'ownershipType' => MenuUpdate::OWNERSHIP_ORGANIZATION,
+                'ownershipType' => GlobalOwnershipProvider::TYPE,
                 'ownerId' => $this->getReference(self::ORGANIZATION)->getId(),
                 'key' => 'product',
                 'menu' => self::MENU,
             ],
             [
-                'ownershipType' => MenuUpdate::OWNERSHIP_USER,
+                'ownershipType' => UserOwnershipProvider::TYPE,
                 'ownerId' => $this->getReference(self::USER)->getId(),
                 'key' => 'lists',
                 'menu' => self::MENU,
-            ],
-            [
-                'ownershipType' => MenuUpdate::OWNERSHIP_USER,
-                'ownerId' => $this->getReference(self::USER)->getId(),
-                'key' => 'menu_item_other',
-                'menu' => self::OTHER_MENU,
             ],
         ];
         foreach ($updatesData as $updateData) {

@@ -24,6 +24,10 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
+        if ($this->securityFacade->getLoggedUser() === null) {
+            return;
+        }
+
         $manageMenusItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'menu_list_default');
         if ($manageMenusItem !== null && !$this->securityFacade->isGranted('oro_config_system')) {
             $manageMenusItem->setDisplay(false);

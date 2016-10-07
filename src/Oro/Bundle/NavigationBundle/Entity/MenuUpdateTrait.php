@@ -58,9 +58,9 @@ trait MenuUpdateTrait
     protected $menu;
 
     /**
-     * @var int
+     * @var string
      *
-     * @ORM\Column(name="ownership_type", type="integer")
+     * @ORM\Column(name="ownership_type", type="string")
      */
     protected $ownershipType;
 
@@ -222,7 +222,7 @@ trait MenuUpdateTrait
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getOwnershipType()
     {
@@ -230,7 +230,7 @@ trait MenuUpdateTrait
     }
 
     /**
-     * @param int $ownershipType
+     * @param string $ownershipType
      *
      * @return MenuUpdateInterface
      */

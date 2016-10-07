@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
@@ -21,9 +22,9 @@ abstract class AbstractMenuController extends Controller
     protected $manager;
 
     /**
-     * @return int
+     * @return OwnershipProviderInterface
      */
-    abstract protected function getOwnershipType();
+    abstract protected function getOwnershipProvider();
 
     /**
      * @return array
@@ -31,7 +32,7 @@ abstract class AbstractMenuController extends Controller
     public function indexAction()
     {
         return [
-            'ownershipType' => $this->getOwnershipType(),
+            'ownershipType' => $this->getOwnershipProvider()->getType(),
             'entityClass' => MenuUpdate::class
         ];
     }
@@ -57,8 +58,9 @@ abstract class AbstractMenuController extends Controller
      */
     public function createAction($menuName, $parentKey = null, $isDivider = false)
     {
+        $provider = $this->getOwnershipProvider();
         /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $this->getManager()->createMenuUpdate($this->getOwnershipType(), $this->getUser()->getId());
+        $menuUpdate = $this->getManager()->createMenuUpdate($provider->getType(), $provider->getId());
 
         if ($isDivider) {
             $menuUpdate->setDivider($isDivider);
@@ -119,7 +121,7 @@ abstract class AbstractMenuController extends Controller
         if (is_array($response)) {
             $treeHandler = $this->get('oro_navigation.tree.menu_update_tree_handler');
 
-            $response['ownershipType'] = $this->getOwnershipType();
+            $response['ownershipType'] = $this->getOwnershipProvider()->getType();
             $response['menuName'] = $menu->getName();
             $response['tree'] = $treeHandler->createTree($menu);
         }
@@ -136,17 +138,13 @@ abstract class AbstractMenuController extends Controller
      */
     protected function getMenuUpdate($menuName, $key, $isExist = false)
     {
-        if ($this->getOwnershipType() == MenuUpdate::OWNERSHIP_ORGANIZATION) {
-            $ownerId = $this->get('oro_security.security_facade')->getOrganization()->getId();
-        } else {
-            $ownerId = $this->get('oro_security.security_facade')->getLoggedUser()->getId();
-        }
+        $provider = $this->getOwnershipProvider();
 
         $menuUpdate = $this->getManager()->getMenuUpdateByKeyAndScope(
             $menuName,
             $key,
-            $this->getOwnershipType(),
-            $ownerId
+            $provider->getType(),
+            $provider->getId()
         );
 
         if ($isExist && !$menuUpdate->getKey()) {
@@ -167,7 +165,7 @@ abstract class AbstractMenuController extends Controller
     protected function getMenu($menuName)
     {
         $options = [
-            'ownershipType' => $this->getOwnershipType()
+            'ownershipType' => $this->getOwnershipProvider()->getType()
         ];
         $menu = $this->getManager()->getMenu($menuName, $options);
         if (!count($menu->getChildren())) {

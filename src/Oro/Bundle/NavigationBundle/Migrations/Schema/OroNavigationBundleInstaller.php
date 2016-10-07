@@ -152,7 +152,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('parent_key', 'string', ['length' => 100, 'notnull' => false]);
         $table->addColumn('uri', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('menu', 'string', ['length' => 100]);
-        $table->addColumn('ownership_type', 'integer');
+        $table->addColumn('ownership_type', 'string');
         $table->addColumn('owner_id', 'integer', ['notnull' => true]);
         $table->addColumn('is_active', 'boolean', []);
         $table->addColumn('is_divider', 'boolean', []);
