@@ -30,7 +30,7 @@ class AddImpersonationTable implements Migration
         $table->addColumn('token', 'string', ['length' => 255]);
         $table->addColumn('expire_at', 'datetime', []);
         $table->addColumn('login_at', 'datetime', ['notnull' => false]);
-        $table->addColumn('notify', 'boolean', ['notnull' => true, 'default' => true]);
+        $table->addColumn('notify', 'boolean', ['notnull' => true, 'default' => false]);
         $table->addIndex(['token'], 'token_idx', []);
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(

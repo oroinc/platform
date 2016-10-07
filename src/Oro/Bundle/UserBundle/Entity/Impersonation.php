@@ -40,7 +40,7 @@ class Impersonation
     /**
      * @var bool
      *
-     * @ORM\Column(type="boolean", nullable=false, options="{default=false}")
+     * @ORM\Column(type="boolean", nullable=false, options={"default": false})
      */
     protected $notify;
 
