@@ -79,6 +79,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
      * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $existingDefinition
      * @param WorkflowDefinition $newDefinition
+     * @param WorkflowDefinition $previousDefinition
      */
     public function testUpdateWorkflowDefinition(
         WorkflowDefinition $definition,
