@@ -31,6 +31,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     const SYNC_CODE_IN_PROCESS = 1;
     const SYNC_CODE_FAILURE    = 2;
     const SYNC_CODE_SUCCESS    = 3;
+    const SYNC_CODE_IN_PROCESS_FORCE = 4;
 
     const ID_OPTION = 'id';
 
@@ -289,7 +290,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         try {
-            if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
+            $inProcessCode = $settings->isForceMode() ? self::SYNC_CODE_IN_PROCESS_FORCE : self::SYNC_CODE_IN_PROCESS;
+            if ($this->changeOriginSyncState($origin, $inProcessCode)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
                 if ($settings) {
                     $processor->setSettings($settings);
@@ -402,7 +404,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
                 ->setParameter('synchronized', $synchronizedAt);
         }
 
-        if ($syncCode === self::SYNC_CODE_IN_PROCESS) {
+        if ($syncCode === self::SYNC_CODE_IN_PROCESS || $syncCode === self::SYNC_CODE_IN_PROCESS_FORCE) {
             $qb->andWhere('(o.syncCode IS NULL OR o.syncCode <> :code)');
         }
 
@@ -462,7 +464,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $query = $repo->createQueryBuilder('o')
             ->select(
                 'o'
-                . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
+                . ', CASE WHEN o.syncCode = :inProcess OR o.syncCode = :inProcessForce THEN 0 ELSE 1 END AS HIDDEN p1'
                 . ', (COALESCE(o.syncCode, 1000) * 30'
                 . ' + TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
                 . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
@@ -470,6 +472,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
+            ->setParameter('inProcessForce', self::SYNC_CODE_IN_PROCESS_FORCE)
             ->setParameter('success', self::SYNC_CODE_SUCCESS)
             ->setParameter('isActive', true)
             ->setParameter('now', $now)
@@ -482,7 +485,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $origins = $query->getResult();
         $result = null;
         foreach ($origins as $origin) {
-            if ($origin->getSyncCode() !== self::SYNC_CODE_IN_PROCESS) {
+            $syncCode = $origin->getSyncCode();
+            if ($syncCode !== self::SYNC_CODE_IN_PROCESS && $syncCode !== self::SYNC_CODE_IN_PROCESS_FORCE) {
                 $result = $origin;
                 break;
             }
