@@ -22,7 +22,6 @@ class DependencyInjectionUtil
         return $container->hasDefinition($serviceId) || $container->hasAlias($serviceId)
             ? $container->findDefinition($serviceId)
             : null;
-
     }
 
     /**

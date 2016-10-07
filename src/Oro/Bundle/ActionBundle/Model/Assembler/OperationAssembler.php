@@ -2,12 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
-use Doctrine\ORM\ORMException;
-
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
@@ -26,52 +23,38 @@ class OperationAssembler extends AbstractAssembler
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var array */
-    private $entityNames = [];
-
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
-     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
-        FormOptionsAssembler $formOptionsAssembler,
-        DoctrineHelper $doctrineHelper
+        FormOptionsAssembler $formOptionsAssembler
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
+     * @param string $name
      * @param array $configuration
-     * @return Operation[]
+     * @return Operation
      */
-    public function assemble(array $configuration)
+    public function createOperation($name, array $configuration)
     {
-        $operations = [];
-
-        foreach ($configuration as $operationName => $options) {
-            $operations[$operationName] = new Operation(
-                $this->actionFactory,
-                $this->conditionFactory,
-                $this->attributeAssembler,
-                $this->formOptionsAssembler,
-                $this->assembleDefinition($operationName, $options)
-            );
-        }
-
-        return $operations;
+        return new Operation(
+            $this->actionFactory,
+            $this->conditionFactory,
+            $this->attributeAssembler,
+            $this->formOptionsAssembler,
+            $this->assembleDefinition($name, $configuration)
+        );
     }
 
     /**
@@ -88,15 +71,6 @@ class OperationAssembler extends AbstractAssembler
             ->setName($operationName)
             ->setLabel($this->getOption($options, 'label'))
             ->setSubstituteOperation($this->getOption($options, 'substitute_operation', null))
-            ->setForAllEntities($this->getOption($options, 'for_all_entities', false))
-            ->setEntities($this->filterEntities($this->getOption($options, 'entities', [])))
-            ->setExcludeEntities($this->filterEntities($this->getOption($options, 'exclude_entities', [])))
-            ->setForAllDatagrids($this->getOption($options, 'for_all_datagrids', false))
-            ->setDatagrids($this->getOption($options, 'datagrids', []))
-            ->setExcludeDatagrids($this->getOption($options, 'exclude_datagrids', []))
-            ->setRoutes($this->getOption($options, 'routes', []))
-            ->setGroups($this->getOption($options, 'groups', []))
-            ->setApplications($this->getOption($options, 'applications', []))
             ->setEnabled($this->getOption($options, 'enabled', true))
             ->setOrder($this->getOption($options, 'order', 0))
             ->setFormType($this->getOption($options, 'form_type', OperationType::NAME))
@@ -159,36 +133,5 @@ class OperationAssembler extends AbstractAssembler
         $newDefinition['@and'][] = $featureResourceDefinition;
 
         $operationDefinition->setConditions(OperationDefinition::PRECONDITIONS, $newDefinition);
-    }
-
-    /**
-     * @param array $entities
-     * @return array
-     */
-    protected function filterEntities(array $entities)
-    {
-        return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
-    }
-
-    /**
-     * @param string $entityName
-     * @return string|bool
-     */
-    protected function getEntityClassName($entityName)
-    {
-        if (!array_key_exists($entityName, $this->entityNames)) {
-            $this->entityNames[$entityName] = null;
-
-            try {
-                $entityClass = $this->doctrineHelper->getEntityClass($entityName);
-
-                if (class_exists($entityClass, true)) {
-                    $this->entityNames[$entityName] = ltrim($entityClass, '\\');
-                }
-            } catch (ORMException $e) {
-            }
-        }
-
-        return $this->entityNames[$entityName];
     }
 }

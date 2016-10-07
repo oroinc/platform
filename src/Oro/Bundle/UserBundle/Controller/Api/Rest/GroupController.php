@@ -178,7 +178,6 @@ class GroupController extends RestController implements ClassResourceInterface
     public function getManager()
     {
         return $this->container->get('oro_user.group_manager.api');
-
     }
 
     /**

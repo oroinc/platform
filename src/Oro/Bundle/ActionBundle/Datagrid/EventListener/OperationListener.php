@@ -133,19 +133,14 @@ class OperationListener
     protected function getRowConfigurationClosure($actionConfiguration)
     {
         return function (ResultRecordInterface $record, array $config) use ($actionConfiguration) {
-            $actionsNew = [];
-            foreach ($this->operations as $operationName => $operation) {
-                $actionsNew[$operationName] = $this->getRowOperationConfig(
-                    $operation,
-                    $record->getValue('id')
-                );
-            }
-
             $configuration = $this->retrieveConfiguration($actionConfiguration, $record, $config);
 
-            foreach ($actionsNew as $name => $action) {
-                if (!array_key_exists($name, $configuration) || $configuration[$name] !== false) {
-                    $configuration[$name] = $action;
+            foreach ($this->operations as $operationName => $operation) {
+                if (!array_key_exists($operationName, $configuration) || $configuration[$operationName] !== false) {
+                    $configuration[$operationName] = $this->getRowOperationConfig(
+                        $operation,
+                        $record->getValue('id')
+                    );
                 }
             }
 
