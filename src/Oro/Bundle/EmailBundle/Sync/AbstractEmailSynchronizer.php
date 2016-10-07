@@ -55,7 +55,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     /** @var JobManager */
     private $jobManager;
 
-    /** @var  string */
+    /** @var string */
     protected $clearInterval = 'P1D';
 
     /**
