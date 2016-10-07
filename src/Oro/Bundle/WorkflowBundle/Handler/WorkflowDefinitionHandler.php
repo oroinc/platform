@@ -64,8 +64,7 @@ class WorkflowDefinitionHandler
         $em = $this->getEntityManager();
         $created = false;
 
-        $previousDefinition = new WorkflowDefinition();
-        $previousDefinition->import($workflowDefinition, true);
+        $previousDefinition = null;
 
         if ($newDefinition) {
             $workflowDefinition->import($newDefinition);
@@ -73,6 +72,8 @@ class WorkflowDefinitionHandler
             /** @var WorkflowDefinition $existingDefinition */
             $existingDefinition = $this->getEntityRepository()->find($workflowDefinition->getName());
             if ($existingDefinition) {
+                $previousDefinition = new WorkflowDefinition();
+                $previousDefinition->import($existingDefinition, true);
                 $workflowDefinition = $existingDefinition->import($workflowDefinition);
             } else {
                 $created = true;

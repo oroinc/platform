@@ -3,24 +3,21 @@
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Translation\KeySource\StepNameSource;
-use Oro\Bundle\WorkflowBundle\Translation\KeySource\TransitionNameSource;
-use Oro\Bundle\WorkflowBundle\Translation\KeySource\WorkflowNameSource;
+use Oro\Bundle\WorkflowBundle\Translation\KeySource\DynamicTranslationKeySource;
+use Oro\Bundle\WorkflowBundle\Translation\KeySource\TranslationKeySource;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class TranslationProcessor
 {
-    const WORKFLOWS_DOMAIN = 'workflows';
-
-    /** @var WorkflowManager */
-    private $workflowManager;
-
-    /** @var Translator */
-    private $translator;
+    /** @var TranslationHelper */
+    private $translationHelper;
 
     /** @var TranslationManager */
     private $translationManager;
@@ -28,41 +25,32 @@ class TranslationProcessor
     /** @var TranslationKeyGenerator */
     private $translationKeyGenerator;
 
-    /** @var string */
-    private $currentLocale = '';
-
     /**
-     * @param WorkflowManager $workflowManager
-     * @param Translator $translator
+     * @param TranslationHelper $translationHelper
      * @param TranslationManager $translationManager
      * @param TranslationKeyGenerator $translationKeyGenerator
      */
     public function __construct(
-        WorkflowManager $workflowManager,
-        Translator $translator,
+        TranslationHelper $translationHelper,
         TranslationManager $translationManager,
         TranslationKeyGenerator $translationKeyGenerator
     ) {
-        $this->workflowManager = $workflowManager;
-        $this->translator = $translator;
+        $this->translationHelper = $translationHelper;
         $this->translationManager = $translationManager;
         $this->translationKeyGenerator = $translationKeyGenerator;
     }
 
     /**
-     * @param WorkflowDefinition $actualDefinition
+     * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $previousDefinition
      */
-    public function process(WorkflowDefinition $actualDefinition = null, WorkflowDefinition $previousDefinition = null)
+    public function process(WorkflowDefinition $definition = null, WorkflowDefinition $previousDefinition = null)
     {
-        if (!$this->currentLocale) {
-            $this->currentLocale = $this->translator->getLocale();
+        if ($definition) {
+            $this->processUpdate($definition, $previousDefinition);
         }
-        if (null !== $actualDefinition) {
-            $this->processUpdate($actualDefinition, $previousDefinition);
-        }
-        if ((null === $actualDefinition && null !== $previousDefinition) ||
-            (null !== $actualDefinition && $actualDefinition->getName() !== $previousDefinition->getName())
+        if ((!$definition && $previousDefinition) ||
+            ($definition && $previousDefinition && $definition->getName() !== $previousDefinition->getName())
         ) {
             $this->processDelete($previousDefinition);
         }
@@ -74,15 +62,18 @@ class TranslationProcessor
      */
     private function processUpdate(WorkflowDefinition $actualDefinition, WorkflowDefinition $previousDefinition = null)
     {
-        $workflow = $this->workflowManager->getWorkflow($actualDefinition->getName());
-        $sourceWorkflowName = new WorkflowNameSource($workflow);
-        $key = $this->translationKeyGenerator->generate($sourceWorkflowName);
-        $this->translationManager
-            ->saveValue($key, $actualDefinition->getLabel(), self::WORKFLOWS_DOMAIN, $this->currentLocale);
+        $translationKeySource = new TranslationKeySource(
+            new WorkflowLabelTemplate(),
+            ['workflow_name' => $actualDefinition->getName()]
+        );
+        $key = $this->translationKeyGenerator->generate($translationKeySource);
+
+        $this->translationHelper->saveTranslation($key, $actualDefinition->getLabel());
         $actualDefinition->setLabel($key);
 
-        $this->updateSteps($workflow, $previousDefinition);
-        $this->updateTransitions($workflow, $previousDefinition);
+        $this->updateSteps($actualDefinition, $previousDefinition);
+        $this->updateTransitions($actualDefinition, $previousDefinition);
+        $this->updateAttributes($actualDefinition, $previousDefinition);
     }
 
     /**
@@ -90,106 +81,84 @@ class TranslationProcessor
      */
     private function processDelete(WorkflowDefinition $definition)
     {
-        // @todo: remove translation keys for this workflow
+        $translationKeySource = new TranslationKeySource(
+            new WorkflowTemplate(),
+            ['workflow_name' => $definition->getName()]
+        );
+        $keyPrefix = $this->translationKeyGenerator->generate($translationKeySource);
+        $this->translationManager->removeTranslationKeysByPrefix($keyPrefix, TranslationHelper::WORKFLOWS_DOMAIN);
     }
 
     /**
-     * @param Workflow $workflow
+     * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $previousDefinition
      */
-    private function updateSteps(Workflow $workflow, WorkflowDefinition $previousDefinition = null)
+    private function updateSteps(WorkflowDefinition $definition, WorkflowDefinition $previousDefinition = null)
     {
-        $definition = $workflow->getDefinition();
+        $template = new StepLabelTemplate();
+        $node = WorkflowConfiguration::NODE_STEPS;
+        $this->translationHelper->updateNode($definition, $previousDefinition, $template, $node, 'step_name');
+
+        // update WorkflowStep objects
         $configuration = $definition->getConfiguration();
-        if (!isset($configuration[WorkflowConfiguration::NODE_STEPS])) {
+        if (empty($configuration[$node])) {
             return;
         }
-        foreach ($configuration[WorkflowConfiguration::NODE_STEPS] as &$stepConfig) {
-            if (!isset($stepConfig['name'], $stepConfig['label'])) {
+        foreach ($configuration[$node] as $name => $stepConfig) {
+            if (empty($stepConfig['label'])) {
                 continue;
             }
-            $step = $definition->getStepByName($stepConfig['name']);
+            $step = $definition->getStepByName($name);
             if (!$step) {
                 continue;
             }
-            $key = $this->getStepKey($workflow, $stepConfig['name']);
-            $this->translationManager
-                ->saveValue($key, $stepConfig['label'], self::WORKFLOWS_DOMAIN, $this->currentLocale);
-            $step->setLabel($key);
-            $stepConfig['label'] = $key;
-        }
-        if (null !== $previousDefinition) {
-            $stepNames = array_column($configuration[WorkflowConfiguration::NODE_STEPS], 'name');
-            $stepNamesOld = isset($configurationOld[WorkflowConfiguration::NODE_STEPS])
-                ? array_column($configurationOld[WorkflowConfiguration::NODE_STEPS], 'name')
-                : [];
-            $removedStepNames = array_diff($stepNamesOld, $stepNames);
-            foreach ($removedStepNames as $stepName) {
-                $key = $this->getStepKey($workflow, $stepName);
-                $this->translationManager->removeTranslationKey($key, self::WORKFLOWS_DOMAIN);
-            }
-            $definition->setConfiguration($configuration);
+            $step->setLabel($stepConfig['label']);
         }
     }
 
     /**
-     * @param Workflow $workflow
+     * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $previousDefinition
      */
-    private function updateTransitions(Workflow $workflow, WorkflowDefinition $previousDefinition = null)
+    private function updateTransitions(WorkflowDefinition $definition, WorkflowDefinition $previousDefinition = null)
     {
-        $definition = $workflow->getDefinition();
+        $template = new TransitionLabelTemplate();
+        $node = WorkflowConfiguration::NODE_TRANSITIONS;
+        $this->translationHelper->updateNode($definition, $previousDefinition, $template, $node, 'transition_name');
         $configuration = $definition->getConfiguration();
-        if (!isset($configuration[WorkflowConfiguration::NODE_TRANSITIONS])) {
+        if (empty($configuration[$node])) {
             return;
         }
-        foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as &$transitionConfig) {
-            if (!isset($transitionConfig['name'], $transitionConfig['label'])) {
+
+        $translationKeySource = new DynamicTranslationKeySource([
+            'workflow_name' => $definition->getName()
+        ]);
+        $templateMessage = new TransitionWarningMessageTemplate();
+
+        foreach ($configuration[$node] as $name => &$transitionConfig) {
+            if (!array_key_exists('message', $transitionConfig)) {
                 continue;
             }
-            $key = $this->getTransitionKey($workflow, $transitionConfig['name']);
-            $this->translationManager
-                ->saveValue($key, $transitionConfig['label'], self::WORKFLOWS_DOMAIN, $this->currentLocale);
-            $transitionConfig['label'] = $key;
+            // process transition message
+            $messageKey = $this->translationHelper->generateKey(
+                $translationKeySource,
+                $templateMessage,
+                ['transition_name' => $name, 'warning_message' => $transitionConfig['message']]
+            );
+            $this->translationHelper->saveTranslation($messageKey, $transitionConfig['message']);
         }
-        if (null !== $previousDefinition) {
-            $configurationOld = $previousDefinition->getConfiguration();
-            $transitionNames = array_column($configuration[WorkflowConfiguration::NODE_TRANSITIONS], 'name');
-            $transitionNamesOld = isset($configurationOld[WorkflowConfiguration::NODE_TRANSITIONS])
-                ? array_column($configurationOld[WorkflowConfiguration::NODE_TRANSITIONS], 'name')
-                : [];
-            $removedTransitionNames = array_diff($transitionNamesOld, $transitionNames);
-            foreach ($removedTransitionNames as $transitionName) {
-                $key = $this->getTransitionKey($workflow, $transitionName);
-                $this->translationManager->removeTranslationKey($key, self::WORKFLOWS_DOMAIN);
-            }
-            $definition->setConfiguration($configuration);
-        }
+
+        $definition->setConfiguration($configuration);
     }
 
     /**
-     * @param Workflow $workflow
-     * @param string $stepName
-     *
-     * @return string
+     * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition|null $previousDefinition
      */
-    private function getStepKey(Workflow $workflow, $stepName)
+    private function updateAttributes(WorkflowDefinition $definition, WorkflowDefinition $previousDefinition = null)
     {
-        $sourceStepName = new StepNameSource($workflow, ['step_name' => $stepName]);
-
-        return $this->translationKeyGenerator->generate($sourceStepName);
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param string $transitionName
-     *
-     * @return string
-     */
-    private function getTransitionKey(Workflow $workflow, $transitionName)
-    {
-        $sourceTransitionName = new TransitionNameSource($workflow, ['transition_name' => $transitionName]);
-
-        return $this->translationKeyGenerator->generate($sourceTransitionName);
+        $template = new AttributeLabelTemplate();
+        $node = WorkflowConfiguration::NODE_ATTRIBUTES;
+        $this->translationHelper->updateNode($definition, $previousDefinition, $template, $node, 'attribute_name');
     }
 }

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
@@ -130,6 +130,21 @@ class TranslationManager
         if ($translationKey) {
             $this->getEntityManager(TranslationKey::class)->remove($translationKey);
         }
+    }
+
+    /**
+     * @param string $keysPrefix
+     * @param string $domain
+     */
+    public function removeTranslationKeysByPrefix($keysPrefix, $domain)
+    {
+        $queryBuilder = $this->getEntityRepository(TranslationKey::class)->createQueryBuilder('tk');
+        $queryBuilder->delete()
+            ->where('domain = :domain')
+            ->andWhere($queryBuilder->expr()->like('tk.key', ':keysPrefix%'))
+            ->setParameters(['domain' => $domain,  'keysPrefix' => $keysPrefix])
+            ->getQuery()
+            ->execute();
     }
 
     /**
@@ -269,7 +284,7 @@ class TranslationManager
     /**
      * @param string $class
      *
-     * @return ObjectRepository
+     * @return EntityRepository
      */
     protected function getEntityRepository($class)
     {

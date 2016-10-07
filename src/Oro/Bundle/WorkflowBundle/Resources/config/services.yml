@@ -319,11 +319,19 @@ services:
         class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
         public: false
 
+    oro_workflow.translation.helper:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationHelper'
+        public: false
+        arguments:
+            - '@translator.default'
+            - '@oro_translation.manager.translation'
+            - '@oro_workflow.generator.translation_key'
+
+
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         public: false
-
-    oro_workflow.generator.translation_key:
-        class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
-        public: false
-
+        arguments:
+            - '@oro_workflow.translation.helper'
+            - '@oro_translation.manager.translation'
+            - '@oro_workflow.generator.translation_key'
