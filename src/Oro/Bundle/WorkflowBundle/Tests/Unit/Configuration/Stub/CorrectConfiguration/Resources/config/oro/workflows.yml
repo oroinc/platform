@@ -1,6 +1,5 @@
 workflows:
     first_workflow:
-        label: 'First Workflow'
         is_system: true
         entity: First\Entity
         start_step: first_step
@@ -15,7 +14,6 @@ workflows:
             - 'record_group1'
         steps:
             first_step:
-                label: 'First Step'
                 order: 1
                 is_final: true
                 entity_acl:
@@ -25,12 +23,10 @@ workflows:
                     - first_transition
         attributes:
             first_attribute:
-                label: 'First Attribute'
                 type: object
                 options:
                     class: DateTime
             second_attribute:
-                label: 'Second Attribute'
                 type: entity
                 property_path: first_attribute.test
                 entity_acl:
@@ -39,7 +35,6 @@ workflows:
                     class: DateTime
         transitions:
             first_transition:
-                label: 'First Transition'
                 step_to: first_step
                 is_start: true
                 is_hidden: true
@@ -103,7 +98,6 @@ workflows:
                 post_actions:
                     - '@custom_action': ~
     second_workflow:
-        label: 'Second Workflow'
         entity: Second\Entity
         start_step: second_step
         steps:
@@ -117,7 +111,6 @@ workflows:
         transitions:
             -
                 name: second_transition
-                label: 'Second Transition'
                 step_to: second_step
                 transition_definition: second_transition_definition
                 frontend_options:
