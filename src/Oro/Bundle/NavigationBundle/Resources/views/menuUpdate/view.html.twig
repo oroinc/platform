@@ -5,31 +5,45 @@
 {% from _self import resetButton %}
 
 {% block content %}
-    <div class="layout-content"
-            {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}
-    >
+    <div class="layout-content"{% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         <div class="container-fluid page-title">
             <div class="navigation clearfix navbar-extra navbar-extra-right">
                 <div class="row">
                     {% set actionButtons %}
                         <div class="pull-right">
-                            <div class="pull-right title-buttons-container">
-                                {{ UI.button({
-                                    'path' : path(routePrefix ~ 'create', { 'menuName': menuName }),
-                                    'iCss': 'icon-folder-close',
-                                    'aCss': 'btn-primary',
-                                    'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
-                                    'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
-                                }) }}
+                            {{ resetButton({
+                                'dataUrl': path('oro_api_reset_menuupdates', {menuName: menuName, ownershipType: ownershipType}),
+                                'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
+                                'menuKey': menuName
+                            }) }}
 
-                                {{ UI.buttonSeparator() }}
+                            {{ UI.buttonSeparator() }}
 
-                                {{ resetButton({
-                                    'dataUrl': path('oro_api_reset_menuupdates', {menuName: menuName, ownershipType: ownershipType}),
-                                    'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
-                                    'menuKey': menuName
-                                }) }}
-                            </div>
+                            {% set html = UI.button({
+                                'path' : path(routePrefix ~ 'create', { 'menuName': menuName }),
+                                'aCss': 'btn-primary',
+                                'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
+                                'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
+                            }) %}
+
+                            {% set html = html ~ UI.button({
+                                'path' : path(routePrefix ~ 'create_divider', {menuName: menuName}),
+                                'aCss': 'btn-primary',
+                                'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+                                'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans})
+                            }) %}
+
+                            {% set parameters = {
+                                'html': html,
+                                'groupKey': 'createButtons',
+                                'options': {
+                                    'moreButtonAttrs': {
+                                        'class': 'btn-primary'
+                                    }
+                                }
+                            } %}
+
+                            {{ UI.pinnedDropdownButton(parameters) }}
                         </div>
                     {% endset %}
                     {%  if not isMobileVersion() %}

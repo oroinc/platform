@@ -56,12 +56,27 @@ class UserMenuController extends AbstractMenuController
      *
      * @param string $menuName
      * @param string|null $parentKey
+     * @param bool $isDivider
      *
      * @return array|RedirectResponse
      */
-    public function createAction($menuName, $parentKey = null)
+    public function createAction($menuName, $parentKey = null, $isDivider = false)
     {
-        return parent::createAction($menuName, $parentKey);
+        return parent::createAction($menuName, $parentKey, $isDivider);
+    }
+
+    /**
+     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_user_menu_create_divider")
+     * @Template("OroNavigationBundle:UserMenu:update.html.twig")
+     *
+     * @param string $menuName
+     * @param string $parentKey
+     *
+     * @return RedirectResponse
+     */
+    public function createDividerAction($menuName, $parentKey = null)
+    {
+        return $this->createAction($menuName, $parentKey, true);
     }
 
     /**

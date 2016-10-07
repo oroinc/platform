@@ -50,6 +50,7 @@ oro:
             select_existing_or_create_new: Select existing menu item or create new.
             roots_plural_label: Menus
             edit_menus: Edit Menus
+            divider: Divider
         action:
             manage_menus:
                 label: Manage Menus

@@ -91,6 +91,13 @@ trait MenuUpdateTrait
     protected $existsInNavigationYml = false;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_divider", type="boolean")
+     */
+    protected $divider = false;
+
+    /**
      * @return int
      */
     public function getId()
@@ -310,6 +317,26 @@ trait MenuUpdateTrait
     public function setExistsInNavigationYml($existsInNavigationYml)
     {
         $this->existsInNavigationYml = $existsInNavigationYml;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDivider()
+    {
+        return $this->divider;
+    }
+
+    /**
+     * @param boolean $divider
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setDivider($divider)
+    {
+        $this->divider = $divider;
 
         return $this;
     }

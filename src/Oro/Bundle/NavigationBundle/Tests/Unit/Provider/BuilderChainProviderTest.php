@@ -2,6 +2,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Knp\Menu\FactoryInterface;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
@@ -84,10 +85,13 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet($alias, $menuName)
     {
-        $options = array();
+        $options = [];
 
-        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
+        $item = new MenuItemStub();
+        $item->setExtra('divider', true);
+
+        $menu = new MenuItemStub();
+        $menu->addChild($item);
 
         $this->factory->expects($this->once())
             ->method('createItem')
@@ -111,6 +115,7 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Knp\Menu\ItemInterface', $this->provider->get($menuName, $options));
 
         $this->assertAttributeCount(1, 'menus', $this->provider);
+        $this->assertEquals('divider', $item->getAttribute('class'));
     }
 
     public function testGetCached()
@@ -239,13 +244,18 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $child = $this->getMockBuilder('Knp\Menu\ItemInterface')
             ->getMock();
-        $child->expects($this->once())
+        $child->expects($this->exactly(2))
             ->method('getExtra')
-            ->with('position')
-            ->will($this->returnValue($position));
+            ->will($this->returnValueMap([
+                ['position', null, $position],
+                ['divider', false, false]
+            ]));
         $child->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));
+        $child->expects($this->once())
+            ->method('getChildren')
+            ->will($this->returnValue([]));
 
         return $child;
     }

@@ -17,9 +17,10 @@ class MenuUpdateTest extends \PHPUnit_Framework_TestCase
         $update = new MenuUpdate();
         $update->setPriority($priority);
         $update->setExistsInNavigationYml(true);
+        $update->setDivider(true);
 
         $this->assertEquals(
-            ['position' => $priority, 'existsInNavigationYml' => true],
+            ['position' => $priority, 'existsInNavigationYml' => true, 'divider' => true],
             $update->getExtras()
         );
     }

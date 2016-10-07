@@ -26,6 +26,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedUpdate->setParentKey('item-1-1');
         $expectedUpdate->setMenu('menu');
         $expectedUpdate->setDefaultTitle('item-1-1-1');
+        $expectedUpdate->setExistsInNavigationYml(true);
 
         MenuUpdateUtils::updateMenuUpdate($update, $item, 'menu');
         $this->assertEquals($expectedUpdate, $update);
