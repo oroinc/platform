@@ -67,7 +67,7 @@ class Grid extends Element
     public function getRowByContent($content)
     {
         $gridRow = $this->findElementContains('GridRow', $content);
-        self::assertNotNull($gridRow, sprintf('Grid has no record with "%s" content', $content));
+        self::assertTrue($gridRow->isValid(), sprintf('Grid has no record with "%s" content', $content));
 
         return $gridRow;
     }
