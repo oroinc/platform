@@ -290,7 +290,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         try {
-            $inProcessCode = $settings->isForceMode() ? self::SYNC_CODE_IN_PROCESS_FORCE : self::SYNC_CODE_IN_PROCESS;
+            $inProcessCode = $settings && $settings->isForceMode()
+                ? self::SYNC_CODE_IN_PROCESS_FORCE : self::SYNC_CODE_IN_PROCESS;
             if ($this->changeOriginSyncState($origin, $inProcessCode)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
                 if ($settings) {
