@@ -418,7 +418,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('select')
             ->with(
                 'o'
-                . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
+                . ', CASE WHEN o.syncCode = :inProcess OR o.syncCode = :inProcessForce THEN 0 ELSE 1 END AS HIDDEN p1'
                 . ', (COALESCE(o.syncCode, 1000) * 30'
                 . ' + TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
                 . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
@@ -435,6 +435,10 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->at($index++))
             ->method('setParameter')
             ->with('inProcess', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS)
+            ->will($this->returnValue($qb));
+        $qb->expects($this->at($index++))
+            ->method('setParameter')
+            ->with('inProcessForce', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS_FORCE)
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
             ->method('setParameter')
