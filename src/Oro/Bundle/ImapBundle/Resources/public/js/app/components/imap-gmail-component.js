@@ -86,7 +86,14 @@ define(function(require) {
                     }, _.bind(this.handleResponseGoogleAuthCode, this)
                 ).then(
                     null,
-                    function() {
+                    function(reason) {
+                        if (null === reason) {
+                            // do not show the flash message if there is not rejection reason
+                            // usually this happens when all goes ok and the callback function is called,
+                            // so, any problems are handled by this callback (see handleResponseGoogleAuthCode)
+                            // e.g. we do not need the flash message if an user clicks "Deny" button
+                            return;
+                        }
                         mediator.execute(
                             'showFlashMessage',
                             'error',
@@ -163,6 +170,17 @@ define(function(require) {
                 this.view.setErrorMessage(response.error);
                 this.view.render();
                 mediator.execute('hideLoading');
+            } else if (response.code !== undefined && response.code >= 400) {
+                this.view.setErrorMessage(response.message || __('oro.imap.connection.google.oauth.error.request'));
+                this.view.render();
+                mediator.execute('hideLoading');
+                if (response.code === 401) {
+                    mediator.execute(
+                        'showFlashMessage',
+                        'error',
+                        __('oro.imap.connection.google.oauth.error.closed_auth')
+                    );
+                }
             } else if (response) {
                 this.view.setEmail(response.email_address);
                 this.view.setAccessToken(response.access_token);

@@ -292,7 +292,6 @@ class SearchHandler implements SearchHandlerInterface
             $keys = array_map(
                 function ($key) {
                     return sprintf('[%s]', $key);
-
                 },
                 explode('.', $propertyPath)
             );

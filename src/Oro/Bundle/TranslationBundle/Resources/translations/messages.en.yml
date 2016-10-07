@@ -1,6 +1,9 @@
 oro.translation:
     download:
         error: 'Error while downloading package'
+        
+    context:
+        ui_label: 'UI Label'
 
     action:
         disable: 'Disable'
@@ -8,12 +11,13 @@ oro.translation:
         download: 'Download'
         install: 'Install'
         update: 'Update'
-        import: 'Import'
-        export: 'Export'
+        import: 'Upload Translation File'
+        export: 'Download Translation File'
         add: 'Add Language'
         translation_completeness.label: 'Translation Completeness:'
         install.title: 'Install "%language%" language'
         update.title: 'Update "%language%" language'
+        rebuild_cache.label: 'Update Cache'
 
     language:
         entity_label: 'Language'
@@ -31,7 +35,8 @@ oro.translation:
         translation_status:
             label: 'Updates'
             up_to_date: 'Up to date'
-            update_needed: 'Update is available'
+            update_available: 'Update is available'
+            install_available: 'Can be installed'
         translation_completeness.label: 'Translation Completeness'
 
         message:
@@ -44,9 +49,33 @@ oro.translation:
         error:
             install: 'Language not installed'
             update: 'Language not updated'
+        permission:
+            translate:
+                label: Translate
+    translation:
+        entity_label: 'Translation'
+        entity_plural_label: 'Translations'
+
+        id.label: 'Id'
+        language.label: 'Language'
+        value.label: 'Translated Value'
+        original_value.label: 'Original Value'
+        context.label: 'Context'
+        status.label: 'Translated'
+        message:
+            rebuild_cache: 'Translation Cache has been updated'
+
+    translation_key:
+        entity_label: 'Translation Key'
+        entity_plural_label: 'Translation Keys'
+
+        id.label: 'Id'
+        key.label: 'Key'
+        domain.label: 'Domain'
 
     menu:
         languages.label: Languages
+        translations.label: Translations
 
     form:
         tooltip:

@@ -76,7 +76,6 @@ class NavigationListener
                     'extras'         => ['position' => '110'],
                 ]
             );
-
         }
     }
 }

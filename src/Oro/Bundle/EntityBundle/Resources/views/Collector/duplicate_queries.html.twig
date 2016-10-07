@@ -1,4 +1,4 @@
-{% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
     {% if collector.identicalQueriesCount > 0 or collector.similarQueriesCount > 0 %}

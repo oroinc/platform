@@ -68,7 +68,6 @@ class TagImportManager
                     $tags[] = $loadedTag;
                 }
             }
-
         }
 
         return $tags;

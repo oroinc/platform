@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\ImportExport\Strategy;
 
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class TranslationImportStrategy extends ConfigurableAddOrReplaceStrategy
@@ -13,13 +14,19 @@ class TranslationImportStrategy extends ConfigurableAddOrReplaceStrategy
      */
     protected function findExistingEntity($entity, array $searchContext = [])
     {
-        return $this->databaseHelper->findOneBy(
-            Translation::class,
-            [
-               'locale' => $entity->getLocale(),
-               'domain' => $entity->getDomain(),
-               'key' => $entity->getKey(),
-            ]
-        );
+        return $this->getTranslationRepository()
+            ->findValue(
+                $entity->getTranslationKey()->getKey(),
+                $entity->getLanguage()->getCode(),
+                $entity->getTranslationKey()->getDomain()
+            );
+    }
+
+    /**
+     * @return TranslationRepository
+     */
+    protected function getTranslationRepository()
+    {
+        return $this->doctrineHelper->getEntityRepositoryForClass(Translation::class);
     }
 }
