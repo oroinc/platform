@@ -100,13 +100,13 @@ class ServiceExistsTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $contextAccessor->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue('oro_rfp.form.type.extension.frontend_request_data_storage'));
+            ->will($this->returnValue('oro_bundle.service'));
 
         $this->serviceExists->initialize([$this->propertyPath])->setContextAccessor($contextAccessor);
 
         $this->assertEquals(
             $expected,
-            $this->serviceExists->evaluate('oro_rfp.form.type.extension.frontend_request_data_storage')
+            $this->serviceExists->evaluate('oro_bundle.service')
         );
     }
 

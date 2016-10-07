@@ -42,9 +42,9 @@ class RouteExists extends AbstractCondition implements ContextAccessorAwareInter
      */
     protected function isConditionAllowed($context)
     {
-        $serviceName = $this->resolveValue($context, $this->propertyPath);
+        $routeName = $this->resolveValue($context, $this->propertyPath);
 
-        return $this->router->getRouteCollection()->get($serviceName) !== null;
+        return $this->router->getRouteCollection()->get($routeName) !== null;
     }
 
     /**

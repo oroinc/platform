@@ -112,11 +112,11 @@ class RouteExistsTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $contextAccessor->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue('oro_rfp_frontend_request_create'));
+            ->will($this->returnValue('oro_bundle_route'));
 
         $this->routeExists->initialize([$this->propertyPath])->setContextAccessor($contextAccessor);
 
-        $this->assertEquals($expected, $this->routeExists->evaluate('oro_rfp_frontend_request_create'));
+        $this->assertEquals($expected, $this->routeExists->evaluate('oro_bundle_route'));
     }
 
     /**

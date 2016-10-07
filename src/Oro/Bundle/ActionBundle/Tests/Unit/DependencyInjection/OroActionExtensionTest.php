@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 use Oro\Bundle\ActionBundle\DependencyInjection\OroActionExtension;
 
-class OroShoppingListExtensionTest extends ExtensionTestCase
+class OroActionExtensionTest extends ExtensionTestCase
 {
     /**
      * @var array
