@@ -21,16 +21,5 @@ class OroShoppingListExtensionTest extends ExtensionTestCase
             'oro_action.condition.service_exists',
         ];
         $this->assertDefinitionsLoaded($expectedDefinitions);
-
-        $this->assertExtensionConfigsLoaded([OroActionExtension::ALIAS]);
-    }
-
-    /**
-     * Test Get Alias
-     */
-    public function testGetAlias()
-    {
-        $extension = new OroActionExtension();
-        $this->assertEquals(OroActionExtension::ALIAS, $extension->getAlias());
     }
 }
