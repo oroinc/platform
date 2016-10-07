@@ -1,0 +1,4 @@
+elements:
+  ImportFileField:
+    selector: "input[id^='oro_importexport_import_file']"
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
