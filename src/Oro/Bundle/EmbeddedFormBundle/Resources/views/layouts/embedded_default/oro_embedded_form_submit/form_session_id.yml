@@ -6,8 +6,11 @@ layout:
             blockType: input
             options:
                 type:  hidden
-                name:  '=data["embedded_form_session_id_field_name"]'
-                value: '=data["embedded_form_session_id"]'
+                name:  { '@value': $data.embedded_form_session_id_field_name }
+                value: { '@value': $data.embedded_form_session_id }
 
-    conditions: 'context["embedded_form"] !== null'
+    conditions:
+        '@neq':
+            - ~
+            - $context.embedded_form
 
