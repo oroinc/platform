@@ -100,14 +100,13 @@ class SendEmail extends AbstractSendEmail
                 $emailModel,
                 $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
             );
-        }
-        catch (\Swift_SwiftException $exception) {
+        } catch (\Swift_SwiftException $exception) {
             if (null !== $this->logger) {
-                $this->logger->error('Workflow send email action.' , ['exception' => $exception]);
+                $this->logger->error('Workflow send email action.', ['exception' => $exception]);
             }
         }
 
-        if (array_key_exists('attribute', $this->options) && $emailUser instanceOf EmailUser) {
+        if (array_key_exists('attribute', $this->options) && $emailUser instanceof EmailUser) {
             $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
         }
     }
