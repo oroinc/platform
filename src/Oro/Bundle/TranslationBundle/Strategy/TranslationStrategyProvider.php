@@ -44,7 +44,7 @@ class TranslationStrategyProvider
 
         $fallback = $this->findPathToLocale($fallbackTree, $locale);
         if (!$fallback) {
-            return [];
+            return $locale !== 'en' ? ['en'] : [];
         }
 
         // remove current locale

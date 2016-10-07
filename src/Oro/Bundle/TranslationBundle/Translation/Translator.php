@@ -269,10 +269,19 @@ class Translator extends BaseTranslator
      */
     protected function registerDynamicResources()
     {
+        $enLocale = isset($this->catalogues['en']) ? $this->catalogues['en'] : null;
+
         foreach ($this->dynamicResources as $items) {
-            foreach ($items as $item) {
-                $this->addResource($item['format'], $item['resource'], $item['locale'], $item['domain']);
+            if (!$enLocale) {
+                foreach ($items as $item) {
+                    $this->addResource($item['format'], $item['resource'], $item['locale'], $item['domain']);
+                }
             }
+        }
+
+        //prevents permanent English language load (English is default fallback language)
+        if ($enLocale && !isset($this->catalogues['en'])) {
+            $this->catalogues['en'] = $enLocale;
         }
     }
 
