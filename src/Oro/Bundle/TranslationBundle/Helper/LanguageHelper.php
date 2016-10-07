@@ -92,9 +92,6 @@ class LanguageHelper
     {
         $stats = $this->getStatistic();
 
-        // TODO: should be fixed in https://magecore.atlassian.net/browse/BAP-10608
-        $stats['en'] = ['translationStatus' => 100];
-
         return isset($stats[$language->getCode()]) ? (int)$stats[$language->getCode()]['translationStatus'] : null;
     }
 

@@ -1,6 +1,7 @@
 operations:
-    oro_translation_add_language:
+    oro_translation_language_add:
         label: oro.translation.action.add
+        acl_resource: oro_translation_language_create
         applications: [default]
         routes:
             - oro_translation_language_index
@@ -8,10 +9,10 @@ operations:
             icon: icon-plus
         frontend_options:
             options:
-                height: 50
+                width: 375
+                height: 125
+                minHeight: 125
                 okText: oro.translation.action.add
-        acl_resource: ['CREATE', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
-
         attributes:
             language_code:
                 label: oro.translation.language.entity_label
@@ -34,15 +35,15 @@ operations:
                 type: 'success'
             - '@refresh_grid': oro-translation-language-grid
 
-    oro_translation_disable_language:
+    oro_translation_language_disable:
         label: oro.translation.action.disable
+        acl_resource: [EDIT, $.data]
         applications: [default]
         datagrids:
             - oro-translation-language-grid
         order: 10
         button_options:
             icon: icon-remove
-        acl_resource: [EDIT, $.data]
         preactions:
             - '@call_service_method':
                 service: oro_translation.helper.language
@@ -65,15 +66,15 @@ operations:
                 type: 'success'
             - '@refresh_grid': oro-translation-language-grid
 
-    oro_translation_enable_language:
+    oro_translation_language_enable:
         label: oro.translation.action.enable
+        acl_resource: [EDIT, $.data]
         applications: [default]
         datagrids:
             - oro-translation-language-grid
         order: 10
         button_options:
             icon: icon-ok
-        acl_resource: [EDIT, $.data]
         preconditions:
             '@equal': [$enabled, false]
         actions:
@@ -88,9 +89,10 @@ operations:
             - '@refresh_grid': oro-translation-language-grid
 
     oro_translation_language_import:
+        label: oro.translation.action.import
+        acl_resource: [TRANSLATE, $.data]
         datagrids:
             - oro-translation-language-grid
-        label: oro.translation.action.import
         order: 20
         datagrid_options:
             data:
@@ -99,7 +101,7 @@ operations:
                 importProcessor: 'oro_translation_translation'
                 importJob: 'language_translations_import_from_csv'
         button_options:
-            icon: download-alt
+            icon: upload-alt
             data:
                 options:
                     refreshPageOnSuccess: $.isDefaultLanguage
@@ -107,6 +109,8 @@ operations:
                     datagridName: ~
                     routeOptions:
                         language_code: $code
+        preconditions:
+            @acl: oro_importexport_import
         preactions:
             - '@call_service_method':
                 service: oro_translation.helper.language
@@ -126,6 +130,7 @@ operations:
                     entityName: $.entityLabel
 
     oro_translation_language_export:
+        acl_resource: [TRANSLATE, $.data]
         datagrids:
             - oro-translation-language-grid
         label: oro.translation.action.export
@@ -137,12 +142,14 @@ operations:
                 exportProcessor: 'oro_translation_translation'
                 exportJob: 'language_translations_export_to_csv'
         button_options:
-            icon: upload-alt
+            icon: download-alt
             data:
                 options:
                     filePrefix: $.filePrefix
                     routeOptions:
                         language_code: $code
+        preconditions:
+            @acl: oro_importexport_export
         preactions:
             - '@format_string':
                 attribute: $.filePrefix
@@ -152,11 +159,12 @@ operations:
 
     oro_translation_language_load_base:
         label: oro.translation.action.install
-        acl_resource: [EDIT, $.data]
+        acl_resource: [TRANSLATE, $.data]
         frontend_options:
             template: 'OroTranslationBundle:Operation:loadLanguage.html.twig'
             options:
-                height: 100
+                height: 80
+                minHeight: 80
             title_parameters:
                 '%%language%%': $.languageName
         button_options:
@@ -273,6 +281,26 @@ operations:
         preconditions:
             '@equal': [$.isAvailableUpdate, true]
 
+    oro_translation_rebuild_cache:
+        label: oro.translation.action.rebuild_cache.label
+        applications: [default]
+        routes:
+            - oro_translation_translation_index
+        button_options:
+            icon: icon-refresh
+            class: btn-danger icons-holder-text
+        acl_resource: oro_translation_language_translate
+        actions:
+            - '@call_service_method':
+                service: oro_translation.manager.translation
+                method: rebuildCache
+            - '@call_service_method':
+                service: oro_translation.js_dumper
+                method: dumpTranslations
+            - '@flash_message':
+                message: oro.translation.translation.message.rebuild_cache
+                type: 'success'
+
 action_groups:
     oro_translation_language_set_enabled:
         parameters:
@@ -293,7 +321,7 @@ action_groups:
                 type: string
             fileDir:
                 type: string
-        acl_resource: ['EDIT', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
+        acl_resource: oro_translation_translation_update
         conditions:
             '@not_empty': [$.fileDir]
         actions:
@@ -309,7 +337,7 @@ action_groups:
                 type: string
             date:
                 type: datetime
-        acl_resource: ['EDIT', 'entity:Oro\Bundle\TranslationBundle\Entity\Language']
+        acl_resource: oro_translation_translation_update
         actions:
             - '@find_entity':
                 class: 'Oro\Bundle\TranslationBundle\Entity\Language'
