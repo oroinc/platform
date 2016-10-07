@@ -41,8 +41,15 @@ define(['jquery'], function($) {
             var $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
             var $autoFocus = $input.filter('[autofocus]');
-            if ($autoFocus.length || $input.length) {
+            if ($autoFocus.length || $input.length && inViewport($input)) {
                 ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+            }
+
+            function inViewport($el) {
+                var elementHeight = $el.height();
+                var elementScrollTop = $el.offset().top;
+                var windowHeight = $(window).height();
+                return (elementScrollTop - elementHeight) < windowHeight;
             }
         },
 
