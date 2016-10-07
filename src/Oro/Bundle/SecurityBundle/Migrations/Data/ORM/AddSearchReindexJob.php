@@ -2,18 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Migrations\Data\ORM;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
@@ -53,32 +49,23 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
             return;
         }
 
-        $searchObjectMapper = $this->getSearchMapper();
-
-        $this->getProducer()->send(Topics::REINDEX, $searchObjectMapper->getEntities());
-    }
-
-    /**
-     * @return ObjectMapper
-     */
-    private function getSearchMapper()
-    {
-        return $this->container->get('oro_search.mapper');
+        // sync reindex as this is a fixture
+        $this->getSearchIndexer()->reindex();
     }
 
     /**
      * @return Indexer
      */
-    private function getIndexer()
+    protected function getIndexer()
     {
         return $this->container->get('oro_search.index');
     }
 
     /**
-     * @return MessageProducerInterface
+     * @return IndexerInterface
      */
-    private function getProducer()
+    protected function getSearchIndexer()
     {
-        return $this->container->get('oro_message_queue.client.message_producer');
+        return $this->container->get('oro_search.async.indexer');
     }
 }
