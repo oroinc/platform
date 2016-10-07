@@ -35,7 +35,7 @@
             <button class="btn dropdown-toggle" data-toggle="dropdown">
                 <%- selectedChoiceLabel %><span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" data-role-type>
                 <% _.each(choices, function (option) { %>
                     <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
                         <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
@@ -57,7 +57,7 @@
             <button class="btn dropdown-toggle" data-toggle="dropdown">
                 <%- selectedChoiceLabel %><span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" data-role-type>
                 <% _.each(choices, function (option) { %>
                     <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
                         <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
@@ -87,7 +87,7 @@
             <button class="btn dropdown-toggle" data-toggle="dropdown">
                 <%- selectedChoiceLabel %><span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" data-role="type">
                 <% _.each(choices, function (option) { %>
                     <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
                         <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
@@ -210,7 +210,7 @@
             <button class="btn dropdown-toggle" data-toggle="dropdown">
                 <%- selectedChoiceLabel %><span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" data-role-type>
                 <% _.each(choices, function (option) { %>
                 <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
                     <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
