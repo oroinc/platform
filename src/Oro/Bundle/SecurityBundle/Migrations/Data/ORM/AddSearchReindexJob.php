@@ -9,9 +9,11 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
@@ -51,23 +53,32 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
             return;
         }
 
-        // sync reindex as this is a fixture
-        $this->getSearchIndexer()->reindex();
+        $searchObjectMapper = $this->getSearchMapper();
+
+        $this->getProducer()->send(Topics::REINDEX, $searchObjectMapper->getEntities());
+    }
+
+    /**
+     * @return ObjectMapper
+     */
+    private function getSearchMapper()
+    {
+        return $this->container->get('oro_search.mapper');
     }
 
     /**
      * @return Indexer
      */
-    protected function getIndexer()
+    private function getIndexer()
     {
         return $this->container->get('oro_search.index');
     }
 
     /**
-     * @return IndexerInterface
+     * @return MessageProducerInterface
      */
-    protected function getSearchIndexer()
+    private function getProducer()
     {
-        return $this->container->get('oro_search.search.engine.indexer');
+        return $this->container->get('oro_message_queue.client.message_producer');
     }
 }
