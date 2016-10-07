@@ -90,14 +90,11 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface
      */
     protected function getTokenStorage()
     {
-        $isEmbeddedFormRequest = false;
         $request = $this->requestStack->getMasterRequest();
-        if (null !== $request) {
-            $isEmbeddedFormRequest =
-                null !== $request
-                && !$request->cookies->has($this->sessionOptions['name'])
-                && $request->attributes->get('_route') === $this->embeddedFormRouteName;
-        }
+        $isEmbeddedFormRequest =
+            null !== $request
+            && !$request->cookies->has($this->sessionOptions['name'])
+            && $request->attributes->get('_route') === $this->embeddedFormRouteName;
 
         return $isEmbeddedFormRequest
             ? $this->embeddedFormTokenStorage
