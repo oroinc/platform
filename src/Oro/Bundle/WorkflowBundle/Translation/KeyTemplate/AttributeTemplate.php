@@ -9,7 +9,7 @@ class AttributeTemplate extends WorkflowTemplate
      */
     public function getTemplate()
     {
-        return parent::getTemplate() . '.attribute.{{ attribute_name}}';
+        return parent::getTemplate() . '.attribute.{{ attribute_name }}';
     }
 
     /**
