@@ -58,8 +58,6 @@ class IntegrationController extends FOSRestController
         $objectManager->persist($integration);
         $objectManager->flush();
 
-        $this->getSyncScheduler()->schedule($integration->getId());
-
         return $this->handleView(
             $this->view(
                 [

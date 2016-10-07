@@ -7,7 +7,6 @@ use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 
 /**
  * @dbIsolationPerTest
@@ -20,7 +19,7 @@ class SyncCommandTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
     }
 
     public function testShouldOutputHelpForTheCommand()
@@ -40,7 +39,7 @@ class SyncCommandTest extends WebTestCase
         $this->assertContains('Run sync for "Foo Integration" integration.', $result);
         $this->assertContains('Completed', $result);
 
-        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
+        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 
         $this->assertCount(1, $traces);
 
@@ -68,7 +67,7 @@ class SyncCommandTest extends WebTestCase
         $this->assertContains('Run sync for "Foo Integration" integration.', $result);
         $this->assertContains('Completed', $result);
 
-        $traces = $this->getMessageProducer()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
+        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 
         $this->assertCount(1, $traces);
 
@@ -82,13 +81,5 @@ class SyncCommandTest extends WebTestCase
             'transport_batch_size' => 100,
         ], $traces[0]['message']->getBody());
         $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
-    }
-
-    /**
-     * @return TraceableMessageProducer
-     */
-    private function getMessageProducer()
-    {
-        return self::getContainer()->get('oro_message_queue.message_producer');
     }
 }
