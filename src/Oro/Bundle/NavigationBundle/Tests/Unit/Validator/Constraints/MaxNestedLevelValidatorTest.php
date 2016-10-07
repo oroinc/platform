@@ -93,6 +93,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $update->setKey('item-1-1-1-1');
         $update->setParentKey('item-1-1-1');
         $update->setUri('#');
+        $update->setCustom(true);
 
         $this->builderChainProvider
             ->expects($this->once())

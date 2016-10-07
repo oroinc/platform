@@ -105,8 +105,7 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
             'parent' => $entity->getParent() ? $entity->getParent()->getName() : null,
             'text' => $text,
             'state' => [
-                'opened' => $entity->getParent() === null,
-                'disabled' => !$entity->getExtra('editable', false)
+                'opened' => $entity->getParent() === null
             ]
         ];
     }

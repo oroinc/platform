@@ -61,7 +61,7 @@ abstract class AbstractMenuController extends Controller
     {
         $provider = $this->getOwnershipProvider();
         /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $this->getManager()->createMenuUpdate($provider->getType(), $provider->getId());
+        $menuUpdate = $this->getManager()->createMenuUpdate($provider->getType(), $provider->getId(), null, true);
 
         if ($isDivider) {
             $menuUpdate->setDivider($isDivider);
@@ -148,7 +148,7 @@ abstract class AbstractMenuController extends Controller
             $provider->getId()
         );
 
-        if ($isExist && !$menuUpdate->getKey()) {
+        if ($isExist && !$menuUpdate->getId() && $menuUpdate->isCustom()) {
             throw $this->createNotFoundException(
                 sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
             );

@@ -2,28 +2,43 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Component\Config\Resolver\ResolverInterface;
 
+use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_AREA = 'default';
 
-    /**
-     * @var array $container
-     */
+    /** @var array */
     protected $configuration;
 
     /** @var ResolverInterface */
     protected $resolver;
 
+    /** @var EventDispatcherInterface */
+    private $factory;
+
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /**
-     * @param ResolverInterface $resolver
+     * @param ResolverInterface        $resolver
+     * @param FactoryInterface         $factory
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ResolverInterface $resolver)
-    {
+    public function __construct(
+        ResolverInterface $resolver,
+        FactoryInterface $factory,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->resolver = $resolver;
+        $this->factory = $factory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -37,11 +52,11 @@ class ConfigurationBuilder implements BuilderInterface
     /**
      * Modify menu by adding, removing or editing items.
      *
-     * @param \Knp\Menu\ItemInterface $menu
-     * @param array                   $options
-     * @param string|null             $alias
+     * @param ItemInterface $menu
+     * @param array         $options
+     * @param string|null   $alias
      */
-    public function build(ItemInterface $menu, array $options = array(), $alias = null)
+    public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $menuConfig = $this->configuration;
 
@@ -57,19 +72,21 @@ class ConfigurationBuilder implements BuilderInterface
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'area', $defaultArea);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
-                    $menu->setExtra('editable', true);
 
                     $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
                 }
             }
         }
+
+        $event = new ConfigureMenuEvent($this->factory, $menu);
+        $this->eventDispatcher->dispatch(ConfigureMenuEvent::getEventName($alias), $event);
     }
 
     /**
      * @param ItemInterface $menu
-     * @param array $config
-     * @param string $optionName
-     * @param mixed $default
+     * @param array         $config
+     * @param string        $optionName
+     * @param mixed         $default
      */
     private function setExtraFromConfig($menu, $config, $optionName, $default = null)
     {
@@ -120,12 +137,6 @@ class ConfigurationBuilder implements BuilderInterface
                 $this->moveToExtras($itemOptions, 'translateParameters');
 
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
-
-                $editable = true;
-                if (!empty($itemOptions['read_only'])) {
-                    $editable = !$itemOptions['read_only'];
-                }
-                $newMenuItem->setExtra('editable', $editable);
 
                 if (!empty($itemData['children'])) {
                     $this->createFromArray($newMenuItem, $itemData['children'], $itemList, $options, $itemCodes);

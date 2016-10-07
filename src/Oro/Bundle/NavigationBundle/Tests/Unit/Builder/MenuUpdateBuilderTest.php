@@ -34,6 +34,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $menuUpdate->setMenu('menu');
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('item-1-1-1');
+        $menuUpdate->setCustom(true);
 
         /** @var OwnershipProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
         $provider = $this->getMock(OwnershipProviderInterface::class);
@@ -54,9 +55,34 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->getChild('item-1-1')
             ->getChild('item-1-1-1');
 
-         $child->addChild('item-1-1-1-1')
-            ->setExtra('userDefined', true)
-            ->setExtra('editable', true);
+        $child->addChild('item-1-1-1-1');
+        
+        $this->assertEquals($result, $menu);
+    }
+
+    public function testBuildWithNotCustomUpdate()
+    {
+        $menuUpdate = new MenuUpdateStub();
+        $menuUpdate->setMenu('menu');
+        $menuUpdate->setKey('item-1-1-1-1');
+        $menuUpdate->setParentKey('item-1-1-1');
+
+        /** @var OwnershipProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        $provider = $this->getMock(OwnershipProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getMenuUpdates')
+            ->will($this->returnValue([$menuUpdate]));
+
+        $this->builder->addProvider($provider, 'default', 100);
+
+        $menu = $this->getMenu();
+        $menu->setExtra('area', 'default');
+
+        $this->builder->build($menu);
+
+        $result = $this->getMenu();
+        $result->setExtra('area', 'default');
+
         $this->assertEquals($result, $menu);
     }
 
@@ -70,6 +96,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $menuUpdate->setMenu('menu');
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('item-1-1-1');
+        $menuUpdate->setCustom(true);
 
         /** @var OwnershipProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
         $provider = $this->getMock(OwnershipProviderInterface::class);
