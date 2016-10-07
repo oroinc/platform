@@ -55,6 +55,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     /** @var JobManager */
     private $jobManager;
 
+    /** @var  string */
+    protected $clearInterval = 'P1D';
+
     /**
      * Constructor
      *
@@ -84,6 +87,14 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     {
         $this->tokenStorage = $tokenStorage;
         $this->currentToken = $tokenStorage->getToken();
+    }
+
+    /**
+     * @param string $clearInterval clear origin interval
+     */
+    public function setClearInterval($clearInterval)
+    {
+        $this->clearInterval = $clearInterval;
     }
 
     /**
@@ -534,7 +545,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
         $now = $this->getCurrentUtcDateTime();
         $border = clone $now;
-        $border->sub(new \DateInterval('P1D'));
+        $border->sub(new \DateInterval($this->clearInterval));
 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $query = $repo->createQueryBuilder('o')

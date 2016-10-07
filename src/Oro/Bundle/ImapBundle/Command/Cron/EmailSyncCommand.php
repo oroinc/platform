@@ -114,6 +114,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
         /** @var ImapEmailSynchronizer $synchronizer */
         $synchronizer = $this->getContainer()->get('oro_imap.email_synchronizer');
         $synchronizer->setLogger(new OutputLogger($output));
+        $synchronizer->setClearInterval('PT' . EmailSyncCommand::MAX_EXEC_TIME_IN_MIN * 2 .'M');
 
         $force = $input->getOption('force');
         $showMessage = $input->getOption('vvv');
