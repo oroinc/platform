@@ -100,7 +100,7 @@ class SidebarTest extends WebTestCase
           'left-maximized' => array(
               'position' => 'SIDEBAR_LEFT',
               'state' => 'SIDEBAR_MAXIMIZED'
-          )),
+            )),
             array(
             'right-maximized' => array(
                 'position' => 'SIDEBAR_RIGHT',

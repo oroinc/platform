@@ -87,6 +87,7 @@ class PlatformUpdateCommand extends AbstractCommand
                         'oro_dataaudit.listener.send_changed_entities_to_message_queue'
                     ]
                 ))
+                ->runCommand('oro:translation:load', ['--process-isolation' => true])
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
                 ->runCommand('router:cache:clear', array('--process-isolation' => true))
                 ->runCommand('oro:message-queue:create-queues', array('--process-isolation' => true))

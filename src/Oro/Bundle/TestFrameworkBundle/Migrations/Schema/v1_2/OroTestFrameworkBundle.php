@@ -18,6 +18,7 @@ class OroTestFrameworkBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->createTestAuditDataTables($schema);
+        $this->createTestSearchItem2Table($schema);
     }
 
     /**
@@ -74,4 +75,16 @@ class OroTestFrameworkBundle implements Migration
             ['unique' => true]
         );
     }
+
+        /**
+         * Create test_search_item2 table
+         *
+         * @param Schema $schema
+         */
+        protected function createTestSearchItem2Table(Schema $schema)
+        {
+                $table = $schema->createTable('test_search_item2');
+                $table->addColumn('id', 'integer', ['autoincrement' => true]);
+                $table->setPrimaryKey(['id']);
+        }
 }

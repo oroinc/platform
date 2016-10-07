@@ -76,44 +76,19 @@ class LocalizationSelectionType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {
-                $this->checkOptions($options);
+                $localizations = $this->getLocalizations();
 
                 if ($options['full_localization_list']) {
-                    return $this->localizationChoicesProvider->getLocalizationChoices();
+                    return $localizations;
                 }
 
-                $localizations = $options['localizations_list'];
-                if (!count($localizations)) {
-                    $localizations = $this->getLocalizations();
-                }
-
-                $localizations = array_merge($localizations, (array)$options['additional_localizations']);
                 $localizations = $this->checkLocalizations($localizations);
 
                 return $this->getChoices($localizations, $options['compact']);
             },
             'compact' => false,
-            'localizations_list' => null,
-            'additional_localizations' => null,
             'full_localization_list' => false
         ]);
-    }
-
-    /**
-     * @param Options $options
-     * @throws LogicException
-     */
-    protected function checkOptions(Options $options)
-    {
-        if (($options['localizations_list'] !== null && !is_array($options['localizations_list']))
-            || (is_array($options['localizations_list']) && empty($options['localizations_list']))
-        ) {
-            throw new LogicException('The option "localizations_list" must be null or not empty array.');
-        }
-
-        if ($options['additional_localizations'] !== null && !is_array($options['additional_localizations'])) {
-            throw new LogicException('The option "additional_localizations" must be null or array.');
-        }
     }
 
     /**

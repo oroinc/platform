@@ -48,7 +48,6 @@ class FileCacheDumper implements DumperInterface
             $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
             $this->cacheDir
         ));
-
     }
 
     /**

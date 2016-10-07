@@ -2,37 +2,33 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Types\Type;
-
-use JMS\JobQueueBundle\Entity\Job;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\SearchBundle\Command\ReindexCommand;
-use Oro\Bundle\SearchBundle\Entity\UpdateEntity;
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class SearchEntityConfigListener
 {
-    /** @var ManagerRegistry */
-    protected $registry;
-
     /** @var SearchMappingProvider */
     protected $searchMappingProvider;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var IndexerInterface */
+    protected $searchIndexer;
+
+    /** @var string[] */
+    protected $classNames = [];
 
     /**
-     * @param ManagerRegistry       $registry
      * @param SearchMappingProvider $searchMappingProvider
+     * @param IndexerInterface      $searchIndexer
      */
-    public function __construct(ManagerRegistry $registry, SearchMappingProvider $searchMappingProvider)
-    {
-        $this->registry              = $registry;
+    public function __construct(
+        SearchMappingProvider $searchMappingProvider,
+        IndexerInterface $searchIndexer
+    ) {
         $this->searchMappingProvider = $searchMappingProvider;
+        $this->searchIndexer = $searchIndexer;
     }
 
     /**
@@ -40,67 +36,49 @@ class SearchEntityConfigListener
      */
     public function preFlush(PreFlushConfigEvent $event)
     {
-        $config = $event->getConfig('search');
-        if (null === $config) {
-            return;
+        if ($this->isReindexRequired($event)) {
+            $entityClass = $event->getClassName();
+            if (!in_array($entityClass, $this->classNames, true)) {
+                $this->classNames[] = $entityClass;
+            }
+        }
+    }
+
+    /**
+     * @param PostFlushConfigEvent $event
+     */
+    public function postFlush(PostFlushConfigEvent $event)
+    {
+        if ($this->classNames) {
+            $this->searchMappingProvider->clearMappingCache();
+            $this->searchIndexer->reindex($this->classNames);
+
+            $this->classNames = [];
+        }
+    }
+
+    /**
+     * @param PreFlushConfigEvent $event
+     *
+     * @return bool
+     */
+    protected function isReindexRequired(PreFlushConfigEvent $event)
+    {
+        $searchConfig = $event->getConfig('search');
+        if (null === $searchConfig) {
+            return false;
         }
 
         $configManager = $event->getConfigManager();
-        $changeSet     = $configManager->getConfigChangeSet($config);
-        if (!isset($changeSet['searchable'])) {
-            return;
+        $searchChangeSet = $configManager->getConfigChangeSet($searchConfig);
+        if (!isset($searchChangeSet['searchable'])) {
+            return false;
         }
 
-        /**
-         * On any configuration changes related to search the search mapping cache should be cleaned.
-         */
-        $this->searchMappingProvider->clearMappingCache();
+        $extendConfig = $event->getConfig('extend');
 
-        $className    = $config->getId()->getClassName();
-        $extendConfig = $configManager->getProvider('extend')->getConfig($className);
-        if ($extendConfig->get('state') === ExtendScope::STATE_ACTIVE) {
-            $this->addReindexJob($className);
-        } else {
-            $this->addPostponeJob($className);
-        }
-    }
-
-    /**
-     * @param string $entityClass
-     */
-    protected function addPostponeJob($entityClass)
-    {
-        $em = $this->registry->getManagerForClass('OroSearchBundle:UpdateEntity');
-        $update = $em->getRepository('OroSearchBundle:UpdateEntity')->find($entityClass);
-        if (!$update) {
-            $update = new UpdateEntity();
-            $update->setEntity($entityClass);
-            $em->persist($update);
-            $em->flush($update);
-        }
-    }
-
-    /**
-     * @param string $entityClass
-     */
-    protected function addReindexJob($entityClass)
-    {
-        $job = $this->registry->getRepository('JMSJobQueueBundle:Job')->createQueryBuilder('job')
-            ->select('job')
-            ->where('job.command = :command')
-            ->andWhere('cast(job.args as text) = :args')
-            ->andWhere('job.state in (\'pending\', \'running\')')
-            ->setParameter('command', ReindexCommand::COMMAND_NAME)
-            ->setParameter('args', ['class' => $entityClass], Type::JSON_ARRAY)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-
-        if (!$job) {
-            $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entityClass]);
-            $em  = $this->registry->getManager();
-            $em->persist($job);
-            $em->flush($job);
-        }
+        return
+            null !== $extendConfig
+            && $extendConfig->is('state', ExtendScope::STATE_ACTIVE);
     }
 }

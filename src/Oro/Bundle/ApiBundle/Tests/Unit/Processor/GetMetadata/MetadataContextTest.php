@@ -77,4 +77,13 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->context->setExtras([new \stdClass()]);
     }
+
+    public function testWithExcludedProperties()
+    {
+        $this->assertFalse($this->context->getWithExcludedProperties());
+
+        $this->context->setWithExcludedProperties(true);
+        $this->assertTrue($this->context->getWithExcludedProperties());
+        $this->assertTrue($this->context->get(MetadataContext::WITH_EXCLUDED_PROPERTIES));
+    }
 }
