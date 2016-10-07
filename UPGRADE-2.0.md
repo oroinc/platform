@@ -468,3 +468,6 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
+
+####CalendarBundle:
+- CalendarBundle moved to a separate package

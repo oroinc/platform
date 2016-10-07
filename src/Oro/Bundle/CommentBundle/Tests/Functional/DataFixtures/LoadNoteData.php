@@ -1,12 +1,11 @@
 <?php
 
-namespace CommentBundle\Tests\Functional\DataFixtures;
+namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures\AbstractCommentFixture;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
 class LoadNoteData extends AbstractCommentFixture implements ContainerAwareInterface
