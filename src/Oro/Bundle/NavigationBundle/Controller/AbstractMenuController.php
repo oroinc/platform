@@ -12,6 +12,7 @@ use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
 abstract class AbstractMenuController extends Controller
@@ -64,7 +65,7 @@ abstract class AbstractMenuController extends Controller
 
         if ($isDivider) {
             $menuUpdate->setDivider($isDivider);
-            $menuUpdate->setDefaultTitle('--------');
+            $menuUpdate->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
             $menuUpdate->setUri('#');
         }
 

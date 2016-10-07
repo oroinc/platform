@@ -25,7 +25,7 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * @Route("/", name="oro_navigation_org_menu_index")
+     * @Route("/", name="oro_navigation_global_menu_index")
      * @Template
      * @AclAncestor("oro_navigation_manage_menus")
      *
@@ -39,7 +39,7 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * @Route("/{menuName}", name="oro_navigation_org_menu_view")
+     * @Route("/{menuName}", name="oro_navigation_global_menu_view")
      * @Template
      * @AclAncestor("oro_navigation_manage_menus")
      *
@@ -55,7 +55,7 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_org_menu_create")
+     * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_global_menu_create")
      * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
      * @AclAncestor("oro_navigation_manage_menus")
      *
@@ -73,8 +73,8 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_org_menu_create_divider")
-     * @Template("OroNavigationBundle:UserMenu:update.html.twig")
+     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_global_menu_create_divider")
+     * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
      *
      * @param string $menuName
      * @param string $parentKey
@@ -87,7 +87,7 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * @Route("/{menuName}/update/{key}", name="oro_navigation_org_menu_update")
+     * @Route("/{menuName}/update/{key}", name="oro_navigation_global_menu_update")
      * @Template
      * @AclAncestor("oro_navigation_manage_menus")
      *
