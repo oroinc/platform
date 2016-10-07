@@ -214,4 +214,24 @@
             transform: rotate(180deg);
         }
     }
+
+    &.select2-container-multi .select2-choices {
+        padding: 4px 9px 4px 4px;
+
+        .select2-search-field {
+            margin-left: 5px;
+            
+            input {
+                margin: 3px 0;
+                padding: 3px 0;
+
+                font-family: $base-font;
+                color: #000;
+            }
+        }
+
+        .select2-search-choice {
+            line-height: 12px;
+        }
+    }
 }

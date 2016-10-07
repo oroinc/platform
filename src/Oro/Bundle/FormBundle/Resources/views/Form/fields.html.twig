@@ -572,22 +572,26 @@
                 {% set _block = block('oro_entity_create_or_select_inline_js_' ~ configs.extra_config) %}
             {% endif %}
         {% if isButtonsEnabled %}class="entity-create-or-select-container {% if form.vars.create_enabled %}entity-create-enabled{% endif %}"{% endif %}>
-        <div {% if isButtonsEnabled %}class="input-append"{% endif %}>
-            {{ form_widget(form) }}
-
-            {% if isButtonsEnabled %}
-                <button class="add-on btn entity-select-btn"><i class="icon-bars"></i></button>
-
-                {% if form.vars.create_enabled %}
-                    <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
-                {% endif %}
-            {% endif %}
-        </div>
+        {{ block('oro_entity_flexible_container_widget') }}
     </div>
 
     {% if _block is defined and _block is not empty %}
         {{ _block|raw }}
     {% endif %}
+{% endblock %}
+
+{% block oro_entity_flexible_container_widget %}
+    <div {% if isButtonsEnabled %}class="input-append"{% endif %}>
+        {{ form_widget(form) }}
+
+        {% if isButtonsEnabled %}
+            <button class="add-on btn entity-select-btn"><i class="icon-bars"></i></button>
+
+            {% if form.vars.create_enabled %}
+                <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+            {% endif %}
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block oro_link_type_widget %}
