@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\WorkflowBundle\Migrations\Schema\RemoveWorkflowFieldsTrait;
@@ -76,15 +75,15 @@ class OroTestFrameworkBundle implements Migration
         );
     }
 
-        /**
-         * Create test_search_item2 table
-         *
-         * @param Schema $schema
-         */
-        protected function createTestSearchItem2Table(Schema $schema)
-        {
-                $table = $schema->createTable('test_search_item2');
-                $table->addColumn('id', 'integer', ['autoincrement' => true]);
-                $table->setPrimaryKey(['id']);
-        }
+    /**
+     * Create test_search_item2 table.
+     *
+     * @param Schema $schema
+     */
+    protected function createTestSearchItem2Table(Schema $schema)
+    {
+        $table = $schema->createTable('test_search_item2');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->setPrimaryKey(['id']);
+    }
 }
