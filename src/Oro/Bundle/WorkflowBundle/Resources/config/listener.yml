@@ -65,8 +65,8 @@ services:
         tags:
             - { name: oro_workflow.listener.event_trigger_collector.extension }
 
-    oro_workflow.entity_listener.activation_validator:
-        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowActivationValidatorEntityListener
+    oro_workflow.entity_listener.workflow_definition:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener'
         arguments:
             - '@oro_workflow.registry'
         tags:
