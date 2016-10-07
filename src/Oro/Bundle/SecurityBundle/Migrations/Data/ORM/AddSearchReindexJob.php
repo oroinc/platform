@@ -51,7 +51,6 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
             return;
         }
 
-        // sync reindex as this is a fixture
         $this->getSearchIndexer()->reindex();
     }
 
