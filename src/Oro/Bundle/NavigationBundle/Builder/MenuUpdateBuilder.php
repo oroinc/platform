@@ -6,17 +6,41 @@ use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
-use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
-use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
 {
     const OWNERSHIP_TYPE_OPTION = 'ownershipType';
 
-    /** @var MenuUpdateProviderInterface[] */
+    /** @var array - an array of OwnershipProviders grouped by area and priority
+     * Example:
+     * [
+     *     'default' => [
+     *         100 => [
+     *             'global' => $globalProvider
+     *         ],
+     *         200 => [
+     *             'organization' => $organizationProvider
+     *         ],
+     *         300 => [
+     *             'user' => $userProvider
+     *         ],
+     *      ],
+     *     'custom' => [
+     *         100 => [
+     *             'global' => $globalProvider
+     *         ],
+     *         200 => [
+     *             'foo' => $fooProvider,
+     *             'bar' => $barProvider
+     *         ],
+     *     ]
+     * ]
+     *
+     */
     private $providers = [];
     
     /** @var LocalizationHelper */
@@ -29,18 +53,17 @@ class MenuUpdateBuilder implements BuilderInterface
     {
         $this->localizationHelper = $localizationHelper;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $ownershipType = array_key_exists(self::OWNERSHIP_TYPE_OPTION, $options) ?
-            $options[self::OWNERSHIP_TYPE_OPTION] : false;
+            $options[self::OWNERSHIP_TYPE_OPTION] : null;
         $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
-        $provider = $this->getProvider($area);
         $menuName = $menu->getName();
-        foreach ($provider->getUpdates($menuName, $ownershipType) as $update) {
+        foreach ($this->getUpdates($area, $menuName, $ownershipType) as $update) {
             if ($update->getMenu() == $menuName) {
                 MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
             }
@@ -62,29 +85,78 @@ class MenuUpdateBuilder implements BuilderInterface
     }
 
     /**
-     * @param string $area
-     * @param MenuUpdateProviderInterface $provider
-     *
+     * @param OwnershipProviderInterface $provider
+     * @param string                     $area
+     * @param integer                    $priority
      * @return MenuUpdateBuilder
      */
-    public function addProvider($area, MenuUpdateProviderInterface $provider)
+    public function addProvider(OwnershipProviderInterface $provider, $area, $priority)
     {
-        $this->providers[$area] = $provider;
+        $this->providers[$area][$priority][$provider->getType()] = $provider;
 
         return $this;
     }
 
     /**
-     * @param $area
-     *
-     * @return MenuUpdateProviderInterface
+     * @param string $area
+     * @param string $type
+     * @return null|OwnershipProviderInterface
      */
-    private function getProvider($area)
+    public function getProvider($area, $type)
     {
-        if (!array_key_exists($area, $this->providers)) {
-            throw new ProviderNotFoundException(sprintf("Provider related to \"%s\" area not found.", $area));
-        }
-        
-        return $this->providers[$area];
+        $providers = $this->getProviders($area);
+
+        return isset($providers[$type]) ? $providers[$type] : null;
     }
+
+    /**
+     * @param string      $area
+     * @param string      $menuName
+     * @param string|null $ownershipType
+     * @return array
+     */
+    public function getUpdates($area, $menuName, $ownershipType = null)
+    {
+        $providers = $this->getProviders($area, $ownershipType);
+
+        $menuUpdates = [];
+        foreach ($providers as $ownershipProvider) {
+            $result = $ownershipProvider->getMenuUpdates($menuName);
+            $menuUpdates = array_merge($menuUpdates, $result);
+        }
+
+        return $menuUpdates;
+    }
+
+    /**
+     * Return ordered list of ownership providers started by $ownershipType
+     * @param string      $area
+     * @param string|null $ownershipType
+     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface[]
+     */
+    protected function getProviders($area, $ownershipType = null)
+    {
+        if (!isset($this->providers[$area])) {
+            return [];
+        }
+        $providers = $this->providers[$area];
+        // convert prioritised list to flat ordered list
+        ksort($providers, SORT_NUMERIC);
+        $filteredProviders = [];
+        foreach ($providers as $list) {
+            $filteredProviders = array_merge($filteredProviders, $list);
+        }
+        // return all tree if ownershipType not defined
+        if (null === $ownershipType) {
+            return $filteredProviders;
+        }
+        // remove ownerships higher than selected
+        $key = array_search($ownershipType, array_keys($filteredProviders), true);
+        if ($key !== false) {
+            return array_slice($filteredProviders, $key, null, true);
+        }
+
+        return [];
+    }
+
 }
