@@ -58,7 +58,7 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
     {
         if (null === $this->keyTemplate) {
             throw new \LogicException(
-                'Cant build source without template'
+                'Can\'t build source without template. Please configure source by ->configure($template) method.'
             );
         }
 

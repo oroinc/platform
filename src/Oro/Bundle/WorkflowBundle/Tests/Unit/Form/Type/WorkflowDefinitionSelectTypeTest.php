@@ -188,11 +188,11 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             $this->definitions = [
                 'wf_42' => $this->getEntity(
                     'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
-                    ['name' => 'wf_42', 'label' => 'label42']
+                    ['name' => 'wf_42']
                 ),
                 'wf_100' => $this->getEntity(
                     'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
-                    ['name' => 'wf_100', 'label' => 'label100']
+                    ['name' => 'wf_100']
                 )
             ];
         }

@@ -103,7 +103,6 @@ workflows:
         steps:
             -
                 name: second_step
-                label: 'Second Step'
                 order: 1
                 is_final: false
                 allowed_transitions: []

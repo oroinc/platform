@@ -182,7 +182,6 @@ return [
                 'is_unavailable_hidden' => false,
                 'acl_resource' => null,
                 'acl_message' => null,
-                'message' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'display_type' => 'dialog',
                 'form_options' => [],
