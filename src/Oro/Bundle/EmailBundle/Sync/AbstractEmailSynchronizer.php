@@ -90,14 +90,6 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     }
 
     /**
-     * @param string $clearInterval clear origin interval
-     */
-    public function setClearInterval($clearInterval)
-    {
-        $this->clearInterval = $clearInterval;
-    }
-
-    /**
      * Returns TRUE if this class supports synchronization of the given origin.
      *
      * @param EmailOrigin $origin
@@ -139,6 +131,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $startTime = $this->getCurrentUtcDateTime();
         $this->resetHangedOrigins();
 
+        if ($maxExecTimeInMin > 5) {
+            $this->clearInterval = 'PT' . ($maxExecTimeInMin * 5) . 'M';
+        }
         $maxExecTimeout = $maxExecTimeInMin > 0
             ? new \DateInterval('PT' . $maxExecTimeInMin . 'M')
             : false;
