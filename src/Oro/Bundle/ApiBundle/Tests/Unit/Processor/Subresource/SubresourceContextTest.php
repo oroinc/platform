@@ -315,7 +315,6 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
             [],
             $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
-
     }
 
     public function testSetParentMetadataExtras()

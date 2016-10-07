@@ -551,7 +551,6 @@ class TagManager
                 },
                 $tagIds->toArray()
             );
-
         }
 
         if (is_array($tagIds)) {

@@ -41,7 +41,6 @@ class Configuration extends AbstractPage
             $this->test->byXPath("//a[normalize-space(.)='Language settings']")->click();
             $this->waitPageToLoad();
             $this->waitForAjax();
-
         }
 
         return new LanguageSettings($this->test, $directLoad);
