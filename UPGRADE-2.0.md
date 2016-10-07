@@ -249,6 +249,7 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
 - For `Oro\Bundle\ImportExportBundle\Job\JobExecutor` added new public method `setEventDispatcher` for setting Event Dispatcher.
+- Options for import/export buttons configuration `dataGridName` was renamed to `datagridName`
 
 ####TranslationBundle
 - Added controller `Oro\Bundle\TranslationBundle\Controller\LanguageController` for manage Languages.
