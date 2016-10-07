@@ -140,9 +140,9 @@ class TranslationManager
     {
         $queryBuilder = $this->getEntityRepository(TranslationKey::class)->createQueryBuilder('tk');
         $queryBuilder->delete()
-            ->where('domain = :domain')
-            ->andWhere($queryBuilder->expr()->like('tk.key', ':keysPrefix%'))
-            ->setParameters(['domain' => $domain,  'keysPrefix' => $keysPrefix])
+            ->where('tk.domain = :domain')
+            ->andWhere($queryBuilder->expr()->like('tk.key', ':keysPrefix'))
+            ->setParameters(['domain' => $domain,  'keysPrefix' => $keysPrefix . '%'])
             ->getQuery()
             ->execute();
     }

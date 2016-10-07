@@ -97,7 +97,7 @@ class TranslationProcessor
     {
         $template = new StepLabelTemplate();
         $node = WorkflowConfiguration::NODE_STEPS;
-        $this->translationHelper->updateNode($definition, $previousDefinition, $template, $node, 'step_name');
+        $this->translationHelper->updateNode($template, $node, 'step_name', $definition, $previousDefinition);
 
         // update WorkflowStep objects
         $configuration = $definition->getConfiguration();
@@ -124,7 +124,7 @@ class TranslationProcessor
     {
         $template = new TransitionLabelTemplate();
         $node = WorkflowConfiguration::NODE_TRANSITIONS;
-        $this->translationHelper->updateNode($definition, $previousDefinition, $template, $node, 'transition_name');
+        $this->translationHelper->updateNode($template, $node, 'transition_name', $definition, $previousDefinition);
         $configuration = $definition->getConfiguration();
         if (empty($configuration[$node])) {
             return;
@@ -159,6 +159,6 @@ class TranslationProcessor
     {
         $template = new AttributeLabelTemplate();
         $node = WorkflowConfiguration::NODE_ATTRIBUTES;
-        $this->translationHelper->updateNode($definition, $previousDefinition, $template, $node, 'attribute_name');
+        $this->translationHelper->updateNode($template, $node, 'attribute_name', $definition, $previousDefinition);
     }
 }

@@ -39,18 +39,18 @@ class TranslationHelper
     }
 
     /**
-     * @param WorkflowDefinition $definition
-     * @param WorkflowDefinition $previousDefinition
      * @param TranslationKeyTemplateInterface $template
      * @param string $nodeName
      * @param string $attributeName
+     * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition $previousDefinition
      */
     public function updateNode(
-        WorkflowDefinition $definition,
-        WorkflowDefinition $previousDefinition,
         TranslationKeyTemplateInterface $template,
         $nodeName,
-        $attributeName
+        $attributeName,
+        WorkflowDefinition $definition,
+        WorkflowDefinition $previousDefinition = null
     ) {
         $configuration = $definition->getConfiguration();
         if (empty($configuration[$nodeName])) {
@@ -75,8 +75,8 @@ class TranslationHelper
                 array_keys($configurationOld[$nodeName]),
                 array_keys($configuration[$nodeName])
             );
-            foreach ($removedItemNames as $transitionName) {
-                $key = $this->generateKey($translationKeySource, $template, [$attributeName => $transitionName]);
+            foreach ($removedItemNames as $itemName) {
+                $key = $this->generateKey($translationKeySource, $template, [$attributeName => $itemName]);
                 $this->translationManager->removeTranslationKey($key, self::WORKFLOWS_DOMAIN);
             }
         }
