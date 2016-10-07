@@ -129,11 +129,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         $startTime = $this->getCurrentUtcDateTime();
-        $this->resetHangedOrigins();
-
         if ($maxExecTimeInMin > 5) {
             $this->clearInterval = 'PT' . ($maxExecTimeInMin * 5) . 'M';
         }
+        $this->resetHangedOrigins();
+
         $maxExecTimeout = $maxExecTimeInMin > 0
             ? new \DateInterval('PT' . $maxExecTimeInMin . 'M')
             : false;
