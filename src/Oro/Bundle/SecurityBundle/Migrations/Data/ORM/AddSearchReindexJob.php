@@ -2,27 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Migrations\Data\ORM;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -65,7 +58,7 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
     /**
      * @return Indexer
      */
-    private function getIndexer()
+    protected function getIndexer()
     {
         return $this->container->get('oro_search.index');
     }
