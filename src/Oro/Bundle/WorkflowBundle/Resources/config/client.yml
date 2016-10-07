@@ -1,0 +1,33 @@
+services:
+    oro_workflow.handler.transition_event_trigger:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler'
+        arguments:
+            - '@oro_workflow.manager'
+            - '@doctrine'
+
+    oro_workflow.handler.transition_cron_trigger:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler'
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_workflow.helper.transition_cron_trigger'
+
+    oro_workflow.async.transition_trigger_processor.abstract:
+        class: 'Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor'
+        abstract: true
+        arguments:
+            - '@doctrine'
+            - '@logger'
+
+    oro_workflow.async.transition_trigger_event_processor:
+        parent: oro_workflow.async.transition_trigger_processor.abstract
+        arguments:
+            - '@oro_workflow.handler.transition_event_trigger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_message_queue.transition_trigger_event_message' }
+
+    oro_workflow.async.transition_trigger_cron_processor:
+        parent: oro_workflow.async.transition_trigger_processor.abstract
+        arguments:
+            - '@oro_workflow.handler.transition_cron_trigger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_message_queue.transition_trigger_cron_message' }

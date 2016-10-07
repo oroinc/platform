@@ -175,7 +175,6 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
         $storage = new JobStorage($doctrine, 'entity-class', 'unique_table');
         $storage->saveJob($job, function () {
-
         });
     }
 
@@ -453,7 +452,6 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
         $storage = new JobStorage($doctrine, 'entity-class', 'unique_table');
         $storage->saveJob($job, function () {
-
         });
     }
 

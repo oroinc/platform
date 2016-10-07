@@ -35,7 +35,6 @@ class OroActivityListBundleInstaller implements Installation
         AddActivityDescription12::addColumns($schema);
 
         AddActivityOwner13::addActivityOwner($schema);
-
     }
 
     /**
