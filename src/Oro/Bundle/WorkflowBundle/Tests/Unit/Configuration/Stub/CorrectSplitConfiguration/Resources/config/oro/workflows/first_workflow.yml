@@ -3,7 +3,6 @@ imports:
 
 workflows:
     first_workflow:
-        label: 'First Workflow'
         is_system: true
         entity: First\Entity
         start_step: first_step
@@ -18,7 +17,6 @@ workflows:
         steps_display_ordered: true
         steps:
             first_step:
-                label: 'First Step'
                 order: 1
                 is_final: true
                 entity_acl:
@@ -28,7 +26,6 @@ workflows:
                     - first_transition
         transitions:
             first_transition:
-                label: 'First Transition'
                 step_to: first_step
                 is_start: true
                 is_hidden: true
@@ -47,7 +44,6 @@ workflows:
                     attribute_fields:
                         first_attribute:
                             form_type: text
-                            label: 'First Attribute'
                             options:
                                 required: true
                 triggers:
