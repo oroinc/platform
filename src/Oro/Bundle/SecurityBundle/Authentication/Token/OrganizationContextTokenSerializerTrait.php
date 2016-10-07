@@ -28,7 +28,16 @@ trait OrganizationContextTokenSerializerTrait
      */
     public function unserialize($serialized)
     {
-        list($organizationContext, $parentStr) = unserialize($serialized);
+        /**
+         * Convert from old serialization format
+         */
+        if (false !== strpos($serialized, '}||a')) {
+            list($organizationData, $parentStr) = explode('||', $serialized);
+            $organizationContext = unserialize($organizationData);
+        } else {
+            list($organizationContext, $parentStr) = unserialize($serialized);
+        }
+
         $this->setOrganizationContext($organizationContext);
 
         if ($this instanceof AbstractToken) {

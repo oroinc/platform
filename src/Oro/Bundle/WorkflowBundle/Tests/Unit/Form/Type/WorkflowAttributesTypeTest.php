@@ -432,6 +432,5 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     protected function setFormTypeGuesser(array $guessedData)
     {
-
     }
 }

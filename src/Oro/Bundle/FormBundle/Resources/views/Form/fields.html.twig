@@ -370,13 +370,15 @@
 {% endmacro %}
 
 {% block oro_form_js_validation %}
-<script type="text/javascript">
-    require(['jquery', 'jquery.validate'],
-    function ($) {
-        var options = {{ js_options ? js_options|json_encode|raw : '{}' }};
-        $('#{{ form.vars.id }}').validate(options);
-    });
-</script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroui/js/app/components/view-component',
+        options: {
+            _sourceElement: '#' ~ form.vars.id,
+            view: 'oroform/js/app/views/form-validate-view',
+            validationOptions: js_options
+        }
+    }) }}></div>
 {% endblock %}
 
 {% block oro_entity_create_or_select_row %}
