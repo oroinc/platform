@@ -18,7 +18,7 @@ elements:
 
   AttachmentItem:
     selector: '.attachment-item'
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+    class: Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem
 
   AttachmentListRow:
     selector: '.attachment-list-row'

@@ -14,6 +14,8 @@ class FormFieldType extends AbstractFormType
 {
     const NAME = 'form_field';
 
+    const SHORT_NAME = 'field';
+
     /**
      * {@inheritdoc}
      */
