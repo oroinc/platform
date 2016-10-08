@@ -163,6 +163,10 @@ class SomeTest extends WebTestCase
     {
         // assert that a message was sent to a topic
         self::assertMessageSent('aFooTopic', 'Something has happened');
+
+        // assert that at least one message was sent to a topic
+        // can be used if a message is not matter
+        self::assertMessageSent('aFooTopic');
     }
 
     public function testSeveralMessages()
@@ -175,11 +179,18 @@ class SomeTest extends WebTestCase
                 'Something else has happened',
             ]
         );
+        // assert that the exactly given number of messages were sent to a topic
+        // can be used if messages are not matter
+        self::assertMessagesCount('aFooTopic', 2);
+        // also assertCountMessages alias can be used to do the same assertion
+        self::assertCountMessages('aFooTopic');
     }
 
     public function testNoMessages()
     {
         // assert that no any message was sent to a topic
+        self::assertMessagesEmpty('aFooTopic');
+        // also assertEmptyMessages alias can be used to do the same assertion
         self::assertEmptyMessages('aFooTopic');
     }
 
