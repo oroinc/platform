@@ -69,7 +69,14 @@ services:
     # This fix brings performance optimization of JobRepository which was introduced in
     # jms/job-queue-bundle 1.3.0. As of there are other stories to upgrade jms/job-queue-bundle version
     # or replace it, this solution is temporary.
-    oro_cron.event_listener.class_metadata_listener:
-        class: 'Oro\Bundle\CronBundle\EventListener\ClassMetadataListener'
+    oro_cron.listener.load_class_metadata_subscriber:
+        class: Oro\Bundle\CronBundle\EventListener\LoadClassMetadataSubscriber
         tags:
-            -  { name: doctrine.event_listener, event: loadClassMetadata }
+            - { name: doctrine.event_subscriber }
+
+    oro_cron.listener.job_subscriber:
+        class: Oro\Bundle\CronBundle\EventListener\JobSubscriber
+        arguments:
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }

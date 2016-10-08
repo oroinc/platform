@@ -1,0 +1,16 @@
+layout:
+    actions:
+        - '@add':
+            id:        embedded_form_session_id
+            parentId:  embedded_form
+            blockType: input
+            options:
+                type:  hidden
+                name:  { '@value': $data.embedded_form_session_id_field_name }
+                value: { '@value': $data.embedded_form_session_id }
+
+    conditions:
+        '@neq':
+            - ~
+            - $context.embedded_form
+
