@@ -98,7 +98,7 @@ class ImageFilterLoader
         ];
 
         foreach ($this->customFilterProviders as $provider) {
-            $filterSettings = array_merge_recursive($filterSettings, $provider->getFilterConfig());
+            $filterSettings = array_replace_recursive($filterSettings, $provider->getFilterConfig());
         }
 
         if ($withResize) {

@@ -315,17 +315,17 @@ class AttachmentManager
      * Get image attachment link with liip imagine filter applied to image
      *
      * @param File   $entity
-     * @param string $filerName
+     * @param string $filterName
      * @return string
      */
-    public function getFilteredImageUrl(File $entity, $filerName)
+    public function getFilteredImageUrl(File $entity, $filterName)
     {
         return $this->router->generate(
             'oro_filtered_attachment',
             [
                 'id'       => $entity->getId(),
                 'filename' => $entity->getFilename() ?: self::UNKNOWN_FILE_NAME,
-                'filter'   => $filerName
+                'filter'   => $filterName
             ]
         );
     }
