@@ -54,8 +54,6 @@ UPGRADE FROM 1.10 to 2.0
 
 - Added trait `Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait` with methods:
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
-    * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder trough specified workflowItem alias
-    * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder through optionally specified workflowItem alias
         Note: `joinWorkflowStep` internally checks for workflowItem alias join to be already present in QueryBuilder instance to use it or creates new one otherwise.
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
@@ -127,8 +125,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) removed.
 - Service `oro_workflow.cache.process_trigger` (`Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache`) removed.
 - Model `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` removed.
-- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler`
-and constructor signature changed to `DeferredScheduler $deferredScheduler`.
+- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger`.
 - Added new interface `Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface`.
