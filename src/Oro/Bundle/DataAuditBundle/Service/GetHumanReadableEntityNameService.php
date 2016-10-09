@@ -1,16 +1,16 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Service;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class GetHumanReadableEntityNameService
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -20,10 +20,10 @@ class GetHumanReadableEntityNameService
     private $entityNameResolver;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param EntityNameResolver $entityNameResolver
      */
-    public function __construct(RegistryInterface $doctrine, EntityNameResolver $entityNameResolver)
+    public function __construct(ManagerRegistry $doctrine, EntityNameResolver $entityNameResolver)
     {
         $this->doctrine = $doctrine;
         $this->entityNameResolver = $entityNameResolver;

@@ -1,17 +1,17 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Service;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class ConvertEntityChangesToAuditService
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -41,7 +41,7 @@ class ConvertEntityChangesToAuditService
     private $convertChangeSetToAuditFieldsService;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param SetNewAuditVersionService $setNewAuditVersionService
      * @param FindOrCreateAuditService $findOrCreateAuditService
      * @param GetEntityAuditMetadataService $getEntityAuditMetadataService
@@ -49,7 +49,7 @@ class ConvertEntityChangesToAuditService
      * @param ConvertChangeSetToAuditFieldsService $convertChangeSetToAuditFieldsService
      */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         SetNewAuditVersionService $setNewAuditVersionService,
         FindOrCreateAuditService $findOrCreateAuditService,
         GetEntityAuditMetadataService $getEntityAuditMetadataService,

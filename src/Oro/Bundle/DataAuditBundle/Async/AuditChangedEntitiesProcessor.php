@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Async;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -13,12 +14,11 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -33,12 +33,12 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
     private $messageProducer;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param ConvertEntityChangesToAuditService $convertEntityChangesToAuditService
      * @param MessageProducerInterface $messageProducer
      */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         ConvertEntityChangesToAuditService $convertEntityChangesToAuditService,
         MessageProducerInterface $messageProducer
     ) {
