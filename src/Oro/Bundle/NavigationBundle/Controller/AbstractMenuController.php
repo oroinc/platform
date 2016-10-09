@@ -13,6 +13,7 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
 abstract class AbstractMenuController extends Controller
 {
@@ -80,19 +81,22 @@ abstract class AbstractMenuController extends Controller
     {
         $menuUpdate = $this->getMenuUpdate($menuName, $key);
         $menu = $this->getMenu($menuName);
+        $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
 
-        return $this->getResponse($this->update($menuUpdate), $menu);
+        return $this->getResponse($this->update($menuUpdate, $menuItem), $menu, $menuItem);
     }
 
     /**
      * @param MenuUpdateInterface $menuUpdate
+     * @param ItemInterface|null $menuItem
      *
      * @return array|RedirectResponse
      */
-    protected function update(MenuUpdateInterface $menuUpdate)
+    protected function update(MenuUpdateInterface $menuUpdate, ItemInterface $menuItem = null)
     {
         $options = [
-            'validation_groups' => $menuUpdate->isExistsInNavigationYml() ? ['Default'] : ['Default', 'UserDefined']
+            'exists_in_navigation_yml' => $menuUpdate->isExistsInNavigationYml(),
+            'acl_resource_id' => $menuItem !== null ? $menuItem->getExtra('aclResourceId') : null,
         ];
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, $options);
 
@@ -106,10 +110,11 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param array|RedirectResponse $response
      * @param ItemInterface $menu
+     * @param ItemInterface|null $menuItem
      *
      * @return array|RedirectResponse
      */
-    private function getResponse($response, ItemInterface $menu)
+    private function getResponse($response, ItemInterface $menu, ItemInterface $menuItem = null)
     {
         if (is_array($response)) {
             $treeHandler = $this->get('oro_navigation.tree.menu_update_tree_handler');
@@ -117,6 +122,7 @@ abstract class AbstractMenuController extends Controller
             $response['ownershipType'] = $this->getOwnershipProvider()->getType();
             $response['menuName'] = $menu->getName();
             $response['tree'] = $treeHandler->createTree($menu);
+            $response['menuItem'] = $menuItem;
         }
 
         return $response;

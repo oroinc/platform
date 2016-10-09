@@ -63,7 +63,8 @@ class MenuUpdateBuilder implements BuilderInterface
             $options[self::OWNERSHIP_TYPE_OPTION] : null;
         $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
         $menuName = $menu->getName();
-        foreach ($this->getUpdates($area, $menuName, $ownershipType) as $update) {
+        $updates = $this->getUpdates($area, $menuName, $ownershipType);
+        foreach ($updates as $update) {
             if ($update->getMenu() == $menuName) {
                 MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
             }
@@ -132,7 +133,7 @@ class MenuUpdateBuilder implements BuilderInterface
      * Return ordered list of ownership providers started by $ownershipType
      * @param string      $area
      * @param string|null $ownershipType
-     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface[]
+     * @return OwnershipProviderInterface[]
      */
     protected function getProviders($area, $ownershipType = null)
     {
@@ -148,15 +149,14 @@ class MenuUpdateBuilder implements BuilderInterface
         }
         // return all tree if ownershipType not defined
         if (null === $ownershipType) {
-            return $filteredProviders;
+            return array_reverse($filteredProviders);
         }
         // remove ownerships higher than selected
         $key = array_search($ownershipType, array_keys($filteredProviders), true);
         if ($key !== false) {
-            return array_slice($filteredProviders, $key, null, true);
+            return array_reverse(array_slice($filteredProviders, $key, null, true));
         }
 
         return [];
     }
-
 }

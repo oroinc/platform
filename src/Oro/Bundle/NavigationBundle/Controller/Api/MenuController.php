@@ -58,14 +58,7 @@ class MenuController extends Controller
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
-
-        if ($menuUpdate->getId() !== null && !$menuUpdate->isExistsInNavigationYml()) {
-            $em->remove($menuUpdate);
-        } else {
-            $menuUpdate->setActive(false);
-            $em->persist($menuUpdate);
-        }
-
+        $em->remove($menuUpdate);
         $em->flush($menuUpdate);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
@@ -88,24 +81,29 @@ class MenuController extends Controller
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager->showMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
 
-        $menuUpdate = $manager->getMenuUpdateByKeyAndScope(
-            $menuName,
-            $key,
-            $ownershipType,
-            $this->getCurrentOwnerId($ownershipType)
-        );
-        if ($menuUpdate === null) {
-            throw $this->createNotFoundException();
-        }
+        return new JsonResponse(null, Response::HTTP_OK);
+    }
 
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
-
-        $menuUpdate->setActive(true);
-
-        $em->persist($menuUpdate);
-        $em->flush();
+    /**
+     * @Put("/menu/hide/{ownershipType}/{menuName}/{key}")
+     *
+     * @ApiDoc(
+     *  description="Make menu item hidden."
+     * )
+     *
+     * @param string $ownershipType
+     * @param string $menuName
+     * @param string $key
+     *
+     * @return Response
+     */
+    public function hideAction($ownershipType, $menuName, $key)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager->hideMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
 
         return new JsonResponse(null, Response::HTTP_OK);
     }

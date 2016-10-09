@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -25,17 +26,32 @@ class MenuUpdateType extends AbstractType
             [
                 'required' => true,
                 'label' => 'oro.navigation.menuupdate.title.label',
-                'options' => ['constraints' => [new NotBlank()]]
+                'options' => ['constraints' => [new NotBlank()]],
+                'validation_groups' => ['Default'],
             ]
         );
 
-        if (!empty($options['validation_groups']) && in_array('UserDefined', $options['validation_groups'])) {
+        if (!$options['exists_in_navigation_yml']) {
             $builder->add(
                 'uri',
                 'text',
                 [
                     'required' => true,
                     'label' => 'oro.navigation.menuupdate.uri.label',
+                    'validation_groups' => ['UserDefined'],
+                ]
+            );
+        }
+
+        if (!empty($options['acl_resource_id'])) {
+            $builder->add(
+                'aclResourceId',
+                'text',
+                [
+                    'label' => 'oro.navigation.menuupdate.acl_resource_id.label',
+                    'mapped' => false,
+                    'disabled' => true,
+                    'data' => $options['acl_resource_id'],
                 ]
             );
         }
@@ -48,6 +64,15 @@ class MenuUpdateType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => MenuUpdate::class,
+            'exists_in_navigation_yml' => true,
+            'acl_resource_id' => null,
+            'validation_groups' => function (FormInterface $form) {
+                $groups = ['Default'];
+                if (!$form->getConfig()->getOption('exists_in_navigation_yml')) {
+                    $groups = ['UserDefined'];
+                }
+                return $groups;
+            }
         ]);
     }
 

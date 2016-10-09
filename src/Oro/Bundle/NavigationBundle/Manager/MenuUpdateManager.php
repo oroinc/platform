@@ -154,6 +154,101 @@ class MenuUpdateManager
     }
 
     /**
+     * @param string $menuName
+     * @param string $key
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    public function showMenuItem($menuName, $key, $ownershipType, $ownerId)
+    {
+        $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
+        if ($item !== null) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $ownershipType, $ownerId);
+            $update->setActive(true);
+            $this->getEntityManager()->persist($update);
+
+            $this->showMenuItemParents($menuName, $item, $ownershipType, $ownerId);
+            $this->showMenuItemChildren($menuName, $item, $ownershipType, $ownerId);
+
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param ItemInterface $item
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    private function showMenuItemParents($menuName, $item, $ownershipType, $ownerId)
+    {
+        $parent = $item->getParent();
+        if ($parent !== null && !$parent->isDisplayed()) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $parent->getName(), $ownershipType, $ownerId);
+            $update->setActive(true);
+            $this->getEntityManager()->persist($update);
+
+            $this->showMenuItemParents($menuName, $parent, $ownershipType, $ownerId);
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param ItemInterface $item
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    private function showMenuItemChildren($menuName, $item, $ownershipType, $ownerId)
+    {
+        /** @var ItemInterface $child */
+        foreach ($item->getChildren() as $child) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $ownershipType, $ownerId);
+            $update->setActive(true);
+            $this->getEntityManager()->persist($update);
+
+            $this->showMenuItemChildren($menuName, $child, $ownershipType, $ownerId);
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param string $key
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    public function hideMenuItem($menuName, $key, $ownershipType, $ownerId)
+    {
+        $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
+        if ($item !== null) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $ownershipType, $ownerId);
+            $update->setActive(false);
+            $this->getEntityManager()->persist($update);
+
+            $this->hideMenuItemChildren($menuName, $item, $ownershipType, $ownerId);
+
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param ItemInterface $item
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    private function hideMenuItemChildren($menuName, $item, $ownershipType, $ownerId)
+    {
+        /** @var ItemInterface $child */
+        foreach ($item->getChildren() as $child) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $ownershipType, $ownerId);
+            $update->setActive(false);
+            $this->getEntityManager()->persist($update);
+
+            $this->hideMenuItemChildren($menuName, $child, $ownershipType, $ownerId);
+        }
+    }
+
+    /**
      * Get menu built by BuilderChainProvider
      *
      * @param string $name

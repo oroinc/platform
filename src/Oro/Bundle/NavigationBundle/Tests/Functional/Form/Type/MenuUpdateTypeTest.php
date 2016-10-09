@@ -66,7 +66,10 @@ class MenuUpdateTypeTest extends WebTestCase
             ];
         }
 
-        $form = $this->formFactory->create(MenuUpdateType::NAME, new MenuUpdate(), $options);
+        $update = new MenuUpdate();
+        $update->setMenu('application_menu');
+
+        $form = $this->formFactory->create(MenuUpdateType::NAME, $update, $options);
         $form->submit($submitData);
         $this->assertEquals($expectedFormIsValid, $form->isValid());
 
@@ -105,7 +108,7 @@ class MenuUpdateTypeTest extends WebTestCase
                 'doAssertEntity' => false,
             ],
             'create' => [
-                'options' => ['validation_groups' => ['Default', 'UserDefined']],
+                'options' => ['exists_in_navigation_yml' => false],
                 'submitData' => [
                     'titles' => ['values' => ['default' => 'Item Title']],
                     'uri'    => '/some/uri',
@@ -114,7 +117,7 @@ class MenuUpdateTypeTest extends WebTestCase
                 'doAssertEntity' => true,
             ],
             'create without uri should fail' => [
-                'options' => ['validation_groups' => ['Default', 'UserDefined']],
+                'options' => ['exists_in_navigation_yml' => false],
                 'submitData' => [
                     'titles' => ['values' => ['default' => 'Item Title']],
                 ],
