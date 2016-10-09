@@ -16,6 +16,8 @@ define([
      * @extends Backgrid.SelectCell
      */
     SelectCell = Backgrid.SelectCell.extend({
+        events: {},
+
         /**
          * @inheritDoc
          */
@@ -27,7 +29,7 @@ define([
             if (options.column.get('metadata').choices) {
                 this.optionValues = [];
                 _.each(options.column.get('metadata').choices, function(value, key) {
-                    this.optionValues.push([textUtil.prepareText(value), key]);
+                    this.optionValues.push([_.escape(textUtil.prepareText(value)), key]);
                 }, this);
             } else {
                 throw new Error('Column metadata must have choices specified');

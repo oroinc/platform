@@ -114,7 +114,6 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
                 if (!$this->startsWith($parts[$partCount - 1], $bundleName)) {
                     $name = $bundleName . $parts[$partCount - 1];
                 }
-
             }
         }
         if (!$name) {

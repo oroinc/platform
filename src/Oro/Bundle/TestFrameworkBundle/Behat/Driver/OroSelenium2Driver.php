@@ -61,12 +61,16 @@ class OroSelenium2Driver extends Selenium2Driver
         if ('input' === $elementName) {
             $classes = explode(' ', $element->attribute('class'));
 
-            if (true === in_array('select2-offscreen', $classes, true)) {
-                $this->fillSelect2Entity($xpath, $value);
+            if (true === in_array('select2-input', $classes, true)) {
+                $parent = $this->findElement($this->xpathManipulator->prepend('/../../..', $xpath));
 
-                return;
-            } elseif (true === in_array('select2-input', $classes, true)) {
-                $this->fillSelect2Entities($xpath, $value);
+                if (in_array('select2-container-multi', explode(' ', $parent->attribute('class')), true)) {
+                    $this->fillSelect2Entities($xpath, $value);
+
+                    return;
+                }
+
+                $this->findElement($xpath)->postValue(['value' => [$value]]);
 
                 return;
             } elseif ('text' === $element->attribute('type')) {
@@ -203,58 +207,6 @@ JS;
         }
 
         return [];
-    }
-
-    /**
-     * Fill select2entity field, like owner, country, state
-     * If more then 1 result found in search, then foreach results and click on the result that exactly matches
-     * If more then 1 result found and no one is exactly matches, then "Too many results" exception will thrown
-     *
-     * @param string $xpath
-     * @param string $value
-     * @throws \Exception
-     */
-    protected function fillSelect2Entity($xpath, $value)
-    {
-        $selectArrow = $this->xpathManipulator->prepend('/../a/span[contains(@class, "select2-arrow")]', $xpath);
-        $driver = $this;
-        $this->waitFor(60000, function () use ($driver, $selectArrow) {
-            return $driver->isVisible($selectArrow);
-        });
-
-        $this
-            ->findElement($selectArrow)
-            ->click();
-
-        foreach ($this->findElementXpaths('//div[contains(@class, "select2-search")]/input') as $input) {
-            $element = $this->findElement($input);
-            if ($element->displayed()) {
-                $element->postValue(['value' => [$value]]);
-            }
-        }
-
-        $this->waitForAjax();
-        $this->wait(60000, "0 == $('ul.select2-results li.select2-searching').length");
-        $results = $this->getEntitiesSearchResultXpaths();
-
-        if (1 < count($results)) {
-            foreach ($results as $result) {
-                $element = $this->findElement($result);
-
-                if ($element->text() == $value) {
-                    $element->click();
-
-                    return;
-                }
-            }
-
-            self::fail(sprintf('Too many results for "%s"', $value));
-        }
-
-        self::assertNotCount(0, $results, sprintf('Not found result for "%s"', $value));
-
-        $this->findElement(array_shift($results))->click();
-        $this->waitForAjax();
     }
 
     /**

@@ -19,6 +19,6 @@ class WorkflowDefinitionRepository extends EntityRepository
             'active' => true,
         ];
 
-        return $this->findBy($criteria, ['priority' => 'DESC']);
+        return $this->findBy($criteria, ['priority' => 'ASC']);
     }
 }

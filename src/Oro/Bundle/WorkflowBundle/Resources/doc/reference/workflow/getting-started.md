@@ -58,6 +58,10 @@ Those values can be entered by user directly or assigned via Actions.
 Attributes. Has it's own state in Workflow Data, current Step and other data. Workflow Item stores entity identifier and entity class that has
 associated workflow.
 
+* **TransitionTriggerEvent** - allows to perform transition when needed entity trigger needed Doctrine Event. 
+
+* **TransitionTriggerCron** - allows to perform transition by cron definition. 
+
 How it works?
 -------------
 
@@ -239,6 +243,21 @@ workflows:
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
                                     - Email: ~              # field must contain valid email
+            schedule_transition:                                            # transition from step "add_email" to "add_email" (self-transition)
+                label: 'Schedule'                                           # transition label
+                step_to: processed                                          # next step after transition performing
+                transition_definition: schedule_transition_definition       # link to definition of conditions and post actions
+                triggers:                                                   # transition triggers
+                    -
+                        cron: '* * * * *'                                   # cron definition
+                        filter: "e.someStatus = 'OPEN'"                     # dql-filter
+                    -
+                        entity_class: Oro\Bundle\SaleBundle\Entity\Quote    # entity class
+                        event: update                                       # event type
+                        field: status                                       # updated field
+                        queued: false                                       # handle trigger not in queue
+                        relation: user                                      # relation to Workflow entity
+                        require: "entity.status = 'pending'"                # expression language condition
 
         transition_definitions:                                   # list of all existing transition definitions
             set_name_definition: []                               # definitions for transition "set_name", no extra conditions or actions here
@@ -257,6 +276,9 @@ workflows:
                             [$email_entity]                       # add email from temporary attribute
                     - @unset_value:                               # unset temporary properties
                             [$email_string, $email_entity]        # clear email string and entity
+            schedule_transition_definition:                       # definitions for transition "schedule_transition", no extra conditions or actions here
+                actions:                                          # list of action which will be performed after transition
+                    - '@assign_value': [$user.status, 'processed']# change user's status
 
 ```
 
@@ -270,6 +292,9 @@ transition entered data will be automatically set to user through attribute prop
 And to perform transition "add_email" user must enter valid email - it must be not empty and has valid format.
 This transition creates new Email entity with assigned email string and User entity, then adds it to User entity to
 create connection and clears temporary attributes in last action.
+
+There are 2 triggers that will try to perform transition `schedule_transition` by cron definition, or when field
+`status` of entity with class`Oro\Bundle\SaleBundle\Entity\Quote` will be updated.
 
 Following diagram shows this logic in graphical representation.
 
@@ -302,3 +327,9 @@ transitions. Command has two required option:
 
 - **--workflow-item** - identifier of WorkflowItem.
 - **--transition** - name of Transition.
+
+#### oro:workflow:handle-transition-cron-trigger
+
+This command handles workflow transition cron trigger with specified identifier. Command has one required option:
+
+- **--id** - identifier of the transition cron trigger.

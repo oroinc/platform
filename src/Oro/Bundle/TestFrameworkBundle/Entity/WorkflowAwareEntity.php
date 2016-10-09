@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareTrait;
 
 /**
  * @ORM\Table(name="test_workflow_aware_entity")

@@ -6,21 +6,11 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 
 class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInterface
 {
-    /**
-     * @var FixtureLoader
-     */
-    protected $fixtureLoader;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFixtureLoader(FixtureLoader $fixtureLoader)
-    {
-        $this->fixtureLoader = $fixtureLoader;
-    }
+    use FixtureLoaderDictionary;
 
     /**
      * Load entity with some data

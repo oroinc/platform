@@ -10,6 +10,7 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -260,17 +261,16 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
+     * @Given /^(?:|I )login as "(?P<loginAndPassword>(?:[^"]|\\")*)" user$/
      * @Given /^(?:|I )login as administrator$/
      */
-    public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
+    public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
         $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
         $this->visit($uri);
-        $this->fillField('_username', $login);
-        $this->fillField('_password', $password);
+        $this->fillField('_username', $loginAndPassword);
+        $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
-
     }
 
     /**
@@ -323,6 +323,35 @@ class OroMainContext extends MinkContext implements
         $page->find('css', 'span.lg-close')->click();
     }
 
+    /**
+     * @Then /^(?:|I )click on "(?P<text>[^"]+)" attachment thumbnail$/
+     */
+    public function commentAttachmentShouldProperlyWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->clickOnAttachmentThumbnail();
+
+        $thumbnail = $this->getPage()->find('css', "div.thumbnail a[title='$text']");
+        self::assertTrue($thumbnail->isValid(), sprintf('Thumbnail "%s" not found', $text));
+
+        $thumbnail->click();
+    }
+
+    /**
+     * @Then /^download link for "(?P<text>[^"]+)" attachment should work$/
+     */
+    public function downloadLinkForAttachmentShouldWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->checkDownloadLink();
+    }
+
      /**
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      */
@@ -371,7 +400,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @When /^(?:|I )save form$/
+     * @When /^(?:|I )(save|submit) form$/
      */
     public function iSaveForm()
     {

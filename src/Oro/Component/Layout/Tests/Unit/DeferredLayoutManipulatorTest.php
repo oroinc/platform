@@ -15,6 +15,7 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
@@ -861,7 +862,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
-                        'vars'     => ['id' => 'header'],
+                        'vars'     =>  ['id' => 'header'],
                         'children' => [
                             [ // logo
                                 'vars' => ['id' => 'logo', 'title' => '']

@@ -143,7 +143,7 @@ class FileExtension extends \Twig_Extension
      * Get file view html block
      *
      * @param \Twig_Environment $environment
-     * @param object            $parentEntity
+     * @param mixed             $parentEntity
      * @param string            $fieldName
      * @param File              $attachment
      * @param array             $additional
@@ -164,11 +164,16 @@ class FileExtension extends \Twig_Extension
             $attachment = $this->getFileById($attachment);
         }
         if ($attachment && $attachment->getFilename()) {
+            if (is_object($parentEntity)) {
+                $url = $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true);
+            } else {
+                $url = null;
+            }
+
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
                     'iconClass'  => $this->manager->getAttachmentIconClass($attachment),
-                    'url'        => $this->manager
-                        ->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'url'        => $url,
                     'fileName'   => $attachment->getOriginalFilename(),
                     'additional' => $additional
                 ]

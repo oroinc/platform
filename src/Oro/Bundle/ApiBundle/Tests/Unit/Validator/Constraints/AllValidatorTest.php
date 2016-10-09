@@ -8,9 +8,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\AbstractLazyCollection;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -83,14 +81,10 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
         ];
     }
 
-    public function testPersistentCollectionKeepsUninitialized()
+    public function testShouldKeepLazyCollectionUninitialized()
     {
-        $collection = new PersistentCollection(
-            $this->getMock('Doctrine\ORM\EntityManagerInterface'),
-            new ClassMetadata('\stdClass'),
-            new ArrayCollection()
-        );
-        $collection->setInitialized(false);
+        /** @var AbstractLazyCollection $collection */
+        $collection = $this->getMockForAbstractClass(AbstractLazyCollection::class);
 
         $this->validator->validate($collection, new All(new NotBlank()));
 

@@ -4,14 +4,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
-use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
 class DatagridTypeTest extends BlockTypeTestCase
@@ -184,7 +183,7 @@ class DatagridTypeTest extends BlockTypeTestCase
 
         $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
         $options = $this->resolveOptions($type, ['grid_name' => 'test-grid', 'split_to_cells' => true]);
-        $type->buildBlock($builder, $options);
+        $type->buildBlock($builder, new Options($options));
     }
 
     public function testGetName()
