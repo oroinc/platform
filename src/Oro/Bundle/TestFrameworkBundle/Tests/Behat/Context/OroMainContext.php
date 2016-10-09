@@ -124,21 +124,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^(?:|I )click update schema$/
-     */
-    public function iClickUpdateSchema()
-    {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-        $page = $this->getPage();
-
-        $page->clickLink('Update schema');
-        $driver->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $driver->waitForAjax(120000);
-    }
-
-    /**
      * Close form error message
      *
      * @Then /^(?:|I )close error message$/
@@ -351,14 +336,6 @@ class OroMainContext extends MinkContext implements
     public function iSaveForm()
     {
         $this->createOroForm()->save();
-    }
-
-    /**
-     * @Given /^(?:|I |I'm )edit entity$/
-     */
-    public function iMEditEntity()
-    {
-        $this->createElement('Entity Edit Button')->click();
     }
 
     /**
