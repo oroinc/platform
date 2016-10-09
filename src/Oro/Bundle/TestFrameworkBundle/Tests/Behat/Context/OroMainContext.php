@@ -149,6 +149,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then /^(?:|I )close ui dialog$/
+     */
+    public function closeUiDialog()
+    {
+        $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
+    }
+
+    /**
      * This is available for collection fields
      * See Emails and Phones in Contact create page
      * Example: And set "charlie@gmail.com" as primary email

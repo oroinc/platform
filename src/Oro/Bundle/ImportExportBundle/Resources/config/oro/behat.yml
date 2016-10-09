@@ -2,3 +2,7 @@ elements:
   ImportFileField:
     selector: "input[id^='oro_importexport_import_file']"
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  ImportErrors:
+    selector: 'div.import-errors'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
