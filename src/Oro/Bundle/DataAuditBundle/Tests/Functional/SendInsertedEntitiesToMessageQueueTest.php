@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Doctrine\ORM\Proxy\Proxy;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
@@ -196,7 +196,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner = new TestAuditDataOwner();
         $owner->setChild($child);
@@ -235,7 +235,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
         //guard
         $this->assertInstanceOf(Proxy::class, $childProxy);
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner = new TestAuditDataOwner();
         $owner->setChild($childProxy);

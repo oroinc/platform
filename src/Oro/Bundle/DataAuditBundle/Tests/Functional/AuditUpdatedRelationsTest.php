@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesRelationsProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
@@ -7,7 +7,6 @@ use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
 class AuditUpdatedRelationsTest extends WebTestCase

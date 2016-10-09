@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
@@ -99,7 +99,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $child->setOwnerManyToOne($owner);
 
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $this->getEntityManager()->remove($child);
         $this->getEntityManager()->flush();

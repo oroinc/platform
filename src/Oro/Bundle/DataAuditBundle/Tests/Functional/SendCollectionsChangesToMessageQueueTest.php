@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
@@ -167,7 +167,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $owner->getChildrenManyToMany()->add($child);
 
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->getChildrenManyToMany()->removeElement($child);
         $this->getEntityManager()->flush();
@@ -203,7 +203,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $owner->getChildrenManyToMany()->add($child);
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->getChildrenManyToMany()->removeElement($child);
         $this->getEntityManager()->remove($child);
@@ -404,7 +404,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $owner->addChildrenOneToMany($child);
 
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->removeChildrenOneToMany($child);
         $this->getEntityManager()->flush();
@@ -439,7 +439,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 
         $owner->addChildrenOneToMany($child);
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->removeChildrenOneToMany($child);
         $this->getEntityManager()->remove($child);
@@ -466,7 +466,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
         $owner->addChildrenOneToMany($this->createChild());
         $owner->addChildrenOneToMany($this->createChild());
         $this->getEntityManager()->flush();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->getChildrenOneToMany()->clear();
         $owner->addChildrenOneToMany($child);

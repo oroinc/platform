@@ -1,8 +1,7 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Util\Async;
+namespace Oro\Bundle\DataAuditBundle\Tests\Util\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseRelationsProcessor;
-use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\Testing\ClassExtensionTrait;

@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Doctrine\ORM\Proxy\Proxy;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
@@ -195,8 +195,8 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 
         $em = $this->getEntityManager();
         $em->flush();
-        
-        $this->getMessageProducer()->clear();
+
+        self::getMessageCollector()->clear();
 
         $owner->setDateProperty($sameDate);
         $em->flush();
@@ -221,7 +221,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $em = $this->getEntityManager();
         $em->flush();
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner = $this->createOwner();
         $owner->setChild($child);
@@ -258,7 +258,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $owner->setChild($firstChild);
 
         $em->flush();
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->setChild($secondChild);
         $em->flush();
@@ -300,7 +300,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         //guard
         $this->assertInstanceOf(Proxy::class, $childProxy);
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner = $this->createOwner();
         $owner->setChild($childProxy);

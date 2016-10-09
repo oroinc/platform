@@ -1,10 +1,9 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional\Listener;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Listener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener;
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
@@ -44,17 +43,6 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertInstanceOf(SendChangedEntitiesToMessageQueueListener::class, $listener);
     }
 
-    public function testShouldDoNothingIfDisabled()
-    {
-        $this->getMessageProducer()->clear();
-
-        $em = $this->getEntityManager();
-        $em->flush();
-
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertEmpty($traces);
-    }
-
     public function testShouldBeEnabledByDefault()
     {
         /** @var SendChangedEntitiesToMessageQueueListener $listener */
@@ -66,8 +54,6 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     public function testShouldDoNothingIfNothingChanged()
     {
         $em = $this->getEntityManager();
-
-        $this->getMessageProducer()->clear();
 
         /** @var SendChangedEntitiesToMessageQueueListener $listener */
         $listener = $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
@@ -81,8 +67,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertEmpty($traces);
+        $this->assertEmpty(self::getSentMessages());
     }
 
     public function testShouldSendEntitiesChangedMessageWithExpectedStructure()
@@ -99,14 +84,14 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
-        
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
+
         //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
 
         /** @var Message $message */
-        $message = $traces[0]['message'];
+        $message = $sentMessages[0]['message'];
 
         self::assertInstanceOf(Message::class, $message);
 
@@ -137,12 +122,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
-
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
+        $this->assertEquals(MessagePriority::VERY_LOW, $sentMessages[0]['message']->getPriority());
     }
 
     public function testShouldSetTimestampToMessage()
@@ -159,13 +142,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
 
         //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
 
-        $message = $traces[0]['message'];
+        $message = $sentMessages[0]['message'];
         $this->assertArrayHasKey('timestamp', $message->getBody());
         $this->assertNotEmpty($message->getBody()['timestamp']);
         
@@ -187,13 +170,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
 
         //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
 
-        $message = $traces[0]['message'];
+        $message = $sentMessages[0]['message'];
         $this->assertArrayHasKey('transaction_id', $message->getBody());
         $this->assertNotEmpty($message->getBody()['transaction_id']);
     }
@@ -207,11 +190,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-
-        $this->assertCount(1, $traces);
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        self::assertMessageSent(Topics::ENTITIES_CHANGED);
     }
 
     public function testShouldSendUpdatedEntityToMessageQueue()
@@ -223,16 +202,12 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        $this->getMessageProducer()->clear();
-        
+        self::getMessageCollector()->clear();
+
         $owner->setStringProperty('anotherString');
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
-
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        self::assertMessageSent(Topics::ENTITIES_CHANGED);
     }
 
     public function testShouldSendDeletedEntityToMessageQueue()
@@ -244,15 +219,12 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
+
         $em->remove($owner);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
-        
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        self::assertMessageSent(Topics::ENTITIES_CHANGED);
     }
 
     public function testShouldSendUpdatedCollectionToMessageQueue()
@@ -267,18 +239,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->getChildrenManyToMany()->add($toBeAddedChild);
 
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-
-        $this->assertCount(1, $traces);
-
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        self::assertMessageSent(Topics::ENTITIES_CHANGED);
     }
 
     public function testShouldSendOneMessagePerFlush()
@@ -294,7 +261,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($toBeUpdateEntity);
         $em->flush();
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         $toBeUpdateEntity->setStringProperty('anotherString');
 
@@ -306,12 +273,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-
-        $this->assertCount(1, $traces);
-
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        self::assertMessageSent(Topics::ENTITIES_CHANGED);
     }
 
     public function testShouldNotSendLoggedInUserInfoIfPresentButNotUserInstance()
@@ -329,13 +291,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
 
         //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
 
-        $message = $traces[0]['message'];
+        $message = $sentMessages[0]['message'];
 
         $this->assertArrayNotHasKey('user_id', $message->getBody());
         $this->assertArrayNotHasKey('user_class', $message->getBody());
@@ -359,13 +321,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
 
         //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
 
-        $message = $traces[0]['message'];
+        $message = $sentMessages[0]['message'];
 
         $this->assertArrayHasKey('user_id', $message->getBody());
         $this->assertSame(123, $message->getBody()['user_id']);
@@ -392,13 +354,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(1, $traces);
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
 
         //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
 
-        $message = $traces[0]['message'];
+        $message = $sentMessages[0]['message'];
 
         $this->assertArrayHasKey('organization_id', $message->getBody());
         $this->assertSame(123, $message->getBody()['organization_id']);
@@ -410,13 +372,5 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     protected function getEntityManager()
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return MessageCollector
-     */
-    private function getMessageProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
 }

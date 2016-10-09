@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional\Service;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Service;
 
 use Oro\Bundle\DataAuditBundle\Service\ConvertChangeSetToAuditFieldsService;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

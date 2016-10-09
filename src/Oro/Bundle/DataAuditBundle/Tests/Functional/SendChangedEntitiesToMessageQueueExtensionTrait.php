@@ -1,10 +1,9 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Proxy;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
@@ -64,7 +63,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         $this->getEntityManager()->persist($owner);
         $this->getEntityManager()->flush();
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         return $owner;
     }
@@ -96,7 +95,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         $this->getEntityManager()->persist($child);
         $this->getEntityManager()->flush();
 
-        $this->getMessageProducer()->clear();
+        self::getMessageCollector()->clear();
 
         return $child;
     }
@@ -106,13 +105,13 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
      */
     protected function getFirstEntitiesChangedMessage()
     {
-        $traces = $this->getMessageProducer()->getSentMessages();
+        $messages = self::getSentMessages();
 
         //guard
-        $this->assertGreaterThanOrEqual(1, count($traces));
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+        $this->assertGreaterThanOrEqual(1, count($messages));
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $messages[0]['topic']);
 
-        return $traces[0]['message'];
+        return $messages[0]['message'];
     }
 
     /**
@@ -121,14 +120,6 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
     protected function getEntityManager()
     {
         return $this->getClient()->getContainer()->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return MessageCollector
-     */
-    private function getMessageProducer()
-    {
-        return $this->getClient()->getContainer()->get('oro_message_queue.client.message_producer');
     }
 
     /**

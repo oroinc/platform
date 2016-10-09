@@ -1,11 +1,10 @@
 <?php
-namespace Oro\Bundle\DataAudit\Tests\Functional\Async;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -96,24 +95,14 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
         $processor->process($message, new NullSession());
         
-        $traces = $this->getMessageProducer()->getSentMessages();
-        $this->assertCount(2, $traces);
-        
-        $this->assertEquals(Topics::ENTITIES_RELATIONS_CHANGED, $traces[0]['topic']);
-
-        /** @var Message $message */
-        $message = $traces[0]['message'];
-        self::assertInstanceOf(Message::class, $message);
-        $this->assertEquals($expectedBody, $message->getBody());
-        $this->assertEquals(MessagePriority::VERY_LOW, $message->getPriority());
-
-        $this->assertEquals(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $traces[1]['topic']);
-
-        /** @var Message $message */
-        $message = $traces[1]['message'];
-        self::assertInstanceOf(Message::class, $message);
-        $this->assertEquals($expectedBody, $message->getBody());
-        $this->assertEquals(MessagePriority::VERY_LOW, $message->getPriority());
+        $this->assertMessageSent(
+            Topics::ENTITIES_RELATIONS_CHANGED,
+            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+        );
+        $this->assertMessageSent(
+            Topics::ENTITIES_INVERSED_RELATIONS_CHANGED,
+            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+        );
     }
 
     public function testShouldCreateAuditForInsertedEntity()
@@ -352,18 +341,25 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
     }
 
     /**
+     * @param mixed  $body
+     * @param string $priority
+     *
+     * @return Message
+     */
+    protected function createExpectedMessage($body, $priority)
+    {
+        $message = new Message();
+        $message->setBody($body);
+        $message->setPriority($priority);
+
+        return $message;
+    }
+
+    /**
      * @return EntityManagerInterface
      */
     private function getEntityManager()
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return MessageCollector
-     */
-    private function getMessageProducer()
-    {
-        return $this->getClient()->getContainer()->get('oro_message_queue.client.message_producer');
     }
 }
