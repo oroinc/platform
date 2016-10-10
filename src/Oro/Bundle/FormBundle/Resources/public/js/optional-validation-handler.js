@@ -8,10 +8,8 @@ define(['jquery'], function($) {
     return {
         /**
          * @param  {jQuery}  $group Optional validation elements group
-         *
-         * @return {boolean}        Should be bubbled
          */
-        handleGroupLoaded: function($group) {
+        initialize: function($group) {
             var self = this;
 
             var labels = this.getGroupElements($group, $group.find('label[data-required]'));
@@ -74,7 +72,7 @@ define(['jquery'], function($) {
          * @param  {jQuery}  $group   Optional validation elements group
          * @param  {jQuery}  $element Changed Element
          *
-         * @return {boolean}          Should be bubbled
+         * @return {boolean} Should parent OptionalValidationHandler be called
          */
         handle: function($group, $element) {
             var tagName = $element.prop('tagName').toLowerCase();
