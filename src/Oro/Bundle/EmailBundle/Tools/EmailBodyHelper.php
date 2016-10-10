@@ -22,7 +22,7 @@ class EmailBodyHelper
                 'hide-comments'  => true
             ];
             $tidy = new \tidy();
-            $body = $tidy->repairString($bodyContent, $config, 'UTF8');
+            $body = $tidy->repairString($bodyContent, $config, 'utf8');
         } else {
             $body = $bodyContent;
             // get `body` content in case of html text
@@ -30,26 +30,20 @@ class EmailBodyHelper
                 $body = $bodyText[1];
             }
         }
+        $body = strip_tags(html_entity_decode(preg_replace('/<(style|script).*?>.*?<\/\1>/su', '', $body)));
+        $body = preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|'
+            . '\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/u', ' ', $body);
 
-        // clear `script` and `style` tags from content
-        $body = preg_replace('/<(style|script).*?>.*?<\/\1>/s', '', html_entity_decode($body));
-
-        // strip tags, clear extra spaces and non printed symbols and convert data to utf-8
-        $clearBodyText = iconv(
-            mb_detect_encoding($body),
-            'UTF-8//IGNORE',
-            preg_replace('/(\s\s+|\n+|[^[:print:]])/', ' ', trim(strip_tags($body)))
-        );
-
+        $body = trim(preg_replace('/(\s\s+|\n+)/u', ' ', $body));
         // trim the text content
-        if (strlen($clearBodyText) > self::MAX_STRING_LENGTH) {
-            $clearBodyText = substr($clearBodyText, 0, self::MAX_STRING_LENGTH);
-            $lastOccurrencePos = strrpos($clearBodyText, ' ', null);
+        if (strlen($body) > self::MAX_STRING_LENGTH) {
+            $body = substr($body, 0, self::MAX_STRING_LENGTH);
+            $lastOccurrencePos = strrpos($body, ' ', null);
             if ($lastOccurrencePos !== false) {
-                $clearBodyText = substr($clearBodyText, 0, $lastOccurrencePos);
+                $body = substr($body, 0, $lastOccurrencePos);
             }
         }
 
-        return $clearBodyText;
+        return $body;
     }
 }
