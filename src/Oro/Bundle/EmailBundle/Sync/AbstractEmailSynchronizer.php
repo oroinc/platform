@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -157,6 +158,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             try {
                 $this->doSyncOrigin($origin, new SynchronizationProcessorSettings());
             } catch (SyncFolderTimeoutException $ex) {
+                break;
+            } catch (ORMException $ex) {
+                $failedOriginIds[] = $origin->getId();
                 break;
             } catch (\Exception $ex) {
                 $failedOriginIds[] = $origin->getId();
