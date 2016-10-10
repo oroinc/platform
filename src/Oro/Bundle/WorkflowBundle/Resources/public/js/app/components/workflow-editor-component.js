@@ -283,7 +283,7 @@ define(function(require) {
                             __(
                                 'oro.workflow.translation_rebuild_required',
                                 {path: routing.generate('oro_translation_translation_index')}
-                                )
+                            )
                         );
                     });
                     mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
