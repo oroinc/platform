@@ -294,10 +294,3 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_search_type_string_filter }
-
-    oro_search.async_messaging.search_message.processor:
-        class: Oro\Bundle\SearchBundle\Engine\AsyncMessaging\SearchMessageProcessor
-        arguments:
-            - '@oro_search.index'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor', 'topicName': 'oro_search.indexing' }
