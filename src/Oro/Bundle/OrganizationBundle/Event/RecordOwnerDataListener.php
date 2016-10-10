@@ -108,9 +108,11 @@ class RecordOwnerDataListener
         $accessor = PropertyAccess::createPropertyAccessor();
         $owner = null;
         if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
-            $owner = $user->getOwner();
-            if (!$owner || !($owner instanceof User)) {
+            $owner = null;
+            if ($user instanceof User) {
                 $owner = $user;
+            } elseif ($user->getOwner() instanceof User) {
+                $owner = $user->getOwner();
             }
         }
         if (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
