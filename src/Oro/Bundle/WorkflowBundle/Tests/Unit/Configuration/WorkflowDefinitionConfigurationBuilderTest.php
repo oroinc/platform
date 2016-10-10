@@ -292,13 +292,6 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
     public function buildFromConfigurationExceptionDataProvider()
     {
         return array(
-            'no label' => array(
-                'expectedException' => '\Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException',
-                'expectedMessage' => 'Configuration option "label" is required',
-                'inputData' => array(
-                    'test_workflow' => array(),
-                ),
-            ),
             'no entity' => array(
                 'expectedException' => '\Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException',
                 'expectedMessage' => 'Configuration option "entity" is required',

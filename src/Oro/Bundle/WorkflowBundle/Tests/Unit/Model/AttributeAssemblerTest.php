@@ -51,20 +51,10 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     public function invalidOptionsDataProvider()
     {
         return array(
-            'no_options' => array(
-                array('name' => array('property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "label" is required'
-            ),
             'no_type' => array(
                 array('name' => array('label' => 'test', 'property_path' => null)),
                 'Oro\Component\Action\Exception\AssemblerException',
                 'Option "type" is required'
-            ),
-            'no_label' => array(
-                array('name' => array('type' => 'test', 'property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "label" is required'
             ),
             'invalid_type' => array(
                 array('name' => array('label' => 'Label', 'type' => 'text', 'property_path' => null)),
