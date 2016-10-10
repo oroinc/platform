@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityBundle\Form\DataTransformer;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
@@ -34,6 +36,9 @@ class ContextsToViewTransformer implements DataTransformerInterface
     /** @var EntityTitleResolverInterface */
     protected $entityTitleResolver;
 
+    /** @var bool */
+    protected $collectionModel;
+
     /**
      * @param EntityManager         $entityManager
      * @param ConfigManager         $configManager
@@ -41,6 +46,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
      * @param TokenStorageInterface $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
      * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param bool $collectionModel True if result should be Collection instead of array
      */
     public function __construct(
         EntityManager $entityManager,
@@ -48,7 +54,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
         TranslatorInterface $translator,
         TokenStorageInterface $securityTokenStorage,
         EventDispatcherInterface $dispatcher,
-        EntityTitleResolverInterface $entityTitleResolver
+        EntityTitleResolverInterface $entityTitleResolver,
+        $collectionModel = false
     ) {
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
@@ -56,6 +63,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
         $this->securityTokenStorage = $securityTokenStorage;
         $this->dispatcher           = $dispatcher;
         $this->entityTitleResolver  = $entityTitleResolver;
+        $this->collectionModel      = $collectionModel;
     }
 
     /**
@@ -67,7 +75,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
             return '';
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Collection) {
             $result = [];
             $user   = $this->securityTokenStorage->getToken()->getUser();
             foreach ($value as $target) {
@@ -128,6 +136,10 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 ['id' => $ids]
             );
             $result   = array_merge($result, $entities);
+        }
+
+        if ($this->collectionModel) {
+            $result = new ArrayCollection($result);
         }
 
         return $result;
