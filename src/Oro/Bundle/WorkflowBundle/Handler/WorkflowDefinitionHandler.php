@@ -11,6 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
@@ -63,20 +64,21 @@ class WorkflowDefinitionHandler
     ) {
         $em = $this->getEntityManager();
         $created = false;
+
         $previousDefinition = null;
 
         if ($newDefinition) {
             if ($workflowDefinition->getName()) {
-                $previousDefinition = new WorkflowDefinition();
-                $previousDefinition->import($workflowDefinition, true);
+                $previousDefinition = WorkflowDefinitionCloner::cloneDefinition($workflowDefinition);
             }
+
             $workflowDefinition->import($newDefinition);
         } else {
             /** @var WorkflowDefinition $existingDefinition */
             $existingDefinition = $this->getEntityRepository()->find($workflowDefinition->getName());
             if ($existingDefinition) {
-                $previousDefinition = new WorkflowDefinition();
-                $previousDefinition->import($existingDefinition, true);
+                $previousDefinition = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
+
                 $workflowDefinition = $existingDefinition->import($workflowDefinition);
             } else {
                 $created = true;

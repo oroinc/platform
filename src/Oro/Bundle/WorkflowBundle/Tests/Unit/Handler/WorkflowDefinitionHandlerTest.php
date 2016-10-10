@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
@@ -78,11 +79,13 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
      * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $existingDefinition
      * @param WorkflowDefinition $newDefinition
+     * @param WorkflowDefinition $previousDefinition
      */
     public function testUpdateWorkflowDefinition(
         WorkflowDefinition $definition,
         WorkflowDefinition $existingDefinition = null,
-        WorkflowDefinition $newDefinition = null
+        WorkflowDefinition $newDefinition = null,
+        WorkflowDefinition $previousDefinition = null
     ) {
         $this->assertNotEquals($definition, $newDefinition);
 
@@ -97,9 +100,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         if (!$existingDefinition && !$newDefinition) {
             $this->entityManager->expects($this->once())->method('persist')->with($definition);
         }
-
-        $previousDefinition = new WorkflowDefinition();
-        $previousDefinition->import($definition);
 
         $this->translationProcessor->expects($this->once())
             ->method('process')
@@ -136,22 +136,38 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->setName('definition3')
             ->setLabel('label3');
 
+        $definition4 = new WorkflowDefinition();
+        $definition4
+            ->setName('definition4')
+            ->setLabel('label4');
+
+        $definition5 = new WorkflowDefinition();
+
         return [
             'with new definition' => [
                 'definition' => $definition1,
                 'existingDefinition' => null,
                 'newDefinition' => $definition2,
+                'prevDefinition' => WorkflowDefinitionCloner::cloneDefinition($definition1),
             ],
             'with existing definition' => [
                 'definition' => $definition3,
-                'existingDefinition' => $definition1,
+                'existingDefinition' => $definition4,
                 'newDefinition' => null,
+                'prevDefinition' => WorkflowDefinitionCloner::cloneDefinition($definition4),
             ],
             'created definition' => [
                 'definition' => $definition1,
                 'existingDefinition' => null,
-                'newDefinition' => null
-            ]
+                'newDefinition' => null,
+                'prevDefinition' => null,
+            ],
+            'with new definition without name' => [
+                'definition' => $definition5,
+                'existingDefinition' => null,
+                'newDefinition' => $definition2,
+                'prevDefinition' => null,
+            ],
         ];
     }
 
