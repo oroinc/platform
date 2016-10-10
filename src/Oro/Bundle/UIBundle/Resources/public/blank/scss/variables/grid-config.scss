@@ -1,2 +1,16 @@
 $grid-offset: 4% !default;
 $grid-count: 12 !default;
+
+%grid__row {
+    margin-bottom: $offset-y;
+
+    @include clearfix;
+}
+
+%grid__column {
+    float: left;
+
+    box-sizing: border-box;
+
+    padding: 0 9px;
+}
