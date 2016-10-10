@@ -124,7 +124,7 @@ class NavigationListener
     {
         $menu->addChild('divider-' . rand(1, 99999))
             ->setLabel('')
-            ->setAttribute('class', 'divider')
+            ->setExtra('divider', true)
             ->setExtra('position', 15); // after manage report, we have 10 there
     }
 

@@ -12,6 +12,7 @@ use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
@@ -27,6 +28,9 @@ abstract class AbstractMenuController extends Controller
      */
     abstract protected function getOwnershipProvider();
 
+    /**
+     * @return array
+     */
     public function indexAction()
     {
         return [
@@ -50,14 +54,21 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param string $menuName
      * @param string|null $parentKey
+     * @param bool $isDivider
      *
      * @return array|RedirectResponse
      */
-    public function createAction($menuName, $parentKey = null)
+    public function createAction($menuName, $parentKey = null, $isDivider = false)
     {
         $provider = $this->getOwnershipProvider();
         /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $this->getManager()->createMenuUpdate($provider->getType(), $provider->getId());
+
+        if ($isDivider) {
+            $menuUpdate->setDivider($isDivider);
+            $menuUpdate->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
+            $menuUpdate->setUri('#');
+        }
 
         if ($parentKey) {
             $parent = $this->getMenuUpdate($menuName, $parentKey, true);
@@ -79,7 +90,7 @@ abstract class AbstractMenuController extends Controller
      */
     public function updateAction($menuName, $key)
     {
-        $menuUpdate = $this->getMenuUpdate($menuName, $key);
+        $menuUpdate = $this->getMenuUpdate($menuName, $key, true);
         $menu = $this->getMenu($menuName);
         $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
 

@@ -54,10 +54,10 @@ navigation:
                 uri: '#'
             menu_list_default:
                 label: 'oro.navigation.menu.menu_list_default.label'
-                route: 'oro_navigation_org_menu_index'
+                route: 'oro_navigation_global_menu_index'
                 extras:
                     position: 90
-                    routes: ['/^oro_navigation_org_menu_[\w_]+$/']
+                    routes: ['/^oro_navigation_global_menu_[\w_]+$/']
                     description: 'Manage menus in default area'
             user_list:
                 extras:
@@ -91,10 +91,10 @@ navigation:
         oro_navigation_user_menu_view: '%%title%% - Menus - %%username%%'
         oro_navigation_user_menu_create: 'Create Menu Item - Menus - %%username%%'
         oro_navigation_user_menu_update: '%%title%% - Edit - Menus - %%username%%'
-        oro_navigation_org_menu_index: ~
-        oro_navigation_org_menu_view: '%%title%%'
-        oro_navigation_org_menu_create: 'Create Menu Item'
-        oro_navigation_org_menu_update: '%%title%% - Edit'
+        oro_navigation_global_menu_index: ~
+        oro_navigation_global_menu_view: '%%title%%'
+        oro_navigation_global_menu_create: 'Create Menu Item'
+        oro_navigation_global_menu_update: '%%title%% - Edit'
 
     navigation_elements:
         pinButton:

@@ -22,13 +22,11 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $update->setKey('item-1-1-1');
 
         $expectedUpdate = new MenuUpdateStub();
-        $expectedUpdate
-            ->setKey('item-1-1-1')
-            ->setParentKey('item-1-1')
-            ->setMenu('menu')
-            ->setExistsInNavigationYml(true)
-            ->setDefaultTitle('item-1-1-1')
-        ;
+        $expectedUpdate->setKey('item-1-1-1');
+        $expectedUpdate->setParentKey('item-1-1');
+        $expectedUpdate->setMenu('menu');
+        $expectedUpdate->setDefaultTitle('item-1-1-1');
+        $expectedUpdate->setExistsInNavigationYml(true);
 
         MenuUpdateUtils::updateMenuUpdate($update, $item, 'menu');
         $this->assertEquals($expectedUpdate, $update);

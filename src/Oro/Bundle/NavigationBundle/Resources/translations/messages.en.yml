@@ -56,6 +56,7 @@ oro:
             delete: Delete
             hide_success_message: Menu item is hidden now.
             show_success_message: Menu item is visible now.
+            divider: Divider
         action:
             manage_menus:
                 label: Manage Menus

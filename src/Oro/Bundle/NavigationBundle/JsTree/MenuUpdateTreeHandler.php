@@ -10,6 +10,8 @@ use Oro\Component\Tree\Handler\AbstractTreeHandler;
 
 class MenuUpdateTreeHandler extends AbstractTreeHandler
 {
+    const MENU_ITEM_DIVIDER_LABEL = '---------------';
+
     /**
      * @var TranslatorInterface
      */
@@ -87,23 +89,23 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
 
     /**
      * {@inheritdoc}
+     *
+     * @param ItemInterface $entity
      */
     protected function formatEntity($entity)
     {
-        $data = [
+        $isDivider = $entity->getExtra('divider', false);
+        $text = $isDivider ? self::MENU_ITEM_DIVIDER_LABEL : $this->translator->trans($entity->getLabel());
+
+        return [
             'id' => $entity->getName(),
             'parent' => $entity->getParent() ? $entity->getParent()->getName() : null,
-            'text' => $this->translator->trans($entity->getLabel()),
+            'text' => $text,
             'state' => [
                 'opened' => $entity->getParent() === null,
                 'disabled' => !$entity->getExtra('editable', false)
-            ]
+            ],
+            'li_attr' => !$entity->isDisplayed() ? ['class' => 'hidden'] : []
         ];
-
-        if (!$entity->isDisplayed()) {
-            $data['li_attr'] = ['class' => 'hidden'];
-        }
-
-        return $data;
     }
 }

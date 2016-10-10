@@ -20,7 +20,7 @@ class OroNavigationBundle implements Migration
     }
 
     /**
-     * Create oro_navigation_menu_upd
+     * Update oro_navigation_menu_upd
      *
      * @param Schema $schema
      */
@@ -28,5 +28,6 @@ class OroNavigationBundle implements Migration
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->changeColumn('ownership_type', ['type' => StringType::getType('string')]);
+        $table->addColumn('is_active', 'boolean', []);
     }
 }

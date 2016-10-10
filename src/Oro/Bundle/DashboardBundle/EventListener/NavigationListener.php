@@ -44,17 +44,17 @@ class NavigationListener
                 $dashboardLabel = $dashboard->getLabel();
                 $dashboardLabel = strlen($dashboardLabel) > 50 ? substr($dashboardLabel, 0, 50).'...' : $dashboardLabel;
 
-                $options = array(
+                $options = [
                     'label' => $dashboardLabel,
                     'route' => 'oro_dashboard_view',
-                    'extras' => array(
+                    'extras' => [
                         'position' => 1
-                    ),
-                    'routeParameters' => array(
+                    ],
+                    'routeParameters' => [
                         'id' => $dashboardId,
                         'change_dashboard' => true
-                    )
-                );
+                    ]
+                ];
                 $dashboardTab
                     ->addChild(
                         $dashboardId . '_dashboard_menu_item',
@@ -64,10 +64,11 @@ class NavigationListener
             }
 
             $dashboardTab
-                ->addChild('divider-' . rand(1, 99999))
+                ->addChild('divider-dashboard')
                 ->setLabel('')
-                ->setAttribute('class', 'divider menu-divider')
-                ->setExtra('position', 2);
+                ->setAttribute('class', 'menu-divider')
+                ->setExtra('position', 2)
+                ->setExtra('divider', true);
         }
     }
 }

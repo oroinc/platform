@@ -31,4 +31,4 @@ datagrids:
         extends: menu-base-grid
         properties:
             view_link:
-                route: oro_navigation_org_menu_view
+                route: oro_navigation_global_menu_view
