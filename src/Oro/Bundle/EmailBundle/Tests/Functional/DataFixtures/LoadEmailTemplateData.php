@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadEmailTemplateData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -39,21 +39,11 @@ class LoadEmailTemplateData extends AbstractFixture implements ContainerAwareInt
     public function load(ObjectManager $manager)
     {
         $owner = $this->getReference('simple_user');
-        $calendar = $manager
-            ->getRepository('Oro\Bundle\CalendarBundle\Entity\Calendar')
-            ->findOneBy([]);
-
-        $event = new CalendarEvent();
-        $event->setTitle('test_title')
-            ->setCalendar($calendar)
-            ->setAllDay(true)
-            ->setStart(new \DateTime('now -2 days', new \DateTimeZone('UTC')))
-            ->setEnd(new \DateTime('now', new \DateTimeZone('UTC')));
 
         $emailTemplate1 = new EmailTemplate('no_entity_name', 'test {{ system.appFullName }} etc');
         $emailTemplate1->setOrganization($owner->getOrganization());
         $emailTemplate2 = new EmailTemplate('test_template', 'test {{ system.appFullName }} etc');
-        $emailTemplate2->setEntityName('Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $emailTemplate2->setEntityName('Oro\Bundle\UserBundle\Entity\User');
         $emailTemplate2->setOrganization($owner->getOrganization());
 
         $emailTemplate3 = new EmailTemplate('no_system', 'test {{ system.appFullName }} etc');
