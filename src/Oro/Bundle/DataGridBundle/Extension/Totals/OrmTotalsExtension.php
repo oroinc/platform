@@ -178,7 +178,6 @@ class OrmTotalsExtension extends AbstractExtension
         }
 
         return $this->groupParts;
-
     }
 
     /**
@@ -359,7 +358,6 @@ class OrmTotalsExtension extends AbstractExtension
 
             $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
         }
-
     }
 
     /**
@@ -437,7 +435,6 @@ class OrmTotalsExtension extends AbstractExtension
             unset($totalRows[$rowName][Configuration::TOTALS_EXTEND_KEY]);
 
             $totalRows[$rowName] = $rowConfig;
-
         }
 
         return $rowConfig;

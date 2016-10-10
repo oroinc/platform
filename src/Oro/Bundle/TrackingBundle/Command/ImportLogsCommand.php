@@ -44,7 +44,6 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
                 InputOption::VALUE_OPTIONAL,
                 'Logs directory'
             );
-
     }
 
     /**

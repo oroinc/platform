@@ -4,19 +4,31 @@ namespace Oro\Bundle\ConfigBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
+use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
+
 class ConfigUpdateEvent extends Event
 {
     const EVENT_NAME = 'oro_config.update_after';
 
-    /** @var array */
+    /** @var ConfigChangeSet */
     protected $changeSet = [];
 
     /**
-     * @param array $changeSet
+     * @param ConfigChangeSet|array $changeSet
      */
-    public function __construct(array $changeSet)
+    public function __construct($changeSet)
     {
-        $this->changeSet = $changeSet;
+        if ($changeSet instanceof ConfigChangeSet) {
+            $this->changeSet = $changeSet;
+        } elseif (is_array($changeSet)) {
+            $this->changeSet = new ConfigChangeSet($changeSet);
+        } else {
+            throw new UnexpectedTypeException(
+                $changeSet,
+                'Oro\Bundle\ConfigBundle\Config\ConfigChangeSet or array'
+            );
+        }
     }
 
     /**
@@ -26,7 +38,7 @@ class ConfigUpdateEvent extends Event
      */
     public function getChangeSet()
     {
-        return $this->changeSet;
+        return $this->changeSet->getChanges();
     }
 
     /**
@@ -38,7 +50,7 @@ class ConfigUpdateEvent extends Event
      */
     public function isChanged($name)
     {
-        return !empty($this->changeSet[$name]);
+        return $this->changeSet->isChanged($name);
     }
 
     /**
@@ -52,11 +64,7 @@ class ConfigUpdateEvent extends Event
      */
     public function getNewValue($name)
     {
-        if (!$this->isChanged($name)) {
-            throw new \LogicException('Could not retrieve value for given key');
-        }
-
-        return $this->changeSet[$name]['new'];
+        return $this->changeSet->getNewValue($name);
     }
 
     /**
@@ -69,10 +77,6 @@ class ConfigUpdateEvent extends Event
      */
     public function getOldValue($name)
     {
-        if (!$this->isChanged($name)) {
-            throw new \LogicException('Could not retrieve value for given key');
-        }
-
-        return $this->changeSet[$name]['old'];
+        return $this->changeSet->getOldValue($name);
     }
 }

@@ -19,7 +19,6 @@ class DatabasePlatformMock extends \Doctrine\DBAL\Platforms\AbstractPlatform
      */
     public function getNativeDeclaration(array $field)
     {
-
     }
 
     /**
@@ -27,7 +26,6 @@ class DatabasePlatformMock extends \Doctrine\DBAL\Platforms\AbstractPlatform
      */
     public function getPortableDeclaration(array $field)
     {
-
     }
 
     /**
@@ -55,45 +53,37 @@ class DatabasePlatformMock extends \Doctrine\DBAL\Platforms\AbstractPlatform
     /** @override */
     public function getBooleanTypeDeclarationSQL(array $field)
     {
-
     }
 
     /** @override */
     public function getIntegerTypeDeclarationSQL(array $field)
     {
-
     }
 
     /** @override */
     public function getBigIntTypeDeclarationSQL(array $field)
     {
-
     }
 
     /** @override */
     public function getSmallIntTypeDeclarationSQL(array $field)
     {
-
     }
 
     /** @override */
     // @codingStandardsIgnoreStart
     protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef) {
     // @codingStandardsIgnoreEnd
-
-
     }
 
     /** @override */
     public function getVarcharTypeDeclarationSQL(array $field)
     {
-
     }
 
     /** @override */
     public function getClobTypeDeclarationSQL(array $field)
     {
-
     }
 
     /* MOCK API */
@@ -120,7 +110,6 @@ class DatabasePlatformMock extends \Doctrine\DBAL\Platforms\AbstractPlatform
 
     protected function initializeDoctrineTypeMappings()
     {
-
     }
     /**
      * Gets the SQL Snippet used to declare a BLOB column type.
