@@ -1,0 +1,23 @@
+$input-padding: $base-ui-element-offset;
+$input-padding--m: 10px 9px;
+$input-padding--s: 8px 9px;
+$input-font-size: $base-ui-element-font-size;
+$input-font-family: $base-ui-element-font-family;
+$input-line-height: $base-ui-element-line-height;
+$input-border: $base-ui-element-border;
+$input-border-radius: $base-ui-element-border-radius;
+$input-background-color: $base-ui-element-bg-color;
+$input-color: $base-ui-element-color;
+
+// Hover
+$input-border-color-hover-state: get-color('ui', 'normal');
+$input-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
+                                     0 0 8px transparentize(get-color('ui', 'focus'), .6);
+
+// Focus
+$input-border-color-focus-state: get-color('ui', 'normal');
+$input-box-shadow-focus-state: $input-box-shadow-hover-state;
+
+// Error
+$input-border-color-error-state: get-color('ui', 'error-dark');
+$input-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);

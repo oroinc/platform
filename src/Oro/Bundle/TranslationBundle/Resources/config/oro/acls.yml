@@ -1,0 +1,20 @@
+acls:
+    oro_translation_language_create:
+        type: entity
+        permission: CREATE
+        class: OroTranslationBundle:Language
+
+    oro_translation_language_view:
+        type: entity
+        permission: VIEW
+        class: OroTranslationBundle:Language
+
+    oro_translation_language_update:
+        type: entity
+        permission: EDIT
+        class: OroTranslationBundle:Language
+
+    oro_translation_language_translate:
+        type: entity
+        permission: TRANSLATE
+        class: OroTranslationBundle:Language

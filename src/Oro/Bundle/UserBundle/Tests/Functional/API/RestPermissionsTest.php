@@ -73,6 +73,5 @@ class RestPermissionsTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(2, $result, "Result should contains only permissions for two entities");
-
     }
 }

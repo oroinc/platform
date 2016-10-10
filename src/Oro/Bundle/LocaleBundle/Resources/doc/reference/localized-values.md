@@ -40,8 +40,8 @@ Use datagrid property with type `localized_value` and attribute `data_name` to s
 If current localization not detected, will be joined SQL relation to default fallback values, otherwhise it will be recieved by LocalizationHelper, sorters and filters will be removed.
 
 ```yml
-# .../Resources/config/datagrid.yml
-datagrid:
+# .../Resources/config/oro/datagrids.yml
+datagrids:
     my-localizations-grid:
         source:
             type: orm

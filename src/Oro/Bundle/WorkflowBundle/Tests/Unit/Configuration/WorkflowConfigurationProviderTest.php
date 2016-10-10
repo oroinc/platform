@@ -76,10 +76,6 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         $bundles = array(new CorrectSplitConfigurationBundle(), new EmptyConfigurationBundle());
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
         $expectedConfiguration = $this->getExpectedWokflowConfiguration('CorrectConfiguration');
-        $expectedConfiguration['first_workflow']['priority'] = 0;
-        $expectedConfiguration['first_workflow']['defaults']['active'] = false;
-        $expectedConfiguration['first_workflow']['exclusive_active_groups'] = [];
-        $expectedConfiguration['first_workflow']['exclusive_record_groups'] = [];
 
         $this->assertEquals(
             $expectedConfiguration,
@@ -136,7 +132,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExpectedWokflowConfiguration($bundleName)
     {
-        $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/workflow.php';
+        $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/oro/workflows.php';
         $this->assertFileExists($fileName);
         return include $fileName;
     }

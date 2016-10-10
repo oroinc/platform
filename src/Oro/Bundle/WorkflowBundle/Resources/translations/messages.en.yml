@@ -243,6 +243,37 @@ oro:
             related_entity.description: Related field for Workflow Step
             grid.label:                 Step
 
+        basetransitiontrigger:
+            entity_label:              Base Transition Trigger
+            entity_plural_label:       Base Transition Triggers
+            id.label:                  ID
+            workflow_definition.label: Workflow Definition
+            transition_name.label:     Transition Name
+            queued.label:              Is Queued
+
+        transitioncrontrigger:
+            entity_label:              Transition Cron Trigger
+            entity_plural_label:       Transition Cron Triggers
+            id.label:                  ID
+            workflow_definition.label: Workflow Definition
+            transition_name.label:     Transition Name
+            queued.label:              Is Queued
+            cron.label:                Cron Expression
+            filter.label:              Filter
+
+        transitioneventtrigger:
+            entity_label:              Transition Event Trigger
+            entity_plural_label:       Transition Event Triggers
+            id.label:                  ID
+            workflow_definition.label: Workflow Definition
+            transition_name.label:     Transition Name
+            queued.label:              Is Queued
+            entity_class.label:        Entity Class
+            event.label:               Event
+            field.label:               Field Name
+            relation.label:            Relation Expression
+            require.label:             Require Expression
+
         form:
             name.label: Name
             from_step.label: From step

@@ -1,0 +1,10 @@
+oro_permissions:
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\TranslationBundle\Entity\Language
+    TRANSLATE:
+        label: oro.translation.language.permission.translate.label
+        group_names: ""
+        apply_to_all: false
+        apply_to_entities:
+            - 'Oro\Bundle\TranslationBundle\Entity\Language'

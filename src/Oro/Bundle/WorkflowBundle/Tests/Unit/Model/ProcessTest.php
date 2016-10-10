@@ -50,8 +50,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        $context = array('context');
-        $configuration = array('config');
+        $context = ['context'];
+        $configuration = ['config'];
 
         $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMock();
@@ -72,8 +72,16 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIsApplicableNoPreConditionsSection()
     {
-        $this->conditionFactory->expects($this->never())
-            ->method($this->anything());
+        $expectedConditionConfiguration = [
+            '@feature_resource_enabled' => [
+                'resource' => '',
+                'resource_type' => 'processes'
+            ]
+        ];
+        $this->conditionFactory->expects($this->once())
+            ->method('create')
+            ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration);
+
 
         $this->assertTrue($this->process->isApplicable([]));
     }
@@ -82,13 +90,20 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $context = [];
         $conditionConfiguration = null;
+        $expectedConditionConfiguration = [
+            '@feature_resource_enabled' => [
+                'resource' => '',
+                'resource_type' => 'processes'
+            ]
+        ];
 
         $this->processDefinition->expects($this->once())
             ->method('getPreConditionsConfiguration')
             ->will($this->returnValue($conditionConfiguration));
 
-        $this->conditionFactory->expects($this->never())
-            ->method($this->anything());
+        $this->conditionFactory->expects($this->once())
+            ->method('create')
+            ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration);
 
         $this->assertTrue($this->process->isApplicable($context));
     }
@@ -97,6 +112,17 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $context = [];
         $conditionConfiguration = ['test' => []];
+        $expectedConditionConfiguration = [
+            '@and' => [
+                [
+                    '@feature_resource_enabled' => [
+                        'resource' => '',
+                        'resource_type' => 'processes'
+                    ]
+                ],
+                ['test' => []]
+            ]
+        ];
         $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
@@ -111,7 +137,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         $this->conditionFactory->expects($this->once())
             ->method('create')
-            ->with(ConfigurableCondition::ALIAS, $conditionConfiguration)
+            ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration)
             ->will($this->returnValue($condition));
 
         $this->assertFalse($this->process->isApplicable($context));
@@ -122,6 +148,17 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $context = [];
         $conditionConfiguration = ['test' => []];
+        $expectedConditionConfiguration = [
+            '@and' => [
+                [
+                    '@feature_resource_enabled' => [
+                        'resource' => '',
+                        'resource_type' => 'processes'
+                    ]
+                ],
+                ['test' => []]
+            ]
+        ];
         $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
@@ -136,7 +173,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         $this->conditionFactory->expects($this->once())
             ->method('create')
-            ->with(ConfigurableCondition::ALIAS, $conditionConfiguration)
+            ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration)
             ->will($this->returnValue($condition));
 
         $this->processDefinition->expects($this->never())

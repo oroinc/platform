@@ -9,6 +9,10 @@ oro_translation_service:
     type:         annotation
     prefix:       /translation
 
+oro_translation_language:
+    resource:     "@OroTranslationBundle/Controller/LanguageController.php"
+    type:         annotation
+    prefix:       /language
 
 oro_translation_bundle_api:
     resource:     "@OroTranslationBundle/Resources/config/oro/routing_api.yml"

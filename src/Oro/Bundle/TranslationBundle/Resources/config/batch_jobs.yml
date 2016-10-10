@@ -1,0 +1,29 @@
+connector:
+    name: oro_importexport
+    jobs:
+        language_translations_export_to_csv:
+            title: "Export Language Translations to CSV"
+            type: export
+            steps:
+                export:
+                    title:     export
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_translation.importexport.reader.translations
+                        processor: oro_importexport.processor.export_delegate
+                        writer:    oro_importexport.writer.csv
+                    parameters:
+                        batch_size: 500
+
+        language_translations_import_from_csv:
+            title: "Import Language Translations from CSV"
+            type: import
+            steps:
+                import:
+                    title:     import
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_importexport.reader.csv
+                        processor: oro_importexport.processor.import_delegate
+                        writer:    oro_integration.writer.persistent_batch_writer
+                    parameters: ~

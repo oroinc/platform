@@ -46,12 +46,12 @@ class OroAsseticExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_assetic',
-            new YamlCumulativeFileLoader('Resources/config/assets.yml')
+            new YamlCumulativeFileLoader('Resources/config/oro/assets.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
-            if (isset($resource->data['css'])) {
-                $result['css'] = array_merge_recursive($result['css'], $resource->data['css']);
+            if (isset($resource->data['assets']['css'])) {
+                $result['css'] = array_merge_recursive($result['css'], $resource->data['assets']['css']);
             }
         }
 

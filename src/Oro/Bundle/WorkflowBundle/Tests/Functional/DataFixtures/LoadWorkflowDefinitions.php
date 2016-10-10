@@ -56,6 +56,7 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
             }
 
             $manager->persist($workflowDefinition);
+            $this->addReference('workflow.' . $workflowDefinition->getName(), $workflowDefinition);
             $hasDefinitions = true;
         }
 
@@ -69,6 +70,6 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
      */
     protected function getWorkflowConfiguration()
     {
-        return Yaml::parse(file_get_contents(__DIR__ . '/config/workflows.yml')) ? : [];
+        return Yaml::parse(file_get_contents(__DIR__ . '/config/oro/workflows.yml')) ? : [];
     }
 }

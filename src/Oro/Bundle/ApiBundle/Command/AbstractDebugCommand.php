@@ -120,9 +120,9 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
 
         /** @var ResourcesProvider $resourcesProvider */
         $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        if (!$resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
+        if (!$resourcesProvider->isResourceKnown($entityClass, $version, $requestType)) {
             throw new \RuntimeException(
-                sprintf('The "%s" entity is not accessible through Data API.', $entityClass)
+                sprintf('The "%s" entity is not configured to be used in Data API.', $entityClass)
             );
         }
 

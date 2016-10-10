@@ -11,6 +11,7 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -105,7 +106,7 @@ class OroMainContext extends MinkContext implements
      */
     public function spin(\Closure $lambda)
     {
-        $time = 6;
+        $time = 60;
 
         while ($time > 0) {
             try {
@@ -230,22 +231,22 @@ class OroMainContext extends MinkContext implements
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
-        $this->getSession()->getDriver()->waitForAjax();
+        $this->waitForAjax();
         $form = $fieldSet->getLastSet();
         $form->fill($table);
     }
 
     /**
-     * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
+     * @Given /^(?:|I )login as "(?P<loginAndPassword>(?:[^"]|\\")*)" user$/
      * @Given /^(?:|I )login as administrator$/
      */
-    public function loginAsUserWithPassword($login = 'admin', $password = 'admin')
+    public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
-        $this->visit('user/login');
-        $this->fillField('_username', $login);
-        $this->fillField('_password', $password);
+        $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
+        $this->visit($uri);
+        $this->fillField('_username', $loginAndPassword);
+        $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
-
     }
 
     /**
@@ -288,6 +289,35 @@ class OroMainContext extends MinkContext implements
         $page = $this->getSession()->getPage();
         $page->find('css', '.lg-image')->mouseOver();
         $page->find('css', 'span.lg-close')->click();
+    }
+
+    /**
+     * @Then /^(?:|I )click on "(?P<text>[^"]+)" attachment thumbnail$/
+     */
+    public function commentAttachmentShouldProperlyWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->clickOnAttachmentThumbnail();
+
+        $thumbnail = $this->getPage()->find('css', "div.thumbnail a[title='$text']");
+        self::assertTrue($thumbnail->isValid(), sprintf('Thumbnail "%s" not found', $text));
+
+        $thumbnail->click();
+    }
+
+    /**
+     * @Then /^download link for "(?P<text>[^"]+)" attachment should work$/
+     */
+    public function downloadLinkForAttachmentShouldWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->checkDownloadLink();
     }
 
      /**
@@ -338,7 +368,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @When /^(?:|I )save form$/
+     * @When /^(?:|I )(save|submit) form$/
      */
     public function iSaveForm()
     {
@@ -458,6 +488,15 @@ class OroMainContext extends MinkContext implements
         $this->createOroForm()->selectFieldOption($select, $option);
     }
 
+    /**
+     * @Then /^(?P<label>[\w\s]+) is a required field$/
+     */
+    public function fieldIsRequired($label)
+    {
+        $labelElement = $this->getPage()->findElementContains('Label', $label);
+        self::assertTrue($labelElement->hasClass('required'));
+    }
+
     /**.
      * @return OroForm
      */
@@ -482,5 +521,13 @@ class OroMainContext extends MinkContext implements
             default:
                 return (int) $count;
         }
+    }
+
+    /**
+     * @param int $time
+     */
+    protected function waitForAjax($time = 60000)
+    {
+        return $this->getSession()->getDriver()->waitForAjax($time);
     }
 }

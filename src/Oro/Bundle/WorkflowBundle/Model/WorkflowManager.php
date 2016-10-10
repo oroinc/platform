@@ -161,7 +161,6 @@ class WorkflowManager
      * @param array $data
      * @param bool $throwGroupException
      * @return WorkflowItem
-     * @throws \Exception
      * @throws WorkflowRecordGroupException
      */
     public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)
@@ -258,7 +257,7 @@ class WorkflowManager
      * Tries to transit workflow and checks weather given transition is allowed.
      * Returns true on success - false otherwise.
      * @param WorkflowItem $workflowItem
-     * @param $transition
+     * @param string $transition
      * @return bool
      */
     public function transitIfAllowed(WorkflowItem $workflowItem, $transition)

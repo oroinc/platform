@@ -1,0 +1,10 @@
+placeholders:
+    placeholders:
+        page_title_after:
+            items:
+                entity_workflows:
+                    order: 100
+
+    items:
+        entity_workflows:
+            template: OroWorkflowBundle:Widget:entityWorkflows.html.twig

@@ -1,0 +1,15 @@
+// Default
+$checkbox-icon-size: auto;
+$checkbox-icon-border: 1px solid transparent;
+$checkbox-icon-bg-color: transparent;
+
+// Checked
+$checkbox-icon-bg-color-focus-state: transparent;
+$checkbox-icon-border-focus-state: 1px solid transparent;
+
+// Hover
+$checkbox-icon-border-hover-state: 1px solid transparent;
+
+// Checked & Focus
+$checkbox-outline-checked-focus-state:  2px solid transparentize(get-color('ui', 'focus'), .47);
+$checkbox-outline-offset-checked-focus-state: -2px;

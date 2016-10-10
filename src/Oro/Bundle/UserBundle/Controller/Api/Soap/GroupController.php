@@ -84,7 +84,6 @@ class GroupController extends SoapController
     public function getManager()
     {
         return $this->container->get('oro_user.group_manager.api');
-
     }
 
     /**

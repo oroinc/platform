@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SearchBundle\Extension\SearchResultProperty;
+use Oro\Bundle\SearchBundle\Datagrid\Extension\SearchResultProperty;
 
 class TagSearchResultProperty extends SearchResultProperty
 {

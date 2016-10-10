@@ -5,4 +5,5 @@ config:
     paths:
         'translator': 'bundles/orotranslation/lib/translator.js'
         'orotranslation/js/translator': 'bundles/orotranslation/js/translator.js'
-        'orotranslation/js/translation/config-action': 'bundles/orotranslation/js/translation/config-action.js'
+        # Will be removed after https://magecore.atlassian.net/browse/BAP-11905
+        'orotranslation/js/app/views/editor/text-editor-view': 'bundles/orotranslation/js/app/views/editor/text-editor-view.js'
