@@ -1,15 +1,14 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Service\ConvertEntityToArrayForMessageQueueService;
 use Oro\Bundle\DataAuditBundle\Service\GetEntityAuditMetadataService;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -27,7 +26,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * "Doctrine will only check the owning side of an association for changes."
  * http://doctrine-orm.readthedocs.io/projects/doctrine-orm/en/latest/reference/unitofwork-associations.html
  */
-class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, OptionalListenerInterface
+class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInterface
 {
     /**
      * @var MessageProducerInterface
@@ -95,7 +94,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
         $this->allUpdates = new \SplObjectStorage;
         $this->allDeletions = new \SplObjectStorage;
         $this->allCollectionUpdates = new \SplObjectStorage;
-        
+
         $this->setEnabled(true);
     }
 
@@ -358,14 +357,6 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
         }
 
         return $collectionUpdates;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSubscribedEvents()
-    {
-        return [Events::onFlush, Events::postFlush];
     }
 
     /**

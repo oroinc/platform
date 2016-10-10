@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\DataAuditBundle\EventListener;
+namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;

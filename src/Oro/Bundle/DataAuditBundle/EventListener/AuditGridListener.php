@@ -5,10 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 
 /**
- * Class AuditGridListener
  * Used to populate choices for objectClass column filter
- *
- * @package Oro\Bundle\DataAuditBundle
  */
 class AuditGridListener
 {

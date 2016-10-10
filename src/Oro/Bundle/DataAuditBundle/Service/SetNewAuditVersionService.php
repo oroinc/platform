@@ -32,12 +32,12 @@ class SetNewAuditVersionService
     public function setVersion(AbstractAudit $audit)
     {
         if (false == $audit->getId()) {
-            throw new \InvalidArgumentException('The audit must be already stored');
+            throw new \InvalidArgumentException('The audit must be already stored.');
         }
 
         if ($audit->getVersion()) {
             throw new \InvalidArgumentException(sprintf(
-                'Audit version already set. Audit: %s, Version: %s',
+                'Audit version already set. Audit: %s, Version: %s.',
                 $audit->getId(),
                 $audit->getVersion()
             ));
@@ -67,7 +67,7 @@ class SetNewAuditVersionService
             }
         }
 
-        throw new \LogicException('Version was not set for audit: id:"%s"', $audit->getId());
+        throw new \LogicException('Version was not set for audit: id:"%s".', $audit->getId());
     }
 
     /**
@@ -107,7 +107,7 @@ class SetNewAuditVersionService
         );
 
         if ($affectedRows > 1) {
-            throw new \LogicException('More than one record were update. auditId: "%s"', $audit->getId());
+            throw new \LogicException('More than one record were update. auditId: "%s".', $audit->getId());
         }
 
         return $affectedRows === 1;
