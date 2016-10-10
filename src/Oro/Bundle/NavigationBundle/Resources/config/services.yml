@@ -6,6 +6,9 @@ parameters:
 
     oro_menu.factory.acl_extension.class:                      Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
+    oro_menu.array_loader.class:                               Knp\Menu\Loader\ArrayLoader
+    oro_menu.menu_manipulator.class:                           Knp\Menu\Util\MenuManipulator
+
     oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
     oro_menu.builder_chain.class:                              Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
     oro_menu.configuration_builder.class:                      Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
@@ -74,16 +77,28 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_menu.factory:
-        class: %oro_menu.factory.class%
+        class: '%oro_menu.factory.class%'
         calls:
             - [ addExtension, [ '@oro_menu_feature_extension' ] ]
             - [ addExtension, [ '@oro_menu_acl_extension' ] ]
 
+    oro_menu.array_loader:
+        class: '%oro_menu.array_loader.class%'
+        public: false
+        arguments:
+            - "@oro_menu.factory"
+
+    oro_menu.manipulator:
+        class: '%oro_menu.menu_manipulator.class%'
+        public: false
+
     oro_menu.builder_chain:
-        class: %oro_menu.builder_chain.class%
+        class: '%oro_menu.builder_chain.class%'
         arguments:
             - '@oro_menu.factory'
             - '@event_dispatcher'
+            - '@oro_menu.array_loader'
+            - '@oro_menu.manipulator'
         tags:
             - { name: knp_menu.provider }
 
