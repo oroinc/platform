@@ -351,7 +351,7 @@ Export template:
 - exportTemplateJob: the id of the export template job you have defined
 - exportTemplateProcessor: the alias id of the export template processor or an array with the alias ids of the processors
 if they are more than one
-- exportTemplatelabel: the label that should be used for the export template options pop-up (in case of multiple export
+- exportTemplateLabel: the label that should be used for the export template options pop-up (in case of multiple export
 processors)
 
 Import:
@@ -370,7 +370,7 @@ Import:
         exportProcessor: exportProcessor,
         importProcessor: 'oro.importexport.processor.import',
         exportTemplateProcessor: exportTemplateProcessor,
-        exportTemplatelabel: 'oro.importexport.processor.export.template_popup.title'|trans,
+        exportTemplateLabel: 'oro.importexport.processor.export.template_popup.title'|trans,
         exportLabel: 'oro.importexport.processor.export.popup.title'|trans,
         datagridName: gridName
     } %}
