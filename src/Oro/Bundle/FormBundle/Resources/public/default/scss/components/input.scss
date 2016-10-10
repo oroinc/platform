@@ -1,4 +1,8 @@
 .input {
+    @include placeholder {
+        color: get-color('additional', 'middle');
+    }
+
     &--size-m {
         padding: $input-padding--m;
     }

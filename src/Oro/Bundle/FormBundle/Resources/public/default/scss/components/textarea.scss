@@ -1,4 +1,8 @@
 .textarea {
+    @include placeholder {
+        color: get-color('additional', 'middle');
+    }
+
     &--size-m {
         padding: $textarea-padding--m;
     }
