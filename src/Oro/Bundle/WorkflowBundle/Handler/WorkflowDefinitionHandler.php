@@ -11,7 +11,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
 class WorkflowDefinitionHandler
 {
@@ -27,21 +29,27 @@ class WorkflowDefinitionHandler
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var TranslationProcessor */
+    protected $translationProcessor;
+
     /**
      * @param WorkflowAssembler $workflowAssembler
      * @param EventDispatcherInterface $eventDispatcher
      * @param ManagerRegistry $managerRegistry
+     * @param TranslationProcessor $translationProcessor
      * @param string $entityClass
      */
     public function __construct(
         WorkflowAssembler $workflowAssembler,
         EventDispatcherInterface $eventDispatcher,
         ManagerRegistry $managerRegistry,
+        TranslationProcessor $translationProcessor,
         $entityClass
     ) {
         $this->workflowAssembler = $workflowAssembler;
         $this->eventDispatcher = $eventDispatcher;
         $this->managerRegistry = $managerRegistry;
+        $this->translationProcessor = $translationProcessor;
         $this->entityClass = $entityClass;
     }
 
@@ -57,12 +65,20 @@ class WorkflowDefinitionHandler
         $em = $this->getEntityManager();
         $created = false;
 
+        $previousDefinition = null;
+
         if ($newDefinition) {
+            if ($workflowDefinition->getName()) {
+                $previousDefinition = WorkflowDefinitionCloner::cloneDefinition($workflowDefinition);
+            }
+
             $workflowDefinition->import($newDefinition);
         } else {
             /** @var WorkflowDefinition $existingDefinition */
             $existingDefinition = $this->getEntityRepository()->find($workflowDefinition->getName());
             if ($existingDefinition) {
+                $previousDefinition = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
+
                 $workflowDefinition = $existingDefinition->import($workflowDefinition);
             } else {
                 $created = true;
@@ -79,6 +95,8 @@ class WorkflowDefinitionHandler
 
         $em->beginTransaction();
         try {
+            $this->translationProcessor->process($workflowDefinition, $previousDefinition);
+
             $em->flush($workflowDefinition);
             $em->commit();
         } catch (\Exception $exception) {
@@ -101,6 +119,8 @@ class WorkflowDefinitionHandler
         if ($workflowDefinition->isSystem()) {
             return false;
         }
+
+        $this->translationProcessor->process(null, $workflowDefinition);
 
         $em = $this->getEntityManager();
         $em->remove($workflowDefinition);
