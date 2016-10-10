@@ -43,7 +43,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      */
     public function buildOneFromConfiguration($name, array $configuration)
     {
-        $this->assertConfigurationOptions($configuration, array('label', 'entity'));
+        $this->assertConfigurationOptions($configuration, array('entity'));
 
         $system = $this->getConfigurationOption($configuration, 'is_system', false);
         $startStepName = $this->getConfigurationOption($configuration, 'start_step', null);
