@@ -32,7 +32,6 @@ class RestDocHandler implements HandlerInterface
 {
     const ID_ATTRIBUTE   = 'id';
     const ID_PLACEHOLDER = '{id}';
-
     const ID_DESCRIPTION = 'The identifier of an entity';
 
     /** @var RestDocViewDetector */

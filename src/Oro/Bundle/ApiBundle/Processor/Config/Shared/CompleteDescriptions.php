@@ -233,6 +233,7 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
+     * @param string                 $targetAction
      * @param string|null            $fieldPrefix
      */
     protected function setDescriptionsForFields(

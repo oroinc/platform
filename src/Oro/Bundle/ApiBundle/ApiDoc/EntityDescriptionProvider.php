@@ -82,9 +82,6 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassName($entityClass);
-        if ($result) {
-            $result = $this->normalizeEntityDescription($result);
-        }
         $this->cache[$entityClass][self::DESCRIPTION] = $result;
 
         return $result;
@@ -107,9 +104,6 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassPluralName($entityClass);
-        if ($result) {
-            $result = $this->normalizeEntityDescription($result);
-        }
         $this->cache[$entityClass][self::PLURAL_DESCRIPTION] = $result;
 
         return $result;
@@ -144,10 +138,7 @@ class EntityDescriptionProvider
                 $result = $this->findFieldDescription($entityClass, $propertyPath);
             }
         }
-        if (!$result) {
-            $result = $this->humanizePropertyPath($propertyPath);
-        }
-        $result = $this->normalizeFieldDescription($result);
+
         $this->cache[$entityClass][self::FIELDS][$propertyPath] = $result;
 
         return $result;
@@ -162,9 +153,7 @@ class EntityDescriptionProvider
      */
     public function humanizeAssociationName($associationName)
     {
-        return $this->normalizeAssociationDescription(
-            $this->humanizePropertyPath($associationName)
-        );
+        return  $this->humanizePropertyPath($associationName);
     }
 
     /**
@@ -180,12 +169,10 @@ class EntityDescriptionProvider
         if (null !== $config) {
             $label = $config->get('description');
             if ($label) {
-                $translated = $this->translator->trans($label);
-                if ($translated === $label) {
-                    $label = $config->get('label');
-                    $translated = $this->translator->trans($label);
+                $result = $this->translator->trans($label);
+                if ($result === $label) {
+                    $result = '';
                 }
-                $result = $translated ? : $label;
             }
         }
 
@@ -238,35 +225,5 @@ class EntityDescriptionProvider
             ' $1',
             strtr($propertyPath, ['_' => ' ', '-' => ' '])
         );
-    }
-
-    /**
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function normalizeEntityDescription($description)
-    {
-        return $description;
-    }
-
-    /**
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function normalizeFieldDescription($description)
-    {
-        return $description;
-    }
-
-    /**
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function normalizeAssociationDescription($description)
-    {
-        return $description;
     }
 }
