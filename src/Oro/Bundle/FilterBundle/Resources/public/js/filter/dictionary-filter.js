@@ -68,6 +68,16 @@ define(function(require) {
         selectedData: {},
 
         /**
+         * Route name for dictionary values filter
+         */
+        dictionaryValueRoute: 'oro_dictionary_value',
+
+        /**
+         * Route name for dictionary search
+         */
+        dictionarySearchRoute: 'oro_dictionary_search',
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
@@ -114,9 +124,10 @@ define(function(require) {
          */
         loadValuesById: function(successEventName) {
             var self = this;
+
             $.ajax({
                 url: routing.generate(
-                    'oro_dictionary_value',
+                    self.dictionaryValueRoute,
                     {
                         dictionary: this.dictionaryClass
                     }
@@ -246,7 +257,7 @@ define(function(require) {
                 containerCssClass: 'dictionary-filter',
                 ajax: {
                     url: routing.generate(
-                        'oro_dictionary_search',
+                        this.dictionarySearchRoute,
                         {
                             dictionary: this.dictionaryClass
                         }
