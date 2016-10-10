@@ -290,16 +290,6 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
-         */
-        resetFilters: function() {
-            _.each(this.filters, function(filter) {
-                filter.reset();
-            });
-            mediator.trigger('datagrid:doRefresh:' + this.collection.inputName);
-        },
-
-        /**
          * Render filter list
          *
          * @return {*}
@@ -420,8 +410,9 @@ define(function(require) {
          * Reset button click handler
          */
         _onReset: function() {
-            this.resetFilters();
-            //mediator.trigger('datagrid:doReset:' + this.collection.inputName);
+            this.collection.state.filters = {};
+            this.collection.trigger('updateState', this.collection);
+            mediator.trigger('datagrid:doRefresh:' + this.collection.inputName);
         },
 
         /**
