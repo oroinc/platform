@@ -138,6 +138,23 @@ services:
             - %oro_user.group.entity.class%
             - '@doctrine.orm.entity_manager'
 
+    oro_user.impersonation_authenticator:
+        class: Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_security.token.factory.username_password_organization'
+            - '@event_dispatcher'
+            - '@router'
+
+    oro_user.event_listener.impersonation_success_listener:
+        class: Oro\Bundle\UserBundle\EventListener\ImpersonationSuccessListener
+        arguments:
+            - '@oro_user.mailer.processor'
+            - '@session.flash_bag'
+            - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: oro_user.impersonation_success, method: onImpersonationSuccess }
+
     # Autocomplete acl user search handler
     oro_user.autocomplete.user.search_acl_handler.abstract:
         abstract: true
@@ -333,7 +350,6 @@ services:
     oro_user.role.datagrid_helper:
         class: %oro_user.role.datagrid_helper.class%
         arguments:
-            - '@security.authorization_checker'
             - '@security.authorization_checker'
 
     oro_user.provider.role_entity_name:

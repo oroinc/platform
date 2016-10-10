@@ -138,3 +138,12 @@ services:
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
+        calls:
+            - [setDoctrine, ['@doctrine']]
+
+    oro_test.environment.handler.scenario_environment_handlre:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
+        arguments:
+            - '@context.factory'
+        tags:
+            - { name: 'environment.handler', priority: 100 }
