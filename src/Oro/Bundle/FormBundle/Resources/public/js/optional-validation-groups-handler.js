@@ -30,7 +30,7 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
                 }
             );
 
-            self.handleOptionalGroupValidationLoaded(formElement);
+            self.initializeOptionalValidationGroupHandlers(formElement);
         },
 
         /**
@@ -50,16 +50,16 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
          *
          * @return {boolean}
          */
-        handleOptionalGroupValidationLoaded: function($formElement) {
+        initializeOptionalValidationGroupHandlers: function($formElement) {
             var self = this;
 
             var rootOptionalValidationGroups = this.getRootLevelOptionalValidationGroups($formElement);
             rootOptionalValidationGroups.each(function(index, group) {
                 var $group = $(group);
-                self.handleOptionalGroupValidationLoaded($group);
+                self.initializeOptionalValidationGroupHandlers($group);
 
                 var optionalValidationHandler = self.getHandler($group);
-                optionalValidationHandler.handleGroupLoaded($group);
+                optionalValidationHandler.initialize($group);
             });
         },
 
@@ -68,7 +68,7 @@ define(['jquery', 'oroform/js/optional-validation-handler'], function($, default
          *
          * @return {boolean}
          */
-        getRootLevelOptionalValidationGroups: function($element){
+        getRootLevelOptionalValidationGroups: function($element) {
             return $element.find('[data-validation-optional-group]')
                 .not('[data-validation-optional-group] [data-validation-optional-group]');
         },
