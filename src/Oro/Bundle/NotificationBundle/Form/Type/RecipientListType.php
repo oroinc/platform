@@ -29,7 +29,7 @@ class RecipientListType extends AbstractType
             'users',
             'oro_user_organization_acl_multiselect',
             [
-                'required' => false,
+                'required' => true,
                 'label'    => 'oro.user.entity_plural_label'
             ]
         );
