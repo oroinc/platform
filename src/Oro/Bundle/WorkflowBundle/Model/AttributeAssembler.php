@@ -66,7 +66,7 @@ class AttributeAssembler extends BaseAbstractAssembler
             $options = $this->guessOptions($options, $definition->getRelatedEntity(), $options['property_path']);
         }
 
-        $this->assertOptions($options, array('type'));
+        $this->assertOptions($options, array('label', 'type'));
         $this->assertAttributeEntityAcl($options);
 
         $attribute = new BaseAttribute();
