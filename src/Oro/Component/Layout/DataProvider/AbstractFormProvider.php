@@ -32,6 +32,7 @@ abstract class AbstractFormProvider
      * @param mixed $data
      * @param array $parameters
      * @param array $options
+     * @param string $instanceName
      *
      * @return FormAccessor
      */
@@ -40,9 +41,10 @@ abstract class AbstractFormProvider
         $routeName = null,
         $data = null,
         array $parameters = [],
-        array $options = []
+        array $options = [],
+        $instanceName = ''
     ) {
-        $cacheKey = $this->getCacheKey($formName, $routeName, $parameters);
+        $cacheKey = $this->getCacheKey($formName, $instanceName, $routeName, $parameters);
         if (!array_key_exists($cacheKey, $this->forms)) {
             $this->forms[$cacheKey] = new FormAccessor(
                 $this->getForm($formName, $data, $options),
@@ -71,13 +73,14 @@ abstract class AbstractFormProvider
      * Get form cache key
      *
      * @param string $formName
+     * @param string $instanceName
      * @param string $routeName
      * @param array $parameters
      *
      * @return string
      */
-    protected function getCacheKey($formName, $routeName, array $parameters = [])
+    protected function getCacheKey($formName, $instanceName, $routeName, array $parameters = [])
     {
-        return sprintf('%s:%s:%s', $formName, $routeName, implode(':', $parameters));
+        return sprintf('%s:%s:%s:%s', $formName, $instanceName, $routeName, implode(':', $parameters));
     }
 }

@@ -89,7 +89,6 @@ class FileController extends RestGetController implements ClassResourceInterface
 
                 return parent::buildResponse($data, $action, $contextValues, $status);
             }
-
         } else {
             return parent::buildResponse($data, $action, $contextValues, $status);
         }

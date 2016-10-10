@@ -28,6 +28,14 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
             $metadata['class'] = $this->params['options']['class'];
         }
 
+        if (array_key_exists('dictionaryValueRoute', $this->params)) {
+            $metadata['dictionaryValueRoute'] = $this->params['dictionaryValueRoute'];
+        }
+
+        if (array_key_exists('dictionaryValueSearch', $this->params)) {
+            $metadata['dictionarySearchRoute'] = $this->params['dictionarySearchRoute'];
+        }
+
         return $metadata;
     }
 

@@ -27,3 +27,10 @@ services:
             - '@oro_locale.settings'
         tags:
             - { name: form.type, alias: oro_translation_add_language }
+
+    oro_translationr.form.type.filter.language:
+        class: 'Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType'
+        arguments: 
+            - '@oro_locale.formatter.language_code'
+        tags:
+            - { name: form.type, alias: oro_translation_filter_language }

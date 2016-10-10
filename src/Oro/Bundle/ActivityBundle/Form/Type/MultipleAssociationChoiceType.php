@@ -30,7 +30,6 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
                 $choiceView->vars['disabled'] = true;
             }
         }
-
     }
 
     /**

@@ -26,7 +26,6 @@ class ReportChartSchemaCollectionType extends ConfigProviderAwareType
                 );
             }
         }
-
     }
 
     /**

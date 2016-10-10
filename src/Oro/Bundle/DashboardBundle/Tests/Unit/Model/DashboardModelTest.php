@@ -165,7 +165,6 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
         $this->dashboardModel->addWidget($widgetModel, $column);
         $this->assertEquals($widgetModel, $this->widgets[2]);
-
     }
 
     public function addWidgetRecalculatePositionDataProvider()
