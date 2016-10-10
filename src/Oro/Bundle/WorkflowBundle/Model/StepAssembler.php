@@ -51,11 +51,9 @@ class StepAssembler extends BaseAbstractAssembler
      */
     protected function assembleStep($stepName, array $options)
     {
-        $this->assertOptions($options, array('label'));
-
         $step = new Step();
         $step->setName($stepName)
-            ->setLabel($options['label'])
+            ->setLabel($this->getOption($options, 'label'))
             ->setOrder($this->getOption($options, 'order', 0))
             ->setFinal($this->getOption($options, 'is_final', false))
             ->setAllowedTransitions($this->getOption($options, 'allowed_transitions', array()))
