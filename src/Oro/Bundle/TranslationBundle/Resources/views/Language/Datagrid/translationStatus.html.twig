@@ -1,9 +1,9 @@
-{% if record.getValue('translationInstalled') %}
-    <div class="translation-status">
-        {% if record.getValue('translationAvailableUpdate') %}
-            <span class="status-needs-update">{{ 'oro.translation.language.translation_status.update_needed'|trans }}</span>
-        {% else %}
-            <span class="status-up-to-date">{{ 'oro.translation.language.translation_status.up_to_date'|trans }}</span>
-        {% endif %}
-    </div>
-{% endif %}
+<div class="translation-status">
+    {% if record.getValue('translationAvailableInstall') %}
+        <span class="status-available-install">{{ 'oro.translation.language.translation_status.install_available'|trans }}</span>
+    {% elseif record.getValue('translationAvailableUpdate') %}
+        <span class="status-available-update">{{ 'oro.translation.language.translation_status.update_available'|trans }}</span>
+    {% elseif record.getValue('translationInstalled') %}
+        <span class="status-up-to-date">{{ 'oro.translation.language.translation_status.up_to_date'|trans }}</span>
+    {% endif %}
+</div>

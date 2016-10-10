@@ -28,6 +28,8 @@ class FormFieldsType extends AbstractFormType
 {
     const NAME = 'form_fields';
 
+    const SHORT_NAME = 'fields';
+
     /** @var FormLayoutBuilderInterface */
     protected $formLayoutBuilder;
 
@@ -95,7 +97,6 @@ class FormFieldsType extends AbstractFormType
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['form_data', 'split_to_fields']);
         parent::buildView($view, $block, $options);
-
     }
 
     /**

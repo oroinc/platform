@@ -164,7 +164,6 @@ abstract class AbstractMapper
                     } else {
                         $objectData[$fieldConfig['target_type']][$targetField] = $value;
                     }
-
                 }
             } else {
                 foreach ($targetFields as $targetField) {

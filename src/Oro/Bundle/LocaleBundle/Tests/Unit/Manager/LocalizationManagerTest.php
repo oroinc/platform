@@ -79,7 +79,6 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->manager->getLocalization($entity->getId());
 
         $this->assertEquals($entity, $result);
-
     }
 
     public function testGetLocalizations()

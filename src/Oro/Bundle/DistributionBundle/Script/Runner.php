@@ -266,7 +266,6 @@ class Runner
             preg_match($regexp, $item, $itemMatches);
 
             return $itemMatches[1];
-
         };
         $files = array_filter(
             $files,
