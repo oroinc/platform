@@ -323,7 +323,6 @@ class Imap extends \Zend\Mail\Storage\Imap
             }
         }
 
-
         return $response;
     }
 
