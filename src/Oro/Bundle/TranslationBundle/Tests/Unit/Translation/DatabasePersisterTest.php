@@ -2,22 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 
 class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var DatabasePersister */
-    protected $persister;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $em;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $repo;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataCache;
+    /** @var NativeQueryExecutorHelper */
+    private $nativeQueryExecutorHelper;
 
     /** @var array */
     protected $testData = [
@@ -35,80 +26,92 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $testLocale = 'en';
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->repo          = $this->getMockBuilder(
-            'Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository'
-        )
-            ->disableOriginalConstructor()->getMock();
-        $this->metadataCache = $this
-            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
-            ->disableOriginalConstructor()->getMock();
+        $this->nativeQueryExecutorHelper =
+            $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
 
-
-        $this->em->expects($this->any())->method('getRepository')->with($this->equalTo(Translation::ENTITY_NAME))
-            ->will($this->returnValue($this->repo));
-        $this->persister = new DatabasePersister($this->em, $this->metadataCache);
-
-        // set batch size to 2
-        $reflection = new \ReflectionProperty(get_class($this->persister), 'batchSize');
-        $reflection->setAccessible(true);
-        $reflection->setValue($this->persister, 2);
+        $this->nativeQueryExecutorHelper->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('oro_test_table');
     }
 
     protected function tearDown()
     {
-        unset($this->em, $this->persister, $this->repo);
+        unset($this->nativeQueryExecutorHelper);
     }
 
-    public function testPersist()
+    public function testAllNewTranslationsInserted()
     {
-        $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->exactly(5))->method('persist');
-        $this->em->expects($this->exactly(3))->method('flush');
-        $this->em->expects($this->exactly(3))->method('clear');
-        $this->em->expects($this->once())->method('commit');
-        $this->em->expects($this->never())->method('rollback');
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->once())->method('beginTransaction');
+        $connection->expects($this->exactly(2))->method('fetchAll')->willReturn([]);
+        $connection->expects($this->exactly(5))->method('insert');
+        $connection->expects($this->never())->method('update');
+        $connection->expects($this->once())->method('commit');
+        $connection->expects($this->never())->method('rollback');
 
-        $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
+        $doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($connection);
 
-        $this->persister->persist($this->testLocale, $this->testData);
+        $metadataCache = $this
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
+
+        $persister = new DatabasePersister($doctrine, $this->nativeQueryExecutorHelper, $metadataCache);
+        $persister->persist($this->testLocale, $this->testData);
     }
 
-    public function testPersistUpdateScenario()
+    public function testInsertAndUpdateScenario()
     {
-        $testValue         = 'some Value';
-        $existsTranslation = new Translation();
-        $existsTranslation->setValue($testValue);
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->once())->method('beginTransaction');
+        $connection->expects($this->exactly(2))->method('fetchAll')->willReturnOnConsecutiveCalls(
+            [
+                ['id' => 1, 'key' => 'key_1', 'value' => 'value_1'], //existing translation, to be skipped
+                ['id' => 2, 'key' => 'key_2', 'value' => 'value_02'], //existing with different value, to be updated
+            ],
+            [
+                ['id' => 4, 'key' => 'key_1', 'value' => 'value_1'], //existing translation, to be skipped
+                ['id' => 5, 'key' => 'key_2', 'value' => 'value_02'], //existing with different value, to be updated
+            ]
+        );
+        $connection->expects($this->exactly(1))->method('insert');
+        $connection->expects($this->exactly(2))->method('update');
 
-        $this->repo->expects($this->any())->method('findValue')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['key_1', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, null],
-                        ['key_2', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, null],
-                        ['key_3', $this->testLocale, 'messages', Translation::SCOPE_SYSTEM, null],
-                        ['key_1', $this->testLocale, 'validators', Translation::SCOPE_SYSTEM, $existsTranslation],
-                        ['key_2', $this->testLocale, 'validators', Translation::SCOPE_SYSTEM, null],
-                    ]
-                )
-            );
+        $connection->expects($this->once())->method('commit');
+        $connection->expects($this->never())->method('rollback');
 
-        $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->exactly(5))->method('persist');
-        $this->em->expects($this->exactly(3))->method('flush');
-        $this->em->expects($this->exactly(3))->method('clear');
-        $this->em->expects($this->once())->method('commit');
-        $this->em->expects($this->never())->method('rollback');
+        $doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($connection);
 
-        $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
+        $metadataCache = $this
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
 
-        $this->persister->persist($this->testLocale, $this->testData);
-
-        $this->assertSame($this->testData['validators']['key_1'], $existsTranslation->getValue());
-        $this->assertNotSame($testValue, $existsTranslation->getValue());
+        $persister = new DatabasePersister($doctrine, $this->nativeQueryExecutorHelper, $metadataCache);
+        $persister->persist($this->testLocale, $this->testData);
     }
 
     public function testExceptionScenario()
@@ -117,15 +120,30 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException($exceptionClass);
         $exception = new $exceptionClass();
 
-        $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->exactly(5))->method('persist');
-        $this->em->expects($this->exactly(3))->method('flush');
-        $this->em->expects($this->exactly(3))->method('clear');
-        $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
-        $this->em->expects($this->once())->method('rollback');
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->once())->method('beginTransaction');
+        $connection->expects($this->any())->method('fetchAll')->willReturn([]);
+        $connection->expects($this->exactly(5))->method('insert');
+        $connection->expects($this->never())->method('update');
+        $connection->expects($this->once())->method('commit')->will($this->throwException($exception));
+        $connection->expects($this->once())->method('rollback');
 
-        $this->metadataCache->expects($this->never())->method('updateTimestamp');
+        $doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($connection);
 
-        $this->persister->persist($this->testLocale, $this->testData);
+        $metadataCache = $this
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadataCache->expects($this->never())->method('updateTimestamp');
+
+        $persister = new DatabasePersister($doctrine, $this->nativeQueryExecutorHelper, $metadataCache);
+        $persister->persist($this->testLocale, $this->testData);
     }
 }
