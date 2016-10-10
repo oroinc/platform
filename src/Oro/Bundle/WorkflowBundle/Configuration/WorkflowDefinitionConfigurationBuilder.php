@@ -73,7 +73,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
             ->setName($name)
-            ->setLabel($configuration['label'])
+            ->setLabel($this->getConfigurationOption($configuration, 'label'))
             ->setRelatedEntity($configuration['entity'])
             ->setStepsDisplayOrdered($stepsDisplayOrdered)
             ->setSystem($system)
