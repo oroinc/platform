@@ -1,0 +1,8 @@
+services:
+    oro_logger.event_subscriber.console_command:
+        class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber
+        arguments:
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
+            - { name: monolog.logger, channel: console }

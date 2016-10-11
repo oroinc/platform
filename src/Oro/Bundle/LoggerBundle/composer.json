@@ -1,0 +1,21 @@
+{
+    "name": "oro/logger-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Logger Bundle",
+    "keywords": ["BAP", "Log", "Logger", "Debug"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*, !=2.8.10"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\LoggerBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/LoggerBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
