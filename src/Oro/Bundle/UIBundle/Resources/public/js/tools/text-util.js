@@ -1,4 +1,4 @@
-define(['orotranslation/js/translator'], function(__) {
+define(['underscore', 'orotranslation/js/translator'], function(_, __) {
     'use strict';
 
     // matches "A. L. Price", "In progress", "one of all"
@@ -24,6 +24,9 @@ define(['orotranslation/js/translator'], function(__) {
          * @returns {string}
          */
         prepareText: function(text) {
+            if (!_.isString(text)) {
+                return text;
+            }
             // disallow line breaks at start of string if there are short words at the start
             text = text.replace(shortWordsAtStartRegExp, function() {
                 // can be one of two following cases
@@ -73,7 +76,10 @@ define(['orotranslation/js/translator'], function(__) {
          * @return {string}
          */
         abbreviate: function(text, minWordsCount) {
-            var words = text.split(/\W+/);
+            if (!_.isString(text)) {
+                return text;
+            }
+            var words = _.compact(text.split(/\W+/));
             if (words.length < minWordsCount) {
                 return text;
             }

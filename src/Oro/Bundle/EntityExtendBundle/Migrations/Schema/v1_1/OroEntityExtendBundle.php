@@ -55,6 +55,5 @@ class OroEntityExtendBundle implements Migration, ContainerAwareInterface
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'oro_enum_value_trans_idx', []);
         /** End of generate table oro_enum_value_trans **/
-
     }
 }

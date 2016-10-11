@@ -67,9 +67,9 @@ class ThemeResourceProvider implements ResourceProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadResources(ContainerBuilder $container = null)
+    public function loadResources(ContainerBuilder $container = null, array $resources = [])
     {
-        $resources = $this->getConfigLoader()->load($container);
+        $resources = array_merge($resources, $this->getConfigLoader()->load($container));
         foreach ($resources as $resource) {
             /**
              * $resource->data contains data in following format

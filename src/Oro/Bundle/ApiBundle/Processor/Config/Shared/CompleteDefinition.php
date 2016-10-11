@@ -131,7 +131,10 @@ class CompleteDefinition implements ProcessorInterface
         $existingFields = [];
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath();
+            if (empty($propertyPath) || ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
+                $propertyPath = $fieldName;
+            }
             $existingFields[$propertyPath] = $fieldName;
         }
 
@@ -206,26 +209,39 @@ class CompleteDefinition implements ProcessorInterface
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 $dataType = $field->getDataType();
-                if ($dataType && 0 === strpos($dataType, 'association:')) {
-                    list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
+                if (DataType::isExtendedAssociation($dataType)) {
+                    if ($field->getTargetType()) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The "target_type" option cannot be configured for "%s::%s".',
+                                $entityClass,
+                                $fieldName
+                            )
+                        );
+                    }
+                    if ($field->getDependsOn()) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The "depends_on" option cannot be configured for "%s::%s".',
+                                $entityClass,
+                                $fieldName
+                            )
+                        );
+                    }
+
+                    list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
                     $targetClass = $field->getTargetClass();
                     if (!$targetClass) {
                         $targetClass = EntityIdentifier::class;
                         $field->setTargetClass($targetClass);
                     }
-                    if (!$field->getTargetType()) {
-                        $field->setTargetType($this->getExtendedAssociationTargetType($associationType));
-                    }
-                    if (!$field->getDependsOn()) {
-                        $field->setDependsOn(
-                            $this->getExtendedAssociationTargetFields(
-                                $entityClass,
-                                $associationType,
-                                $associationKind
-                            )
-                        );
-                    }
+                    $field->setTargetType($this->getExtendedAssociationTargetType($associationType));
+
                     $this->completeAssociation($field, $targetClass, $version, $requestType);
+
+                    $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
+                    $field->setDependsOn(array_values($targets));
+                    $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
                 }
             }
         }
@@ -250,18 +266,58 @@ class CompleteDefinition implements ProcessorInterface
      * @param string $associationType
      * @param string $associationKind
      *
-     * @return string[]
+     * @return array [target_entity_class => field_name]
      */
-    protected function getExtendedAssociationTargetFields($entityClass, $associationType, $associationKind)
+    protected function getExtendedAssociationTargets($entityClass, $associationType, $associationKind)
     {
-        $targets = $this->associationManager->getAssociationTargets(
+        return $this->associationManager->getAssociationTargets(
             $entityClass,
             null,
             $associationType,
             $associationKind
         );
+    }
 
-        return array_values($targets);
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param string[]                    $targets
+     */
+    protected function fixExtendedAssociationIdentifierDataType(EntityDefinitionFieldConfig $field, array $targets)
+    {
+        $targetEntity = $field->getTargetEntity();
+        if (null === $targetEntity) {
+            return;
+        }
+        $idFieldNames = $targetEntity->getIdentifierFieldNames();
+        if (1 !== count($idFieldNames)) {
+            return;
+        }
+        $idField = $targetEntity->getField(reset($idFieldNames));
+        if (null === $idField) {
+            return;
+        }
+
+        if (DataType::STRING === $idField->getDataType()) {
+            $idDataType = null;
+            foreach ($targets as $target) {
+                $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($target);
+                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+                if (1 !== count($targetIdFieldNames)) {
+                    $idDataType = null;
+                    break;
+                }
+                $dataType = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
+                if (null === $idDataType) {
+                    $idDataType = $dataType;
+                } elseif ($idDataType !== $dataType) {
+                    $idDataType = null;
+                    break;
+                }
+            }
+            if ($idDataType) {
+                $idField->setDataType($idDataType);
+            }
+        }
     }
 
     /**

@@ -11,7 +11,7 @@ use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
@@ -294,18 +294,20 @@ class RestDocHandler implements HandlerInterface
                     }
                 }
 
-                if ($filter instanceof ComparisonFilter && $metadata->hasAssociation($filter->getField())) {
-                    $targetClassNames = $metadata->getAssociation($filter->getField())
-                        ->getAcceptableTargetClassNames();
-                    $targetEntityTypes = [];
-                    foreach ($targetClassNames as $targetClassName) {
-                        $targetEntityType = $this->getEntityType($targetClassName);
-                        if ($targetEntityType) {
-                            $targetEntityTypes[] = $targetEntityType;
+                if ($filter instanceof FieldAwareFilterInterface) {
+                    $association = $metadata->getAssociation($filter->getField());
+                    if (null !== $association && !DataType::isAssociationAsField($association->getDataType())) {
+                        $targetClassNames = $association->getAcceptableTargetClassNames();
+                        $targetEntityTypes = [];
+                        foreach ($targetClassNames as $targetClassName) {
+                            $targetEntityType = $this->getEntityType($targetClassName);
+                            if ($targetEntityType) {
+                                $targetEntityTypes[] = $targetEntityType;
+                            }
                         }
-                    }
-                    if (!empty($targetEntityTypes)) {
-                        $options['relation'] = implode(',', $targetEntityTypes);
+                        if (!empty($targetEntityTypes)) {
+                            $options['relation'] = implode(',', $targetEntityTypes);
+                        }
                     }
                 }
 

@@ -3,14 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -18,24 +11,8 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 /**
  * Initializes sub-resources for all API resources based on API configuration and metadata.
  */
-class InitializeSubresources implements ProcessorInterface
+class InitializeSubresources extends LoadSubresources
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
-
-    /** @var MetadataProvider */
-    protected $metadataProvider;
-
-    /**
-     * @param ConfigProvider   $configProvider
-     * @param MetadataProvider $metadataProvider
-     */
-    public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
-    {
-        $this->configProvider = $configProvider;
-        $this->metadataProvider = $metadataProvider;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -51,45 +28,21 @@ class InitializeSubresources implements ProcessorInterface
 
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-        $configExtras = $this->getConfigExtras();
-        $metadataExtras = $this->getMetadataExtras();
 
+        $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
         $resources = $context->getResources();
         foreach ($resources as $resource) {
             $subresources->add(
-                $this->createEntitySubresources(
-                    $resource,
-                    $version,
-                    $requestType,
-                    $configExtras,
-                    $metadataExtras
-                )
+                $this->createEntitySubresources($resource, $version, $requestType, $accessibleResources)
             );
         }
     }
 
     /**
-     * @return ConfigExtraInterface[]
-     */
-    protected function getConfigExtras()
-    {
-        return [new EntityDefinitionConfigExtra()];
-    }
-
-    /**
-     * @return MetadataExtraInterface[]
-     */
-    protected function getMetadataExtras()
-    {
-        return [];
-    }
-
-    /**
-     * @param ApiResource              $resource
-     * @param string                   $version
-     * @param RequestType              $requestType
-     * @param ConfigExtraInterface[]   $configExtras
-     * @param MetadataExtraInterface[] $metadataExtras
+     * @param ApiResource $resource
+     * @param string      $version
+     * @param RequestType $requestType
+     * @param array       $accessibleResources
      *
      * @return ApiResourceSubresources
      */
@@ -97,87 +50,29 @@ class InitializeSubresources implements ProcessorInterface
         ApiResource $resource,
         $version,
         RequestType $requestType,
-        array $configExtras,
-        array $metadataExtras
+        array $accessibleResources
     ) {
         $entityClass = $resource->getEntityClass();
-        $config = $this->configProvider->getConfig(
-            $entityClass,
-            $version,
-            $requestType,
-            $configExtras
-        );
-        $metadata = $this->metadataProvider->getMetadata(
-            $entityClass,
-            $version,
-            $requestType,
-            $config->getDefinition(),
-            $metadataExtras
-        );
+        $config = $this->getConfig($entityClass, $version, $requestType);
+        $metadata = $this->getMetadata($entityClass, $version, $requestType, $config);
         if (null === $metadata) {
             throw new RuntimeException(sprintf('A metadata for "%s" entity does not exist.', $entityClass));
         }
 
-        $resourceExcludedActions = $resource->getExcludedActions();
-        $subresourceExcludedActions = !empty($resourceExcludedActions)
-            ? $this->getSubresourceExcludedActions($resourceExcludedActions)
-            : [];
-
+        $subresourceExcludedActions = $this->getSubresourceExcludedActions($resource);
         $entitySubresources = new ApiResourceSubresources($entityClass);
         $associations = $metadata->getAssociations();
         foreach ($associations as $associationName => $association) {
-            $subresource = $entitySubresources->addSubresource($associationName);
-            $subresource->setTargetClassName($association->getTargetClassName());
-            $subresource->setAcceptableTargetClassNames($association->getAcceptableTargetClassNames());
-            $subresource->setIsCollection($association->isCollection());
-            if (!$association->isCollection()) {
-                $excludedActions = $subresourceExcludedActions;
-                if (!in_array(ApiActions::ADD_RELATIONSHIP, $excludedActions, true)) {
-                    $excludedActions[] = ApiActions::ADD_RELATIONSHIP;
-                }
-                if (!in_array(ApiActions::DELETE_RELATIONSHIP, $excludedActions, true)) {
-                    $excludedActions[] = ApiActions::DELETE_RELATIONSHIP;
-                }
-                $subresource->setExcludedActions($excludedActions);
-            } elseif (!empty($subresourceExcludedActions)) {
-                $subresource->setExcludedActions($subresourceExcludedActions);
+            if ($this->isExcludedAssociation($associationName, $config)) {
+                continue;
             }
-        }
 
-        return $entitySubresources;
-    }
-
-    /**
-     * @param string[] $resourceExcludedActions
-     *
-     * @return string[]
-     */
-    protected function getSubresourceExcludedActions(array $resourceExcludedActions)
-    {
-        $result = array_intersect(
-            $resourceExcludedActions,
-            [
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
-            ]
-        );
-
-        if (in_array(ApiActions::UPDATE, $resourceExcludedActions, true)) {
-            $result = array_unique(
-                array_merge(
-                    $result,
-                    [
-                        ApiActions::UPDATE_RELATIONSHIP,
-                        ApiActions::ADD_RELATIONSHIP,
-                        ApiActions::DELETE_RELATIONSHIP
-                    ]
-                )
+            $entitySubresources->addSubresource(
+                $associationName,
+                $this->createSubresource($association, $accessibleResources, $subresourceExcludedActions)
             );
         }
 
-        return array_values($result);
+        return $entitySubresources;
     }
 }

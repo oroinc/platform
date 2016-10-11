@@ -103,10 +103,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $configValues
+     * @param array $expectedValues
      * @param string $entityName
-     * @dataProvider setParametersDataProvider
+     * @dataProvider processConfigsProvider
      */
-    public function testProcessConfigs(array $configValues, $entityName)
+    public function testProcessConfigs(array $configValues, array $expectedValues, $entityName)
     {
         $this->authChecker->expects($this->any())
             ->method('isGranted')
@@ -116,6 +117,15 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                     return !in_array($fieldName, ['nonAvailable1', 'nonAvailable2']);
                 }
             );
+
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->will($this->returnValueMap([
+                ['resource1', null, false],
+                ['resource2', null, true],
+                ['EDIT;entity:' . $entityName, null, true],
+            ]));
+
         $config = DatagridConfiguration::create($configValues);
 
         $callback = $this->getProcessConfigsCallBack();
@@ -128,7 +138,6 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->processConfigs($config);
 
-        $expectedValues = $this->getProcessConfigsExpectedValues($entityName);
         $expectedResult = DatagridConfiguration::create($expectedValues);
 
         $key = Configuration::BASE_CONFIG_KEY;
@@ -138,11 +147,15 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($config->offsetGet($key), $expectedResult->offsetGet($key));
     }
 
+    /**
+     * @param string $entityName
+     * @return array
+     */
     protected function getProcessConfigsExpectedValues($entityName)
     {
         return [
             Configuration::BASE_CONFIG_KEY => [
-                'enable' => false,
+                'enable' => true,
                 'entity_name' => $entityName,
                 'behaviour' => 'enable_all',
                 'save_api_accessor' => [
@@ -165,6 +178,22 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                     'choices' => [
                         'one' => 'One',
                         'two' => 'Two',
+                    ]
+                ],
+                'testRel' => [
+                    'label' => 'test_rel',
+                    PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                    Configuration::BASE_CONFIG_KEY => [
+                        'enable' => 'true',
+                        'editor' => [
+                            'view_options' => [
+                                'value_field_name' => 'owner'
+                            ]
+                        ],
+                        'autocomplete_api_accessor' => [
+                            'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                            'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                        ]
                     ]
                 ],
                 'testAnotherText' => [
@@ -204,28 +233,60 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'two' => 'Two',
                         ]
                     ];
+                case 'testRel':
+                    return [
+                        Configuration::BASE_CONFIG_KEY => [],
+                        PropertyInterface::FRONTEND_TYPE_KEY => 'relation'
+                    ];
+                case 'nonAvailable1':
+                case 'nonAvailable2':
+                    return [Configuration::BASE_CONFIG_KEY => ['enable' => 'true']];
             }
 
             return [];
         };
     }
 
-    public function setParametersDataProvider()
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function processConfigsProvider()
     {
         $entityName = 'Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity';
 
+        $expectedValues = $this->getProcessConfigsExpectedValues($entityName);
+
         return [
-            'with entity_name' => [
+            'with entity_name and ACL resource1' => [
                 [
                     Configuration::BASE_CONFIG_KEY => [
                         'enable' => true,
                         'entity_name' => $entityName,
+                        'acl_resource' => 'resource1',
                     ],
                     FormatterConfiguration::COLUMNS_KEY => [
                         'testText' => ['label' => 'test_text'],
                         'testSelect' => [
                             'label' => 'test_select',
                             PropertyInterface::FRONTEND_TYPE_KEY => 'string',
+                        ],
+                        'testRel' => [
+                            'label' => 'test_rel',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                            Configuration::BASE_CONFIG_KEY => [
+                                'enable' => 'true',
+                                'editor' => [
+                                    'view_options' => [
+                                        'value_field_name' => 'owner'
+                                    ]
+                                ],
+                                'autocomplete_api_accessor' => [
+                                    'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                                    'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                                ]
+                            ],
                         ],
                         'testAnotherText' => [
                             'label' => 'test_config_overwrite',
@@ -240,6 +301,70 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'inline_editing' => ['enable' => true]
                         ]
                     ]
+                ],
+                [
+                    Configuration::BASE_CONFIG_KEY => array_merge(
+                        $expectedValues[Configuration::BASE_CONFIG_KEY],
+                        [
+                            Configuration::CONFIG_ACL_KEY => 'resource1',
+                            Configuration::CONFIG_ENABLE_KEY => false,
+                        ]
+                    ),
+                    FormatterConfiguration::COLUMNS_KEY => $expectedValues[FormatterConfiguration::COLUMNS_KEY],
+                ],
+                $entityName
+            ],
+            'with entity_name and ACL resource2' => [
+                [
+                    Configuration::BASE_CONFIG_KEY => [
+                        'enable' => true,
+                        'entity_name' => $entityName,
+                        'acl_resource' => 'resource2',
+                    ],
+                    FormatterConfiguration::COLUMNS_KEY => [
+                        'testText' => ['label' => 'test_text'],
+                        'testSelect' => [
+                            'label' => 'test_select',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'string',
+                        ],
+                        'testRel' => [
+                            'label' => 'test_rel',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                            Configuration::BASE_CONFIG_KEY => [
+                                'enable' => 'true',
+                                'editor' => [
+                                    'view_options' => [
+                                        'value_field_name' => 'owner'
+                                    ]
+                                ],
+                                'autocomplete_api_accessor' => [
+                                    'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                                    'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                                ]
+                            ],
+                        ],
+                        'testAnotherText' => [
+                            'label' => 'test_config_overwrite',
+                            'inline_editing' => ['enable' => false]
+                        ],
+                        'id' => ['label' => 'test_black_list'],
+                        'updatedAt' => ['label' => 'test_black_list'],
+                        'createdAt' => ['label' => 'test_black_list'],
+                        'nonAvailable1' => ['label' => 'nonAvailable1'],
+                        'nonAvailable2' => [
+                            'label' => 'nonAvailable2',
+                            'inline_editing' => ['enable' => true]
+                        ]
+                    ]
+                ],
+                [
+                    Configuration::BASE_CONFIG_KEY => array_merge(
+                        $expectedValues[Configuration::BASE_CONFIG_KEY],
+                        [
+                            Configuration::CONFIG_ACL_KEY => 'resource2',
+                        ]
+                    ),
+                    FormatterConfiguration::COLUMNS_KEY => $expectedValues[FormatterConfiguration::COLUMNS_KEY],
                 ],
                 $entityName
             ],
@@ -255,6 +380,22 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'label' => 'test_select',
                             PropertyInterface::FRONTEND_TYPE_KEY => 'string',
                         ],
+                        'testRel' => [
+                            'label' => 'test_rel',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                            Configuration::BASE_CONFIG_KEY => [
+                                'enable' => 'true',
+                                'editor' => [
+                                    'view_options' => [
+                                        'value_field_name' => 'owner'
+                                    ]
+                                ],
+                                'autocomplete_api_accessor' => [
+                                    'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                                    'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                                ]
+                            ],
+                        ],
                         'testAnotherText' => [
                             'label' => 'test_config_overwrite',
                             'inline_editing' => ['enable' => false]
@@ -269,6 +410,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ],
+                $this->getProcessConfigsExpectedValues($entityName),
                 $entityName
             ],
             'entity_name & extended_entity_name' => [
@@ -284,6 +426,22 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                             'label' => 'test_select',
                             PropertyInterface::FRONTEND_TYPE_KEY => 'string',
                         ],
+                        'testRel' => [
+                            'label' => 'test_rel',
+                            PropertyInterface::FRONTEND_TYPE_KEY => 'relation',
+                            Configuration::BASE_CONFIG_KEY => [
+                                'enable' => 'true',
+                                'editor' => [
+                                    'view_options' => [
+                                        'value_field_name' => 'owner'
+                                    ]
+                                ],
+                                'autocomplete_api_accessor' => [
+                                    'class' => 'orouser/js/tools/acl-users-search-api-accessor',
+                                    'permission_check_entity_name' => 'Oro_Bundle_TestBundle_Entity_Test'
+                                ]
+                            ],
+                        ],
                         'testAnotherText' => [
                             'label' => 'test_config_overwrite',
                             'inline_editing' => ['enable' => false]
@@ -298,6 +456,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ],
+                $this->getProcessConfigsExpectedValues($entityName),
                 $entityName
             ]
         ];

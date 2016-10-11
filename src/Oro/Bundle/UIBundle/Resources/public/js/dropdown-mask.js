@@ -24,7 +24,7 @@ define(['jquery'], function($) {
             if (!$mask) {
                 createMask();
             }
-            $mask.css('zIndex', zIndex || '').show();
+            $mask.css('zIndex', zIndex === void 0 ? '' : zIndex).show();
             return {
                 onhide: function(callback) {
                     onHide = callback;

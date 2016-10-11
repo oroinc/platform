@@ -5,9 +5,11 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\ArrayOptionValueBuilder;
 use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class TitleType extends AbstractType
 {
@@ -29,23 +31,19 @@ class TitleType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        foreach (['value', 'separator', 'reverse'] as $optionName) {
-            $view->vars[$optionName] = $options[$optionName];
-        }
+        BlockUtils::setViewVarsFromOptions($view, $options, ['value', 'separator', 'reverse']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
         $title = $view->vars['value'];
         if ($title instanceof OptionValueBag) {
             $view->vars['value'] = $title->buildValue(new ArrayOptionValueBuilder(true));
-        } else {
-            $view->vars['value'] = (array)$view->vars['value'];
         }
     }
 

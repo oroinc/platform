@@ -14,22 +14,13 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     public function hasGetter($className, $property)
     {
-        $suffix = $this->camelize($property);
+        $reflClass = $this->getReflectionClass($className);
 
-        $refl = $this->getReflectionClass($className);
-        if ($refl->hasMethod('get' . $suffix)) {
+        $getter = $this->findGetterName($reflClass, $property);
+        if ($getter) {
             return true;
         }
-        if ($refl->hasMethod('is' . $suffix)) {
-            return true;
-        }
-        if ($refl->hasMethod('has' . $suffix)) {
-            return true;
-        }
-        if ($refl->hasMethod($suffix)) {
-            return true;
-        }
-        if ($refl->hasProperty($property)) {
+        if ($reflClass->hasProperty($property)) {
             return true;
         }
 
@@ -48,36 +39,16 @@ class EntityDataAccessor implements DataAccessorInterface
                 return true;
             }
         } else {
-            $refl = $this->getReflectionClass(get_class($object));
+            $reflClass = $this->getReflectionClass(get_class($object));
 
-            $suffix = $this->camelize($property);
-
-            $accessor = 'get' . $suffix;
-            if ($refl->hasMethod($accessor)) {
-                $value = $object->{$accessor}();
+            $getter = $this->findGetterName($reflClass, $property);
+            if ($getter) {
+                $value = $object->{$getter}();
 
                 return true;
             }
-            $accessor = 'is' . $suffix;
-            if ($refl->hasMethod($accessor)) {
-                $value = $object->{$accessor}();
-
-                return true;
-            }
-            $accessor = 'has' . $suffix;
-            if ($refl->hasMethod($accessor)) {
-                $value = $object->{$accessor}();
-
-                return true;
-            }
-            $accessor = $suffix;
-            if ($refl->hasMethod($accessor)) {
-                $value = $object->{$accessor}();
-
-                return true;
-            }
-            if ($refl->hasProperty($property)) {
-                $prop = $refl->getProperty($property);
+            if ($reflClass->hasProperty($property)) {
+                $prop = $reflClass->getProperty($property);
                 $prop->setAccessible(true);
                 $value = $prop->getValue($object);
 
@@ -141,9 +112,58 @@ class EntityDataAccessor implements DataAccessorInterface
             return $this->reflCache[$className];
         }
 
-        $reflClass                   = new \ReflectionClass($className);
+        $reflClass = new \ReflectionClass($className);
         $this->reflCache[$className] = $reflClass;
 
         return $reflClass;
+    }
+
+    /**
+     * @param \ReflectionClass $reflClass
+     * @param string           $property
+     *
+     * @return string|null
+     */
+    protected function findGetterName(\ReflectionClass $reflClass, $property)
+    {
+        $camelized = $this->camelize($property);
+
+        $getter = 'get' . $camelized;
+        if ($this->isGetter($reflClass, $getter)) {
+            return $getter;
+        }
+        $getter = 'is' . $camelized;
+        if ($this->isGetter($reflClass, $getter)) {
+            return $getter;
+        }
+        $getter = 'has' . $camelized;
+        if ($this->isGetter($reflClass, $getter)) {
+            return $getter;
+        }
+        $getter = lcfirst($camelized);
+        if ($this->isGetter($reflClass, $getter)) {
+            return $getter;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \ReflectionClass $reflClass
+     * @param string           $methodName
+     *
+     * @return string|null
+     */
+    protected function isGetter(\ReflectionClass $reflClass, $methodName)
+    {
+        if (!$reflClass->hasMethod($methodName)) {
+            return false;
+        }
+
+        $method = $reflClass->getMethod($methodName);
+
+        return
+            $method->isPublic()
+            && 0 === $method->getNumberOfRequiredParameters();
     }
 }
