@@ -3,10 +3,10 @@
 
     background: $base-white-color;
 
-    font-size: $font-size;
+    font-size: $base-font-size;
     line-height: 1;
 
-    border: 1px solid $base-border-color;
+    border: 1px solid get-color(additional, 'light');
     border-radius: 5px;
 
     padding: 0 !important; //TODO: After remove .input classes from select delete !important
@@ -38,7 +38,7 @@
 
                 margin-top: -($oro-select2-arrow-size - 2);
 
-                border-top: ($oro-select2-arrow-size + 1) solid $base-font-color-lighter;
+                border-top: ($oro-select2-arrow-size + 1) solid get-color('additional', 'lighter');
                 border-left: $oro-select2-arrow-size solid transparent;
                 border-right: $oro-select2-arrow-size solid transparent;
 
@@ -69,10 +69,10 @@
     .select2-search input {
         padding: 11px 9px;
 
-        font-size: $font-size;
+        font-size: $base-font-size;
         line-height: 1;
 
-        border: 1px solid $base-border-color;
+        border: 1px solid get-color(additional, 'light');
         border-radius: 5px;
     }
 
@@ -85,7 +85,7 @@
 
         font-size: 13px;
 
-        border: 0.1rem solid $base-border-color;
+        border: 0.1rem solid get-color(additional, 'light');
         border-top-color: transparent;
         box-shadow: 0 3px 5px rgba(0,0,0,.15);
 
@@ -93,7 +93,7 @@
             margin: 0;
             padding: 0;
 
-            color: $base-font-color;
+            color: get-color('additional', 'dark');
         }
 
         .select2-no-results {
@@ -114,7 +114,7 @@
 
         // Open up
         &.select2-drop-above {
-            border-top-color: $base-border-color;
+            border-top-color: get-color(additional, 'light');
             border-bottom-color: transparent;
             box-shadow: 0 -3px 5px rgba(0,0,0,0.15)
         }
@@ -150,10 +150,10 @@
                 border: .1rem solid $color-success;
             }
 
-            font-size: $font-size;
+            font-size: $base-font-size;
             line-height: 1;
 
-            border: 1px solid $base-border-color;
+            border: 1px solid get-color(additional, 'light');
             border-radius: 5px;
 
             padding: 6px 8px;
@@ -198,12 +198,12 @@
     &.error {
         border-color: $color-error;
 
-        color: $base-font-color;
+        color: get-color('additional', 'dark');
     }
 
     // Open select
     &.select2-container-active {
-        border: 1px solid $base-border-color;
+        border: 1px solid get-color(additional, 'light');
         box-shadow: 0 1px 5px rgba(0,0,0,.15);
     }
 

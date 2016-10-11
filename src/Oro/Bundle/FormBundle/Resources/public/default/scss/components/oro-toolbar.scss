@@ -16,7 +16,7 @@
 
         padding: 0 $offset-y-m;
 
-        line-height: ($font-size - 0.1) * 2;
+        line-height: ($base-font-size - 0.1) * 2;
         font-family: $roboto-font;
         text-align: center;
 
@@ -65,10 +65,10 @@
 
         line-height: 2;
 
-        color: $base-font-color;
+        color: get-color('additional', 'dark');
 
         &:hover {
-            color: $base-font-color;
+            color: get-color('additional', 'dark');
         }
     }
 
