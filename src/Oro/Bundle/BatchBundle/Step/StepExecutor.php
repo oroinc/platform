@@ -149,7 +149,6 @@ class StepExecutor
                         $stopExecution = true;
                         continue;
                     }
-
                 } catch (InvalidItemException $e) {
                     $this->handleStepExecutionWarning($this->reader, $e, $warningHandler);
 

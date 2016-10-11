@@ -85,10 +85,8 @@ class UrlExtension extends \Twig_Extension
 
         if (!empty($parts['host']) && $parts['host'] !== $this->request->getHost()) {
             $isLocal = false;
-
         } elseif (!empty($parts['port']) && $parts['port'] !== $this->request->getPort()) {
             $isLocal = false;
-
         } elseif (!empty($parts['scheme']) && $this->request->isSecure() && $parts['scheme'] !== 'https') {
             // going out from secure connection to insecure page on same domain is not local
             $isLocal = false;

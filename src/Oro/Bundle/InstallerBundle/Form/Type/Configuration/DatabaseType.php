@@ -4,6 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
@@ -11,6 +12,14 @@ use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoaded;
 
 class DatabaseType extends AbstractType
 {
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -27,6 +36,11 @@ class DatabaseType extends AbstractType
                         new Assert\NotBlank(),
                         new ExtensionLoaded(),
                     ),
+                    'attr' => [
+                        'data-mysql-hint' => $this->translator->trans(
+                            'form.configuration.database.mysql_hint'
+                        ),
+                    ]
                 )
             )
             ->add(

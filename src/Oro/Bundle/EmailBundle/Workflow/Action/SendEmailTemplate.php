@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
@@ -133,12 +134,17 @@ class SendEmailTemplate extends AbstractSendEmail
         $emailModel->setBody($templateRendered);
         $emailModel->setType($emailTemplate->getType());
 
-        $emailUser = $this->emailProcessor->process(
-            $emailModel,
-            $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
-        );
+        $emailUser = null;
+        try {
+            $emailUser = $this->emailProcessor->process(
+                $emailModel,
+                $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
+            );
+        } catch (\Swift_SwiftException $exception) {
+            $this->logger->error('Workflow send email template action.', ['exception' => $exception]);
+        }
 
-        if (array_key_exists('attribute', $this->options)) {
+        if (array_key_exists('attribute', $this->options) && $emailUser instanceof EmailUser) {
             $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
         }
     }
