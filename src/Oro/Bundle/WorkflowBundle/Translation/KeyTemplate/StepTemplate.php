@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
 class StepTemplate extends WorkflowTemplate
 {
+    const NAME = 'step';
+
     /**
      * @return string
      */

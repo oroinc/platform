@@ -241,3 +241,7 @@ services:
         parent: oro_filter.entity_filter
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }
+
+    oro_translation.generator.translation_key:
+        class: 'Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator'
+        public: false

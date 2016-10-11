@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Translation;
+namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Inflector\Inflector;
 

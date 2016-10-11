@@ -3,6 +3,7 @@ oro:
         change_entity_confirmation: "Are you sure you want to change entity?"
         activated: "Workflow activated"
         deactivated_list: "Deactivated workflows: "
+        translation_rebuild_required: "Update Translation Cache Required. <a href='{{ path }}'>Click here</a>"
         workflowdefinition:
             activate: 'Activate workflow "{{ label }}"'
             deactivate: 'Deactivate workflow "{{ label }}"'
