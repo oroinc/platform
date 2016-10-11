@@ -28,6 +28,12 @@ class OroEmailBundle implements Migration, ContainerAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        // We should not do anything if text_body field already exists.
+        // This field could be added during update from old versions.
+        if ($schema->getTable('oro_email_body')->hasColumn('text_body')) {
+            return;
+        }
+
         static::addTextBodyFieldToEmailBodyTable($schema);
 
         // send migration message to queue
@@ -41,8 +47,6 @@ class OroEmailBundle implements Migration, ContainerAwareInterface
     public static function addTextBodyFieldToEmailBodyTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_body');
-        if (!$table->hasColumn('text_body')) {
-            $table->addColumn('text_body', 'text', ['notnull' => false]);
-        }
+        $table->addColumn('text_body', 'text', ['notnull' => false]);
     }
 }
