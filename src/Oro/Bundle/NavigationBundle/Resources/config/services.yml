@@ -444,11 +444,15 @@ services:
         tags:
             - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
 
+    oro_navigation.menu_manipulator:
+        class: Knp\Menu\Util\MenuManipulator
+        public: false
+
     oro_navigation.extension.datasource.menu:
         class: Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource
         arguments:
             - '@oro_menu.builder_chain'
-            - '@oro_menu.menu_manipulator'
+            - '@oro_navigation.menu_manipulator'
             - '%oro_navigation.area%'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }

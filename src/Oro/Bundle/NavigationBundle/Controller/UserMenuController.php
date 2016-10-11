@@ -13,14 +13,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class UserMenuController extends AbstractMenuController
 {
     /**
-     * {@inheritdoc}
-     */
-    protected function getOwnershipProvider()
-    {
-        return $this->get('oro_navigation.ownership_provider.user');
-    }
-
-    /**
      * @Route("/", name="oro_navigation_user_menu_index")
      * @Template
      *
@@ -28,7 +20,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function indexAction()
     {
-        return parent::indexAction();
+        return parent::index();
     }
 
     /**
@@ -41,7 +33,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return parent::viewAction($menuName);
+        return parent::view($menuName);
     }
 
     /**
@@ -55,7 +47,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::createAction($menuName, $parentKey);
+        return parent::create($menuName, $parentKey, $this->getOwnerId());
     }
 
     /**
@@ -69,6 +61,30 @@ class UserMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::updateAction($menuName, $key);
+        return parent::update($menuName, $key, $this->getOwnerId());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getOwnershipType()
+    {
+        return $this->getOwnershipProvider()->getType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getOwnerId()
+    {
+        return $this->getOwnershipProvider()->getId();
+    }
+
+    /**
+     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
+     */
+    protected function getOwnershipProvider()
+    {
+        return $this->get('oro_navigation.ownership_provider.user');
     }
 }

@@ -27,8 +27,3 @@ datagrids:
         properties:
             view_link:
                 route: oro_navigation_user_menu_view
-    menu-organization-grid:
-        extends: menu-base-grid
-        properties:
-            view_link:
-                route: oro_navigation_org_menu_view
