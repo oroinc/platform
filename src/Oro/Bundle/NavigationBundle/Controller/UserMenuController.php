@@ -7,6 +7,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
 /**
  * @Route("/menu/user")
  */
@@ -15,6 +18,7 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/", name="oro_navigation_user_menu_index")
      * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @return array
      */
@@ -26,6 +30,7 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}", name="oro_navigation_user_menu_view")
      * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      *
@@ -39,20 +44,37 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_user_menu_create")
      * @Template("OroNavigationBundle:UserMenu:update.html.twig")
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      * @param string|null $parentKey
+     * @param bool $isDivider
      *
      * @return array|RedirectResponse
      */
-    public function createAction($menuName, $parentKey = null)
+    public function createAction($menuName, $parentKey = null, $isDivider = false)
     {
         return parent::create($menuName, $parentKey, $this->getOwnerId());
     }
 
     /**
+     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_user_menu_create_divider")
+     * @Template("OroNavigationBundle:UserMenu:update.html.twig")
+     *
+     * @param string $menuName
+     * @param string $parentKey
+     *
+     * @return RedirectResponse
+     */
+    public function createDividerAction($menuName, $parentKey = null)
+    {
+        return $this->createAction($menuName, $parentKey, true);
+    }
+
+    /**
      * @Route("/{menuName}/update/{key}", name="oro_navigation_user_menu_update")
      * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      * @param string $key

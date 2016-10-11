@@ -2,40 +2,52 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit;
 
+use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
-use Knp\Menu\MenuItem;
 
 trait MenuItemTestTrait
 {
     /**
-     * @var MenuItem
+     * @return ItemInterface
      */
-    protected $menu;
-
-    /**
-     * @var MenuItem
-     */
-    protected $pt1;
-
-    /**
-     * @var MenuItem
-     */
-    protected $pt2;
-
-    /**
-     * @var MenuItem
-     */
-    protected $ch1;
-
-    public function prepareMenu()
+    public function getMenu()
     {
         $factory = new MenuFactory();
-        
-        $this->menu = $factory->createItem('Root Menu');
-        
-        $this->pt1 = $this->menu->addChild('Parent 1');
-        $this->pt2 = $this->menu->addChild('Parent 2');
-        
-        $this->ch1 = $this->pt1->addChild('Child 1');
+
+        $menu = $factory->createItem('menu');
+
+        $item1 = $factory->createItem('item-1');
+        $item2 = $factory->createItem('item-2');
+        $item3 = $factory->createItem('item-3');
+        $item4 = $factory->createItem('item-4');
+
+        $item11 = $factory->createItem('item-1-1');
+        $item12 = $factory->createItem('item-1-2');
+
+        $item111 = $factory->createItem('item-1-1-1');
+
+        $menu->addChild($item1);
+        $menu->addChild($item2);
+        $menu->addChild($item3);
+        $menu->addChild($item4);
+
+        $item1->addChild($item11);
+        $item1->addChild($item12);
+
+        $item11->addChild($item111);
+
+        return $menu;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return ItemInterface
+     */
+    public function createItem($name)
+    {
+        $factory = new MenuFactory();
+
+        return $factory->createItem($name);
     }
 }

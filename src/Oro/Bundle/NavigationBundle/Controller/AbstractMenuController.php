@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
 abstract class AbstractMenuController extends Controller
@@ -19,6 +20,9 @@ abstract class AbstractMenuController extends Controller
 
     abstract protected function getOwnershipType();
 
+    /**
+     * @return array
+     */
     protected function index()
     {
         return [
@@ -45,9 +49,11 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param string $menuName
      * @param string $parentKey
+     * @param bool $isDivider
      * @return array|RedirectResponse
+     *
      */
-    protected function create($menuName, $parentKey, $ownerId)
+    protected function create($menuName, $parentKey, $ownerId, $isDivider = false)
     {
         /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $this->getManager()->createMenuUpdate(
@@ -59,7 +65,14 @@ abstract class AbstractMenuController extends Controller
             ]
         );
 
+        if ($isDivider) {
+            $menuUpdate->setDivider($isDivider);
+            $menuUpdate->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
+            $menuUpdate->setUri('#');
+        }
+
         return $this->handleUpdate($menuUpdate);
+
     }
 
     /**

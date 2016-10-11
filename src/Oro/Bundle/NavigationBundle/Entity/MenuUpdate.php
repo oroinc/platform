@@ -9,7 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
- * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
+ * @ORM\Entity
  * @ORM\Table(name="oro_navigation_menu_upd")
  * @ORM\AssociationOverrides({
  *      @ORM\AssociationOverride(
@@ -64,7 +64,8 @@ class MenuUpdate extends ExtendMenuUpdate implements
     public function getExtras()
     {
         $extras = [
-            'existsInNavigationYml' => $this->isExistsInNavigationYml()
+            'existsInNavigationYml' => $this->isExistsInNavigationYml(),
+            'divider' => $this->isDivider()
         ];
 
         if ($this->getPriority() !== null) {

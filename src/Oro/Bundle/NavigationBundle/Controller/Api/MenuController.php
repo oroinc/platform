@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Doctrine\ORM\EntityManager;
+
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -16,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
@@ -54,12 +57,17 @@ class MenuController extends Controller
             throw $this->createNotFoundException();
         }
 
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+
         if (!$menuUpdate->isExistsInNavigationYml()) {
-            $manager->removeMenuUpdate($menuUpdate);
+            $entityManager->remove($menuUpdate);
         } else {
             $menuUpdate->setActive(false);
-            $manager->updateMenuUpdate($menuUpdate);
+            $entityManager->persist($menuUpdate);
         }
+
+        $entityManager->flush($menuUpdate);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -85,9 +93,14 @@ class MenuController extends Controller
             $this->getCurrentOwnerId($ownershipType)
         );
 
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+
         foreach ($updates as $update) {
-            $manager->removeMenuUpdate($update);
+            $entityManager->remove($update);
         }
+
+        $entityManager->flush($updates);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -133,10 +146,30 @@ class MenuController extends Controller
             }
         }
 
-        $manager->updateMenuUpdate($currentUpdate);
-        $manager->reorderMenuUpdate($menuName, $order, $ownershipType, $ownerId);
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-        return new JsonResponse(['status' => true], 200);
+        $updates = array_merge(
+            [$currentUpdate],
+            $manager->getReorderedMenuUpdates($menuName, $order, $ownershipType, $ownerId)
+        );
+
+        $errors = [];
+        foreach ($updates as $update) {
+            $errors = $this->get('validator')->validate($currentUpdate);
+            if (count($errors)) {
+                break;
+            }
+
+            $entityManager->persist($update);
+        }
+
+        if (!count($errors)) {
+            $entityManager->flush($updates);
+            return new JsonResponse(['status' => true], Response::HTTP_OK);
+        }
+
+        return new JsonResponse(['status' => false, 'message' => (string) $errors], Response::HTTP_OK);
     }
 
     /**

@@ -80,10 +80,12 @@ define(function(require) {
                 success: function(result) {
                     if (!result.status) {
                         self.rollback(data);
-                        messenger.notificationFlashMessage(
-                            'error',
-                            __('oro.ui.jstree.move_node_error', {nodeText: data.node.text})
-                        );
+
+                        var message = __('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
+                        if (result.message) {
+                            message = result.message;
+                        }
+                        messenger.notificationFlashMessage('error', message);
                     } else if (self.reloadWidget) {
                         widgetManager.getWidgetInstanceByAlias(self.reloadWidget, function(widget) {
                             widget.render();

@@ -151,6 +151,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('type')->end()
                         ->scalarNode('area')->end()
                         ->scalarNode('read_only')->end()
+                        ->scalarNode('max_nesting_level')->end()
                         ->arrayNode('extras')
                             ->useAttributeAsKey('extras')->prototype('scalar')->end()
                         ->end()
