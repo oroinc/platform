@@ -110,7 +110,7 @@ class ControllersTest extends WebTestCase
             array(
                 'audit-grid[_filter][objectName][type]' => 1,
                 'audit-grid[_filter][objectName][value]' => $this->userData['username'],
-                'audit-grid[_filter][objectClass][value]' => 'Oro\\Bundle\\CalendarBundle\\Entity\\User'
+                'audit-grid[_filter][objectClass][value]' => 'Oro\\Bundle\\UserBundle\\Entity\\User'
             )
         );
 
