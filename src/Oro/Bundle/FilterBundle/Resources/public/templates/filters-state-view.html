@@ -1,0 +1,5 @@
+<div class="filters-status">
+<% for(let i = 0; i < filters.length; i++) { %>
+<% if (i > 0) { %>, <% } %><span><%=filters[i].label %> <span><%=filters[i].hint %></span></span>
+<% } %>
+</div>

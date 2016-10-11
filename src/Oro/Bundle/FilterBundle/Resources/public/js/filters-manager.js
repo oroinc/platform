@@ -3,6 +3,7 @@ define(function(require) {
 
     var FiltersManager;
     var DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
+    var MODES = ['manage', 'view'];
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -11,6 +12,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var MultiselectDecorator = require('./multiselect-decorator');
     var filterWrapper = require('./datafilter-wrapper');
+    var FiltersStateView = require('./app/views/filters-state-view');
 
     /**
      * View that represents all grid filters
@@ -41,6 +43,14 @@ define(function(require) {
          * Template
          */
         template: null,
+
+        /**
+         * Mode of filters displaying
+         *
+         * @type {String}
+         * @property
+         */
+        mode: MODES[0],
 
         /**
          * Filter list input selector
@@ -93,12 +103,14 @@ define(function(require) {
          */
         initialize: function(options) {
             var filterListeners;
+            var filtersStateView;
+            var filtersStateElement;
 
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
 
-            _.extend(this, _.pick(options, ['addButtonHint']));
+            _.extend(this, _.pick(options, ['addButtonHint', 'stateViewElement']));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);
@@ -121,6 +133,21 @@ define(function(require) {
 
                 this.listenTo(filter, filterListeners);
             }, this);
+
+            if (_.isString(options.filtersStateElement)) {
+                filtersStateElement = $(options.filtersStateElement);
+            } else if (_.isObject(options.filtersStateElement)) {
+                filtersStateElement = options.filtersStateElement;
+            }
+
+            if (filtersStateElement) {
+                filtersStateView = new FiltersStateView({
+                    el: filtersStateElement,
+                    filters: options.filters
+                });
+
+                this.subview('filters-state', filtersStateView);
+            }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
@@ -295,6 +322,7 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
+            var filtersStateView = this.subview('filters-state');
             this.$el.html(
                 this.template({filters: this.filters})
             );
@@ -314,6 +342,7 @@ define(function(require) {
                 filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();
+
             }, this);
 
             this.trigger('rendered');
@@ -322,6 +351,13 @@ define(function(require) {
                 this.$el.hide();
             } else {
                 this._initializeSelectWidget();
+            }
+
+            if (filtersStateView) {
+                filtersStateView.render();
+                if (this.mode === MODES[0]) {
+                    filtersStateView.hide();
+                }
             }
 
             return this;
@@ -456,6 +492,20 @@ define(function(require) {
         _onUpdateCriteriaClick: function(filter) {
             filter.once('update', this.closeDropdown, this);
             _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
+        },
+
+        setMode: function(mode) {
+            if (mode === MODES[1]) {
+                this.mode = mode;
+                this.$el.hide();
+                _.result(this.subview('filters-state'), 'show');
+            } else if (mode === MODES[0]) {
+                this.mode = mode;
+                if (!_.isEmpty(this.filters)) {
+                    this.$el.show();
+                }
+                _.result(this.subview('filters-state'), 'hide');
+            }
         }
     });
 
