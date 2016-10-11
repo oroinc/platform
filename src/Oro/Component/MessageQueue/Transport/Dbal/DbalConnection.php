@@ -23,8 +23,8 @@ class DbalConnection implements ConnectionInterface
 
     /**
      * @param Connection $connection
-     * @param string     $tableName
-     * @param array      $options
+     * @param string $tableName
+     * @param array $options
      */
     public function __construct(Connection $connection, $tableName, array $options = [])
     {

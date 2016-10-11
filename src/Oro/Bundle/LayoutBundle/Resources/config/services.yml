@@ -136,7 +136,7 @@ services:
     oro_layout.provider.image_type:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
-            - @oro_layout.theme_manager
+            - '@oro_layout.theme_manager'
 
     oro_layout.provider.requirejs_config:
         class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
@@ -189,3 +189,18 @@ services:
             - '@assets.packages'
         tags:
             - { name: layout.data_provider, alias: asset }
+
+    oro_layout.loader.image_filter:
+        class: Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader
+        arguments:
+            - '@oro_layout.provider.image_type'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_entity.doctrine_helper'
+
+
+    oro_layout.request.listener.imagine_filter_config:
+        class: Oro\Bundle\LayoutBundle\EventListener\ImagineFilterConfigListener
+        arguments:
+            - '@oro_layout.loader.image_filter'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }

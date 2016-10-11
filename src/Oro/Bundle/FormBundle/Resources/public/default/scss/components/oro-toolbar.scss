@@ -38,6 +38,8 @@
 
         padding: 10px 15px;
 
+        font-size: $base-font-size;
+
         background: $base-background-color;
         border-radius: 2px;
         box-shadow: 0 4px 5px 0 rgba(0,0,0,.4);
@@ -83,7 +85,8 @@
     }
 
     // toolbar open
-    &.active {
+    &.active,
+    &.open {
         .oro-toolbar__content {
             box-shadow: inset 1px 1px 3px 0 rgba(0,0,0,.3);
         }

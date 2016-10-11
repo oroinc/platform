@@ -60,7 +60,6 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getProcessor->process($getContext);
 
         $this->processGetResult($getContext, $context);
-
     }
 
     /**

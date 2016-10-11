@@ -1,8 +1,12 @@
 <span class="filename">
     <i class="fa {{ iconClass }}"></i>
-    <a href="{{ url }}" data-filename="{{ fileName }}"
-       {% if additional['galleryId'] is defined %}data-gallery="{{ additional['galleryId'] }}"{% endif %}
-       class="no-hash" title="{{ fileName }}">
+    {% if url %}
+        <a href="{{ url }}" data-filename="{{ fileName }}"
+           {% if additional['galleryId'] is defined %}data-gallery="{{ additional['galleryId'] }}"{% endif %}
+           class="no-hash" title="{{ fileName }}">
+    {% endif %}
         {{ oro_format_filename(fileName) }}
-    </a>
+    {% if url %}
+        </a>
+    {% endif %}
 </span>
