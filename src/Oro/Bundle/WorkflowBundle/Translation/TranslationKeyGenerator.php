@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\WorkflowBundle\Translation\KeySource\TranslationKeySourceInterface;
 
 class TranslationKeyGenerator
 {

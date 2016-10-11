@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Translation\KeySource;
+namespace Oro\Bundle\WorkflowBundle\Translation;
 
 interface TranslationKeySourceInterface
 {
