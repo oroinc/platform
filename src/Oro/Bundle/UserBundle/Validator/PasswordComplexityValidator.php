@@ -14,9 +14,9 @@ use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
  */
 class PasswordComplexityValidator extends ConstraintValidator
 {
-    const REGEX_UPPER_CASE = '/\p{Lu}/u';
-    const REGEX_NUMBERS = '/\pN/u';
-    const REGEX_SPECIAL_CHARS = '/[^p{Ll}\p{Lu}\pL\pN]/u';
+    const REGEX_UPPER_CASE = '/[A-Z]/u';
+    const REGEX_NUMBERS = '/[\d]/u';
+    const REGEX_SPECIAL_CHARS = '/[\W_]/u';
 
     /** @var PasswordComplexityConfigProvider */
     private $configProvider;
@@ -105,7 +105,7 @@ class PasswordComplexityValidator extends ConstraintValidator
     protected function validUpperCase($value, PasswordComplexity $constraint)
     {
         $isEnabled = null === $constraint->requireUpperCase
-            ? $this->configProvider->getMinLength()
+            ? $this->configProvider->getUpperCase()
             : $constraint->requireUpperCase;
 
         return !$isEnabled || preg_match(self::REGEX_UPPER_CASE, $value);

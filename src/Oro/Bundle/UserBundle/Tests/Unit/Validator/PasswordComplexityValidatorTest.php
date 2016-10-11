@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator;
 
@@ -39,7 +40,7 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalid(array $configMap, $value, $message)
     {
-        $validator = new PasswordComplexityValidator($this->getConfigManager($configMap));
+        $validator = new PasswordComplexityValidator($this->getConfigProvider($configMap));
         $context = $this->getMockBuilder(ExecutionContextInterface::class)->disableOriginalConstructor()->getMock();
 
         $context->expects($this->once())
@@ -60,7 +61,7 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateValid(array $configMap, $value)
     {
-        $validator = new PasswordComplexityValidator($this->getConfigManager($configMap));
+        $validator = new PasswordComplexityValidator($this->getConfigProvider($configMap));
         $context = $this->getMockBuilder(ExecutionContextInterface::class)->disableOriginalConstructor()->getMock();
 
         $context->expects($this->never())
@@ -81,10 +82,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
         return [
             'min length' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 10],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 10],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
                 'message' => 'oro.user.message.invalid_password.min_length',
@@ -92,10 +93,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
             ],
             'upper case' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
                 'message' => 'oro.user.message.invalid_password.upper_case',
@@ -103,10 +104,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
             ],
             'numbers' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
                 'message' => 'oro.user.message.invalid_password.numbers',
@@ -114,10 +115,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
             ],
             'special chars' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'value' => 'password',
                 'message' => 'oro.user.message.invalid_password.special_chars',
@@ -125,10 +126,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
             ],
             'upper case and numbers' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
                 'message' => 'oro.user.message.invalid_password.upper_case_numbers',
@@ -136,22 +137,22 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
             ],
             'all rules - invalid value' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 10],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 10],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'value' => 'password',
                 'message' => 'oro.user.message.invalid_password.min_length_upper_case_numbers_special_chars',
             ],
             'all rules - invalid length and numbers' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 10],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 10],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
-                'value' => 'paSsword!',
+                'value' => 'paSsword_',
                 'message' => 'oro.user.message.invalid_password.min_length_numbers',
             ],
         ];
@@ -165,37 +166,37 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
         return [
             'all rules disabled' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'password',
             ],
             'min length - valid password' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 8],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 8],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => 'paSsw0rd!',
             ],
             'numbers - valid password' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'value' => '1',
             ],
             'all rules - valid password' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 8],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 8],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'value' => 'paSsw0rd!',
             ],
@@ -205,9 +206,9 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $configMap
      *
-     * @return ConfigManager
+     * @return PasswordComplexityConfigProvider
      */
-    protected function getConfigManager(array $configMap)
+    protected function getConfigProvider(array $configMap)
     {
         $configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
@@ -215,7 +216,10 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
         $configManager->method('get')->willReturnMap($configMap);
 
         /** @var ConfigManager $configManager */
-        return $configManager;
+        $configProvider = new PasswordComplexityConfigProvider($configManager);
+
+        /** @var PasswordComplexityConfigProvider $configManager */
+        return $configProvider;
     }
 
     protected function tearDown()
