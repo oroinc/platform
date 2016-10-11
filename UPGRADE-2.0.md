@@ -386,6 +386,7 @@ placeholders:
     items: ...
 ```
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
+- Updated jquery.mCustomScrollbar plugin to version 3.1.5 `Resources/public/lib/jquery/jquery.mCustomScrollbar.min.js`
 
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
