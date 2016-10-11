@@ -292,7 +292,7 @@ operations:
         acl_resource: oro_translation_language_translate
         actions:
             - '@call_service_method':
-                service: translator
+                service: translator.default
                 method: rebuildCache
             - '@call_service_method':
                 service: oro_translation.js_dumper
