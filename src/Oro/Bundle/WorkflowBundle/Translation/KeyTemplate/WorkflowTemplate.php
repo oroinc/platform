@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyTemplateInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
 class WorkflowTemplate implements TranslationKeyTemplateInterface
 {

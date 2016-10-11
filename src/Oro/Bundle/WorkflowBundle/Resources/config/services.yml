@@ -315,10 +315,6 @@ services:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]
 
-    oro_workflow.generator.translation_key:
-        class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
-        public: false
-
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         public: false
