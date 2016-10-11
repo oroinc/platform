@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -31,17 +33,18 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     public function build(WorkflowDefinition $definition, array &$configuration)
     {
 
-        var_dump($configuration);
         $configuration['name'] = $definition->getName();
-        $generator = new WorkflowTranslationFieldsGenerator();
+        $fieldsIterator = new WorkflowTranslationFieldsGenerator();
+
+        $generator = new TranslationKeyGenerator();
 
 
-        foreach ($generator->generate($configuration) as $source => $value) {
-            var_dump($value);
-            var_dump(get_class($source));
+        foreach ($fieldsIterator->iterate($configuration) as $source => &$value) {
+            /**@var TranslationKeySourceInterface $source */
+            $value = $generator->generate($source);
         }
 
-        die();
+        return;
         //$workflowName = $configuration['name'];
         //$configuration['label'] = $this->workflowLabelKey($workflowName);
         //foreach ($configuration as $nodeName => &$nodeValue) {

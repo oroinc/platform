@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
-use Oro\Bundle\WorkflowBundle\Translation\KeySource\TranslationKeySource;
+use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
@@ -21,7 +22,7 @@ class WorkflowTranslationFieldsGenerator
      * @return \Generator
      * @throws \InvalidArgumentException
      */
-    public function &generate(array &$configuration)
+    public function &iterate(array &$configuration)
     {
         $workflowName = $configuration['name'];
 
