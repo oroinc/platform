@@ -4,12 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
+
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyTemplateInterface;
 
 class KeyTemplateParametersResolver
 {
