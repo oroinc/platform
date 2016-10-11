@@ -8,7 +8,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
-use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
@@ -36,7 +35,8 @@ class GridViewManager
     /** @var  Manager */
     protected $gridManager;
 
-    protected $cacheData;
+    /** @var array */
+    protected $cacheData = [];
 
     /** @var  array */
     protected $appearanceTypes;
@@ -105,17 +105,10 @@ class GridViewManager
      */
     protected function isViewDefault(ViewInterface $view, User $user)
     {
-        if ($view instanceof GridView) {
-            $isDefault = $view->getUsers()->contains($user);
-        } else {
-            $defaultViews = $this->registry
-                ->getManagerForClass('OroDataGridBundle:GridViewUser')
-                ->getRepository('OroDataGridBundle:GridViewUser')
-                ->findBy(['user' => $user, 'alias' => $view->getName(), 'gridName' => $view->getGridName()]);
-            $isDefault = count($defaultViews) ? true : false;
-        }
-
-        return $isDefault;
+        return (bool) $this->registry
+            ->getManagerForClass('OroDataGridBundle:GridViewUser')
+            ->getRepository('OroDataGridBundle:GridViewUser')
+            ->findOneBy(['user' => $user, 'alias' => $view->getName(), 'gridName' => $view->getGridName()]);
     }
 
     /**
@@ -143,7 +136,8 @@ class GridViewManager
      */
     public function getSystemViews($gridName)
     {
-        if (!isset($this->cacheData[self::SYSTEM_VIEWS_KEY])) {
+        $cacheKey = sprintf('%s.%s', self::SYSTEM_VIEWS_KEY, $gridName);
+        if (!isset($this->cacheData[$cacheKey])) {
             $config = $this->getConfigurationForGrid($gridName);
             $list = $config->offsetGetOr(GridViewsExtension::VIEWS_LIST_KEY, false);
             $gridViews[] = new View(GridViewsExtension::DEFAULT_VIEW_ID);
@@ -151,20 +145,22 @@ class GridViewManager
                 $list = $this->applyAppearanceRestrictions($list->getList()->getValues(), $gridName);
                 $gridViews = array_merge($gridViews, $list);
             }
-            $this->cacheData[self::SYSTEM_VIEWS_KEY] = $gridViews;
+            $this->cacheData[$cacheKey] = $gridViews;
         }
 
-        return $this->cacheData[self::SYSTEM_VIEWS_KEY];
+        return $this->cacheData[$cacheKey];
     }
 
     /**
-     * @param $user
-     * @param $gridName
+     * @param User|null  $user
+     * @param string $gridName
+     *
      * @return array
      */
-    public function getAllGridViews($user, $gridName)
+    public function getAllGridViews(User $user = null, $gridName = null)
     {
-        if (!isset($this->cacheData[self::ALL_VIEWS_KEY])) {
+        $cacheKey = sprintf('%s.%s.%s', self::ALL_VIEWS_KEY, $user ? $user->getUsername() : (string) $user, $gridName);
+        if (!isset($this->cacheData[$cacheKey])) {
             $systemViews = $this->getSystemViews($gridName);
             $gridViews = [];
             if ($user instanceof UserInterface) {
@@ -173,25 +169,27 @@ class GridViewManager
                     ->findGridViews($this->aclHelper, $user, $gridName);
                 $gridViews = $this->applyAppearanceRestrictions($gridViews, $gridName);
             }
-            $this->cacheData[self::ALL_VIEWS_KEY] = [
+            $this->cacheData[$cacheKey] = [
                 'system' => $systemViews,
                 'user' => $gridViews
             ];
         }
 
-        return $this->cacheData[self::ALL_VIEWS_KEY];
+        return $this->cacheData[$cacheKey];
     }
 
     /**
      * Get default view from all views (user made, system, etc)
      *
-     * @param $user
-     * @param $gridName
+     * @param User $user
+     * @param string $gridName
+     *
      * @return mixed
      */
-    public function getDefaultView($user, $gridName)
+    public function getDefaultView(User $user, $gridName)
     {
-        if (!isset($this->cacheData[self::DEFAULT_VIEW_KEY])) {
+        $cacheKey = sprintf('%s.%s.%s', self::DEFAULT_VIEW_KEY, $user->getUsername(), $gridName);
+        if (!array_key_exists($cacheKey, $this->cacheData)) {
             $gridViewRepository = $this->registry->getRepository('OroDataGridBundle:GridViewUser');
             $default = $gridViewRepository->findDefaultGridView($this->aclHelper, $user, $gridName, false);
             $systemViews = $this->getSystemViews($gridName);
@@ -225,10 +223,10 @@ class GridViewManager
                     $systemViews
                 );
             }
-            $this->cacheData[self::DEFAULT_VIEW_KEY] = $defaultView;
+            $this->cacheData[$cacheKey] = $defaultView;
         }
 
-        return $this->cacheData[self::DEFAULT_VIEW_KEY];
+        return $this->cacheData[$cacheKey];
     }
 
     /**

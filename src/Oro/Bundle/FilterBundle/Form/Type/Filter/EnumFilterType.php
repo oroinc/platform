@@ -16,10 +16,10 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class EnumFilterType extends AbstractMultiChoiceType
 {
     const NAME = 'oro_enum_filter';
-    const TYPE_IN = 1;
-    const TYPE_NOT_IN = 2;
-    const EQUAL = 3;
-    const NOT_EQUAL = 4;
+    const TYPE_IN = '1';
+    const TYPE_NOT_IN = '2';
+    const EQUAL = '3';
+    const NOT_EQUAL = '4';
 
     /**
      * @var EnumValueProvider

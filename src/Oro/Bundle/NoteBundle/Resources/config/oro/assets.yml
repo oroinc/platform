@@ -1,0 +1,4 @@
+assets:
+    css:
+        'oronote':
+          - 'bundles/oronote/css/less/main.less'

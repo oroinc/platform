@@ -2,7 +2,7 @@ knp_gaufrette:
     adapters:
         attachments:
             local:
-                directory: %kernel.root_dir%/attachment
+                directory: '%kernel.root_dir%/%oro_attachment.attachments_dir%'
     filesystems:
         attachments:
             adapter:    attachments

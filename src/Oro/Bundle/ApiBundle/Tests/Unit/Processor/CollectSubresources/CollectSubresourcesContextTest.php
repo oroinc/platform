@@ -7,25 +7,12 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 
 class CollectSubresourcesContextTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
-
     /** @var CollectSubresourcesContext */
     protected $context;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->context = new CollectSubresourcesContext($this->configProvider, $this->metadataProvider);
+        $this->context = new CollectSubresourcesContext();
     }
 
     public function testResultShouldBeInitialized()
@@ -47,5 +34,13 @@ class CollectSubresourcesContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['Test\Class' => $resource], $this->context->getResources());
         $this->assertTrue($this->context->hasResource('Test\Class'));
         $this->assertSame($resource, $this->context->getResource('Test\Class'));
+    }
+
+    public function testAccessibleResources()
+    {
+        $this->assertEquals([], $this->context->getAccessibleResources());
+
+        $this->context->setAccessibleResources(['Test\Class']);
+        $this->assertEquals(['Test\Class'], $this->context->getAccessibleResources());
     }
 }

@@ -64,7 +64,7 @@ public function isCommentsEnabled($entityClass)
 }
 ...
 ```
-The comment widget will be rendered into ```div.message .comment``` node of js/activityItemTemplate.js.twig template.
+The comment widget will be rendered into ```div.message .comment``` node of js/activityItemTemplate.html.twig template.
 
 Attachment configuration
 ------------------------

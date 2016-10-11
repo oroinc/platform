@@ -10,31 +10,31 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_url: http://localhost/search/
+                record_url: http://localhost%oro_default_prefix%search/
     soap:
         item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordUrl: http://localhost/search/
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordUrl: http://localhost/search/
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordUrl: http://localhost/search/
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordUrl: http://localhost/search/
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []

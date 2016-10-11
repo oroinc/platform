@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataAudit\Tests\Functional;
 
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -55,8 +57,17 @@ class ControllersTest extends WebTestCase
         $form['oro_user_user_form[birthday]'] = $this->userData['birthday'];
         $form['oro_user_user_form[email]'] = $this->userData['email'];
         $form['oro_user_user_form[groups][1]']->tick();
-        $form['oro_user_user_form[roles][0]']->tick();
         $form['oro_user_user_form[owner]'] = 1;
+
+        /** @var ChoiceFormField[] $roleChoices */
+        $roleChoices = $form['oro_user_user_form[roles]'];
+        $roleId = $this
+            ->getContainer()
+            ->get('doctrine')
+            ->getRepository('OroUserBundle:Role')
+            ->findOneBy(['label' => 'Administrator'])
+            ->getId();
+        $this->selectChoiceById($roleChoices, $roleId);
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
@@ -64,6 +75,20 @@ class ControllersTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("User saved", $crawler->html());
+    }
+
+    /**
+     * @param ChoiceFormField[] $choices
+     * @param int $id
+     */
+    protected function selectChoiceById(array $choices, $id)
+    {
+        foreach ($choices as $choice) {
+            if (in_array($id, $choice->availableOptionValues())) {
+                $choice->tick();
+                break;
+            }
+        }
     }
 
     public function testIndex()

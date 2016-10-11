@@ -178,6 +178,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
         $containerBuilder->setDefinition('mink.listener.sessions', new Definition());
+        $containerBuilder->setDefinition('symfony2_extension.context_initializer.kernel_aware', new Definition());
 
         return $containerBuilder;
     }

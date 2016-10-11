@@ -2,27 +2,28 @@
 
 namespace Oro\Bundle\TranslationBundle\Strategy;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
 class DefaultTranslationStrategy implements TranslationStrategyInterface
 {
     const NAME = 'default';
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /**
+     * @var LanguageProvider
+     */
+    protected $languageProvider;
 
     /** @var bool */
     protected $installed = false;
 
     /**
-     * @param ConfigManager $configManager
+     * @param LanguageProvider $languageProvider
      * @param bool          $installed
      */
-    public function __construct(ConfigManager $configManager, $installed = false)
+    public function __construct(LanguageProvider $languageProvider, $installed = false)
     {
-        $this->configManager = $configManager;
+        $this->languageProvider = $languageProvider;
         $this->installed = (bool)$installed;
     }
 
@@ -42,7 +43,7 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
         // default strategy has only one fallback to default locale
         if ($this->installed) {
             $locales = [];
-            $installedLocales = (array)$this->configManager->get(TranslationStatusInterface::CONFIG_KEY);
+            $installedLocales = $this->languageProvider->getAvailableLanguages();
             foreach ($installedLocales as $code => $installedLocale) {
                 $locales[Configuration::DEFAULT_LOCALE][$code] = [];
             }
