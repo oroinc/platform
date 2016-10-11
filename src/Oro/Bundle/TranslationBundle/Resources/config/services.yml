@@ -242,6 +242,6 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }
 
-    oro_workflow.generator.translation_key:
-        class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
+    oro_translation.generator.translation_key:
+        class: 'Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator'
         public: false
