@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeySource;
 
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyTemplateInterface;
 
 class DynamicTranslationKeySource implements TranslationKeySourceInterface

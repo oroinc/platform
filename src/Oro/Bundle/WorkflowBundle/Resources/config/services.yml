@@ -199,6 +199,7 @@ services:
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
+            - '@oro_workflow.translation.processor'
             - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
