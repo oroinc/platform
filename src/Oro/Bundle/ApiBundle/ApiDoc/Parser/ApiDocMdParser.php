@@ -182,7 +182,6 @@ class ApiDocMdParser
         return [$type, $element];
     }
 
-
     /**
      * @param $resourceLink
      *
