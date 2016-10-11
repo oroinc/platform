@@ -16,7 +16,7 @@ use Oro\Bundle\EmailBundle\Command\MigrateEmailBodyCommand;
  * Adds job to collect email body representations.
  * Will be deleted in 2.0
  */
-class CollectEmailBodyJobFixture extends AbstractFixture  implements ContainerAwareInterface
+class CollectEmailBodyJobFixture extends AbstractFixture implements ContainerAwareInterface
 {
     /** @var ContainerInterface */
     protected $container;
