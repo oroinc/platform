@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
 class TransitionTemplate extends WorkflowTemplate
 {
+    const NAME = 'transition';
+
     /**
      * @return string
      */

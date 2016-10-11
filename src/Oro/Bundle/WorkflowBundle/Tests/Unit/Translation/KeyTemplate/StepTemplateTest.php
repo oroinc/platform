@@ -12,6 +12,11 @@ class StepTemplateTest extends TemplateTestCase
         return new StepTemplate();
     }
 
+    public function testGetName()
+    {
+        $this->assertName(StepTemplate::NAME);
+    }
+
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.step.{{ step_name }}');
@@ -20,5 +25,13 @@ class StepTemplateTest extends TemplateTestCase
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'step_name']);
+    }
+
+    public function testGetKeyTemplates()
+    {
+        $this->assertKeyTemplates([
+            'workflow_name' => '{{ workflow_name }}',
+            'step_name' => '{{ step_name }}',
+        ]);
     }
 }

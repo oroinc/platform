@@ -77,6 +77,12 @@ oro:
     workflow:
         translation:
             workflow.label: Workflow
+            context:
+                workflow_label: 'Workflow "{{ workflow_label }}" -> Name'
+                step_label: 'Workflow "{{ workflow_label }}" -> Step "{{ step_label }}" -> Label'
+                transition_label: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Label'
+                transition_warning_message: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Warning Message'
+                attribute_label: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Attribute "{{ attribute_label }}"'
         action:
             process:
                 activate:   Activate

@@ -12,6 +12,11 @@ class AttributeTemplateTest extends TemplateTestCase
         return new AttributeTemplate();
     }
 
+    public function testGetName()
+    {
+        $this->assertName(AttributeTemplate::NAME);
+    }
+
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.attribute.{{ attribute_name }}');
@@ -20,5 +25,13 @@ class AttributeTemplateTest extends TemplateTestCase
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'attribute_name']);
+    }
+
+    public function testGetKeyTemplates()
+    {
+        $this->assertKeyTemplates([
+            'workflow_name' => '{{ workflow_name }}',
+            'attribute_name' => '{{ attribute_name }}',
+        ]);
     }
 }
