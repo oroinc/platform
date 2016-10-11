@@ -318,3 +318,12 @@ services:
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         public: false
+
+    oro_workflow.filter.workflow:
+        class: 'Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter'
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_translation.generator.translation_key'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
