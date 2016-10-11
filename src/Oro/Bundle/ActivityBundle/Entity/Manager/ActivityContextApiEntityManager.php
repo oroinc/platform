@@ -129,7 +129,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         usort(
             $result,
             function ($a, $b) {
-                if ($a['targetClassName'] . $a['title'] <= $b['targetClassName'] . $b['title']){
+                if ($a['targetClassName'] . $a['title'] <= $b['targetClassName'] . $b['title']) {
                     return -1;
                 }
 
