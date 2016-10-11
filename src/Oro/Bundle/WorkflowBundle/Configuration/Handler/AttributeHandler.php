@@ -11,7 +11,6 @@ class AttributeHandler extends AbstractHandler
      */
     protected $attributeKeys = array(
         'name',
-        'label',
         'type',
         'entity_acl',
         'property_path',

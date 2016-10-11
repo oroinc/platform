@@ -11,7 +11,6 @@ class TransitionHandler extends AbstractHandler
      */
     protected $transitionKeys = array(
         'name',
-        'label',
         'step_to',
         'is_start',
         'is_hidden',
@@ -65,10 +64,6 @@ class TransitionHandler extends AbstractHandler
     {
         if (empty($transition['name'])) {
             $transition['name'] = uniqid('transition_');
-        }
-
-        if (empty($transition['label'])) {
-            $transition['label'] = $transition['name'];
         }
 
         if (empty($transition['transition_definition'])) {

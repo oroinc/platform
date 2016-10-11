@@ -199,7 +199,6 @@ services:
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
-            - '@oro_workflow.translation.processor'
             - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
@@ -315,9 +314,16 @@ services:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]
 
+    oro_workflow.generator.translation_key:
+        class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
+        public: false
+
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         public: false
+        tags:
+            - { name: oro.workflow.configuration.handler, priority: -10 }
+            - { name: oro.workflow.workflow_definition.builder }
 
     oro_workflow.extension.translation_context_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'
