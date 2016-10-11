@@ -29,6 +29,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_23\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_24\OroEmailBundle as OroEmailBundle124;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_26\OroEmailBundle as OroEmailBundle126;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_27\OroEmailBundle as OroEmailBundle127;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_28\OroEmailBundle as OroEmailBundle128;
 
 /**
  * Class OroEmailBundleInstaller
@@ -56,7 +57,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle::oroEmailAttachmentTable($schema);
         OroEmailBundle::oroEmailAttachmentContentTable($schema);
         OroEmailBundle::oroEmailBodyTable($schema);
-        OroEmailBundle127::addTextBodyFieldToEmailBodyTable($schema);
+        OroEmailBundle128::addTextBodyFieldToEmailBodyTable($schema);
         OroEmailBundle::oroEmailFolderTable($schema);
         OroEmailBundle::oroEmailOriginTable($schema);
         OroEmailBundle::oroEmailRecipientTable($schema);
