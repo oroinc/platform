@@ -75,6 +75,8 @@ Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:
+        translation:
+            workflow.label: Workflow
         action:
             process:
                 activate:   Activate
