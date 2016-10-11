@@ -1,0 +1,84 @@
+// TODO: Refactor
+.radio_custom {
+    cursor: pointer;
+
+    &:focus i {
+        outline: thin dotted;
+        outline: 5px auto -webkit-focus-ring-color;
+        outline-offset: -2px;
+    }
+
+    input[type="radio"] {
+        display: none;
+    }
+
+    &.radio_custom_abs {
+        position: relative;
+        padding-left: 28px;
+
+        .radio_checked,
+        .radio_not-checked {
+            position: absolute;
+            top: 2px;
+            left: 0;
+        }
+    }
+
+    &.checked {
+
+        .radio_checked {
+            display: inline-block;
+        }
+
+        .radio_not-checked {
+            display: none;
+        }
+    }
+
+    &.has-error {
+        .fa {
+            &.radio_not-checked {
+                color: get-color('ui', 'error-dark') !important;
+            }
+        }
+    }
+
+    &.radio_custom_orange {
+
+        [class^="cf-"] {
+            color: get-color('primary', 'base');
+        }
+    }
+
+    &.radio_custom_blue {
+        [class^="cf-"] {
+            color: get-color('additional', 'middle');
+
+            &.radio_checked {
+                color: get-color('ui', 'focus');
+            }
+        }
+
+        .fa {
+            &.radio_not-checked {
+                color: get-color('additional', 'dark');
+            }
+
+            &.radio_checked {
+                color: get-color('ui', 'focus');
+            }
+        }
+    }
+
+    .radio_checked {
+        display: none;
+    }
+
+    .radio_not-checked {
+        display: inline-block;
+    }
+
+    .radio_custom__text {
+        font-weight: 400;
+    }
+}

@@ -17,7 +17,7 @@
         padding: 0 $offset-y-m;
 
         line-height: ($base-font-size - 0.1) * 2;
-        font-family: $roboto-font;
+        font-family: $bae-font-minor;
         text-align: center;
 
         cursor: pointer;
@@ -40,7 +40,7 @@
 
         font-size: $base-font-size;
 
-        background: $base-background-color;
+        background: get-color('additional', 'ultra');
         border-radius: 2px;
         box-shadow: 0 4px 5px 0 rgba(0,0,0,.4);
     }
