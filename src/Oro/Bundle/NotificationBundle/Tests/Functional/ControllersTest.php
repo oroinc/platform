@@ -15,7 +15,7 @@ class ControllersTest extends WebTestCase
 {
     use ResponseExtension;
 
-    const ENTITY_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const ENTITY_NAME = 'Oro\Bundle\UserBundle\Entity\UserEvent';
 
     protected $eventUpdate;
     protected $eventCreate;
@@ -49,7 +49,7 @@ class ControllersTest extends WebTestCase
     public function testIndex()
     {
         $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_index'));
-        
+
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
     }
