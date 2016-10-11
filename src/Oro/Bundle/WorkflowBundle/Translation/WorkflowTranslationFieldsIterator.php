@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepTemplate;
@@ -10,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
-class WorkflowTranslationFieldsGenerator
+class WorkflowTranslationFieldsIterator
 {
     /**
      * @var array|TranslationKeyTemplateInterface[]
@@ -19,7 +20,7 @@ class WorkflowTranslationFieldsGenerator
 
     /**
      * @param array $configuration
-     * @return \Generator
+     * @return \Generator|array(TranslationKeySourceInterface $source => &$value)
      * @throws \InvalidArgumentException
      */
     public function &iterate(array &$configuration)

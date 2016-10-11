@@ -34,7 +34,7 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     {
 
         $configuration['name'] = $definition->getName();
-        $fieldsIterator = new WorkflowTranslationFieldsGenerator();
+        $fieldsIterator = new WorkflowTranslationFieldsIterator();
 
         $generator = new TranslationKeyGenerator();
 
