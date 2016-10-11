@@ -99,7 +99,7 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
                 );
             }
         } catch (\Exception $e) {
-            // in case if something ges wrong - requeue current process
+            // in case if something goes wrong - requeue current process
             return self::REQUEUE;
         }
 

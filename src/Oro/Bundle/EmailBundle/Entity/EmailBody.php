@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 
 /**
  * Email Body
