@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Extension\InlineEditing\Handler;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\EntityField\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 

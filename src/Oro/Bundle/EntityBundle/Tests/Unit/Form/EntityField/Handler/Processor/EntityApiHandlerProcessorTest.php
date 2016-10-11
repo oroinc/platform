@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\InlineEditing\Processor;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\EntityField\Handler\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
 
