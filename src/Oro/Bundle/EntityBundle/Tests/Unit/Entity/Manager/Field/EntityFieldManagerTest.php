@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Extension\InlineEditing\Processor;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Entity\Manager\Field;
 
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 
-class EntityManagerTest extends \PHPUnit_Framework_TestCase
+class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
@@ -102,7 +102,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException
      */
     public function testBlockedFieldNameUpdate()
     {
