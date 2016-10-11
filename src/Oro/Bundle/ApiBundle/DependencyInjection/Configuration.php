@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
                 ->defaultValue(['default'])
             ->end()
             ->scalarNode('documentation_path')
-                ->info('Path to the API documentation')
+                ->info('The URL to the API documentation')
                 ->defaultNull()
             ->end();
     }

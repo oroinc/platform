@@ -1,11 +1,12 @@
-{% if documentationPath is not null%}
-    <div class="motd" style="font-size: 1.2em; padding: 5px 40px;">
-        <a href="{{ asset(documentationPath) }}">The documentation</a>
-    </div>
-{% endif %}
 <style type="text/css">
     #summary { display: none; }
+    #api_type { float: left; font-size: 1.2em; padding: 12px 24px; }
+    #api_type a.active { font-weight: bold; color: #3d5b00; }
+    .authentication-warning svg { vertical-align: middle; padding-right: 5px; }
     div.heading ul.options li { text-transform: capitalize; }
+    div.motd { padding-top: 10px; }
+    div.motd div.documentation { padding: 3px 0; overflow: hidden; }
+    div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
 </style>
 <script type="text/javascript">
     gotoResource = function (resourceId) {
@@ -72,10 +73,10 @@
                 $('input.value', header).val(headerValue);
             };
 
-        $apiDocLink.after('<div id="api_type" style="float: left; font-size: 1.2em; padding: 13px 16px;">type: ' +
-            '<a href="' + apiDocHref + '">plain</a>' +
+        $apiDocLink.after('<div id="api_type">type:&nbsp;&nbsp;' +
+            '<a href="' + apiDocHref + '"' + (apiType === '' ? ' class="active"' : '') + '>plain</a>' +
             '&nbsp;|&nbsp;' +
-            '<a href="' + apiDocHref + '/rest_json_api">JSON.API</a>' +
+            '<a href="' + apiDocHref + '/rest_json_api"' + (apiType === 'rest_json_api' ? ' class="active"' : '') + '>JSON.API</a>' +
             '</div>'
         );
 
@@ -83,6 +84,9 @@
          * Add the authentication type selector
          */
         $('#sandbox_configuration').prepend(
+            (wsseAllowed ? '' : '<span class="authentication-warning"' +
+            ' title="To use WSSE authentication you need to generate API key"' +
+            '>{{ include('@OroApi/ApiDoc/warning.svg') }}</span>') +
             'authentication: ' +
             '<select id="authentication_type">' +
                 '<option value=""' + (!wsseAllowed ? ' selected=""' : '') + '>None</option>' +
@@ -340,3 +344,11 @@
         });
     });
 </script>
+
+{% if documentationPath is not null%}
+    <div class="motd">
+        <div class="documentation">
+            <a href="{{ asset(documentationPath) }}" target="_blank">The documentation</a>
+        </div>
+    </div>
+{% endif %}
