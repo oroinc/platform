@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Translation\KeySource;
+namespace Oro\Bundle\TranslationBundle\Translation\KeySource;
 
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyTemplateInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
 class DynamicTranslationKeySource implements TranslationKeySourceInterface
 {
