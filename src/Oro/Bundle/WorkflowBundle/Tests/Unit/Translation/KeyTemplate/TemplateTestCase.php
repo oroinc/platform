@@ -24,4 +24,20 @@ abstract class TemplateTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame($requiredKeys, $this->getTemplateInstance()->getRequiredKeys());
     }
+
+    /**
+     * @param string $name
+     */
+    protected function assertName($name)
+    {
+        $this->assertSame($name, $this->getTemplateInstance()->getName());
+    }
+
+    /**
+     * @param array $templates
+     */
+    protected function assertKeyTemplates(array $templates)
+    {
+        $this->assertEquals($templates, $this->getTemplateInstance()->getKeyTemplates());
+    }
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\KeyTemplate;
 
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyTemplateInterface;
 
 class WorkflowLabelTemplateTest extends TemplateTestCase
 {
@@ -11,6 +10,11 @@ class WorkflowLabelTemplateTest extends TemplateTestCase
     public function getTemplateInstance()
     {
         return new WorkflowLabelTemplate();
+    }
+
+    public function testGetName()
+    {
+        $this->assertName(WorkflowLabelTemplate::NAME);
     }
 
     public function testGetTemplate()
@@ -21,5 +25,10 @@ class WorkflowLabelTemplateTest extends TemplateTestCase
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name']);
+    }
+
+    public function testGetKeyTemplates()
+    {
+        $this->assertKeyTemplates(['workflow_name' => '{{ workflow_name }}']);
     }
 }
