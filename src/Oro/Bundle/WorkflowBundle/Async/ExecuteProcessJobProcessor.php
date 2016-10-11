@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Async;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
@@ -48,7 +47,8 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
         $body = array_replace_recursive(['process_job_id' => null, ], JSON::decode($message->getBody()));
         if (false == $body['process_job_id']) {
             $this->logger->critical(
-                sprintf('[ExecuteProcessJobProcessor] Process Job Id not set: "%s"', $message->getBody())
+                '[ExecuteProcessJobProcessor] Process Job Id not set',
+                ['message_body' => $message->getBody()]
             );
 
             return self::REJECT;
@@ -65,7 +65,11 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
         $processJob = $this->doctrineHelper->getEntityRepository(ProcessJob::class)->find($body['process_job_id']);
         if (!$processJob) {
             $this->logger->critical(
-                sprintf('[ExecuteProcessJobProcessor] Process Job with id %d not found', $body['process_job_id'])
+                '[ExecuteProcessJobProcessor] Process Job with id %d not found',
+                [
+                    'message_body' => $message->getBody(),
+                    'process_job_id' =>  $body['process_job_id']
+                ]
             );
 
             return self::REJECT;
