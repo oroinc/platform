@@ -12,6 +12,11 @@ class TransitionTemplateTest extends TemplateTestCase
         return new TransitionTemplate();
     }
 
+    public function testGetName()
+    {
+        $this->assertName(TransitionTemplate::NAME);
+    }
+
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.transition.{{ transition_name }}');
@@ -20,5 +25,13 @@ class TransitionTemplateTest extends TemplateTestCase
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'transition_name']);
+    }
+
+    public function testGetKeyTemplates()
+    {
+        $this->assertKeyTemplates([
+            'workflow_name' => '{{ workflow_name }}',
+            'transition_name' => '{{ transition_name }}',
+        ]);
     }
 }

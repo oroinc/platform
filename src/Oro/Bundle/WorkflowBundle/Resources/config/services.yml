@@ -319,6 +319,20 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         public: false
 
+    oro_workflow.extension.translation_context_resolver:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'
+        arguments:
+            - '@translator'
+            - '@oro_workflow.translation.key_template_parameters_resolver'
+        tags:
+            - { name: oro_translation.extension.translation_context_resolver }
+
+    oro_workflow.translation.key_template_parameters_resolver:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
+        arguments:
+            - '@translator'
+            - '@oro_workflow.manager'
+
     oro_workflow.filter.workflow:
         class: 'Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter'
         arguments:
@@ -327,3 +341,4 @@ services:
             - '@oro_translation.generator.translation_key'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
+
