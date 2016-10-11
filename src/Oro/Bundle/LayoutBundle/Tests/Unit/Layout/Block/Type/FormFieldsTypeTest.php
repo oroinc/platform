@@ -36,7 +36,8 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_',
                     'form_group_prefix' => 'form:group_',
-                    'split_to_fields'   => false
+                    'split_to_fields'   => false,
+                    'instance_name'     => '',
                 ]
             ],
             'with form_name'                 => [
@@ -51,7 +52,8 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_prefix'       => 'test',
                     'form_field_prefix' => 'test_',
                     'form_group_prefix' => 'test:group_',
-                    'split_to_fields'   => false
+                    'split_to_fields'   => false,
+                    'instance_name'     => '',
                 ]
             ],
             'with form_name and form_prefix' => [
@@ -67,7 +69,8 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_prefix'       => 'test_prefix',
                     'form_field_prefix' => 'test_prefix_',
                     'form_group_prefix' => 'test_prefix:group_',
-                    'split_to_fields'   => false
+                    'split_to_fields'   => false,
+                    'instance_name'     => '',
                 ]
             ],
             'all options'                    => [
@@ -87,7 +90,8 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_field_prefix_',
                     'form_group_prefix' => 'form_group_prefix_',
-                    'split_to_fields'   => false
+                    'split_to_fields'   => false,
+                    'instance_name'     => '',
                 ]
             ]
         ];
