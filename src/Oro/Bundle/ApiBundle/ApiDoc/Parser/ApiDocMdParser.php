@@ -83,7 +83,6 @@ class ApiDocMdParser
                             if (array_key_exists($actionName, $elementDocumentation)) {
                                 return $elementDocumentation[$actionName];
                             }
-
                         }
                     }
                 }
@@ -181,7 +180,6 @@ class ApiDocMdParser
 
         return [$type, $element];
     }
-
 
     /**
      * @param $resourceLink
