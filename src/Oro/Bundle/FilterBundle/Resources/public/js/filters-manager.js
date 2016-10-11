@@ -410,7 +410,9 @@ define(function(require) {
          * Reset button click handler
          */
         _onReset: function() {
-            mediator.trigger('datagrid:doReset:' + this.collection.inputName);
+            this.collection.state.filters = {};
+            this.collection.trigger('updateState', this.collection);
+            mediator.trigger('datagrid:doRefresh:' + this.collection.inputName);
         },
 
         /**

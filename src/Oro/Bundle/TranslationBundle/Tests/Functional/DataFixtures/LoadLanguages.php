@@ -5,7 +5,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadLanguages extends AbstractFixture
 {
@@ -30,14 +32,20 @@ class LoadLanguages extends AbstractFixture
      * @param ObjectManager $manager
      * @param string $code
      * @param bool $isEnabled
+     *
      * @return Language
      */
     protected function createLanguage(ObjectManager $manager, $code, $isEnabled)
     {
         $language = new Language();
+        $user = $manager->getRepository(User::class)->findOneBy([]);
+        $organization = $manager->getRepository(Organization::class)->findOneBy([]);
+
         $language
             ->setCode($code)
-            ->setEnabled($isEnabled);
+            ->setEnabled($isEnabled)
+            ->setOwner($user)
+            ->setOrganization($organization);
         $manager->persist($language);
         $this->addReference($code, $language);
 

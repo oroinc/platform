@@ -5,7 +5,7 @@ Feature: User
   I need to be able to open Create User dialog and create new user
 
   Scenario: Create new user
-    Given I login as "admin" user with "admin" password
+    Given I login as administrator
     And go to System/User Management/Users
     And press "Create User"
     When I fill "User" form with:

@@ -75,7 +75,6 @@ class SoapUsersTest extends WebTestCase
         );
 
         $this->assertNotEmpty($user, 'Updated user is not in users list');
-
     }
 
     public function testGetUserRoles()

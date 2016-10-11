@@ -99,6 +99,8 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
+        $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
+            ->clearTag(\Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension::SUBSCRIBER_TAG);
     }
 
     /**

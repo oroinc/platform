@@ -4,6 +4,25 @@ OroEmbeddedFormBundle
 The Bundle provides mechanism to create forms, embed them into third party sites, store and view data submitted via them.
 Basically an `EmbeddedForm` is a `FormType`. Also it contains custom css and a success message.
 
+## Configuration
+
+This bundle has the following configuration options:
+
+```yaml
+oro_embedded_form:
+    # The name of the hidden field that should be used to pass the session id to third party site.
+    # This allows to use the embedded form even if a web browser blocks third-party cookies.
+    session_id_field_name: _embedded_form_sid
+    # The number of seconds the CSRF token should live for.
+    csrf_token_lifetime: 3600
+    # The service id that is used to cache CSRF tokens.
+    # If not specified the Oro\Bundle\SecurityBundle\Cache\WsseNoncePhpFileCache
+    # will be used that stores data in %kernel.cache_dir%/security/embedded_form
+    csrf_token_cache_service_id: ~
+```
+
+The custom CSRF token cache is used only if a web browser blocks third-party cookies. For other cases the default Symfony behaviour is used (CSRF tokens are stored in the PHP session).
+
 ## UI
 The menu item that leads to the list of embedded forms is under the `System` menu.
 To list, view and update pages standard UI components are used - grids, filters, sorters, forms.
