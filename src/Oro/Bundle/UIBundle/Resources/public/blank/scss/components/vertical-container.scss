@@ -1,25 +1,13 @@
+%vertical-aligned-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
 .vertical-container {
-    height: 100%;
+    @extend %vertical-aligned-container;
 
-    text-align: center;
-
-    &::before,
-    &__content {
-        display: inline-block;
-    }
-
-    &::before {
-        height: 100%;
-
-        vertical-align: middle;
-
-        content: ''
-    }
-
-    &__content {
-        width: 99%;
-
-        text-align: left;
-        vertical-align: middle;
-    }
+    width: 100%;
 }

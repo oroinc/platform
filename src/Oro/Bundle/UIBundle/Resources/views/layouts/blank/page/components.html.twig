@@ -4,8 +4,6 @@
     }) %}
 
     <div {{ block('block_attributes') }}>
-        <div class="vertical-container__content">
-            {{ block_widget(block) }}
-        </div>
+        {{ block_widget(block) }}
     </div>
 {% endblock %}
