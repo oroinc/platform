@@ -39,7 +39,12 @@ services:
             - [addWorkflowStepColumn, ["workflowStepLabel"]]
             - [addWorkflowStepColumn, ["step"]]
             - [addWorkflowStepColumn, ["stepLabel"]]
-
+            
+    oro_workflow.datagrid.listener.translation_workflow_column:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Translation\WorkflowColumnListener'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
+            
     oro_workflow.datagrid.extension.restrictions:
         class: Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension
         arguments:

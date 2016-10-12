@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\KeyTemplate;
 
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyTemplateInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
 abstract class TemplateTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -23,5 +23,21 @@ abstract class TemplateTestCase extends \PHPUnit_Framework_TestCase
     protected function assertRequiredKeys(array $requiredKeys)
     {
         $this->assertSame($requiredKeys, $this->getTemplateInstance()->getRequiredKeys());
+    }
+
+    /**
+     * @param string $name
+     */
+    protected function assertName($name)
+    {
+        $this->assertSame($name, $this->getTemplateInstance()->getName());
+    }
+
+    /**
+     * @param array $templates
+     */
+    protected function assertKeyTemplates(array $templates)
+    {
+        $this->assertEquals($templates, $this->getTemplateInstance()->getKeyTemplates());
     }
 }

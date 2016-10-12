@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 class TranslationKeyGeneratorTest extends \PHPUnit_Framework_TestCase
 {

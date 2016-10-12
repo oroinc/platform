@@ -315,23 +315,30 @@ services:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]
 
-    oro_workflow.generator.translation_key:
-        class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
-        public: false
-
-    oro_workflow.translation.helper:
-        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationHelper'
-        public: false
-        arguments:
-            - '@translator.default'
-            - '@oro_translation.manager.translation'
-            - '@oro_workflow.generator.translation_key'
-
-
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         public: false
+
+    oro_workflow.extension.translation_context_resolver:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'
         arguments:
-            - '@oro_workflow.translation.helper'
-            - '@oro_translation.manager.translation'
-            - '@oro_workflow.generator.translation_key'
+            - '@translator'
+            - '@oro_workflow.translation.key_template_parameters_resolver'
+        tags:
+            - { name: oro_translation.extension.translation_context_resolver }
+
+    oro_workflow.translation.key_template_parameters_resolver:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
+        arguments:
+            - '@translator'
+            - '@oro_workflow.manager'
+
+    oro_workflow.filter.workflow:
+        class: 'Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter'
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_translation.generator.translation_key'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
+
