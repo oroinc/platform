@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Translation;
 
-use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 /**
  * @dbIsolation
  */
-class TranslatorTest extends ActionTestCase
+class TranslatorTest extends WebTestCase
 {
     /**
      * {@inheritdoc}
