@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Async;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

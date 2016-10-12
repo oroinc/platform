@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
@@ -13,7 +15,6 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 {
