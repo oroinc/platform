@@ -3,7 +3,6 @@ define(function(require) {
 
     var FiltersManager;
     var DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
-    var MODES = ['manage', 'view'];
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -47,10 +46,10 @@ define(function(require) {
         /**
          * Mode of filters displaying
          *
-         * @type {String}
+         * @type {Integer}
          * @property
          */
-        mode: MODES[0],
+        mode: NaN,
 
         /**
          * Filter list input selector
@@ -102,10 +101,7 @@ define(function(require) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            var filterListeners;
-            var filtersStateView;
-            var filtersStateElement;
-
+            this.mode = FiltersManager.MANAGE_MODE;
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
@@ -116,7 +112,7 @@ define(function(require) {
                 _.extend(this.filters, options.filters);
             }
 
-            filterListeners = {
+            var filterListeners = {
                 'update': this._onFilterUpdated,
                 'disable': this._onFilterDisabled
             };
@@ -134,15 +130,9 @@ define(function(require) {
                 this.listenTo(filter, filterListeners);
             }, this);
 
-            if (_.isString(options.filtersStateElement)) {
-                filtersStateElement = $(options.filtersStateElement);
-            } else if (_.isObject(options.filtersStateElement)) {
-                filtersStateElement = options.filtersStateElement;
-            }
-
-            if (filtersStateElement) {
-                filtersStateView = new FiltersStateView({
-                    el: filtersStateElement,
+            if ('filtersStateElement' in options) {
+                var filtersStateView = new FiltersStateView({
+                    el: $(options.filtersStateElement),
                     filters: options.filters
                 });
 
@@ -355,7 +345,7 @@ define(function(require) {
 
             if (filtersStateView) {
                 filtersStateView.render();
-                if (this.mode === MODES[0]) {
+                if (this.mode === FiltersManager.MANAGE_MODE) {
                     filtersStateView.hide();
                 }
             }
@@ -495,11 +485,11 @@ define(function(require) {
         },
 
         setMode: function(mode) {
-            if (mode === MODES[1]) {
+            if (mode === FiltersManager.VIEW_MODE) {
                 this.mode = mode;
                 this.$el.hide();
                 _.result(this.subview('filters-state'), 'show');
-            } else if (mode === MODES[0]) {
+            } else if (mode === FiltersManager.MANAGE_MODE) {
                 this.mode = mode;
                 if (!_.isEmpty(this.filters)) {
                     this.$el.show();
@@ -507,6 +497,11 @@ define(function(require) {
                 _.result(this.subview('filters-state'), 'hide');
             }
         }
+    });
+
+    _.extend(FiltersManager, {
+        MANAGE_MODE: 0,
+        VIEW_MODE: 1
     });
 
     return FiltersManager;
