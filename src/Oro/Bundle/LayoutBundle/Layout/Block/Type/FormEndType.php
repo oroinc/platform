@@ -12,6 +12,8 @@ class FormEndType extends AbstractFormType
 {
     const NAME = 'form_end';
 
+    const SHORT_NAME = 'end';
+
     /**
      * {@inheritdoc}
      */

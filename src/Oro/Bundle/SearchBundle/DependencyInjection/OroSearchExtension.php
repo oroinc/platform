@@ -75,7 +75,6 @@ class OroSearchExtension extends Extension
         $container->setParameter('oro_search.engine', $config['engine']);
         $container->setParameter('oro_search.engine_parameters', $config['engine_parameters']);
         $container->setParameter('oro_search.log_queries', $config['log_queries']);
-        $container->setParameter('oro_search.realtime_update', $config['realtime_update']);
         $this->setEntitiesConfigParameter($container, $config['entities_config']);
         $container->setParameter('oro_search.twig.item_container_template', $config['item_container_template']);
 

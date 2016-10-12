@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -14,94 +13,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
-class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface
 {
     const COUNT = 9;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
-        $this->loadItems($manager);
-        $this->ensureItemsLoaded();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
-    {
-        return 4;
-    }
-
-    /**
-     * Load items
-     *
-     * @param ObjectManager $manager
-     */
-    public function loadItems($manager)
-    {
-        $items = $this->generateItems();
-
-        foreach ($items as $item) {
-            $manager->persist($item);
-        }
-
-        $manager->flush();
-    }
-
-    /**
-     * Ensure that items loaded to search index
-     *
-     * @throws \LogicException
-     */
-    protected function ensureItemsLoaded()
-    {
-        $query = new Query();
-        $query->from('oro_test_item');
-
-        $requestCounts = 20;
-        do {
-            $result = $this->container->get('oro_search.search.engine')->search($query);
-            $isLoaded = $result->getRecordsCount() == self::COUNT;
-            if (!$isLoaded) {
-                $requestCounts++;
-                sleep(1);
-            }
-        } while (!$isLoaded && $requestCounts > 0);
-
-        if (!$isLoaded) {
-            throw new \LogicException('Search items are not loaded');
-        }
-    }
-
-    /**
-     * @return array
-     */
-    private function generateItems()
-    {
-        $items = [];
-
         for ($ind = 1; $ind <= self::COUNT; $ind++) {
             //create item
             /** @var $item Item */
             $item = new Item();
             //string value
-            $item->stringValue = 'item' . $ind . '@mail.com';
+            $item->stringValue  = 'item' . $ind . '@mail.com';
             $item->integerValue = $ind * 1000;
             //decimal
             $item->decimalValue = $ind / 10.0;
@@ -124,11 +50,17 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             //phone
             $item->phone = sprintf($ind % 2 ? '123-456-%s00' : '%s00987654', $ind);
 
-            $this->addReference(sprintf('searchItem%s', $ind), $item);
-
-            $items[] = $item;
+            $manager->persist($item);
         }
 
-        return $items;
+        $manager->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 4;
     }
 }
