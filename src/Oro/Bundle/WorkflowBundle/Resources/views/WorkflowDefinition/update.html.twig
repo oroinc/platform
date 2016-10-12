@@ -1,5 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
     {% set pageComponent = {
             module: 'oroworkflow/js/app/components/workflow-editor-component',
@@ -133,6 +134,7 @@
                                     {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                                        {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
                                     </div>
                                 </div>
 
@@ -189,6 +191,7 @@
                                     {{ _self.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
                                     <div class="controls">
                                         <textarea name="message"><%= message %></textarea>
+                                        {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
                                     </div>
                                 </div>
 
@@ -266,6 +269,7 @@
                                     {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                                        {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
                                     </div>
                                 </div>
 
@@ -322,13 +326,14 @@
     </script>
 
     <script type="text/template" id="step-row-template">
-        <td class="step-name">
+        <td class="step-name workflow-translatable-label">
             <% if (_is_start) { %>
             <%- label %>
             <% } else { %>
             <a href="#" class="edit-step" title="{{ 'Update this step'|trans}}"><%- label %></a>
-            <% } %>
             <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">({{ "Final"|trans }})</strong><% } %>
+            {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
+            <% } %>
         </td>
         <td class="step-transitions"></td>
         <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}"><%- order %></span></td>
@@ -346,6 +351,7 @@
 
     <script type="text/template" id="transition-row-short-template">
         <a href="#" class="edit-transition" title="{{ 'Update this transition'|trans }}"><%- label %></a>
+        {{ workflowMacros.renderGoToTranslationsIcon() }}
         <a href="#" class="clone-transition action" title="{{ 'Clone this transition'|trans }}"><i class="icon-copy hide-text"></i></a>
         <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="icon-trash hide-text"></i></a>
         <i class="icon-long-arrow-right"/>

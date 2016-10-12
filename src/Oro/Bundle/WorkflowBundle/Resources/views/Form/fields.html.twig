@@ -1,3 +1,5 @@
+{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+
 {% block oro_workflow_transition_row %}
     <fieldset class="form-horizontal">
         {{ form_rest(form) }}
@@ -7,4 +9,9 @@
         <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
         <button type="submit" class="btn btn-success">{{ 'Submit'|trans }}</button>
     </div>
+{% endblock %}
+
+{% block _oro_workflow_definition_form_label_widget %}
+    {{ form_widget(form) }}
+    {{ workflowMacros.renderGoToTranslationsIcon('test') }}
 {% endblock %}

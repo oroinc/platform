@@ -132,3 +132,9 @@
             });
     </script>
 {% endmacro %}
+
+{% macro renderGoToTranslationsIcon(workflowName) %}
+    {% if workflowName %}
+        <a href="#" class="workflow-translatable-field" title="{{ 'oro.workflow.action.workflow.go_to_translations'|trans}}"><i class="fa fa-language large-icon"></i></a>
+    {% endif %}
+{% endmacro %}

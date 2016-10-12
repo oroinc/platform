@@ -131,13 +131,17 @@
 {% endblock breadcrumbs %}
 
 {% macro view_step_row(stepData, entity) %}
+    {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
     <tr>
-        <td class="step-name">
+        <td class="step-name workflow-translatable-label">
             {{ stepData.label }}
             {% if stepData.is_final %}
                 <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">
                     ({{ "Final"|trans }})
                 </strong>
+            {% endif %}
+            {% if stepData.order >= 0 %}
+                {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
             {% endif %}
         </td>
         <td class="step-transitions">
@@ -148,6 +152,7 @@
                         {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
                         <li>
                             <span>{{ currentTransition.label }}</span>
+                            {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
                             <i class="icon-long-arrow-right"></i>
                             <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ toStep.label }}</span>
                         </li>
