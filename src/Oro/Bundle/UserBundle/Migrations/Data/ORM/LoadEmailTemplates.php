@@ -41,25 +41,4 @@ class LoadEmailTemplates extends AbstractEmailFixture implements VersionedFixtur
             ->get('kernel')
             ->locateResource('@OroUserBundle/Migrations/Data/ORM/emails');
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVersion()
-    {
-        return '1.0';
-    }
-    /**
-     * {@inheritdoc}
-     */
-    protected function findExistingTemplate(ObjectManager $manager, array $template)
-    {
-        if (empty($template['params']['name'])) {
-            return null;
-        }
-        return $manager->getRepository('OroEmailBundle:EmailTemplate')->findOneBy([
-            'name' => $template['params']['name'],
-            'entityName' => 'Oro\Bundle\UserBundle\Entity\User',
-        ]);
-    }
 }
