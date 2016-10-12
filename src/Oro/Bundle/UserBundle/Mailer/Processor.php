@@ -58,12 +58,12 @@ class Processor extends BaseProcessor
      *
      * @return int
      */
-    public function sendAutoDeactivateEmail(UserInterface $user)
+    public function sendAutoDeactivateEmail(UserInterface $user, $exceededLimit)
     {
         return $this->getEmailTemplateAndSendEmail(
             $user,
             static::TEMPLATE_USER_AUTO_DEACTIVATE,
-            ['entity' => $user]
+            ['entity' => $user, 'exceededLimit' => $exceededLimit]
         );
     }
 }

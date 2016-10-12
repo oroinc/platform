@@ -37,6 +37,37 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider exceedLoginAttemptsProvider
+     */
+    public function testShouldReturnExceededLimitPerUser(
+        $dailyAttempts,
+        $cumutativeAttempts,
+        $dailyLimit,
+        $cumulativeLimit,
+        $expected
+    ) {
+        $provider = new LoginAttemptsProvider(
+            $this->getDoctrine($dailyAttempts, $cumutativeAttempts),
+            $this->getConfigManager($dailyLimit, $cumulativeLimit),
+            $this->getUserManager(new User())
+        );
+
+        $this->assertSame($expected, $provider->getExceedLimit(new User()));
+    }
+
+    /**
+     * @return array (dailyAttempts, cumulativeAttempts, dailyLimit, cumulativeLimit, expected)
+     */
+    public function exceedLoginAttemptsProvider()
+    {
+        return [
+            'exceed daily logins' => [12, 10, 10, 99, 10],
+            'exceed cumulative logins' => [3, 25, 99, 20, 20],
+            'does not exceed any limits' => [3, 5, 99, 99, 0],
+        ];
+    }
+
+    /**
      * @dataProvider loginAttemptsProvider
      */
     public function testShouldReturnRemainingLoginAttemptsPerUser(

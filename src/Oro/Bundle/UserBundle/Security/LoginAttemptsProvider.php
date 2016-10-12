@@ -48,16 +48,47 @@ class LoginAttemptsProvider
 
     public function getByUser(UserInterface $user)
     {
-        $repository = $this->getLoginHistoryRepository();
+        $remainingCumulative = $this->getRemainingCumulativeLoginAttempts($user);
+        $remainingDaily = $this->getRemainingDailyLoginAttempts($user);
 
+        return max(0, min($remainingCumulative, $remainingDaily));
+    }
+
+    public function getExceedLimit(UserInterface $user)
+    {
+        if ($this->getRemainingCumulativeLoginAttempts($user) <= 0) {
+            return $this->getMaxCumulativeLoginAttempts();
+        }
+
+        if ($this->getRemainingDailyLoginAttempts($user) <= 0) {
+            return $this->getMaxDailyLoginAttempts();
+        }
+
+        return 0;
+    }
+
+    public function getRemainingCumulativeLoginAttempts(UserInterface $user)
+    {
         $cumulativeCount = $this->getLoginHistoryRepository()->countUserCumulativeFailedLogins($user);
+
+        return $this->getMaxCumulativeLoginAttempts() - $cumulativeCount;
+    }
+
+    public function getRemainingDailyLoginAttempts(UserInterface $user)
+    {
         $dailyCount = $this->getLoginHistoryRepository()->countUserDailyFailedLogins($user);
 
-        $maxAttempts = $this->configManager->get(self::MAX_LOGIN_ATTEMPTS);
-        $maxDailyAttempts = $this->configManager->get(self::MAX_DAILY_LOGIN_ATTEMPTS);
+        return $this->getMaxDailyLoginAttempts() - $dailyCount;
+    }
 
-        // subtract current values from the configured and take the minimum
-        return max(0, min($maxAttempts - $cumulativeCount, $maxDailyAttempts - $dailyCount));
+    public function getMaxCumulativeLoginAttempts()
+    {
+        return $this->configManager->get(self::MAX_LOGIN_ATTEMPTS);
+    }
+
+    public function getMaxDailyLoginAttempts()
+    {
+        return $this->configManager->get(self::MAX_DAILY_LOGIN_ATTEMPTS);
     }
 
     /**

@@ -66,7 +66,10 @@ class LoginHistorySubscriber implements EventSubscriberInterface
         if (0 === $remainingAttempts) {
             $user->setEnabled(false);
             $this->userManager->updateUser($user);
-            $this->mailProcessor->sendAutoDeactivateEmail($user);
+            $this->mailProcessor->sendAutoDeactivateEmail(
+                $user,
+                $this->loginAttemptsProvider->getExceedLimit($user)
+            );
         }
     }
 }
