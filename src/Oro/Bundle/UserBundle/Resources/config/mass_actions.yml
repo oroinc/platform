@@ -8,8 +8,9 @@ services:
     oro_datagrid.mass_action.forced_password_reset.handler:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler
         arguments:
-            - '@oro_user.mailer.processor'
+            - '@oro_notification.email_processor'
             - '@oro_user.manager'
+            - "@oro_config.manager"
             - '@translator'
             - '@logger'
         tags:

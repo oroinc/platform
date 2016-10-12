@@ -10,30 +10,41 @@ use Doctrine\ORM\Query;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Model\MassPasswordResetEmailNotification;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {
+    const TEMPLATE_NAME = 'force_reset_password';
+
     /** @var EntityManager */
     protected $em;
 
-    /** @var Processor */
+    /** @var EmailNotificationProcessor */
     protected $mailerProcessor;
 
     /** @var UserManager */
     protected $userManager;
+
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var LoggerInterface */
     protected $logger;
 
     /** @var TranslatorInterface  */
     protected $translator;
+
+    /** @var int */
+    protected $template = null;
 
     /** @var int */
     protected $counter = 0;
@@ -45,13 +56,15 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     protected $errorMessage = 'oro.user.password.force_reset.mass_action.failure';
 
     public function __construct(
-        Processor $mailerProcessor,
+        EmailNotificationProcessor $mailerProcessor,
         UserManager $userManager,
+        ConfigManager $configManager,
         TranslatorInterface $translator,
         LoggerInterface $logger
     ) {
         $this->mailerProcessor = $mailerProcessor;
         $this->userManager = $userManager;
+        $this->configManager = $configManager;
         $this->translator = $translator;
         $this->logger = $logger;
     }
@@ -69,12 +82,6 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
 
         $this->em = $results->getSource()->getEntityManager();
 
-        $results->setPageCallback(function () {
-            $this->em->flush();
-            $this->em->clear();
-            $this->counter = 0;
-        });
-
         while ($results->current() != null) {
             $entity = $results->current()->getRootEntity();
 
@@ -91,8 +98,13 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
                 $entity->setConfirmationToken($entity->generateToken());
             }
 
+            $entity->setLoginDisabled(true);
+            $this->userManager->updateUser($entity, false);
+
             try {
-                $this->mailerProcessor->sendForcedResetPasswordAsAdminEmail($entity);
+                $passResetNotification = $this->prepareNotification($entity);
+                $this->mailerProcessor->process($entity, [$passResetNotification], $this->logger);
+                $this->em->flush();
             } catch (\Exception $e) {
                 if (null !== $this->logger) {
                     $this->logger->error(sprintf('Sending email to %s failed.', $entity->getEmail()));
@@ -100,16 +112,12 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
                 }
             }
 
-            $entity->setLoginDisabled(true);
-            $this->userManager->updateUser($entity, false);
             $this->counter++;
             $results->next();
         }
 
-        if ($this->counter > 0) {
-            $this->em->flush();
-            $this->em->clear();
-        }
+        $this->em->flush();
+        $this->em->clear();
 
         $responseMessage = $massActionOptions->offsetGetByPath('[messages][success]', $this->successMessage);
 
@@ -117,5 +125,33 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
             true,
             $this->translator->trans($responseMessage)
         );
+    }
+
+    /**
+     * @return EmailTemplate
+     */
+    protected function getTemplate()
+    {
+        if (null != $this->template) {
+            return $this->template;
+        }
+
+        return $this->em
+            ->getRepository('OroEmailBundle:EmailTemplate')
+            ->findOneBy(['name' => self::TEMPLATE_NAME]);
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return MassPasswordResetEmailNotification
+     */
+    protected function prepareNotification(User $user)
+    {
+        $passResetNotification = new MassPasswordResetEmailNotification();
+        $passResetNotification->addEmail($user->getEmail());
+        $passResetNotification->setTemplate($this->getTemplate());
+
+        return $passResetNotification;
     }
 }
