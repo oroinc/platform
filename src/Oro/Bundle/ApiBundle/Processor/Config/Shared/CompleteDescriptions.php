@@ -8,7 +8,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
-use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMdParser;
+use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProviderInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
@@ -26,8 +26,8 @@ class CompleteDescriptions implements ProcessorInterface
     /** @var ResourceDocProviderInterface */
     protected $resourceDocProvider;
 
-    /** @var ApiDocMdParser */
-    protected $apiDocMdParser;
+    /** @var MarkdownApiDocParser */
+    protected $apiDocParser;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -35,18 +35,18 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDescriptionProvider    $entityDescriptionProvider
      * @param ResourceDocProviderInterface $resourceDocProvider
-     * @param ApiDocMdParser               $apiDocMdParser
+     * @param MarkdownApiDocParser         $apiDocParser
      * @param TranslatorInterface          $translator
      */
     public function __construct(
         EntityDescriptionProvider $entityDescriptionProvider,
         ResourceDocProviderInterface $resourceDocProvider,
-        ApiDocMdParser $apiDocMdParser,
+        MarkdownApiDocParser $apiDocParser,
         TranslatorInterface $translator
     ) {
         $this->entityDescriptionProvider = $entityDescriptionProvider;
         $this->resourceDocProvider = $resourceDocProvider;
-        $this->apiDocMdParser = $apiDocMdParser;
+        $this->apiDocParser = $apiDocParser;
         $this->translator = $translator;
     }
 
@@ -119,17 +119,10 @@ class CompleteDescriptions implements ProcessorInterface
             }
         }
 
-        if ($definition->has(EntityDefinitionConfig::DOCUMENTATION_RESOURCE)) {
-            $this->apiDocMdParser->parseDocumentationResource(
-                $definition->get(EntityDefinitionConfig::DOCUMENTATION_RESOURCE)
-            );
-        }
+        $this->registerDocumentationResource($definition->getDocumentationResource());
+        $this->registerDocumentationResource($definition->getDocumentation());
 
-        if ($definition->hasDocumentation()) {
-            $this->apiDocMdParser->parseDocumentationResource($definition->getDocumentation());
-        }
-
-        $loadedDocumentation = $this->apiDocMdParser->getDocumentation($entityClass, 'actions', $targetAction);
+        $loadedDocumentation = $this->apiDocParser->getActionDocumentation($entityClass, $targetAction);
         if ($loadedDocumentation) {
             $definition->setDocumentation($loadedDocumentation);
         } else {
@@ -245,9 +238,8 @@ class CompleteDescriptions implements ProcessorInterface
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                $loadedDescription = $this->apiDocParser->getFieldDocumentation(
                     $entityClass,
-                    'fields',
                     $fieldName,
                     $targetAction
                 );
@@ -269,12 +261,11 @@ class CompleteDescriptions implements ProcessorInterface
                 if ($label instanceof Label) {
                     $field->setDescription($this->trans($label));
                 } else {
-                    $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                    $this->registerDocumentationResource($label);
+                    $loadedDescription = $this->apiDocParser->getFieldDocumentation(
                         $entityClass,
-                        'fields',
                         $fieldName,
-                        $targetAction,
-                        $label
+                        $targetAction
                     );
                     if ($loadedDescription) {
                         $field->setDescription($loadedDescription);
@@ -310,12 +301,7 @@ class CompleteDescriptions implements ProcessorInterface
         $fields = $filters->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $loadedDescription = $this->apiDocMdParser->getDocumentation(
-                    $entityClass,
-                    'filters',
-                    $fieldName,
-                    $targetAction
-                );
+                $loadedDescription = $this->apiDocParser->getFilterDocumentation($entityClass, $fieldName);
                 if ($loadedDescription) {
                     $field->setDescription($loadedDescription);
                     continue;
@@ -343,13 +329,8 @@ class CompleteDescriptions implements ProcessorInterface
                 if ($description instanceof Label) {
                     $field->setDescription($this->trans($description));
                 } else {
-                    $loadedDescription = $this->apiDocMdParser->getDocumentation(
-                        $entityClass,
-                        'filters',
-                        $fieldName,
-                        $targetAction,
-                        $description
-                    );
+                    $this->registerDocumentationResource($description);
+                    $loadedDescription = $this->apiDocParser->getFilterDocumentation($entityClass, $fieldName);
                     if ($loadedDescription) {
                         $field->setDescription($loadedDescription);
                         continue;
@@ -390,5 +371,15 @@ class CompleteDescriptions implements ProcessorInterface
     protected function trans(Label $label)
     {
         return $label->trans($this->translator) ? : null;
+    }
+
+    /**
+     * @param mixed $resource
+     */
+    protected function registerDocumentationResource($resource)
+    {
+        if (is_string($resource) && !empty($resource)) {
+            $this->apiDocParser->parseDocumentationResource($resource);
+        }
     }
 }

@@ -310,4 +310,40 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
             unset($this->items[self::DELETE_HANDLER]);
         }
     }
+
+    /**
+     * Indicates whether a link to documentation file exists.
+     *
+     * @return bool
+     */
+    public function hasDocumentationResource()
+    {
+        return array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items);
+    }
+
+    /**
+     * Gets a link to file contains the documentation for API resource.
+     *
+     * @return string|null
+     */
+    public function getDocumentationResource()
+    {
+        return array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items)
+            ? $this->items[self::DOCUMENTATION_RESOURCE]
+            : null;
+    }
+
+    /**
+     * Sets a link to file contains the documentation for API resource.
+     *
+     * @param string|null $resource
+     */
+    public function setDocumentationResource($resource)
+    {
+        if ($resource) {
+            $this->items[self::DOCUMENTATION_RESOURCE] = $resource;
+        } else {
+            unset($this->items[self::DOCUMENTATION_RESOURCE]);
+        }
+    }
 }

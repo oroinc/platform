@@ -6,7 +6,7 @@ use Michelf\Markdown;
 
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
-class ApiDocMdParser
+class MarkdownApiDocParser
 {
     /**
      * @var array
@@ -46,50 +46,36 @@ class ApiDocMdParser
 
     /**
      * @param string $className
-     * @param string $section
-     * @param string $element
      * @param string $actionName
-     * @param string $resource
      *
-     * @return mixed|string
+     * @return string|null
      */
-    public function getDocumentation($className, $section, $element = null, $actionName = null, $resource = null)
+    public function getActionDocumentation($className, $actionName)
     {
-        if (null !== $resource) {
-            $this->parseDocumentationResource($resource);
-        }
+        return $this->getDocumentation($className, 'actions', $actionName);
+    }
 
-        if (array_key_exists($className, $this->loadedDocumentation)) {
-            $classDocumentation = $this->loadedDocumentation[$className];
-            if (array_key_exists($section, $classDocumentation)) {
-                $sectionDocumentation = $classDocumentation[$section];
-                if (!is_array($sectionDocumentation)) {
-                    return $sectionDocumentation;
-                }
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param string $actionName
+     *
+     * @return string|null
+     */
+    public function getFieldDocumentation($className, $fieldName, $actionName)
+    {
+        return $this->getDocumentation($className, 'fields', $fieldName, $actionName);
+    }
 
-                if (null !== $element) {
-                    $element = strtolower($element);
-                    $actionName = strtolower($actionName);
-                    if (array_key_exists($element, $sectionDocumentation)) {
-                        $elementDocumentation = $sectionDocumentation[$element];
-                        if (!is_array($elementDocumentation)) {
-                            return $elementDocumentation;
-                        }
-                        if (null !== $actionName) {
-                            if (!array_key_exists($actionName, $elementDocumentation)
-                                && array_key_exists('common', $elementDocumentation)) {
-                                return $elementDocumentation['common'];
-                            }
-                            if (array_key_exists($actionName, $elementDocumentation)) {
-                                return $elementDocumentation[$actionName];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return '';
+    /**
+     * @param string $className
+     * @param string $filterName
+     *
+     * @return string|null
+     */
+    public function getFilterDocumentation($className, $filterName)
+    {
+        return $this->getDocumentation($className, 'filters', $filterName);
     }
 
     /**
@@ -154,6 +140,44 @@ class ApiDocMdParser
                 }
             }
         }
+    }
+
+    /**
+     * @param string      $className
+     * @param string      $section
+     * @param string      $element
+     * @param string|null $subElement
+     *
+     * @return string|null
+     */
+    protected function getDocumentation($className, $section, $element, $subElement = null)
+    {
+        if (array_key_exists($className, $this->loadedDocumentation)) {
+            $classDocumentation = $this->loadedDocumentation[$className];
+            if (array_key_exists($section, $classDocumentation)) {
+                $sectionDocumentation = $classDocumentation[$section];
+                $element = strtolower($element);
+                if (array_key_exists($element, $sectionDocumentation)) {
+                    $elementDocumentation = $sectionDocumentation[$element];
+                    if (!is_array($elementDocumentation)) {
+                        return $elementDocumentation;
+                    }
+                    if ($subElement) {
+                        $subElement = strtolower($subElement);
+                        if (!array_key_exists($subElement, $elementDocumentation)
+                            && array_key_exists('common', $elementDocumentation)
+                        ) {
+                            return $elementDocumentation['common'];
+                        }
+                        if (array_key_exists($subElement, $elementDocumentation)) {
+                            return $elementDocumentation[$subElement];
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
