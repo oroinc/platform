@@ -1,6 +1,6 @@
 # Oro\Bundle\UserBundle\Entity\User
 
-## Fields
+## FIELDS
 
 ### emails
 

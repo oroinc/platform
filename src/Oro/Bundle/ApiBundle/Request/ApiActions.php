@@ -48,13 +48,13 @@ class ApiActions
     }
 
     /**
-     * Returns true in case if input or output data can have identificator fields.
+     * Returns true in case if input or output data can have identifier fields.
      *
      * @param $action
      *
      * @return bool
      */
-    public static function isIdentificatorNeededForAction($action)
+    public static function isIdentifierNeededForAction($action)
     {
         return $action !== self::CREATE;
     }

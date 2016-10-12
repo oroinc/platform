@@ -1,89 +1,94 @@
-Documentation resource format
-=============================
+Documentation File Format
+=========================
 
-The documentation resource file is a regular .md document that contains description about one or multiple resources.
-The only requirement for such document is it should be written in particular format:
+The documentation file is a regular [markdown](https://en.wikipedia.org/wiki/Markdown) document that contains description about one or multiple API resources.
 
-Each resource documentation should starts from '#' (h1) header that contains Fully-Qualified Class Name (FQCN) of the resource. For instance: 
+The only requirement for such document is it should be written in particular format.
 
-    # Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+Each resource documentation should starts from '#' (h1) header that contains Fully-Qualified Class Name (FQCN) of the resource, e.g.:
 
-As already mentioned above, a single documentation file may contain multiple resource documentations, e.g.:
+```markdown
+# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+```
 
-    # Acme\Bundle\AcmeBundle\Entity\AcmeEntity1
-    ...
-    # Acme\Bundle\AcmeBundle\Entity\AcmeEntity2
+As already mentioned above, a single documentation file may contain documentations for several resource. In general, this can be used to document a main resource and related resources. For example, you can document resources for User and UserGroup entities in one file.
 
 At the next level `##` (h2) one of the documentation sections should be specified, e.g.:
 
-    # Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+```markdown
+# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
 
-    ## Actions
-    ...
-    ## FIELDS
-    ...
-    ## filters
+## ACTIONS
+...
+## FIELDS
+...
+## FILTERS
+```
 
 The letters case of the section name is no matter. They are used only by documentation parser to identify the documentation part.  
 The following table describes the purposes of each documentation section:
 
 | Section name | Description | Example |
 | --- | --- | --- |
-| Actions | Followed by action name and contains a description for particular action. | GET, GET_LIST, CREATE, UPDATE, etc. |
-| Fields | Followed by field name and contains a description for particular field. At the same time it is possible to specify the description for field and for particular action as well. | id, name, createdAt, updatedAt, etc. |
-| Filters | Followed by field name and contains a description for particular field, but in case it will be used for filtering purposes. | id, name, createdAt, updatedAt, etc. |
+| ACTIONS | Followed by action name and contains a description for particular action. | Get, Get_list, Create, Update, etc. |
+| FIELDS | Followed by field name and contains a description for particular field. At the same time it is possible to specify the description for field and for particular action as well. | id, name, createdAt, updatedAt, etc. |
+| FILTERS | Followed by field name and contains a description for particular field, but in case it will be used for filtering purposes. | id, name, createdAt, updatedAt, etc. |
 
 The third level `###` (h3) is field name or filter field name:
 
-	# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
-	
-	## Actions
-	
-	### GET
-	
-	Description for GET action. May contain any formatting e.g.: ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
-	
-	### CREATE
-	
-	Description for CREATE action
-	
-	## Fields
-	
-	### id
-	
-	Description for ID field
-	
-	### name
-	
-	Description for NAME field
-	
-	## Filters
-	
-	### id
-	
-	Description for ID filter
-	
-	### name
-	
-	Description for NAME filter
-	
-	### createdAt
-	
-	Description for CREATED AT filter
+```markdown
+# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+
+## ACTIONS
+
+### Get
+
+Description for GET action. May contain any formatting e.g.: ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
+
+### Create
+
+Description for CREATE action
+
+## FIELDS
+
+### id
+
+Description for ID field
+
+### name
+
+Description for NAME field
+
+## FILTERS
+
+### id
+
+Description for ID filter
+
+### name
+
+Description for NAME filter
+
+### createdAt
+
+Description for CREATED AT filter
+```
 
 And for the case then it is needed to specify the description for field and for particular action, the fourth level `####` (h4) header should be added, so the formatting will looks like this:
 
-	# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
-	
-	## FIELDS
-	
-	### name
-	
-	Regular description for NAME field
-	
-	#### GET
-	
-	Description for NAME field and for GET action
+```markdown
+# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+
+## FIELDS
+
+### name
+
+Regular description for NAME field
+
+#### Get
+
+Description for NAME field and for GET action
+```
 
 
-Please note, the `Filters` section do not supports the 4th level (per action type) of description.
+Please note, the `FILTERS` section do not supports the 4th level (per action type) of description.

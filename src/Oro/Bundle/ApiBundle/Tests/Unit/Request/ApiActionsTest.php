@@ -57,14 +57,14 @@ class ApiActionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider isIdentificatorNeededForActionProvider
+     * @dataProvider isIdentifierNeededForActionProvider
      */
-    public function testIsIdentificatorNeededForAction($action, $result)
+    public function testIsIdentifierNeededForAction($action, $result)
     {
-        $this->assertEquals($result, ApiActions::isIdentificatorNeededForAction($action));
+        $this->assertEquals($result, ApiActions::isIdentifierNeededForAction($action));
     }
 
-    public function isIdentificatorNeededForActionProvider()
+    public function isIdentifierNeededForActionProvider()
     {
         return [
             ['get', true],

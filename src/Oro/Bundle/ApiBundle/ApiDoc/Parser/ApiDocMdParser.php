@@ -127,7 +127,7 @@ class ApiDocMdParser
             foreach ($subElements as $subElement) {
                 /** @var \DOMElement $subElement*/
 
-                if (in_array($subElement->tagName, ['h1', 'h2', 'h3'])) {
+                if (in_array($subElement->tagName, ['h1', 'h2', 'h3'], true)) {
                     list($type, $element) = $this->parseDocumentationHeaders($subElement, $headerKey, $type, $element);
                     $action = '';
                     continue;

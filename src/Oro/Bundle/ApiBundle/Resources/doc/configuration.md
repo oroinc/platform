@@ -205,7 +205,7 @@ Example:
 api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
-            documentation_resource: "@AcmeAcmeBundle/Resources/doc/api.md"
+            documentation_resource: '@AcmeAcmeBundle/Resources/doc/api/acme_entity.md'
             inherit:              false
             exclusion_policy:     all
             max_results:          25
@@ -215,7 +215,7 @@ api:
             hints:
                 - HINT_TRANSLATABLE
                 - { name: HINT_FILTER_BY_CURRENT_USER }
-                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: "Acme\Bundle\AcmeBundle\AST_Walker_Class"}
+                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: 'Acme\Bundle\AcmeBundle\AST_Walker_Class'}
             delete_handler:       acme.demo.test_entity.delete_handler
             excluded:             false
             form_type: acme_entity.api_form
@@ -264,12 +264,12 @@ api:
                 # full syntax for data transformer
                 field2:
                     data_transformer:
-                        - "my.data.transformer.service.id"
-                        - ["Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer", "transform"]
+                        - 'my.data.transformer.service.id'
+                        - ['Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer', 'transform']
 
                 # short syntax for data transformer
                 field3:
-                    data_transformer: "my.data.transformer.service.id"
+                    data_transformer: 'my.data.transformer.service.id'
 
                 # full syntax for "collapse" property
                 field4:
@@ -336,7 +336,7 @@ api:
                     field2:
                         data_type: string
                         property_path: firstName
-                        description: "My filter description"
+                        description: 'My filter description'
                     field3:
                         data_type: boolean
                         allow_array: false

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Parse fields definition by given ApiDocMetadata information
@@ -29,7 +30,8 @@ class ApiDocMetadataParser implements ParserInterface
      */
     public function supports(array $item)
     {
-        return array_key_exists('options', $item)
+        return
+            array_key_exists('options', $item)
             && array_key_exists('metadata', $item['options'])
             && is_a($item['class'], ApiDocMetadata::class, true)
             &&  $item['options']['metadata'] instanceof ApiDocMetadata;
@@ -69,7 +71,7 @@ class ApiDocMetadataParser implements ParserInterface
         $fields = [];
         $relations = [];
 
-        $addIdentificators = ApiActions::isIdentificatorNeededForAction($action);
+        $addIdentifiers = ApiActions::isIdentifierNeededForAction($action);
         $identifiers = $metadata->getIdentifierFieldNames();
         // process fields
         foreach ($metadata->getFields() as $fieldName => $fieldMetadata) {
@@ -78,7 +80,7 @@ class ApiDocMetadataParser implements ParserInterface
             $fieldData['required'] = !$fieldMetadata->isNullable();
             $fieldData['dataType'] = $fieldMetadata->getDataType();
             $fieldData['description'] = $config->getField($fieldName)->getDescription();
-            $fieldData['readonly'] = !$addIdentificators && in_array($fieldName, $identifiers, true);
+            $fieldData['readonly'] = !$addIdentifiers && in_array($fieldName, $identifiers, true);
             $fieldData['isRelation'] = false;
             $fieldData['isCollection'] = false;
 
@@ -94,7 +96,7 @@ class ApiDocMetadataParser implements ParserInterface
 
             $fieldData['required'] = !$associationMetadata->isNullable();
             $fieldData['description'] = $config->getField($associationName)->getDescription();
-            $fieldData['readonly'] = !$addIdentificators && in_array($associationName, $identifiers, true);
+            $fieldData['readonly'] = !$addIdentifiers && in_array($associationName, $identifiers, true);
             $fieldData['isCollection'] = $associationMetadata->isCollection();
 
             $fieldData['dataType'] = $this->getEntityType($associationMetadata->getTargetClassName(), $requestType);
@@ -128,16 +130,11 @@ class ApiDocMetadataParser implements ParserInterface
      */
     protected function getEntityType($entityClass, RequestType $requestType)
     {
-        try {
-            return $this->valueNormalizer->normalizeValue(
-                $entityClass,
-                DataType::ENTITY_TYPE,
-                $requestType
-            );
-        } catch (\Exception $e) {
-            // ignore any exception here
-        }
-
-        return null;
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $requestType,
+            false
+        );
     }
 }
