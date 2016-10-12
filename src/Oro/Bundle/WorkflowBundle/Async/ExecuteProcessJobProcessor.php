@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
-use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
+use Psr\Log\LoggerInterface;
 
 class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -62,14 +60,6 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
 
             return self::REJECT;
         }
-
-        $this->logger->critical(
-            sprintf('[ExecuteProcessJobProcessor] Process Job with id %d not found', $body['process_job_id']),
-            [
-                'message_body' => $message->getBody(),
-                'process_job_id' =>  $body['process_job_id']
-            ]
-        );
 
         /** @var ProcessJob $processJob */
         $processJob = $this->doctrineHelper->getEntityRepository(ProcessJob::class)->find($body['process_job_id']);
