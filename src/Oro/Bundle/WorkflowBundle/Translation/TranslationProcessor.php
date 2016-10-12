@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
-use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
-use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -13,9 +11,12 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     /** @var WorkflowTranslationFieldsIterator */
     protected $translationFieldsIterator;
 
-    public function __construct()
+    /**
+     * @param WorkflowTranslationFieldsIterator $translationFieldsIterator
+     */
+    public function __construct(WorkflowTranslationFieldsIterator $translationFieldsIterator)
     {
-        $this->translationFieldsIterator = new WorkflowTranslationFieldsIterator();
+        $this->translationFieldsIterator = $translationFieldsIterator;
     }
 
     /**
@@ -57,14 +58,9 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
         //ensure workflow name defined in configuration
         $configuration['name'] = $definition->getName();
 
-        $generator = new TranslationKeyGenerator();
-
-        foreach ($this->translationFieldsIterator->iterate($configuration) as $source => &$value) {
-            /**@var TranslationKeySourceInterface $source */
-            $value = $generator->generate($source);
+        //fill by reference translatable fields with correct translation keys
+        foreach ($this->translationFieldsIterator->iterateWorkflowConfiguration($configuration) as $key => &$value) {
+            $value = $key;
         }
-        unset($value);
-
-        $definition->setLabel($configuration['label']);
     }
 }

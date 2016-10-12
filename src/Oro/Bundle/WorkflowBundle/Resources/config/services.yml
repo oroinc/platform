@@ -315,11 +315,17 @@ services:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]
 
     oro_workflow.generator.translation_key:
-        class: Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator
+        class: Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator
         public: false
+
+    oro_workflow.translation.fields_iterator:
+        class: Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator
+        arguments:
+            - '@oro_workflow.generator.translation_key'
 
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
+        arguments: ['@oro_workflow.translation.fields_iterator']
         public: false
         tags:
             - { name: oro.workflow.configuration.handler, priority: -10 }
