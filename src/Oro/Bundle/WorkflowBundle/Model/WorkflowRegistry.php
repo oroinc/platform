@@ -66,7 +66,11 @@ class WorkflowRegistry
         }
 
         if (!$this->featureChecker->isResourceEnabled($name, self::FEATURE_CONFIG_WORKFLOW_KEY)) {
-            return null;
+            if ($exceptionOnNotFound) {
+                throw new WorkflowNotFoundException($name);
+            } else {
+                return null;
+            }
         }
 
         if (!array_key_exists($name, $this->workflowByName)) {
