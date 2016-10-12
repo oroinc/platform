@@ -2,19 +2,25 @@
 
 namespace Oro\Bundle\TranslationBundle\EventListener\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 
 class LanguageListener
 {
     const STATS_COVERAGE_NAME = 'translationCompleteness';
+    const STATS_COUNT = 'translationCount';
     const STATS_INSTALLED = 'translationInstalled';
     const STATS_AVAILABLE_UPDATE = 'translationAvailableUpdate';
+    const STATS_AVAILABLE_INSTALL = 'translationAvailableInstall';
 
     const COLUMN_STATUS = 'translationStatus';
     const COLUMN_COVERAGE = 'translationCompleteness';
@@ -25,14 +31,21 @@ class LanguageListener
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var GridConfigurationHelper */
+    protected $gridConfigurationHelper;
+
     /**
      * @param LanguageHelper $languageHelper
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(LanguageHelper $languageHelper, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        LanguageHelper $languageHelper,
+        DoctrineHelper $doctrineHelper,
+        GridConfigurationHelper $gridConfigurationHelper
+    ) {
         $this->languageHelper = $languageHelper;
         $this->doctrineHelper = $doctrineHelper;
+        $this->gridConfigurationHelper = $gridConfigurationHelper;
     }
 
     /**
@@ -43,15 +56,24 @@ class LanguageListener
         /** @var ResultRecord[] $records */
         $records = $event->getRecords();
 
+        $totalCount = $this->doctrineHelper->getEntityRepository(TranslationKey::class)->getCount();
+
         foreach ($records as $record) {
             /** @var Language $language */
             $language = $this->doctrineHelper->getEntity(Language::class, $record->getValue('id'));
 
-            $record->setValue(self::STATS_COVERAGE_NAME, $this->languageHelper->getTranslationStatus($language));
+            $record->setValue(
+                self::STATS_COVERAGE_NAME,
+                $totalCount ? $record->getValue(self::STATS_COUNT) / $totalCount : null
+            );
             $record->setValue(self::STATS_INSTALLED, null !== $language->getInstalledBuildDate());
             $record->setValue(
                 self::STATS_AVAILABLE_UPDATE,
                 $this->languageHelper->isAvailableUpdateTranslates($language)
+            );
+            $record->setValue(
+                self::STATS_AVAILABLE_INSTALL,
+                $this->languageHelper->isAvailableInstallTranslates($language)
             );
         }
     }
@@ -61,8 +83,15 @@ class LanguageListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $config = $event->getConfig();
+        $this->updateColumnsConfig($event->getConfig());
+        $this->updateSourceConfig($event->getConfig());
+    }
 
+    /**
+     * @param DatagridConfiguration $config
+     */
+    public function updateColumnsConfig(DatagridConfiguration $config)
+    {
         $columns = $config->offsetGetByPath('[columns]', []);
 
         $columns[self::COLUMN_COVERAGE] = array_merge(
@@ -86,5 +115,25 @@ class LanguageListener
         );
 
         $config->offsetSetByPath('[columns]', $columns);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     */
+    public function updateSourceConfig(DatagridConfiguration $config)
+    {
+        $source = $config->offsetGetByPath('[source]', []);
+
+        $languageAlias = $this->gridConfigurationHelper->getEntityRootAlias($config);
+
+        $source['query']['select'][] = sprintf('COUNT(translation) %s', self::STATS_COUNT);
+        $source['query']['join']['left'][] = [
+            'join' => Translation::class,
+            'alias' => 'translation',
+            'conditionType' => 'WITH',
+            'condition' =>  sprintf('translation.language = %s', $languageAlias),
+        ];
+
+        $config->offsetSetByPath('[source]', $source);
     }
 }

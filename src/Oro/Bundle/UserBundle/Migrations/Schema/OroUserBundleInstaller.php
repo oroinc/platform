@@ -29,7 +29,8 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation 
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\CreateLoginHistoryTable;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_23\CreateLoginHistoryTable;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -51,7 +52,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_22';
+        return 'v1_23';
     }
 
     /**
@@ -91,7 +92,6 @@ class OroUserBundleInstaller implements
         $this->createOroUserAccessGroupRoleTable($schema);
         $this->createOroAccessRoleTable($schema);
         $this->createOroUserStatusTable($schema);
-        $this->createOroUserLoginHistoryTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroUserEmailForeignKeys($schema);
@@ -132,6 +132,7 @@ class OroUserBundleInstaller implements
         AddEmailUserColumn::updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
+        AddImpersonationTable::createOroUserImpersonationTable($schema);
         CreateLoginHistoryTable::createOroUserLoginHistoryTable($schema);
     }
 

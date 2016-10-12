@@ -4,7 +4,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     'oroui/js/tools/logger',
-    'oroform/js/optional-validation-handler',
+    'oroform/js/optional-validation-groups-handler',
     'jquery.validate'
 ], function($, _, __, tools, logger, validationHandler) {
     'use strict';
@@ -371,7 +371,8 @@ define([
                     var isValidFound = false;
                     var isInvalidFound = false;
                     _.each(validator.elementsOf(optionalGroup), function(elem) {
-                        if ($(elem).prop('willValidate')) {
+                        var $element = $(elem);
+                        if ($element.prop('willValidate') && !$element.data('ignore-validation')) {
                             if ($.validator.methods.required.call(validator, validator.elementValue(elem), elem)) {
                                 isValidFound = true;
                             } else {

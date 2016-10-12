@@ -183,18 +183,6 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->helper->getTranslationStatus(new Language()));
     }
 
-    public function testGetTranslationStatusAndEnCode()
-    {
-        // TODO: should be removed in https://magecore.atlassian.net/browse/BAP-10608
-        $this->statisticProvider->expects($this->once())
-            ->method('get')
-            ->willReturn([]);
-
-        $language = (new Language())->setCode('en');
-
-        $this->assertEquals(100, $this->helper->getTranslationStatus($language));
-    }
-
     public function testGetTranslationStatus()
     {
         $this->statisticProvider->expects($this->once())

@@ -279,7 +279,6 @@ class User extends AbstractPageEntity
         }
 
         return $this;
-
     }
 
     public function setGroups($groups = array())
