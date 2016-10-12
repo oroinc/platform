@@ -49,6 +49,9 @@ a {
   &.disabled {
     color: #bfbfbf;
     pointer-events: none;
+    [class^='icon-'].hide-text:before {
+      color: #bfbfbf;
+    }
   }
 }
 form {
@@ -1688,10 +1691,6 @@ footer {
         margin-left: 142px;
         .control-label {
           width: auto;
-        }
-        select{
-          width: 100%;
-          max-width: 282px;
         }
       }
     }
