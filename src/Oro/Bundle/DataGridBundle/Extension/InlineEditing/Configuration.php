@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
     const CONFIG_ENTITY_KEY             = 'entity_name';
     const CONFIG_EXTENDED_ENTITY_KEY    = 'extended_entity_name';
     const AUTOCOMPLETE_API_ACCESSOR_KEY = 'autocomplete_api_accessor';
+    const SAVE_API_ACCESSOR_KEY         = 'save_api_accessor';
     const CLASS_KEY                     = 'class';
     const EDITOR_KEY                    = 'editor';
     const VIEW_KEY                      = 'view';
