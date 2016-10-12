@@ -31,6 +31,18 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
      */
     public function handle(array $configuration)
     {
+        $configuration = $this->normalizeConfiguration($configuration);
+
+
+
+        return $configuration;
+    }
+
+    private function normalizeConfiguration(array $configuration)
+    {
+        if (empty($configuration['label'])) {
+            $configuration['label'] = $configuration['name'];
+        }
 
         return $configuration;
     }
@@ -51,5 +63,8 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
             /**@var TranslationKeySourceInterface $source */
             $value = $generator->generate($source);
         }
+        unset($value);
+
+        $definition->setLabel($configuration['label']);
     }
 }
