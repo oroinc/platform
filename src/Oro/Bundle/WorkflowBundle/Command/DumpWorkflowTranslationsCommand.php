@@ -6,11 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Translation\Util\ArrayConverter;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -51,7 +51,7 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
         $workflowManager = $this->getContainer()->get('oro_workflow.manager');
 
         $keys = $this->collectKeys($workflowManager->getWorkflow($workflowName));
-        $translations = $this->processkeys($this->getContainer()->get('translator'), $keys, $locale);
+        $translations = $this->processkeys($this->getContainer()->get('translator.default'), $keys, $locale);
 
         $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), 10));
     }
@@ -85,17 +85,23 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param TranslatorInterface $translator
+     * @param Translator $translator
      * @param array $keys
      * @param string|null $locale
      * @return array
      */
-    protected function processKeys(TranslatorInterface $translator, array $keys, $locale)
+    protected function processKeys(Translator $translator, array $keys, $locale)
     {
         $translations = [];
         foreach ($keys as $key) {
-            $translation = $translator->trans($key, [], self::TRANSLATION_DOMAIN, $locale);
-            $translations[$key] = $translation !== $key ? $translation : '';
+            if ($translator->hasTrans($key, self::TRANSLATION_DOMAIN, $locale)) {
+                $translation = $translator->trans($key, [], self::TRANSLATION_DOMAIN, $locale);
+            } elseif ($translator->hasTrans($key, self::TRANSLATION_DOMAIN, Translation::DEFAULT_LOCALE)) {
+                $translation = $translator->trans($key, [], self::TRANSLATION_DOMAIN, Translation::DEFAULT_LOCALE);
+            } else {
+                $translation = '';
+            }
+            $translations[$key] = $translation;
         }
 
         return $translations;
