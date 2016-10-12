@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
+use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfiguration;
 
 class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
 {
@@ -302,7 +303,7 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with('oro_locale.currency')
+            ->with('oro_currency.default_currency')
             ->will($this->returnValue($expectedCurrency));
 
         $this->assertEquals($expectedCurrency, $this->localeSettings->getCurrency());
@@ -311,11 +312,11 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCurrencyDefault()
     {
-        $expectedCurrency = LocaleConfiguration::DEFAULT_CURRENCY;
+        $expectedCurrency = CurrencyConfiguration::DEFAULT_CURRENCY;
 
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with('oro_locale.currency')
+            ->with('oro_currency.default_currency')
             ->will($this->returnValue(null));
 
         $this->assertEquals($expectedCurrency, $this->localeSettings->getCurrency());
@@ -443,5 +444,64 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('test');
         $this->localeSettings->get('test');
+    }
+
+    /**
+     * @dataProvider localeProvider
+     *
+     * @param string $locale
+     * @param string $expectedCurrency
+     */
+    public function testGetCountryByLocal($locale, $expectedCurrency)
+    {
+        $currency = LocaleSettings::getCurrencyByLocale($locale);
+
+        $this->assertEquals($expectedCurrency, $currency);
+    }
+
+    /**
+     * The USD is default currency
+     *
+     * @return array
+     */
+    public function localeProvider()
+    {
+        return [
+            [
+                'en',
+                'USD'
+            ],
+            [
+                'en_CA',
+                $this->getCurrencyBuLocale('en_CA')
+            ],
+            [
+                'it',
+                'USD'
+            ],
+            [
+                'it_IT',
+                $this->getCurrencyBuLocale('it_IT')
+            ],
+            [
+                'ua',
+                'USD'
+            ],
+            [
+                'ru_UA',
+                $this->getCurrencyBuLocale('ru_UA')
+            ]
+        ];
+    }
+
+    /**
+     * @param string $locale
+     * @return bool|string
+     */
+    protected function getCurrencyBuLocale($locale)
+    {
+        $formatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+
+        return $formatter->getTextAttribute(\NumberFormatter::CURRENCY_CODE);
     }
 }
