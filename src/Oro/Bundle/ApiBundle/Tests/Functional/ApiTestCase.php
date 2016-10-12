@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Parser;
 
+use Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -292,5 +293,14 @@ abstract class ApiTestCase extends WebTestCase
             }
             throw $e;
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function isEntityEnabled($entityClass)
+    {
+        return $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')
+            ->isResourceEnabled($entityClass, EntityTypeFeatureCheck::API_RESOURCE_KEY);
     }
 }

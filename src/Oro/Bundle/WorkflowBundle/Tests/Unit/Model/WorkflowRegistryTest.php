@@ -127,6 +127,10 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals([$workflowName => $workflow], 'workflowByName', $this->registry);
     }
 
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
+     * @expectedExceptionMessage Workflow "test_workflow" not found
+     */
     public function testGetWorkflowDisabledFeature()
     {
         $workflowName = 'test_workflow';
@@ -140,7 +144,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
             ->willReturn(false);
 
-        $this->assertNull($this->registry->getWorkflow($workflowName));
+        $this->registry->getWorkflow($workflowName);
     }
 
     public function testGetWorkflowWithDbEntitiesUpdate()
