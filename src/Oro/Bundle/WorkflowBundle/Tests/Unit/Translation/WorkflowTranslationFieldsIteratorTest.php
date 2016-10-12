@@ -11,15 +11,19 @@ use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
 class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @param string $workflowName
      * @param array $config
      * @param array $readResultExpected
      * @dataProvider iterateReadCases
      */
-    public function testIterateRead(array $config, array $readResultExpected)
+    public function testIterateRead($workflowName, array $config, array $readResultExpected)
     {
         $iterator = new WorkflowTranslationFieldsIterator(new TranslationKeyGenerator());
 
-        $this->assertEquals($readResultExpected, iterator_to_array($iterator->iterateWorkflowConfiguration($config)));
+        $this->assertEquals(
+            $readResultExpected,
+            iterator_to_array($iterator->iterateConfigFields($workflowName, $config))
+        );
     }
 
     /**
@@ -29,14 +33,15 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'empty' => [
-                'config' => ['name' => 'test_workflow'],
+                'workflow_name' => 'test_workflow',
+                'config' => [],
                 'expected' => [
                     'oro.workflow.test_workflow.label' => null
                 ]
             ],
             'full' => [
+                'workflow_name' => 'test_workflow',
                 'config' => [
-                    'name' => 'test_workflow',
                     'label' => 'wf label',
                     'attributes' => [
                         'attribute_1' => [
@@ -84,15 +89,16 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $workflowName
      * @param array $config
      * @param array $expected
      * @dataProvider iterateWriteCases
      */
-    public function testIterateWrite(array $config, array $expected)
+    public function testIterateWrite($workflowName, array $config, array $expected)
     {
         $iterator = new WorkflowTranslationFieldsIterator(new TranslationKeyGenerator());
         $i = 0;
-        foreach ($iterator->iterateWorkflowConfiguration($config) as $source => &$value) {
+        foreach ($iterator->iterateConfigFields($workflowName, $config) as $source => &$value) {
             /**@var TranslationKeySourceInterface $source */
             $value = (string)$i++;
         }
@@ -100,6 +106,7 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $config);
     }
+
     /**
      * @return array
      */
@@ -107,12 +114,13 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'empty' => [
-                'config' => ['name' => 'test_workflow'],
-                'expected' => ['name' => 'test_workflow', 'label' => '0']
+                'workflow_name' => 'test_workflow',
+                'config' => [],
+                'expected' => ['label' => '0']
             ],
             'full' => [
+                'workflow_name' => 'test_workflow',
                 'config' => [
-                    'name' => 'test_workflow',
                     'label' => 'wf label',
                     'attributes' => [
                         'attribute_1' => [
@@ -141,7 +149,6 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'expected' => [
-                    'name' => 'test_workflow',
                     'label' => '0',
                     'transitions' => [
                         'transition_1' => [

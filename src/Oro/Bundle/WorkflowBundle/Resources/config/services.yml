@@ -329,7 +329,7 @@ services:
         public: false
         tags:
             - { name: oro.workflow.configuration.handler, priority: -10 }
-            - { name: oro.workflow.workflow_definition.builder }
+            - { name: oro.workflow.definition_builder.extension }
 
     oro_workflow.extension.translation_context_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'

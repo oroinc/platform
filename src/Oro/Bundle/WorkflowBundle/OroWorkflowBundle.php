@@ -12,7 +12,7 @@ use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddWorkflowValidation
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\EventTriggerExtensionCompilerPass;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowConfigurationHandlerCompilerPass;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowDefinitionBuilderCompilerPass;
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowDefinitionBuilderExtensionCompilerPass;
 
 class OroWorkflowBundle extends Bundle
 {
@@ -29,6 +29,6 @@ class OroWorkflowBundle extends Bundle
         $container->addCompilerPass(new WorkflowChangesEventsCompilerPass());
         $container->addCompilerPass(new EventTriggerExtensionCompilerPass());
         $container->addCompilerPass(new WorkflowConfigurationHandlerCompilerPass);
-        $container->addCompilerPass(new WorkflowDefinitionBuilderCompilerPass);
+        $container->addCompilerPass(new WorkflowDefinitionBuilderExtensionCompilerPass);
     }
 }

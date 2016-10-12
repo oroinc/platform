@@ -14,14 +14,10 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
 class WorkflowTranslationFieldsIterator
 {
-    /**
-     * @var array|TranslationKeyTemplateInterface[]
-     */
-    private $templates = [];
+    /** @var TranslationKeyTemplateInterface[] */
+    private $templateInstances = [];
 
-    /**
-     * @var TranslationKeyGenerator
-     */
+    /** @var TranslationKeyGenerator */
     private $keyGenerator;
 
     /**
@@ -33,14 +29,13 @@ class WorkflowTranslationFieldsIterator
     }
 
     /**
+     * @param string $workflowName
      * @param array $configuration
-     * @return \Generator|array($translationKey => &$fieldValue)
+     * @return array|\Generator ($translationKey => &$fieldValue)
      * @throws \InvalidArgumentException
      */
-    public function &iterateWorkflowConfiguration(array &$configuration)
+    public function &iterateConfigFields($workflowName, array &$configuration)
     {
-        $workflowName = $configuration['name'];
-
         $data = ['workflow_name' => $workflowName];
 
         yield $this->makeKey(WorkflowLabelTemplate::class, $data) => $configuration['label'];
@@ -152,8 +147,8 @@ class WorkflowTranslationFieldsIterator
      */
     private function getTemplate($templateClass)
     {
-        if (array_key_exists($templateClass, $this->templates)) {
-            return $this->templates[$templateClass];
+        if (array_key_exists($templateClass, $this->templateInstances)) {
+            return $this->templateInstances[$templateClass];
         }
 
         if (!is_a($templateClass, TranslationKeyTemplateInterface::class, true)) {
@@ -162,6 +157,6 @@ class WorkflowTranslationFieldsIterator
             );
         }
 
-        return $this->templates[$templateClass] = new $templateClass;
+        return $this->templateInstances[$templateClass] = new $templateClass;
     }
 }
