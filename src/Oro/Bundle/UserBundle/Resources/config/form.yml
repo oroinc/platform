@@ -94,7 +94,7 @@ services:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
-            - '@oro_user.form.provider.password_tooltip'
+            - '@oro_user.form.provider.password_field_options_provider'
         calls:
             - [setUserConfigManager, ["@oro_config.user"]]
         tags:
