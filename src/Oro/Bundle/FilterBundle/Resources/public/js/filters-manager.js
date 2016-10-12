@@ -312,7 +312,6 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            var filtersStateView = this.subview('filters-state');
             this.$el.html(
                 this.template({filters: this.filters})
             );
@@ -343,6 +342,7 @@ define(function(require) {
                 this._initializeSelectWidget();
             }
 
+            var filtersStateView = this.subview('filters-state');
             if (filtersStateView) {
                 filtersStateView.render();
                 if (this.mode === FiltersManager.MANAGE_MODE) {
