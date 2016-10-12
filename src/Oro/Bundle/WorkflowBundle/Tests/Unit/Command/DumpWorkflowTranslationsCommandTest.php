@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -33,7 +34,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
     /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $input;
 
-    /** @var TestOutput */
+    /** @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $output;
 
     /** @var DumpWorkflowTranslationsCommand */
@@ -65,7 +66,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
             ]));
 
         $this->input = $this->getMock(InputInterface::class);
-        $this->output = new TestOutput();
+        $this->output = $this->getMock(OutputInterface::class);
 
         $this->command = new DumpWorkflowTranslationsCommand();
         $this->command->setContainer($this->container);
@@ -168,11 +169,9 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
                 ['wf1.transition1.message', [], $domain, 'locale1', 'transition1.message.locale1'],
             ]));
 
-
-        $this->command->run($this->input, $this->output);
-
-        $this->assertEquals(
-            [
+        $this->output->expects($this->once())
+            ->method('write')
+            ->with(
                 Yaml::dump(
                     [
                         'wf1' => [
@@ -188,9 +187,9 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                     DumpWorkflowTranslationsCommand::INLINE_LEVEL
-                ),
-            ],
-            $this->output->messages
-        );
+                )
+            );
+
+        $this->command->run($this->input, $this->output);
     }
 }
