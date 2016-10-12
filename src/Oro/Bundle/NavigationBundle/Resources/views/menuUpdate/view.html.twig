@@ -12,22 +12,22 @@
                     {% set actionButtons %}
                         <div class="pull-right">
                             {{ resetButton({
-                                'dataUrl': path('oro_api_reset_menuupdates', {menuName: menuName, ownershipType: ownershipType}),
-                                'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
-                                'menuKey': menuName
+                                'dataUrl': path('oro_api_reset_menuupdates', {menuName: entity.root.name, ownershipType: ownershipType}),
+                                'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.root.name}),
+                                'menuKey': entity.root.name
                             }) }}
 
                             {{ UI.buttonSeparator() }}
 
                             {% set html = UI.button({
-                                'path' : path(routePrefix ~ 'create', { 'menuName': menuName }),
+                                'path' : path(routePrefix ~ 'create', { 'menuName': entity.root.name }),
                                 'aCss': 'btn-primary',
                                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
                                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
                             }) %}
 
                             {% set html = html ~ UI.button({
-                                'path' : path(routePrefix ~ 'create_divider', {menuName: menuName}),
+                                'path' : path(routePrefix ~ 'create_divider', {menuName: entity.root.name}),
                                 'aCss': 'btn-primary',
                                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans})
@@ -70,7 +70,7 @@
                                 <div class="menu-item">
                                     {% set treeOptions = {
                                         'data' : tree,
-                                        'menu' : menuName,
+                                        'menu' : entity.root.name,
                                         'ownershipType' : ownershipType,
                                         'updateAllowed' : true,
                                         'onRootSelectRoute' : routePrefix ~ 'view',

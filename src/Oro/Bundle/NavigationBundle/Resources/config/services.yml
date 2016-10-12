@@ -107,8 +107,7 @@ services:
         arguments:
             - '%oro_navigation.entity.menu_update.class%'
             - "@doctrine"
-        calls:
-            - [ setTranslator, [ '@translator' ]]
+            - '@translator'
 
     oro_menu.twig.extension:
         class: %oro_menu.twig.extension.class%

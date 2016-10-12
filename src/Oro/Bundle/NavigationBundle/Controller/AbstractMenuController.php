@@ -39,10 +39,10 @@ abstract class AbstractMenuController extends Controller
     protected function view($menuName)
     {
         $menu = $this->getMenu($menuName);
-
         return [
             'entity' => $menu,
-            'tree' => $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu)
+            'ownershipType'=> $this->getOwnershipType(),
+            'tree' => $this->createMenuTree($menu)
         ];
     }
 
@@ -118,7 +118,7 @@ abstract class AbstractMenuController extends Controller
 
             $response['ownershipType'] = $this->getOwnershipType();
             $response['menuName'] = $menu->getName();
-            $response['tree'] = $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
+            $response['tree'] = $this->createMenuTree($menu);
         }
         return $response;
     }
@@ -147,6 +147,15 @@ abstract class AbstractMenuController extends Controller
         }
 
         return $menu;
+    }
+
+    /**
+     * @param $menu
+     * @return array
+     */
+    protected function createMenuTree($menu)
+    {
+        return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
     }
 
 }

@@ -328,7 +328,6 @@ placeholders:
 - Added interface `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
 - Added trait `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
 - Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate`, implements `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface` and using `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
-- Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
 - Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
 - Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
 

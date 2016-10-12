@@ -2,40 +2,43 @@
 
 namespace Oro\Bundle\NavigationBundle\JsTree;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Component\Tree\Handler\AbstractTreeHandler;
-
-class MenuUpdateTreeHandler extends AbstractTreeHandler
+class MenuUpdateTreeHandler
 {
     const MENU_ITEM_DIVIDER_LABEL = '---------------';
+    const ROOT_PARENT_VALUE = '#';
+
+    /**
+     * @var ManagerRegistry
+     */
+    protected $managerRegistry;
+
+    /**
+     * @var string
+     */
+    protected $entityClass;
 
     /**
      * @var TranslatorInterface
      */
     protected $translator;
 
+
     /**
-     * @param TranslatorInterface $translator
+     * @param string          $entityClass
+     * @param ManagerRegistry $managerRegistry
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function __construct($entityClass, ManagerRegistry $managerRegistry, TranslatorInterface $translator)
     {
+        $this->entityClass = $entityClass;
+        $this->managerRegistry = $managerRegistry;
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function moveProcessing($entityId, $parentId, $position)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function createTree($root = null, $includeRoot = true)
     {
         if ($root === null) {
@@ -48,9 +51,9 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ItemInterface $root
+     * @param bool          $includeRoot
+     * @return array
      */
     protected function getNodes($root, $includeRoot)
     {
@@ -71,7 +74,10 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @param array          $entities
+     * @param  ItemInterface $root
+     * @param  string        $includeRoot
+     * @return array
      */
     protected function formatTree(array $entities, $root, $includeRoot)
     {
@@ -81,7 +87,11 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
             $node = $this->formatEntity($entity);
 
             if ($entity === $root) {
-                $node['parent'] = self::ROOT_PARENT_VALUE;
+                if ($includeRoot) {
+                    $node['parent'] = self::ROOT_PARENT_VALUE;
+                } else {
+                    continue;
+                }
             }
 
             $formattedTree[] = $node;
@@ -91,8 +101,6 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ItemInterface $entity
      */
     protected function formatEntity($entity)
