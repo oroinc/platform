@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeySource\DynamicTranslationKeySource;

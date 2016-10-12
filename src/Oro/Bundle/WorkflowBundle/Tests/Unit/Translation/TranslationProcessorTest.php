@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationHelper;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
 class TranslationProcessorTest extends \PHPUnit_Framework_TestCase

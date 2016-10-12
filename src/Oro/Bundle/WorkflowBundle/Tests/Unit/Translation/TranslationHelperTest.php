@@ -3,13 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeySource\DynamicTranslationKeySource;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationHelper;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeySourceInterface;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyGenerator;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationKeyTemplateInterface;
 
 class TranslationHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -194,7 +194,6 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper->saveTranslation('test_key', 'test_value');
         $this->helper->saveTranslation('test_key', 'test_value');
     }
-
 
     public function testGenerateKey()
     {
