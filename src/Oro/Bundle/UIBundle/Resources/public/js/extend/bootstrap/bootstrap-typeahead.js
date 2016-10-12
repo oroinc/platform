@@ -13,9 +13,11 @@ define(function(require) {
 
     Typeahead = function(element, options) {
         var _this = this;
-        var opts = $.extend({}, $.fn.typeahead.defaults, options);
+        var opts = $.extend({}, $.fn.typeahead.defaults, typeaheadPatches, options);
 
         _.each(opts, function(value, name) {
+            console.log(name, value);
+
             _this[name] = value || _this[name];
         });
 
@@ -42,4 +44,34 @@ define(function(require) {
     $.fn.typeahead.defaults = origFnTypeahead.defaults;
     $.fn.typeahead.Constructor = Typeahead;
     $.fn.typeahead.noConflict = origFnTypeahead.noConflict;
+
+    var typeaheadPatches = {
+        show: function() { // fixes dropdown position inside scrollable containers
+            var pos = $.extend({}, this.$element.position(), {
+                height: this.$element[0].offsetHeight
+            });
+
+            this.$menu
+                .insertAfter(this.$element)
+                .css({
+                    top: pos.top + pos.height + this.scrollOffset(this.$element)
+                    , left: pos.left
+                })
+                .show();
+
+            this.shown = true;
+            return this;
+        },
+        scrollOffset: function($el) { // calculates scroll offset from all parents, except body and html
+            var offset = 0;
+
+            $el.parents().each(function(i, el) {
+                if (el !== document.body && el !== document.html) {
+                    offset += el.scrollTop;
+                }
+            });
+
+            return offset;
+        }
+    };
 });
