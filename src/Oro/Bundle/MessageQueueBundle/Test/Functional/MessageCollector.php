@@ -76,4 +76,14 @@ class MessageCollector implements MessageProducerInterface
 
         return $this;
     }
+
+    public function enable()
+    {
+        //toDo: Remove after merging task/CRM-5838_migrate_integration_logic_from_jms_to_mq
+    }
+
+    public function disable()
+    {
+        //toDo: Remove after merging task/CRM-5838_migrate_integration_logic_from_jms_to_mq
+    }
 }
