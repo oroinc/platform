@@ -2,26 +2,36 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\SetPasswordType;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 
 class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var SetPasswordType */
     protected $formType;
 
-    /** @var PasswordTooltipProvider */
-    protected $tooltipProvider;
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
 
     protected function setUp()
     {
-        $this->tooltipProvider = $this->getMockBuilder(PasswordTooltipProvider::class)
+        $this->optionsProvider = $this->getMockBuilder(PasswordFieldOptionsProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formType = new SetPasswordType($this->tooltipProvider);
+        $this->optionsProvider->expects($this->any())
+            ->method('getOptions')
+            ->willReturn(
+                [
+                    'required' => true,
+                    'label' => 'oro.user.new_password.label',
+                    'hint' => null,
+                    'attr' => [
+                        'data-require-length' => '',
+                        'data-require-rules' => '',
+                    ],
+                ]
+            );
+        $this->formType = new SetPasswordType($this->optionsProvider);
     }
 
     public function testBuildForm()
@@ -38,13 +48,9 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
                 'attr' => [
                     'data-require-length' => '',
                     'data-require-rules' => '',
-                ],
-                'constraints'   => [
-                    new NotBlank(),
-                    new PasswordComplexity(),
-                ],
+                ]
             ]);
-        $this->formType->buildForm($builder, array());
+        $this->formType->buildForm($builder, []);
     }
 
     public function testGetName()
@@ -59,10 +65,12 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
     }
 }

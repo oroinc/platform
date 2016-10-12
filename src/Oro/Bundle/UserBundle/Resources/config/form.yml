@@ -295,6 +295,14 @@ services:
             - '@oro_user.provider.password_complexity_config_provider'
             - '@oro_user.form.provider.password_tooltip'
 
+    oro_user.form.extension.js_validation.password_complexity_extension:
+        class: Oro\Bundle\UserBundle\Form\Extension\JsValidation\PasswordComplexityExtension
+        arguments:
+            - '@oro_form.extension.js_validation.constraints_provider'
+            - '@oro_user.provider.password_complexity_config_provider'
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'repeated' }
+
     # Dashboard
     oro_user.form.type.widget_owners:
         class: Oro\Bundle\UserBundle\Form\Type\WidgetOwnersType

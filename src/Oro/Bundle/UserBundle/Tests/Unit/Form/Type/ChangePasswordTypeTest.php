@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
-use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ChangePasswordTypeTest extends FormIntegrationTestCase
 {
@@ -18,8 +18,8 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     /** @var ChangePasswordType */
     protected $type;
 
-    /** @var PasswordTooltipProvider */
-    protected $tooltipProvider;
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
 
     protected function setUp()
     {
@@ -28,11 +28,11 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->tooltipProvider = $this->getMockBuilder(PasswordTooltipProvider::class)
+        $this->optionsProvider = $this->getMockBuilder(PasswordFieldOptionsProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new ChangePasswordType($this->subscriber, $this->tooltipProvider);
+        $this->type = new ChangePasswordType($this->subscriber, $this->optionsProvider);
     }
 
     protected function tearDown()

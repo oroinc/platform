@@ -4,11 +4,9 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class SetPasswordType extends AbstractType
@@ -34,10 +32,6 @@ class SetPasswordType extends AbstractType
                 'required' => true,
                 'label' => 'oro.user.new_password.label',
                 'attr' => $this->optionsProvider->getSuggestPasswordOptions(),
-                'constraints' => [
-                    new NotBlank(),
-                    new PasswordComplexity(),
-                ],
             ]
         ));
     }
@@ -69,7 +63,7 @@ class SetPasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'compound'        => true,

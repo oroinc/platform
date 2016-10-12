@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 class PasswordComplexityValidator extends ConstraintValidator
 {
     const REGEX_UPPER_CASE = '/[A-Z]/u';
-    const REGEX_NUMBERS = '/[\d]/u';
+    const REGEX_NUMBERS = '/\d/u';
     const REGEX_SPECIAL_CHARS = '/[\W_]/u';
 
     /** @var PasswordComplexityConfigProvider */

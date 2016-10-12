@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Provider;
 
-use Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 
@@ -29,8 +29,8 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTooltip(array $configMap, $expected)
     {
-        $configManager = $this->getConfigManager($configMap);
-        $provider = new PasswordTooltipProvider($configManager, $this->translator);
+        $configProvider = $this->getConfigProvider($configMap);
+        $provider = new PasswordTooltipProvider($configProvider, $this->translator);
 
         $this->assertEquals($expected, $provider->getTooltip());
     }
@@ -43,19 +43,19 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
         return [
             'no rules enabled' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'expected' => PasswordTooltipProvider::UNRESTRICTED,
             ],
             'min length rule' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 2],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 2],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'expected' => PasswordTooltipProvider::BASE .
                               PasswordTooltipProvider::MIN_LENGTH,
@@ -63,10 +63,10 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
             ],
             'some rules' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 0],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'expected' => PasswordTooltipProvider::BASE .
                               PasswordTooltipProvider::UPPER_CASE .
@@ -76,10 +76,10 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
             ],
             'all rules' => [
                 'configMap' => [
-                    [PasswordComplexityValidator::CONFIG_MIN_LENGTH, false, false, null, 2],
-                    [PasswordComplexityValidator::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_NUMBERS, false, false, null, true],
-                    [PasswordComplexityValidator::CONFIG_SPECIAL_CHARS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 2],
+                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
+                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'expected' => PasswordTooltipProvider::BASE .
                               PasswordTooltipProvider::MIN_LENGTH .
@@ -96,9 +96,9 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $configMap
      *
-     * @return ConfigManager
+     * @return PasswordComplexityConfigProvider
      */
-    protected function getConfigManager(array $configMap)
+    protected function getConfigProvider(array $configMap)
     {
         $configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
@@ -106,7 +106,10 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
         $configManager->method('get')->willReturnMap($configMap);
 
         /** @var ConfigManager $configManager */
-        return $configManager;
+        $configProvider = new PasswordComplexityConfigProvider($configManager);
+
+        /** @var PasswordComplexityConfigProvider $configManager */
+        return $configProvider;
     }
 
     protected function tearDown()

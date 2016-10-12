@@ -44,7 +44,7 @@ class PasswordFieldOptionsProvider
      *
      * @return array
      */
-    public function getOptions($options = [])
+    public function getOptions(array $options = [])
     {
         if (!isset($options['hint'])) {
             $options['hint'] = $this->getHintOption();

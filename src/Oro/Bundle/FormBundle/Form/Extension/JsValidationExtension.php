@@ -13,11 +13,9 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 class JsValidationExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
-    /**
-     * @var ConstraintsProvider
-     */
-    protected $eventDispatcher;
+
+    /** @var ConstraintsProvider */
+    protected $constraintsProvider;
 
     /**
      * @param ConstraintsProvider $constraintsProvider
