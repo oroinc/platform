@@ -43,7 +43,8 @@ The third level `###` (h3) is field name or filter field name:
 
 ### Get
 
-Description for GET action. May contain any formatting e.g.: ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
+Description for GET action. May contain any formatting e.g.: ordered or unordered lists,
+ request or response examples, links, text in bold or italic, etc.
 
 ### Create
 
