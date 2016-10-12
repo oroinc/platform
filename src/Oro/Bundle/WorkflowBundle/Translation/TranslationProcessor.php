@@ -33,7 +33,7 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     {
         $configuration = $this->normalizeConfiguration($configuration);
 
-
+        //TODO BAP-12016 process translated values here
 
         return $configuration;
     }
