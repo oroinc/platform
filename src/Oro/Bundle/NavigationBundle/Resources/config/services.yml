@@ -6,8 +6,6 @@ parameters:
 
     oro_menu.factory.acl_extension.class:                      Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
-    oro_menu.array_loader.class:                               Knp\Menu\Loader\ArrayLoader
-    oro_menu.menu_manipulator.class:                           Knp\Menu\Util\MenuManipulator
 
     oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
     oro_menu.builder_chain.class:                              Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
@@ -83,13 +81,13 @@ services:
             - [ addExtension, [ '@oro_menu_acl_extension' ] ]
 
     oro_menu.array_loader:
-        class: '%oro_menu.array_loader.class%'
+        class: 'Knp\Menu\Loader\ArrayLoader'
         public: false
         arguments:
             - "@oro_menu.factory"
 
     oro_menu.manipulator:
-        class: '%oro_menu.menu_manipulator.class%'
+        class: 'Knp\Menu\Util\MenuManipulator'
         public: false
 
     oro_menu.builder_chain:
