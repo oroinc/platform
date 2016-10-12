@@ -226,7 +226,7 @@ oro:
 
         system_configuration:
             groups:
-                security_options.title: Security options
+                security_settings.title: Security settings
                 login_attempts.title: Login attempts
             fields:
                 login_attempts.label: Max login attempts

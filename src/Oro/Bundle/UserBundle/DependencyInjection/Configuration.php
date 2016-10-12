@@ -70,8 +70,8 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'login_attempts' => ['value' => 2, 'type' => 'scalar'],
-                'daily_login_attempts' => ['value' => 2, 'type' => 'scalar']
+                'login_attempts' => ['value' => 30, 'type' => 'scalar'],
+                'daily_login_attempts' => ['value' => 5, 'type' => 'scalar']
             ]
         );
 
