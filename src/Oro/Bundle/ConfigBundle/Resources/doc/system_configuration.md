@@ -137,6 +137,7 @@ Field declaration have required property `type`.
 `acl_resource` - determines acl resource to check permissions to change config field value(optional)
 `priority` - sort order for displaying(optional)
 `ui_only` - indicates whether a field is used only on UI and do not related to any variable (optional, defaults to false)
+`property_path` - overrides configuration key where field's value will be stored (by default field's name used as path)
 
 Also `options` available property here, it's just a proxy to form type definition
 
