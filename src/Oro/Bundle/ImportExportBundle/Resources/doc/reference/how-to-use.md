@@ -337,7 +337,7 @@ display of these buttons and the pup-ups that can be set to appear in certain ca
 General:
 - refreshPageOnSuccess: set to true in order to refresh the page after successful import
 - afterRefreshPageMessage: the message that will be displayed if previous option is set
-- dataGridName: the id of the grid that will be used to refresh the data after an import operation (alternative to previus refresh options)
+- datagridName: the id of the grid that will be used to refresh the data after an import operation (alternative to previous refresh options)
 - options: options to pass to the import/export route
 - entity_class: the full class name of the entity
 
@@ -351,7 +351,7 @@ Export template:
 - exportTemplateJob: the id of the export template job you have defined
 - exportTemplateProcessor: the alias id of the export template processor or an array with the alias ids of the processors
 if they are more than one
-- exportTemplatelabel: the label that should be used for the export template options pop-up (in case of multiple export
+- exportTemplateLabel: the label that should be used for the export template options pop-up (in case of multiple export
 processors)
 
 Import:
@@ -370,9 +370,9 @@ Import:
         exportProcessor: exportProcessor,
         importProcessor: 'oro.importexport.processor.import',
         exportTemplateProcessor: exportTemplateProcessor,
-        exportTemplatelabel: 'oro.importexport.processor.export.template_popup.title'|trans,
+        exportTemplateLabel: 'oro.importexport.processor.export.template_popup.title'|trans,
         exportLabel: 'oro.importexport.processor.export.popup.title'|trans,
-        dataGridName: gridName
+        datagridName: gridName
     } %}
 ```
 

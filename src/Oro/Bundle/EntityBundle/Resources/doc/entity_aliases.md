@@ -24,7 +24,7 @@ You can explicitly define aliases for a specific entity in the `entity_aliases` 
 ```yml
 oro_entity:
     entity_aliases:
-        JMS\JobQueueBundle\Entity\Job:
+        Oro\Component\MessageQueue\Job:
             alias:        job
             plural_alias: jobs
 ```
