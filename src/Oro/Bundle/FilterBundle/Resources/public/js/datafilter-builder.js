@@ -47,7 +47,7 @@ define([
             var options = methods.combineOptions.call(this);
             options.collection = this.collection;
             options.el = $('<div/>').prependTo(this.$el);
-            options.filtersStateElement = $('<div/>').prependTo(this.$el);
+            options.filtersStateElement = '.page-title-center';
             filtersList = new FiltersManager(options);
             filtersList.render();
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
