@@ -44,7 +44,7 @@ define(function(require) {
     $.fn.typeahead.noConflict = origFnTypeahead.noConflict;
 
     var typeaheadPatches = {
-        show: function() { // fixes dropdown position inside scrollable containers
+        show: function() { // fix for dropdown menu position that placed inside scrollable containers
             var pos = $.extend({}, this.$element.position(), {
                 height: this.$element[0].offsetHeight
             });
@@ -60,13 +60,15 @@ define(function(require) {
             this.shown = true;
             return this;
         },
-        scrollOffset: function($el) { // calculates scroll offset from all parents, except body and html
-            var offset = 0;
+        scrollOffset: function($el) { // calculates additional offset of all scrolled on parents, except body and html
+            var offset = 0,
+                stopProcess = false;
 
             $el.parents().each(function(i, el) {
-                if (el !== document.body && el !== document.html) {
+                if (el !== document.body && el !== document.html && !stopProcess) {
                     offset += el.scrollTop;
-                }
+                    stopProcess = $(el).css('position') === 'relative';
+               }
             });
 
             return offset;
