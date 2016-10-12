@@ -16,8 +16,6 @@ define(function(require) {
         var opts = $.extend({}, $.fn.typeahead.defaults, typeaheadPatches, options);
 
         _.each(opts, function(value, name) {
-            console.log(name, value);
-
             _this[name] = value || _this[name];
         });
 
