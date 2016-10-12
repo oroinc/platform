@@ -10,6 +10,14 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDefinitionBuilderInterface
 {
+    /** @var WorkflowTranslationFieldsIterator */
+    protected $translationFieldsIterator;
+
+    public function __construct()
+    {
+        $this->translationFieldsIterator = new WorkflowTranslationFieldsIterator();
+    }
+
     /**
      * @param WorkflowDefinition $actualDefinition
      * @param WorkflowDefinition $previousDefinition
@@ -28,95 +36,20 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     }
 
     /**
+     * Define translation keys for translated fields in workflow configuration before it builds.
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function build(WorkflowDefinition $definition, array &$configuration)
     {
-
+        //ensure workflow name defined in configuration
         $configuration['name'] = $definition->getName();
-        $fieldsIterator = new WorkflowTranslationFieldsIterator();
 
         $generator = new TranslationKeyGenerator();
 
-
-        foreach ($fieldsIterator->iterate($configuration) as $source => &$value) {
+        foreach ($this->translationFieldsIterator->iterate($configuration) as $source => &$value) {
             /**@var TranslationKeySourceInterface $source */
             $value = $generator->generate($source);
         }
-
-        return;
-        //$workflowName = $configuration['name'];
-        //$configuration['label'] = $this->workflowLabelKey($workflowName);
-        //foreach ($configuration as $nodeName => &$nodeValue) {
-        //    if ($nodeName === 'transitions') {
-        //        foreach ($nodeValue as $transitionName => &$transitionConfig) {
-        //            $transitionConfig['label'] = $this->transitionLabelKey(
-        //                $workflowName, $transitionName
-        //            );
-        //
-        //            $transitionConfig['message'] = $this->transitionWarningMessageKey(
-        //                $workflowName, $transitionName
-        //            );
-        //        }
-        //        unset($transitionConfig);
-        //    }
-        //
-        //    if ($nodeName === 'steps') {
-        //        foreach ($nodeValue as $stepName => &$stepConfig) {
-        //            $stepConfig['label'] = $this->stepLabelKey($workflowName, $stepName);
-        //        }
-        //        unset($stepConfig);
-        //    }
-        //
-        //    if ($nodeName === 'attributes') {
-        //        foreach ($nodeValue as $attributeName => &$attributeConfig) {
-        //            $attributeConfig['label'] = $this->attributeLabelKey($workflowName, $attributeName);
-        //        }
-        //    }
-        //}
-    }
-
-    /**
-     * @param string $workflowName
-     * @return string
-     */
-    private function workflowLabelKey($workflowName)
-    {
-    }
-
-    /**
-     * @param string $workflowName
-     * @param string $transitionName
-     * @return string
-     */
-    private function transitionLabelKey($workflowName, $transitionName)
-    {
-    }
-
-    /**
-     * @param string $workflowName
-     * @param string $transitionName
-     * @return string
-     */
-    private function transitionWarningMessageKey($workflowName, $transitionName)
-    {
-    }
-
-    /**
-     * @param string $workflowName
-     * @param string $stepName
-     * @return string
-     */
-    private function stepLabelKey($workflowName, $stepName)
-    {
-    }
-
-    /**
-     * @param $workflowName
-     * @param $attributeName
-     * @return string
-     */
-    private function attributeLabelKey($workflowName, $attributeName)
-    {
     }
 }

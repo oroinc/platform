@@ -51,11 +51,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
         foreach ($this->definitionBuilders as $builder){
             $builder->build($workflowDefinition, $configuration);
-            print_r($configuration);
-            die();
         }
 
-        die();
         $this->assertConfigurationOptions($configuration, ['label', 'entity']);
 
         $system = $this->getConfigurationOption($configuration, 'is_system', false);

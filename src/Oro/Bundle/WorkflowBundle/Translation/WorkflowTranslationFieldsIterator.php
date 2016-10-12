@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
-use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepTemplate;
@@ -29,7 +28,7 @@ class WorkflowTranslationFieldsIterator
 
         $data = ['workflow_name' => $workflowName];
 
-        yield $this->getSource(WorkflowLabelTemplate::class, $data) => $configuration['label'];
+        yield $this->makeSource(WorkflowLabelTemplate::class, $data) => $configuration['label'];
 
         if (array_key_exists('transitions', $configuration) && is_array($configuration['transitions'])) {
             foreach ($configuration['transitions'] as $transitionName => &$transitionConfig) {
@@ -38,8 +37,8 @@ class WorkflowTranslationFieldsIterator
                     'transition_name' => $transitionName,
                     '_' => $transitionConfig
                 ];
-                yield $this->getSource(TransitionLabelTemplate::class, $data) => $transitionConfig['label'];
-                yield $this->getSource(TransitionWarningMessageTemplate::class, $data) => $transitionConfig['message'];
+                yield $this->makeSource(TransitionLabelTemplate::class, $data) => $transitionConfig['label'];
+                yield $this->makeSource(TransitionWarningMessageTemplate::class, $data) => $transitionConfig['message'];
             }
             unset($transitionConfig);
         }
@@ -47,7 +46,7 @@ class WorkflowTranslationFieldsIterator
         if (array_key_exists('steps', $configuration) && is_array($configuration['steps'])) {
             foreach ($configuration['steps'] as $stepName => &$stepConfig) {
                 $data = ['workflow_name' => $workflowName, 'step_name' => $stepName, '_' => $stepConfig];
-                yield $this->getSource(StepTemplate::class, $data) => $stepConfig['label'];
+                yield $this->makeSource(StepTemplate::class, $data) => $stepConfig['label'];
             }
             unset($stepConfig);
         }
@@ -55,13 +54,19 @@ class WorkflowTranslationFieldsIterator
         if (array_key_exists('attributes', $configuration) && is_array($configuration['attributes'])) {
             foreach ($configuration['attributes'] as $attributeName => &$attributeConfig) {
                 $data = ['workflow_name' => $workflowName, 'attribute_name' => $attributeName, '_' => $attributeConfig];
-                yield $this->getSource(AttributeLabelTemplate::class, $data) => $attributeConfig['label'];
+                yield $this->makeSource(AttributeLabelTemplate::class, $data) => $attributeConfig['label'];
             }
             unset($attributeConfig);
         }
     }
 
-    private function getSource($templateClass, array $data = [])
+    /**
+     * @param $templateClass
+     * @param array $data
+     * @return TranslationKeySource
+     * @throws \InvalidArgumentException
+     */
+    private function makeSource($templateClass, array $data = [])
     {
         return new TranslationKeySource($this->getTemplate($templateClass), $data);
     }
@@ -69,11 +74,18 @@ class WorkflowTranslationFieldsIterator
     /**
      * @param $templateClass
      * @return TranslationKeyTemplateInterface
+     * @throws \InvalidArgumentException
      */
     private function getTemplate($templateClass)
     {
         if (array_key_exists($templateClass, $this->templates)) {
             return $this->templates[$templateClass];
+        }
+
+        if (!is_a($templateClass, TranslationKeyTemplateInterface::class, true)) {
+            throw new \InvalidArgumentException(
+                sprintf('Template class must implement %s', TranslationKeyTemplateInterface::class)
+            );
         }
 
         return $this->templates[$templateClass] = new $templateClass;
