@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Component\MessageQueue\Client\MessagePriority;

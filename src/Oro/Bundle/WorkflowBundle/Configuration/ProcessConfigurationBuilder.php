@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Cron\CronExpression;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Component\Action\Exception\InvalidParameterException;

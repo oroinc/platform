@@ -3,11 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Cron\CronExpression;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerConfiguration implements ConfigurationInterface
 {

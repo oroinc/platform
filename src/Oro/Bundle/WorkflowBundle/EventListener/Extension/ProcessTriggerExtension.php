@@ -4,7 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
@@ -17,8 +22,6 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
-use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class ProcessTriggerExtension extends AbstractEventTriggerExtension
 {
@@ -240,7 +243,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         foreach ($this->queuedJobs as $timeShift => $processJobBatch) {
             foreach ($processJobBatch as $priority => $processJobs) {
                 /** @var ProcessJob $processJob */
-
                 foreach ($processJobs as $processJob) {
                     $message = new Message();
                     $message->setBody(['process_job_id' => $processJob->getId()]);
