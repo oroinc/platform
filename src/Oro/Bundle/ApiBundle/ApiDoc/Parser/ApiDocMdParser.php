@@ -11,7 +11,7 @@ class ApiDocMdParser
     /**
      * @var array
      *
-     * [OroCRM\Bundle\SalesBundle\Entity\Opportunity] => Array
+     * [Oro\Bundle\SalesBundle\Entity\Opportunity] => Array
      *  [<section name>] =>
      *      [<element name>] => '<element description>'
      *  ...

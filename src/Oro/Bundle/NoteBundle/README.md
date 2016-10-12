@@ -10,7 +10,7 @@ The following example shows how notes can be enabled for some entity:
 ``` php
 <?php
 
-namespace OroCRM\Bundle\AccountBundle\Migrations\Schema\v1_1;
+namespace Oro\Bundle\AccountBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
 

@@ -26,7 +26,7 @@ The existing entity can be extended using migration scripts. To create new exten
 ``` php
 <?php
 
-namespace OroCRM\Bundle\AccountBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\AccountBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -91,7 +91,7 @@ Creating relations is more complex task than creation of regular field. Oro Plat
 ``` php
 <?php
 
-namespace OroCRM\Bundle\SalesBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\SalesBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;

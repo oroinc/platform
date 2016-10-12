@@ -170,7 +170,7 @@ class LeadMailboxProcessProvider implements MailboxProcessProviderInterface
      */
     public function getSettingsEntityFQCN()
     {
-        return 'OroCRM\Bundle\SalesBundle\Entity\LeadMailboxProcessSettings';
+        return 'Oro\Bundle\SalesBundle\Entity\LeadMailboxProcessSettings';
     }
 
     /**
