@@ -11,6 +11,10 @@
         padding: $input-padding--s;
     }
 
+    &--size-x-s {
+        padding: $input-padding--x-s;
+    }
+
     &--has-datepicker {
         max-width: 140px;
         padding-left: 39px;

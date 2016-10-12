@@ -13,8 +13,6 @@
     box-sizing: border-box;
 
     @include element-state('hover') {
-        text-decoration: none;
-
         border-color: $input-border-color-hover-state;
     }
 
