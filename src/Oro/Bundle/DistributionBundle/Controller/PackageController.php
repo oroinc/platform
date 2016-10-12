@@ -137,11 +137,9 @@ class PackageController extends Controller
                 $response->setContent(json_encode($responseContent));
 
                 return $response;
-
             }
 
             $manager->install($packageName, $packageVersion, (bool)$loadDemoData);
-
         } catch (\Exception $e) {
             $message = $e instanceof VerboseException ?
                 $e->getMessage() . '_' . $e->getVerboseMessage() :

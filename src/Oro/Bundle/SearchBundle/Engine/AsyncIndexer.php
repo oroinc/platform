@@ -62,7 +62,7 @@ class AsyncIndexer implements IndexerInterface
     /**
      * @inheritdoc
      */
-    public function getClassesForReindex($class = null, $context = [])
+    public function getClassesForReindex($class = null, array $context = [])
     {
         return $this->baseIndexer->getClassesForReindex($class, $context);
     }

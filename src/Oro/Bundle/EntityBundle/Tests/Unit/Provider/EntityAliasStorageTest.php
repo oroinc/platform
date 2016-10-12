@@ -281,7 +281,6 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             'Test\Entity2',
             new EntityAlias('alias2', 'alias1')
         );
-
     }
 
     public function testValidateDuplicateAliasAndPluralAliasNoDebug()

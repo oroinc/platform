@@ -56,6 +56,7 @@ config:
         'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
+        'oroform/js/optional-validation-groups-handler': 'bundles/oroform/js/optional-validation-groups-handler.js'
 
         #inline editing
         'oroform/js/tools/frontend-type-map': 'bundles/oroform/js/tools/frontend-type-map.js'
@@ -89,6 +90,7 @@ config:
         'oroform/js/app/views/collapsible-form-row-view': 'bundles/oroform/js/app/views/collapsible-form-row-view.js'
         'oroform/js/app/views/fields-groups-collection-view': 'bundles/oroform/js/app/views/fields-groups-collection-view.js'
         'oro/autocomplete-component': 'bundles/oroform/js/app/components/autocomplete-component.js'
+        'oroform/js/app/views/form-validate-view': 'bundles/oroform/js/app/views/form-validate-view.js'
         'oro/select2-component': 'bundles/oroform/js/app/components/select2-component.js'
         'oro/select2-tree-autocomplete-component': 'bundles/oroform/js/app/components/select2-tree-autocomplete-component.js'
         'oro/select2-autocomplete-component': 'bundles/oroform/js/app/components/select2-autocomplete-component.js'

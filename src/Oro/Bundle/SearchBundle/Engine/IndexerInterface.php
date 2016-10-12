@@ -27,20 +27,20 @@ interface IndexerInterface
     /**
      * Returns classes required to reindex for one or several classes
      * Returns all indexed classes if $class is null
-     *
      * @param string|string[] $class
-     *
+     * @param array $context
      * @return string[]
      */
-    public function getClassesForReindex($class = null);
+    public function getClassesForReindex($class = null, array $context = []);
 
     /**
      * Resets data for one or several classes in index
      * Resets data for all indexed classes if $class is null
      *
      * @param string|string[] $class
+     * @param array $context
      */
-    public function resetIndex($class = null);
+    public function resetIndex($class = null, array $context = []);
 
     /**
      * Reindex data for one or several classes in index
