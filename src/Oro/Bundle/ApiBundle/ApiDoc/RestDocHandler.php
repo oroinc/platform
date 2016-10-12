@@ -8,10 +8,11 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
 use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
@@ -19,14 +20,18 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * TODO: Add unit tests and refactor class to resolve overall complexity (BAP-12042).
+ */
 class RestDocHandler implements HandlerInterface
 {
     const ID_ATTRIBUTE   = 'id';
     const ID_PLACEHOLDER = '{id}';
-
     const ID_DESCRIPTION = 'The identifier of an entity';
 
     /** @var RestDocViewDetector */
@@ -86,6 +91,7 @@ class RestDocHandler implements HandlerInterface
             if ($statusCodes) {
                 $this->setStatusCodes($annotation, $statusCodes);
             }
+
             if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
                 if ($associationName) {
                     $this->addIdRequirement($annotation, $route, $actionContext->getParentMetadata());
@@ -98,6 +104,79 @@ class RestDocHandler implements HandlerInterface
                 $this->addFilters($annotation, $filters, $actionContext->getMetadata());
             }
             $this->sortFilters($annotation);
+
+            $this->addApiMetadataToAnnotation(
+                $annotation,
+                $actionContext->getMetadata(),
+                $config,
+                $action,
+                $entityClass,
+                $associationName
+            );
+        }
+    }
+
+    /**
+     * Adds API Metadata to input and output parameters of annotation.
+     *
+     * @param ApiDoc                 $annotation
+     * @param EntityMetadata         $actionMetadata
+     * @param EntityDefinitionConfig $config
+     * @param string                 $action
+     * @param string                 $entityClass
+     * @param string                 $associationName
+     */
+    protected function addApiMetadataToAnnotation(
+        ApiDoc $annotation,
+        EntityMetadata $actionMetadata,
+        EntityDefinitionConfig $config,
+        $action,
+        $entityClass,
+        $associationName = null
+    ) {
+        // add metadata for input
+        $requestType = $this->docViewDetector->getRequestType();
+        if (ApiActions::isInputAction($action)) {
+            // unfortunately there is no other way to update input parameter except to use the reflection
+            $directionProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'input');
+            $directionProperty->setAccessible(true);
+            $directionProperty->setValue(
+                $annotation,
+                [
+                    'class' => ApiDocMetadata::class,
+                    'options' => [
+                        'metadata' => new ApiDocMetadata($action, $actionMetadata, $config, $requestType)
+                    ]
+                ]
+            );
+        }
+
+        // add metadata for output
+        if (ApiActions::isOutputAction($action)) {
+            $outputMetadata = $actionMetadata;
+            $outputConfig = $config;
+
+            // check if output format should be taken from another action type. In this case Entity metadata and config
+            // will be taken for the action, those format should be used.
+            $outputFormatData = ApiActions::getActionOutputFormatActionType($action);
+            if ($action !== $outputFormatData) {
+                $outContext = $this->getContext($outputFormatData, $entityClass, $associationName);
+                $outputMetadata = $outContext->getMetadata();
+                $outputConfig = $outContext->getConfig();
+            }
+
+            // unfortunately there is no other way to update output parameter except to use the reflection
+            $directionProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'output');
+            $directionProperty->setAccessible(true);
+            $directionProperty->setValue(
+                $annotation,
+                [
+                    'class' => ApiDocMetadata::class,
+                    'options' => [
+                        'metadata' => new ApiDocMetadata($action, $outputMetadata, $outputConfig, $requestType)
+                    ]
+                ]
+            );
         }
     }
 
@@ -294,18 +373,20 @@ class RestDocHandler implements HandlerInterface
                     }
                 }
 
-                if ($filter instanceof ComparisonFilter && $metadata->hasAssociation($filter->getField())) {
-                    $targetClassNames = $metadata->getAssociation($filter->getField())
-                        ->getAcceptableTargetClassNames();
-                    $targetEntityTypes = [];
-                    foreach ($targetClassNames as $targetClassName) {
-                        $targetEntityType = $this->getEntityType($targetClassName);
-                        if ($targetEntityType) {
-                            $targetEntityTypes[] = $targetEntityType;
+                if ($filter instanceof FieldAwareFilterInterface) {
+                    $association = $metadata->getAssociation($filter->getField());
+                    if (null !== $association && !DataType::isAssociationAsField($association->getDataType())) {
+                        $targetClassNames = $association->getAcceptableTargetClassNames();
+                        $targetEntityTypes = [];
+                        foreach ($targetClassNames as $targetClassName) {
+                            $targetEntityType = $this->getEntityType($targetClassName);
+                            if ($targetEntityType) {
+                                $targetEntityTypes[] = $targetEntityType;
+                            }
                         }
-                    }
-                    if (!empty($targetEntityTypes)) {
-                        $options['relation'] = implode(',', $targetEntityTypes);
+                        if (!empty($targetEntityTypes)) {
+                            $options['relation'] = implode(',', $targetEntityTypes);
+                        }
                     }
                 }
 

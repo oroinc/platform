@@ -49,6 +49,9 @@ a {
   &.disabled {
     color: #bfbfbf;
     pointer-events: none;
+    [class^='icon-'].hide-text:before {
+      color: #bfbfbf;
+    }
   }
 }
 form {
@@ -1689,10 +1692,6 @@ footer {
         .control-label {
           width: auto;
         }
-        select{
-          width: 100%;
-          max-width: 282px;
-        }
       }
     }
   }
@@ -2286,6 +2285,8 @@ div.selector select {
   width: auto;
   box-sizing: border-box;
 }
+
+div.selector.input-widget-select select {width: 100%;}
 
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
 .controls select {width: 279px;}

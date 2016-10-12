@@ -9,7 +9,7 @@ Scenario: Send email
     | Charlie   | Sheen    | charlie@sheen.com | charlie  |
     | Brad      | Pitt     | brad@pitt.com     | brad     |
     | Bruce     | Willis   | bruce@willis.com  | bruce    |
-  And I login as "admin" user with "admin" password
+  And I login as administrator
   And I go to System/User Management/Users
   And click view Charlie in grid
   And follow "More actions"

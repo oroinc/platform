@@ -96,7 +96,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('orWhere')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(1))
+        $qb->expects($this->once())
             ->method('andWhere')
             ->will($this->returnSelf());
         $qb->expects($this->once())
@@ -213,14 +213,6 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('where')
             ->with('e.entityName IS NULL')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())
-            ->method('andWhere')
-            ->with('e.isSystem = :isSystem')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())
-            ->method('setParameter')
-            ->with('isSystem', true)
             ->will($this->returnSelf());
 
         $this->entityManager->expects($this->once())

@@ -298,7 +298,7 @@ class ColumnsExtension extends AbstractExtension
             if (!$currentUser = $this->getCurrentUser()) {
                 return null;
             }
-            
+
             $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
                 $this->aclHelper,
                 $currentUser,

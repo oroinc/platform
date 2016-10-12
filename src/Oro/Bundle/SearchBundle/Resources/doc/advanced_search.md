@@ -45,6 +45,19 @@ select text.field_name
 select (text.first_field_name, text.second_field_name)
 ```
 
+You can use fieldname aliasing, as known in SQL, for example:
+
+```
+select text.field_1 as name, text.field_2 as author
+```
+
+You can use fieldname aliasing, as known in SQL, for example:
+
+```
+select (text.field_1 as name, text.field_2 as author)
+```
+Note that parentheses are mandatory.
+
 ### from
 
 List of entity aliases to search from. It can be one alias or group. Examples:

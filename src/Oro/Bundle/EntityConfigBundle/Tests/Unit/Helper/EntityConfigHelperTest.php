@@ -102,6 +102,25 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param bool $strict
+     *
+     * @dataProvider strictParamProvider
+     */
+    public function testGetConfigValueStrictParam($strict)
+    {
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('stdClass')
+            ->willThrowException(new \RuntimeException('test exception'));
+
+        if ($strict) {
+            $this->setExpectedException('RuntimeException', 'test exception');
+        }
+
+        $this->assertNull($this->helper->getConfigValue('stdClass', 'param', $strict));
+    }
+
+    /**
      * @return array
      */
     public function getRoutesProvider()
@@ -171,6 +190,17 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => 'value1',
             ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function strictParamProvider()
+    {
+        return [
+            [true],
+            [false]
         ];
     }
 

@@ -13,6 +13,7 @@ class AuditFieldTypeRegistry
         'boolean'    => 'boolean',
         'text'       => 'text',
         'string'     => 'text',
+        'currency'   => 'text',
         'guid'       => 'text',
         'manyToOne'  => 'text',
         'enum'       => 'text',

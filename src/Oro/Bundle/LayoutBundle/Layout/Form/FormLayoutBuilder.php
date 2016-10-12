@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Form;
 
+use Oro\Component\Layout\Block\Type\Options;
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Component\Layout\BlockBuilderInterface;
@@ -23,7 +24,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     /** @var BlockBuilderInterface */
     protected $builder;
 
-    /** @var array */
+    /** @var Options */
     protected $options;
 
     /** @var LayoutManipulatorInterface */
@@ -35,7 +36,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function build(FormAccessorInterface $formAccessor, BlockBuilderInterface $builder, array $options)
+    public function build(FormAccessorInterface $formAccessor, BlockBuilderInterface $builder, Options $options)
     {
         $this->initializeState($formAccessor, $builder, $options);
         try {
@@ -82,12 +83,12 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
      *
      * @param FormAccessorInterface $formAccessor
      * @param BlockBuilderInterface $builder
-     * @param array                 $options
+     * @param Options               $options
      */
     protected function initializeState(
         FormAccessorInterface $formAccessor,
         BlockBuilderInterface $builder,
-        array $options
+        Options $options
     ) {
         $this->formAccessor      = $formAccessor;
         $this->builder           = $builder;

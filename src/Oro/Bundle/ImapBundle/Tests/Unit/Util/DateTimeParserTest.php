@@ -9,10 +9,10 @@ class DateTimeParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParse($strDate)
+    public function testParse($strDate, $expectedDate = '2011-06-30 23:59:59 UTC')
     {
         $this->assertEquals(
-            new \DateTime('2011-06-30 23:59:59', new \DateTimeZone('UTC')),
+            new \DateTime($expectedDate),
             DateTimeParser::parse($strDate)
         );
     }
@@ -37,6 +37,13 @@ class DateTimeParserTest extends \PHPUnit_Framework_TestCase
             ['Fri, 31 06 2011 10:59:59 +1100'],
             ['Fri, 31 06 2011 10:59:59 +1100 (GMT+11:00)'],
             ['Sum, 30 Jun 2011 21:59:59 -0200'],
+            ['Fri,  31 Jun 2011 10:59:59 +1100'],
+            ['Fri, 31 Jun 2011 10:59:59 +11: 0'],
+            ['Fri, 31 Jun 2011 10:59: 9 +1100', '2011-06-30 23:59:09 UTC'],
+            ['Fri, 31 Jun 2011 10: 9: 9 +1100', '2011-06-30 23:09:09 UTC'],
+            ['Fri, 31 Jun 2011  1: 9: 9 +1100', '2011-06-30 14:09:09 UTC'],
+            ['Fri, 31 Jun 2011  1:09:09 +1100', '2011-06-30 14:09:09 UTC'],
+            ['Fri, 31 Jun 2011  1: 9:09 +1100', '2011-06-30 14:09:09 UTC'],
         ];
     }
 

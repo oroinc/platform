@@ -90,7 +90,6 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
                     ]
                 );
             }
-
         }
         $this->assetHelper->expects($this->exactly(count($files)))->method('getUrl')
             ->willReturnMap($valueMap);

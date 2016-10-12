@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\Options;
 
 class BlockFactory implements BlockFactoryInterface
 {
@@ -211,7 +212,7 @@ class BlockFactory implements BlockFactoryInterface
         $types     = $this->typeHelper->getTypes($blockType);
 
         // resolve options
-        $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
+        $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
 
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);
@@ -247,6 +248,15 @@ class BlockFactory implements BlockFactoryInterface
             $this->registry->buildView($type->getName(), $view, $this->block, $options);
         }
 
+        array_walk_recursive(
+            $view->vars,
+            function (&$var) {
+                if ($var instanceof Options) {
+                    $var = $var->toArray();
+                }
+            }
+        );
+
         return $view;
     }
 
@@ -266,8 +276,8 @@ class BlockFactory implements BlockFactoryInterface
         $this->block->initialize($id);
         // finish the view
         foreach ($types as $type) {
-            $type->finishView($view, $this->block, $options);
-            $this->registry->finishView($type->getName(), $view, $this->block, $options);
+            $type->finishView($view, $this->block);
+            $this->registry->finishView($type->getName(), $view, $this->block);
         }
     }
 

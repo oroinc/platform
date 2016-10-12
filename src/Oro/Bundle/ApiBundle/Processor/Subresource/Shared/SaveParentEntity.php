@@ -42,6 +42,6 @@ class SaveParentEntity implements ProcessorInterface
             return;
         }
 
-        $em->flush($parentEntity);
+        $em->flush();
     }
 }

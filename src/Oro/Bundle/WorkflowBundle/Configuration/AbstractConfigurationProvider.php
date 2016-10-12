@@ -32,7 +32,7 @@ abstract class AbstractConfigurationProvider
      */
     protected function getConfigFinder(array $directoriesWhiteList = array())
     {
-        $configDirectories = $this->getConfigDirectories($directoriesWhiteList);
+        $configDirectories = $this->getConfigDirectories();
 
         // prepare finder
         $finder = new Finder();

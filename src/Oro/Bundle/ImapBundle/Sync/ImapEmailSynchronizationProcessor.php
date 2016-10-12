@@ -78,7 +78,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->initEnv($origin);
         $processStartTime = time();
         // iterate through all folders enabled for sync and do a synchronization of emails for each one
-        $imapFolders = $this->getSyncEnabledImapFolders($origin);
+        $imapFolders = $this->getSyncEnabledImapFolders($origin, true);
         foreach ($imapFolders as $imapFolder) {
             $folder = $imapFolder->getFolder();
 
@@ -86,6 +86,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folderName = $folder->getFullName();
             try {
                 $this->manager->selectFolder($folderName);
+                $folder->setFailedCount(0);
                 $this->logger->info(sprintf('The folder "%s" is selected.', $folderName));
 
                 // register the current folder in the entity builder
@@ -103,12 +104,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->checkFlags($imapFolder, $checkStartDate);
 
                 $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
-
             } catch (UnselectableFolderException $e) {
-                $folder->setSyncEnabled(false);
-                $this->logger->info(
-                    sprintf('The folder "%s" cannot be selected and was skipped and disabled.', $folderName)
-                );
+                $this->processUnselectableFolderException($folder);
             } catch (InvalidEmailFormatException $e) {
                 $folder->setSyncEnabled(false);
                 $this->logger->info(
@@ -563,16 +560,41 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @return ImapEmailFolder[]
      */
-    protected function getSyncEnabledImapFolders(EmailOrigin $origin)
+    protected function getSyncEnabledImapFolders(EmailOrigin $origin, $sortByFailedCount = false)
     {
         $this->logger->info('Get folders enabled for sync...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE);
+        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE, $sortByFailedCount);
 
         $this->logger->info(sprintf('Got %d folder(s).', count($imapFolders)));
 
         return $imapFolders;
+    }
+
+    /**
+     * Process actions when email folder can't be selected.
+     *
+     * @param EmailFolder $folder
+     */
+    protected function processUnselectableFolderException(EmailFolder $folder)
+    {
+        $folderName = $folder->getFullName();
+        $folder->setFailedCount((integer)$folder->getFailedCount() + 1);
+        $this->logger->info(
+            sprintf('The folder "%s" cannot be selected and was skipped.', $folderName)
+        );
+
+        if ($folder->getFailedCount() > EmailFolder::MAX_FAILED_COUNT) {
+            $folder->setSyncEnabled(false);
+            $this->logger->info(
+                sprintf(
+                    'The folder "%s" cannot be selected %s times and was disabled.',
+                    $folderName,
+                    EmailFolder::MAX_FAILED_COUNT
+                )
+            );
+        }
     }
 }

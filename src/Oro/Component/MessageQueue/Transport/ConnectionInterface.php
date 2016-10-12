@@ -12,7 +12,7 @@ namespace Oro\Component\MessageQueue\Transport;
  * A transport client typically creates a connection, one or more sessions,
  * and a number of message producers and consumers.
  *
- * @link https://docs.oracle.com/javaee/1.4/api/javax/MQ/Connection.html
+ * @link https://docs.oracle.com/javaee/1.4/api/javax/jms/Connection.html
  */
 interface ConnectionInterface
 {

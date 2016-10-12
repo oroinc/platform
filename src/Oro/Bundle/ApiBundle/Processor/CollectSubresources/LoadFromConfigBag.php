@@ -3,7 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
@@ -16,7 +20,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 /**
  * Loads sub-resources configured in "Resources/config/oro/api.yml".
  */
-class LoadFromConfigBag implements ProcessorInterface
+class LoadFromConfigBag extends LoadSubresources
 {
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
@@ -27,11 +31,16 @@ class LoadFromConfigBag implements ProcessorInterface
     /**
      * @param ConfigLoaderFactory $configLoaderFactory
      * @param ConfigBag           $configBag
+     * @param ConfigProvider      $configProvider
+     * @param MetadataProvider    $metadataProvider
      */
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
-        ConfigBag $configBag
+        ConfigBag $configBag,
+        ConfigProvider $configProvider,
+        MetadataProvider $metadataProvider
     ) {
+        parent::__construct($configProvider, $metadataProvider);
         $this->configLoaderFactory = $configLoaderFactory;
         $this->configBag = $configBag;
     }
@@ -44,8 +53,11 @@ class LoadFromConfigBag implements ProcessorInterface
         /** @var CollectSubresourcesContext $context */
 
         $version = $context->getVersion();
-        $resources = $context->getResources();
+        $requestType = $context->getRequestType();
+        $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
         $subresources = $context->getResult();
+
+        $resources = $context->getResources();
         foreach ($resources as $entityClass => $resource) {
             if (in_array(ApiActions::GET_SUBRESOURCE, $resource->getExcludedActions(), true)) {
                 continue;
@@ -71,7 +83,16 @@ class LoadFromConfigBag implements ProcessorInterface
                 } else {
                     $subresource = $entitySubresources->getSubresource($associationName);
                     if (null === $subresource) {
-                        $subresource = $this->createNewSubresource($subresourceConfig);
+                        if ($subresourceConfig->getTargetClass()) {
+                            $subresource = $this->createSubresourceFromConfig($subresourceConfig);
+                        } else {
+                            $subresource = $this->createSubresource(
+                                $this->getAssociationMetadata($entityClass, $associationName, $version, $requestType),
+                                $accessibleResources,
+                                $this->getSubresourceExcludedActions($resource)
+                            );
+                            $this->updateSubresourceTargetFromConfig($subresource, $subresourceConfig);
+                        }
                         $entitySubresources->addSubresource($associationName, $subresource);
                     } else {
                         $this->validateExistingSubresource(
@@ -92,7 +113,7 @@ class LoadFromConfigBag implements ProcessorInterface
      *
      * @return ApiSubresource
      */
-    protected function createNewSubresource(SubresourceConfig $subresourceConfig)
+    protected function createSubresourceFromConfig(SubresourceConfig $subresourceConfig)
     {
         $subresource = new ApiSubresource();
         $subresource->setTargetClassName($subresourceConfig->getTargetClass());
@@ -100,6 +121,55 @@ class LoadFromConfigBag implements ProcessorInterface
         $subresource->setIsCollection($subresourceConfig->isCollectionValuedAssociation());
 
         return $subresource;
+    }
+
+    /**
+     * @param ApiSubresource    $subresource
+     * @param SubresourceConfig $subresourceConfig
+     */
+    protected function updateSubresourceTargetFromConfig(
+        ApiSubresource $subresource,
+        SubresourceConfig $subresourceConfig
+    ) {
+        $targetClass = $subresourceConfig->getTargetClass();
+        if ($targetClass) {
+            $subresource->setTargetClassName($targetClass);
+            $subresource->setAcceptableTargetClassNames([$targetClass]);
+        }
+        if ($subresourceConfig->hasTargetType()) {
+            $subresource->setIsCollection($subresourceConfig->isCollectionValuedAssociation());
+        }
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param string      $associationName
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return AssociationMetadata
+     */
+    protected function getAssociationMetadata($entityClass, $associationName, $version, RequestType $requestType)
+    {
+        $metadata = $this->getMetadata(
+            $entityClass,
+            $version,
+            $requestType,
+            $this->getConfig($entityClass, $version, $requestType)
+        );
+
+        $association = $metadata->getAssociation($associationName);
+        if (null === $association) {
+            throw new \RuntimeException(
+                sprintf(
+                    'The target class for "%s" subresource of "%s" entity should be specified in config.',
+                    $associationName,
+                    $entityClass
+                )
+            );
+        }
+
+        return $association;
     }
 
     /**

@@ -1,0 +1,24 @@
+Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
+  actions:
+    get: "<p>Description for GET action</p><ul>\n<li>list item 1</li>\n<li>list item 2</li>\n</ul>\n"
+    get_list: '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>'
+    create: '<p>Description for CREATE action</p><p><em>text in italic</em></p>'
+    update: '<p>Description for UPDATE action</p><p><a href="http://localhost.com">a link to resource</a></p>'
+  fields:
+    id:
+      common: '<p>Description for ID field</p>'
+    name:
+      common: '<p>Description for NAME field</p>'
+      create: '<p>Description for NAME field for CREATE action</p>'
+      update: '<p>Description for NAME field for UPDATE action</p>'
+      delete: '<p>Description for NAME field for DELETE action</p>'
+    createdat: []
+    updatedat: []
+  filters:
+    id: 'Description for ID filter'
+    name: 'Description for NAME filter'
+    createdat: 'Description for CREATEDAT filter'
+    updatedat: 'Description for UPDATEDAT filter'
+Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category: []
+Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Company: []
+Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group: []

@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
+use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMdParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProviderInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
@@ -24,21 +26,27 @@ class CompleteDescriptions implements ProcessorInterface
     /** @var ResourceDocProviderInterface */
     protected $resourceDocProvider;
 
+    /** @var ApiDocMdParser */
+    protected $apiDocMdParser;
+
     /** @var TranslatorInterface */
     protected $translator;
 
     /**
      * @param EntityDescriptionProvider    $entityDescriptionProvider
      * @param ResourceDocProviderInterface $resourceDocProvider
+     * @param ApiDocMdParser               $apiDocMdParser
      * @param TranslatorInterface          $translator
      */
     public function __construct(
         EntityDescriptionProvider $entityDescriptionProvider,
         ResourceDocProviderInterface $resourceDocProvider,
+        ApiDocMdParser $apiDocMdParser,
         TranslatorInterface $translator
     ) {
         $this->entityDescriptionProvider = $entityDescriptionProvider;
         $this->resourceDocProvider = $resourceDocProvider;
+        $this->apiDocMdParser = $apiDocMdParser;
         $this->translator = $translator;
     }
 
@@ -65,10 +73,10 @@ class CompleteDescriptions implements ProcessorInterface
             $context->isCollection(),
             $context->getAssociationName()
         );
-        $this->setDescriptionsForFields($definition, $entityClass);
+        $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
         $filters = $context->getFilters();
         if (null !== $filters) {
-            $this->setDescriptionsForFilters($filters, $entityClass);
+            $this->setDescriptionsForFilters($filters, $definition, $entityClass, $targetAction);
         }
     }
 
@@ -110,7 +118,21 @@ class CompleteDescriptions implements ProcessorInterface
                 $definition->setDescription($this->trans($description));
             }
         }
-        if (!$definition->hasDocumentation()) {
+
+        if ($definition->has(EntityDefinitionConfig::DOCUMENTATION_RESOURCE)) {
+            $this->apiDocMdParser->parseDocumentationResource(
+                $definition->get(EntityDefinitionConfig::DOCUMENTATION_RESOURCE)
+            );
+        }
+
+        if ($definition->hasDocumentation()) {
+            $this->apiDocMdParser->parseDocumentationResource($definition->getDocumentation());
+        }
+
+        $loadedDocumentation = $this->apiDocMdParser->getDocumentation($entityClass, 'actions', $targetAction);
+        if ($loadedDocumentation) {
+            $definition->setDocumentation($loadedDocumentation);
+        } else {
             if ($associationName) {
                 if (false === $associationDescription) {
                     $associationDescription = $this->getAssociationDescription($associationName);
@@ -211,14 +233,30 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
+     * @param string                 $targetAction
      * @param string|null            $fieldPrefix
      */
-    protected function setDescriptionsForFields(EntityDefinitionConfig $definition, $entityClass, $fieldPrefix = null)
-    {
+    protected function setDescriptionsForFields(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $targetAction,
+        $fieldPrefix = null
+    ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                    $entityClass,
+                    'fields',
+                    $fieldName,
+                    $targetAction
+                );
+                if ($loadedDescription) {
+                    $field->setDescription($loadedDescription);
+                    continue;
+                }
+
+                $propertyPath = $field->getPropertyPath($fieldName);
                 if ($fieldPrefix) {
                     $propertyPath = $fieldPrefix . $propertyPath;
                 }
@@ -230,15 +268,27 @@ class CompleteDescriptions implements ProcessorInterface
                 $label = $field->getDescription();
                 if ($label instanceof Label) {
                     $field->setDescription($this->trans($label));
+                } else {
+                    $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                        $entityClass,
+                        'fields',
+                        $fieldName,
+                        $targetAction,
+                        $label
+                    );
+                    if ($loadedDescription) {
+                        $field->setDescription($loadedDescription);
+                        continue;
+                    }
                 }
             }
             $targetEntity = $field->getTargetEntity();
             if ($targetEntity && $targetEntity->hasFields()) {
                 $targetClass = $field->getTargetClass();
                 if ($targetClass) {
-                    $this->setDescriptionsForFields($targetEntity, $targetClass);
+                    $this->setDescriptionsForFields($targetEntity, $targetClass, $targetAction);
                 } else {
-                    $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                    $propertyPath = $field->getPropertyPath($fieldName);
                     $this->setDescriptionsForFields($targetEntity, $entityClass, $propertyPath . '.');
                 }
             }
@@ -246,15 +296,44 @@ class CompleteDescriptions implements ProcessorInterface
     }
 
     /**
-     * @param FiltersConfig $filters
-     * @param string        $entityClass
+     * @param FiltersConfig          $filters
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param string                 $targetAction
      */
-    protected function setDescriptionsForFilters(FiltersConfig $filters, $entityClass)
-    {
+    protected function setDescriptionsForFilters(
+        FiltersConfig $filters,
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $targetAction
+    ) {
         $fields = $filters->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                    $entityClass,
+                    'filters',
+                    $fieldName,
+                    $targetAction
+                );
+                if ($loadedDescription) {
+                    $field->setDescription($loadedDescription);
+                    continue;
+                }
+
+                $fieldsDefinition = $definition->getField($fieldName);
+                if ($fieldsDefinition && $fieldsDefinition->hasTargetEntity()) {
+                    $description = sprintf(
+                        'Filter \'%s\' by \'%s\' relation value, accepts \'%s\' type values.',
+                        ValueNormalizerUtil::humanizeClassName($entityClass),
+                        $fieldName,
+                        $field->getDataType()
+                    );
+                    $field->setDescription($description);
+                    continue;
+                }
+
+                $propertyPath = $field->getPropertyPath($fieldName);
                 $description = $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath);
                 if ($description) {
                     $field->setDescription($description);
@@ -263,6 +342,18 @@ class CompleteDescriptions implements ProcessorInterface
                 $description = $field->getDescription();
                 if ($description instanceof Label) {
                     $field->setDescription($this->trans($description));
+                } else {
+                    $loadedDescription = $this->apiDocMdParser->getDocumentation(
+                        $entityClass,
+                        'filters',
+                        $fieldName,
+                        $targetAction,
+                        $description
+                    );
+                    if ($loadedDescription) {
+                        $field->setDescription($loadedDescription);
+                        continue;
+                    }
                 }
             }
         }
@@ -298,6 +389,6 @@ class CompleteDescriptions implements ProcessorInterface
      */
     protected function trans(Label $label)
     {
-        return $label->trans($this->translator) ?: null;
+        return $label->trans($this->translator) ? : null;
     }
 }
