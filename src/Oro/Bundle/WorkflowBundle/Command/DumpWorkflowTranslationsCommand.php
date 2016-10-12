@@ -12,11 +12,12 @@ use Symfony\Component\Yaml\Yaml;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
 {
+    const INLINE_LEVEL = 10;
     const TRANSLATION_DOMAIN = 'workflows';
 
     /**
@@ -50,22 +51,22 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
         /* @var $workflowManager WorkflowManager */
         $workflowManager = $this->getContainer()->get('oro_workflow.manager');
 
-        $keys = $this->collectKeys($workflowManager->getWorkflow($workflowName));
+        $keys = $this->collectKeys($workflowManager->getWorkflow($workflowName)->getDefinition());
         $translations = $this->processkeys($this->getContainer()->get('translator.default'), $keys, $locale);
 
-        $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), 10));
+        $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), self::INLINE_LEVEL));
     }
 
     /**
-     * @param Workflow $workflow
+     * @param WorkflowDefinition $definition
      * @return array
      */
-    protected function collectKeys(Workflow $workflow)
+    protected function collectKeys(WorkflowDefinition $definition)
     {
-        $config = $workflow->getDefinition()->getConfiguration();
+        $config = $definition->getConfiguration();
 
         $keys = [
-            $workflow->getLabel(),
+            $definition->getLabel(),
         ];
 
         foreach ($config['steps'] as $item) {
@@ -101,6 +102,7 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
             } else {
                 $translation = '';
             }
+
             $translations[$key] = $translation;
         }
 
