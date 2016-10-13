@@ -14,7 +14,7 @@ class EmailNotificationManagerTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_notifications.manager.email_notification');
+        $service = $this->getContainer()->get('oro_notification.manager.email_notification');
 
         $this->assertInstanceOf(EmailNotificationManager::class, $service);
     }

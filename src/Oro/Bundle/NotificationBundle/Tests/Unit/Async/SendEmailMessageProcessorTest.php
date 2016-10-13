@@ -3,18 +3,18 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
-use Oro\Bundle\NotificationBundle\Async\EmailSendingMessageProcessor;
+use Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldConstructWithRequiredArguments()
     {
-        new EmailSendingMessageProcessor($this->createMailerMock(), $this->createLoggerMock());
+        new SendEmailMessageProcessor($this->createMailerMock(), $this->createLoggerMock());
     }
 
     public function testShouldBeSubscribedForTopics()
@@ -23,7 +23,7 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
             Topics::SEND_NOTIFICATION_EMAIL,
         ];
 
-        $this->assertEquals($expectedSubscribedTopics, EmailSendingMessageProcessor::getSubscribedTopics());
+        $this->assertEquals($expectedSubscribedTopics, SendEmailMessageProcessor::getSubscribedTopics());
     }
 
     public function testShouldRejectIfSenderNotSet()
@@ -32,10 +32,10 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[EmailSendingMessageProcessor] Got invalid message: "{"toEmail":"to@email.com"}"')
+            ->with('[SendEmailMessageProcessor] Got invalid message: "{"toEmail":"to@email.com"}"')
         ;
 
-        $processor = new EmailSendingMessageProcessor(
+        $processor = new SendEmailMessageProcessor(
             $this->createMailerMock(),
             $logger
         );
@@ -56,10 +56,10 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[EmailSendingMessageProcessor] Got invalid message: "{"fromEmail":"from@email.com"}"')
+            ->with('[SendEmailMessageProcessor] Got invalid message: "{"fromEmail":"from@email.com"}"')
         ;
 
-        $processor = new EmailSendingMessageProcessor(
+        $processor = new SendEmailMessageProcessor(
             $this->createMailerMock(),
             $logger
         );
@@ -87,11 +87,11 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[EmailSendingMessageProcessor] '.
+            ->with('[SendEmailMessageProcessor] '.
                 'Cannot send message: "{"toEmail":"to@email.com","fromEmail":"from@email.com"}"')
         ;
 
-        $processor = new EmailSendingMessageProcessor(
+        $processor = new SendEmailMessageProcessor(
             $mailer,
             $logger
         );
@@ -122,7 +122,7 @@ class EmailSendingMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('critical')
         ;
 
-        $processor = new EmailSendingMessageProcessor(
+        $processor = new SendEmailMessageProcessor(
             $mailer,
             $logger
         );

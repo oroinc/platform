@@ -134,7 +134,7 @@ services:
     oro_notification.mass_notification_sender:
         class: %oro_notification.mass_notification_sender.class%
         arguments:
-            - '@oro_notifications.manager.email_notification'
+            - '@oro_notification.manager.email_notification'
             - '@oro_config.user'
             - '@doctrine.orm.entity_manager'
             - '@oro_notification.entity_spool'
@@ -143,7 +143,7 @@ services:
     oro_notification.email_handler:
         class: %oro_notification.email_handler.class%
         arguments:
-            - '@oro_notifications.manager.email_notification'
+            - '@oro_notification.manager.email_notification'
             - '@doctrine.orm.entity_manager'
             - '@oro_entity_config.provider.ownership'
         tags:
@@ -199,8 +199,8 @@ services:
 
     # message queue
 
-    oro_notification.async.processor.email_sending:
-        class: 'Oro\Bundle\NotificationBundle\Async\EmailSendingMessageProcessor'
+    oro_notification.async.send_email_processor:
+        class: 'Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor'
         arguments:
             - '@oro_email.direct_mailer'
             - '@logger'
@@ -210,14 +210,14 @@ services:
 
     # manager
 
-    oro_notifications.manager.email_notification:
+    oro_notification.manager.email_notification:
         class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager'
         arguments:
             - '@oro_email.email_renderer'
-            - '@oro_notifications.manager.email_notification_sender'
+            - '@oro_notification.manager.email_notification_sender'
             - '@logger'
 
-    oro_notifications.manager.email_notification_sender:
+    oro_notification.manager.email_notification_sender:
         class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender'
         arguments:
             - '@oro_config.user'

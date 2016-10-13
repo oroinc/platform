@@ -9,7 +9,6 @@ use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 
 class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +17,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandle()
     {
-        $entity = $this->getMock(Taggable::class);
+        $entity = $this->getMock(\stdClass::class);
         /** @var NotificationEvent | \PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(NotificationEvent::class)
             ->disableOriginalConstructor()

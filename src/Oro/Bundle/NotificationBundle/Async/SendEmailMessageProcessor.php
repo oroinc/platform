@@ -10,9 +10,8 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
-class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-
     /**
      * @var DirectMailer
      */
@@ -34,7 +33,7 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
@@ -49,12 +48,15 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
             'contentType' => null
         ], $data);
 
-        if (null == $data['fromEmail']  || null == $data['toEmail']) {
+        if (null == $data['fromEmail'] || null == $data['toEmail']) {
             $this->logger->critical(
                 sprintf(
-                    '[EmailSendingMessageProcessor] Got invalid message: "%s"',
+                    '[SendEmailMessageProcessor] Got invalid message: "%s"',
                     $message->getBody()
-                )
+                ),
+                [
+                    'message' => $message
+                ]
             );
 
             return self::REJECT;
@@ -70,11 +72,16 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
         $emailMessage->setTo($data['toEmail']);
 
 
-        if (false == $this->mailer->send($emailMessage)) {
-            $this->logger->critical(sprintf(
-                '[EmailSendingMessageProcessor] Cannot send message: "%s"',
-                $message->getBody()
-            ));
+        if (! $this->mailer->send($emailMessage)) {
+            $this->logger->critical(
+                sprintf(
+                    '[SendEmailMessageProcessor] Cannot send message: "%s"',
+                    $message->getBody()
+                ),
+                [
+                    'message' => $message
+                ]
+            );
 
             return self::REJECT;
         }
@@ -83,7 +90,7 @@ class EmailSendingMessageProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedTopics()
     {
