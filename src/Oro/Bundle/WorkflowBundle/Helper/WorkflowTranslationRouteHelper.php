@@ -9,7 +9,6 @@ class WorkflowTranslationRouteHelper
 {
     const TRANSLATION_GRID_ROUTE_NAME = 'oro_translation_translation_index';
     const TRANSLATION_GRID_NAME = 'oro-translation-translations-grid';
-    const TRANSLATION_FILTER_NAME = 'key';
 
     /**
      * @var DatagridRouteHelper
@@ -27,17 +26,23 @@ class WorkflowTranslationRouteHelper
     }
 
     /**
-     * @param $workflowName
+     * @param array $filters
      * @param int $referenceType
      *
      * @return string
      */
-    public function generate($workflowName, $referenceType = Router::ABSOLUTE_PATH)
+    public function generate(array $filters, $referenceType = Router::ABSOLUTE_PATH)
     {
+        $f = [];
+
+        foreach ($filters as $filterName => $filterCriteria) {
+            $f[$filterName]['value'] = (string)$filterCriteria;
+        }
+
         return $this->datagridRouteHelper->generate(
             self::TRANSLATION_GRID_ROUTE_NAME,
             self::TRANSLATION_GRID_NAME,
-            ['f' => [self::TRANSLATION_FILTER_NAME => ['value' => $workflowName]]],
+            ['f' => $f],
             $referenceType
         );
     }

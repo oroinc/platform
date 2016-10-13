@@ -29,7 +29,7 @@ class WorkflowTranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
     public function testGenerate()
     {
         $workflowName = 'SAMPLE_WF_NAME';
-        $data = ['f' => [WorkflowTranslationRouteHelper::TRANSLATION_FILTER_NAME => ['value' => $workflowName]]];
+        $data = ['f' => ['workflow' => ['value' => $workflowName]]];
 
         $this->datagridRouteHelperMock->expects($this->once())->method('generate')->with(
             WorkflowTranslationRouteHelper::TRANSLATION_GRID_ROUTE_NAME,
@@ -40,7 +40,7 @@ class WorkflowTranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
 
         $helper = new WorkflowTranslationRouteHelper($this->datagridRouteHelperMock);
 
-        $result = $helper->generate($workflowName);
+        $result = $helper->generate(['workflow' => $workflowName]);
 
         $this->assertInternalType('string', $result);
     }
