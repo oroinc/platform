@@ -16,7 +16,8 @@ define(function(require) {
             message: null,
             is_unavailable_hidden: true,
             transition_definition: null,
-            _is_clone: false
+            _is_clone: false,
+            _is_added: false
         },
 
         initialize: function() {

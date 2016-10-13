@@ -95,6 +95,7 @@ define(function(require) {
             var formData = helper.getFormData(this.widget.form);
             if (!this.model.get('name')) {
                 this.model.set('name', helper.getNameByString(formData.label, 'transition_'));
+                this.model.set('_is_added', true);
             }
             this.model.set('label', formData.label);
             this.model.set('step_to', formData.step_to);
