@@ -4,21 +4,13 @@
 
 ### emails
 
-Array of emails.
+An array of emails.
 
 Format of data: [{"email": first@email.com}, {"email": second@email.com}]
 
-#### Update
+#### create, update
 
-Array of emails.
-
-Format of data: [{"email": first@email.com}, {"email": second@email.com}]
-
-The data should contain full collection of emails.
-
-#### Create
-
-Array of emails.
+An array of emails.
 
 Format of data: [{"email": first@email.com}, {"email": second@email.com}]
 
