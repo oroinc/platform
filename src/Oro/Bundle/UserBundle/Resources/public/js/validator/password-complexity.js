@@ -17,7 +17,7 @@ define(['underscore', 'orotranslation/js/translator'
     };
 
     /**
-     * @export oroform/js/validator/regex
+     * @export oroform/js/validator/password-complexity
      */
     return [
         'Oro\\Bundle\\UserBundle\\Validator\\Constraints\\PasswordComplexity',
