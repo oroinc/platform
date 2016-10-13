@@ -43,7 +43,8 @@ class PasswordComplexityConfigProvider
 
         foreach (self::$configKeys as $configKey => $type) {
             $value = $this->configManager->get($configKey);
-            $parts[$configKey] = settype($value, $type);
+            settype($value, $type);
+            $parts[$configKey] = $value;
         }
 
         return $parts;

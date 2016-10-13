@@ -51,10 +51,6 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
                 'attr' => [
                     'data-suggest-length' => '',
                     'data-suggest-rules' => '',
-                ],
-                'constraints' => [
-                    new NotBlank(),
-                    new PasswordComplexity()
                 ]
             ]);
         $this->formType->buildForm($builder, []);
