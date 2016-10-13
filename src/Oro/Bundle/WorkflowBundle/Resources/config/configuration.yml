@@ -44,7 +44,7 @@ services:
             - [addHandler, ['@oro_workflow.configuration.handler.attribute']]
             - [addHandler, ['@oro_workflow.configuration.handler.transition']]
         tags:
-            - { name: oro.workflow.configuration.handler, priority: 100 }
+            - { name: oro.workflow.configuration.handler, priority: 0 }
 
     oro_workflow.configuration.config.process_definition_sole:
         class: %oro_workflow.configuration.config.process_definition_sole.class%

@@ -34,7 +34,7 @@ class WorkflowTranslationFieldsIterator
      * @return array|\Generator ($translationKey => &$fieldValue)
      * @throws \InvalidArgumentException
      */
-    public function &iterateConfigFields($workflowName, array &$configuration)
+    public function &iterateConfigTranslationFields($workflowName, array &$configuration)
     {
         $data = ['workflow_name' => $workflowName];
 
