@@ -1,27 +1,12 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Form\Type;
+namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CurrencyType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'choices' => array_flip(Intl::getCurrencyBundle()->getCurrencyNames('en')),
-            'restrict' => false
-        ]);
-
-        $resolver->setDefined('restrict');
-        $resolver->setAllowedTypes('restrict', 'bool');
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -44,5 +29,11 @@ class CurrencyType extends AbstractType
     public function getBlockPrefix()
     {
         return 'oro_currency';
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+        $resolver->setDefaults(['restrict' => false]);
     }
 }

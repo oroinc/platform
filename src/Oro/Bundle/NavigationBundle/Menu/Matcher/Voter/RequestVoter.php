@@ -16,7 +16,7 @@ class RequestVoter extends UriVoter
     {
         $this->request = $request;
 
-        $this->setUri($request->getRequestUri());
+        parent::__construct($request->getRequestUri());
 
         return $this;
     }

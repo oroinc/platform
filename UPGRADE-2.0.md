@@ -407,6 +407,12 @@ placeholders:
 - Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
 - Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
 - Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+- Class `Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`
+    - construction signature was changed now it takes next arguments:
+        - `FactoryInterface` $factory,
+        - `EventDispatcherInterface` $eventDispatcher,
+        - `ArrayLoader` $loader,
+        - `MenuManipulator` $manipulator
 
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.

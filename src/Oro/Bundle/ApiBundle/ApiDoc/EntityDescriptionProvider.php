@@ -14,6 +14,7 @@ class EntityDescriptionProvider
 {
     const DESCRIPTION        = 'description';
     const PLURAL_DESCRIPTION = 'plural_description';
+    const DOCUMENTATION      = 'documentation';
     const MANAGEABLE         = 'manageable';
     const CONFIGURABLE       = 'configurable';
     const FIELDS             = 'fields';
@@ -110,6 +111,28 @@ class EntityDescriptionProvider
     }
 
     /**
+     * Returns the detailed documentation in English of the given entity type.
+     *
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    public function getEntityDocumentation($entityClass)
+    {
+        if (!isset($this->cache[$entityClass])) {
+            $this->cache[$entityClass] = [];
+        }
+        if (array_key_exists(self::DOCUMENTATION, $this->cache[$entityClass])) {
+            return $this->cache[$entityClass][self::DOCUMENTATION];
+        }
+
+        $result = $this->findEntityDocumentation($entityClass);
+        $this->cache[$entityClass][self::DOCUMENTATION] = $result;
+
+        return $result;
+    }
+
+    /**
      * Returns the human-readable description in English of the given entity field.
      *
      * @param string $entityClass
@@ -153,7 +176,29 @@ class EntityDescriptionProvider
      */
     public function humanizeAssociationName($associationName)
     {
-        return  $this->humanizePropertyPath($associationName);
+        return $this->humanizePropertyPath($associationName);
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    protected function findEntityDocumentation($entityClass)
+    {
+        $result = null;
+        $config = $this->getEntityConfig($entityClass);
+        if (null !== $config) {
+            $label = $config->get('description');
+            if ($label) {
+                $result = $this->translator->trans($label);
+                if ($result === $label) {
+                    $result = '';
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -197,6 +242,18 @@ class EntityDescriptionProvider
 
         return null !== $classMetadata
             ? $this->getFieldConfig($classMetadata->name, $linkedProperty)
+            : null;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return ConfigInterface|null
+     */
+    protected function getEntityConfig($entityClass)
+    {
+        return $this->entityConfigProvider->hasConfig($entityClass)
+            ? $this->entityConfigProvider->getConfig($entityClass)
             : null;
     }
 
