@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\KeySource;
 
+
+use Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
-use Oro\Bundle\WorkflowBundle\Translation\KeySource\DynamicTranslationKeySource;
 
 class DynamicTranslationKeySourceTest extends \PHPUnit_Framework_TestCase
 {

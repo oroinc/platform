@@ -11,7 +11,6 @@ class StepHandler extends AbstractHandler
      */
     protected $stepKeys = array(
         'name',
-        'label',
         'order',
         'is_final',
         '_is_start',
@@ -93,10 +92,6 @@ class StepHandler extends AbstractHandler
     {
         if (empty($step['name'])) {
             $step['name'] = uniqid('step_');
-        }
-
-        if (empty($step['label'])) {
-            $step['label'] = $step['name'];
         }
 
         if (empty($step['_is_start'])) {

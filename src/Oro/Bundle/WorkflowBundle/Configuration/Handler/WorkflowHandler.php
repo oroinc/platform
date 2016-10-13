@@ -11,7 +11,6 @@ class WorkflowHandler extends AbstractHandler
      */
     protected $workflowKeys = array(
         'name',
-        'label',
         'entity',
         'is_system',
         'start_step',
@@ -59,10 +58,6 @@ class WorkflowHandler extends AbstractHandler
     {
         if (empty($workflow['name'])) {
             $workflow['name'] = uniqid('workflow_');
-        }
-
-        if (empty($workflow['label'])) {
-            $workflow['label'] = $workflow['name'];
         }
 
         if (!empty($workflow['entity']) && !class_exists($workflow['entity'])) {
