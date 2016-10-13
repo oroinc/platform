@@ -18,7 +18,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertEquals('form', $options['form_name']);
     }
 
-    public function testBuildView()
+    public function testGetBlockView()
     {
         $formName       = 'test_form';
         $formActionPath = 'test_form_action_path';
@@ -55,7 +55,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testBuildViewWithRoute()
+    public function testGetBlockViewWithRoute()
     {
         $formName              = 'test_form';
         $formActionRoute       = 'test_form_action_route';
@@ -93,7 +93,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testBuildViewWithRouteWithoutParams()
+    public function testGetBlockViewWithRouteWithoutParams()
     {
         $formName        = 'test_form';
         $formActionRoute = 'test_form_action_route';
@@ -130,7 +130,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testBuildViewWithEmptyFormParams()
+    public function testGetBlockViewWithEmptyFormParams()
     {
         $formName = 'test_form';
         $formView = new FormView();
@@ -164,7 +164,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertArrayNotHasKey('enctype', $view->vars);
     }
 
-    public function testBuildViewWithOverrideOptions()
+    public function testGetBlockViewWithOverrideOptions()
     {
         $formName       = 'test_form';
         $formActionPath = 'test_form_action_path';
@@ -206,7 +206,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testBuildViewWithOverrideOptionsRoute()
+    public function testGetBlockViewWithOverrideOptionsRoute()
     {
         $formName              = 'test_form';
         $formActionRoute       = 'test_form_action_route';
@@ -250,7 +250,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testBuildViewWithOverrideOptionsRouteWithoutParams()
+    public function testGetBlockViewWithOverrideOptionsRouteWithoutParams()
     {
         $formName        = 'test_form';
         $formActionRoute = 'test_form_action_route';
@@ -296,7 +296,7 @@ class FormStartTypeTest extends BlockTypeTestCase
      * @expectedException \OutOfBoundsException
      * @expectedExceptionMessage Undefined index: test_form.
      */
-    public function testBuildViewWithoutForm()
+    public function testGetBlockViewWithoutForm()
     {
         $this->getBlockView(
             FormStartType::NAME,
@@ -310,7 +310,7 @@ class FormStartTypeTest extends BlockTypeTestCase
      * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface", "integer" given.
      */
     // @codingStandardsIgnoreEnd
-    public function testBuildViewWithInvalidForm()
+    public function testGetBlockViewWithInvalidForm()
     {
         $formName = 'test_form';
 

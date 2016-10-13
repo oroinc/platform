@@ -6,6 +6,7 @@ parameters:
 
     oro_menu.factory.acl_extension.class:                      Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
+
     oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
     oro_menu.builder_chain.class:                              Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
     oro_menu.configuration_builder.class:                      Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
@@ -64,7 +65,7 @@ services:
         class: %oro_menu.factory.acl_extension.class%
         arguments:
             - '@router'
-            - '@oro_security.security_facade'
+            - '@oro_security.security_facade.link'
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
 
@@ -74,16 +75,28 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_menu.factory:
-        class: %oro_menu.factory.class%
+        class: '%oro_menu.factory.class%'
         calls:
             - [ addExtension, [ '@oro_menu_feature_extension' ] ]
             - [ addExtension, [ '@oro_menu_acl_extension' ] ]
 
+    oro_menu.array_loader:
+        class: 'Knp\Menu\Loader\ArrayLoader'
+        public: false
+        arguments:
+            - "@oro_menu.factory"
+
+    oro_menu.manipulator:
+        class: 'Knp\Menu\Util\MenuManipulator'
+        public: false
+
     oro_menu.builder_chain:
-        class: %oro_menu.builder_chain.class%
+        class: '%oro_menu.builder_chain.class%'
         arguments:
             - '@oro_menu.factory'
             - '@event_dispatcher'
+            - '@oro_menu.array_loader'
+            - '@oro_menu.manipulator'
         tags:
             - { name: knp_menu.provider }
 
@@ -404,3 +417,18 @@ services:
             - '@oro_navigation.content.tag_generator_chain'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+
+    oro_navigation.menu_update.builder:
+        class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+        arguments:
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: oro_menu.builder }
+
+    oro_navigation.menu_update_provider.default:
+        class: Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_navigation.menu_update_provider, area: default }

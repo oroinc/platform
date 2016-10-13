@@ -10,8 +10,10 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class DatagridType extends AbstractContainerType
 {
@@ -39,7 +41,6 @@ class DatagridType extends AbstractContainerType
         $this->nameStrategy = $nameStrategy;
         $this->manager = $manager;
         $this->securityFacade = $securityFacade;
-
     }
 
     /**
@@ -60,7 +61,7 @@ class DatagridType extends AbstractContainerType
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         if ($options['split_to_cells']) {
             $columns = $this->getGridColumns($options['grid_name']);
@@ -93,14 +94,13 @@ class DatagridType extends AbstractContainerType
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        $view->vars['grid_name'] = $options['grid_name'];
-        $view->vars['grid_parameters'] = $options['grid_parameters'];
-        $view->vars['grid_render_parameters'] = $options['grid_render_parameters'];
+        BlockUtils::setViewVarsFromOptions($view, $options, ['grid_name', 'grid_parameters', 'grid_render_parameters']);
+
         $view->vars['split_to_cells'] = $options['split_to_cells'];
         if (!empty($options['grid_scope'])) {
-            $view->vars['grid_scope']     = $options['grid_scope'];
+            $view->vars['grid_scope']     = $options->get('grid_scope', false);
             $view->vars['grid_full_name'] = $this->nameStrategy->buildGridFullName(
                 $view->vars['grid_name'],
                 $view->vars['grid_scope']

@@ -19,6 +19,9 @@ class ObjectNormalizer
 {
     const MAX_NESTING_LEVEL = 1;
 
+    /** @var ObjectNormalizerRegistry */
+    protected $normalizerRegistry;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -28,25 +31,28 @@ class ObjectNormalizer
     /** @var DataTransformerInterface */
     protected $dataTransformer;
 
-    /** @var ObjectNormalizerRegistry */
-    private $normalizerRegistry;
+    /** @var ConfigNormalizer */
+    protected $configNormalizer;
 
     /**
      * @param ObjectNormalizerRegistry $normalizerRegistry
      * @param DoctrineHelper           $doctrineHelper
      * @param DataAccessorInterface    $dataAccessor
      * @param DataTransformerInterface $dataTransformer
+     * @param ConfigNormalizer         $configNormalizer
      */
     public function __construct(
         ObjectNormalizerRegistry $normalizerRegistry,
         DoctrineHelper $doctrineHelper,
         DataAccessorInterface $dataAccessor,
-        DataTransformerInterface $dataTransformer
+        DataTransformerInterface $dataTransformer,
+        ConfigNormalizer $configNormalizer
     ) {
         $this->normalizerRegistry = $normalizerRegistry;
         $this->doctrineHelper = $doctrineHelper;
         $this->dataAccessor = $dataAccessor;
         $this->dataTransformer = $dataTransformer;
+        $this->configNormalizer = $configNormalizer;
     }
 
     /**
@@ -58,6 +64,11 @@ class ObjectNormalizer
     public function normalizeObject($object, EntityDefinitionConfig $config = null)
     {
         if (null !== $object) {
+            if (null !== $config) {
+                $normalizedConfig = clone $config;
+                $this->configNormalizer->normalizeConfig($normalizedConfig);
+                $config = $normalizedConfig;
+            }
             $object = $this->normalizeValue($object, is_array($object) ? 0 : 1, $config);
         }
 
@@ -148,7 +159,7 @@ class ObjectNormalizer
             }
 
             $value = null;
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $propertyPath = $field->getPropertyPath($fieldName);
             if (ConfigUtil::isMetadataProperty($propertyPath)) {
                 $value = $this->getMetadataProperty($entityClass, $propertyPath);
             } elseif ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {

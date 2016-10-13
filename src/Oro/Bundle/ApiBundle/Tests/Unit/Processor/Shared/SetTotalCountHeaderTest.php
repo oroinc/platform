@@ -119,7 +119,6 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
                     $qb->setMaxResults(10);
 
                     return $qb;
-
                 }
             );
 

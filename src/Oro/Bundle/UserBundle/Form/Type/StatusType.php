@@ -21,7 +21,6 @@ class StatusType extends AbstractType
                 'required' => true,
             )
         );
-
     }
 
     /**

@@ -54,6 +54,7 @@ class SubresourcesProvider
         $context->setVersion($version);
         $context->getRequestType()->set($requestType);
         $context->setResources($this->resourcesProvider->getResources($version, $requestType));
+        $context->setAccessibleResources($this->resourcesProvider->getAccessibleResources($version, $requestType));
 
         $this->processor->process($context);
 

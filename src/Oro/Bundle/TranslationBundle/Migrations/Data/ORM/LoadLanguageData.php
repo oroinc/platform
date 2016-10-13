@@ -12,7 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
@@ -41,7 +40,7 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
 
         $defaultLanguage = $configManager->get(Configuration::getConfigKeyByName(Configuration::LANGUAGE));
         $enabledLanguages = (array)$configManager->get(Configuration::getConfigKeyByName('languages'));
-        $downloadedLanguages = array_keys((array)$configManager->get(TranslationStatusInterface::CONFIG_KEY));
+        $downloadedLanguages = array_keys((array)$configManager->get('oro_translation.available_translations'));
 
         /** English language must be in list by default, because we already have translations in *.en.yml files */
         $languages = array_unique(array_merge(['en', $defaultLanguage], $enabledLanguages, $downloadedLanguages));

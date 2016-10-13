@@ -17,23 +17,29 @@
                 margin-bottom: $offset-y-m;
             }
         }
+
+        &--has-twin-row {
+            &:not(:last-child) {
+                margin-bottom: 50px;
+            }
+        }
     }
 
     &__column {
         &-half {
-            width: (100% - $grid-offset) / 2;
-
             float: left;
+
+            width: (100% - $grid-offset) / 2;
 
             &:first-child {
                 margin-right: $grid-offset;
             }
 
-            @include breakpoint('tablet') {
+            @media (max-width: 991px) {
+                clear: left;
+
                 width: 100%;
                 margin-right: auto;
-
-                clear: left;
             }
         }
 
@@ -48,8 +54,16 @@
         }
     }
 
+    &__column {
+        float: left;
+
+        box-sizing: border-box;
+
+        padding: 0 9px;
+    }
+
     @for $i from 1 through $grid-count {
-        &__column-#{$i} {
+        &__column--#{$i} {
             width: (($i* 100%) / $grid-count);
         }
     }

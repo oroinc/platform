@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
@@ -76,6 +77,11 @@ class OperationListener
     {
         $config = $event->getConfig();
 
+        // datasource type other than ORM is not handled
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return;
+        }
+
         $this->datagridContext = $this->getDatagridContext($config);
         $this->operations = $this->getOperations(
             $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),
@@ -127,19 +133,14 @@ class OperationListener
     protected function getRowConfigurationClosure($actionConfiguration)
     {
         return function (ResultRecordInterface $record, array $config) use ($actionConfiguration) {
-            $actionsNew = [];
-            foreach ($this->operations as $operationName => $operation) {
-                $actionsNew[$operationName] = $this->getRowOperationConfig(
-                    $operation,
-                    $record->getValue('id')
-                );
-            }
-
             $configuration = $this->retrieveConfiguration($actionConfiguration, $record, $config);
 
-            foreach ($actionsNew as $name => $action) {
-                if (!array_key_exists($name, $configuration) || $configuration[$name] !== false) {
-                    $configuration[$name] = $action;
+            foreach ($this->operations as $operationName => $operation) {
+                if (!array_key_exists($operationName, $configuration) || $configuration[$operationName] !== false) {
+                    $configuration[$operationName] = $this->getRowOperationConfig(
+                        $operation,
+                        $record->getValue('id')
+                    );
                 }
             }
 
