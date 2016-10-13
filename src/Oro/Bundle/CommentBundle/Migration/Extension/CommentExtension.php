@@ -70,7 +70,17 @@ class CommentExtension implements ExtendExtensionAwareInterface
     public function hasCommentAssociation(Schema $schema, $targetTableName)
     {
         $commentTable = $schema->getTable(self::COMMENT_TABLE_NAME);
+        $targetTable  = $schema->getTable($targetTableName);
 
-        return $commentTable->hasColumn($targetTableName);
+        $associationName = ExtendHelper::buildAssociationName(
+            $this->extendExtension->getEntityClassByTableName($targetTableName)
+        );
+        $primaryKeyColumnName = $this->extendExtension->getPrimaryKeyColumnName($targetTable);
+        $selfColumnName       = $this->extendExtension->nameGenerator->generateRelationColumnName(
+            $associationName,
+            '_' . $primaryKeyColumnName
+        );
+
+        return $commentTable->hasColumn($selfColumnName);
     }
 }
