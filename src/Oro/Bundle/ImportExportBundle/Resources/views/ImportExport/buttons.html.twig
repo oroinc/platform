@@ -18,7 +18,7 @@
     {% set exportTemplateProcessor = exportTemplateProcessor is iterable ? exportTemplateProcessor[0] : exportTemplateProcessor %}
 {% endif %}
 
-{% set exportTemplateLabel = exportTemplatelabel|default('oro.importexport.export_template.label'|trans) %}
+{% set exportTemplateLabel = exportTemplateLabel|default('oro.importexport.export_template.label'|trans) %}
 
 {% if exportAllowed or importAllowed %}
     <span class="pull-left"
@@ -38,7 +38,7 @@
                 exportProcessor: exportProcessor|default(null),
                 isExportPopupRequired: isExportPopupRequired|default(false),
 
-                exportTemplateTitle: exportTemplateLabel|default(exportLabel),
+                exportTemplateTitle: exportTemplateTitle|default(exportLabel),
                 exportTemplateJob: exportTemplateJob|default(null),
                 exportTemplateProcessor: exportTemplateProcessor|default(null),
                 isExportTemplatePopupRequired: isExportTemplatePopupRequired|default(false),

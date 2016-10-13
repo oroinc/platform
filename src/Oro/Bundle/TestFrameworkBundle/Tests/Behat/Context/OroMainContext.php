@@ -124,21 +124,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^(?:|I )click update schema$/
-     */
-    public function iClickUpdateSchema()
-    {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-        $page = $this->getPage();
-
-        $page->clickLink('Update schema');
-        $driver->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $driver->waitForAjax(120000);
-    }
-
-    /**
      * @Then page has :header header
      */
     public function pageHasHeader($header)
@@ -154,6 +139,14 @@ class OroMainContext extends MinkContext implements
     public function closeErrorMessage()
     {
         $this->createOroForm()->find('css', '.alert-error button.close')->press();
+    }
+
+    /**
+     * @Then /^(?:|I )close ui dialog$/
+     */
+    public function closeUiDialog()
+    {
+        $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
     }
 
     /**
@@ -374,7 +367,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I go to System/ Channels
      * Example: And go to System/ User Management/ Users
      *
-     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)([^":]*)))$/
+     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)(?!.*page)([^"]*)))$/
      */
     public function iOpenTheMenuAndClick($path)
     {
@@ -405,14 +398,6 @@ class OroMainContext extends MinkContext implements
     public function iSaveForm()
     {
         $this->createOroForm()->save();
-    }
-
-    /**
-     * @Given /^(?:|I |I'm )edit entity$/
-     */
-    public function iMEditEntity()
-    {
-        $this->createElement('Entity Edit Button')->click();
     }
 
     /**

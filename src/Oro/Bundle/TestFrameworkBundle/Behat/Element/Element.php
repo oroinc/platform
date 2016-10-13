@@ -118,6 +118,14 @@ class Element extends NodeElement
     }
 
     /**
+     * @return bool
+     */
+    public function isIsset()
+    {
+        return 0 !== count($this->getDriver()->find($this->getXpath()));
+    }
+
+    /**
      * @param string $name Element name
      *
      * @return Element
