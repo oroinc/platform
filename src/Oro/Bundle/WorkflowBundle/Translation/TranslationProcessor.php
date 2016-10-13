@@ -96,7 +96,7 @@ class TranslationProcessor implements
         $previousDefinition = $changesEvent->getPrevious();
 
         if ($previousDefinition === null) {
-            throw new \LogicException('Previous WorkflowDefinition expected. Got null');
+            throw new \LogicException('Previous WorkflowDefinition expected. But got null.');
         }
 
         $updatedDefinitionKeys = $this->translationFieldsIterator->iterateWorkflowDefinition(
@@ -141,7 +141,7 @@ class TranslationProcessor implements
         return [
             WorkflowEvents::WORKFLOW_AFTER_CREATE => 'ensureTranslationKeys',
             WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'clearTranslationKeys',
-            WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTranslationKeys',
+            WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTranslationKeys'
         ];
     }
 }
