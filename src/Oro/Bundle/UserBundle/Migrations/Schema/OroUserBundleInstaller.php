@@ -29,6 +29,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation 
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -130,6 +131,7 @@ class OroUserBundleInstaller implements
         AddEmailUserColumn::updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
+        AddImpersonationTable::createOroUserImpersonationTable($schema);
     }
 
     /**

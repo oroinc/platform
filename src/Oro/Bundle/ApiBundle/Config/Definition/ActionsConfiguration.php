@@ -35,6 +35,13 @@ class ActionsConfiguration extends AbstractConfigurationSection
         /** @var NodeBuilder $actionNode */
         $actionNode = $node->end()
             ->useAttributeAsKey('name')
+            ->beforeNormalization()
+                ->always(function ($value) {
+                    return false === $value
+                        ? array_fill_keys($this->permissibleActions, false)
+                        : $value;
+                })
+            ->end()
             ->validate()
                 ->always(function ($value) {
                     $unknownActions = array_diff(array_keys($value), $this->permissibleActions);

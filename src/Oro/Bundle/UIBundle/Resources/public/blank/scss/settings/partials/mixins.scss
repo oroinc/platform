@@ -30,6 +30,12 @@
     @return $z-index;
 }
 
+@mixin list-normalize() {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 // Use: @include breakpoint('desktop') {
 //  content
 //}
@@ -37,6 +43,8 @@
     $breakpoints: (
         'desktop': '(min-width: ' + $breakpoint-desktop + ')',
         'tablet': '(max-width: ' +  $breakpoint-tablet + ')',
+        'tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ')',
+        'mobile-portrait': '(max-width: ' +  $breakpoint-mobile-portrait + ')',
         'mobile': '(max-width: ' + $breakpoint-mobile + ')'
     );
 

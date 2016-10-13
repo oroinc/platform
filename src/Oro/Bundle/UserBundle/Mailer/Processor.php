@@ -10,6 +10,7 @@ class Processor extends BaseProcessor
     const TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN = 'user_reset_password_as_admin';
     const TEMPLATE_USER_CHANGE_PASSWORD         = 'user_change_password';
     const TEMPLATE_FORCE_RESET_PASSWORD         = 'force_reset_password';
+    const TEMPLATE_USER_IMPERSONATE             = 'user_impersonate';
 
     /**
      * @param UserInterface $user
@@ -63,6 +64,20 @@ class Processor extends BaseProcessor
         return $this->getEmailTemplateAndSendEmail(
             $user,
             static::TEMPLATE_FORCE_RESET_PASSWORD,
+            ['entity' => $user]
+        );
+    }
+
+    /**
+     * @param UserInterface $user
+     *
+     * @return int
+     */
+    public function sendImpersonateEmail(UserInterface $user)
+    {
+        return $this->getEmailTemplateAndSendEmail(
+            $user,
+            static::TEMPLATE_USER_IMPERSONATE,
             ['entity' => $user]
         );
     }

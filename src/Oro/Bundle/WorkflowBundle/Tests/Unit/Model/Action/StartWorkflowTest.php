@@ -222,6 +222,5 @@ class StartWorkflowTest extends \PHPUnit_Framework_TestCase
 
         $this->action->initialize($options);
         $this->action->execute($context);
-
     }
 }

@@ -440,7 +440,7 @@ class LoggableManager
                 $old = $changes[0];
                 $new = $changes[1];
 
-                if ($old == $new) {
+                if ($old === $new) {
                     continue;
                 }
 

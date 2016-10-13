@@ -19,6 +19,9 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
+    const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
+    const API_DOC_PARH = 'oro_api.api_doc.path';
+
     const ACTION_PROCESSOR_BAG_SERVICE_ID             = 'oro_api.action_processor_bag';
     const ACTION_PROCESSOR_TAG                        = 'oro.api.action_processor';
     const CONFIG_EXTENSION_REGISTRY_SERVICE_ID        = 'oro_api.config_extension_registry';
@@ -29,6 +32,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     const COLLECT_RESOURCES_PROCESSOR_SERVICE_ID      = 'oro_api.collect_resources.processor';
     const COLLECT_SUBRESOURCES_PROCESSOR_SERVICE_ID   = 'oro_api.collect_subresources.processor';
     const CUSTOMIZE_LOADED_DATA_PROCESSOR_SERVICE_ID  = 'oro_api.customize_loaded_data.processor';
+    const CUSTOMIZE_FORM_DATA_PROCESSOR_SERVICE_ID    = 'oro_api.customize_form_data.processor';
     const GET_CONFIG_PROCESSOR_SERVICE_ID             = 'oro_api.get_config.processor';
     const GET_RELATION_CONFIG_PROCESSOR_SERVICE_ID    = 'oro_api.get_relation_config.processor';
     const GET_METADATA_PROCESSOR_SERVICE_ID           = 'oro_api.get_metadata.processor';
@@ -43,6 +47,8 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('data_transformers.yml');
@@ -73,6 +79,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
          * To load configuration we need fully configured config tree builder,
          * that's why the action processors bag and all configuration extensions should be registered before.
          */
+        $this->registerConfigParameters($container, $config);
         $this->registerActionProcessors($container);
         $this->registerConfigExtensions($container);
 
@@ -152,6 +159,10 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         );
         DependencyInjectionUtil::registerDebugService(
             $container,
+            self::CUSTOMIZE_FORM_DATA_PROCESSOR_SERVICE_ID
+        );
+        DependencyInjectionUtil::registerDebugService(
+            $container,
             self::GET_CONFIG_PROCESSOR_SERVICE_ID
         );
         DependencyInjectionUtil::registerDebugService(
@@ -207,6 +218,19 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $chainProviderDef = $container->getDefinition(self::ENTITY_EXCLUSION_PROVIDER_SERVICE_ID);
         $chainProviderDef->replaceArgument(1, $inclusions);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    protected function registerConfigParameters(ContainerBuilder $container, array $config)
+    {
+        $container
+            ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
+            ->replaceArgument(0, $config['config_max_nesting_level']);
+        $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, $config['api_doc_views']);
+        $container->setParameter(self::API_DOC_PARH, $config['documentation_path']);
     }
 
     /**

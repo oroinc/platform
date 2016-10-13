@@ -42,8 +42,23 @@ define(['jquery'], function($) {
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
             var $autoFocus = $input.filter('[autofocus]');
             if ($autoFocus.length || $input.length) {
-                ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+                var $element = ($autoFocus.length ? $autoFocus : $input).first();
+                if ($element.isInViewPort()) {
+                    $element.setCursorToEnd().focus();
+                }
             }
+        },
+
+        isInViewPort: function() {
+            var $element = $(this);
+            var elementTop = $element.offset().top;
+            var elementBottom = elementTop + $element.height();
+            var viewPortTop = $(window).scrollTop();
+            var viewPortBottom = viewPortTop + $(window).height();
+
+            return (
+                (elementTop >= viewPortTop) && (elementBottom <= viewPortBottom)
+            );
         },
 
         focus: (function(orig) {

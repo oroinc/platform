@@ -85,6 +85,8 @@ class Form extends Element
 
     /**
      * {@inheritdoc}
+     * @todo Move behat elements to Driver layer. BAP-11887.
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function findField($locator)
     {
@@ -99,6 +101,10 @@ class Form extends Element
 
             if ($field->hasAttribute('type') && 'checkbox' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('Checkbox', $field);
+            }
+
+            if ($field->hasClass('select2-offscreen')) {
+                return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
 
             return $field;
@@ -139,6 +145,8 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif ($sndParent->hasClass('control-group-choice')) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
+            } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
+                return $field;
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }

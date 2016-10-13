@@ -1,6 +1,6 @@
 <?php
 
-namespace LayoutBundle\Tests\Unit\Layout\Processor;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Processor;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
@@ -148,7 +148,6 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['third'] = '=true == first';
 
         $this->processor->processExpressions($values, $context, $data, true, null);
-
     }
 
 
@@ -193,7 +192,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['scalar'] = 123;
         $values['attr']['enabled'] = '=true';
         $values['label_attr']['enabled'] = '=true';
-
+        
         $initialVars = $values;
 
         $this->processor->processExpressions($values, $context, $data, false, null);
@@ -204,7 +203,6 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessExpressionsEncodesAllExpressions()
     {
         $context = new LayoutContext();
-        $context->set('expressions_evaluate_deferred', true);
         $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $trueExpr = new ParsedExpression('true', new ConstantNode(true));
 
@@ -220,7 +218,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['label_attr']['enabled'] = '=true';
 
         $this->processor->processExpressions($values, $context, $data, false, 'json');
-
+        
         $trueExprJson = __DIR__.'/data/true_expression.json';
 
         $this->assertJsonStringEqualsJsonFile(

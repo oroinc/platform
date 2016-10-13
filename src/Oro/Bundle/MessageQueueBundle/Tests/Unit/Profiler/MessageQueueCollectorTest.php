@@ -28,7 +28,7 @@ class MessageQueueCollectorTest extends \PHPUnit_Framework_TestCase
     {
         $collector = new MessageQueueCollector($this->createMessageProducerMock());
 
-        $this->assertEquals('oro.message_queue', $collector->getName());
+        $this->assertEquals('message_queue', $collector->getName());
     }
 
     public function testShouldReturnEmptySentMessageArrayIfNotTraceableMessageProducer()

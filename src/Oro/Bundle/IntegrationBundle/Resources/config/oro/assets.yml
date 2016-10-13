@@ -1,0 +1,4 @@
+assets:
+    css:
+        'orointegration':
+          - 'bundles/orointegration/css/style.css'

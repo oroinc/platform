@@ -132,6 +132,17 @@ oro:
         organization.label:          Organization
         business_unit.label:         Business Unit
 
+        impersonation:
+            entity_label: Impersonation
+            entity_plural_label: Impersonations
+            id.label: Id
+            expire_at.label: Expire At
+            login_at.label: Login At
+            token.label: Token
+            user.label: User
+            notify.label: Notify
+            notification_error: Error while sending impersonation notification
+
         # extended field added in migrations
         title.label:                 Title
 
