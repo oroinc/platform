@@ -91,7 +91,7 @@ class PasswordComplexityValidator extends ConstraintValidator
      */
     protected function validMinLength($value, PasswordComplexity $constraint)
     {
-        return strlen($value) >= $this->getMinLength($constraint);
+        return mb_strlen($value) >= $this->getMinLength($constraint);
     }
 
     /**
