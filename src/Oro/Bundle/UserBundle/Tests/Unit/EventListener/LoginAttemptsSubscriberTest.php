@@ -8,19 +8,16 @@ use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Oro\Bundle\UserBundle\EventListener\LoginHistorySubscriber;
+use Oro\Bundle\UserBundle\EventListener\LoginAttemptsSubscriber;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsProvider;
-use Oro\Bundle\UserBundle\Security\LoginHistoryManager;
 
-class LoginHistorySubscriberTest extends \PHPUnit_Framework_TestCase
+class LoginAttemptsSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     public function testDoesNotDisableUserOnRemainingAttempts()
     {
-        $user = new User();
-        $user->setEnabled(true);
-        $user->setUsername('john');
-        $subscriber = $this->getSubscriber(3, 1, $user);
+        $user = $this->getUser();
+        $subscriber = $this->getSubscriber(3, $user);
         $event = $this->getEvent($user->getUsername());
 
         $subscriber->onAuthenticationFailure($event);
@@ -28,12 +25,22 @@ class LoginHistorySubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->isEnabled());
     }
 
+    public function testIncrementCountersOnFailedLogin()
+    {
+        $user = $this->getUser();
+        $subscriber = $this->getSubscriber(3, $user);
+        $event = $this->getEvent($user->getUsername());
+
+        $subscriber->onAuthenticationFailure($event);
+
+        $this->assertSame(1, $user->getDailyFailedLoginCount());
+        $this->assertSame(1, $user->getFailedLoginCount());
+    }
+
     public function testDisableUser()
     {
-        $user = new User();
-        $user->setEnabled(true);
-        $user->setUsername('john');
-        $subscriber = $this->getSubscriber(0, 1, $user);
+        $user = $this->getUser();
+        $subscriber = $this->getSubscriber(0, $user);
         $event = $this->getEvent($user->getUsername());
 
         $subscriber->onAuthenticationFailure($event);
@@ -43,26 +50,22 @@ class LoginHistorySubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testDoesNotLogEmptyUsernames()
     {
-        $subscriber = $this->getSubscriber(0, 0, null);
+        $subscriber = $this->getSubscriber(0, null);
         $event = $this->getEvent('john');
 
         $subscriber->onAuthenticationFailure($event);
     }
 
     /**
-     * @param int $nbUserLogins
-     * @return LoginHistoryManager
+     * @return User
      */
-    private function getLoginHistoryManager($nbUserLogins)
+    private function getUser()
     {
-        $provider = $this->getMockBuilder(LoginHistoryManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $user = new User();
+        $user->setEnabled(true);
+        $user->setUsername('john');
 
-        $provider->expects($this->exactly($nbUserLogins))
-            ->method('logUserLogin');
-
-        return $provider;
+        return $user;
     }
 
     /**
@@ -78,6 +81,10 @@ class LoginHistorySubscriberTest extends \PHPUnit_Framework_TestCase
         $provider->expects($this->any())
             ->method('getByUser')
             ->willReturn($remainingAttempts);
+
+        $provider->expects($this->any())
+            ->method('hasRemainingAttempts')
+            ->willReturn(0 !== $remainingAttempts);
 
         return $provider;
     }
@@ -136,14 +143,12 @@ class LoginHistorySubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $remainingAttempts
-     * @param int $nbUserLogins
      * @param UserInterface|null $user
-     * @return LoginHistorySubscriber
+     * @return LoginAttemptsSubscriber
      */
-    private function getSubscriber($remainingAttempts, $nbUserLogins, UserInterface $user = null)
+    private function getSubscriber($remainingAttempts, UserInterface $user = null)
     {
-        return new LoginHistorySubscriber(
-            $this->getLoginHistoryManager($nbUserLogins),
+        return new LoginAttemptsSubscriber(
             $this->getLoginAttemptsProvider($remainingAttempts),
             $this->getUserManager($user),
             $this->getMailProcessor()

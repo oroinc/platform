@@ -133,7 +133,6 @@ class OroUserBundleInstaller implements
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
-        CreateLoginHistoryTable::createOroUserLoginHistoryTable($schema);
     }
 
     /**
@@ -206,6 +205,12 @@ class OroUserBundleInstaller implements
         $table->addColumn('password_requested', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('last_login', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('login_count', 'integer', ['default' => '0', 'precision' => 0, 'unsigned' => true]);
+        $table->addColumn('failed_login_count', 'integer', ['default' => '0', 'precision' => 0, 'unsigned' => true]);
+        $table->addColumn(
+            'daily_failed_login_count',
+            'integer',
+            ['default' => '0', 'precision' => 0, 'unsigned' => true]
+        );
         $table->addColumn('createdAt', 'datetime', ['precision' => 0]);
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');

@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Entity\Repository\LoginHistoryRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsProvider;
 
@@ -17,7 +14,6 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
     public function testShouldReturnNullForUnknownUsername()
     {
         $provider = new LoginAttemptsProvider(
-            $this->getDoctrine(1, 2),
             $this->getConfigManager(10, 20),
             $this->getUserManager(null)
         );
@@ -27,13 +23,14 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnAttemptsByUsername()
     {
+        $user = $this->getUser(1, 1);
+
         $provider = new LoginAttemptsProvider(
-            $this->getDoctrine(1, 2),
             $this->getConfigManager(10, 20),
-            $this->getUserManager(new User())
+            $this->getUserManager($user)
         );
 
-        $this->assertSame(9, $provider->getByUser(new User()));
+        $this->assertSame(9, $provider->getByUsername($user->getUsername()));
     }
 
     /**
@@ -41,18 +38,18 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testShouldReturnExceededLimitPerUser(
         $dailyAttempts,
-        $cumutativeAttempts,
+        $cumulativeAttempts,
         $dailyLimit,
         $cumulativeLimit,
         $expected
     ) {
+        $user = $this->getUser($dailyAttempts, $cumulativeAttempts);
         $provider = new LoginAttemptsProvider(
-            $this->getDoctrine($dailyAttempts, $cumutativeAttempts),
             $this->getConfigManager($dailyLimit, $cumulativeLimit),
-            $this->getUserManager(new User())
+            $this->getUserManager($user)
         );
 
-        $this->assertSame($expected, $provider->getExceedLimit(new User()));
+        $this->assertSame($expected, $provider->getExceedLimit($user));
     }
 
     /**
@@ -72,18 +69,18 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testShouldReturnRemainingLoginAttemptsPerUser(
         $dailyAttempts,
-        $cumutativeAttempts,
+        $cumulativeAttempts,
         $dailyLimit,
         $cumulativeLimit,
         $expected
     ) {
+        $user = $this->getUser($dailyAttempts, $cumulativeAttempts);
         $provider = new LoginAttemptsProvider(
-            $this->getDoctrine($dailyAttempts, $cumutativeAttempts),
             $this->getConfigManager($dailyLimit, $cumulativeLimit),
-            $this->getUserManager(new User())
+            $this->getUserManager($user)
         );
 
-        $this->assertSame($expected, $provider->getByUser(new User()));
+        $this->assertSame($expected, $provider->getByUser($user));
     }
 
     /**
@@ -101,11 +98,26 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  int $maxAttempts
+     * @param  int $dailyAttempts
+     * @param  int $cumulativeAttempts
+     * @return User
+     */
+    private function getUser($dailyAttempts, $cumulativeAttempts)
+    {
+        $user = new User();
+        $user->setUsername('john_doe');
+        $user->setDailyFailedLoginCount($dailyAttempts);
+        $user->setFailedLoginCount($cumulativeAttempts);
+
+        return $user;
+    }
+
+    /**
      * @param  int $maxDailyAttempts
+     * @param  int $maxAttempts
      * @return ConfigManager
      */
-    private function getConfigManager($maxAttempts, $maxDailyAttempts)
+    private function getConfigManager($maxDailyAttempts, $maxAttempts)
     {
         $manager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
@@ -119,36 +131,6 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
             ]));
 
         return $manager;
-    }
-
-    /**
-     * @param  int $cumutativeLogins
-     * @param  int $dailyLogins
-     * @return Registry
-     */
-    private function getDoctrine($cumutativeLogins, $dailyLogins)
-    {
-        $repository = $this->getMockBuilder(LoginHistoryRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository->expects($this->any())
-            ->method('countUserCumulativeFailedLogins')
-            ->willReturn($cumutativeLogins);
-
-        $repository->expects($this->any())
-            ->method('countUserDailyFailedLogins')
-            ->willReturn($dailyLogins);
-
-        $registry = $this->getMockBuilder(Registry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $registry->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($repository);
-
-        return $registry;
     }
 
     /**

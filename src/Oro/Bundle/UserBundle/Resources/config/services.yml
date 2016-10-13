@@ -442,22 +442,15 @@ services:
             - '@request_stack'
             - '@security.context'
 
-    oro_user.security.login_history_manager:
-        class: Oro\Bundle\UserBundle\Security\LoginHistoryManager
-        arguments:
-            - '@doctrine.orm.entity_manager'
-
     oro_user.security.login_attempts_provider:
         class: Oro\Bundle\UserBundle\Security\LoginAttemptsProvider
         arguments:
-            - '@doctrine'
             - '@oro_config.user'
             - '@oro_user.manager'
 
-    oro_user.security.login_history_subscriber:
-        class: Oro\Bundle\UserBundle\EventListener\LoginHistorySubscriber
+    oro_user.security.login_attempts_subscriber:
+        class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsSubscriber
         arguments:
-            - '@oro_user.security.login_history_manager'
             - '@oro_user.security.login_attempts_provider'
             - '@oro_user.manager'
             - '@oro_user.mailer.processor'

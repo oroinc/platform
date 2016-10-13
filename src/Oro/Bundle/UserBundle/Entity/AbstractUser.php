@@ -122,6 +122,20 @@ abstract class AbstractUser implements
     protected $loginCount;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
+     */
+    protected $failedLoginCount;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="daily_failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
+     */
+    protected $dailyFailedLoginCount;
+
+    /**
      * @var bool
      *
      * @ORM\Column(type="boolean")
@@ -234,6 +248,8 @@ abstract class AbstractUser implements
         $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
         $this->roles = new ArrayCollection();
         $this->organizations = new ArrayCollection();
+        $this->failedLoginCount = 0;
+        $this->dailyFailedLoginCount = 0;
     }
 
     /**
@@ -343,6 +359,46 @@ abstract class AbstractUser implements
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @return AbstractUser
+     */
+    public function setFailedLoginCount($count)
+    {
+        $this->failedLoginCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFailedLoginCount()
+    {
+        return $this->failedLoginCount;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return AbstractUser
+     */
+    public function setDailyFailedLoginCount($count)
+    {
+        $this->dailyFailedLoginCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDailyFailedLoginCount()
+    {
+        return $this->dailyFailedLoginCount;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getSalt()
@@ -429,6 +485,12 @@ abstract class AbstractUser implements
      */
     public function setEnabled($enabled)
     {
+        // reset failed logins counter when user is re-activated
+        if ($enabled && !$this->enabled) {
+            $this->setFailedLoginCount(0);
+            $this->setDailyFailedLoginCount(0);
+        }
+
         $this->enabled = (bool)$enabled;
 
         return $this;

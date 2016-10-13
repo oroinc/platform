@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -14,9 +12,6 @@ class LoginAttemptsProvider
 {
     const MAX_LOGIN_ATTEMPTS = 'oro_user.login_attempts';
     const MAX_DAILY_LOGIN_ATTEMPTS = 'oro_user.daily_login_attempts';
-
-    /** @var Registry */
-    protected $doctrine;
 
     /** @var  ConfigManager */
     protected $configManager;
@@ -30,11 +25,9 @@ class LoginAttemptsProvider
      * @param BaseUserManager $userManager
      */
     public function __construct(
-        Registry $registry,
         ConfigManager $configManager,
         BaseUserManager $userManager
     ) {
-        $this->doctrine = $registry;
         $this->configManager = $configManager;
         $this->userManager = $userManager;
     }
@@ -86,15 +79,18 @@ class LoginAttemptsProvider
         return 0;
     }
 
+    public function hasRemainingAttempts(UserInterface $user)
+    {
+        return 0 !== $this->getByUser($user);
+    }
+
     /**
      * @param  UserInterface $user
      * @return int
      */
     public function getRemainingCumulativeLoginAttempts(UserInterface $user)
     {
-        $cumulativeCount = $this->getLoginHistoryRepository()->countUserCumulativeFailedLogins($user);
-
-        return $this->getMaxCumulativeLoginAttempts() - $cumulativeCount;
+        return $this->getMaxCumulativeLoginAttempts() - $user->getFailedLoginCount();
     }
 
     /**
@@ -103,9 +99,7 @@ class LoginAttemptsProvider
      */
     public function getRemainingDailyLoginAttempts(UserInterface $user)
     {
-        $dailyCount = $this->getLoginHistoryRepository()->countUserDailyFailedLogins($user);
-
-        return $this->getMaxDailyLoginAttempts() - $dailyCount;
+        return $this->getMaxDailyLoginAttempts() - $user->getDailyFailedLoginCount();
     }
 
     /**
@@ -122,13 +116,5 @@ class LoginAttemptsProvider
     public function getMaxDailyLoginAttempts()
     {
         return $this->configManager->get(self::MAX_DAILY_LOGIN_ATTEMPTS);
-    }
-
-    /**
-     * @return LoginHistoryRepository
-     */
-    protected function getLoginHistoryRepository()
-    {
-        return $this->doctrine->getRepository('OroUserBundle:LoginHistory');
     }
 }
