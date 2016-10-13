@@ -38,7 +38,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertAttributeEquals(
             $expected,
-            'loadedDocumentation',
+            'loadedData',
             $apiDocParser
         );
     }
@@ -103,43 +103,55 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     public function getFieldDocumentationProvider()
     {
         return [
-            'only common doc exists'           => [
+            'only common doc exists'                                               => [
                 '<p>Description for ID field</p>',
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'id',
                 'get'
             ],
-            'common doc should be used'        => [
+            'common doc should be used'                                            => [
                 '<p>Description for NAME field</p>',
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'name',
                 'get'
             ],
-            'action doc should be used'        => [
-                '<p>Description for NAME field for CREATE action</p>',
+            'action doc should be used'                                            => [
+                '<p>Description for NAME field for DELETE action</p>',
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                'name',
+                'delete'
+            ],
+            'action doc should be used (the first action in #### Create, Update)'  => [
+                '<p>Description for NAME field for CREATE and UPDATE actions</p>',
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'name',
                 'create'
             ],
-            'names should be case insensitive' => [
-                '<p>Description for NAME field for CREATE action</p>',
+            'action doc should be used (the second action in #### Create, Update)' => [
+                '<p>Description for NAME field for CREATE and UPDATE actions</p>',
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                'name',
+                'update'
+            ],
+            'names should be case insensitive'                                     => [
+                '<p>Description for NAME field for CREATE and UPDATE actions</p>',
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'NAME',
                 'CREATE'
             ],
-            'unknown field'                    => [
+            'unknown field'                                                        => [
                 null,
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'unknown',
                 'get'
             ],
-            'unknown fields group'             => [
+            'unknown fields group'                                                 => [
                 null,
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
                 'name',
                 'get'
             ],
-            'unknown class'                    => [
+            'unknown class'                                                        => [
                 null,
                 'Test\UnknownClass',
                 'name',
@@ -188,6 +200,55 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 null,
                 'Test\UnknownClass',
                 'name'
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getSubresourceDocumentationProvider
+     */
+    public function testGetSubresourceDocumentation($expected, $className, $subresourceName, $actionName)
+    {
+        $apiDocParser = $this->loadDocument();
+
+        $this->assertSame(
+            $expected,
+            $apiDocParser->getSubresourceDocumentation($className, $subresourceName, $actionName)
+        );
+    }
+
+    public function getSubresourceDocumentationProvider()
+    {
+        return [
+            'known sub-resource'               => [
+                '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>',
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                'contacts',
+                'get_subresource'
+            ],
+            'names should be case insensitive' => [
+                '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>',
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                'CONTACTS',
+                'GET_SUBRESOURCE'
+            ],
+            'unknown sub-resource'             => [
+                null,
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                'unknown',
+                'get_subresource'
+            ],
+            'unknown subresources group'       => [
+                null,
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                'contacts',
+                'get_subresource'
+            ],
+            'unknown class'                    => [
+                null,
+                'Test\UnknownClass',
+                'contacts',
+                'get_subresource'
             ],
         ];
     }

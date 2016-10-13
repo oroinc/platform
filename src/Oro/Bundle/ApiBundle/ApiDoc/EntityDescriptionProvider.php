@@ -153,7 +153,7 @@ class EntityDescriptionProvider
      */
     public function humanizeAssociationName($associationName)
     {
-        return  $this->humanizePropertyPath($associationName);
+        return $this->humanizePropertyPath($associationName);
     }
 
     /**

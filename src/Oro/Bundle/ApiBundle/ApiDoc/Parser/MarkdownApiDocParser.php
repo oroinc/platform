@@ -6,35 +6,48 @@ use Michelf\Markdown;
 
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 class MarkdownApiDocParser
 {
     /**
      * @var array
      *
-     * [OroCRM\Bundle\SalesBundle\Entity\Opportunity] => Array
-     *  [<section name>] =>
-     *      [<element name>] => '<element description>'
+     * [
+     *  class name => [
+     *      "actions" => [
+     *          action name => action description,
+     *          ...
+     *      ],
+     *      "fields" => [
+     *          field name => [
+     *              action name => field description,
+     *              ...
+     *          ],
+     *          ...
+     *      ],
+     *      "filters" => [
+     *          filter name => filter description,
+     *          ...
+     *      ],
+     *      "subresources" => [
+     *          sub-resource name => [
+     *              action name => sub-resource description,
+     *              ...
+     *          ],
+     *          ...
+     *      ],
+     *  ],
      *  ...
-     *  [actions] => Array
-     *      [GET_LIST] => 'action GET_LIST description'
-     *      ...
-     *      [CREATE]   => 'action GET description'
-     *  [fields] => Array
-     *      [field1]  => 'field 1 description'
-     *      ...
-     *      [field_N] => 'field N description'
-     *  [filters] => Array
-     *      [field1]  => 'field 1 description'
-     *      ...
-     *      [field_N] => 'field N description'
+     * ]
      */
-    public $loadedDocumentation = [];
+    protected $loadedData = [];
 
     /** @var FileLocator */
     protected $fileLocator;
 
-    /** @var [string] */
-    protected $parsedDocumentation = [];
+    /** @var string[] */
+    protected $parsedFiles = [];
 
     /**
      * @param FileLocator $fileLocator
@@ -52,7 +65,7 @@ class MarkdownApiDocParser
      */
     public function getActionDocumentation($className, $actionName)
     {
-        return $this->getDocumentation($className, 'actions', $actionName);
+        return $this->getDocumentation($className, ConfigUtil::ACTIONS, $actionName);
     }
 
     /**
@@ -64,7 +77,7 @@ class MarkdownApiDocParser
      */
     public function getFieldDocumentation($className, $fieldName, $actionName)
     {
-        return $this->getDocumentation($className, 'fields', $fieldName, $actionName);
+        return $this->getDocumentation($className, ConfigUtil::FIELDS, $fieldName, $actionName);
     }
 
     /**
@@ -75,19 +88,55 @@ class MarkdownApiDocParser
      */
     public function getFilterDocumentation($className, $filterName)
     {
-        return $this->getDocumentation($className, 'filters', $filterName);
+        return $this->getDocumentation($className, ConfigUtil::FILTERS, $filterName);
     }
 
     /**
-     * @param string $resourceLink
+     * @param string $className
+     * @param string $subresourceName
+     * @param string $actionName
+     *
+     * @return string|null
      */
-    public function parseDocumentationResource($resourceLink)
+    public function getSubresourceDocumentation($className, $subresourceName, $actionName)
     {
-        $fileContent = $this->getFileContent($resourceLink);
-        if (!$fileContent) {
-            return;
+        return $this->getDocumentation($className, ConfigUtil::SUBRESOURCES, $subresourceName, $actionName);
+    }
+
+    /**
+     * @param mixed $resource
+     *
+     * @return bool TRUE if the given resource is supported; otherwise, FALSE.
+     */
+    public function parseDocumentationResource($resource)
+    {
+        if (!is_string($resource)) {
+            // unsupported resource type
+            return false;
         }
 
+        $pos = strrpos($resource, '.md');
+        if (false === $pos) {
+            // unsupported resource
+            return false;
+        }
+
+        $filePath = $this->fileLocator->locate(substr($resource, 0, $pos + 3));
+        if (!isset($this->parsedFiles[$filePath])) {
+            $this->parseDocumentation(file_get_contents($filePath));
+
+            // store parsed documentations file paths to avoid unnecessary parsing
+            $this->parsedFiles[$filePath] = true;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $fileContent
+     */
+    protected function parseDocumentation($fileContent)
+    {
         $parser = new Markdown();
         $html = $parser->transform($fileContent);
 
@@ -98,48 +147,92 @@ class MarkdownApiDocParser
 
         $headers = $xpath->query('*//h1');
         foreach ($headers as $index => $header) {
-            if (!isset($this->loadedDocumentation[$header->nodeValue])) {
-                $this->loadedDocumentation[$header->nodeValue] = [];
+            if (!isset($this->loadedData[$header->nodeValue])) {
+                $this->loadedData[$header->nodeValue] = [];
             }
         }
 
-        $headerKeys = array_keys($this->loadedDocumentation);
-        foreach ($headerKeys as $index => $headerKey) {
-            $type = ''; //'fields', 'filters', 'actions', etc.
-            $element = ''; //field name, filter name, etc.
+        $classNames = array_keys($this->loadedData);
+        foreach ($classNames as $className) {
+            $section = ''; // 'fields', 'filters', 'actions', etc.
+            $element = ''; // field name, filter name, etc.
             $action = '';
 
-            $subElements = $xpath->query("//*[preceding-sibling::h1[1][normalize-space()='{$headerKey}']]");
-            foreach ($subElements as $subElement) {
-                /** @var \DOMElement $subElement*/
+            $nodes = $xpath->query("//*[preceding-sibling::h1[1][normalize-space()='{$className}']]");
+            foreach ($nodes as $node) {
+                /** @var \DOMElement $node */
 
-                if (in_array($subElement->tagName, ['h1', 'h2', 'h3'], true)) {
-                    list($type, $element) = $this->parseDocumentationHeaders($subElement, $headerKey, $type, $element);
-                    $action = '';
+                if (in_array($node->tagName, ['h1', 'h2', 'h3', 'h4'], true)) {
+                    list($section, $element, $action) = $this->parseDocumentationHeaders(
+                        $node,
+                        $className,
+                        $section,
+                        $element
+                    );
                     continue;
                 }
 
-                if ('filters' === $type) {
-                    $this->loadedDocumentation[$headerKey][$type][$element] .= $subElement->nodeValue;
-                } elseif ('actions' !== $type) {
-                    if ($subElement->tagName === 'h4') {
-                        $action = strtolower($subElement->nodeValue);
-                        continue;
-                    }
-                    $actionName = 'common';
-                    if ($action) {
-                        $actionName = $action;
-                    }
-                    if (!array_key_exists($actionName, $this->loadedDocumentation[$headerKey][$type][$element])) {
-                        $this->loadedDocumentation[$headerKey][$type][$element][$actionName] = '';
-                    }
-
-                    $this->loadedDocumentation[$headerKey][$type][$element][$actionName] .= $doc->saveHTML($subElement);
-                } else {
-                    $this->loadedDocumentation[$headerKey][$type][$element] .= $doc->saveHTML($subElement);
+                switch ($section) {
+                    case ConfigUtil::ACTIONS:
+                        $this->loadedData[$className][$section][$element] .= $doc->saveHTML($node);
+                        break;
+                    case ConfigUtil::FIELDS:
+                        $actions = $action ?: 'common';
+                        $text = $doc->saveHTML($node);
+                        foreach (explode(',', $actions) as $actionName) {
+                            $actionName = trim($actionName);
+                            if (!array_key_exists($actionName, $this->loadedData[$className][$section][$element])) {
+                                $this->loadedData[$className][$section][$element][$actionName] = '';
+                            }
+                            $this->loadedData[$className][$section][$element][$actionName] .= $text;
+                        }
+                        break;
+                    case ConfigUtil::SUBRESOURCES:
+                        if (!array_key_exists($action, $this->loadedData[$className][$section][$element])) {
+                            $this->loadedData[$className][$section][$element][$action] = '';
+                        }
+                        $this->loadedData[$className][$section][$element][$action] .= $doc->saveHTML($node);
+                        break;
+                    case ConfigUtil::FILTERS:
+                        $this->loadedData[$className][$section][$element] .= $node->nodeValue;
+                        break;
+                    default:
+                        throw new \RuntimeException(sprintf('Unknown section: "%s".', $section));
                 }
             }
         }
+    }
+
+    /**
+     * @param \DOMElement $tag
+     * @param string      $className
+     * @param string      $section
+     * @param string      $element
+     *
+     * @return array
+     */
+    protected function parseDocumentationHeaders($tag, $className, $section, $element)
+    {
+        $action = '';
+
+        if ($tag->tagName === 'h2') {
+            $section = strtolower($tag->nodeValue);
+            if (!isset($this->loadedData[$className][$section])) {
+                $this->loadedData[$className][$section] = [];
+            }
+        }
+
+        if ($tag->tagName === 'h3') {
+            $element = strtolower($tag->nodeValue);
+            $hasSubElements = (ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section);
+            $this->loadedData[$className][$section][$element] = $hasSubElements ? [] : '';
+        }
+
+        if ($tag->tagName === 'h4') {
+            $action = strtolower($tag->nodeValue);
+        }
+
+        return [$section, $element, $action];
     }
 
     /**
@@ -152,8 +245,8 @@ class MarkdownApiDocParser
      */
     protected function getDocumentation($className, $section, $element, $subElement = null)
     {
-        if (array_key_exists($className, $this->loadedDocumentation)) {
-            $classDocumentation = $this->loadedDocumentation[$className];
+        if (array_key_exists($className, $this->loadedData)) {
+            $classDocumentation = $this->loadedData[$className];
             if (array_key_exists($section, $classDocumentation)) {
                 $sectionDocumentation = $classDocumentation[$section];
                 $element = strtolower($element);
@@ -178,53 +271,5 @@ class MarkdownApiDocParser
         }
 
         return null;
-    }
-
-    /**
-     * @param \DOMElement $tag
-     * @param string $headerKey
-     * @param string $type
-     * @param string $element
-     *
-     * @return array
-     */
-    protected function parseDocumentationHeaders($tag, $headerKey, $type, $element)
-    {
-        if ($tag->tagName === 'h2') {
-            $type = strtolower($tag->nodeValue);
-            if (!isset($this->loadedDocumentation[$headerKey][$type])) {
-                $this->loadedDocumentation[$headerKey][$type] = [];
-            }
-        }
-
-        if ($tag->tagName === 'h3') {
-            $element = strtolower($tag->nodeValue);
-            $this->loadedDocumentation[$headerKey][$type][$element] = $type === 'fields' ? [] : '';
-        }
-
-        return [$type, $element];
-    }
-
-    /**
-     * @param $resourceLink
-     *
-     * @return string|bool
-     */
-    protected function getFileContent($resourceLink)
-    {
-        $pos = strrpos($resourceLink, '.md');
-        if (false === $pos) {
-            return false;
-        }
-
-        $filePath = $this->fileLocator->locate(substr($resourceLink, 0, $pos + 3));
-        if (isset($this->parsedDocumentation[$filePath])) {
-            return false;
-        }
-
-        //store parsed documentations file paths to avoid unnecessary parsing
-        $this->parsedDocumentation[$filePath] = true;
-
-        return file_get_contents($filePath);
     }
 }
