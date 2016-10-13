@@ -9,6 +9,7 @@ class WorkflowTranslationRouteHelper
 {
     const TRANSLATION_GRID_ROUTE_NAME = 'oro_translation_translation_index';
     const TRANSLATION_GRID_NAME = 'oro-translation-translations-grid';
+    const TRANSLATION_FILTER_NAME = 'key';
 
     /**
      * @var DatagridRouteHelper
@@ -36,7 +37,7 @@ class WorkflowTranslationRouteHelper
         return $this->datagridRouteHelper->generate(
             self::TRANSLATION_GRID_ROUTE_NAME,
             self::TRANSLATION_GRID_NAME,
-            ['f' => ['workflow' => ['value' => $workflowName]]],
+            ['f' => [self::TRANSLATION_FILTER_NAME => ['value' => $workflowName]]],
             $referenceType
         );
     }
