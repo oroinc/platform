@@ -484,18 +484,24 @@ define(function(require) {
             _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
         },
 
+        getMode: function() {
+            return this.mode;
+        },
+
         setMode: function(mode) {
             if (mode === FiltersManager.VIEW_MODE) {
-                this.mode = mode;
                 this.$el.hide();
                 _.result(this.subview('filters-state'), 'show');
             } else if (mode === FiltersManager.MANAGE_MODE) {
-                this.mode = mode;
                 if (!_.isEmpty(this.filters)) {
                     this.$el.show();
                 }
                 _.result(this.subview('filters-state'), 'hide');
+            } else {
+                return;
             }
+            this.mode = mode;
+            this.trigger('changeMode', mode);
         }
     });
 

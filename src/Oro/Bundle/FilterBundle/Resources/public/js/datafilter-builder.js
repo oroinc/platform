@@ -1,15 +1,15 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'routing',
-    'oroui/js/tools',
-    'oroui/js/mediator',
-    './map-filter-module-name',
-    './collection-filters-manager'
-], function($, _, __, routing, tools, mediator, mapFilterModuleName, FiltersManager) {
+define(function(require) {
     'use strict';
 
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var routing = require('routing');
+    var tools = require('oroui/js/tools');
+    var mapFilterModuleName = require('orofilter/js/map-filter-module-name');
+    var FiltersManager = require('orofilter/js/collection-filters-manager');
+    var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
     var cachedFilters = {};
 
     var methods = {
@@ -171,6 +171,13 @@ define([
             }).fail(function() {
                 deferred.reject();
             });
+        },
+        processDatagridOptions: function(deferred, options) {
+            if (!_.isArray(options.metadata.plugins)) {
+                options.metadata.plugins = [];
+            }
+            options.metadata.plugins.push(FiltersTogglePlugin);
+            deferred.resolve();
         }
     };
 });
