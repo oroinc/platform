@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Security\KernelListener;
+use Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber;
 
-class KernelListenerTest extends \PHPUnit_Framework_TestCase
+class DisabledLoginSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $tokenStorage;
@@ -43,30 +41,21 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
             ->method('set');
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->expects($this->once())
+            ->method('hasSession')
+            ->willReturn(true);
         $request->expects($this->any())
             ->method('getSession')
             ->willReturn($session);
 
-        $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
-        $requestStack->expects($this->once())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        $container = $this->getMock(ContainerInterface::class);
-        $container->expects($this->exactly(2))
-            ->method('get')
-            ->willReturnMap(
-                [
-                    ['security.token_storage', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->tokenStorage],
-                    ['request_stack', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $requestStack]
-                ]
-            );
-
         $getResponseEvent = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
             ->getMock();
+        $getResponseEvent->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request);
 
-        $kernelListener = new KernelListener($container);
-        $kernelListener->onKernelRequest($getResponseEvent);
+        $disabledLoginSubscriber = new DisabledLoginSubscriber($this->tokenStorage);
+        $disabledLoginSubscriber->onKernelRequest($getResponseEvent);
     }
 }

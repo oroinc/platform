@@ -8,26 +8,26 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 
-class KernelListener implements EventSubscriberInterface
+class DisabledLoginSubscriber implements EventSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     protected $tokenStorage  = false;
 
     /**
-     * @param ContainerInterface $container
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->container = $container;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -45,43 +45,23 @@ class KernelListener implements EventSubscriberInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $storage = $this->getTokenStorage();
-
-        if (null === $storage) {
-            return;
-        }
-
         /** @var TokenInterface $token */
-        $token = $storage->getToken();
-
-        if (!$token) {
+        if (null === $token = $this->tokenStorage->getToken()) {
             return;
         }
 
         $user = $token->getUser();
 
-        if ($user && $user instanceof User && $user->isLoginDisabled()) {
-            $storage->setToken(null);
+        if ($user instanceof User && $user->isLoginDisabled()) {
+            $this->tokenStorage->setToken(null);
             $exception = new PasswordChangedException('Invalid password.');
             $exception->setUser($user);
             /** @var Request $request */
-            $request = $this->container->get('request_stack')->getCurrentRequest();
+            $request = $event->getRequest();
 
-            if ($request->getSession()) {
+            if ($request->hasSession()) {
                 $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
             }
         }
-    }
-
-    /**
-     * @return TokenStorage
-     */
-    protected function getTokenStorage()
-    {
-        if (false === $this->tokenStorage) {
-            $this->tokenStorage = $this->container->get('security.token_storage');
-        }
-
-        return $this->tokenStorage;
     }
 }

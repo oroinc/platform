@@ -103,6 +103,8 @@ class ResetController extends Controller
             try {
                 $this->get('oro_user.mailer.processor')->sendForcedResetPasswordAsAdminEmail($user);
             } catch (\Exception $e) {
+                $this->get('logger')->addCritical($e->getMessage(), ['exception' => $e]);
+
                 $params['processed'] = false;
                 $params['error'] = $this->get('translator')->trans('oro.email.handler.unable_to_send_email');
 

@@ -9,7 +9,7 @@ oro:
             flash:
                 success: Reset password email has been sent to user
             popup:
-                question: User {{ user }} will receive reset password by email and will be disabled from login.
+                question: User <b>{{ user }}</b> will receive reset password by email and will be disabled from login.
                 title: Reset password
                 label: Reset
             mass_action:

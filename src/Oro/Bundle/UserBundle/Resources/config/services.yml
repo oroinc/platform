@@ -450,8 +450,8 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    oro_user.security.kernel_listener:
-        class: Oro\Bundle\UserBundle\Security\KernelListener
-        arguments: ['@service_container']
+    oro_user.security.disabled_login_subscriber:
+        class: Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber
+        arguments: ['@security.token_storage']
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}

@@ -82,10 +82,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
             if (!$entity instanceof User) {
                 // hydration failed
                 $responseMessage = $massActionOptions->offsetGetByPath('[messages][failure]', $this->errorMessage);
-                return new MassActionResponse(
-                    false,
-                    $this->translator->trans($responseMessage)
-                );
+                return new MassActionResponse(false, $this->translator->trans($responseMessage));
             }
 
             if (null === $entity->getConfirmationToken()) {
