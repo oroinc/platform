@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\SetPasswordType;
+use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 
 class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,8 +29,8 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
                     'label' => 'oro.user.new_password.label',
                     'hint' => null,
                     'attr' => [
-                        'data-require-length' => '',
-                        'data-require-rules' => '',
+                        'data-suggest-length' => '',
+                        'data-suggest-rules' => '',
                     ],
                 ]
             );
@@ -46,8 +49,12 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
                 'label'         => 'oro.user.new_password.label',
                 'hint'       => null,
                 'attr' => [
-                    'data-require-length' => '',
-                    'data-require-rules' => '',
+                    'data-suggest-length' => '',
+                    'data-suggest-rules' => '',
+                ],
+                'constraints' => [
+                    new NotBlank(),
+                    new PasswordComplexity()
                 ]
             ]);
         $this->formType->buildForm($builder, []);

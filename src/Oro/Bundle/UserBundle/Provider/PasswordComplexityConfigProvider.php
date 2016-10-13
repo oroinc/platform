@@ -43,7 +43,7 @@ class PasswordComplexityConfigProvider
 
         foreach (self::$configKeys as $configKey => $type) {
             $value = $this->configManager->get($configKey);
-            $parts[$configKey] = ('bool' === $type) ? (bool) $value : (int) $value;
+            $parts[$configKey] = settype($value, $type);
         }
 
         return $parts;

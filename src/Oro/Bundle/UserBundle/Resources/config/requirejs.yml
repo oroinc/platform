@@ -10,3 +10,6 @@ config:
         'orouser/js/components/role/capability-set-component': 'orouser/js/components/role/capability-set-component.js'
         'orouser/js/validator/password-complexity': 'orouser/js/validator/password-complexity.js'
         'oro/datagrid/cell/action-permissions-cell': 'orouser/js/datagrid/cell/action-permissions-cell.js'
+        'orouser/js/app/modules/validator-constraints-module': 'orouser/js/app/modules/validator-constraints-module.js'
+    appmodules:
+        - orouser/js/app/modules/validator-constraints-module

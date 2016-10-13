@@ -75,17 +75,23 @@ class PasswordFieldOptionsProvider
     public function getDataValidationOption()
     {
         $dataValidation = [
-            PasswordComplexity::class => new PasswordComplexity(
-                [
-                    'requireMinLength' => $this->passwordConfigProvider->getMinLength(),
-                    'requireNumbers' => $this->passwordConfigProvider->getNumbers(),
-                    'requireUpperCase' => $this->passwordConfigProvider->getUpperCase(),
-                    'requireSpecialCharacter' => $this->passwordConfigProvider->getSpecialChars(),
-                ]
-            ),
+            PasswordComplexity::class => new PasswordComplexity($this->getPasswordComplexityConstraintOptions()),
         ];
 
         return json_encode($dataValidation);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPasswordComplexityConstraintOptions()
+    {
+        return [
+            'requireMinLength' => $this->passwordConfigProvider->getMinLength(),
+            'requireNumbers' => $this->passwordConfigProvider->getNumbers(),
+            'requireUpperCase' => $this->passwordConfigProvider->getUpperCase(),
+            'requireSpecialCharacter' => $this->passwordConfigProvider->getSpecialChars(),
+        ];
     }
 
     /**
@@ -105,8 +111,8 @@ class PasswordFieldOptionsProvider
         }
 
         return [
-            'data-require-length' => $this->passwordConfigProvider->getMinLength(),
-            'data-require-rules' => join(',', $rules),
+            'data-suggest-length' => $this->passwordConfigProvider->getMinLength(),
+            'data-suggest-rules' => join(',', $rules),
         ];
     }
 }

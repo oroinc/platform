@@ -39,8 +39,8 @@
                 var getRnd = function(n) {
                     return Math.floor(Math.random() * n);
                 };
-                var requireLength = $passwordInput.data('require-length') || 1;
-                var requirements = $passwordInput.data('require-rules') || '';
+                var requireLength = $passwordInput.data('suggest-length') || 1;
+                var requirements = $passwordInput.data('suggest-rules') || '';
                 var length = requireLength ? Math.max(requireLength, 8) : 8;
                 var charsets = {
                     'lower_case': 'abcdefghijklnopqrstuvwxyz',
