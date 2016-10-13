@@ -90,7 +90,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getFieldDocumentationProvider
      */
-    public function testGetFieldDocumentation($expected, $className, $fieldName, $actionName)
+    public function testGetFieldDocumentation($expected, $className, $fieldName, $actionName = null)
     {
         $apiDocParser = $this->loadDocument();
 
@@ -109,11 +109,21 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 'id',
                 'get'
             ],
+            'only common doc exists (requested common doc)'                        => [
+                '<p>Description for ID field</p>',
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                'id'
+            ],
             'common doc should be used'                                            => [
                 '<p>Description for NAME field</p>',
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'name',
                 'get'
+            ],
+            'common doc should be used (requested common doc)'                     => [
+                '<p>Description for NAME field</p>',
+                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                'name'
             ],
             'action doc should be used'                                            => [
                 '<p>Description for NAME field for DELETE action</p>',

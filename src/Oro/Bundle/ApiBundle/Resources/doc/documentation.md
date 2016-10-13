@@ -145,3 +145,30 @@ The documentation for a sub-resource, in this example for "get_subresource" acti
 May contain any formatting e.g.: ordered or unordered lists,
  request or response examples, links, text in bold or italic, etc.
 ```
+
+The `{@inheritdoc}` placeholder can be used to get common documentation for an action or a field. This placeholder works only for **ACTIONS** and **FIELDS** sections.
+
+An example:
+
+```markdown
+# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+
+## ACTIONS
+
+### create
+
+Create a new AcmeEntity record.
+The created record is returned in the response.
+
+{@inheritdoc}
+
+## FIELDS
+
+### name
+
+#### create
+
+{@inheritdoc}
+
+**The required field**
+```

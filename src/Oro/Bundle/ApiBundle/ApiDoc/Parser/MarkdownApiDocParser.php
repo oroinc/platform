@@ -69,15 +69,15 @@ class MarkdownApiDocParser
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $actionName
+     * @param string      $className
+     * @param string      $fieldName
+     * @param string|null $actionName
      *
      * @return string|null
      */
-    public function getFieldDocumentation($className, $fieldName, $actionName)
+    public function getFieldDocumentation($className, $fieldName, $actionName = null)
     {
-        return $this->getDocumentation($className, ConfigUtil::FIELDS, $fieldName, $actionName);
+        return $this->getDocumentation($className, ConfigUtil::FIELDS, $fieldName, $actionName ?: 'common');
     }
 
     /**

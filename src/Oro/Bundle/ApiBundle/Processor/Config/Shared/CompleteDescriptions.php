@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProviderInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
@@ -22,6 +23,8 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class CompleteDescriptions implements ProcessorInterface
 {
+    const PLACEHOLDER_INHERIT_DOC = '{@inheritdoc}';
+
     /** @var EntityDescriptionProvider */
     protected $entityDescriptionProvider;
 
@@ -100,6 +103,7 @@ class CompleteDescriptions implements ProcessorInterface
         $parentEntityClass
     ) {
         $entityDescription = false;
+        $processInheritDoc = !$associationName;
 
         if ($definition->hasDescription()) {
             $description = $definition->getDescription();
@@ -132,12 +136,22 @@ class CompleteDescriptions implements ProcessorInterface
                 }
                 $this->setDocumentationForSubresource($definition, $entityDescription, $targetAction, $isCollection);
             } else {
+                $processInheritDoc = false;
                 if (false === $entityDescription) {
                     $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
                 }
                 if ($entityDescription) {
                     $this->setDocumentationForResource($definition, $targetAction, $entityDescription);
                 }
+            }
+        }
+        if ($processInheritDoc && $definition->hasDocumentation()) {
+            $documentation = $definition->getDocumentation();
+            if (false !== strpos($documentation, self::PLACEHOLDER_INHERIT_DOC)) {
+                $entityDocumentation = $this->entityDescriptionProvider->getEntityDocumentation($entityClass);
+                $definition->setDocumentation(
+                    str_replace(self::PLACEHOLDER_INHERIT_DOC, $entityDocumentation, $documentation)
+                );
             }
         }
     }
@@ -259,34 +273,33 @@ class CompleteDescriptions implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
+            $propertyPath = $this->getFieldPropertyPath($field, $fieldName, $fieldPrefix);
             if (!$field->hasDescription()) {
                 $description = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
                 if ($description) {
-                    $field->setDescription($description);
-                    continue;
-                }
-
-                $propertyPath = $field->getPropertyPath($fieldName);
-                if ($fieldPrefix) {
-                    $propertyPath = $fieldPrefix . $propertyPath;
-                }
-                $description = $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath);
-                if ($description) {
-                    $field->setDescription($description);
-                }
-            } else {
-                $label = $field->getDescription();
-                if ($label instanceof Label) {
-                    $field->setDescription($this->trans($label));
+                    $field->setDescription(
+                        $this->processInheritDocForField($description, $entityClass, $fieldName, $propertyPath)
+                    );
                 } else {
-                    $this->registerDocumentationResource($label);
-                    $description = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
+                    $description = $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath);
                     if ($description) {
                         $field->setDescription($description);
-                        continue;
+                    }
+                }
+            } else {
+                $description = $field->getDescription();
+                if ($description instanceof Label) {
+                    $field->setDescription($this->trans($description));
+                } elseif ($this->registerDocumentationResource($description)) {
+                    $description = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
+                    if ($description) {
+                        $field->setDescription(
+                            $this->processInheritDocForField($description, $entityClass, $fieldName, $propertyPath)
+                        );
                     }
                 }
             }
+
             $targetEntity = $field->getTargetEntity();
             if ($targetEntity && $targetEntity->hasFields()) {
                 $targetClass = $field->getTargetClass();
@@ -298,6 +311,50 @@ class CompleteDescriptions implements ProcessorInterface
                 }
             }
         }
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param string                      $fieldName
+     * @param string|null                 $fieldPrefix
+     *
+     * @return string
+     */
+    protected function getFieldPropertyPath(
+        EntityDefinitionFieldConfig $field,
+        $fieldName,
+        $fieldPrefix = null
+    ) {
+        $propertyPath = $field->getPropertyPath($fieldName);
+        if ($fieldPrefix) {
+            $propertyPath = $fieldPrefix . $propertyPath;
+        }
+
+        return $propertyPath;
+    }
+
+    /**
+     * @param string $description
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param string $propertyPath
+     *
+     * @return string
+     */
+    protected function processInheritDocForField($description, $entityClass, $fieldName, $propertyPath)
+    {
+        if (false !== strpos($description, self::PLACEHOLDER_INHERIT_DOC)) {
+            $commonDescription = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName);
+            if (!$commonDescription) {
+                $commonDescription = $this->entityDescriptionProvider->getFieldDescription(
+                    $entityClass,
+                    $propertyPath
+                );
+            }
+            $description = str_replace(self::PLACEHOLDER_INHERIT_DOC, $commonDescription, $description);
+        }
+
+        return $description;
     }
 
     /**
