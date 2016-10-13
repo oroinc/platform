@@ -3,6 +3,7 @@
 
 namespace Oro\Bundle\ImapBundle\Connector;
 
+use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 
@@ -131,7 +132,10 @@ class ImapMessageIterator implements \Iterator, \Countable
                 }
                 $messages = $this->imap->getMessages(array_values($ids));
                 foreach ($ids as $pos => $id) {
-                    $this->batch[$pos] = isset($messages[$id]) ? $messages[$id] : null;
+                    if (!isset($messages[$id])) {
+                        throw new InvalidEmailFormatException('Invalid email format');
+                    }
+                    $this->batch[$pos] = $messages[$id];
                 }
             } else {
                 $this->batch[$this->iterationPos] = $this->imap->getMessage(
