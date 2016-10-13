@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
@@ -50,19 +51,41 @@ class MenuUpdateManager
      *
      * @param int $ownershipType
      * @param int $ownerId
-     * @param string $key
+     * @param array $options
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownershipType, $ownerId, $key = null)
+    public function createMenuUpdate($ownershipType, $ownerId, array $options = [])
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
         $entity
             ->setOwnershipType($ownershipType)
-            ->setOwnerId($ownerId)
-            ->setKey($key ? $key : $this->generateKey())
-        ;
+            ->setOwnerId($ownerId);
+        if (isset($options['key'])) {
+            $entity->setKey($options['key']);
+        } else {
+            $entity->setKey($this->generateKey());
+        }
+
+        if ($options['parentKey']) {
+            $parent = $this->getMenuUpdateByKeyAndScope(
+                $options['menu'],
+                $options['parentKey'],
+                $ownershipType,
+                $ownerId
+            );
+            if(!$parent)
+                $entity->setParentKey($options['parentKey']);
+        }
+
+        $entity->setMenu($options['menu']);
+
+        if (isset($options['isDivider']) && $options['isDivider']) {
+            $entity->setDivider(true);
+            $entity->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
+            $entity->setUri('#');
+        }
 
         return $entity;
     }
@@ -104,7 +127,7 @@ class MenuUpdateManager
         ]);
         
         if (!$update) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, $key);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['parentKey' => $key, 'menu' => $menuName]);
         }
 
         return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);

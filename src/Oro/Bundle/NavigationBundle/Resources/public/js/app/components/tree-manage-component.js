@@ -20,9 +20,14 @@ define(function(require) {
         menu: '',
 
         /**
+         * @property {String}
+         */
+        ownershipType: '',
+
+        /**
          * @property {Number}
          */
-        ownershipType: 0,
+        ownerId: 0,
 
         /**
          * @param {Object} options
@@ -32,6 +37,7 @@ define(function(require) {
 
             this.menu = options.menu;
             this.ownershipType = options.ownershipType;
+            this.ownerId = options.ownerId;
         },
 
         /**
@@ -48,10 +54,14 @@ define(function(require) {
             var routeParams;
             if (this.onRootSelectRoute && selected.node.parent === '#') {
                 route = this.onRootSelectRoute;
-                routeParams = {menuName: this.menu};
+                routeParams = {menuName: this.menu, id: this.ownerId};
             } else {
                 route = this.onSelectRoute;
-                routeParams = {menuName: this.menu, key: selected.node.id};
+                routeParams = {
+                    id: this.ownerId,
+                    menuName: this.menu,
+                    key: selected.node.id
+                };
             }
             mediator.execute('redirectTo', {url: routing.generate(route, routeParams)});
         },
@@ -71,7 +81,11 @@ define(function(require) {
             $.ajax({
                 async: false,
                 type: 'PUT',
-                url: routing.generate(self.onMoveRoute, {ownershipType: this.ownershipType, menuName: this.menu}),
+                url: routing.generate(self.onMoveRoute, {
+                    ownershipType: this.ownershipType,
+                    ownerId: this.ownerId,
+                    menuName: this.menu
+                }),
                 data: {
                     key: data.node.id,
                     parentKey: data.parent,

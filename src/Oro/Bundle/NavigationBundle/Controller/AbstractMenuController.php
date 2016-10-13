@@ -61,15 +61,10 @@ abstract class AbstractMenuController extends Controller
             $ownerId,
             [
                 'menu' => $menuName,
-                'parentKey' => $parentKey
+                'parentKey' => $parentKey,
+                'isDivider'=> $isDivider
             ]
         );
-
-        if ($isDivider) {
-            $menuUpdate->setDivider($isDivider);
-            $menuUpdate->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
-            $menuUpdate->setUri('#');
-        }
 
         return $this->handleUpdate($menuUpdate);
 
