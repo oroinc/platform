@@ -106,8 +106,7 @@ abstract class AbstractMenuController extends Controller
     protected function update(MenuUpdateInterface $menuUpdate, ItemInterface $menuItem = null)
     {
         $options = [
-            'exists_in_navigation_yml' => $menuUpdate->isExistsInNavigationYml(),
-            'acl_resource_id' => $menuItem !== null ? $menuItem->getExtra('aclResourceId') : null,
+            'menu_item' => $menuItem,
         ];
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, $options);
 
