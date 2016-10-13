@@ -33,7 +33,7 @@ class InputStub implements InputInterface
      */
     public function getFirstArgument()
     {
-        return current($arguments);
+        return current($this->arguments);
     }
 
     /**

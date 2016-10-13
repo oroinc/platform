@@ -40,11 +40,10 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         if ($event->commandShouldRun()) {
-
             $input = $event->getInput();
 
             $this->logger->info(
-                sprintf('Launched command "%s"', (string) $input),
+                sprintf('Launched command "%s"', $input->getFirstArgument()),
                 $this->getContext($input)
             );
         }

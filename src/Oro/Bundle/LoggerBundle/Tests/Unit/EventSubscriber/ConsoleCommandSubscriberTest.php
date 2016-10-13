@@ -61,13 +61,12 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider consoleCommandProvider
      *
-     * @param string $command
      * @param array $arguments
      * @param array $options
      */
-    public function testOnConsoleCommand($command, array $arguments, array $options)
+    public function testOnConsoleCommand(array $arguments, array $options)
     {
-        $input = new InputStub($command, $arguments, $options);
+        $input = new InputStub('test:command', $arguments, $options);
 
         /** @var ConsoleCommandEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMock(ConsoleCommandEvent::class, [], [], '', false);
@@ -92,7 +91,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->logger
             ->expects($this->once())
             ->method('info')
-            ->with(sprintf('Launched command "%s"', $command), $context);
+            ->with(sprintf('Launched command "%s"', 'test:command'), $context);
 
         $this->subscriber->onConsoleCommand($event);
     }
@@ -100,13 +99,12 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider consoleCommandProvider
      *
-     * @param string $command
      * @param array $arguments
      * @param array $options
      */
-    public function testOnConsoleException($command, array $arguments, array $options)
+    public function testOnConsoleException(array $arguments, array $options)
     {
-        $input = new InputStub($command, $arguments, $options);
+        $input = new InputStub('test:command', $arguments, $options);
 
         /** @var ConsoleExceptionEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMock(ConsoleExceptionEvent::class, [], [], '', false);
@@ -140,7 +138,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with(
                 sprintf(
                     'An error occurred while running command "%s". %s',
-                    $command,
+                    'test:command',
                     'exception message'
                 ),
                 $context
@@ -156,14 +154,12 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'without arguments and options' => [
-                'command' => 'test:command',
                 'arguments' => [
                     'command' => 'test:command'
                 ],
                 'options' => []
             ],
             'with arguments' => [
-                'command' => 'test:command argumentValue',
                 'arguments' => [
                     'command' => 'test:command',
                     'argumentKey' => 'argumentValue'
@@ -171,7 +167,6 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
                 'options' => []
             ],
             'with options' => [
-                'command' => 'test:command --optionKey=optionValue',
                 'arguments' => [
                     'command' => 'test:command'
                 ],
@@ -180,7 +175,6 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'with arguments and options' => [
-                'command' => 'test:command argumentValue --optionKey=optionValue',
                 'arguments' => [
                     'command' => 'test:command',
                     'argumentKey' => 'argumentValue'
