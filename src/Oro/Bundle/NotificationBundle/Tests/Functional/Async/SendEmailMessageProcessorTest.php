@@ -14,7 +14,7 @@ class SendEmailMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_notification.async.send_email_processor');
+        $service = $this->getContainer()->get('oro_notification.async.send_email_message_processor');
 
         $this->assertInstanceOf(SendEmailMessageProcessor::class, $service);
     }
