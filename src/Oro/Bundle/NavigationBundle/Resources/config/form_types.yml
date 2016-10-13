@@ -1,5 +1,8 @@
 services:
     oro_navigation.form.type.menu_update:
         class: 'Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType'
+        arguments:
+            - '@translator'
+            - '@oro_locale.helper.localization'
         tags:
             - { name: form.type, alias: oro_navigation_menu_update }
