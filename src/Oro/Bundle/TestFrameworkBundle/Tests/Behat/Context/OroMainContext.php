@@ -506,6 +506,16 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function fillField($field, $value)
+    {
+        $field = $this->fixStepArgument($field);
+        $value = $this->fixStepArgument($value);
+        $this->createOroForm()->fillField($field, $value);
+    }
+
+    /**
      * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
      */
     public function iTypeInFieldWith($locator, $value)
@@ -517,12 +527,7 @@ class OroMainContext extends MinkContext implements
         $driver = $this->getSession()->getDriver();
 
         if (null === $field) {
-            throw new ElementNotFoundException(
-                $this->getSession()->getDriver(),
-                'form field',
-                'id|name|label|value|placeholder',
-                $locator
-            );
+            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $locator);
         }
 
         self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
