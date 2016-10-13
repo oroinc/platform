@@ -51,6 +51,7 @@ class UpgradeCommand extends AbstractCommand
                     '--force'             => true
                 ]
             );
+            $commandExecutor->runCommand('cache:clear', ['--process-isolation' => true]);
             $updateParams = [];
             foreach ($input->getOptions() as $key => $value) {
                 if ($value) {
