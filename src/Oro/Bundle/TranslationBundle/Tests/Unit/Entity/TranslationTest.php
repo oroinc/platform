@@ -1,40 +1,24 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Tests\Entity;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class TranslationTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  Translation */
-    protected $translation;
+    use EntityTestCaseTrait;
 
-    protected function setUp()
+    public function testAccessors()
     {
-        $this->translation = new Translation();
-    }
-
-    public function testGettersAndSetters()
-    {
-        $this->assertNull($this->translation->getId());
-        $this->assertNull($this->translation->getKey());
-        $this->assertNull($this->translation->getValue());
-        $this->assertNull($this->translation->getLocale());
-        $this->assertNull($this->translation->getDomain());
-        $this->assertEquals(Translation::SCOPE_SYSTEM, $this->translation->getScope());
-
-        $this->translation
-            ->setKey('test.key')
-            ->setValue('Test value')
-            ->setLocale('en')
-            ->setDomain('messages')
-            ->setScope(Translation::SCOPE_UI);
-
-        $this->assertNull($this->translation->getId());
-        $this->assertEquals('test.key', $this->translation->getKey());
-        $this->assertEquals('Test value', $this->translation->getValue());
-        $this->assertEquals('en', $this->translation->getLocale());
-        $this->assertEquals('messages', $this->translation->getDomain());
-        $this->assertEquals(Translation::SCOPE_UI, $this->translation->getScope());
+        $this->assertPropertyAccessors(new Translation(), [
+            ['id', 1],
+            ['translationKey', new TranslationKey()],
+            ['value', 'test_value'],
+            ['language', new Language()],
+            ['scope', Translation::SCOPE_SYSTEM],
+        ]);
     }
 }
