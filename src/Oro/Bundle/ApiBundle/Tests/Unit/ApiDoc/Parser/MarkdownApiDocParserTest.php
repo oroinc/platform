@@ -121,13 +121,13 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 'name',
                 'delete'
             ],
-            'action doc should be used (the first action in #### Create, Update)'  => [
+            'action doc should be used (the first action in #### create, update)'  => [
                 '<p>Description for NAME field for CREATE and UPDATE actions</p>',
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'name',
                 'create'
             ],
-            'action doc should be used (the second action in #### Create, Update)' => [
+            'action doc should be used (the second action in #### create, update)' => [
                 '<p>Description for NAME field for CREATE and UPDATE actions</p>',
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
                 'name',

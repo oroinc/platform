@@ -102,7 +102,7 @@ An example:
 
 ## ACTIONS
 
-### Get
+### get
 
 The documentation for an action, in this example for "get" action.
 May contain any formatting e.g.: ordered or unordered lists,
@@ -116,13 +116,13 @@ The description for "name" field.
 May contain any formatting e.g.: ordered or unordered lists,
  request or response examples, links, text in bold or italic, etc.
 
-#### Get
+#### get
 
 The description for "name" field for "get" action.
 May contain any formatting e.g.: ordered or unordered lists,
  request or response examples, links, text in bold or italic, etc.
 
-#### Create, Update
+#### create, update
 
 The description for "name" field for "create" and "update" actions.
 May contain any formatting e.g.: ordered or unordered lists,
@@ -139,7 +139,7 @@ The formatting is not allowed here.
 
 ### contacts
 
-#### Get_subresource
+#### get_subresource
 
 The documentation for a sub-resource, in this example for "get_subresource" action for "contacts" sub-resource.
 May contain any formatting e.g.: ordered or unordered lists,

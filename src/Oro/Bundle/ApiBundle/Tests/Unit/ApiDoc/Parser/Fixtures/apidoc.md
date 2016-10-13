@@ -2,26 +2,26 @@
 
 ## ACTIONS
 
-### Get
+### get
 
 Description for GET action
 
 - list item 1
 - list item 2
 
-### Get_list
+### get_list
 
 Description for GET_LIST action
 
 **text in bold**
 
-### Create
+### create
 
 Description for CREATE action
 
 _text in italic_
 
-### Update
+### update
 
 Description for UPDATE action
 
@@ -37,19 +37,19 @@ Description for ID field
 
 Description for NAME field
 
-#### Create, Update
+#### create, update
 
 Description for NAME field for CREATE and UPDATE actions
 
-#### Delete
+#### delete
 
 Description for NAME field for DELETE action
 
 ### createdAt
 
-#### Create
+#### create
 
-#### Update
+#### update
 
 ### updatedAt
 
@@ -75,7 +75,7 @@ Description for UPDATEDAT filter
 
 ### contacts
 
-#### Get_subresource
+#### get_subresource
 
 Description for *contacts GET_SUBRESOURCE* sub-resource
 
