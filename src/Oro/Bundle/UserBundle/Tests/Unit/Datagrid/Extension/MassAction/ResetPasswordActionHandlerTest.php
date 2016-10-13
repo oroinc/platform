@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
+use Oro\Bundle\NotificationBundle\Model\EmailTemplate;
 
 class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,12 +21,12 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $processor = $this->getMockBuilder('Oro\Bundle\UserBundle\Mailer\Processor')
+        $processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor')
             ->disableOriginalConstructor()
             ->getMock();
         $processor
             ->expects($this->atLeastOnce())
-            ->method('sendForcedResetPasswordAsAdminEmail');
+            ->method('process');
 
         $userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
             ->disableOriginalConstructor()
@@ -72,6 +73,14 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getOptions')
             ->will($this->returnValue($options));
 
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->will($this->returnValue(new EmailTemplate()));
+
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -81,6 +90,10 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
         $em
             ->expects($this->atLeastOnce())
             ->method('clear');
+        $em
+            ->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()

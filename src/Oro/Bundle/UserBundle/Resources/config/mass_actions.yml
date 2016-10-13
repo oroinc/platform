@@ -10,7 +10,6 @@ services:
         arguments:
             - '@oro_notification.email_processor'
             - '@oro_user.manager'
-            - "@oro_config.manager"
             - '@translator'
             - '@logger'
         tags:

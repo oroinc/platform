@@ -135,6 +135,5 @@ class ControllersResetTest extends WebTestCase
             ],
             $response
         );
-
     }
 }

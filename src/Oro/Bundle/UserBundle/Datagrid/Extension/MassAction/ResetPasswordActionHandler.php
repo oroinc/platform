@@ -19,7 +19,6 @@ use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {
@@ -33,9 +32,6 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
 
     /** @var UserManager */
     protected $userManager;
-
-    /** @var ConfigManager */
-    protected $configManager;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -58,13 +54,11 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     public function __construct(
         EmailNotificationProcessor $mailerProcessor,
         UserManager $userManager,
-        ConfigManager $configManager,
         TranslatorInterface $translator,
         LoggerInterface $logger
     ) {
         $this->mailerProcessor = $mailerProcessor;
         $this->userManager = $userManager;
-        $this->configManager = $configManager;
         $this->translator = $translator;
         $this->logger = $logger;
     }
@@ -132,13 +126,13 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
      */
     protected function getTemplate()
     {
-        if (null != $this->template) {
-            return $this->template;
+        if (null == $this->template) {
+            $this->template = $this->em
+                ->getRepository('OroEmailBundle:EmailTemplate')
+                ->findOneBy(['name' => self::TEMPLATE_NAME]);
         }
 
-        return $this->em
-            ->getRepository('OroEmailBundle:EmailTemplate')
-            ->findOneBy(['name' => self::TEMPLATE_NAME]);
+        return $this->template;
     }
 
     /**
