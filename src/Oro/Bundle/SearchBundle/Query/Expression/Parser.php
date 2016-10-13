@@ -99,6 +99,8 @@ class Parser
                 Query::OPERATOR_NOT_EQUALS,
                 Query::OPERATOR_IN,
                 Query::OPERATOR_NOT_IN,
+                Query::OPERATOR_EXISTS,
+                Query::OPERATOR_NOT_EXISTS,
             ],
             Query::TYPE_DECIMAL  => [
                 Query::OPERATOR_GREATER_THAN,
@@ -109,6 +111,8 @@ class Parser
                 Query::OPERATOR_NOT_EQUALS,
                 Query::OPERATOR_IN,
                 Query::OPERATOR_NOT_IN,
+                Query::OPERATOR_EXISTS,
+                Query::OPERATOR_NOT_EXISTS,
             ],
             Query::TYPE_DATETIME => [
                 Query::OPERATOR_GREATER_THAN,
@@ -119,6 +123,8 @@ class Parser
                 Query::OPERATOR_NOT_EQUALS,
                 Query::OPERATOR_IN,
                 Query::OPERATOR_NOT_IN,
+                Query::OPERATOR_EXISTS,
+                Query::OPERATOR_NOT_EXISTS,
             ]
         ];
 
@@ -459,6 +465,11 @@ class Parser
                 return [$whereType, $expr->in($fieldName, $this->parseArguments())];
             case Query::OPERATOR_NOT_IN:
                 return [$whereType, $expr->notIn($fieldName, $this->parseArguments())];
+
+            case Query::OPERATOR_EXISTS:
+                return [$whereType, $expr->exists($fieldName)];
+            case Query::OPERATOR_NOT_EXISTS:
+                return [$whereType, $expr->notExists($fieldName)];
 
             default:
                 throw new ExpressionSyntaxError(
