@@ -311,7 +311,6 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.acl_helper'
-            - '@router.default'
 
     oro_datagrid.cache.datagrid_configuration_cache_warmer:
         class: Oro\Bundle\DataGridBundle\Cache\DatagridConfigurationCacheWarmer
