@@ -48,10 +48,14 @@ class UpgradeCommand extends AbstractCommand
                 'oro:platform:upgrade20:db-configs',
                 [
                     '--process-isolation' => true,
-                    '--force'             => true
+                    '--force'             => true,
+                    '--disabled-listeners' => 'all'
                 ]
             );
-            $commandExecutor->runCommand('cache:clear', ['--process-isolation' => true]);
+            $commandExecutor->runCommand('cache:clear', [
+                '--process-isolation' => true,
+                '--disabled-listeners' => 'all'
+            ]);
             $updateParams = [];
             foreach ($input->getOptions() as $key => $value) {
                 if ($value) {
