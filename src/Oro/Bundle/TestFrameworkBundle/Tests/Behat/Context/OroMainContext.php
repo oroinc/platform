@@ -11,6 +11,7 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -124,21 +125,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^(?:|I )click update schema$/
-     */
-    public function iClickUpdateSchema()
-    {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-        $page = $this->getPage();
-
-        $page->clickLink('Update schema');
-        $driver->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $driver->waitForAjax(120000);
-    }
-
-    /**
      * Close form error message
      *
      * @Then /^(?:|I )close error message$/
@@ -146,6 +132,14 @@ class OroMainContext extends MinkContext implements
     public function closeErrorMessage()
     {
         $this->createOroForm()->find('css', '.alert-error button.close')->press();
+    }
+
+    /**
+     * @Then /^(?:|I )close ui dialog$/
+     */
+    public function closeUiDialog()
+    {
+        $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
     }
 
     /**
@@ -290,6 +284,35 @@ class OroMainContext extends MinkContext implements
         $page->find('css', 'span.lg-close')->click();
     }
 
+    /**
+     * @Then /^(?:|I )click on "(?P<text>[^"]+)" attachment thumbnail$/
+     */
+    public function commentAttachmentShouldProperlyWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->clickOnAttachmentThumbnail();
+
+        $thumbnail = $this->getPage()->find('css', "div.thumbnail a[title='$text']");
+        self::assertTrue($thumbnail->isValid(), sprintf('Thumbnail "%s" not found', $text));
+
+        $thumbnail->click();
+    }
+
+    /**
+     * @Then /^download link for "(?P<text>[^"]+)" attachment should work$/
+     */
+    public function downloadLinkForAttachmentShouldWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->checkDownloadLink();
+    }
+
      /**
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      */
@@ -312,7 +335,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I go to System/ Channels
      * Example: And go to System/ User Management/ Users
      *
-     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)([^"]*)))$/
+     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)(?!.*page)([^"]*)))$/
      */
     public function iOpenTheMenuAndClick($path)
     {
@@ -343,14 +366,6 @@ class OroMainContext extends MinkContext implements
     public function iSaveForm()
     {
         $this->createOroForm()->save();
-    }
-
-    /**
-     * @Given /^(?:|I |I'm )edit entity$/
-     */
-    public function iMEditEntity()
-    {
-        $this->createElement('Entity Edit Button')->click();
     }
 
     /**
