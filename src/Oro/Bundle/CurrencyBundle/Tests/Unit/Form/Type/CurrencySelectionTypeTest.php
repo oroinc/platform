@@ -8,7 +8,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
-use Oro\Bundle\CurrencyBundle\Tests\Units\Utils\CurrencyNameHelperStub;
+use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 
 class CurrencySelectionTypeTest extends FormIntegrationTestCase
 {
