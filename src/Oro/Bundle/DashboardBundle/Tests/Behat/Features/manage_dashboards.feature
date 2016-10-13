@@ -4,7 +4,7 @@ Feature: Manage dashboards
   I need to have ability to manage dashboards
 
   Scenario: Create new dashboard
-    Given I login as "admin" user with "admin" password
+    Given I login as administrator
     And I go to Dashboards/Manage Dashboards
     And number of records should be 1
     And I press "Create Dashboard"
