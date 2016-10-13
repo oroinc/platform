@@ -3,9 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
@@ -18,26 +15,16 @@ class TranslationOperationsTest extends ActionTestCase
      */
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader(), true);
-        $this->loadFixtures([LoadLanguages::class]);
+        $this->initClient([], $this->generateBasicAuthHeader());
     }
 
     public function testUpdateCacheOperation()
     {
-        $key = uniqid('TRANSLATION_KEY_', true);
-        $locale = LoadLanguages::LANGUAGE1;
-        $expectedValue = uniqid('TEST_VALUE_', true);
+        $translator = $this->getTranslatorMock();
+        $translator->expects($this->once())->method('rebuildCache');
+        $translator->expects($this->any())->method('getTranslations')->willReturn([]);
 
-        /** @var Translator $translator */
-        $translator = $this->getContainer()->get('translator');
-        $translator->warmUp(null);
-
-        /** @var TranslationManager $manager */
-        $manager = $this->getContainer()->get('oro_translation.manager.translation');
-        $manager->saveValue($key, $expectedValue, $locale, TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI);
-        $manager->flush();
-
-        $this->assertEquals($key, $translator->trans($key, [], TranslationManager::DEFAULT_DOMAIN, $locale));
+        $this->setTranslator($translator);
 
         $this->assertExecuteOperation(
             'oro_translation_rebuild_cache',
@@ -45,7 +32,21 @@ class TranslationOperationsTest extends ActionTestCase
             null,
             ['route' => 'oro_translation_translation_index']
         );
+    }
 
-        $this->assertEquals($expectedValue, $translator->trans($key, [], TranslationManager::DEFAULT_DOMAIN, $locale));
+    /**
+     * @param Translator $translator
+     */
+    private function setTranslator(Translator $translator)
+    {
+        self::$kernel->getContainer()->set('translator.default', $translator);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Translator
+     */
+    private function getTranslatorMock()
+    {
+        return $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
     }
 }

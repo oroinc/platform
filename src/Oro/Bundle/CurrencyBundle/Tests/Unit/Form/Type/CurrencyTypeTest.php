@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\LocaleBundle\Form\Type\CurrencyType;
+use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
 
 class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,15 +29,8 @@ class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'choices' => array_flip(Intl::getCurrencyBundle()->getCurrencyNames('en')),
                 'restrict' => false
             ]);
-        $resolver->expects($this->once())
-            ->method('setDefined')
-            ->with('restrict');
-        $resolver->expects($this->once())
-            ->method('setAllowedTypes')
-            ->with('restrict', 'bool');
 
         $this->formType->configureOptions($resolver);
     }
