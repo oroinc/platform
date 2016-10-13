@@ -51,17 +51,19 @@ class MenuUpdateManager
      * @param int $ownershipType
      * @param int $ownerId
      * @param string $key
+     * @param bool $custom
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownershipType, $ownerId, $key = null)
+    public function createMenuUpdate($ownershipType, $ownerId, $key = null, $custom = false)
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
         $entity
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
-            ->setKey($key)
+            ->setKey($key ? $key : $this->generateKey())
+            ->setCustom($custom)
         ;
 
         return $entity;
@@ -141,11 +143,8 @@ class MenuUpdateManager
         }
 
         foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId);
-            $update->setKey($child->getName());
-            $update->setMenu($menuName);
-            $parentKey = $child->getParent()->getName();
-            $update->setParentKey($parentKey != $menuName ? $parentKey : null);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, $child->getName());
+            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
             $update->setPriority($priority);
             $updates[] = $update;
         }
@@ -297,6 +296,8 @@ class MenuUpdateManager
 
         if ($item) {
             MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName);
+        } else {
+            $update->setCustom(true);
         }
 
         return $update;

@@ -87,15 +87,17 @@ trait MenuUpdateTrait
 
     /**
      * @var boolean
-     */
-    protected $existsInNavigationYml = false;
-
-    /**
-     * @var boolean
      *
      * @ORM\Column(name="is_divider", type="boolean")
      */
     protected $divider = false;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_custom", type="boolean")
+     */
+    protected $custom = false;
 
     /**
      * @return int
@@ -304,19 +306,19 @@ trait MenuUpdateTrait
     /**
      * @return boolean
      */
-    public function isExistsInNavigationYml()
+    public function isDivider()
     {
-        return $this->existsInNavigationYml;
+        return $this->divider;
     }
 
     /**
-     * @param boolean $existsInNavigationYml
+     * @param boolean $divider
      *
      * @return MenuUpdateInterface
      */
-    public function setExistsInNavigationYml($existsInNavigationYml)
+    public function setDivider($divider)
     {
-        $this->existsInNavigationYml = $existsInNavigationYml;
+        $this->divider = $divider;
 
         return $this;
     }
@@ -342,19 +344,19 @@ trait MenuUpdateTrait
     /**
      * @return boolean
      */
-    public function isDivider()
+    public function isCustom()
     {
-        return $this->divider;
+        return $this->custom;
     }
 
     /**
-     * @param boolean $divider
+     * @param boolean $custom
      *
      * @return MenuUpdateInterface
      */
-    public function setDivider($divider)
+    public function setCustom($custom)
     {
-        $this->divider = $divider;
+        $this->custom = $custom;
 
         return $this;
     }

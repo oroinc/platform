@@ -137,8 +137,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setDefaultTitle('item-1-1-1')
             ->setParentKey('item-1-1')
             ->setMenu('menu')
-            ->setUri('uri')
-            ->setExistsInNavigationYml(true);
+            ->setUri('uri');
 
         $this->assertEquals($update, $result);
     }
@@ -154,6 +153,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
             ->setKey($key)
+            ->setCustom(true)
         ;
 
         $menu = $this->getMenu();
@@ -215,6 +215,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $update0 = new MenuUpdateStub();
         $update0->setKey('item-1');
+        $update0->setDefaultTitle('item-1');
         $update0->setMenu('menu');
         $update0->setParentKey(null);
         $update0->setPriority(0);
@@ -223,6 +224,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $update2 = new MenuUpdateStub();
         $update2->setKey('item-3');
+        $update2->setDefaultTitle('item-3');
         $update2->setMenu('menu');
         $update0->setParentKey(null);
         $update2->setPriority(2);

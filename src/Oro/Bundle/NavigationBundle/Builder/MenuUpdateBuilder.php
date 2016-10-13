@@ -70,6 +70,8 @@ class MenuUpdateBuilder implements BuilderInterface
             }
         }
 
+        $this->applyDivider($menu);
+
         /** @var ItemInterface $item */
         foreach ($menu->getChildren() as $item) {
             $item = MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item);
@@ -135,7 +137,7 @@ class MenuUpdateBuilder implements BuilderInterface
      * @param string|null $ownershipType
      * @return OwnershipProviderInterface[]
      */
-    protected function getProviders($area, $ownershipType = null)
+    private function getProviders($area, $ownershipType = null)
     {
         if (!isset($this->providers[$area])) {
             return [];
@@ -158,5 +160,20 @@ class MenuUpdateBuilder implements BuilderInterface
         }
 
         return [];
+    }
+
+    /**
+     * @param ItemInterface $item
+     */
+    private function applyDivider(ItemInterface $item)
+    {
+        if ($item->getExtra('divider', false)) {
+            $class = trim(sprintf("%s %s", $item->getAttribute('class', ''), 'divider'));
+            $item->setAttribute('class', $class);
+        }
+
+        foreach ($item->getChildren() as $child) {
+            $this->applyDivider($child);
+        }
     }
 }

@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
 
+use Knp\Menu\FactoryInterface;
 use Knp\Menu\MenuItem;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,10 +24,20 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected $factory;
 
+    /** @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $menuFactory;
+
+    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
     protected function setUp()
     {
         $resolver = new SystemAwareResolver();
-        $this->configurationBuilder = new ConfigurationBuilder($resolver);
+
+        $this->menuFactory = $this->getMock('Knp\Menu\FactoryInterface');
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $this->configurationBuilder = new ConfigurationBuilder($resolver, $this->menuFactory, $this->eventDispatcher);
 
         $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
             ->setMethods(['getRouteInfo', 'processRoute'])
@@ -47,6 +61,12 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->configurationBuilder->setConfiguration($options);
 
         $menu = new MenuItem('navbar', $this->factory);
+
+        $this->eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with('oro_menu.configure.navbar', new ConfigureMenuEvent($this->menuFactory, $menu));
+
         $this->configurationBuilder->build($menu, [], 'navbar');
 
         $this->assertCount(2, $menu->getChildren());

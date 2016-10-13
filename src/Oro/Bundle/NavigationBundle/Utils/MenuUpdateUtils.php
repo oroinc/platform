@@ -35,8 +35,11 @@ class MenuUpdateUtils
             self::setValue($accessor, $update, 'defaultTitle', $item->getLabel());
         }
 
-        $parentKey = $item->getParent() ? $item->getParent()->getName() : null;
-        self::setValue($accessor, $update, 'parentKey', $parentKey);
+        $parent = $item->getParent();
+        if ($parent) {
+            $parentKey = $parent->getName() !== $menuName ? $parent->getName() : null;
+            self::setValue($accessor, $update, 'parentKey', $parentKey);
+        }
 
         $update->setActive($item->isDisplayed());
         $update->setMenu($menuName);
@@ -48,8 +51,6 @@ class MenuUpdateUtils
 
             self::setValue($accessor, $update, $key, $value);
         }
-
-        $update->setExistsInNavigationYml(!$item->getExtra("userDefined", false));
     }
 
     /**
@@ -65,12 +66,15 @@ class MenuUpdateUtils
         LocalizationHelper $localizationHelper
     ) {
         $item = self::findMenuItem($menu, $update->getKey());
+        if ($item === null && !$update->isCustom()) {
+            return;
+        }
+
         $parentItem = self::findMenuItem($menu, $update->getParentKey());
         $parentItem = $parentItem === null ? $menu : $parentItem;
 
-        if (!$item instanceof ItemInterface) {
+        if ($item === null) {
             $item = $parentItem->addChild($update->getKey());
-            $item->setExtra('userDefined', true);
         }
 
         if ($item->getParent()->getName() != $parentItem->getName()) {
@@ -91,8 +95,6 @@ class MenuUpdateUtils
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
         }
-
-        $item->setExtra('editable', true);
     }
 
     /**
