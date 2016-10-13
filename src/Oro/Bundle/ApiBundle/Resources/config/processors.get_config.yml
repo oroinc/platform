@@ -97,7 +97,7 @@ services:
         arguments:
             - '@oro_api.entity_description_provider'
             - '@oro_api.resource_doc_provider'
-            - '@oro_api.api_doc.md.parser'
+            - '@oro_api.api_doc.parser'
             - '@translator'
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -210 }
