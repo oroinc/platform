@@ -24,7 +24,7 @@ class OroNotificationBundle extends Bundle
         $container->addCompilerPass(new EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
 
         $addTopicPass = AddTopicMetaPass::create()
-            ->add(Topics::SEND_NOTIFICATION_EMAIL)
+            ->add(Topics::SEND_NOTIFICATION_EMAIL, 'Sending email notifications')
         ;
         $container->addCompilerPass($addTopicPass);
     }
