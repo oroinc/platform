@@ -444,21 +444,23 @@ class OroMainContext extends MinkContext implements
         $page = $this->getSession()->getPage();
 
         foreach ($table->getRows() as $row) {
-            $labels = $page->findAll('xpath', sprintf('//label[text()="%s"]', $row[0]));
+            list($label, $value) = $row;
+            $labelElement = $this->findElementContains('Label', $label);
+            $labels = $page->findAll('xpath', $labelElement->getXpath());
 
-            self::assertNotCount(0, $labels, sprintf('Can\'t find "%s" label', $row[0]));
+            self::assertNotCount(0, $labels, sprintf('Can\'t find "%s" label', $label));
 
             /** @var NodeElement $label */
-            foreach ($labels as $label) {
-                $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
+            foreach ($labels as $labelElement) {
+                $text = $labelElement->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-                if (false !== preg_match(sprintf('/%s/i', $row[1]), $text)) {
+                if (false !== stripos($text, $value)) {
                     continue 2;
                 }
             }
 
             self::fail(
-                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $row[0], $row[1])
+                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $label, $value)
             );
         }
     }
