@@ -3,10 +3,12 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\Repository\LoginHistoryRepository;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class LoginAttemptsProvider
 {
@@ -37,6 +39,10 @@ class LoginAttemptsProvider
         $this->userManager = $userManager;
     }
 
+    /**
+     * @param  string $username
+     * @return int|null Return null if user with supplied username does not exists
+     */
     public function getByUsername($username)
     {
         if ($user = $this->userManager->findUserByUsername($username)) {
@@ -46,6 +52,12 @@ class LoginAttemptsProvider
         return null;
     }
 
+    /**
+     * Get remaining login attempts by used
+     *
+     * @param  UserInterface $user
+     * @return int
+     */
     public function getByUser(UserInterface $user)
     {
         $remainingCumulative = $this->getRemainingCumulativeLoginAttempts($user);
@@ -54,6 +66,13 @@ class LoginAttemptsProvider
         return max(0, min($remainingCumulative, $remainingDaily));
     }
 
+    /**
+     * Get exceed login attempts limit - daily or cumulative.
+     * Return zero when limits are not exceed.
+     *
+     * @param  UserInterface $user
+     * @return int
+     */
     public function getExceedLimit(UserInterface $user)
     {
         if ($this->getRemainingCumulativeLoginAttempts($user) <= 0) {
@@ -67,6 +86,10 @@ class LoginAttemptsProvider
         return 0;
     }
 
+    /**
+     * @param  UserInterface $user
+     * @return int
+     */
     public function getRemainingCumulativeLoginAttempts(UserInterface $user)
     {
         $cumulativeCount = $this->getLoginHistoryRepository()->countUserCumulativeFailedLogins($user);
@@ -74,6 +97,10 @@ class LoginAttemptsProvider
         return $this->getMaxCumulativeLoginAttempts() - $cumulativeCount;
     }
 
+    /**
+     * @param  UserInterface $user
+     * @return int
+     */
     public function getRemainingDailyLoginAttempts(UserInterface $user)
     {
         $dailyCount = $this->getLoginHistoryRepository()->countUserDailyFailedLogins($user);
@@ -81,11 +108,17 @@ class LoginAttemptsProvider
         return $this->getMaxDailyLoginAttempts() - $dailyCount;
     }
 
+    /**
+     * @return int
+     */
     public function getMaxCumulativeLoginAttempts()
     {
         return $this->configManager->get(self::MAX_LOGIN_ATTEMPTS);
     }
 
+    /**
+     * @return int
+     */
     public function getMaxDailyLoginAttempts()
     {
         return $this->configManager->get(self::MAX_DAILY_LOGIN_ATTEMPTS);

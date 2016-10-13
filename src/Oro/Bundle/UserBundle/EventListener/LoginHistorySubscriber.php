@@ -52,6 +52,9 @@ class LoginHistorySubscriber implements EventSubscriberInterface
         );
     }
  
+    /**
+     * @param AuthenticationFailureEvent $event
+     */
     public function onAuthenticationFailure(AuthenticationFailureEvent $event)
     {
         $username = $event->getAuthenticationToken()->getUser();

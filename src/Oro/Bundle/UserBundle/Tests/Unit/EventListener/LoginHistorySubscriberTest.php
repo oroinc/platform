@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
@@ -11,7 +12,6 @@ use Oro\Bundle\UserBundle\EventListener\LoginHistorySubscriber;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsProvider;
 use Oro\Bundle\UserBundle\Security\LoginHistoryManager;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class LoginHistorySubscriberTest extends \PHPUnit_Framework_TestCase
 {
