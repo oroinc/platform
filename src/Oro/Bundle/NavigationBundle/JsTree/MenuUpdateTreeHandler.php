@@ -104,7 +104,8 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
             'state' => [
                 'opened' => $entity->getParent() === null,
                 'disabled' => $entity->getExtra('read_only', false)
-            ]
+            ],
+            'li_attr' => !$entity->isDisplayed() ? ['class' => 'hidden'] : []
         ];
     }
 }

@@ -30,7 +30,6 @@ class MenuUpdateType extends AbstractType
                 'required' => true,
                 'label' => 'oro.navigation.menuupdate.title.label',
                 'options' => ['constraints' => [new NotBlank()]],
-                'validation_groups' => ['Default'],
             ]
         );
 
@@ -54,16 +53,16 @@ class MenuUpdateType extends AbstractType
                         ]
                     );
                 }
-                $form->add(
-                    'uri',
-                    'text',
-                    [
-                        'required' => true,
-                        'disabled'=> $menuUpdate->isExistsInNavigationYml(),
-                        'label' => 'oro.navigation.menuupdate.uri.label',
-                        'validation_groups' => ['UserDefined'],
-                    ]
-                );
+                if($menuUpdate->isCustom()) {
+                    $form->add(
+                        'uri',
+                        'text',
+                        [
+                            'required' => true,
+                            'label' => 'oro.navigation.menuupdate.uri.label',
+                        ]
+                    );
+                }
             }
         );
     }
@@ -81,7 +80,7 @@ class MenuUpdateType extends AbstractType
                     $groups = ['Default'];
                     /** @var MenuUpdate $menuUpdate */
                     $menuUpdate = $form->getData();
-                    if (null === $menuUpdate || false == $menuUpdate->isExistsInNavigationYml()) {
+                    if (null === $menuUpdate || false == $menuUpdate->isCustom()) {
                         $groups[] = 'UserDefined';
                     }
 
