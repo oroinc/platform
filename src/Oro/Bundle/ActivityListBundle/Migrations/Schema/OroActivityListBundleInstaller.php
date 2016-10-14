@@ -17,7 +17,7 @@ class OroActivityListBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_0';
+        return 'v1_3';
     }
 
     /**
