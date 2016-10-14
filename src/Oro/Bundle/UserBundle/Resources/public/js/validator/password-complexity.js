@@ -1,6 +1,7 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator'
-], function(_, __) {
+define([
+    'underscore', 'orotranslation/js/translator', 'orouser/js/tools/unicode-matcher'
+], function(_, __, unicodeMatcher) {
     'use strict';
 
     var defaultParam = {
@@ -17,7 +18,7 @@ define(['underscore', 'orotranslation/js/translator'
     };
 
     /**
-     * @export oroform/js/validator/password-complexity
+     * @export orouser/js/validator/password-complexity
      */
     return [
         'Oro\\Bundle\\UserBundle\\Validator\\Constraints\\PasswordComplexity',
@@ -28,15 +29,15 @@ define(['underscore', 'orotranslation/js/translator'
                 messages.push(param.requireMinLengthKey);
             }
 
-            if (Boolean(param.requireUpperCase) && !value.match(/[A-Z]/)) {
+            if (Boolean(param.requireUpperCase) && !unicodeMatcher.matchUpperCase(value)) {
                 messages.push(param.requireUpperCaseKey);
             }
 
-            if (Boolean(param.requireNumbers) && !value.match(/\d/)) {
+            if (Boolean(param.requireNumbers) && !unicodeMatcher.matchNumbers(value)) {
                 messages.push(param.requireNumbersKey);
             }
 
-            if (Boolean(param.requireSpecialCharacter) && !value.match(/[^A-Za-z0-9]/)) {
+            if (Boolean(param.requireSpecialCharacter) && !unicodeMatcher.matchSpecialChars(value)) {
                 messages.push(param.requireSpecialCharacterKey);
             }
 
