@@ -21,7 +21,7 @@ parameters:
 
 services:
     oro_workflow.attribute_guesser:
-        class: %oro_workflow.attribute_guesser.class%
+        class: '%oro_workflow.attribute_guesser.class%'
         arguments:
             - '@form.registry'
             - '@doctrine'
@@ -58,7 +58,7 @@ services:
         deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.attribute_guesser" instead
 
     oro_workflow.context_accessor:
-        class: %oro_workflow.context_accessor.class%
+        class: '%oro_workflow.context_accessor.class%'
         deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.context_accessor" instead
 
     oro_workflow.datagrid.action.workflow_activate:
@@ -74,12 +74,12 @@ services:
             - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
 
     oro_workflow.entity_connector:
-        class: Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector'
         arguments:
             - '@doctrine'
 
     oro_workflow.manager:
-        class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
         arguments:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
@@ -89,31 +89,31 @@ services:
             - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
 
     oro_workflow.applicability_filter.exclusive_record_group:
-        class: Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter'
         arguments:
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.abstract.workflow_aware_manager:
-        class: Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager'
         abstract: true
         arguments:
             - '@oro_workflow.manager'
 
     oro_workflow.process.process_factory:
-        class: %oro_workflow.process.process_factory.class%
+        class: '%oro_workflow.process.process_factory.class%'
         arguments:
             - '@oro_workflow.action_assembler'
             - '@oro_workflow.expression.factory'
 
     oro_workflow.process.process_handler:
-        class: %oro_workflow.process.process_handler.class%
+        class: '%oro_workflow.process.process_handler.class%'
         arguments:
             - '@oro_workflow.process.process_factory'
             - '@oro_workflow.process.logger'
             - '@event_dispatcher'
 
     oro_workflow.process.schedule_policy.exclude_definitions:
-        class: %oro_workflow.process.schedule_policy.exclude_definitions.class%
+        class: '%oro_workflow.process.schedule_policy.exclude_definitions.class%'
         tags:
             - { name: kernel.event_listener, event: oro_workflow.process.handle_before, method: onProcessHandleBefore }
             - { name: kernel.event_listener, event: oro_workflow.process.handle_after_flush, method: onProcessHandleAfterFlush }
@@ -122,27 +122,27 @@ services:
         alias: oro_workflow.process.schedule_policy.exclude_definitions
 
     oro_workflow.process.logger:
-        class: %oro_workflow.process.logger.class%
+        class: '%oro_workflow.process.logger.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - "@?logger"
 
     oro_workflow.registry:
-        class: %oro_workflow.registry.class%
+        class: '%oro_workflow.registry.class%'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.permission_registry:
-        class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry'
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry'
 
     oro_workflow.exclusion_provider.workflow_item_step:
-        class: Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider
+        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider'
         public: false
         tags:
             - { name: oro_entity.exclusion_provider.api }
@@ -156,27 +156,27 @@ services:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
     oro_workflow.handler.transition_helper:
-        class: %oro_workflow.handler.transition_helper.class%
+        class: '%oro_workflow.handler.transition_helper.class%'
         arguments:
             - '@fos_rest.view_handler'
             - '@twig'
 
     oro_workflow.handler.transition_handler:
-        class: %oro_workflow.handler.transition_handler.class%
+        class: '%oro_workflow.handler.transition_handler.class%'
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.handler.transition_helper'
             - '@logger'
 
     oro_workflow.handler.start_transition_handler:
-        class: %oro_workflow.handler.start_transition_handler.class%
+        class: '%oro_workflow.handler.start_transition_handler.class%'
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
 
     oro_workflow.validation_loader:
-        class: Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader
+        class: 'Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader'
         public: false
         arguments:
             - '@oro_workflow.permission_registry'
@@ -184,17 +184,17 @@ services:
             - '@oro_entity_config.link.entity_manager'
 
     oro_workflow.restriction.manager:
-        class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager
+        class: 'Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager'
         public: false
         arguments:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.changes.event.dispatcher:
-        class: Symfony\Component\EventDispatcher\EventDispatcher
+        class: 'Symfony\Component\EventDispatcher\EventDispatcher'
 
     oro_workflow.handler.workflow_definition:
-        class: Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler
+        class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
         arguments:
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.changes.event.dispatcher'
@@ -202,19 +202,19 @@ services:
             - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
-        class: Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler
+        class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
         arguments:
             - '@oro_cron.deferred_scheduler'
 
     oro_workflow.process.definitions_configurator:
-        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator'
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@doctrine'
             - '%oro_workflow.process_definition.entity.class%'
 
     oro_workflow.process.triggers_configurator:
-        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator'
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@oro_workflow.process.cron_scheduler'
@@ -222,7 +222,7 @@ services:
             - '%oro_workflow.process_trigger.entity.class%'
 
     oro_workflow.process.configurator:
-        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator'
         public: true
         arguments:
             - '@doctrine'
@@ -249,40 +249,40 @@ services:
             - '%oro_workflow.entity.transition_trigger_event.class%'
 
     oro_workflow.helper.workflow_aware_entity_fetcher:
-        class: Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher'
         public: true
         arguments:
             - '@doctrine'
 
     oro_workflow.helper.transition_event_trigger:
-        class: Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper
+        class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper'
         public: false
         arguments:
             - '@oro_workflow.manager'
 
     oro_workflow.helper.transition_cron_trigger:
-        class: Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper
+        class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.helper.workflow_aware_entity_fetcher'
 
     oro_workflow.transition_trigger.cron_scheduler:
-        class: Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler
+        class: 'Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler'
         arguments:
             - '@oro_cron.deferred_scheduler'
 
     oro_workflow.validator_expression.dql_expression_verifier:
-        class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
+        class: 'Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier'
 
     oro_workflow.validator_expression.cron_expression_verifier:
-        class: Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier
+        class: 'Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier'
 
     oro_workflow.transition_trigger.update_decider:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider'
         public: false
 
     oro_workflow.transition_trigger_updater:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.transition_trigger.update_decider'
@@ -300,31 +300,31 @@ services:
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
 
     oro_workflow.transition_trigger.verifier.event_trigger_relation:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerRelationVerifier
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerRelationVerifier'
         public: false
 
     oro_workflow.transition_trigger.verifier.event_trigger_expression:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier'
         public: false
 
     oro_workflow.transition_trigger.trigger_event_verifier:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerCompoundVerifier
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerCompoundVerifier'
         public: false
         calls:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]
 
     oro_workflow.generator.translation_key:
-        class: Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator
+        class: 'Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator'
         public: false
 
     oro_workflow.translation.fields_iterator:
-        class: Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator
+        class: 'Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator'
         arguments:
             - '@oro_workflow.generator.translation_key'
 
     oro_workflow.translation.helper:
-        class: Oro\Bundle\WorkflowBundle\Translation\TranslationHelper
+        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationHelper'
         arguments:
             - '@translator.default'
             - '@oro_translation.manager.translation'
@@ -339,6 +339,7 @@ services:
             - { name: oro.workflow.configuration.handler, priority: -100 }
             - { name: oro.workflow.definition_builder.extension }
             - { name: oro_workflow.changes.subscriber }
+
     oro_workflow.extension.translation_context_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'
         arguments:
@@ -361,4 +362,3 @@ services:
             - '@oro_translation.generator.translation_key'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
-

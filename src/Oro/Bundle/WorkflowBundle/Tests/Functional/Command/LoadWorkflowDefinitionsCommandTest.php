@@ -156,7 +156,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      */
     protected function assertCommandExecuted(array $messages)
     {
-        $result = $this->runCommand(self::NAME);
+        $result = $this->runCommand(self::NAME, ['--no-ansi']);
 
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {
