@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
