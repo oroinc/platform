@@ -14,16 +14,6 @@
     {{ oro_form_js_validation(form, js_validation_options|default({})) }}
 {% endblock %}
 
-{% block oro_form_js_validation %}
-    <script type="text/javascript">
-        require(['jquery', 'jquery.validate'],
-                function ($) {
-                    var options = {{ js_options ? js_options|json_encode|raw : '{}' }};
-                    $('#{{ form.vars.id }}').validate(options);
-                });
-    </script>
-{% endblock %}
-
 {% block input_widget %}
     {% if type == 'checkbox' %}
         {% set attr = layout_attr_defaults(attr, {
