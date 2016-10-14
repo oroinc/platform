@@ -68,20 +68,20 @@ class TranslationHelper
      * @param string $key
      * @param string $locale
      * @param string $domain
-     * @return string|null
+     * @return string
      */
     public function getValue($key, $locale, $domain)
     {
         $cacheKey = sprintf('%s-%s', $locale, $domain);
 
-        return isset($this->values[$cacheKey][$key]) ? $this->values[$cacheKey][$key] : null;
+        return isset($this->values[$cacheKey][$key]) ? $this->values[$cacheKey][$key] : $key;
     }
 
     /**
      * @param string $key
      * @param string $locale
      * @param string $domain
-     * @return string|null
+     * @return string
      */
     public function findValue($key, $locale, $domain)
     {
@@ -96,7 +96,7 @@ class TranslationHelper
 
         $result = $queryBuilder->getQuery()->getOneOrNullResult();
 
-        return $result ? $result['value'] : null;
+        return $result ? $result['value'] : $key;
     }
 
     /**
