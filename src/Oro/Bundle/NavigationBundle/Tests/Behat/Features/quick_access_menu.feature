@@ -32,7 +32,7 @@ Feature: Quick access menu
     And I go to System/ User Management/ Users
     And I add page to favorites
     And I press "Create User"
-    And I fill "User" form with:
+    And I fill "User Form" with:
       | Username          | userName       |
       | Password          | 123123q        |
       | Re-Enter Password | 123123q        |
@@ -57,7 +57,7 @@ Feature: Quick access menu
     And Favorites must looks like:
       | Create User - Users - User Management - System |
     When I click on "Create User - Users - User Management - System" in Favorites
-    Then  "User" form must contains values:
+    Then  "User Form" must contains values:
       | Username          |    |
       | Password          |    |
       | Re-Enter Password |    |

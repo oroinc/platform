@@ -5,7 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Initializer\ContextInitializer;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 
 class ElementFactoryInitializer implements ContextInitializer
 {
@@ -15,11 +16,17 @@ class ElementFactoryInitializer implements ContextInitializer
     protected $elementFactory;
 
     /**
+     * @var OroPageFactory
+     */
+    protected $pageFactory;
+
+    /**
      * @param OroElementFactory $elementFactory
      */
-    public function __construct(OroElementFactory $elementFactory)
+    public function __construct(OroElementFactory $elementFactory, OroPageFactory $pageFactory)
     {
         $this->elementFactory = $elementFactory;
+        $this->pageFactory = $pageFactory;
     }
 
     /**
@@ -27,8 +34,9 @@ class ElementFactoryInitializer implements ContextInitializer
      */
     public function initializeContext(Context $context)
     {
-        if ($context instanceof OroElementFactoryAware) {
+        if ($context instanceof OroPageObjectAware) {
             $context->setElementFactory($this->elementFactory);
+            $context->setPageFactory($this->pageFactory);
         }
     }
 }

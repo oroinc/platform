@@ -12,13 +12,13 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
-use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
-class GridContext extends OroFeatureContext implements OroElementFactoryAware
+class GridContext extends OroFeatureContext implements OroPageObjectAware
 {
-    use ElementFactoryDictionary;
+    use PageObjectDictionary;
 
     /**
      * @var int

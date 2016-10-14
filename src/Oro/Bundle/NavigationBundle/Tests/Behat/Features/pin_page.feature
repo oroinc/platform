@@ -29,7 +29,7 @@ Feature: Pin page
 #    And there are 7 records in grid
     And go to Dashboards/Dashboard
     When follow Users link in pin holder
-    Then I should be on "/user"
+    Then I should be on User Index page
     And there is one record in grid
     And I should see Charlie Sheen in grid with following data:
       | Email    | charlie@sheen.com |
@@ -57,7 +57,7 @@ Feature: Pin page
     Given go to Dashboards/Dashboard
     And go to System/User Management/Users
     And press "Create User"
-    When I fill "User" form with:
+    When I fill "User Form" with:
       | Username          | userName       |
       | Password          | 123123q        |
       | Re-Enter Password | 123123q        |
@@ -73,8 +73,8 @@ Feature: Pin page
   Scenario: View pinned form
     Given I go to Dashboards/Dashboard
     When I follow Create User link in pin holder
-    Then I should be on "/user/create"
-    And "User" form must contains values:
+    Then I should be on User Create page
+    And "User Form" must contains values:
       | Username          | userName        |
       | Password          |                 |
       | Re-Enter Password |                 |
@@ -83,32 +83,32 @@ Feature: Pin page
       | Primary Email     | email@test.com  |
 
   Scenario: Save form and view pinned form
-    Given I fill "User" form with:
+    Given I fill "User Form" with:
       | Password          | 123123q |
       | Re-Enter Password | 123123q |
     And I save and close form
     And I should see "User saved" flash message
     When I follow Create User link in pin holder
-    Then I should be on "/user/create"
-    And "User" form must contains values:
+    Then I should be on User Create page
+    And "User Form" must contains values:
       | Username          | userName        |
       | Password          |                 |
       | Re-Enter Password |                 |
       | First Name        | First Name      |
       | Last Name         | Last Name       |
       | Primary Email     | email@test.com  |
-    And I fill "User" form with:
+    And I fill "User Form" with:
       | Password          | 123123q |
       | Re-Enter Password | 123123q |
     And I save and close form
-    And I should be on "/user/create"
+    And I should be on User Create page
     And I should see "This value is already used."
 
 # Remove or uncomment after BAP-11232
 #  Scenario: View blank form
 #    Given I go to System/User Management/Users
 #    When press Create User button
-#    Then  "User" form must contains values:
+#    Then  "User Form" must contains values:
 #      | Username          |    |
 #      | Password          |    |
 #      | Re-Enter Password |    |

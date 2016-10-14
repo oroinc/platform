@@ -31,3 +31,8 @@ elements:
   ReadUnreadIcon:
     selector: 'i.icon-envelope'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+pages:
+  User Emails:
+    class: Oro\Bundle\EmailBundle\Tests\Behat\Page\UserEmails
+    route: 'oro_email_user_emails'

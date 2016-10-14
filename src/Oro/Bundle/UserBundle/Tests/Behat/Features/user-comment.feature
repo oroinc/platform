@@ -20,7 +20,7 @@ Feature: User user comment
     Given I go to System/User Management/Users
     And click view Charlie in grid
     And press "Add Comment"
-    When I fill "Comment" form with:
+    When I fill "Comment Form" with:
       | Message    | Amazing cat |
       | Attachment | cat.jpg     |
     And press "Add"

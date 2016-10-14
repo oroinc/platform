@@ -98,12 +98,19 @@ services:
         arguments:
             - '@mink'
             - '@mink.selectors_handler'
-            - ~
+            - []
+
+    oro_page_factory:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory'
+        arguments:
+            - '@oro_element_factory'
+            - []
 
     oro_behat_element_factory_initializer:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer'
         arguments:
             - '@oro_element_factory'
+            - '@oro_page_factory'
         tags:
             - { name: 'context.initializer' }
 

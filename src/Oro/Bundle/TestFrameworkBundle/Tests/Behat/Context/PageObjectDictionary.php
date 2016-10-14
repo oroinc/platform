@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
+use Behat\Mink\Element\DocumentElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Page;
 
-trait ElementFactoryDictionary
+trait PageObjectDictionary
 {
     /**
      * @var OroElementFactory
@@ -13,11 +16,21 @@ trait ElementFactoryDictionary
     protected $elementFactory;
 
     /**
+     * @var OroPageFactory
+     */
+    protected $pageFactory;
+
+    /**
      * {@inheritdoc}
      */
     public function setElementFactory(OroElementFactory $elementFactory)
     {
         $this->elementFactory = $elementFactory;
+    }
+
+    public function setPageFactory(OroPageFactory $pageFactory)
+    {
+        $this->pageFactory = $pageFactory;
     }
 
     /**
@@ -42,10 +55,14 @@ trait ElementFactoryDictionary
     }
 
     /**
-     * @return OroElement
+     * @return Page|DocumentElement
      */
-    public function getPage()
+    public function getPage($name = null)
     {
-        return $this->elementFactory->getPage();
+        if (null === $name) {
+            return $this->elementFactory->getPage();
+        }
+
+        return $this->pageFactory->getPage($name);
     }
 }

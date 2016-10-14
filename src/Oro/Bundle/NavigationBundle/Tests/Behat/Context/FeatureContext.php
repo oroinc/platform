@@ -12,13 +12,13 @@ use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
-use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
-class FeatureContext extends OroFeatureContext implements OroElementFactoryAware, KernelAwareContext
+class FeatureContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
 {
-    use ElementFactoryDictionary, KernelDictionary;
+    use PageObjectDictionary, KernelDictionary;
 
     /**
      * @Given uncheck Use Default for :label field

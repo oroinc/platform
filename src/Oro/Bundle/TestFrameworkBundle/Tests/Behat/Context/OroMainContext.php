@@ -17,18 +17,17 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
-    OroElementFactoryAware,
+    OroPageObjectAware,
     KernelAwareContext
 {
-    use AssertTrait;
-    use KernelDictionary, ElementFactoryDictionary;
+    use AssertTrait, KernelDictionary, PageObjectDictionary;
 
     /**
      * @BeforeScenario
@@ -171,7 +170,7 @@ class OroMainContext extends MinkContext implements
      *            | Users       | [Charlie, Pitt] |
      *            | Date        | 2017-08-24      |
      *
-     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
+     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" with:$/
      * @When /^(?:|I )fill form with:$/
      */
     public function iFillFormWith(TableNode $table, $formName = "OroForm")
@@ -189,7 +188,7 @@ class OroMainContext extends MinkContext implements
      *            | Last Name         | Sheen             |
      *            | Primary Email     | charlie@sheen.com |
      *
-     * @Then /^"(?P<formName>(?:[^"]|\\")*)" form must contains values:$/
+     * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
      */
     public function formMustContainsValues($formName, TableNode $table)
     {
@@ -374,6 +373,17 @@ class OroMainContext extends MinkContext implements
         /** @var MainMenu $mainMenu */
         $mainMenu = $this->createElement('MainMenu');
         $mainMenu->openAndClick($path);
+    }
+
+    /**
+     * @Given /^(?:|I )should be on (?P<page>[\w\s\/]+) page$/
+     */
+    public function assertPage($page)
+    {
+        $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
+        $route = $this->getContainer()->get('router')->match($urlPath);
+
+        self::assertEquals($route['_route'], $this->getPage($page)->getRoute());
     }
 
     /**

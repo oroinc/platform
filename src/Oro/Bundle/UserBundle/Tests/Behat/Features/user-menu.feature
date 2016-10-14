@@ -6,15 +6,15 @@ Feature: User menu
   Scenario: My profile
     Given I login as administrator
     When I click My User in user menu
-    Then I should be on "/user/profile/view"
+    Then I should be on User Profile View page
 
   Scenario: My configuration
     Given I click My Configuration in user menu
-    Then I should be on "/config/user/profile"
+    Then I should be on User Profile Configuration page
 
   Scenario: My Emails
     Given I click My Emails in user menu
-    And I should be on "/email/user-emails"
+    And I should be on User Emails page
     And there is no records in grid
     When I follow "Compose"
     And fill form with:
@@ -27,8 +27,8 @@ Feature: User menu
 
   Scenario: My Calendar
     Given I click My Calendar in user menu
-    Then I should be on "/calendar/default"
+    Then I should be on Default Calendar View page
 
   Scenario: Logout
     Given I click Logout in user menu
-    And I should be on "/user/login"
+    And I should be on Login page

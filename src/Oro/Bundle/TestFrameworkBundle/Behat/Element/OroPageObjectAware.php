@@ -2,12 +2,19 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-interface OroElementFactoryAware
+interface OroPageObjectAware
 {
     /**
      * @param OroElementFactory $elementFactory
      *
-     * @return null
+     * @return void
      */
     public function setElementFactory(OroElementFactory $elementFactory);
+
+    /**
+     * @param OroPageFactory $elementFactory
+     *
+     * @return void
+     */
+    public function setPageFactory(OroPageFactory $elementFactory);
 }

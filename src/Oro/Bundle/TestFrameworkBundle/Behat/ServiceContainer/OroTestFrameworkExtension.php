@@ -31,6 +31,8 @@ class OroTestFrameworkExtension implements TestworkExtension
 
     const ELEMENTS_CONFIG_ROOT = 'elements';
 
+    const PAGES_CONFIG_ROOT = 'pages';
+
     /**
      * {@inheritdoc}
      */
@@ -234,6 +236,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function processElements(ContainerBuilder $container)
     {
         $elementConfiguration = [];
+        $pagesConfiguration = [];
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
 
         /** @var BundleInterface $bundle */
@@ -250,10 +253,17 @@ class OroTestFrameworkExtension implements TestworkExtension
 
             $config = Yaml::parse(file_get_contents($mappingPath));
 
-            $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
+            if (isset($config[self::ELEMENTS_CONFIG_ROOT])) {
+                $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
+            }
+
+            if (isset($config[self::PAGES_CONFIG_ROOT])) {
+                $pagesConfiguration = array_merge($pagesConfiguration, $config[self::PAGES_CONFIG_ROOT]);
+            }
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
+        $container->getDefinition('oro_page_factory')->replaceArgument(1, $pagesConfiguration);
     }
 
     /**
