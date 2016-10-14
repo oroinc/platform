@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\Factory;
 
 class FactoryTest extends \PHPUnit_Framework_TestCase
@@ -12,14 +13,19 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     protected $dashboardFactory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|Oro\Bundle\DashboardBundle\Model\ConfigProvider
      */
     protected $configProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|Oro\Bundle\DashboardBundle\Model\StateManager
      */
     protected $stateManager;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Oro\Component\Config\Resolver\ResolverInterface
+     */
+    protected $resolver;
 
     protected function setUp()
     {
@@ -33,9 +39,18 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->resolver->expects($this->any())
+            ->method('resolve')
+            ->will($this->returnValueMap([
+                [['applicable'], [], [true]],
+                [['inapplicable'], [], [false]],
+            ]));
+
         $this->dashboardFactory = new Factory(
             $this->configProvider,
-            $this->stateManager
+            $this->stateManager,
+            $this->resolver
         );
     }
 
@@ -96,5 +111,85 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $result = $this->dashboardFactory->createWidgetModel($widget);
         $this->assertEquals($expectedConfig, $result->getConfig());
         $this->assertSame($widget, $result->getEntity());
+    }
+
+    /**
+     * @dataProvider createVisibleWidgetModelProvider
+     */
+    public function testCreateVisibleWidgetModel($widgetName, array $widgetConfig)
+    {
+        $widget = (new Widget())
+            ->setName($widgetName);
+
+        $this->configProvider->expects($this->once())
+            ->method('getWidgetConfig')
+            ->with($widget->getName())
+            ->will($this->returnValue($widgetConfig));
+
+        $this->stateManager
+            ->expects($this->once())
+            ->method('getWidgetState')
+            ->with($widget)
+            ->will($this->returnValue($this->getMock('Oro\Bundle\DashboardBundle\Entity\WidgetState')));
+
+        $result = $this->dashboardFactory->createVisibleWidgetModel($widget);
+        $this->assertNotNull($result);
+        $this->assertEquals($widgetConfig, $result->getConfig());
+        $this->assertSame($widget, $result->getEntity());
+    }
+
+    public function createVisibleWidgetModelProvider()
+    {
+        return [
+            'widget without applicable config' => [
+                'widget-name',
+                [
+                    'label' => 'Widget label',
+                ],
+            ],
+            'applicable widget' => [
+                'widget-name',
+                [
+                    'label'      => 'Widget label',
+                    'applicable' => 'applicable',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createVisibleWidgetModelProviderInapplicable
+     */
+    public function testCreateVisibleWidgetModelInapplicable($widgetName, array $widgetConfig)
+    {
+        $widget = (new Widget())
+            ->setName($widgetName);
+
+        $this->configProvider->expects($this->once())
+            ->method('getWidgetConfig')
+            ->with($widget->getName())
+            ->will($this->returnValue($widgetConfig));
+
+        $this->stateManager
+            ->expects($this->once())
+            ->method('getWidgetState')
+            ->with($widget)
+            ->will($this->returnValue($this->getMock('Oro\Bundle\DashboardBundle\Entity\WidgetState')));
+
+        $result = $this->dashboardFactory->createVisibleWidgetModel($widget);
+        $this->assertNull($result);
+    }
+
+    public function createVisibleWidgetModelProviderInapplicable()
+    {
+        return [
+            'inapplicable widget' => [
+                'widget-name',
+                [
+                    'label'      => 'Widget label',
+                    'applicable' => 'inapplicable',
+                ],
+            ],
+        ];
     }
 }
