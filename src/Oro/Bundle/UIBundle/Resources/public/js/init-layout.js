@@ -194,11 +194,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         }, true);
 
         var mainMenu = $('#main-menu');
-        var activeDropdownsSelector = $(openDropdownsSelector.replace('open', 'active'), mainMenu);
+        var activeDropdownsSelector = $('.dropdown, .dropup, .oro-drop', mainMenu);
 
         // trigger refresh of current page if active dropdown is clicked, despite the Backbone router limitations
-        $('li.active', $(activeDropdownsSelector)).on('click', function() {
-            mediator.execute('refreshPage');
+        $(activeDropdownsSelector).on('click', $('li.active a'), function(e) {
+            var $target = $(e.target).closest('a');
+            if (!$target.hasClass('unclickable') && $target[0] !== undefined && 'pathname' in $target[0]) {
+                if (mediator.execute('compareUrl', $target[0].pathname)) {
+                    mediator.execute('refreshPage');
+                    return false;
+                }
+            }
         });
 
         mainMenu.mouseover(function() {
