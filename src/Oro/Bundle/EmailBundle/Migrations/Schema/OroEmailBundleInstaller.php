@@ -44,7 +44,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_28';
+        return 'v2_0';
     }
 
     /**
